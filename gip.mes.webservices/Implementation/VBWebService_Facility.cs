@@ -1320,22 +1320,38 @@ namespace gip.mes.webservices
 
                     if (dbFacilityInventoryPos == null)
                     {
-                        dbFacilityInventoryPos = datamodel.FacilityInventoryPos.NewACObject(databaseApp, null);
-                        gip.mes.datamodel.FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityInventoryPos.FacilityInventory.FacilityInventoryID);
-                        dbFacilityInventoryPos.FacilityInventory = facilityInventory;
+                        Msg errorMissingPosition = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Missing Inventory Linie!" };
+                        response.Message = errorMissingPosition;
                     }
-
-                    
-                    dbFacilityInventoryPos.NewStockQuantity = facilityInventoryPos.NewStockQuantity;
-                    dbFacilityInventoryPos.NotAvailable = facilityInventoryPos.NotAvailable;
-                    dbFacilityInventoryPos.Comment = facilityInventoryPos.Comment;
-
-                    MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
-                    if (saveMsg == null || saveMsg.IsSucceded())
-                        response.Data = true;
                     else
-                        response.Message = saveMsg;
+                    {
+                        bool newInventory = dbFacilityInventoryPos.FacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.New;
+                        bool finishedInventory = dbFacilityInventoryPos.FacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.Finished;
+                        if (newInventory)
+                        {
+                            Msg errorNewInventory = new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format("Inventory {0} is not started! Fail to update line!", dbFacilityInventoryPos.FacilityInventory.FacilityInventoryNo) };
+                            response.Message = errorNewInventory;
+                        }
+                        else if (finishedInventory)
+                        {
+                            Msg errorFinishedInventory = new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format("Inventory {0} is finished! Fail to update line!", dbFacilityInventoryPos.FacilityInventory.FacilityInventoryNo) };
+                            response.Message = errorFinishedInventory;
+                        }
+                        if (!newInventory && !finishedInventory)
+                        {
+                            gip.mes.datamodel.MDFacilityInventoryPosState inProgressState = databaseApp.MDFacilityInventoryPosState.Where(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress).FirstOrDefault();
+                            dbFacilityInventoryPos.NewStockQuantity = facilityInventoryPos.NewStockQuantity;
+                            dbFacilityInventoryPos.NotAvailable = facilityInventoryPos.NotAvailable;
+                            dbFacilityInventoryPos.Comment = facilityInventoryPos.Comment;
+                            dbFacilityInventoryPos.MDFacilityInventoryPosState = inProgressState;
 
+                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                            if (saveMsg == null || saveMsg.IsSucceded())
+                                response.Data = true;
+                            else
+                                response.Message = saveMsg;
+                        }
+                    }
                 }
             }
             catch (Exception e)
