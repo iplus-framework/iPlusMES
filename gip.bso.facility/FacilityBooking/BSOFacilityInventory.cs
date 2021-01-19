@@ -200,7 +200,7 @@ namespace gip.bso.facility
         #region Properties -> Filter -> InventoryPos -> Facility
 
         ACAccessNav<Facility> _AccessFilterInventoryPosFacility;
-        [ACPropertyAccess(100, "FilterInventoryPosFacility")]
+        [ACPropertyAccess(500, "FilterInventoryPosFacility")]
         public ACAccessNav<Facility> AccessFilterInventoryPosFacility
         {
             get
@@ -219,7 +219,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected FilterInventoryPosFacility.
         /// </summary>
         /// <value>The selected FilterInventoryPosFacility.</value>
-        [ACPropertySelected(101, ConstApp.Facility)]
+        [ACPropertySelected(501, "FilterInventoryPosFacility", ConstApp.Facility)]
         public Facility SelectedFilterInventoryPosFacility
         {
             get
@@ -242,7 +242,7 @@ namespace gip.bso.facility
         /// Gets the FilterInventoryPosFacility list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "FilterInventoryPosFacility")]
+        [ACPropertyList(502, "FilterInventoryPosFacility")]
         public IEnumerable<Facility> FilterInventoryPosFacilityList
         {
             get
@@ -278,7 +278,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected FilterInventoryPosMaterial.
         /// </summary>
         /// <value>The selected FilterInventoryPosMaterial.</value>
-        [ACPropertySelected(201, ConstApp.Material)]
+        [ACPropertySelected(201, "FilterInventoryPosMaterial", ConstApp.Material)]
         public Material SelectedFilterInventoryPosMaterial
         {
             get
@@ -435,12 +435,7 @@ namespace gip.bso.facility
                 {
                     _FilterInventoryPosFBConnected = value;
                     OnPropertyChanged("FilterInventoryPosFBConnected");
-
-                    _FacilityBookingList = LoadFacilityBookingList();
-                    if (_FacilityBookingList != null)
-                        SelectedFacilityBooking = _FacilityBookingList.FirstOrDefault();
-                    else
-                        SelectedFacilityBooking = null;
+                    SetFacilityBookingList();
                 }
             }
         }
@@ -472,12 +467,9 @@ namespace gip.bso.facility
             }
             set
             {
-                if (_IsEnabledInventoryPosEdit != value)
-                {
-                    _IsEnabledInventoryPosEdit = value;
-                    OnPropertyChanged("IsEnabledInventoryPosEdit");
-                    InventoryPosDisabledModes = IsEnabledInventoryPosEdit ? "" : "Disabled";
-                }
+                _IsEnabledInventoryPosEdit = value;
+                OnPropertyChanged("IsEnabledInventoryPosEdit");
+                InventoryPosDisabledModes = IsEnabledInventoryPosEdit ? "" : "Disabled";
             }
         }
 
@@ -490,11 +482,8 @@ namespace gip.bso.facility
             }
             set
             {
-                if (_InventoryDisabledModes != value)
-                {
-                    _InventoryDisabledModes = value;
-                    OnPropertyChanged("InventoryDisabledModes");
-                }
+                _InventoryDisabledModes = value;
+                OnPropertyChanged("InventoryDisabledModes");
             }
         }
 
@@ -785,21 +774,17 @@ namespace gip.bso.facility
                         SelectedFacilityInventoryPos.PropertyChanged -= SelectedFacilityInventoryPos_PropertyChanged;
                         SelectedFacilityInventoryPos.PropertyChanged += SelectedFacilityInventoryPos_PropertyChanged;
                     }
-
-                    _FacilityBookingList = LoadFacilityBookingList();
-                    if (_FacilityBookingList != null)
-                        SelectedFacilityBooking = _FacilityBookingList.FirstOrDefault();
-                    else
-                        SelectedFacilityBooking = null;
+                    if (FilterInventoryPosFBConnected)
+                        SetFacilityBookingList();
                 }
             }
         }
 
         private bool IsInventoryPosEnabledEdit()
         {
-            return 
-                IsEnabledInventoryEdit 
-                && SelectedFacilityInventoryPos != null 
+            return
+                IsEnabledInventoryEdit
+                && SelectedFacilityInventoryPos != null
                 && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress;
         }
 
@@ -836,7 +821,7 @@ namespace gip.bso.facility
                 .Where(c =>
                     ((InputCode ?? "") == "" || c.FacilityCharge.FacilityChargeID == new Guid(InputCode))
                     && (SelectedFilterInventoryPosFacility == null || c.FacilityCharge.Facility.FacilityNo == SelectedFilterInventoryPosFacility.FacilityNo)
-                    && ((FilterInventoryPosLotNo ?? "") == "" || c.FacilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo)
+                    && ((FilterInventoryPosLotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo))
                     && (SelectedFilterInventoryPosMaterial == null || c.FacilityCharge.Material.MaterialNo == SelectedFilterInventoryPosMaterial.MaterialNo)
                     && (SelectedFilterInventoryPosState == null || c.MDFacilityInventoryPosState.MDKey == SelectedFilterInventoryPosState.MDKey)
                     && (FilterInventoryPosNotAvailable == null || c.NotAvailable == (FilterInventoryPosNotAvailable ?? false))
@@ -871,6 +856,7 @@ namespace gip.bso.facility
                     OnPropertyChanged("SelectedFacilityBooking");
 
                     _FacilityBookingChargeList = LoadFacilityBookingChargeList();
+                    OnPropertyChanged("FacilityBookingChargeList");
                     if (_FacilityBookingChargeList != null)
                         SelectedFacilityBookingCharge = _FacilityBookingChargeList.FirstOrDefault();
                     else
@@ -889,23 +875,42 @@ namespace gip.bso.facility
         {
             get
             {
-                if (_FacilityBookingList == null)
-                    _FacilityBookingList = LoadFacilityBookingList();
                 return _FacilityBookingList;
             }
         }
 
-        private List<FacilityBooking> LoadFacilityBookingList()
+        private List<FacilityBooking> GetFacilityBookingList()
         {
             List<FacilityBooking> bookings = null;
 
             if (FilterInventoryPosFBConnected)
+            {
                 if (SelectedFacilityInventoryPos != null)
+                {
+                    SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.AutoLoad();
                     bookings = SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.OrderBy(c => c.FacilityBookingNo).ToList();
-                else
+                }
+            }
+            else
+            {
                 if (FacilityInventoryPosList != null && FacilityInventoryPosList.Any())
+                {
+                    foreach (var item in FacilityInventoryPosList)
+                        item.FacilityBooking_FacilityInventoryPos.AutoLoad();
                     bookings = FacilityInventoryPosList.SelectMany(c => c.FacilityBooking_FacilityInventoryPos).OrderBy(c => c.FacilityBookingNo).ToList();
+                }
+            }
             return bookings;
+        }
+
+        public void SetFacilityBookingList()
+        {
+            _FacilityBookingList = GetFacilityBookingList();
+            OnPropertyChanged("FacilityBookingList");
+            if (_FacilityBookingList != null)
+                SelectedFacilityBooking = _FacilityBookingList.FirstOrDefault();
+            else
+                SelectedFacilityBooking = null;
         }
         #endregion
 
@@ -1010,7 +1015,7 @@ namespace gip.bso.facility
 
         /// Searches this instance.
         /// </summary>
-        [ACMethodInfo(FacilityInventoryPos.ClassName, "en{'Reset'}de{'Zurücksetzen'}", 201)]
+        [ACMethodInfo(FacilityInventoryPos.ClassName, "en{'Reset'}de{'Zurücksetzen'}", 501)]
         public void ClearSearchPos()
         {
             if (!IsEnabledClearSearchPos())
@@ -1162,6 +1167,9 @@ namespace gip.bso.facility
             SelectedFacilityInventory.MDFacilityInventoryState = inProgressState;
             DatabaseApp.ACSaveChanges();
             OnPropertyChanged("SelectedFacilityInventory");
+            OnPropertyChanged("SelectedFacilityInventoryPos");
+            IsEnabledInventoryEdit = true;
+            IsEnabledInventoryPosEdit = IsInventoryPosEnabledEdit();
         }
 
         public bool IsEnabledStartInventory()
@@ -1187,7 +1195,7 @@ namespace gip.bso.facility
             }
             else
             {
-                var questionResult = Root.Messages.Warning(this, "Question50054");
+                var questionResult = Root.Messages.Question(this, "Question50054");
                 if (questionResult == MsgResult.Yes)
                 {
                     BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoInventoryClosing);
@@ -1200,6 +1208,29 @@ namespace gip.bso.facility
         {
             return
                 SelectedFacilityInventory != null &&
+                SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
+        }
+
+        [ACMethodInfo("CloseAllPositions", "en{'Close all lines'}de{'Schließe alle Linien'}", 100)]
+        public void CloseAllPositions()
+        {
+            // Question50055.
+            var questionResult = Root.Messages.Question(this, "Question50055");
+            if (questionResult == MsgResult.Yes)
+            {
+                MDFacilityInventoryPosState finishedState = DatabaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                foreach (FacilityInventoryPos item in FacilityInventoryPosList)
+                {
+                    item.MDFacilityInventoryPosState = finishedState;
+                }
+                ACSaveChanges();
+                OnPropertyChanged("FacilityInventoryPosList");
+            }
+        }
+
+        public bool IsEnabledCloseAllPositions()
+        {
+            return SelectedFacilityInventory != null &&
                 SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
         }
 
@@ -1220,7 +1251,9 @@ namespace gip.bso.facility
         public bool IsEnabledStartInventoryPos()
         {
             return
-                SelectedFacilityInventoryPos != null
+                SelectedFacilityInventory != null
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short) MDFacilityInventoryState.FacilityInventoryStates.InProgress
+                && SelectedFacilityInventoryPos != null
                 && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New;
         }
 
@@ -1271,6 +1304,106 @@ namespace gip.bso.facility
         }
 
         #endregion
+
+        #endregion
+
+        #region Mehtods -> Override
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case "Search":
+                    Search();
+                    return true;
+                case "ClearSearch":
+                    ClearSearch();
+                    return true;
+                case "SearchPos":
+                    SearchPos();
+                    return true;
+                case "IsEnabledSearchPos":
+                    result = IsEnabledSearchPos();
+                    return true;
+                case "ClearSearchPos":
+                    ClearSearchPos();
+                    return true;
+                case "IsEnabledClearSearchPos":
+                    result = IsEnabledClearSearchPos();
+                    return true;
+                case "Load":
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case "SelectPos":
+                    SelectPos();
+                    return true;
+                case "IsEnabledSelectPos":
+                    result = IsEnabledSelectPos();
+                    return true;
+                case "New":
+                    New();
+                    return true;
+                case "NewDlgOk":
+                    NewDlgOk();
+                    return true;
+                case "IsEnabledNewDlgOk":
+                    result = IsEnabledNewDlgOk();
+                    return true;
+                case "NewDlgOkCancel":
+                    NewDlgOkCancel();
+                    return true;
+                case "Delete":
+                    Delete();
+                    return true;
+                case "IsEnabledDelete":
+                    result = IsEnabledDelete();
+                    return true;
+                case "DeletePos":
+                    DeletePos();
+                    return true;
+                case "IsEnabledDeletePos":
+                    result = IsEnabledDeletePos();
+                    return true;
+                case "StartInventory":
+                    StartInventory();
+                    return true;
+                case "IsEnabledStartInventory":
+                    result = IsEnabledStartInventory();
+                    return true;
+                case "ClosingInventory":
+                    ClosingInventory();
+                    return true;
+                case "IsEnabledClosingInventory":
+                    result = IsEnabledClosingInventory();
+                    return true;
+                case "CloseAllPositions":
+                    CloseAllPositions();
+                    return true;
+                case "IsEnabledCloseAllPositions":
+                    result = IsEnabledCloseAllPositions();
+                    return true;
+                case "StartInventoryPos":
+                    StartInventoryPos();
+                    return true;
+                case "IsEnabledStartInventoryPos":
+                    result = IsEnabledStartInventoryPos();
+                    return true;
+                case "ClosingInventoryPos":
+                    ClosingInventoryPos();
+                    return true;
+                case "IsEnabledClosingInventoryPos":
+                    result = IsEnabledClosingInventoryPos();
+                    return true;
+                case "Save":
+                    Save();
+                    return true;
+                case "IsEnabledSave":
+                    result = IsEnabledSave();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
 
         #endregion
 
@@ -1353,6 +1486,8 @@ namespace gip.bso.facility
                         {
                             SelectedFacilityInventory.AutoRefresh();
                             OnPropertyChanged("SelectedFacilityInventory");
+                            OnPropertyChanged("FacilityInventoryList");
+                            SetFacilityBookingList();
                         }
                         else
                         {

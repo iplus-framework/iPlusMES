@@ -147,6 +147,7 @@ namespace gip.mes.facility
             FBC.MDReleaseState = BP.ParamsAdjusted.MDReleaseState;
             FBC.MDReservationMode = BP.ParamsAdjusted.MDReservationMode;
             FBC.MDMovementReason = BP.ParamsAdjusted.MDMovementReason;
+            FBC.FacilityInventoryPos = BP.ParamsAdjusted.FacilityInventoryPos;
 
             if (copyEntityValues)
             {
@@ -188,7 +189,6 @@ namespace gip.mes.facility
                 FBC.OutOrderPos = BP.ParamsAdjusted.OutOrderPos;
                 FBC.ProdOrderPartslistPos = BP.ParamsAdjusted.PartslistPos;
                 FBC.ProdOrderPartslistPosRelation = BP.ParamsAdjusted.PartslistPosRelation;
-                FBC.FacilityInventoryPos = BP.ParamsAdjusted.FacilityInventoryPos;
                 FBC.ProdOrderPartslistPosFacilityLot = BP.ParamsAdjusted.ProdOrderPartslistPosFacilityLot;
                 FBC.PickingPos = BP.ParamsAdjusted.PickingPos;
                 FBC.StorageDate = BP.ParamsAdjusted.StorageDate;
