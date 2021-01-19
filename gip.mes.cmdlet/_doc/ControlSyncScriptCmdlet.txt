@@ -1,0 +1,18 @@
+﻿Installation sample:
+
+Import-Module "c:\Aleksandar\gipSoft\Source\iPlusMES\V4\trunk\iPlusMES\bin\Debug\gip.mes.cmdlet.dll" -Force
+
+Calling sample:
+New-ControlSyncScript -UserName "aagincic" -ProjectName "Root" -RootFolder "c:\VarioData\"  -ClassNames "BSOTandTv3" -IsExportACClassDesign $true -IsExportACClassMessage $true -IsExportACClassText $true
+
+
+-IsExportACClass
+-IsExportACClassProperty
+-IsExportACClassMethod
+-IsExportACClassPropertyRelation
+-IsExportACClassConfig
+-IsExportACClassMessage
+-IsExportACClassText
+-IsExportACClassDesign
+-UseExportFromTime
+-ExportFromTime

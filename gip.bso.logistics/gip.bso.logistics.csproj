@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D82E92F5-AEB2-4826-812B-2AA51B7BC069}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip.bso.logistics</RootNamespace>
+    <AssemblyName>gip.bso.logistics</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\gip.core.layoutengine\Controls\VBBingMap\Microsoft.Maps.MapControl.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BingMaps\BSOBingMaps.cs" />
+    <Compile Include="BingMaps\Direction.cs" />
+    <Compile Include="BingMaps\MapInteractivity.cs" />
+    <Compile Include="Logistics\BSOPicking.cs" />
+    <Compile Include="Logistics\BSOTourBingMaps.cs" />
+    <Compile Include="Logistics\BSOTourManagement.cs" />
+    <Compile Include="Logistics\BSOTourplan.cs" />
+    <Compile Include="Logistics\BSOVisitor.cs" />
+    <Compile Include="Logistics\BSOVisitorVoucher.cs" />
+    <Compile Include="Logistics\BSOVisitorVoucher_DNote.cs" />
+    <Compile Include="Logistics\BSOVisitorVoucher_Tour.cs" />
+    <Compile Include="Logistics\BSOVisitorVoucher_Picking.cs" />
+    <Compile Include="Logistics\BSOPicking_InOrder.cs" />
+    <Compile Include="Logistics\BSOPicking_OutOrder.cs" />
+    <Compile Include="Logistics\BSOPicking_ProdOrder.cs" />
+    <Compile Include="Logistics\BSOWeighing.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\BingServices\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Service References\BingServices\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\common.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\common1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\contracts.wsdl" />
+    <None Include="Service References\BingServices\contracts.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\contracts1.wsdl" />
+    <None Include="Service References\BingServices\contracts1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\geocode.wsdl" />
+    <None Include="Service References\BingServices\geocode.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\gip.bso.logistics.BingServices.GeocodeResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\BingServices\gip.bso.logistics.BingServices.MajorRoutesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\BingServices\gip.bso.logistics.BingServices.RouteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\BingServices\route.wsdl" />
+    <None Include="Service References\BingServices\route.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\BingServices\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\BingServices\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BingServices\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BingServices\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BingServices\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
+      <Project>{3a9383d8-5c6d-429c-89d3-57c1d2565ad1}</Project>
+      <Name>gip.core.manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj">
+      <Project>{64342646-dad9-441c-a270-2a7dd2228a42}</Project>
+      <Name>gip.bso.masterdata</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.bso.purchasing\gip.bso.purchasing.csproj">
+      <Project>{EC203D60-594B-47E0-BCB5-80643D25DAFF}</Project>
+      <Name>gip.bso.purchasing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj">
+      <Project>{8E8C3A4B-86DF-42B4-AA59-A4F4B4E3882A}</Project>
+      <Name>gip.bso.sales</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
+      <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
+      <Name>gip.mes.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+      <Name>gip.mes.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj">
+      <Project>{52DC947D-677D-42CA-BCA6-153A4E027272}</Project>
+      <Name>gip.mes.facility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="VBControlScripts\" />
+  </ItemGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

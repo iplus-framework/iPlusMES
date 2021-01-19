@@ -1,0 +1,1391 @@
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
+using gip.mes.datamodel;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.Objects;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Reflection;
+
+namespace gip.mes.facility
+{
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'ProdOrderManager'}de{'ProdOrderManager'}", Global.ACKinds.TPARole, Global.ACStorableTypes.NotStorable, false, false)]
+    public partial class ACProdOrderManager : PARole
+    {
+        public const string ReloadBPAndResumeACIdentifier = "ReloadBPAndResume";
+
+        #region c´tors
+        public ACProdOrderManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+            : base(acType, content, parentACObject, parameter, acIdentifier)
+        {
+            _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, "TolRemainingCallQ", 20);
+            _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, "IsActiveMatReqCheck", false);
+        }
+
+        public const string ClassName = "ACProdOrderManager";
+        public const string C_DefaultServiceACIdentifier = "ProdOrderManager";
+        #endregion
+
+        #region PrecompiledQueries
+        //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
+        //CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
+        //);
+
+        //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
+        //CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
+        //);
+
+        //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
+        //CompiledQuery.Compile<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
+        //);
+
+        public static Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>> s_cQry_ProdOrderAlternativePositions =
+            CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<ProdOrderPartslistPos>>(
+            (db, selectedProdOrderPartslistID, selectedProdOrderPartslistPosID) =>
+                    db.ProdOrderPartslistPos.Where(c =>
+                    c.ProdOrderPartslistID == selectedProdOrderPartslistID &&
+                    c.AlternativeProdOrderPartslistPosID == selectedProdOrderPartslistPosID &&
+                    c.MaterialPosTypeIndex == (int)(gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot) &&
+                    c.ParentProdOrderPartslistPosID == null &&
+                    c.AlternativeProdOrderPartslistPosID == null)
+                    .Select(c => c)
+        );
+
+
+        #endregion
+
+        #region static Methods
+        public static ACProdOrderManager GetServiceInstance(ACComponent requester)
+        {
+            return GetServiceInstance<ACProdOrderManager>(requester, C_DefaultServiceACIdentifier, CreationBehaviour.OnlyLocal);
+        }
+
+        public static ACRef<ACProdOrderManager> ACRefToServiceInstance(ACComponent requester)
+        {
+            ACProdOrderManager serviceInstance = GetServiceInstance(requester) as ACProdOrderManager;
+            if (serviceInstance != null)
+                return new ACRef<ACProdOrderManager>(serviceInstance, requester);
+            return null;
+        }
+        #endregion
+
+        #region Properties
+        ACMethodBooking _BookParamInwardMovementClone;
+        public ACMethodBooking BookParamInwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamInwardMovementClone != null)
+                return _BookParamInwardMovementClone;
+            if (facilityManager == null)
+                return null;
+            _BookParamInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            return _BookParamInwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamInCancelClone;
+        public ACMethodBooking BookParamInCancelClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamInCancelClone != null)
+                return _BookParamInCancelClone;
+            if (facilityManager == null)
+                return null;
+            _BookParamInCancelClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            return _BookParamInCancelClone;
+        }
+
+        ACMethodBooking _BookParamOutwardMovementClone;
+        public ACMethodBooking BookParamOutwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamOutwardMovementClone != null)
+                return _BookParamOutwardMovementClone;
+            if (facilityManager == null)
+                return null;
+            _BookParamOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            return _BookParamOutwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamOutCancelClone;
+        public ACMethodBooking BookParamOutCancelClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamOutCancelClone != null)
+                return _BookParamOutCancelClone;
+            if (facilityManager == null)
+                return null;
+            _BookParamOutCancelClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutwardCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            return _BookParamOutCancelClone;
+        }
+
+        private ACPropertyConfigValue<double> _TolRemainingCallQ;
+        [ACPropertyConfig("en{'Tolerance in called up quantity %'}de{'Toleranz Abrufmenge %'}")]
+        public double TolRemainingCallQ
+        {
+            get
+            {
+                return _TolRemainingCallQ.ValueT;
+            }
+            set
+            {
+                _TolRemainingCallQ.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _IsActiveMatReqCheck;
+        [ACPropertyConfig("en{'Activate Material-Requirement-Check'}de{'Materialbedarfsprüfung aktivieren'}")]
+        public bool IsActiveMatReqCheck
+        {
+            get
+            {
+                return _IsActiveMatReqCheck.ValueT;
+            }
+            set
+            {
+                _IsActiveMatReqCheck.ValueT = value;
+            }
+        }
+
+        public class BatchCreateEntry
+        {
+            public int BatchSeqNo { get; set; }
+            public double Size { get; set; }
+        }
+        #endregion
+
+        #region (ProdOrder)Partslist
+        /// <summary>
+        /// Add Partslist to production order
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="partslistID"></param>
+        public Msg PartslistAdd(DatabaseApp dbApp, ProdOrder prodOrder, Partslist partsList, int sequence, double targetQuantityUOM, out ProdOrderPartslist prodOrderPartsList)
+        {
+            prodOrderPartsList = null;
+            Msg msg = null;
+            if (!PreExecute("PartslistAdd"))
+            {
+                //"Info: Adding parts list into production order is in progress!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Info,
+                    ACIdentifier = "PartslistAdd(0)",
+                    Message = Root.Environment.TranslateMessage(this, "Info50012")
+                };
+            }
+
+            if (prodOrder == null)
+            {
+                //"Error: Poduction order is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "PartslistAdd(1)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50027")
+                };
+            }
+
+            if (targetQuantityUOM <= 0)
+            {
+                //"Error: Target Quantity shuld be greather than zero!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "PartslistAdd(2)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50028")
+                };
+            }
+
+            if (partsList == null)
+            {
+                //"Error: Parts list is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "PartslistAdd(3)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50029")
+                };
+            }
+
+
+            if (partsList.TargetQuantity <= 0)
+            {
+                //"Error: Partslist quantity shuld be greather than zero!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "PartslistAdd(4)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50030")
+                };
+            }
+
+            double quantityFactor = targetQuantityUOM / partsList.TargetQuantityUOM;
+
+            List<PartslistPos> partsListPosItems = dbApp.PartslistPos.Where(x => x.PartslistID == partsList.PartslistID).ToList();
+            List<Guid> partsListPosItemIDs = partsListPosItems.Select(x => x.PartslistPosID).ToList();
+            List<PartslistPosRelation> partsListPosRelationItems =
+            dbApp.PartslistPosRelation.Where(x => partsListPosItemIDs.Contains(x.TargetPartslistPosID)).ToList();
+            partsListPosRelationItems.AddRange(dbApp.PartslistPosRelation.Where(x => partsListPosItemIDs.Contains(x.SourcePartslistPosID)));
+
+            partsListPosRelationItems = partsListPosRelationItems.Distinct().ToList();
+
+            prodOrderPartsList = ProdOrderPartslist.NewACObject(dbApp, prodOrder);
+            prodOrderPartsList.TargetQuantity = partsList.TargetQuantityUOM;
+            prodOrderPartsList.IsEnabled = true;
+            prodOrderPartsList.Partslist = partsList;
+            prodOrderPartsList.Sequence = sequence;
+
+            List<ProdOrderPartslistPos> prodOrderPartsListPosItems = new List<ProdOrderPartslistPos>();
+            foreach (var pos in partsListPosItems)
+            {
+                ProdOrderPartslistPos prodPos = ProdOrderPartslistPos.NewACObject(dbApp, null);
+                prodPos.ProdOrderPartslistID = prodOrderPartsList.ProdOrderPartslistID;
+                prodPos.ProdOrderPartslist = prodOrderPartsList;
+                prodPos.Sequence = pos.Sequence;
+                prodPos.SequenceProduction = pos.Sequence;
+                prodPos.MaterialPosTypeIndex = pos.MaterialPosTypeIndex;
+                prodPos.MaterialID = pos.MaterialID;
+                prodPos.MDUnitID = pos.MDUnitID;
+                prodPos.ActualQuantity = 0;
+                prodPos.TargetQuantityUOM = pos.TargetQuantityUOM;
+                //prodPos.TargetQuantity = pos.TargetQuantity;
+                prodPos.ActualQuantityUOM = 0;
+                prodPos.IsBaseQuantityExcluded = false;
+                prodPos.ParentProdOrderPartslistPosID = null;
+                prodPos.AlternativeProdOrderPartslistPosID = null;
+                prodPos.LineNumber = pos.LineNumber;
+                prodPos.BasedOnPartslistPos = pos;
+                prodOrderPartsListPosItems.Add(prodPos);
+                prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist.Add(prodPos);
+            }
+
+            // update alternative relations
+            prodOrderPartsListPosItems.ForEach(x =>
+            {
+                if (x.BasedOnPartslistPos.AlternativePartslistPosID != null)
+                {
+                    x.ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == x.BasedOnPartslistPos.AlternativePartslistPosID);
+                }
+            }
+                );
+
+            List<ProdOrderPartslistPosRelation> prodOrderPartsListPosRelationItems = new List<ProdOrderPartslistPosRelation>();
+            foreach (var posRelation in partsListPosRelationItems)
+            {
+                ProdOrderPartslistPosRelation prodRelationItem = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
+                prodRelationItem.Sequence = posRelation.Sequence;
+                prodRelationItem.TargetQuantityUOM = posRelation.TargetQuantityUOM;
+                // build relation same to PartslistPosRelation
+                prodRelationItem.TargetProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);
+                prodRelationItem.SourceProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);// ToSetup
+                prodOrderPartsListPosRelationItems.Add(prodRelationItem);
+            }
+
+            foreach (var item in prodOrderPartsListPosItems)
+            {
+                List<ProdOrderPartslistPosRelation> targets = prodOrderPartsListPosRelationItems.Where(x => x.TargetProdOrderPartslistPosID == item.ProdOrderPartslistPosID).ToList();
+                List<ProdOrderPartslistPosRelation> sources = prodOrderPartsListPosRelationItems.Where(x => x.SourceProdOrderPartslistPosID == item.ProdOrderPartslistPosID).ToList();
+                targets.ForEach(x => item.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(x));
+                sources.ForEach(x => item.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Add(x));
+            }
+
+            // Resize quantity
+            BatchLinearResize(prodOrderPartsList, quantityFactor);
+            BatchLinearResize(prodOrderPartsListPosItems, quantityFactor);
+            BatchLinearResize(prodOrderPartsListPosRelationItems, quantityFactor);
+
+            dbApp.ProdOrderPartslist.AddObject(prodOrderPartsList);
+
+            PostExecute("PartslistAdd");
+            return msg;
+        }
+
+        /// <summary>
+        /// Removing partslist from prodorder
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="prodOrder"></param>
+        /// <param name="prodOrderPartslist"></param>
+        /// <returns></returns>
+        public Msg PartslistRemove(DatabaseApp dbApp, ProdOrder prodOrder, ProdOrderPartslist prodOrderPartslist)
+        {
+            Msg msg = null;
+            if (!PreExecute("PartslistRemove"))
+            {
+                //"Info: Adding parts list into production order is in progress!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Info,
+                    ACIdentifier = "PartslistRemove(0)",
+                    Message = Root.Environment.TranslateMessage(this, "Info50012")
+                };
+            }
+
+            if (prodOrder == null)
+            {
+                //"Error: Poduction order is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "PartslistRemove(1)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50027")
+                };
+            }
+
+            if (prodOrderPartslist == null)
+            {
+                //"Error: Production order parts list is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "PartslistRemove(1)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50031")
+                };
+            }
+
+            // Delete reference to ProdorderPartslistPos witch this ProdOrderPartslist produced
+            List<ProdOrderPartslistPos> prodOrderPosProducedWithThisProdPartList = dbApp.ProdOrderPartslistPos.Where(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID).ToList();
+            prodOrderPosProducedWithThisProdPartList.Where(c => c.EntityState != EntityState.Deleted).ToList().ForEach(x => x.SourceProdOrderPartslistID = null);
+
+            List<ProdOrderPartslistPos> items =
+                dbApp
+                .ProdOrderPartslistPos
+                .Where(x => x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
+                .ToList();
+            List<Guid> itemIDs = items.Select(x => x.ProdOrderPartslistPosID).ToList();
+
+            List<ProdOrderPartslistPosRelation> relations =
+                 dbApp
+                .ProdOrderPartslistPosRelation
+                .Where(x => itemIDs.Contains(x.TargetProdOrderPartslistPosID) || itemIDs.Contains(x.SourceProdOrderPartslistPosID))
+                .ToList();
+
+
+            List<ProdOrderBatch> batches = dbApp.ProdOrderBatch.Where(x => x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID).ToList();
+
+            List<FacilityPreBooking> preBookings = new List<FacilityPreBooking>();
+            foreach (var item in items)
+            {
+                preBookings.AddRange(item.FacilityPreBooking_ProdOrderPartslistPos);
+            }
+
+            foreach (var bp in prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToArray())
+            {
+                foreach (var fr in bp.FacilityReservation_ProdOrderBatchPlan.ToArray())
+                {
+                    fr.DeleteACObject(dbApp, false);
+                }
+                bp.DeleteACObject(dbApp, false);
+            }
+
+            preBookings.ForEach(x => x.DeleteACObject(dbApp, false));
+
+            relations.ForEach(x => x.DeleteACObject(dbApp, false));
+            items.ForEach(x => x.DeleteACObject(dbApp, false));
+
+            batches.ForEach(x => x.DeleteACObject(dbApp, false));
+
+            prodOrderPartslist.DeleteACObject(dbApp, true);
+
+            PostExecute("PartslistRemove");
+            return msg;
+        }
+
+        /// <summary>
+        /// changing target quantity
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="prodOrderPartslist"></param>
+        /// <param name="targetQuantityUOM"></param>
+        public Msg ProdOrderPartslistChangeTargetQuantity(DatabaseApp dbApp, ProdOrderPartslist prodOrderPartslist, double targetQuantityUOM)
+        {
+            Msg msg = null;
+            if (!PreExecute("ProdOrderPartslistChangeTargetQuantity"))
+            {
+                //"Info: Changing production order parts list target quantity in progress!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Info,
+                    ACIdentifier = "ProdOrderPartslistChangeTargetQuantity(0)",
+                    Message = Root.Environment.TranslateMessage(this, "Info50013")
+                };
+            }
+
+            if (prodOrderPartslist == null)
+            {
+                //"Error: Production order parts list is not defined!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "ProdOrderPartslistChangeTargetQuantity(1)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50031")
+                };
+            }
+
+            if (prodOrderPartslist.TargetQuantity <= 0)
+            {
+                //"Error: Production order parts list target quantity shuld be greather then zero!"
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "ProdOrderPartslistChangeTargetQuantity(2)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50032")
+                };
+            }
+
+            double changeFactor = targetQuantityUOM / prodOrderPartslist.TargetQuantity;
+
+            // calculate database items
+            List<ProdOrderPartslistPos> positions = dbApp.ProdOrderPartslistPos.Where(x =>
+                x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID &&
+                x.ParentProdOrderPartslistPosID == null).ToList(); // --> resize positions they are not batches
+            List<Guid> positionIds = positions.Select(x => x.ProdOrderPartslistPosID).ToList();
+            List<ProdOrderPartslistPosRelation> relations = dbApp.ProdOrderPartslistPosRelation.Where(x =>
+            positionIds.Contains(x.TargetProdOrderPartslistPosID)).ToList();
+
+            // calculate unsaved added items
+            List<ProdOrderPartslistPos> positionsAdded = dbApp
+                .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
+                .Select(o => o.Entity)
+                .OfType<ProdOrderPartslistPos>()
+                .Where(x => x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
+                .ToList();
+            List<Guid> positionAddedIds = positionsAdded.Select(x => x.ProdOrderPartslistPosID).ToList();
+            List<ProdOrderPartslistPosRelation> relationsAdded = dbApp
+                .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
+                .Select(o => o.Entity)
+                .OfType<ProdOrderPartslistPosRelation>()
+                .Where(x => positionAddedIds.Contains(x.TargetProdOrderPartslistPosID))
+                .ToList();
+
+            BatchLinearResize(positions, changeFactor);
+            BatchLinearResize(relations, changeFactor);
+
+            BatchLinearResize(positionsAdded, changeFactor);
+            BatchLinearResize(relationsAdded, changeFactor);
+
+            prodOrderPartslist.TargetQuantity = targetQuantityUOM;
+
+            PostExecute("ProdOrderPartslistChangeTargetQuantity");
+            return msg;
+        }
+
+        #endregion
+
+        #region Batch-Creation
+        /// <summary>
+        /// Create batch item
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="intermediateItem"></param>
+        /// <param name="batches"></param>
+        /// <returns></returns>
+        public Msg BatchCreate(DatabaseApp dbApp, ProdOrderPartslistPos intermediateItem, List<BatchCreateEntry> batches, List<object> resultNewEntities, bool reduceWithLossFactor, double? toleranceRemainingQuantity = null)
+        {
+            Msg msg = null;
+            if (!PreExecute("BatchCreate"))
+            {
+                //"Info: Batch creating in progress!"
+                return new Msg(this, eMsgLevel.Info, "ACProdOrderManager", "BatchCreate", 1000, "Info50014");
+            }
+
+            if (intermediateItem == null)
+            {
+                //"Error50033: Intermediate product not defined!"
+                return new Msg(this, eMsgLevel.Error, ClassName, "BatchCreate", 1010, "Error50033");
+            }
+
+            if (batches == null || !batches.Any())
+            {
+                //"Error50034: Batch size not defined!"
+                return new Msg(this, eMsgLevel.Error, ClassName, "BatchCreate", 1020, "Error50034");
+            }
+
+            if (!toleranceRemainingQuantity.HasValue)
+            {
+                if (TolRemainingCallQ != 0 && intermediateItem.TargetQuantityUOM != 0)
+                    toleranceRemainingQuantity = intermediateItem.TargetQuantityUOM * TolRemainingCallQ * 0.01;
+                else
+                    toleranceRemainingQuantity = 0;
+            }
+
+            intermediateItem.AutoRefresh(dbApp);
+
+            if (reduceWithLossFactor)
+            {
+                double lossFactor = intermediateItem.ProdOrderPartslist.TargetQuantityLossFactor;
+                if (lossFactor < 0.0000000001 || lossFactor > 2)
+                    lossFactor = 1;
+                batches.ForEach(c => c.Size = c.Size * lossFactor);
+            }
+
+            double quantityOverAllBatches = batches.Select(c => c.Size).Sum();
+
+            if ((intermediateItem.RemainingCallQuantity + toleranceRemainingQuantity) < quantityOverAllBatches
+                || intermediateItem.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                || intermediateItem.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Blocked)
+            {
+                //Error50052: Batch not startable. The remaining quantity is {1}. Planned are {0}. The maximum order quantity would be exceeeded.
+                Msg rMsg = new Msg(this, eMsgLevel.Error, ClassName, "BatchCreate", 1030, "Error50052", quantityOverAllBatches, intermediateItem.RemainingCallQuantity);
+                return rMsg;
+            }
+
+            BatchCreateModel model = null;
+            if (intermediateItem.ParentProdOrderPartslistPosID == null)
+            {
+                model = new BatchCreateModel();
+                List<ProdOrderPartslistPosRelation> relations = dbApp.ProdOrderPartslistPosRelation
+                    .Where(x => x.TargetProdOrderPartslistPosID == intermediateItem.ProdOrderPartslistPosID).ToList();
+                foreach (var item in batches)
+                {
+                    string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrderBatch), ProdOrderBatch.NoColumnName, ProdOrderBatch.FormatNewNo, this);
+                    ProdOrderBatch batch = ProdOrderBatch.NewACObject(dbApp, intermediateItem.ProdOrderPartslist, secondaryKey);
+                    batch.BatchSeqNo = item.BatchSeqNo;
+                    model.Batches.Add(batch);
+                    resultNewEntities.Add(batch);
+
+                    ProdOrderPartslistPos childPosition = ProdOrderPartslistPos.NewACObject(dbApp, intermediateItem);
+                    childPosition.Sequence = item.BatchSeqNo;
+                    childPosition.TargetQuantityUOM = item.Size;
+                    intermediateItem.CalledUpQuantityUOM += childPosition.TargetQuantityUOM;
+                    childPosition.ProdOrderBatch = batch;
+                    model.BatchPositions.Add(childPosition);
+                    resultNewEntities.Add(childPosition);
+                    double quantityFactor = childPosition.TargetQuantityUOM / intermediateItem.TargetQuantityUOM;
+
+                    foreach (var rel in relations)
+                    {
+                        ProdOrderPartslistPosRelation childRelation = ProdOrderPartslistPosRelation.NewACObject(dbApp, rel);
+                        childRelation.Sequence = rel.Sequence;
+                        childRelation.TargetProdOrderPartslistPos = childPosition;
+                        childRelation.SourceProdOrderPartslistPos = rel.SourceProdOrderPartslistPos;
+                        childRelation.TargetQuantityUOM = rel.TargetQuantityUOM * quantityFactor;
+                        childRelation.ProdOrderBatch = batch;
+                        model.BatchRelations.Add(childRelation);
+                        resultNewEntities.Add(childRelation);
+                    }
+                }
+
+                model.Batches.ForEach(x => dbApp.ProdOrderBatch.AddObject(x));
+                model.BatchPositions.ForEach(x => dbApp.ProdOrderPartslistPos.AddObject(x));
+                model.BatchRelations.ForEach(x => dbApp.ProdOrderPartslistPosRelation.AddObject(x));
+                //model.BatchDefinition = batches;
+            }
+
+            PostExecute("BatchCreate");
+            return msg;
+        }
+
+        public Msg BatchCreate(DatabaseApp dbApp, ProdOrderPartslistPos intermediateItem, ProdOrderBatch batch, double batchFraction, int sequenceNo, List<object> resultNewEntities)
+        {
+            Msg msg = null;
+            //if (!PreExecute("BatchCreate"))
+            //{
+            //    //"Info: Batch creating in progress!"
+            //    return new Msg
+            //    {
+            //        Source = GetACUrl(),
+            //        MessageLevel = eMsgLevel.Info,
+            //        ACIdentifier = "BatchCreate(0)",
+            //        Message = Root.Environment.TranslateMessage(this, "Info50014")
+            //    };
+            //}
+
+            if (intermediateItem == null)
+            {
+                //"Error50033: Intermediate product not defined!"
+                return new Msg(this, eMsgLevel.Error, ClassName, "BatchCreate", 1500, "Error50033");
+            }
+
+            if (batch == null)
+            {
+                //"Error50034: Batch size not defined!"
+                return new Msg(this, eMsgLevel.Error, ClassName, "BatchCreate", 1510, "Error50034");
+            }
+
+            intermediateItem.AutoRefresh(dbApp);
+
+            if (intermediateItem.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                || intermediateItem.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Blocked)
+            {
+                //Error50099: Orderline is already in state completed or blocked.
+                return new Msg(this, eMsgLevel.Error, ClassName, "BatchCreate", 1520, "Error50099");
+            }
+
+            List<ProdOrderPartslistPosRelation> batchRelations = new List<ProdOrderPartslistPosRelation>();
+            if (intermediateItem.ParentProdOrderPartslistPosID == null)
+            {
+                ProdOrderPartslistPos childPosition = ProdOrderPartslistPos.NewACObject(dbApp, intermediateItem);
+                childPosition.Sequence = sequenceNo;
+                childPosition.TargetQuantityUOM = intermediateItem.TargetQuantityUOM * batchFraction;
+                intermediateItem.CalledUpQuantityUOM += childPosition.TargetQuantityUOM;
+                childPosition.ProdOrderBatch = batch;
+                resultNewEntities.Add(childPosition);
+
+                List<ProdOrderPartslistPosRelation> relations = dbApp.ProdOrderPartslistPosRelation.Where(x => x.TargetProdOrderPartslistPosID == intermediateItem.ProdOrderPartslistPosID).ToList();
+                foreach (var rel in relations)
+                {
+                    ProdOrderPartslistPosRelation childRelation = ProdOrderPartslistPosRelation.NewACObject(dbApp, rel);
+                    childRelation.Sequence = rel.Sequence;
+                    childRelation.TargetProdOrderPartslistPos = childPosition;
+                    childRelation.SourceProdOrderPartslistPos = rel.SourceProdOrderPartslistPos;
+                    // COMMENT @aagincic: This shuld be corect
+                    // first we take proportion between quantity of batch intermediate component and intermediate product => childPosition.TargetQuantity / intermediateItem.TargetQuantity
+                    // this shuld say percentage of batch component participation in final intermediate product
+                    // second we multiple this factor with parent "complete" intermediate component to get batch component size
+                    if (rel.TargetQuantityUOM > 0.00001)
+                        childRelation.TargetQuantityUOM = rel.TargetQuantityUOM * batchFraction;
+                    else
+                        childRelation.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * batchFraction;
+                    childRelation.ProdOrderBatch = batch;
+                    batchRelations.Add(childRelation);
+                    resultNewEntities.Add(childRelation);
+                }
+
+                dbApp.ProdOrderPartslistPos.AddObject(childPosition);
+                batchRelations.ForEach(x => dbApp.ProdOrderPartslistPosRelation.AddObject(x));
+            }
+
+            //PostExecute("BatchCreate");
+            return msg;
+        }
+
+        #endregion
+
+        #region ProdOrder -> Batch
+
+        #region Batch cascade creation
+
+        #region Batch cascade creation -> Public methods
+
+        /// <summary>
+        /// Generate list of connected intermediates 
+        /// for selection in batch cascade creation process
+        /// </summary>
+        /// <param name="intermediate"></param>
+        /// <returns></returns>
+        public List<PosIntermediateDepthWrap> BatchCreateBuildIntermediateIncludedList(ProdOrderPartslistPos intermediate, MaterialWFACClassMethod materialWFACClassMethod)
+        {
+            List<PosIntermediateDepthWrap> list = new List<PosIntermediateDepthWrap>();
+            BatchCreateBuildIntermediateIncludedList(intermediate, 1, list, intermediate.TargetQuantityUOM, materialWFACClassMethod);
+            return list;
+        }
+
+        /// <summary>
+        /// Create a cascade of batches
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="batchPercentageDefinition"></param>
+        /// <param name="intermediateList"></param>
+        /// <returns></returns>
+        public Msg BatchCreateCascade(DatabaseApp dbApp, List<BatchPercentageModel> batchPercentageDefinition, List<PosIntermediateDepthWrap> intermediateList, RestHandleModeEnum calculationModel, int roundingDecimalPlaces = 2)
+        {
+            ProdOrderPartslist mandatoryPartslist = intermediateList.FirstOrDefault().Intermediate.ProdOrderPartslist;
+            // Two list in game
+            // 1. Batch list
+            // 2. Intermediate List 
+
+            // Creation definition
+            List<IntermediateBatchQuantityConnection> defQuantityDistribution =
+                intermediateList.Select(x => new IntermediateBatchQuantityConnection()
+                {
+                    IntermediateWarp = x,
+                    BatchPercentageDefinition = batchPercentageDefinition,
+                    BatchQuantityDefinition = BatchSizeCalculation.GetQuantityModel(x.TargetQuantityUOM, batchPercentageDefinition, calculationModel, roundingDecimalPlaces)
+                }).ToList();
+
+            foreach (BatchPercentageModel batchDef in batchPercentageDefinition)
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrderBatch), ProdOrderBatch.NoColumnName, ProdOrderBatch.FormatNewNo, this);
+                ProdOrderBatch batch = ProdOrderBatch.NewACObject(dbApp, mandatoryPartslist, secondaryKey);
+                batch.BatchSeqNo = batchDef.Sequence;
+                mandatoryPartslist.ProdOrderBatch_ProdOrderPartslist.Add(batch);
+                foreach (IntermediateBatchQuantityConnection connItem in defQuantityDistribution)
+                {
+                    ProdOrderPartslistPos childPosition = BatchCreatePos(dbApp, connItem.IntermediateWarp.Intermediate, batch, connItem.BatchQuantityDefinition[batchDef.Sequence - 1]);
+
+                    List<ProdOrderPartslistPosRelation> relations = dbApp.ProdOrderPartslistPosRelation
+                            .Where(x => x.TargetProdOrderPartslistPosID == connItem.IntermediateWarp.Intermediate.ProdOrderPartslistPosID).ToList();
+                    if (relations != null && relations.Any())
+                        foreach (ProdOrderPartslistPosRelation relation in relations)
+                        {
+                            double quantityFactor = childPosition.TargetQuantityUOM / connItem.IntermediateWarp.Intermediate.TargetQuantityUOM;
+                            BatchCreateRelation(dbApp, batch, childPosition, relation, quantityFactor);
+                        }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region Batch cascade creation -> Helper methods
+
+        /// <summary>
+        ///  Created tree of included intermediates 
+        ///  with applyed quantity in relation
+        /// </summary>
+        /// <param name="intermediate"></param>
+        /// <param name="depth"></param>
+        /// <param name="list"></param>
+        /// <param name="targetQuantityUOM"></param>
+        private void BatchCreateBuildIntermediateIncludedList(ProdOrderPartslistPos intermediate, int depth, List<PosIntermediateDepthWrap> list, double targetQuantityUOM, MaterialWFACClassMethod materialWFACClassMethod)
+        {
+            list.Add(new PosIntermediateDepthWrap() { Depth = depth, Selected = true, Intermediate = intermediate, TargetQuantityUOM = targetQuantityUOM });
+            depth++;
+            List<Guid> sharedGroup = intermediate.Material.MaterialWFConnection_Material.Select(x => x.ACClassWF).Select(x => x.RefPAACClassMethodID ?? Guid.Empty).ToList();
+            var intermediateInList = intermediate
+                .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                .Where(x =>
+                        x.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern
+                        && !x.SourceProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                        && x.SourceProdOrderPartslistPos.Material.MaterialWFConnection_Material
+                                            .Where(d =>
+                                                    d.MaterialWFACClassMethodID == materialWFACClassMethod.MaterialWFACClassMethodID
+                                            // && sharedGroup.Contains(d.ACClassWF.ACClassMethodID)
+                                            ).Any()
+                        )
+                .Select(x => new { Pos = x.SourceProdOrderPartslistPos, TargetQuantityUOM = x.TargetQuantityUOM })
+                .ToList();
+            if (intermediateInList != null && intermediateInList.Any())
+                foreach (var intermediateIn in intermediateInList)
+                    BatchCreateBuildIntermediateIncludedList(intermediateIn.Pos, depth, list, intermediateIn.TargetQuantityUOM, materialWFACClassMethod);
+        }
+
+        private ProdOrderPartslistPos BatchCreatePos(DatabaseApp dbApp, ProdOrderPartslistPos intermediate, ProdOrderBatch batch, BatchQuantityModel batchQuantityDefinition)
+        {
+            ProdOrderPartslistPos childPosition = ProdOrderPartslistPos.NewACObject(dbApp, intermediate);
+            childPosition.Sequence = batchQuantityDefinition.Sequence;
+            childPosition.TargetQuantityUOM = batchQuantityDefinition.TargetQuantity;
+            intermediate.CalledUpQuantityUOM += childPosition.TargetQuantityUOM;
+            childPosition.ProdOrderBatch = batch;
+            intermediate.ProdOrderPartslistPos_ParentProdOrderPartslistPos.Add(childPosition);
+            return childPosition;
+        }
+
+        private void BatchCreateRelation(DatabaseApp dbApp, ProdOrderBatch batch, ProdOrderPartslistPos childPosition, ProdOrderPartslistPosRelation parentRelation, double quantityFactor)
+        {
+            ProdOrderPartslistPosRelation childRelation = ProdOrderPartslistPosRelation.NewACObject(dbApp, parentRelation);
+            childRelation.Sequence = parentRelation.Sequence;
+            childRelation.TargetProdOrderPartslistPos = childPosition;
+            childRelation.SourceProdOrderPartslistPos = parentRelation.SourceProdOrderPartslistPos;
+            childRelation.TargetQuantityUOM = parentRelation.TargetQuantityUOM * quantityFactor;
+            childRelation.ProdOrderBatch = batch;
+        }
+
+
+        #endregion
+
+        #endregion
+
+        #region ProdOrder -> Batch -> Start
+
+
+        public virtual void SetProdOrderItemsToInProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate)
+        {
+            MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
+            prodOrderPartslist.ProdOrder.MDProdOrderState = mDProdOrderStateInProduction;
+            prodOrderPartslist.MDProdOrderState = prodOrderPartslist.ProdOrder.MDProdOrderState;
+            prodOrderPartslist.StartDate = DateTime.Now;
+            intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
+            if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
+                prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
+            prodOrderBatchPlan.PlannedStartDate = DateTime.Now;
+        }
+
+        public ProdOrderPartslistPos GetIntermediate(ProdOrderPartslist prodOrderPartslist, MaterialWFConnection matWFConnection)
+        {
+            return
+                prodOrderPartslist
+                .ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(c =>
+                    c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
+                    && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                    && !c.ParentProdOrderPartslistPosID.HasValue
+                    )
+                .FirstOrDefault();
+        }
+
+        public MaterialWFConnection GetMaterialWFConnection(gip.mes.datamodel.ACClassWF aCClassWF, Guid? materialWFID)
+        {
+            return
+                aCClassWF
+                .MaterialWFConnection_ACClassWF
+                .Where(c => c.MaterialWFACClassMethod.MaterialWFID == materialWFID)
+                .FirstOrDefault();
+        }
+
+        public MsgWithDetails StartBatchPlan(DatabaseApp databaseApp, gip.core.datamodel.ACClassMethod acClassMethod,
+                                            gip.mes.datamodel.ACClassWF VbACClassWf, ProdOrderBatchPlan prodOrderBatchPlan,
+                                            bool checkIfWorkflowIsRunning = true)
+        {
+            gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
+            var managerList = this.Root.FindChildComponents(project.RootClass, 1);
+            ACComponent appManager = managerList.FirstOrDefault() as ACComponent;
+
+            return StartBatchPlan(appManager, databaseApp, acClassMethod, VbACClassWf, prodOrderBatchPlan, checkIfWorkflowIsRunning);
+        }
+
+        public MsgWithDetails StartBatchPlan(ACComponent appManager, DatabaseApp databaseApp,
+                                            gip.core.datamodel.ACClassMethod acClassMethod, gip.mes.datamodel.ACClassWF VbACClassWf, ProdOrderBatchPlan prodOrderBatchPlan,
+                                            bool checkIfWorkflowIsRunning = true)
+        {
+            ProdOrderPartslist prodOrderPartslist = prodOrderBatchPlan.ProdOrderPartslist;
+            MaterialWFConnection matWFConnection = GetMaterialWFConnection(VbACClassWf, prodOrderPartslist.Partslist.MaterialWFID);
+            ProdOrderPartslistPos intermediate = GetIntermediate(prodOrderPartslist, matWFConnection);
+
+            return StartBatchPlan(databaseApp, appManager, prodOrderPartslist, intermediate, acClassMethod, checkIfWorkflowIsRunning);
+        }
+
+        public MsgWithDetails StartBatchPlan(DatabaseApp databaseApp, ACComponent appManager,
+                                            ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate, gip.core.datamodel.ACClassMethod acClassMethod,
+                                            bool checkIfWorkflowIsRunning = true)
+        {
+            if (checkIfWorkflowIsRunning)
+            {
+                var acProgramIDs = databaseApp.OrderLog.Where(c => c.ProdOrderPartslistPosID.HasValue
+                                                         && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
+                                              .Select(c => c.VBiACProgramLog.ACProgramID)
+                                              .Distinct()
+                                              .ToArray();
+
+                if (acProgramIDs != null && acProgramIDs.Any())
+                {
+                    ChildInstanceInfoSearchParam searchParam = new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, ACProgramIDs = acProgramIDs };
+                    var childInstanceInfos = appManager.GetChildInstanceInfo(1, searchParam);
+                    if (childInstanceInfos != null && childInstanceInfos.Any())
+                    {
+                        var childInstanceInfo = childInstanceInfos.FirstOrDefault();
+                        string acUrlComand = String.Format("{0}\\{1}!{2}", childInstanceInfo.ACUrlParent, childInstanceInfo.ACIdentifier, ReloadBPAndResumeACIdentifier);
+                        appManager.ACUrlCommand(acUrlComand);
+                        return null;
+                    }
+                }
+            }
+
+            ACMethod acMethod = appManager.NewACMethod(acClassMethod.ACIdentifier);
+            if (acMethod == null)
+                return null;
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
+            gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(databaseApp.ContextIPlus, null, secondaryKey);
+            program.ProgramACClassMethod = acClassMethod;
+            program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
+            databaseApp.ContextIPlus.ACProgram.AddObject(program);
+            //CurrentProdOrderPartslist.VBiACProgramID = program.ACProgramID;
+            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+            if (saveMsg == null)
+            {
+                ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
+                if (paramProgram == null)
+                    acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
+                else
+                    paramProgram.Value = program.ACProgramID;
+
+                if (intermediate != null)
+                {
+                    ACValue acValuePPos = acMethod.ParameterValueList.GetACValue(ProdOrderPartslistPos.ClassName);
+                    if (acValuePPos == null)
+                        acMethod.ParameterValueList.Add(new ACValue(ProdOrderPartslistPos.ClassName, typeof(Guid), intermediate.ProdOrderPartslistPosID));
+                    else
+                        acValuePPos.Value = intermediate.ProdOrderPartslistPosID;
+                }
+
+                appManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
+            }
+            return saveMsg;
+        }
+
+
+
+        #endregion
+
+        #region Public -> Batch -> Duration Calculation
+        public TimeSpan? GetCalculatedBatchPlanDuration(DatabaseApp databaseApp, ProdOrderBatchPlan batchPlan)
+        {
+            TimeSpan? duration = null;
+            ProdOrderBatchPlan prevousBatchPlan =
+                databaseApp
+                .ProdOrderBatchPlan
+                .Where(c =>
+                    c.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID &&
+                    c.VBiACClassWFID == batchPlan.VBiACClassWFID &&
+                    c.ProdOrderPartslistPos.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed &&
+                    c.ProdOrderPartslistPos.OrderLog_ProdOrderPartslistPos.Any()
+                  )
+                .OrderByDescending(c => c.InsertDate)
+                .FirstOrDefault();
+            if (prevousBatchPlan != null)
+            {
+                ProdOrderBatch firstBatch = prevousBatchPlan.ProdOrderBatch_ProdOrderBatchPlan.OrderBy(c => c.InsertDate).FirstOrDefault();
+                ProdOrderBatch lastBatch = prevousBatchPlan.ProdOrderBatch_ProdOrderBatchPlan.OrderByDescending(c => c.InsertDate).FirstOrDefault();
+
+                DateTime? startTime = firstBatch.ProdOrderPartslistPos_ProdOrderBatch.SelectMany(c => c.OrderLog_ProdOrderPartslistPos).Min(c => c.VBiACProgramLog.StartDate);
+                DateTime? endTime = lastBatch.ProdOrderPartslistPos_ProdOrderBatch.SelectMany(c => c.OrderLog_ProdOrderPartslistPos).Max(c => c.VBiACProgramLog.StartDate);
+                if (startTime != null && endTime != null)
+                    duration = endTime - startTime;
+            }
+            return duration;
+        }
+
+        #endregion
+
+        #region Batch -> Select batch
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, toOrderState) => ctx.ProdOrderBatchPlan
+                                    .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
+                                            && c.PlanStateIndex >= fromPlanState
+                                            && c.PlanStateIndex <= toPlanState
+                                            && (toOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex <= toOrderState)
+                                            && (toOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= toOrderState)
+                                            && (filterStartTime == null
+                                                 || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
+                                                 || (c.CalculatedStartDate != null && c.CalculatedStartDate >= filterStartTime))
+                                            && (filterEndTime == null
+                                                 || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
+                                                 || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime))
+                                          )
+                                    .OrderBy(c => c.ScheduledOrder ?? 0)
+        );
+
+
+        public ObservableCollection<ProdOrderBatchPlan> GetProductionLinieBatchPlans(DatabaseApp databaseApp, Guid? mdSchedulingGroupID, GlobalApp.BatchPlanState fromPlanState, GlobalApp.BatchPlanState toPlanState, DateTime? filterStartTime, DateTime? filterEndTime,
+            MDProdOrderState.ProdOrderStates? toOrderState)
+        {
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, toOrderState.HasValue ? (short?)toOrderState.Value : null) as ObjectQuery<ProdOrderBatchPlan>;
+            batchQuery.MergeOption = MergeOption.OverwriteChanges;
+            return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
+        }
+
+
+        #endregion
+        #endregion
+
+        #region Public Methods
+
+        #region ProdOrder
+        public virtual void FinishOrder(DatabaseApp dbApp, ProdOrder currentProdOrder)
+        {
+            MDProdOrderState state = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
+            MDProdOrderPartslistPosState statePos = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
+            if (state != null)
+            {
+                currentProdOrder.MDProdOrderState = state;
+                foreach (ProdOrderPartslist pOPl in currentProdOrder.ProdOrderPartslist_ProdOrder)
+                {
+                    pOPl.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.Completed).ToList().ForEach(c => c.PlanState = GlobalApp.BatchPlanState.Completed);
+
+                    if (statePos != null)
+                    {
+                        pOPl.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => (c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardRoot)
+                                                                             && (c.MDProdOrderPartslistPosStateID.HasValue
+                                                                                && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                                && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
+                                                                 .ToList()
+                                                                 .ForEach(c => c.MDProdOrderPartslistPosState = statePos);
+                    }
+                    if (pOPl.MDProdOrderState != state)
+                        pOPl.MDProdOrderState = state;
+                }
+            }
+        }
+        #endregion
+
+        #region BookingOutward
+        public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation)
+        {
+            ACMethodBooking acMethodClone = BookParamOutwardMovementClone(facilityManager, dbApp);
+            partsListPosRelation.AutoRefresh(dbApp);
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+            FacilityPreBooking facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, partsListPosRelation, secondaryKey); // TODO später: Child-Instanz erzeugen
+            facilityPreBooking.ProdOrderPartslistPosRelation = partsListPosRelation;
+            ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+            acMethodBooking.OutwardMaterial = partsListPosRelation.SourceProdOrderPartslistPos.Material;
+            acMethodBooking.PartslistPosRelation = partsListPosRelation;
+            //acMethodBooking.InwardQuantity = deliveryNotePos.InOrderPos.TargetQuantityUOM;
+            double quantityUOM = partsListPosRelation.TargetQuantityUOM - partsListPosRelation.PreBookingOutwardQuantityUOM() - partsListPosRelation.SourceProdOrderPartslistPos.ActualQuantityUOM;
+            if (partsListPosRelation.SourceProdOrderPartslistPos.MDUnit != null)
+            {
+                acMethodBooking.OutwardQuantity = partsListPosRelation.SourceProdOrderPartslistPos.Material.ConvertQuantity(quantityUOM, partsListPosRelation.SourceProdOrderPartslistPos.Material.BaseMDUnit, partsListPosRelation.SourceProdOrderPartslistPos.MDUnit);
+                acMethodBooking.MDUnit = partsListPosRelation.SourceProdOrderPartslistPos.MDUnit;
+            }
+            else
+            {
+                acMethodBooking.OutwardQuantity = quantityUOM;
+            }
+            if (partsListPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.CPartnerCompany != null)
+                acMethodBooking.CPartnerCompany = partsListPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.CPartnerCompany;
+            facilityPreBooking.ACMethodBooking = acMethodBooking;
+            return facilityPreBooking;
+        }
+
+        public List<FacilityPreBooking> CancelOutFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation)
+        {
+            List<FacilityPreBooking> bookings = new List<FacilityPreBooking>();
+            ACMethodBooking acMethodClone = null;
+            FacilityPreBooking facilityPreBooking = null;
+            if (partsListPosRelation == null || partsListPosRelation.MDProdOrderPartslistPosState == null || partsListPosRelation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
+                return null;
+            if (partsListPosRelation.EntityState != System.Data.EntityState.Added)
+            {
+                partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad(dbApp);
+                partsListPosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad(dbApp);
+            }
+            else
+                return null;
+            if (partsListPosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.Any())
+                return null;
+            foreach (FacilityBooking previousBooking in partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation)
+            {
+                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward)
+                    continue;
+                // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
+                // da der Positionsstatus auch MDOutOrderPosState.OutOrderPosStates.Cancelled sein müsste
+                else if (previousBooking.FacilityBookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel)
+                    return null;
+            }
+
+            foreach (FacilityBooking previousBooking in partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation)
+            {
+                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward)
+                    continue;
+                acMethodClone = BookParamOutCancelClone(facilityManager, dbApp);
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, partsListPosRelation, secondaryKey);
+                ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+                acMethodBooking.OutwardQuantity = previousBooking.OutwardQuantity * -1;
+                if (previousBooking.MDUnit != null)
+                    acMethodBooking.MDUnit = previousBooking.MDUnit;
+                acMethodBooking.OutwardFacility = previousBooking.OutwardFacility;
+                if (previousBooking.OutwardFacilityLot != null)
+                    acMethodBooking.OutwardFacilityLot = previousBooking.OutwardFacilityLot;
+                if (previousBooking.OutwardFacilityCharge != null)
+                    acMethodBooking.OutwardFacilityCharge = previousBooking.OutwardFacilityCharge;
+                if (previousBooking.OutwardMaterial != null)
+                    acMethodBooking.OutwardMaterial = previousBooking.OutwardMaterial;
+                acMethodBooking.PartslistPosRelation = partsListPosRelation;
+                if (previousBooking.CPartnerCompany != null)
+                    acMethodBooking.CPartnerCompany = previousBooking.CPartnerCompany;
+                facilityPreBooking.ACMethodBooking = acMethodBooking;
+                bookings.Add(facilityPreBooking);
+            }
+            return bookings;
+        }
+
+        public List<FacilityPreBooking> CancelOutFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslist partsList)
+        {
+            if (partsList == null)
+                return null;
+            if (partsList.EntityState != System.Data.EntityState.Added)
+                partsList.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(dbApp);
+            List<FacilityPreBooking> result = null;
+            foreach (ProdOrderPartslistPos partsListPos in partsList.ProdOrderPartslistPos_ProdOrderPartslist)
+            {
+                if (!(partsListPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot
+                    || partsListPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardPart))
+                    continue;
+                foreach (ProdOrderPartslistPosRelation relation in partsListPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                {
+                    var subResult = CancelOutFacilityPreBooking(facilityManager, dbApp, relation);
+                    if (subResult != null)
+                    {
+                        if (result == null)
+                            result = subResult;
+                        else
+                            result.AddRange(subResult);
+                    }
+                }
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region BookingInward
+        public FacilityPreBooking NewInwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPos partsListPos)
+        {
+            ACMethodBooking acMethodClone = BookParamInwardMovementClone(facilityManager, dbApp);
+            partsListPos.AutoRefresh(dbApp);
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+            FacilityPreBooking facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, partsListPos, secondaryKey); // TODO später: Child-Instanz erzeugen
+            facilityPreBooking.ProdOrderPartslistPos = partsListPos;
+            ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+            acMethodBooking.InwardMaterial = partsListPos.BookingMaterial;
+            acMethodBooking.PartslistPos = partsListPos;
+            //acMethodBooking.InwardQuantity = deliveryNotePos.InOrderPos.TargetQuantityUOM;
+            double quantityUOM = partsListPos.TargetQuantityUOM - partsListPos.PreBookingInwardQuantityUOM() - partsListPos.ActualQuantityUOM;
+            if (partsListPos.MDUnit != null)
+            {
+                acMethodBooking.InwardQuantity = partsListPos.BookingMaterial.ConvertQuantity(quantityUOM, partsListPos.BookingMaterial.BaseMDUnit, partsListPos.MDUnit);
+                acMethodBooking.MDUnit = partsListPos.MDUnit;
+            }
+            else
+            {
+                acMethodBooking.InwardQuantity = quantityUOM;
+            }
+            if (partsListPos.ProdOrderPartslist.ProdOrder.CPartnerCompany != null)
+                acMethodBooking.CPartnerCompany = partsListPos.ProdOrderPartslist.ProdOrder.CPartnerCompany;
+            facilityPreBooking.ACMethodBooking = acMethodBooking;
+            return facilityPreBooking;
+        }
+
+        public List<FacilityPreBooking> CancelInFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPos partsListPos)
+        {
+            List<FacilityPreBooking> bookings = new List<FacilityPreBooking>();
+            ACMethodBooking acMethodClone = null;
+            FacilityPreBooking facilityPreBooking = null;
+            if (partsListPos == null || partsListPos.MDProdOrderPartslistPosState == null || partsListPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
+                return null;
+            if (partsListPos.EntityState != System.Data.EntityState.Added)
+            {
+                partsListPos.FacilityBooking_ProdOrderPartslistPos.AutoLoad(dbApp);
+                partsListPos.FacilityPreBooking_ProdOrderPartslistPos.AutoLoad(dbApp);
+            }
+            else
+                return null;
+            if (partsListPos.FacilityPreBooking_ProdOrderPartslistPos.Any())
+                return null;
+            foreach (FacilityBooking previousBooking in partsListPos.FacilityBooking_ProdOrderPartslistPos)
+            {
+                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosInward)
+                    continue;
+                // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
+                // da der Positionsstatus auch MDOutOrderPosState.OutOrderPosStates.Cancelled sein müsste
+                else if (previousBooking.FacilityBookingType == GlobalApp.FacilityBookingType.ProdOrderPosInwardCancel)
+                    return null;
+            }
+
+            foreach (FacilityBooking previousBooking in partsListPos.FacilityBooking_ProdOrderPartslistPos)
+            {
+                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosInward)
+                    continue;
+                acMethodClone = BookParamInCancelClone(facilityManager, dbApp);
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, partsListPos, secondaryKey);
+                ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+                acMethodBooking.InwardQuantity = previousBooking.InwardQuantity * -1;
+                if (previousBooking.MDUnit != null)
+                    acMethodBooking.MDUnit = previousBooking.MDUnit;
+                acMethodBooking.InwardFacility = previousBooking.InwardFacility;
+                if (previousBooking.InwardFacilityLot != null)
+                    acMethodBooking.InwardFacilityLot = previousBooking.InwardFacilityLot;
+                if (previousBooking.InwardFacilityCharge != null)
+                    acMethodBooking.InwardFacilityCharge = previousBooking.InwardFacilityCharge;
+                if (previousBooking.InwardMaterial != null)
+                    acMethodBooking.InwardMaterial = previousBooking.InwardMaterial;
+                else
+                    acMethodBooking.InwardMaterial = partsListPos.BookingMaterial;
+                acMethodBooking.PartslistPos = partsListPos;
+                if (previousBooking.CPartnerCompany != null)
+                    acMethodBooking.CPartnerCompany = previousBooking.CPartnerCompany;
+                facilityPreBooking.ACMethodBooking = acMethodBooking;
+                bookings.Add(facilityPreBooking);
+            }
+            return bookings;
+        }
+
+        public List<FacilityPreBooking> CancelInFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslist partsList)
+        {
+            if (partsList == null)
+                return null;
+            if (partsList.EntityState != System.Data.EntityState.Added)
+                partsList.ProdOrderPartslistPos_ProdOrderPartslist.AutoLoad(dbApp);
+            List<FacilityPreBooking> result = null;
+            foreach (ProdOrderPartslistPos partsListPos in partsList.ProdOrderPartslistPos_ProdOrderPartslist)
+            {
+                if (!(partsListPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardRoot
+                    || partsListPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPart
+                    || partsListPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardInternInwardExtern))
+                    continue;
+                var subResult = CancelInFacilityPreBooking(facilityManager, dbApp, partsListPos);
+                if (subResult != null)
+                {
+                    if (result == null)
+                        result = subResult;
+                    else
+                        result.AddRange(subResult);
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region RecalcTargetQuantity
+
+        public MsgWithDetails RecalcIntermediateItem(ProdOrderPartslistPos inwardPos)
+        {
+            MsgWithDetails msgWithDetails = null;
+            try
+            {
+                List<ProdOrderPartslistPos> inputMixures =
+                   inwardPos
+                   .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                   .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                   .Select(c => c.SourceProdOrderPartslistPos)
+                   .ToList();
+                foreach (ProdOrderPartslistPos inputMixure in inputMixures)
+                    RecalcIntermediateItem(inputMixure);
+
+                // fix child relations
+                double newTargetQuantityUOM = 0;
+                if (inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any())
+                    newTargetQuantityUOM = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
+                else
+                    newTargetQuantityUOM = 0;
+                bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
+                double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
+                double factor = 0;
+                if (inwardPos.TargetQuantityUOM > 0)
+                    factor = diffQuantity / inwardPos.TargetQuantityUOM;
+                inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
+
+                //mixure distrubutes it's quantity to target mixures
+                if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                {
+                    if (factor == 0 && !noChange)
+                        factor = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+                    if (factor != 0)
+                        foreach (var rel in inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                        {
+                            rel.TargetQuantityUOM = rel.TargetQuantityUOM + factor * rel.TargetQuantityUOM;
+                        }
+                }
+            }
+            catch (Exception ec)
+            {
+                msgWithDetails = new MsgWithDetails() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+            }
+
+            return msgWithDetails;
+        }
+
+
+        /// <summary>
+        /// Recalculate rest quantity
+        /// </summary>
+        /// <param name="partslist"></param>
+        /// <returns></returns>
+        public MsgWithDetails RecalcRemainingQuantity(ProdOrderPartslistPos mixItem)
+        {
+            MsgWithDetails msgWithDetails = null;
+            try
+            {
+                var inputMixures =
+                    mixItem
+                    .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                    .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                    .Select(c => c.SourceProdOrderPartslistPos)
+                    .ToList();
+                foreach (ProdOrderPartslistPos inputMixure in inputMixures)
+                    RecalcRemainingQuantity(inputMixure);
+
+                var relations = mixItem.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos;
+                mixItem.RestQuantityUOM = mixItem.TargetQuantityUOM;
+                foreach (var rel in relations)
+                {
+                    mixItem.RestQuantity -= rel.TargetQuantity;
+                    mixItem.RestQuantityUOM -= rel.TargetQuantityUOM;
+                }
+            }
+            catch (Exception ec)
+            {
+                msgWithDetails = new MsgWithDetails() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+            }
+            return msgWithDetails;
+        }
+
+        #endregion
+
+        #region 
+        public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, out double sumWeight)
+        {
+            sumWeight = 0;
+            if (batchIntermediatePos == null)
+                return new Msg() { Message = "batchIntermediatePos is null" };
+            if (batchIntermediatePos.ProdOrderBatch == null)
+                return new Msg() { Message = "no Batch assigned to intermediate line" };
+
+            MDUnit unitKG = MDUnit.GetSIUnit(dbApp, GlobalApp.SIDimensions.Mass);
+            if (unitKG == null)
+                return new Msg() { Message = "Mass-Unit KG not found" };
+
+            CalcProducedBatchWeight(ref sumWeight, batchIntermediatePos, batchIntermediatePos.ProdOrderBatch, unitKG);
+
+            return null;
+        }
+
+        private void CalcProducedBatchWeight(ref double sumWeight, ProdOrderPartslistPos batchIntermediatePos, ProdOrderBatch forBatch, MDUnit unitKG)
+        {
+            foreach (var relation in batchIntermediatePos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+            {
+                if (relation.ActualQuantityUOM > 0.000001)
+                {
+                    if (relation.SourceProdOrderPartslistPos.MDUnit != null)
+                    {
+                        if (!relation.SourceProdOrderPartslistPos.Material.IsConvertableToUnit(relation.SourceProdOrderPartslistPos.MDUnit, unitKG))
+                            continue;
+                        sumWeight += relation.SourceProdOrderPartslistPos.Material.ConvertQuantity(relation.ActualQuantity, relation.SourceProdOrderPartslistPos.MDUnit, unitKG);
+                    }
+                    else
+                        sumWeight += relation.SourceProdOrderPartslistPos.Material.ConvertQuantity(relation.ActualQuantityUOM, relation.SourceProdOrderPartslistPos.Material.BaseMDUnit, unitKG);
+                }
+                else
+                {
+                    var prevBatchIntermediatePos = forBatch.ProdOrderPartslistPos_ProdOrderBatch.Where(c => c.ParentProdOrderPartslistPosID.HasValue && c.ParentProdOrderPartslistPosID.Value == relation.SourceProdOrderPartslistPosID).FirstOrDefault();
+                    if (prevBatchIntermediatePos != null)
+                    {
+                        CalcProducedBatchWeight(ref sumWeight, prevBatchIntermediatePos, forBatch, unitKG);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Common
+        /// <summary>
+        /// Batch linear resize by 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="factor"></param>
+        public static void BatchLinearResize(ITargetQuantity item, double factor)
+        {
+            ITargetQuantityUOM iUOM = item as ITargetQuantityUOM;
+            if (iUOM != null)
+                iUOM.TargetQuantityUOM = iUOM.TargetQuantityUOM * factor;
+            else
+                item.TargetQuantity = item.TargetQuantity * factor;
+        }
+
+        /// <summary>
+        /// Batch linear resize
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="factor"></param>
+        public static void BatchLinearResize(IEnumerable<ITargetQuantity> items, double factor)
+        {
+            foreach (var item in items)
+            {
+                BatchLinearResize(item, factor);
+            }
+        }
+        #endregion
+
+    }
+
+}

@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9D0A5A8E-7C05-4F37-8E98-848C8E9DB4E4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip.bso.facility</RootNamespace>
+    <AssemblyName>gip.bso.facility</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>..\bin\Release\gip.bso.facility.XML</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Entity">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BSOFacilityBase.cs" />
+    <Compile Include="Components\TandTPointPresenter.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityBookCharge.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityBookInOrderPos.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityBookOutOrderPos.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityEndClosing.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityBookCell.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityChangeUnit.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityCorrection.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityInventory.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityLot.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityMaintenance.cs" />
+    <Compile Include="FacilityBooking\BSOFacilityCorrectionCost.cs" />
+    <Compile Include="FacilityHistory\BSOBarcodeFacilityOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityIntermediateMaterialOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityLotOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityOverviewBase.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityHistory.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityMaterialOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityChargeOverview.cs" />
+    <Compile Include="FacilityHistory\BSOFacilityLocationOverview.cs" />
+    <Compile Include="Model\IntermediateMaterialOverview.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TandTv2\BSOTandTv2.cs" />
+    <Compile Include="TandTv3\BSOTandTv3.cs" />
+    <Compile Include="TandTv3\GraphRelationCommand.cs" />
+    <Compile Include="TandTv3\GraphCommand.cs" />
+    <Compile Include="TandTv3\GraphFilterHelper.cs" />
+    <Compile Include="TandTv3\GraphPoint.cs" />
+    <Compile Include="TandTv3\GraphPointRelation.cs" />
+    <Compile Include="TandTv3\GraphPointRelationTypeEnum.cs" />
+    <Compile Include="TandTv3\GraphPointResult.cs" />
+    <Compile Include="TandTv3\GraphRoutingRelations.cs" />
+    <Compile Include="TandTv3\IFactoryTandTPointPresenterComponent.cs" />
+    <Compile Include="TandTv3\SearchRouteCombination.cs" />
+    <Compile Include="TandTv3\TandTGraphModel.cs" />
+    <Compile Include="TrackingAndTracing\BSOTrackingAndTracing.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
+      <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
+      <Name>gip.mes.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+      <Name>gip.mes.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj">
+      <Project>{52DC947D-677D-42CA-BCA6-153A4E027272}</Project>
+      <Name>gip.mes.facility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
+      <Project>{D1320FB8-333D-4072-880D-BD5137933D2F}</Project>
+      <Name>gip.mes.processapplication</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="VBControlScripts\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>1131f03b-f0f7-4ab7-ad22-8207d49c2e24</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>gip.mes.webservices.shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Facility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Logistics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Manufacturing.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Masterdata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Purchasing.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Sales.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\VBWebServiceConst.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\ACMethodBooking.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventoryPos.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MaterialStock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityStock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityLotStock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityLot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\Facility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityCharge.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityLocationSumOverview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityLotSumOverview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDFacilityInventoryPosState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDFacilityInventoryState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDFacilityType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\PostingOverview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilitySumOverview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MaterialSumOverview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDReleaseState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeSequence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\Picking.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\PickingPos.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderBatch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderPartslist.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderPartslistPos.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderPartslistPosRelation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\MDUnit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\Material.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\Partslist.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Model\Purchasing\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Model\Sales\" />
+  </ItemGroup>
+</Project>

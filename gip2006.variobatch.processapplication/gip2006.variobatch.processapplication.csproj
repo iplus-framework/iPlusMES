@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BC0B3EC7-E348-4E7D-96A9-FBBE68BD1AB3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip2006.variobatch.processapplication</RootNamespace>
+    <AssemblyName>gip2006.variobatch.processapplication</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>..\bin\Release\gip2006.variobatch.processapplication.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BSO\BSOTableImport.cs" />
+    <Compile Include="GIP2006TableImport\GIPConv2006TableImportArtikel.cs" />
+    <Compile Include="GIP2006TableImport\GIPConv2006TableImportRezept.cs" />
+    <Compile Include="GIP2006TableImport\GIPConv2006TableImportLKW.cs" />
+    <Compile Include="GIP2006TableImport\GIPConv2006TableImportAdresse.cs" />
+    <Compile Include="GIP2006TableImport\GIPConv2006TableImportChipCard.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006BaseExt.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Cooling.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Discharging.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Vacuum.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Mixing.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Dosing.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Way.cs" />
+    <Compile Include="GIP2006\GIPControllerPID2006.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act1Way.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act1Way_3pos.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act1Way_Analog.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act2Way.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act2Way_1plus2.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act2Way_3pos.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act3Way.cs" />
+    <Compile Include="GIP2006\GIPConv2006OnOff.cs" />
+    <Compile Include="GIP2006\GIPConv2006SensorD.cs" />
+    <Compile Include="GIP2006\GIPConv2006Vario.cs" />
+    <Compile Include="GIP2006\GIPConv2006Actuator.cs" />
+    <Compile Include="GIP2006\GIPConv2006Base.cs" />
+    <Compile Include="GIP2006\GIPConv2006ConfigMUX.cs" />
+    <Compile Include="GIP2006\GIPConv2006Mot.cs" />
+    <Compile Include="GIP2006\GIPConv2006ParamMUX.cs" />
+    <Compile Include="GIP2006\GIPConv2006QueryVB.cs" />
+    <Compile Include="GIP2006\GIPConv2006Scale.cs" />
+    <Compile Include="GIP2006TableImport\GIPConv2006TableImport.cs" />
+    <Compile Include="GIP2006\GIPConv2006Way.cs" />
+    <Compile Include="GIP2006\VBBSOSelDlgPluginConfigMUX.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893d3b1b-dc55-4684-8b5d-941f1049151b}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.communication\gip.core.communication.csproj">
+      <Project>{96014a57-e700-478f-850e-452e9bfcaa90}</Project>
+      <Name>gip.core.communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16fb4111-5110-46e5-851d-38a4d7522f85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
+      <Project>{66484708-85BD-47C4-92DD-3010387465F4}</Project>
+      <Name>gip.core.processapplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
+      <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
+      <Name>gip.mes.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+      <Name>gip.mes.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
+      <Project>{D1320FB8-333D-4072-880D-BD5137933D2F}</Project>
+      <Name>gip.mes.processapplication</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="VBControlScripts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

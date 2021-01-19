@@ -1,0 +1,1533 @@
+using gip.core.autocomponent;
+using gip.core.datamodel;
+using gip.mes.autocomponent;
+using gip.mes.datamodel;
+using gip.mes.facility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace gip.bso.sales
+{
+    /// <summary>
+    /// Version 3
+    /// Folgende alte Masken sind in diesem BSO enthalten: 
+    /// 1. Warenausgang->Bestellungen
+    /// 2. Warenausgang->Bestellpositionen
+    /// 3. Warenausgang->Bestellpositionen (Druckansicht)
+    /// 
+    /// Neue Masken:
+    /// 1. Auftragsverwaltung
+    /// 
+    /// TODO: Betroffene Tabellen: OutOrder, OutOrderPos
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order'}de{'Kundenauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrder.ClassName)]
+    [ACQueryInfo(Const.PackName_VarioSales, Const.QueryPrefix + "OutOpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}", typeof(OutOrderPos), OutOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "Material\\MaterialNo,TargetDeliveryDate")]
+    public class BSOOutOrder : ACBSOvbNav
+    {
+        #region c´tors
+
+        public BSOOutOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+            : base(acType, content, parentACObject, parameter, acIdentifier)
+        {
+            //DatabaseMode = DatabaseModes.OwnDB;
+        }
+
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            if (!base.ACInit(startChildMode))
+                return false;
+
+            _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_OutDeliveryNoteManager == null)
+                throw new Exception("InDeliveryNoteManager not configured");
+
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
+            Search();
+            return true;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
+            _OutDeliveryNoteManager = null;
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
+            this._AccessOutOrderPos = null;
+            this._ChangeTargetQuantity = null;
+            this._CurrentCompanyMaterialPickup = null;
+            this._CurrentMDUnit = null;
+            this._CurrentOutOrderPos = null;
+            this._SelectedAvailableCompMaterial = null;
+            this._SelectedCompanyMaterialPickup = null;
+            this._SelectedOutOrderPos = null;
+            this._UnSavedUnAssignedContractPos = null;
+            this._PartialQuantity = null;
+            _SelectedFilterMaterial = null;
+
+            if (_AccessPrimary != null)
+                _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
+
+            bool result = base.ACDeInit(deleteACClassTask);
+
+            
+            if (_AccessOutOrderPos != null)
+            {
+                _AccessOutOrderPos.ACDeInit(false);
+                _AccessOutOrderPos = null;
+            }
+            if (_AccessPrimary != null)
+            {
+                _AccessPrimary.ACDeInit(false);
+                _AccessPrimary = null;
+            }
+            if (_AccessOpenContractPos != null)
+            {
+                _AccessOpenContractPos.ACDeInit(false);
+                _AccessOpenContractPos = null;
+            }
+            if (_AccessFilterMaterial != null)
+            {
+                _AccessFilterMaterial.ACDeInit(false);
+                _AccessFilterMaterial = null;
+            }
+
+
+            return result;
+
+        }
+
+        #endregion
+
+        #region Filters
+
+        #region Properties - > FilterMaterial
+
+        ACAccess<Material> _AccessFilterMaterial;
+        [ACPropertyAccess(9999, "FilterMaterial")]
+        public ACAccess<Material> AccessFilterMaterial
+        {
+            get
+            {
+                if (_AccessFilterMaterial == null && ACType != null)
+                {
+                    ACQueryDefinition acQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Material.ClassName, ACType.ACIdentifier);
+                    acQueryDefinition.TakeCount = 2000;
+                    acQueryDefinition.ClearFilter();
+                    _AccessFilterMaterial = acQueryDefinition.NewAccess<Material>("FilterMaterial", this);
+                    BuildInOrderMaterialFilterColumns(_AccessFilterMaterial.NavACQueryDefinition);
+                    _AccessFilterMaterial.NavSearch();
+                }
+                return _AccessFilterMaterial;
+            }
+        }
+
+        private List<string> materialGroups;
+
+        public virtual void BuildInOrderMaterialFilterColumns(ACQueryDefinition acQueryDefinition)
+        {
+            if (materialGroups == null)
+                materialGroups = DatabaseApp.InOrderPos.Select(c => c.Material.MDMaterialGroup.MDKey).Distinct().OrderBy(c => c).ToList();
+            string filterPropertyName = @"MDMaterialGroup\MDKey";
+            if (!acQueryDefinition.ACFilterColumns.Any(c => c.PropertyName == filterPropertyName))
+            {
+                acQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
+                foreach (var materialGroupName in materialGroups)
+                {
+                    acQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, filterPropertyName, Global.LogicalOperators.equal, Global.Operators.or, materialGroupName, true));
+                }
+                acQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
+            }
+        }
+
+        [ACPropertyInfo(9999, "FilterMaterial")]
+        public IEnumerable<Material> FilterMaterialList
+        {
+            get
+            {
+                return AccessFilterMaterial.NavList;
+            }
+        }
+
+        private Material _SelectedFilterMaterial;
+        [ACPropertySelected(9999, "FilterMaterial", "en{'Material'}de{'Material'}")]
+        public Material SelectedFilterMaterial
+        {
+            get
+            {
+                return _SelectedFilterMaterial;
+            }
+            set
+            {
+                if (_SelectedFilterMaterial != value)
+                {
+                    _SelectedFilterMaterial = value;
+                    OnPropertyChanged("SelectedFilterMaterial");
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+
+        #region Managers
+
+        protected ACRef<ACOutDeliveryNoteManager> _OutDeliveryNoteManager = null;
+        public ACOutDeliveryNoteManager OutDeliveryNoteManager
+        {
+            get
+            {
+                if (_OutDeliveryNoteManager == null)
+                    return null;
+                return _OutDeliveryNoteManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        #endregion
+
+
+        #region BSO->ACProperty
+        #region 1. OutOrder
+        public override IAccessNav AccessNav { get { return AccessPrimary; } }
+        ACAccessNav<OutOrder> _AccessPrimary;
+        [ACPropertyAccessPrimary(690, OutOrder.ClassName)]
+        public ACAccessNav<OutOrder> AccessPrimary
+        {
+            get
+            {
+                if (_AccessPrimary == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
+                    if (navACQueryDefinition != null)
+                    {
+                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "OutOrderNo").FirstOrDefault();
+                        if (sortItem != null && sortItem.IsConfiguration)
+                            sortItem.SortDirection = Global.SortDirections.descending;
+                        if (navACQueryDefinition.TakeCount == 0)
+                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                    }
+                    _AccessPrimary = navACQueryDefinition.NewAccessNav<OutOrder>(OutOrder.ClassName, this);
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
+                }
+                return _AccessPrimary;
+            }
+        }
+
+        private IQueryable<OutOrder> _AccessPrimary_NavSearchExecuting(IQueryable<OutOrder> result)
+        {
+            if (SelectedFilterMaterial != null)
+            {
+                result = result.Where(c => c.OutOrderPos_OutOrder.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+            }
+            return result;
+        }
+
+        [ACPropertyCurrent(600, OutOrder.ClassName)]
+        public OutOrder CurrentOutOrder
+        {
+            get
+            {
+                if (AccessPrimary == null) 
+                    return null; 
+                return AccessPrimary.Current;
+            }
+            set
+            {
+                if (CurrentOutOrder != null)
+                    CurrentOutOrder.PropertyChanged -= CurrentOutOrder_PropertyChanged;
+                if (AccessPrimary == null) 
+                    return; 
+                AccessPrimary.Current = value;
+
+                if (CurrentOutOrder != null)
+                    CurrentOutOrder.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentOutOrder_PropertyChanged);
+                CurrentOutOrderPos = null;
+                OnPropertyChanged("CurrentOutOrder");
+                OnPropertyChanged("OutOrderPosList");
+                OnPropertyChanged("CompanyList");
+                OnPropertyChanged("BillingCompanyAddressList");
+                OnPropertyChanged("DeliveryCompanyAddressList");
+                OnPropertyChanged("CurrentBillingCompanyAddress");
+                OnPropertyChanged("CurrentDeliveryCompanyAddress");
+            }
+        }
+
+        void CurrentOutOrder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "CustomerCompanyID":
+                    if (CurrentOutOrder.CustomerCompany != null)
+                    {
+                        CurrentOutOrder.BillingCompanyAddress = CurrentOutOrder.CustomerCompany.BillingCompanyAddress;
+                        CurrentOutOrder.DeliveryCompanyAddress = CurrentOutOrder.CustomerCompany.DeliveryCompanyAddress;
+                    }
+                    else
+                    {
+                        CurrentOutOrder.BillingCompanyAddress = null;
+                        CurrentOutOrder.DeliveryCompanyAddress = null;
+                    }
+                    OnPropertyChanged("BillingCompanyAddressList");
+                    OnPropertyChanged("DeliveryCompanyAddressList");
+                    OnPropertyChanged("CurrentBillingCompanyAddress");
+                    OnPropertyChanged("CurrentDeliveryCompanyAddress");
+
+                    break;
+            }
+        }
+
+        [ACPropertyList(601, OutOrder.ClassName)]
+        public IEnumerable<OutOrder> OutOrderList
+        {
+            get
+            {
+                return AccessPrimary.NavList;
+            }
+        }
+
+        [ACPropertySelected(602, OutOrder.ClassName)]
+        public OutOrder SelectedOutOrder
+        {
+            get
+            {
+                if (AccessPrimary == null) 
+                    return null; 
+                return AccessPrimary.Selected;
+            }
+            set
+            {
+                if (AccessPrimary == null) 
+                    return; 
+                AccessPrimary.Selected = value;
+                OnPropertyChanged("SelectedOutOrder");
+            }
+        }
+        #endregion
+
+        #region 1.1 OutOrderPos
+        ACAccess<OutOrderPos> _AccessOutOrderPos;
+        [ACPropertyAccess(691, OutOrderPos.ClassName)]
+        public ACAccess<OutOrderPos> AccessOutOrderPos
+        {
+            get
+            {
+                if (_AccessOutOrderPos == null && ACType != null)
+                {
+                    ACQueryDefinition acQueryDefinition = AccessPrimary.NavACQueryDefinition.ACUrlCommand(Const.QueryPrefix + OutOrderPos.ClassName) as ACQueryDefinition;
+                    _AccessOutOrderPos = acQueryDefinition.NewAccess<OutOrderPos>(OutOrderPos.ClassName, this);
+                }
+                return _AccessOutOrderPos;
+            }
+        }
+
+        OutOrderPos _CurrentOutOrderPos;
+        [ACPropertyCurrent(603, OutOrderPos.ClassName)]
+        public OutOrderPos CurrentOutOrderPos
+        {
+            get
+            {
+                return _CurrentOutOrderPos;
+            }
+            set
+            {
+                if (_CurrentOutOrderPos != value)
+                {
+                    if (_CurrentOutOrderPos != null)
+                        _CurrentOutOrderPos.PropertyChanged -= CurrentOutOrderPos_PropertyChanged;
+                    _CurrentOutOrderPos = value;
+                    if (_CurrentOutOrderPos != null)
+                        _CurrentOutOrderPos.PropertyChanged += CurrentOutOrderPos_PropertyChanged;
+                    OnPropertyChanged("CurrentOutOrderPos");
+                    OnPropertyChanged("MDUnitList");
+                    OnPropertyChanged("CompanyMaterialPickupList");
+                    OnPropertyChanged("AvailableCompMaterialList");
+                }
+            }
+        }
+
+        void CurrentOutOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "MaterialID":
+                    {
+                        if (CurrentOutOrderPos.Material != null && CurrentOutOrderPos.Material.BaseMDUnit != null)
+                            CurrentMDUnit = CurrentOutOrderPos.Material.BaseMDUnit;
+                        OnPropertyChanged("CurrentOutOrderPos");
+                    }
+                    break;
+            }
+        }
+
+        [ACPropertyList(604, OutOrderPos.ClassName)]
+        public IEnumerable<OutOrderPos> OutOrderPosList
+        {
+            get
+            {
+                if (CurrentOutOrder == null)
+                    return null;
+                return CurrentOutOrder.OutOrderPos_OutOrder.OrderBy(c => c.Sequence);
+            }
+        }
+
+        OutOrderPos _SelectedOutOrderPos;
+        [ACPropertySelected(605, OutOrderPos.ClassName)]
+        public OutOrderPos SelectedOutOrderPos
+        {
+            get
+            {
+                return _SelectedOutOrderPos;
+            }
+            set
+            {
+                _SelectedOutOrderPos = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the MU quantity unit list.
+        /// </summary>
+        /// <value>The MU quantity unit list.</value>
+        [ACPropertyList(606, MDUnit.ClassName)]
+        public IEnumerable<MDUnit> MDUnitList
+        {
+            get
+            {
+                if (CurrentOutOrderPos == null || CurrentOutOrderPos.Material == null)
+                    return null;
+                return CurrentOutOrderPos.Material.MDUnitList;
+            }
+        }
+
+        MDUnit _CurrentMDUnit;
+        /// <summary>
+        /// Gets or sets the current MU quantity unit.
+        /// </summary>
+        /// <value>The current MU quantity unit.</value>
+        [ACPropertyCurrent(607, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}")]
+        public MDUnit CurrentMDUnit
+        {
+            get
+            {
+                return _CurrentMDUnit;
+            }
+            set
+            {
+                _CurrentMDUnit = value;
+                if (_CurrentMDUnit != null && CurrentOutOrderPos.MDUnit != value)
+                {
+                    CurrentOutOrderPos.MDUnit = value;
+                    CurrentOutOrderPos.TargetQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.TargetQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    CurrentOutOrderPos.ActualQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.ActualQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    CurrentOutOrderPos.CalledUpQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.CalledUpQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    CurrentOutOrderPos.ExternQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.ExternQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    OnPropertyChanged("CurrentOutOrderPos");
+                }
+                OnPropertyChanged("CurrentMDUnit");
+            }
+        }
+
+        Nullable<double> _ChangeTargetQuantity = null;
+        [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
+        public Nullable<double> ChangeTargetQuantity
+        {
+            get
+            {
+                return _ChangeTargetQuantity;
+            }
+            set
+            {
+                _ChangeTargetQuantity = value;
+                if (_ChangeTargetQuantity.HasValue && (_ChangeTargetQuantity.Value > 0) && CurrentOutOrderPos != null && CurrentOutOrderPos.Material != null)
+                {
+                    //CurrentOutOrderPos.TargetQuantityUOM = CurrentOutOrderPos.Material.ConvertToBaseQuantity(_ChangeTargetQuantity.Value, CurrentOutOrderPos.MDUnit);
+                    //CurrentOutOrderPos.TargetQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.TargetQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    CurrentOutOrderPos.TargetQuantity = _ChangeTargetQuantity.Value;
+                }
+                _ChangeTargetQuantity = null;
+                OnPropertyChanged("ChangeTargetQuantity");
+            }
+        }
+        #endregion
+
+        #region 1.1.1 CompanyMaterialPickup
+        CompanyMaterialPickup _CurrentCompanyMaterialPickup;
+        [ACPropertyCurrent(609, "CompanyMaterialPickup")]
+        public CompanyMaterialPickup CurrentCompanyMaterialPickup
+        {
+            get
+            {
+                return _CurrentCompanyMaterialPickup;
+            }
+            set
+            {
+                if (_CurrentCompanyMaterialPickup != value)
+                {
+                    _CurrentCompanyMaterialPickup = value;
+                    OnPropertyChanged("CurrentCompanyMaterialPickup");
+                }
+            }
+        }
+
+        CompanyMaterialPickup _SelectedCompanyMaterialPickup;
+        [ACPropertySelected(610, "CompanyMaterialPickup")]
+        public CompanyMaterialPickup SelectedCompanyMaterialPickup
+        {
+            get
+            {
+                return _SelectedCompanyMaterialPickup;
+            }
+            set
+            {
+                _SelectedCompanyMaterialPickup = value;
+            }
+        }
+
+        [ACPropertyList(611, "CompanyMaterialPickup")]
+        public IEnumerable<CompanyMaterialPickup> CompanyMaterialPickupList
+        {
+            get
+            {
+                if (CurrentOutOrderPos == null)
+                    return null;
+                return CurrentOutOrderPos.CompanyMaterialPickup_OutOrderPos;
+            }
+        }
+
+        CompanyMaterial _SelectedAvailableCompMaterial;
+        [ACPropertySelected(612, "AvailableCompMatPickups", "en{'Available Ext. Material'}de{'Verfügbares externes Material'}")]
+        public CompanyMaterial SelectedAvailableCompMaterial
+        {
+            get
+            {
+                return _SelectedAvailableCompMaterial;
+            }
+            set
+            {
+                _SelectedAvailableCompMaterial = value;
+            }
+        }
+
+        [ACPropertyList(613, "AvailableCompMatPickups")]
+        public IEnumerable<CompanyMaterial> AvailableCompMaterialList
+        {
+            get
+            {
+                if (CurrentOutOrder == null || CurrentOutOrderPos == null || CurrentOutOrder.CustomerCompany == null)
+                    return null;
+                return DatabaseApp.CompanyMaterial.Where(c => c.CompanyID == CurrentOutOrder.CustomerCompanyID
+                                                        && c.MaterialID == CurrentOutOrderPos.MaterialID
+                                                        && c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.Pickup);
+            }
+        }
+        #endregion
+
+        #region Company
+        /// <summary>
+        /// Liste aller Unternehmen, die Lieferanten sind
+        /// </summary>
+        [ACPropertyList(614, Company.ClassName)]
+        public IEnumerable<Company> CompanyList
+        {
+            get
+            {
+                return DatabaseApp.Company
+                    .Where(c => c.IsCustomer)
+                    .OrderBy(c => c.CompanyName);
+            }
+        }
+
+        [ACPropertyList(615, "BillingCompanyAddress")]
+        public IEnumerable<CompanyAddress> BillingCompanyAddressList
+        {
+            get
+            {
+                if (CurrentOutOrder == null || CurrentOutOrder.CustomerCompany == null)
+                    return null;
+                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
+                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
+                return CurrentOutOrder.CustomerCompany.CompanyAddress_Company
+                    .Where(c => c.IsBillingCompanyAddress)
+                    .OrderBy(c => c.Name1);
+            }
+        }
+
+        [ACPropertyList(616, "DeliveryCompanyAddress")]
+        public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
+        {
+            get
+            {
+                if (CurrentOutOrder == null || CurrentOutOrder.CustomerCompany == null)
+                    return null;
+                if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
+                    CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
+                return CurrentOutOrder.CustomerCompany.CompanyAddress_Company
+                    .Where(c => c.IsDeliveryCompanyAddress)
+                    .OrderBy(c => c.Name1);
+            }
+        }
+
+        [ACPropertyCurrent(617, "BillingCompanyAddress", "en{'Billing Address'}de{'Rechnungsadresse'}")]
+        public CompanyAddress CurrentBillingCompanyAddress
+        {
+            get
+            {
+                if (CurrentOutOrder == null)
+                    return null;
+                return CurrentOutOrder.BillingCompanyAddress;
+            }
+            set
+            {
+                if (CurrentOutOrder != null && value != null)
+                {
+                    CurrentOutOrder.BillingCompanyAddress = value;
+                    OnPropertyChanged("CurrentBillingCompanyAddress");
+                }
+            }
+        }
+
+        [ACPropertyCurrent(618, "DeliveryCompanyAddress", "en{'Delivery Address'}de{'Lieferandresse'}")]
+        public CompanyAddress CurrentDeliveryCompanyAddress
+        {
+            get
+            {
+                if (CurrentOutOrder == null)
+                    return null;
+                return CurrentOutOrder.DeliveryCompanyAddress;
+            }
+            set
+            {
+                if (CurrentOutOrder != null && value != null)
+                {
+                    CurrentOutOrder.DeliveryCompanyAddress = value;
+                    OnPropertyChanged("CurrentDeliveryCompanyAddress");
+                }
+            }
+        }
+        #endregion
+
+
+        #region 1.2 OpenContractPos
+        /// <summary>
+        /// The _ access delivery note pos
+        /// </summary>
+        ACAccessNav<OutOrderPos> _AccessOpenContractPos;
+        /// <summary>
+        /// Gets the access delivery note pos.
+        /// </summary>
+        /// <value>The access delivery note pos.</value>
+        [ACPropertyAccess(692, "OpenContractPos")]
+        public ACAccessNav<OutOrderPos> AccessOpenContractPos
+        {
+            get
+            {
+                if (_AccessOpenContractPos == null && ACType != null)
+                {
+                    ACQueryDefinition acQueryDef = Root.Queries.CreateQuery(null, Const.QueryPrefix + "OutOpenContractPos", ACType.ACIdentifier);
+                    if (acQueryDef != null)
+                    {
+                        acQueryDef.CheckAndReplaceColumnsIfDifferent(OpenContractPosDefaultFilter, OpenContractPosDefaultSort, true, true);
+                        if (acQueryDef.TakeCount == 0)
+                            acQueryDef.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                    }
+
+                    _AccessOpenContractPos = acQueryDef.NewAccessNav<OutOrderPos>(OutOrderPos.ClassName, this);
+                    _AccessOpenContractPos.AutoSaveOnNavigation = false;
+                    _AccessOpenContractPos.NavSearch(DatabaseApp);
+                }
+                return _AccessOpenContractPos;
+            }
+        }
+
+        protected virtual List<ACFilterItem> OpenContractPosDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "MDDelivPosState\\MDDelivPosStateIndex", Global.LogicalOperators.lessThan, Global.Operators.and, ((short) MDDelivPosState.DelivPosStates.CompletelyAssigned).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "OutOrderPos1_ParentOutOrderPos", Global.LogicalOperators.isNull, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, OutOrder.ClassName + "\\" + MDOutOrderType.ClassName + "\\OrderTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short) GlobalApp.OrderTypes.Contract).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CTargetDeliveryMaxDateProperty, Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CMaterialNoProperty, Global.LogicalOperators.contains, Global.Operators.or, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CMaterialNameProperty, Global.LogicalOperators.contains, Global.Operators.or, "", true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> OpenContractPosDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("Material\\MaterialNo", Global.SortDirections.ascending, true),
+                    new ACSortItem("TargetDeliveryDate", Global.SortDirections.ascending, true),
+                };
+            }
+        }
+
+        #region Filter
+        public const string _CMaterialNoProperty = Material.ClassName + "\\MaterialNo";
+        public const string _CMaterialNameProperty = Material.ClassName + "\\MaterialName1";
+        [ACPropertyInfo(713, "Filter", "en{'Material'}de{'Material'}")]
+        public string FilterMaterial
+        {
+            get
+            {
+                return AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<string>(_CMaterialNoProperty);
+            }
+            set
+            {
+                string tmp = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<string>(_CMaterialNoProperty);
+                if (tmp != value)
+                {
+                    AccessOpenContractPos.NavACQueryDefinition.SetSearchValue<string>(_CMaterialNoProperty, value);
+                    AccessOpenContractPos.NavACQueryDefinition.SetSearchValue<string>(_CMaterialNameProperty, value);
+                    OnPropertyChanged("FilterMaterial");
+                }
+            }
+        }
+
+        public const string _CTargetDeliveryDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryDate";
+
+        [ACPropertyInfo(618, "", "en{'Contract date from'}de{'Kontraktdatum von'}")]
+        public DateTime? FilterDelivDateFrom
+        {
+            get
+            {
+                string tmp = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<string>(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual);
+                if (String.IsNullOrEmpty(tmp))
+                    return null;
+                return AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<DateTime>(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual);
+            }
+            set
+            {
+                string tmp = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<string>(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual);
+                if (String.IsNullOrEmpty(tmp))
+                {
+                    if (value.HasValue)
+                    {
+                        AccessOpenContractPos.NavACQueryDefinition.SetSearchValue<DateTime>(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual, value.Value);
+                        OnPropertyChanged("FilterDelivDateFrom");
+                    }
+                }
+                else
+                {
+                    if (value.HasValue)
+                    {
+                        DateTime tmpdt = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<DateTime>(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual);
+                        if (tmpdt != value.Value)
+                        {
+                            AccessOpenContractPos.NavACQueryDefinition.SetSearchValue(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual, value.Value);
+                            OnPropertyChanged("FilterDelivDateFrom");
+                        }
+                    }
+                    else
+                    {
+                        AccessOpenContractPos.NavACQueryDefinition.SetSearchValue(_CTargetDeliveryDateProperty, Global.LogicalOperators.greaterThanOrEqual, "");
+                        OnPropertyChanged("FilterDelivDateFrom");
+                    }
+                }
+            }
+        }
+
+        public const string _CTargetDeliveryMaxDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryMaxDate";
+        [ACPropertyInfo(619, "", "en{'Contract date to'}de{'Kontraktdatum bis'}")]
+        public DateTime? FilterDelivDateTo
+        {
+            get
+            {
+                string tmp = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<string>(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual);
+                if (String.IsNullOrEmpty(tmp))
+                    return null;
+                return AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<DateTime>(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual);
+            }
+            set
+            {
+                string tmp = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<string>(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual);
+                if (String.IsNullOrEmpty(tmp))
+                {
+                    if (value.HasValue)
+                    {
+                        AccessOpenContractPos.NavACQueryDefinition.SetSearchValue(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual, value.Value);
+                        OnPropertyChanged("FilterDelivDateTo");
+                    }
+                }
+                else
+                {
+                    if (value.HasValue)
+                    {
+                        DateTime tmpdt = AccessOpenContractPos.NavACQueryDefinition.GetSearchValue<DateTime>(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual);
+                        if (tmpdt != value)
+                        {
+                            AccessOpenContractPos.NavACQueryDefinition.SetSearchValue(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual, value.Value);
+                            OnPropertyChanged("FilterDelivDateTo");
+                        }
+                    }
+                    else
+                    {
+                        AccessOpenContractPos.NavACQueryDefinition.SetSearchValue(_CTargetDeliveryDateProperty, Global.LogicalOperators.lessThanOrEqual, "");
+                        OnPropertyChanged("FilterDelivDateTo");
+                    }
+                }
+            }
+        }
+        #endregion
+
+
+
+        Nullable<double> _PartialQuantity;
+        [ACPropertyInfo(637, "", "en{'Partial Quantity'}de{'Teilmenge'}")]
+        public Nullable<double> PartialQuantity
+        {
+            get
+            {
+                return _PartialQuantity;
+            }
+            set
+            {
+                _PartialQuantity = value;
+                OnPropertyChanged("PartialQuantity");
+            }
+        }
+
+
+        /// <summary>
+        /// Gets or sets the current in order pos.
+        /// </summary>
+        /// <value>The current in order pos.</value>
+        [ACPropertyCurrent(613, "OpenContractPos")]
+        public OutOrderPos CurrentOpenContractPos
+        {
+            get
+            {
+                if (AccessOpenContractPos == null)
+                    return null;
+                return AccessOpenContractPos.Current;
+            }
+            set
+            {
+                if (AccessOpenContractPos != null)
+                    AccessOpenContractPos.Current = value;
+                OnPropertyChanged("CurrentOpenContractPos");
+            }
+        }
+
+        MDDelivPosState _StateCompletelyAssigned = null;
+        MDDelivPosState StateCompletelyAssigned
+        {
+            get
+            {
+                if (_StateCompletelyAssigned != null)
+                    return _StateCompletelyAssigned;
+                var queryDelivStateAssigned = DatabaseApp.MDDelivPosState.Where(c => c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned);
+                _StateCompletelyAssigned = queryDelivStateAssigned.FirstOrDefault();
+                return _StateCompletelyAssigned;
+            }
+        }
+
+        protected List<OutOrderPos> _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
+
+        /// <summary>
+        /// Gets the in order pos list.
+        /// </summary>
+        /// <value>The in order pos list.</value>
+        [ACPropertyList(614, "OpenContractPos")]
+        public IEnumerable<OutOrderPos> OpenContractPosList
+        {
+            get
+            {
+                if (AccessOpenContractPos == null)
+                    return null;
+                if (CurrentOutOrderPos != null)
+                {
+                    IEnumerable<OutOrderPos> addedPositions = CurrentOutOrderPos.OutOrderPos_ParentOutOrderPos.Where(c => c.EntityState == System.Data.EntityState.Added
+                        && c != null
+                        && c.OutOrderPos1_ParentOutOrderPos != null
+                        && c.OutOrderPos1_ParentOutOrderPos.MDDelivPosState == StateCompletelyAssigned
+                        ).Select(c => c.OutOrderPos1_ParentOutOrderPos);
+                    if (addedPositions.Any())
+                    {
+                        if (_UnSavedUnAssignedContractPos.Any())
+                            return AccessOpenContractPos.NavList.Except(addedPositions).Union(_UnSavedUnAssignedContractPos);
+                        else
+                            return AccessOpenContractPos.NavList.Except(addedPositions);
+                    }
+                    else if (_UnSavedUnAssignedContractPos.Any())
+                    {
+                        return AccessOpenContractPos.NavList.Union(_UnSavedUnAssignedContractPos);
+                    }
+                }
+                return AccessOpenContractPos.NavList;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected in order pos.
+        /// </summary>
+        /// <value>The selected in order pos.</value>
+        [ACPropertySelected(615, "OpenContractPos")]
+        public OutOrderPos SelectedOpenContractPos
+        {
+            get
+            {
+                if (AccessOpenContractPos == null)
+                    return null;
+                return AccessOpenContractPos.Selected;
+            }
+            set
+            {
+                if (AccessOpenContractPos != null)
+                    AccessOpenContractPos.Selected = value;
+                OnPropertyChanged("SelectedOpenContractPos");
+                CurrentOpenContractPos = value;
+            }
+        }
+
+
+        [ACPropertyList(616, "TransportMode")]
+        public IEnumerable<MDTransportMode> MDTransportModeList
+        {
+            get
+            {
+                return DatabaseApp.MDTransportMode;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region BSO->ACMethod
+
+        #region Activation
+        /// <summary>
+        /// ACAction is called when one IACInteractiveObject (Source) wants to inform another IACInteractiveObject (Target) about an relevant interaction-event.
+        /// </summary>
+        /// <param name="actionArgs">Information about the type of interaction and the source</param>
+        public override void ACAction(ACActionArgs actionArgs)
+        {
+            if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
+            {
+                OnActivate(actionArgs.DropObject.VBContent);
+            }
+            else
+                base.ACAction(actionArgs);
+        }
+
+        protected bool _ActivateInOpen = false;
+        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost)]
+        public void OnActivate(string page)
+        {
+            if (!PreExecute("OnActivate"))
+                return;
+            switch (page)
+            {
+                case "*AssignContractPos":
+                case "AssignContractPos":
+                    if (!_ActivateInOpen)
+                    {
+                        _ActivateInOpen = true;
+                        RefreshOpenContractPosList();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            PostExecute("OnActivate");
+        }
+
+        public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
+        {
+            if (vbControl == null)
+                return base.OnGetControlModes(vbControl);
+
+            Global.ControlModes result = base.OnGetControlModes(vbControl);
+            if (result < Global.ControlModes.Enabled)
+                return result;
+            switch (vbControl.VBContent)
+            {
+                case "CurrentOutOrder\\MDOutOrderType":
+                    {
+                        if (OutOrderPosList != null && OutOrderPosList.Any())
+                            return Global.ControlModes.Disabled;
+                        break;
+                    }
+            }
+
+            return result;
+        }
+
+        #endregion
+
+
+        #region OutOrder
+        [ACMethodCommand(OutOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        public void Save()
+        {
+            OnSave();
+        }
+
+        public bool IsEnabledSave()
+        {
+            return OnIsEnabledSave();
+        }
+
+        [ACMethodCommand(OutOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        public void UndoSave()
+        {
+            OnUndoSave();
+        }
+
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
+        }
+
+        protected override void OnPostSave()
+        {
+            _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
+        }
+
+        protected override void OnPostUndoSave()
+        {
+            _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
+            RefreshOpenContractPosList();
+            if (CurrentOutOrder != null && CurrentOutOrder.EntityState != System.Data.EntityState.Added)
+                CurrentOutOrder.OutOrderPos_OutOrder.Load();
+            OnPropertyChanged("OutOrderPosList");
+            base.OnPostUndoSave();
+        }
+
+
+        [ACMethodInteraction(OutOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
+        public void Load(bool requery = false)
+        {
+            if (!PreExecute("Load"))
+                return;
+            LoadEntity<OutOrder>(requery, () => SelectedOutOrder, () => CurrentOutOrder, c => CurrentOutOrder = c,
+                        DatabaseApp.OutOrder
+                        .Include(c => c.OutOrderPos_OutOrder)
+                        .Where(c => c.OutOrderID == SelectedOutOrder.OutOrderID));
+            PostExecute("Load");
+        }
+
+        public bool IsEnabledLoad()
+        {
+            return SelectedOutOrder != null;
+        }
+
+        [ACMethodInteraction(OutOrder.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
+        public void New()
+        {
+            if (!PreExecute("New")) 
+                return;
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOrder), OutOrder.NoColumnName, OutOrder.FormatNewNo, this);
+            CurrentOutOrder = OutOrder.NewACObject(DatabaseApp, null, secondaryKey);
+            DatabaseApp.OutOrder.AddObject(CurrentOutOrder);
+            SelectedOutOrder = CurrentOutOrder;
+            if (AccessPrimary != null)
+                AccessPrimary.NavList.Add(CurrentOutOrder);
+            ACState = Const.SMNew;
+            PostExecute("New");
+
+        }
+
+        public bool IsEnabledNew()
+        {
+            return true;
+        }
+
+        [ACMethodInteraction(OutOrder.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
+        public void Delete()
+        {
+            if (!PreExecute("Delete")) 
+                return;
+            Msg msg = CurrentOutOrder.DeleteACObject(DatabaseApp, true);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+            if (AccessPrimary == null) 
+                return; 
+            AccessPrimary.NavList.Remove(CurrentOutOrder);
+            SelectedOutOrder = AccessPrimary.NavList.FirstOrDefault();
+            Load();
+            PostExecute("Delete");
+
+        }
+
+        public bool IsEnabledDelete()
+        {
+            return CurrentOutOrder != null;
+        }
+
+        [ACMethodCommand(OutOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        public void Search()
+        {
+            if (AccessPrimary == null) 
+                return; 
+            AccessPrimary.NavSearch(DatabaseApp);
+            OnPropertyChanged("OutOrderList");
+        }
+        #endregion
+
+        #region OutOrderPos
+
+        #region OutOrderPos -> Manipulate (New, Edit, Delete ...)
+        [ACMethodInteraction(OutOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        public void NewOutOrderPos()
+        {
+            if (!PreExecute("NewOutOrderPos")) 
+                return;
+            // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
+            var outOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder);
+            OnPropertyChanged("OutOrderPosList");
+            CurrentOutOrderPos = outOrderPos;
+            SelectedOutOrderPos = outOrderPos;
+            PostExecute("NewOutOrderPos");
+        }
+
+        public bool IsEnabledNewOutOrderPos()
+        {
+            return true;
+        }
+
+        [ACMethodInteraction(OutOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        public void DeleteOutOrderPos()
+        {
+            if (!PreExecute("DeleteOutOrderPos")) 
+                return;
+            if (IsEnabledUnAssignContractPos())
+            {
+                UnAssignContractPos();
+            }
+            else
+            {
+                Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    return;
+                }
+                OnPropertyChanged("OutOrderPosList");
+            }
+            PostExecute("DeleteOutOrderPos");
+        }
+
+        public bool IsEnabledDeleteOutOrderPos()
+        {
+            return CurrentOutOrder != null && CurrentOutOrderPos != null;
+        }
+        #endregion
+
+        #region Tracking
+        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
+        {
+            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
+            if (vbContent == "SelectedOutOrderPos" && SelectedOutOrderPos != null)
+            {
+                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos);
+                aCMenuItems.AddRange(trackingAndTracingMenuItems);
+            }
+            return aCMenuItems;
+        }
+
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
+        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
+        {
+            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region CompanyMaterialPickup
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load Pick Up'}de{'Verladestamm laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        public void LoadCompanyMaterialPickup()
+        {
+            if (!IsEnabledLoadCompanyMaterialPickup())
+                return;
+            if (!PreExecute("LoadCompanyMaterialPickup")) 
+                return;
+            // Laden des aktuell selektierten CompanyMaterialPickup 
+            CurrentCompanyMaterialPickup = CurrentOutOrderPos.CompanyMaterialPickup_OutOrderPos
+                                           .Where(c => c.CompanyMaterialPickupID == SelectedCompanyMaterialPickup.CompanyMaterialPickupID)
+                                           .FirstOrDefault();
+            PostExecute("LoadCompanyMaterialPickup");
+        }
+
+        public bool IsEnabledLoadCompanyMaterialPickup()
+        {
+            return SelectedCompanyMaterialPickup != null && CurrentOutOrderPos != null;
+        }
+
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        public void NewCompanyMaterialPickup()
+        {
+            if (!PreExecute("NewCompanyMaterialPickup")) 
+                return;
+            // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
+            var companyMaterialPickup = CompanyMaterialPickup.NewACObject(DatabaseApp, CurrentOutOrderPos);
+            companyMaterialPickup.CompanyMaterial = SelectedAvailableCompMaterial;
+            OnPropertyChanged("CompanyMaterialPickupList");
+            CurrentCompanyMaterialPickup = companyMaterialPickup;
+            SelectedCompanyMaterialPickup = companyMaterialPickup;
+            PostExecute("NewCompanyMaterialPickup");
+        }
+
+        public bool IsEnabledNewCompanyMaterialPickup()
+        {
+            if (SelectedAvailableCompMaterial == null || CurrentOutOrderPos == null || SelectedAvailableCompMaterial.MaterialID != CurrentOutOrderPos.MaterialID)
+                return false;
+            return true;
+        }
+
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete Pick Up'}de{'Verladestamm löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        public void DeleteCompanyMaterialPickup()
+        {
+            if (!PreExecute("DeleteCompanyMaterialPickup")) 
+                return;
+            Msg msg = CurrentCompanyMaterialPickup.DeleteACObject(DatabaseApp, true);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+            OnPropertyChanged("CompanyMaterialPickupList");
+
+            PostExecute("DeleteCompanyMaterialPickup");
+        }
+
+        public bool IsEnabledDeleteCompanyMaterialPickup()
+        {
+            return CurrentOutOrderPos != null && CurrentCompanyMaterialPickup != null;
+        }
+        #endregion
+
+        #region OrderDialog
+        public VBDialogResult DialogResult { get; set; }
+
+        [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(string OutOrderNo, Guid? OutOrderPosID)
+        {
+            if (AccessPrimary == null)
+                return;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "OutOrderNo").FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, "OutOrderNo", Global.LogicalOperators.contains, Global.Operators.and, OutOrderNo, false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = OutOrderNo;
+
+            this.Search();
+            if (CurrentOutOrder != null && OutOrderPosID != null)
+            {
+                OnPropertyChanged("OutOrderPosList");
+                if (OutOrderPosList != null && OutOrderPosList.Any())
+                {
+                    OutOrderPos dbOutOrderPos = DatabaseApp.OutOrderPos.FirstOrDefault(c => c.OutOrderPosID == (OutOrderPosID ?? Guid.Empty));
+                    if (dbOutOrderPos != null)
+                    {
+                        var OutOrderPos = OutOrderPosList.Where(c => c.OutOrderPosID == dbOutOrderPos.OutOrderPosID ||
+                        c.OutOrderPosID == dbOutOrderPos.ParentOutOrderPosID).FirstOrDefault();
+                        if (OutOrderPos != null)
+                            SelectedOutOrderPos = OutOrderPos;
+                    }
+                }
+            }
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+
+        [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
+        public void DialogOK()
+        {
+            DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.OK;
+            DialogResult.ReturnValue = CurrentOutOrder;
+            CloseTopDialog();
+        }
+
+        [ACMethodCommand("Dialog", "en{'Cancel'}de{'Abbrechen'}", (short)MISort.Cancel)]
+        public void DialogCancel()
+        {
+            if (CurrentOutOrder != null && CurrentOutOrder.EntityState == System.Data.EntityState.Added)
+                Delete();
+            DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.Cancel;
+            CloseTopDialog();
+        }
+        #endregion
+
+        #region Assign / Unassign Contract lines
+
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
+        public bool FilterDialogContractPos()
+        {
+            bool result = AccessOpenContractPos.ShowACQueryDialog();
+            if (result)
+            {
+                RefreshOpenContractPosList();
+            }
+            return result;
+        }
+
+
+        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 602, false)]
+        public void RefreshOpenContractPosList()
+        {
+            if (_ActivateInOpen && AccessOpenContractPos != null)
+                AccessOpenContractPos.NavSearch(DatabaseApp);
+            OnPropertyChanged("OpenContractPosList");
+        }
+
+        /// <summary>
+        /// Assigns the in order pos.
+        /// </summary>
+        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 603, true)]
+        public virtual void AssignContractPos()
+        {
+            if (!IsEnabledAssignContractPos())
+                return;
+            List<object> resultNewEntities = new List<object>();
+            try
+            {
+
+                Msg result = OutDeliveryNoteManager.AssignContractOutOrderPos(CurrentOpenContractPos, CurrentOutOrder, PartialQuantity, DatabaseApp, ACFacilityManager, resultNewEntities);
+                if (result != null)
+                {
+                    Messages.Msg(result);
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                string msg = e.Message;
+                if (e.InnerException != null && e.InnerException.Message != null)
+                    msg += " Inner:" + e.InnerException.Message;
+
+                Messages.LogException("BSOOutOrder", "AssignContractPos", msg);
+
+                return;
+            }
+
+            if (_UnSavedUnAssignedContractPos.Contains(CurrentOpenContractPos))
+                _UnSavedUnAssignedContractPos.Remove(CurrentOpenContractPos);
+            OnPropertyChanged("OutOrderPosList");
+
+            RefreshOpenContractPosList();
+            PartialQuantity = null;
+            foreach (object item in resultNewEntities)
+            {
+                if (item is OutOrderPos)
+                {
+                    SelectedOutOrderPos = item as OutOrderPos;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled assign in order pos].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled assign in order pos]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledAssignContractPos()
+        {
+            if (CurrentOpenContractPos == null
+                || CurrentOutOrder == null
+                || CurrentOutOrder.MDOutOrderType == null
+                || CurrentOutOrder.MDOutOrderType.OrderType == GlobalApp.OrderTypes.Contract
+                || CurrentOutOrder.MDOutOrderType.OrderType == GlobalApp.OrderTypes.InternalOrder)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Unassigns the in order pos.
+        /// </summary>
+        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 604, true)]
+        public void UnAssignContractPos()
+        {
+            if (!IsEnabledUnAssignContractPos())
+                return;
+
+            OutOrderPos parentOutOrderPos = null;
+            OutOrderPos currentOutOrderPos = CurrentOutOrderPos;
+            parentOutOrderPos = CurrentOutOrderPos.OutOrderPos1_ParentOutOrderPos;
+
+            Msg result = null;
+            try
+            {
+                result = OutDeliveryNoteManager.UnassignContractOutOrderPos(currentOutOrderPos, DatabaseApp);
+                if (result != null)
+                {
+                    Messages.Msg(result);
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                string msg = e.Message;
+                if (e.InnerException != null && e.InnerException.Message != null)
+                    msg += " Inner:" + e.InnerException.Message;
+
+                Messages.LogException("BSOOutOrder", "UnAssignContractPos", msg);
+                return;
+            }
+
+            if (result == null && parentOutOrderPos != null)
+            {
+                if (!_UnSavedUnAssignedContractPos.Contains(parentOutOrderPos))
+                    _UnSavedUnAssignedContractPos.Add(parentOutOrderPos);
+            }
+
+            OnPropertyChanged("OutOrderPosList");
+            RefreshOpenContractPosList();
+            PartialQuantity = null;
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled unassign in order pos].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled unassign in order pos]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUnAssignContractPos()
+        {
+            if (CurrentOutOrderPos == null
+                || CurrentOutOrderPos.OutOrderPos1_ParentOutOrderPos == null
+                || CurrentOutOrderPos.OutOrderPos1_ParentOutOrderPos.OutOrder.MDOutOrderType.OrderType != GlobalApp.OrderTypes.Contract)
+                return false;
+            return true;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case "Save":
+                    Save();
+                    return true;
+                case "IsEnabledSave":
+                    result = IsEnabledSave();
+                    return true;
+                case "UndoSave":
+                    UndoSave();
+                    return true;
+                case "IsEnabledUndoSave":
+                    result = IsEnabledUndoSave();
+                    return true;
+                case "Load":
+                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    return true;
+                case "IsEnabledLoad":
+                    result = IsEnabledLoad();
+                    return true;
+                case "New":
+                    New();
+                    return true;
+                case "IsEnabledNew":
+                    result = IsEnabledNew();
+                    return true;
+                case "Delete":
+                    Delete();
+                    return true;
+                case "IsEnabledDelete":
+                    result = IsEnabledDelete();
+                    return true;
+                case "Search":
+                    Search();
+                    return true;
+                case "NewOutOrderPos":
+                    NewOutOrderPos();
+                    return true;
+                case "IsEnabledNewOutOrderPos":
+                    result = IsEnabledNewOutOrderPos();
+                    return true;
+                case "DeleteOutOrderPos":
+                    DeleteOutOrderPos();
+                    return true;
+                case "IsEnabledDeleteOutOrderPos":
+                    result = IsEnabledDeleteOutOrderPos();
+                    return true;
+                case "LoadCompanyMaterialPickup":
+                    LoadCompanyMaterialPickup();
+                    return true;
+                case "IsEnabledLoadCompanyMaterialPickup":
+                    result = IsEnabledLoadCompanyMaterialPickup();
+                    return true;
+                case "NewCompanyMaterialPickup":
+                    NewCompanyMaterialPickup();
+                    return true;
+                case "IsEnabledNewCompanyMaterialPickup":
+                    result = IsEnabledNewCompanyMaterialPickup();
+                    return true;
+                case "DeleteCompanyMaterialPickup":
+                    DeleteCompanyMaterialPickup();
+                    return true;
+                case "IsEnabledDeleteCompanyMaterialPickup":
+                    result = IsEnabledDeleteCompanyMaterialPickup();
+                    return true;
+                case "AssignContractPos":
+                    AssignContractPos();
+                    return true;
+                case "IsEnabledAssignContractPos":
+                    result = IsEnabledAssignContractPos();
+                    return true;
+                case "UnAssignContractPos":
+                    UnAssignContractPos();
+                    return true;
+                case "IsEnabledUnAssignContractPos":
+                    result = IsEnabledUnAssignContractPos();
+                    return true;
+                case "RefreshOpenContractPosList":
+                    RefreshOpenContractPosList();
+                    return true;
+                case "FilterDialogContractPos":
+                    FilterDialogContractPos();
+                    return true;
+                case "ShowDialogOrder":
+                    ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
+
+    }
+}

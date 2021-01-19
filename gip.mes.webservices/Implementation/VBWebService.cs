@@ -1,0 +1,114 @@
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
+using gip.core.webservices;
+using gip.mes.facility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace gip.mes.webservices
+{
+    public partial class VBWebService : CoreWebService, IVBWebService
+    {
+        public WSResponse<BarcodeEntity> GetBarcodeEntity(string barcodeID)
+        {
+            if (string.IsNullOrEmpty(barcodeID))
+                return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "barcodeID is empty"));
+
+            var result01 = GetFacilityChargeByBarcode(barcodeID);
+            if (result01.Suceeded && result01.Data != null)
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { FacilityCharge = result01.Data });
+
+            var result02 = GetFacilityLotByBarcode(barcodeID);
+            if (result02.Suceeded && result02.Data != null)
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { FacilityLot = result02.Data });
+
+            var result03 = GetMaterialByBarcode(barcodeID);
+            if (result03.Suceeded && result03.Data != null)
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { Material = result03.Data });
+
+            var result04 = GetFacilityByBarcode(barcodeID);
+            if (result04.Suceeded && result04.Data != null)
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { Facility = result04.Data });
+
+            var result05 = GetACClassByBarcode(barcodeID);
+            if (result05.Suceeded && result05.Data != null)
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { ACClass = result05.Data });
+
+            return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Unknown barcode"));
+        }
+
+        public WSResponse<BarcodeSequence> InvokeBarcodeSequence(BarcodeSequence sequence)
+        {
+            if (String.IsNullOrEmpty(sequence.CurrentBarcode) && sequence.State < BarcodeSequence.ActionState.Question)
+                return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "barcodeID is empty"));
+
+            if (   sequence.State == BarcodeSequence.ActionState.Completed
+                || sequence.State == BarcodeSequence.ActionState.Cancelled
+                || sequence.Sequence == null)
+            {
+                sequence.Sequence = new List<BarcodeEntity>();
+            }
+            if (sequence.State < BarcodeSequence.ActionState.Question)
+            {
+                WSResponse<BarcodeEntity> nextEntity = GetBarcodeEntity(sequence.CurrentBarcode);
+
+                if (!nextEntity.Suceeded)
+                {
+                    sequence.State = BarcodeSequence.ActionState.Cancelled;
+                    sequence.Message = nextEntity.Message;
+                    return new WSResponse<BarcodeSequence>(sequence, nextEntity.Message);
+                }
+                sequence.Sequence.Add(nextEntity.Data);
+            }
+            else if (sequence.State == datamodel.BarcodeSequenceBase.ActionState.Selection)
+            {
+                BarcodeEntity lastEntity = sequence.Sequence.LastOrDefault();
+                if (lastEntity.SelectedOrderWF == null)
+                    return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "SelectedOrderWF is empty"));
+            }
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PAEScannerDecoderWS decoder = myServiceHost.FindChildComponents<PAEScannerDecoderWS>(c => c is PAEScannerDecoderWS).FirstOrDefault();
+            if (decoder == null)
+                return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "PAEScannerDecoderWS not found"));
+
+            return decoder.OnHandleNextBarcodeSequence(sequence);
+        }
+
+
+        protected override void OnGetKnownTypes4Translation(ref List<Tuple<Type, Type>> knownTypes)
+        {
+            base.OnGetKnownTypes4Translation(ref knownTypes);
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Facility), typeof(webservices.Facility)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityCharge), typeof(webservices.FacilityCharge)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityLot), typeof(webservices.FacilityLot)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityLotStock), typeof(webservices.FacilityLotStock)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityStock), typeof(webservices.FacilityStock)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Material), typeof(webservices.Material)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MaterialStock), typeof(webservices.MaterialStock)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDFacilityType), typeof(webservices.MDFacilityType)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDReleaseState), typeof(webservices.MDReleaseState)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Picking), typeof(webservices.Picking)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.PickingPos), typeof(webservices.PickingPos)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDUnit), typeof(webservices.MDUnit)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(facility.ACMethodBooking), typeof(webservices.ACMethodBooking)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityChargeSumMaterialHelper), typeof(FacilityChargeSumMaterialHelper)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityChargeSumLotHelper), typeof(FacilityChargeSumLotHelper)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityChargeSumLocationHelper), typeof(FacilityChargeSumLocationHelper)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityChargeSumFacilityHelper), typeof(FacilityChargeSumFacilityHelper)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityBookingOverview), typeof(FacilityBookingOverview)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityBookingChargeOverview), typeof(FacilityBookingChargeOverview)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Partslist), typeof(webservices.Partslist)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslistPos), typeof(webservices.ProdOrderPartslistPos)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrder), typeof(webservices.ProdOrder)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderBatch), typeof(webservices.ProdOrderBatch)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslistPosRelation), typeof(webservices.ProdOrderPartslistPosRelation)));
+        }
+    }
+}

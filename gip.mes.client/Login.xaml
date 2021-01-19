@@ -1,0 +1,145 @@
+﻿<Window x:Class="gip.mes.client.Login"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vbcontrols="clr-namespace:gip.core.layoutengine;assembly=gip.core.layoutengine"    
+    Title="iPlus.MES" Height="300" Width="600" MaxHeight="300" MaxWidth="600" MinHeight="180" MinWidth="525" WindowStartupLocation="CenterScreen" Icon="/gip.mes.client;component/Images/gip.ico" WindowStyle="SingleBorderWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+    <Grid Background="{StaticResource {ComponentResourceKey ResourceId=AppDark, TypeInTargetAssembly={x:Type vbcontrols:VBCustomControl}}}">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="225"></ColumnDefinition>
+            <ColumnDefinition Width="80*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush Opacity="1" RelativeTransform="Identity" Transform="Identity" ColorInterpolationMode="SRgbLinearInterpolation" MappingMode="RelativeToBoundingBox" SpreadMethod="Pad" StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="#FF000004" Offset="0" />
+                    <GradientStop Color="#FF000020" Offset="0.3" />
+                    <GradientStop Color="#FF000030" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        <vbcontrols:VBBorder RenderTransformOrigin="0.5, 0.5" Margin="20">
+            <Border.Background>
+                <ImageBrush ImageSource="/Images/Login.png" Stretch="UniformToFill"/>
+            </Border.Background>
+            <Border.RenderTransform>
+                <ScaleTransform ScaleX="0" />
+            </Border.RenderTransform>
+            <Border.Triggers>
+                <EventTrigger RoutedEvent="Border.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleX)" From="-1" To="1" Duration="0:0:6" RepeatBehavior="Forever" AutoReverse="True" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+        </vbcontrols:VBBorder>
+        <StackPanel  Grid.Row="0" Grid.Column="1">
+            <Grid x:Name="ProgressGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="250"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                        <ColumnDefinition Width="200*"></ColumnDefinition>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"></RowDefinition>
+                        <RowDefinition Height="20"></RowDefinition>
+                        <RowDefinition Height="10"></RowDefinition>
+                        <RowDefinition Height="20"></RowDefinition>
+                        <RowDefinition Height="10"></RowDefinition>
+                        <RowDefinition Height="35*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.ColumnSpan="3" Grid.RowSpan="6" CornerRadius="4" BorderThickness="1"></Border>
+                    <Border Grid.Row="1" Grid.Column="1" CornerRadius="4" Margin="3,0,3,0" HorizontalAlignment="Left">
+                        <vbcontrols:VBTextBlock Text="Initialization..." FontStyle="Italic" FontSize="14" FontWeight="Bold">
+                        </vbcontrols:VBTextBlock>
+                    </Border>
+                    <vbcontrols:VBProgressBar x:Name="progressBar" Grid.Row="3" Grid.Column="1" IsIndeterminate="True"></vbcontrols:VBProgressBar>
+                    <vbcontrols:VBListBox x:Name="listboxInfo" Grid.Row="5" Grid.Column="1" ItemsSource="{Binding MsgDetails}" DisplayMemberPath="Message" IsSynchronizedWithCurrentItem="True" ShowCaption="False"></vbcontrols:VBListBox>
+                </Grid>
+            </Grid>
+            <Grid x:Name="LoginGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                        <ColumnDefinition Width="80*"></ColumnDefinition>
+                        <ColumnDefinition Width="120*"></ColumnDefinition>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"></RowDefinition>
+                        <RowDefinition Height="20"></RowDefinition>
+                        <RowDefinition Height="40"></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="25*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="1" Grid.Column="1" CornerRadius="4" Margin="3,0,3,0"  Width="100" HorizontalAlignment="Left">
+                        <vbcontrols:VBTextBlock Text="Login" FontStyle="Italic" FontSize="14" FontWeight="Bold">
+                        </vbcontrols:VBTextBlock>
+                    </Border>
+
+                    <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="1" Name="label1">User</vbcontrols:VBTextBlock>
+                    <vbcontrols:VBTextBox VerticalAlignment="Bottom" Height="25" Grid.Row="2" Grid.Column="2" Name="TextboxUser" ShowCaption="False"/>
+
+                    <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="3" Grid.Column="1" Name="label2">Password</vbcontrols:VBTextBlock>
+                    <vbcontrols:VBPasswordBox VerticalAlignment="Bottom" Height="25" Grid.Row="3" Margin="-1,0,-1,0" Grid.Column="2" ShowCaption="False" Name="TextboxPassword"/>
+
+                    <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="4" Grid.Column="1" >Style</vbcontrols:VBTextBlock>
+                    <vbcontrols:VBComboBox VerticalAlignment="Bottom" Height="25" Grid.Row="4" Grid.Column="2" Name="selTheme" ShowCaption="False" IsEditable="False"></vbcontrols:VBComboBox>
+
+                    <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="5" Grid.Column="1" Name="labelRestoreSameScreen">Multiple Screens</vbcontrols:VBTextBlock>
+                    <vbcontrols:VBCheckBox VerticalAlignment="Bottom" Grid.Row="5" Grid.Column="2" Name="CheckRestoreSameScreen"></vbcontrols:VBCheckBox>
+
+                    <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="6" Grid.Column="1" Name="labelTouchScreen">Touch screen</vbcontrols:VBTextBlock>
+                    <vbcontrols:VBCheckBox VerticalAlignment="Bottom" Grid.Row="6" Grid.Column="2" Name="CheckTouchScreen"></vbcontrols:VBCheckBox>
+
+                    <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="6" Grid.Column="1" Name="label3"  Visibility="Hidden">Programming-Key</vbcontrols:VBTextBlock>
+                    <vbcontrols:VBTextBox VerticalAlignment="Bottom" Height="25" Grid.Row="6" Grid.Column="2" Name="TextboxKey" ShowCaption="False" Visibility="Hidden"/>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                        <ColumnDefinition Width="10"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"></RowDefinition>
+                        <RowDefinition Height="35"></RowDefinition>
+                        <RowDefinition Height="10"></RowDefinition>
+                        <RowDefinition Height="16*" />
+                    </Grid.RowDefinitions>
+                    <Border Grid.ColumnSpan="5" Grid.RowSpan="3"  CornerRadius="4" BorderThickness="1"></Border>
+
+                    <vbcontrols:VBButton Grid.Row="1" Grid.Column="1" Name="ButtonLogin" IsDefault="True" Click="ButtonLogin_Click" MouseRightButtonDown="ButtonLogin_MouseRightButtonDown">Login</vbcontrols:VBButton>
+                    <vbcontrols:VBButton Grid.Row="1" Grid.Column="3" Name="ButtonCancel" Click="ButtonCancel_Click">Cancel</vbcontrols:VBButton>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

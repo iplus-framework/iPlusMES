@@ -1,0 +1,209 @@
+using System;
+using System.Linq;
+using gip.core.datamodel;
+using gip.mes.datamodel;
+using System.Threading;
+
+namespace gip.mes.processapplication
+{
+    /// <summary>
+    /// Workflow-Root für Umlagerung
+    /// </summary>
+    [ACClassConstructorInfo(
+        new object[] 
+        { 
+            new object[] {gip.core.datamodel.ACProgram.ClassName, Global.ParamOption.Required, typeof(Guid)},
+            new object[] {gip.core.datamodel.ACProgramLog.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {Picking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid)}
+        }
+    )]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Relocation'}de{'Umlagerung'}", Global.ACKinds.TPWMethod, Global.ACStorableTypes.Optional, true, true, "", "ACProgram", 40)]
+    public class PWMethodRelocation : PWMethodTransportBase
+    {
+        new public const string PWClassName = "PWMethodRelocation";
+
+        #region c´tors
+        static PWMethodRelocation()
+        {
+            RegisterExecuteHandler(typeof(PWMethodRelocation), HandleExecuteACMethod_PWMethodRelocation);
+        }
+
+        public PWMethodRelocation(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+            : base(acType, content, parentACObject, parameter, acIdentifier)
+        {
+        }
+
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            if (!base.ACInit(startChildMode))
+                return false;
+
+            return true;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _CurrentFacilityBooking = null;
+            }
+
+
+            if (!base.ACDeInit(deleteACClassTask))
+                return false;
+
+            return true;
+        }
+
+        public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        {
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _CurrentFacilityBooking = null;
+            }
+
+            base.Recycle(content, parentACObject, parameter, acIdentifier);
+        }
+        #endregion
+
+        #region Properties
+        protected gip.mes.datamodel.FacilityBooking _CurrentFacilityBooking = null;
+        public gip.mes.datamodel.FacilityBooking CurrentFacilityBooking
+        {
+            get
+            {
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    if (_CurrentFacilityBooking != null)
+                        return _CurrentFacilityBooking;
+                }
+                LoadVBEntities();
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _CurrentFacilityBooking;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        #region Execute-Helper-Handlers
+        public static bool HandleExecuteACMethod_PWMethodRelocation(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            return HandleExecuteACMethod_PWMethodTransportBase(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+        #endregion
+
+
+        #region Planning and Testing
+        protected override TimeSpan GetPlannedDuration()
+        {
+            return base.GetPlannedDuration();
+        }
+
+        protected override DateTime GetPlannedStartTime()
+        {
+            return base.GetPlannedStartTime();
+        }
+        #endregion
+
+        #region Order
+
+        protected override void LoadVBEntities()
+        {
+            var rootPW = RootPW;
+            if (rootPW == null)
+                return;
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                if (_CurrentPicking != null || _CurrentFacilityBooking != null)
+                    return;
+            }
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                ACMethod acMethod = CurrentACMethod.ValueT;
+                if (acMethod != null)
+                {
+                    var entity = PWDischarging.GetTransportEntityFromACMethod(dbApp, acMethod);
+                    if (entity != null)
+                    {
+                        Picking currentPicking = entity as Picking;
+                        if (currentPicking != null)
+                        {
+                            PickingPos currentPickingPos = null;
+                            Guid pickingPosID = PWDischarging.GetPickingPosIDFromACMethod(acMethod);
+                            if (pickingPosID != Guid.Empty)
+                                currentPickingPos = currentPicking.PickingPos_Picking.Where(c => c.PickingPosID == pickingPosID).FirstOrDefault();
+                            if (currentPickingPos == null)
+                                currentPickingPos = currentPicking.PickingPos_Picking.Where(c => c.MDDelivPosLoadStateID.HasValue 
+                                                                && (   c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive
+                                                                    || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)).FirstOrDefault();
+                            if (currentPickingPos == null)
+                                currentPickingPos = currentPicking.PickingPos_Picking.FirstOrDefault();
+                            dbApp.Detach(currentPicking);
+                            if (currentPickingPos != null)
+                                dbApp.Detach(currentPickingPos);
+
+                            using (ACMonitor.Lock(_20015_LockValue))
+                            {
+                                _CurrentPickingPos = currentPickingPos;
+                            }
+                        }
+
+                        FacilityBooking currentFacilityBooking = entity as FacilityBooking;
+                        if (currentFacilityBooking != null)
+                            dbApp.Detach(currentFacilityBooking);
+
+
+                        using (ACMonitor.Lock(_20015_LockValue))
+                        {
+                            _CurrentPicking = currentPicking;
+                            _CurrentFacilityBooking = currentFacilityBooking;
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void ACClassTaskQueue_ChangesSaved(object sender, ACChangesEventArgs e)
+        {
+            if (CurrentFacilityBooking != null)
+            {
+                ACClassTaskQueue.TaskQueue.ObjectContext.ACChangesExecuted -= ACClassTaskQueue_ChangesSaved;
+                if (_NewAddedProgramLog != null)
+                {
+                    this.ApplicationManager.ApplicationQueue.Add(() =>
+                    //ThreadPool.QueueUserWorkItem((object state) =>
+                    {
+                        using (DatabaseApp dbApp = new DatabaseApp())
+                        {
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
+                            orderLog.FacilityBookingID = CurrentFacilityBooking.FacilityBookingID;
+                            dbApp.OrderLog.AddObject(orderLog);
+                            dbApp.ACSaveChanges();
+                        }
+                        _NewAddedProgramLog = null;
+                    });
+                }
+                else
+                    _NewAddedProgramLog = null;
+            }
+            else
+            {
+                base.ACClassTaskQueue_ChangesSaved(sender, e);
+            }
+        }
+        #endregion
+
+        #endregion
+    }
+}

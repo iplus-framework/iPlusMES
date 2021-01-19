@@ -1,0 +1,380 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip.mes.datamodel</RootNamespace>
+    <AssemblyName>gip.mes.datamodel</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\GIP-SNKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACHandlingUnit\HandlingUnit.cs" />
+    <Compile Include="ACHandlingUnit\HU.cs" />
+    <Compile Include="ACHandlingUnit\HUData.cs" />
+    <Compile Include="ACHandlingUnit\HUList.cs" />
+    <Compile Include="ACHandlingUnit\HUPos.cs" />
+    <Compile Include="ACHandlingUnit\HUPosCharge.cs" />
+    <Compile Include="ACHandlingUnit\HUPosChargeList.cs" />
+    <Compile Include="ACHandlingUnit\HUPosList.cs" />
+    <Compile Include="ACHelperclasses\HelperIFacilityManager.cs" />
+    <Compile Include="ACHelperclasses\POPartslistPosReservation.cs" />
+    <Compile Include="ACInterfaces\ACHandlingUnit\IPackaging.cs" />
+    <Compile Include="ACInterfaces\ACHandlingUnit\IPackagingHierarchy.cs" />
+    <Compile Include="ACInterfaces\ACHandlingUnit\IPackagingPos.cs" />
+    <Compile Include="ACInterfaces\Document\DocumentManager.cs" />
+    <Compile Include="ACInterfaces\Document\DocumentSearchResult.cs" />
+    <Compile Include="ACInterfaces\Document\DocumentSettings.cs" />
+    <Compile Include="ACInterfaces\Document\DocumentTypesEnum.cs" />
+    <Compile Include="ACInterfaces\Document\DoumentFilter.cs" />
+    <Compile Include="ACInterfaces\FacilityManager\IFacilityManager.cs" />
+    <Compile Include="ACInterfaces\ITargetQuantity.cs" />
+    <Compile Include="ACInterfaces\PartslistPos\IPartslist.cs" />
+    <Compile Include="ACInterfaces\PartslistPos\IPartslistPosRelation.cs" />
+    <Compile Include="ACInterfaces\PartslistPos\IPartslistPos.cs" />
+    <Compile Include="ConstApp.cs" />
+    <Compile Include="EntityACProgram\MachineMaterialView.cs" />
+    <Compile Include="EntityACProgram\OrderLogPosMachines.cs" />
+    <Compile Include="EntityACProgram\OrderLogPosView.cs" />
+    <Compile Include="EntityACProgram\OrderLogRelView.cs" />
+    <Compile Include="EntityFacility\FacilityLotModel.cs" />
+    <Compile Include="EntityMD\MDSchedulingGroup.cs" />
+    <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
+    <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
+    <Compile Include="TandT\IACObjectEntityComparer.cs" />
+    <Compile Include="TandT\StartItemTypeComparer.cs" />
+    <Compile Include="TrackingCommon\TrackingEngineList.cs" />
+    <Compile Include="Views\ACProgramLogView.cs" />
+    <Compile Include="Views\DeliveryNotePosPreview.cs" />
+    <Compile Include="Views\InOrderPosPreview.cs" />
+    <Compile Include="Views\OrderPosPreviewBase.cs" />
+    <Compile Include="Views\OutOrderPosPreview.cs" />
+    <Compile Include="Views\PickingPosPreview.cs" />
+    <None Include="..\..\GIP-SNKey.snk">
+      <Link>GIP-SNKey.snk</Link>
+    </None>
+    <Compile Include="EntityACClass\ACClass.cs" />
+    <Compile Include="EntityACProgram\OrderLog.cs" />
+    <Compile Include="EntityCalendar\Calendar.cs" />
+    <Compile Include="EntityCalendar\CalendarHoliday.cs" />
+    <Compile Include="EntityCalendar\CalendarShift.cs" />
+    <Compile Include="EntityCalendar\CalendarShiftPerson.cs" />
+    <Compile Include="EntityCompany\Company.cs" />
+    <Compile Include="EntityCompany\CompanyAddress.cs" />
+    <Compile Include="EntityCompany\CompanyAddressDepartment.cs" />
+    <Compile Include="EntityCompany\CompanyAddressUnloadingpoint.cs" />
+    <Compile Include="EntityCompany\CompanyMaterial.cs" />
+    <Compile Include="EntityCompany\CompanyMaterialStock.cs" />
+    <Compile Include="EntityCompany\CompanyPerson.cs" />
+    <Compile Include="EntityCompany\CompanyPersonRole.cs" />
+    <Compile Include="EntityCompany\CompanyMaterialHistory.cs" />
+    <Compile Include="EntityCompany\CompanyMaterialPickup.cs" />
+    <Compile Include="EntityDelivery\DeliveryNote.cs" />
+    <Compile Include="EntityDelivery\DeliveryNotePos.cs" />
+    <Compile Include="EntityDemand\DemandOrder.cs" />
+    <Compile Include="EntityDemand\DemandOrderPos.cs" />
+    <Compile Include="EntityDemand\DemandPrimary.cs" />
+    <Compile Include="EntityDemand\DemandProdOrder.cs" />
+    <Compile Include="EntityFacility\Facility.cs" />
+    <Compile Include="EntityFacility\FacilityBooking.cs" />
+    <Compile Include="EntityFacility\FacilityBookingCharge.cs" />
+    <Compile Include="EntityFacility\FacilityCharge.cs" />
+    <Compile Include="EntityFacility\FacilityChargeModel.cs" />
+    <Compile Include="EntityFacility\FacilityHistory.cs" />
+    <Compile Include="EntityFacility\FacilityInventory.cs" />
+    <Compile Include="EntityFacility\FacilityInventoryPos.cs" />
+    <Compile Include="EntityFacility\FacilityLot.cs" />
+    <Compile Include="EntityFacility\FacilityLotStock.cs" />
+    <Compile Include="EntityFacility\FacilityPreBooking.cs" />
+    <Compile Include="EntityFacility\FacilityReservation.cs" />
+    <Compile Include="EntityFacility\FacilityStock.cs" />
+    <Compile Include="EntityFacility\History.cs" />
+    <Compile Include="EntityFacility\HistoryConfig.cs" />
+    <Compile Include="EntityFacility\HistoryExtension.cs" />
+    <Compile Include="EntityInOrder\InOrder.cs" />
+    <Compile Include="EntityInOrder\InOrderConfig.cs" />
+    <Compile Include="EntityInOrder\InOrderPos.cs" />
+    <Compile Include="EntityInOrder\InOrderPosSplit.cs" />
+    <Compile Include="EntityInOrder\InRequest.cs" />
+    <Compile Include="EntityInOrder\InRequestConfig.cs" />
+    <Compile Include="EntityInOrder\InRequestPos.cs" />
+    <Compile Include="EntityLabel\Label.cs" />
+    <Compile Include="EntityLabel\LabelTranslation.cs" />
+    <Compile Include="EntityMaint\MaintACClass.cs" />
+    <Compile Include="EntityMaint\MaintACClassProperty.cs" />
+    <Compile Include="EntityMaint\MaintACClassVBGroup.cs" />
+    <Compile Include="EntityMaint\MaintOrder.cs" />
+    <Compile Include="EntityMaint\MaintOrderProperty.cs" />
+    <Compile Include="EntityMaint\MaintTask.cs" />
+    <Compile Include="EntityMaterialWF\MaterialWFACClassMethodConfig.cs" />
+    <Compile Include="EntityMaterialWF\MaterialWFACClassMethod.cs" />
+    <Compile Include="EntityMaterialWF\MaterialWFConnection.cs" />
+    <Compile Include="EntityMaterialWF\MaterialWFRelation.cs" />
+    <Compile Include="EntityMaterialWF\MaterialWF.cs" />
+    <Compile Include="EntityMaterialWF\PWMaterial.cs" />
+    <Compile Include="EntityMaterial\MaterialHelper.cs" />
+    <Compile Include="EntityMaterial\MaterialPetroleum.cs" />
+    <Compile Include="EntityMaterial\MaterialHistory.cs" />
+    <Compile Include="EntityMaterial\Material.cs" />
+    <Compile Include="EntityMaterial\MaterialCalculation.cs" />
+    <Compile Include="EntityMaterial\MaterialConfig.cs" />
+    <Compile Include="EntityMaterial\MaterialGMPAdditive.cs" />
+    <Compile Include="EntityMaterial\MaterialStock.cs" />
+    <Compile Include="EntityMaterial\MaterialUnit.cs" />
+    <Compile Include="EntityMD\MDMaintTaskState.cs" />
+    <Compile Include="EntityMD\MDTransportMode.cs" />
+    <Compile Include="EntityMD\MDProdOrderPartslistPosState.cs" />
+    <Compile Include="EntityMD\MDFacilityVehicleType.cs" />
+    <Compile Include="EntityMD\MDBalancingMode.cs" />
+    <Compile Include="EntityMD\MDBookingNotAvailableMode.cs" />
+    <Compile Include="EntityMD\MDCostCenter.cs" />
+    <Compile Include="EntityMD\MDCountry.cs" />
+    <Compile Include="EntityMD\MDCountryLand.cs" />
+    <Compile Include="EntityMD\MDCountrySalesTax.cs" />
+    <Compile Include="EntityMD\MDCurrency.cs" />
+    <Compile Include="EntityMD\MDCurrencyExchange.cs" />
+    <Compile Include="EntityMD\MDDelivNoteState.cs" />
+    <Compile Include="EntityMD\MDDelivPosLoadState.cs" />
+    <Compile Include="EntityMD\MDDelivPosState.cs" />
+    <Compile Include="EntityMD\MDDelivType.cs" />
+    <Compile Include="EntityMD\MDDemandOrderState.cs" />
+    <Compile Include="EntityMD\MDFacilityInventoryPosState.cs" />
+    <Compile Include="EntityMD\MDFacilityInventoryState.cs" />
+    <Compile Include="EntityMD\MDFacilityManagementType.cs" />
+    <Compile Include="EntityMD\MDFacilityType.cs" />
+    <Compile Include="EntityMD\MDGMPAdditives.cs" />
+    <Compile Include="EntityMD\MDGMPMaterialGroup.cs" />
+    <Compile Include="EntityMD\MDGMPMaterialGroupPos.cs" />
+    <Compile Include="EntityMD\MDInOrderPosState.cs" />
+    <Compile Include="EntityMD\MDInOrderState.cs" />
+    <Compile Include="EntityMD\MDInOrderType.cs" />
+    <Compile Include="EntityMD\MDInRequestState.cs" />
+    <Compile Include="EntityMD\MDInventoryManagementType.cs" />
+    <Compile Include="EntityMD\MDLabOrderPosState.cs" />
+    <Compile Include="EntityMD\MDLabOrderState.cs" />
+    <Compile Include="EntityMD\MDLabTag.cs" />
+    <Compile Include="EntityMD\MDMaintMode.cs" />
+    <Compile Include="EntityMD\MDMaintOrderPropertyState.cs" />
+    <Compile Include="EntityMD\MDMaintOrderState.cs" />
+    <Compile Include="EntityMD\MDMaterialGroup.cs" />
+    <Compile Include="EntityMD\MDMaterialType.cs" />
+    <Compile Include="EntityMD\MDMovementReason.cs" />
+    <Compile Include="EntityMD\MDOutOfferingState.cs" />
+    <Compile Include="EntityMD\MDOutOrderPlanState.cs" />
+    <Compile Include="EntityMD\MDOutOrderPosState.cs" />
+    <Compile Include="EntityMD\MDOutOrderState.cs" />
+    <Compile Include="EntityMD\MDOutOrderType.cs" />
+    <Compile Include="EntityMD\MDProcessErrorAction.cs" />
+    <Compile Include="EntityMD\MDProdOrderState.cs" />
+    <Compile Include="EntityMD\MDReleaseState.cs" />
+    <Compile Include="EntityMD\MDReservationMode.cs" />
+    <Compile Include="EntityMD\MDTermOfPayment.cs" />
+    <Compile Include="EntityMD\MDTimeRange.cs" />
+    <Compile Include="EntityMD\MDToleranceState.cs" />
+    <Compile Include="EntityMD\MDTour.cs" />
+    <Compile Include="EntityMD\MDTourplanPosState.cs" />
+    <Compile Include="EntityMD\MDTourplanState.cs" />
+    <Compile Include="EntityMD\MDUnit.cs" />
+    <Compile Include="EntityMD\MDUnitConversion.cs" />
+    <Compile Include="EntityMD\MDVisitorCard.cs" />
+    <Compile Include="EntityMD\MDVisitorCardState.cs" />
+    <Compile Include="EntityMD\MDVisitorVoucherState.cs" />
+    <Compile Include="EntityMD\MDZeroStockState.cs" />
+    <Compile Include="EntityLab\LabOrder.cs" />
+    <Compile Include="EntityLab\LabOrderPos.cs" />
+    <Compile Include="EntityOutOrder\OutOffering.cs" />
+    <Compile Include="EntityOutOrder\OutOfferingConfig.cs" />
+    <Compile Include="EntityOutOrder\OutOfferingPos.cs" />
+    <Compile Include="EntityOutOrder\OutOrder.cs" />
+    <Compile Include="EntityOutOrder\OutOrderConfig.cs" />
+    <Compile Include="EntityOutOrder\OutOrderPos.cs" />
+    <Compile Include="EntityOutOrder\OutOrderPosSplit.cs" />
+    <Compile Include="EntityOutOrder\OutOrderPosUtilization.cs" />
+    <Compile Include="EntityPartsList\ExpandResult.cs" />
+    <Compile Include="EntityPartsList\PartslistACClassMethod.cs" />
+    <Compile Include="EntityPartsList\Partslist.cs" />
+    <Compile Include="EntityPartsList\PartslistConfig.cs" />
+    <Compile Include="EntityPartsList\PartslistExpand.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EntityPartsList\PartslistPos.cs" />
+    <Compile Include="EntityPartsList\PartslistPosRelation.cs" />
+    <Compile Include="EntityPartsList\PartslistStock.cs" />
+    <Compile Include="EntityPicking\Picking.cs" />
+    <Compile Include="EntityPicking\PickingConfig.cs" />
+    <Compile Include="EntityPicking\PickingPos.cs" />
+    <Compile Include="EntityProdOrder\BatchCreateModel.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistConfig.cs" />
+    <Compile Include="EntityProdOrder\ProdOrder.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderBatch.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslist.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderBatchPlan.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistPos.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistPosFacilityLot.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistPosRelation.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistPosSplit.cs" />
+    <Compile Include="EntityMD\MDRatingComplaintType.cs" />
+    <Compile Include="EntityRating\Rating.cs" />
+    <Compile Include="EntityRating\RatingComplaint.cs" />
+    <Compile Include="EntityTour\Tourplan.cs" />
+    <Compile Include="EntityTour\TourplanPos.cs" />
+    <Compile Include="EntityTour\TourplanConfig.cs" />
+    <Compile Include="EntityVisitor\Visitor.cs" />
+    <Compile Include="EntityVisitor\VisitorVoucher.cs" />
+    <Compile Include="EntityWeighing\Weighing.cs" />
+    <Compile Include="EntityWeighing\WeighingNet.cs" />
+    <Compile Include="EntityWeighing\WeighingTotal.cs" />
+    <Compile Include="EntityWeighing\WeighingValue.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DatabaseApp.cs" />
+    <Compile Include="TandT\MDBookingDirectionEnum.cs" />
+    <Compile Include="TandT\MDTrackingDirectionEnum.cs" />
+    <Compile Include="TandT\MDTrackingStartItemTypeEnum.cs" />
+    <Compile Include="TandT\TandTv3FilterTracking.cs" />
+    <Compile Include="TandT\TandTv3MDBookingDirection.cs" />
+    <Compile Include="TandT\TandTv3MDTrackingDirection.cs" />
+    <Compile Include="TandT\TandTv3MDTrackingStartItemType.cs" />
+    <Compile Include="TandT\TandTv3Step.cs" />
+    <Compile Include="TrackingCommon\IOnTrackingCall.cs" />
+    <Compile Include="TrackingCommon\ITrackingCommand.cs" />
+    <Compile Include="TandT2\TandTv2ItemType.cs" />
+    <Compile Include="TandT2\TandTv2ItemTypeEnum.cs" />
+    <Compile Include="TandT2\TandTv2Job.cs" />
+    <Compile Include="TandT2\TandTv2Operation.cs" />
+    <Compile Include="TandT2\TandTv2OperationEnum.cs" />
+    <Compile Include="TandT2\TandTv2RelationType.cs" />
+    <Compile Include="TandT2\TandTv2RelationTypeEnum.cs" />
+    <Compile Include="TandT2\TandTv2Step.cs" />
+    <Compile Include="TandT2\TandTv2StepItem.cs" />
+    <Compile Include="TandT2\TandTv2StepItemRelation.cs" />
+    <Compile Include="TandT2\TandTv2StepLot.cs" />
+    <Compile Include="TandT2\TandTv2TempPos.cs" />
+    <Compile Include="TandT2\TandTv2TrackingStyle.cs" />
+    <Compile Include="TandT2\TandTv2TrackingStyleEnum.cs" />
+    <Compile Include="TrackingCommon\TrackingConfiguration.cs" />
+    <Compile Include="TrackingCommon\TrackingEnginesEnum.cs" />
+    <Compile Include="TrackingCommon\TrackingWorkingModelEnum.cs" />
+    <Compile Include="iPlusMESV4.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>iPlusMESV4.tt</DependentUpon>
+    </Compile>
+    <Compile Include="iPlusMESV4.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>iPlusMESV4.edmx</DependentUpon>
+    </Compile>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+    <EntityDeploy Include="iPlusMESV4.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>iPlusMESV4.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="iPlusMESV4.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>iPlusMESV4.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\info.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\InsertUpdateInfo.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="VBControlScripts\" />
+  </ItemGroup>
+  <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="$(OutDir)\iPlusMESV4.csdl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(OutDir)\iPlusMESV4.msl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(OutDir)\iPlusMESV4.ssdl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

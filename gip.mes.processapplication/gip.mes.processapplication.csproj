@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D1320FB8-333D-4072-880D-BD5137933D2F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip.mes.processapplication</RootNamespace>
+    <AssemblyName>gip.mes.processapplication</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACProcessApplication\PABatchPlanScheduler.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEChainConveyor.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEConveyorBelt.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEElevator.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEPump.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAESampleMagazine.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScaleCalibratable.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScrew.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAETransport.cs" />
+    <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinSelection.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFDischarging.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFDosing.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFCooling.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFManualAddition.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFSampleWeighing.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFVacuum.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFDrying.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFExtruding.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFManualWeighing.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFMixing.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMBeltscale.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMContinuosfurnace.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMDryer.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMExtruder.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMFlowmeter.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMFurnace.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\IPAMContScale.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMHopperscale.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMIntake.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMIntermediatebin.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMLoadingstation.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMMixer.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMParkingspace.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMPlatformscale.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMSilo.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMTank.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskScanBase.cs" />
+    <Compile Include="ACProcessWorkflow\PWGroupVB.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\PWMethodTransportBase.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\ACSubStateEnum.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\PWMethodVBBase.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSampleWeighing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSampleWeighingLoop.cs" />
+    <Compile Include="Manager\DischargingItemManager.cs" />
+    <Compile Include="Manager\DischargingItemNoValidator.cs" />
+    <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
+    <Compile Include="Model\BatchSuggestionCommandModeEnum.cs" />
+    <Compile Include="Model\BinSelectionItem.cs" />
+    <Compile Include="Model\ManualPreparationSourceInfoType.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWBinChangeLoop.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWBinDischarging.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWBinSelection.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosing_Picking.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosing_Prod.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDischarging_Loading.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDischarging_Picking.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDischarging_Relocation.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWEmptyingModeQuestion.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDischarging_Intake.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDischarging_Prod.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosingLoop.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWCooling.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeCheckWeighing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeProcessWorkflowVB_Picking.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeProcessWorkflowVB_Prod.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeDeliverMaterial.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWVacuum.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeProcessWorkflowVB.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWNodeStartNextBatch.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\PWMethodIntake.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\PWMethodLoading.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\PWMethodProduction.cs" />
+    <Compile Include="ACProcessWorkflow\PWMethod\PWMethodRelocation.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDischarging.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDrying.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWExtruding.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWLoad.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualAddition.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWMixing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWScanning.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWUnload.cs" />
+    <Compile Include="BSO\ACClassTaskWrapperVB.cs" />
+    <Compile Include="BSO\VBBSOControlPAVB.cs" />
+    <Compile Include="Configuration\ProcessConfiguration.cs" />
+    <Compile Include="Configuration\ConfigManagerIPlusMES.cs" />
+    <Compile Include="Manager\PAShowDlgManagerVB.cs" />
+    <Compile Include="Model\BinSelectionModel.cs" />
+    <Compile Include="Model\DischargingItem.cs" />
+    <Compile Include="Model\PAScheduleForPWNodeList.cs" />
+    <Compile Include="Model\PAScheduleForPWNode.cs" />
+    <Compile Include="Model\StartNextCompResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
+      <Project>{3a9383d8-5c6d-429c-89d3-57c1d2565ad1}</Project>
+      <Name>gip.core.manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
+      <Project>{66484708-85BD-47C4-92DD-3010387465F4}</Project>
+      <Name>gip.core.processapplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
+      <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
+      <Name>gip.mes.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+      <Name>gip.mes.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj">
+      <Project>{52dc947d-677d-42ca-bca6-153a4e027272}</Project>
+      <Name>gip.mes.facility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.maintenance\gip.mes.maintenance.csproj">
+      <Project>{4e67a54f-a057-4fe7-9e5d-c40a5c465aea}</Project>
+      <Name>gip.mes.maintenance</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj">
+      <Project>{89d489d6-8881-4e43-a760-48051fac6c41}</Project>
+      <Name>gip.mes.manager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="VBControlScripts\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

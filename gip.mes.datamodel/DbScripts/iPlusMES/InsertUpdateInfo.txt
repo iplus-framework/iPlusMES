@@ -1,0 +1,7 @@
+﻿IUpdateInfo
+UpdateName varchar(5) not null;
+UpdateDate datetime not null;
+
+IInsertInfo
+InsertName varchar(5) not null;
+InsertDate datetime not null;
