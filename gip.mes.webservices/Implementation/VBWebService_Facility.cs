@@ -1224,7 +1224,7 @@ namespace gip.mes.webservices
                         .Where(c =>
                            (inputCode == null || c.FacilityChargeID == inputCode)
                             && ((facilityNo ?? "") == "" || c.FacilityCharge.Facility.FacilityNo == facilityNo)
-                            && ((lotNo ?? "") == "" || c.FacilityCharge.FacilityLot.LotNo == lotNo)
+                            && ((lotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == lotNo))
                             && ((materialNo ?? "") == "" || c.FacilityCharge.Material.MaterialNo == materialNo)
                             && (inventoryPosState == null || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == inventoryPosState)
                             && (notAvailable == null || c.NotAvailable == (notAvailable ?? false))
