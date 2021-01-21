@@ -999,6 +999,8 @@ namespace gip.mes.webservices
                     myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMDFacilityInventoryStates(973)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
+            Console.WriteLine("web service: GetMDFacilityInventoryStates");
+
             return response;
         }
 
@@ -1031,6 +1033,7 @@ namespace gip.mes.webservices
                     myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMDFacilityInventoryStates(973)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
+            Console.WriteLine("web service: GetMDFacilityInventoryPosStates");
             return response;
         }
         #endregion
@@ -1093,6 +1096,7 @@ namespace gip.mes.webservices
                     myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventories(1067)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
+            Console.WriteLine("web service: GetFacilityInventories");
             return response;
         }
 
@@ -1237,7 +1241,7 @@ namespace gip.mes.webservices
                             Comment = c.Comment,
                             LotNo = c.FacilityCharge.FacilityLot.LotNo,
                             MaterialNo = c.FacilityCharge.Material.MaterialNo,
-                            MaterialName  = c.FacilityCharge.Material.MaterialName1,
+                            MaterialName = c.FacilityCharge.Material.MaterialName1,
                             FacilityNo = c.FacilityCharge.Facility.FacilityNo,
                             FacilityName = c.FacilityCharge.Facility.FacilityName,
                             StockQuantity = c.StockQuantity,
@@ -1246,19 +1250,8 @@ namespace gip.mes.webservices
                             UpdateDate = c.UpdateDate,
                             UpdateName = c.UpdateName,
                             FacilityChargeID = c.FacilityChargeID,
-                            FacilityInventory = new FacilityInventory()
-                            {
-                                FacilityInventoryID = c.FacilityInventoryID,
-                                FacilityInventoryNo = c.FacilityInventory.FacilityInventoryNo
-                            },
-                            MDFacilityInventoryPosState = new MDFacilityInventoryPosState()
-                            {
-                                MDFacilityInventoryPosStateID = c.MDFacilityInventoryPosStateID,
-                                MDNameTrans = c.MDFacilityInventoryPosState.MDNameTrans,
-                                IsDefault = c.MDFacilityInventoryPosState.IsDefault,
-                                SortIndex = c.MDFacilityInventoryPosState.SortIndex,
-                                MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
-                            }
+                            FacilityInventoryNo = c.FacilityInventory.FacilityInventoryNo,
+                            MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
                         })
         );
         public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock)
@@ -1272,23 +1265,80 @@ namespace gip.mes.webservices
                     lotNo = lotNo != CoreWebServiceConst.EmptyParam ? lotNo : "";
                     materialNo = materialNo != CoreWebServiceConst.EmptyParam ? materialNo : "";
 
-                    Guid? inputCodeVal = null;
-                    if (!string.IsNullOrEmpty(inputCode) && inputCode != CoreWebServiceConst.EmptyParam)
-                        inputCodeVal = Guid.Parse(inputCode);
-                    
                     short? inventoryPosStateVal = null;
                     if (!string.IsNullOrEmpty(inventoryPosState) && inventoryPosState != CoreWebServiceConst.EmptyParam)
                         inventoryPosStateVal = short.Parse(inventoryPosState);
-                    
+
                     bool? notAvailableVal = null;
                     if (!string.IsNullOrEmpty(notAvailable) && notAvailable != CoreWebServiceConst.EmptyParam)
                         notAvailableVal = bool.Parse(notAvailable);
-                    
+
                     bool? zeroStockVal = null;
                     if (!string.IsNullOrEmpty(zeroStock) && zeroStock != CoreWebServiceConst.EmptyParam)
                         zeroStockVal = bool.Parse(zeroStock);
-                    
-                    response.Data = s_cQry_GetFacilityInventoryPoses(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal).ToList();
+
+                    Guid? inputCodeVal = null;
+                    if (!string.IsNullOrEmpty(inputCode) && inputCode != CoreWebServiceConst.EmptyParam)
+                    {
+                        Guid testParseInputCode = Guid.Empty;
+                        if (Guid.TryParse(inputCode, out testParseInputCode))
+                        {
+                            bool isFacilityCharge = databaseApp.FacilityCharge.Any(c => c.FacilityChargeID == inputCodeVal);
+                            if (!isFacilityCharge)
+                            {
+                                // Facility
+                                datamodel.Facility facility = databaseApp.Facility.FirstOrDefault(c => c.FacilityID == inputCodeVal);
+                                if (facility != null)
+                                {
+                                    facilityNo = facility.FacilityNo;
+                                    inputCodeVal = null;
+                                }
+                                else
+                                {
+                                    // Material
+                                    datamodel.Material material = databaseApp.Material.FirstOrDefault(c => c.MaterialID == inputCodeVal);
+                                    if (material != null)
+                                    {
+                                        materialNo = material.MaterialNo;
+                                        inputCodeVal = null;
+                                    }
+                                    else
+                                    {
+                                        // Lot
+                                        datamodel.FacilityLot facilityLot = databaseApp.FacilityLot.FirstOrDefault(c => c.FacilityLotID == inputCodeVal);
+                                        if (facilityLot != null)
+                                        {
+                                            lotNo = facilityLot.LotNo;
+                                            inputCodeVal = null;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Facility
+                            datamodel.Facility facility = databaseApp.Facility.FirstOrDefault(c => c.FacilityNo == inputCode);
+                            if (facility != null)
+                                facilityNo = facility.FacilityNo;
+                            else
+                            {
+                                // Material
+                                datamodel.Material material = databaseApp.Material.FirstOrDefault(c => c.MaterialNo == inputCode);
+                                if (material != null)
+                                    materialNo = material.MaterialNo;
+                                else
+                                {
+                                    // Lot
+                                    datamodel.FacilityLot facilityLot = databaseApp.FacilityLot.FirstOrDefault(c => c.LotNo == inputCode);
+                                    if (facilityLot != null)
+                                        lotNo = facilityLot.LotNo;
+                                }
+                            }
+                        }
+                    }
+                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryPoses(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal).OrderBy(c => c.Sequence).ToList();
+                    response.Data = items;
                 }
             }
             catch (Exception e)
@@ -1298,6 +1348,7 @@ namespace gip.mes.webservices
                     myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryPoses(1090)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
+            Console.WriteLine("web service: GetFacilityInventoryPoses");
             return response;
         }
 
@@ -1309,10 +1360,10 @@ namespace gip.mes.webservices
             WSResponse<bool> response = new WSResponse<bool>();
             try
             {
-                
+
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
-                    mes.datamodel.FacilityInventoryPos dbFacilityInventoryPos = 
+                    mes.datamodel.FacilityInventoryPos dbFacilityInventoryPos =
                         databaseApp
                         .FacilityInventoryPos
                         .Where(c => c.FacilityInventoryPosID == facilityInventoryPos.FacilityInventoryPosID)

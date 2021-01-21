@@ -712,12 +712,7 @@ namespace gip.bso.facility
 
                     OnPropertyChanged("SelectedFacilityInventory");
 
-                    _FacilityInventoryPosList = LoadFacilityInventoryPosList();
-                    OnPropertyChanged("FacilityInventoryPosList");
-                    if (_FacilityInventoryPosList != null)
-                        SelectedFacilityInventoryPos = _FacilityInventoryPosList.FirstOrDefault();
-                    else
-                        SelectedFacilityInventoryPos = null;
+                    SetFacilityInventoryPosList();
                 }
             }
         }
@@ -807,8 +802,6 @@ namespace gip.bso.facility
         {
             get
             {
-                if (_FacilityInventoryPosList == null)
-                    _FacilityInventoryPosList = LoadFacilityInventoryPosList();
                 return _FacilityInventoryPosList;
             }
         }
@@ -816,6 +809,7 @@ namespace gip.bso.facility
         private List<FacilityInventoryPos> LoadFacilityInventoryPosList()
         {
             if (SelectedFacilityInventory == null) return null;
+            SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
             return SelectedFacilityInventory
                 .FacilityInventoryPos_FacilityInventory
                 .Where(c =>
@@ -831,6 +825,16 @@ namespace gip.bso.facility
                  )
                 .OrderBy(c => c.Sequence)
                 .ToList();
+        }
+
+        public void SetFacilityInventoryPosList()
+        {
+            _FacilityInventoryPosList = LoadFacilityInventoryPosList();
+            OnPropertyChanged("FacilityInventoryPosList");
+            if (_FacilityInventoryPosList != null)
+                SelectedFacilityInventoryPos = _FacilityInventoryPosList.FirstOrDefault();
+            else
+                SelectedFacilityInventoryPos = null;
         }
 
         #endregion
@@ -992,6 +996,22 @@ namespace gip.bso.facility
             Search();
         }
 
+        [ACMethodInteraction(FacilityInventory.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityInventory", Global.ACKinds.MSMethodPrePost)]
+        public void Load(bool requery = false)
+        {
+            if (requery)
+            {
+                SelectedFacilityInventory.AutoRefresh();
+                OnPropertyChanged("SelectedFacilityInventory");
+                SetFacilityInventoryPosList();
+            }
+        }
+
+        public bool IsEnabledLoad()
+        {
+            return SelectedFacilityInventory != null;
+        }
+
         /// Searches this instance.
         /// </summary>
         [ACMethodInfo(FacilityInventoryPos.ClassName, "en{'Search'}de{'Suche'}", 205)]
@@ -999,13 +1019,7 @@ namespace gip.bso.facility
         {
             if (!IsEnabledSearchPos())
                 return;
-            _FacilityInventoryPosList = LoadFacilityInventoryPosList();
-            OnPropertyChanged("FacilityInventoryPosList");
-            if (_FacilityInventoryPosList != null)
-                SelectedFacilityInventoryPos = _FacilityInventoryPosList.FirstOrDefault();
-            else
-                SelectedFacilityInventoryPos = null;
-            return;
+            SetFacilityInventoryPosList();
         }
 
         public bool IsEnabledSearchPos()
@@ -1035,37 +1049,6 @@ namespace gip.bso.facility
         {
             return SelectedFacilityInventory != null;
         }
-
-        /// <summary>
-        /// Searches this instance.
-        /// </summary>
-
-
-        [ACMethodInteraction(FacilityInventory.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityInventory", Global.ACKinds.MSMethodPrePost)]
-        public void Load(bool requery = false)
-        {
-            //if (!PreExecute("Load")) return;
-            //if (IsLoadDisabled) return;
-            //IsLoadDisabled = true;
-
-            //LoadEntity<Partslist>(requery, () => SelectedPartslist, () => CurrentPartslist, c => CurrentPartslist = c,
-            //            DatabaseApp.Partslist
-            //            .Include(c => c.Material)
-            //            .Include(c => c.Material.BaseMDUnit)
-            //            .Include(c => c.MaterialWF)
-            //            .Include(c => c.Material.MDUnitList)
-            //            .Include(c => c.PartslistPos_Partslist)
-            //            .Include(c => c.MDUnit)
-            //            .Include(x => x.PartslistPos_Partslist)
-            //            .Where(c => c.PartslistID == SelectedPartslist.PartslistID));
-            //if (requery && CurrentPartslist != null)
-            //    foreach (var item in CurrentPartslist.PartslistPos_Partslist)
-            //        item.PartslistPosRelation_TargetPartslistPos.AutoLoad(this.DatabaseApp);
-            //PostExecute("Load");
-            //OnPropertyChanged("MaterialWFList");
-            //IsLoadDisabled = false;
-        }
-
 
         /// <summary>
         /// News this instance.
@@ -1252,7 +1235,7 @@ namespace gip.bso.facility
         {
             return
                 SelectedFacilityInventory != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short) MDFacilityInventoryState.FacilityInventoryStates.InProgress
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress
                 && SelectedFacilityInventoryPos != null
                 && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New;
         }

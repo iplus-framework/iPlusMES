@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace gip.mes.webservices
 {
@@ -63,13 +61,13 @@ namespace gip.mes.webservices
         }
 
         [DataMember(Name = "cFI")]
-        public FacilityInventory FacilityInventory
+        public string FacilityInventoryNo
         {
             get; set;
         }
 
         [DataMember(Name = "MDFIPosS")]
-        public MDFacilityInventoryPosState MDFacilityInventoryPosState
+        public short MDFacilityInventoryPosStateIndex
         {
             get; set;
         }
