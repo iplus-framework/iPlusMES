@@ -854,14 +854,14 @@ namespace gip.mes.processapplication
                                 if (weighingFunction is IPAFuncReceiveMaterial)
                                 {
                                     if (totalizingScale != null)
-                                        currentFillLevel -= totalizingScale.TotalActualWeight.ValueT;
+                                        currentFillLevel -= totalizingScale.TotalActualWeight.ValueT - totalizingScale.StoredWeightForPosting.ValueT;
                                     else
                                         currentFillLevel -= currentScale.ActualWeight.ValueT;
                                 }
                                 else if (weighingFunction is IPAFuncDeliverMaterial)
                                 {
                                     if (totalizingScale != null)
-                                        currentFillLevel -= Math.Abs(totalizingScale.TotalActualWeight.ValueT);
+                                        currentFillLevel += Math.Abs(totalizingScale.TotalActualWeight.ValueT - totalizingScale.StoredWeightForPosting.ValueT);
                                     else
                                         currentFillLevel += Math.Abs(currentScale.ActualWeight.ValueT);
                                 }

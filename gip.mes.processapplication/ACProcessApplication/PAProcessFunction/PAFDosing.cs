@@ -342,6 +342,8 @@ namespace gip.mes.processapplication
             StateTolerance.PropertyChanged += StateTolerance_PropertyChanged;
             StateLackOfMaterial.PropertyChanged += StateLackOfMaterial_PropertyChanged;
             StateDosingTime.PropertyChanged += StateDosingTime_PropertyChanged;
+            _ = _FuncScaleConfig.ValueT;
+            _ = _StopOnSourceChange.ValueT;
             return true;
         }
 
