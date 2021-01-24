@@ -63,7 +63,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Images\gip.ico</ApplicationIcon>
+    <ApplicationIcon>iPlusIconDesktop.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -287,13 +287,16 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\gip.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="_task\CommitPrepare.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Login.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\iPlusIconDesktop.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="iPlusIconDesktop.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
