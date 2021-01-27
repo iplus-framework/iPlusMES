@@ -63,7 +63,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>iPlusIconDesktop.ico</ApplicationIcon>
+    <ApplicationIcon>Images\iPlusIconDesktop.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -294,9 +294,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\iPlusIconDesktop.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="iPlusIconDesktop.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

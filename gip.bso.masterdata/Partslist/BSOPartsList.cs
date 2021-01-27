@@ -349,6 +349,7 @@ namespace gip.bso.masterdata
                 LoadProcessWorkflows();
                 LoadMaterialWorkflows();
             }
+            SelectedMaterialWF = null;
         }
 
         #region Partslist -> Methods -> IsEnabled
@@ -1136,6 +1137,8 @@ namespace gip.bso.masterdata
                 {
                     Messages.Msg(msg);
                 }
+
+                SelectedMaterialWF = null;
             }
             PostExecute("SetMaterialWF");
         }
@@ -2194,12 +2197,23 @@ namespace gip.bso.masterdata
                 case Const.IsEnabledPrefix + "Restore":
                     result = IsEnabledRestore();
                     return true;
+                case "UpdateFromMaterialWF":
+                    UpdateFromMaterialWF();
+                    return true;
+                case "IsEnabledUpdateFromMaterialWF":
+                    result = IsEnabledUpdateFromMaterialWF();
+                    return true;
+                case "UpdateAllFromMaterialWF":
+                    UpdateAllFromMaterialWF();
+                    return true;
+                case "IsEnabledUpdateAllFromMaterialWF":
+                    result = IsEnabledUpdateAllFromMaterialWF();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
-
 
     }
 }
