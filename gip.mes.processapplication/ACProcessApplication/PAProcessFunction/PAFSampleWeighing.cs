@@ -126,14 +126,22 @@ namespace gip.mes.processapplication
             {
                 Msg msg = calibScale.OnRegisterAlibiWeight(null);
                 if (msg != null)
+                {
+                    OnNewAlarmOccurred(FunctionError, msg.Message);
+                    FunctionError.ValueT = PANotifyState.AlarmOrFault;
                     return msg;
+                }
 
                 CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = calibScale.AlibiWeight.ValueT;
                 CurrentACMethod.ValueT.ResultValueList["AlibiNo"] = calibScale.AlibiNo.ValueT;
             }
-            else
+            else if (scale != null)
             {
                 CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = scale.ActualWeight.ValueT;
+            }
+            else
+            {
+                CurrentACMethod.ValueT.ResultValueList["ActualWeight"] = 0;
             }
 
             CurrentACState = ACStateEnum.SMCompleted;
