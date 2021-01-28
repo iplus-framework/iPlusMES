@@ -351,8 +351,15 @@ namespace gip.mes.processapplication
                                 Guid plPosID = function.CurrentACMethod.ValueT.ParameterValueList.GetGuid("PLPos");
                                 if (plPosID != Guid.Empty)
                                 {
-                                    double actualWeight = function.CurrentACMethod.ValueT.ResultValueList.GetDouble("ActualWeight");
-                                    string alibiNo = function.CurrentACMethod.ValueT.ResultValueList.GetString("AlibiNo");
+                                    ACValue actualWeightParam = function.CurrentACMethod.ValueT.ResultValueList.GetACValue("ActualWeight");
+                                    double actualWeight = 0;
+                                    if (actualWeightParam != null)
+                                        actualWeight = actualWeightParam.ParamAsDouble;
+
+                                    ACValue alibiNoParam = function.CurrentACMethod.ValueT.ResultValueList.GetACValue("AlibiNo");
+                                    string alibiNo = "";
+                                    if (alibiNoParam != null)
+                                        alibiNo = alibiNoParam.ParamAsString;
 
                                     using(Database db = new core.datamodel.Database())
                                     using (DatabaseApp dbApp = new DatabaseApp(db))

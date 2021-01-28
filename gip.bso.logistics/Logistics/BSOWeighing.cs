@@ -149,7 +149,7 @@ namespace gip.bso.logistics.Logistics
             {
                 if (SelectedWeighing != null)
                 {
-                    return SelectedWeighing.InOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote;
+                    return SelectedWeighing.InOrderPos?.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote;
                 }
                 return null;
             }
