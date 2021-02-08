@@ -15,7 +15,7 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Bin Inventory'}de{'Behälterveinventar'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityInventory.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Warehouse Inventory'}de{'Lager Inventur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityInventory.ClassName)]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "FacilityInventory", "en{'FacilityInventory'}de{'FacilityInventory'}", typeof(FacilityInventory), FacilityInventory.ClassName, "FacilityInventoryNo", "FacilityInventoryNo")]
 
     public class BSOFacilityInventory : ACBSOvbNav
