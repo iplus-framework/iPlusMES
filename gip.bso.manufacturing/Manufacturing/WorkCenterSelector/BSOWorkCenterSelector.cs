@@ -286,10 +286,8 @@ namespace gip.bso.manufacturing
                 {
                     _TaskPresenter = this.ACUrlCommand("VBPresenterTask(CurrentDesign)") as VBPresenterTask;
                     if (_TaskPresenter == null && !_PresenterRightsChecked)
-                    {
                         Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterTask in the group management!", true);
-                        _PresenterRightsChecked = true;
-                    }
+                    _PresenterRightsChecked = true;
                 }
                 return _TaskPresenter;
             }

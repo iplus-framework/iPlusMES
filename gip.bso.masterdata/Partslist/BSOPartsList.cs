@@ -1310,10 +1310,8 @@ namespace gip.bso.masterdata
                 {
                     _MaterialWFPresenter = this.ACUrlCommand("VBPresenterMaterialWF(CurrentDesign)") as VBPresenterMaterialWF;
                     if (_MaterialWFPresenter == null && !_MatPresenterRightsChecked)
-                    {
                         Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
-                        _MatPresenterRightsChecked = true;
-                    }
+                    _MatPresenterRightsChecked = true;
                 }
                 return _MaterialWFPresenter;
             }
@@ -1729,10 +1727,8 @@ namespace gip.bso.masterdata
                 {
                     _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
                     if (_presenter == null && !_PresenterRightsChecked)
-                    {
                         Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
-                        _PresenterRightsChecked = true;
-                    }
+                    _PresenterRightsChecked = true;
                 }
 
                 return _presenter;

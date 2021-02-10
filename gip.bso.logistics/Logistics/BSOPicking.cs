@@ -2476,10 +2476,8 @@ namespace gip.bso.logistics
                 {
                     _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
                     if (_presenter == null && !_PresenterRightsChecked)
-                    {
                         Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
-                        _PresenterRightsChecked = true;
-                    }
+                    _PresenterRightsChecked = true;
                 }
                 return _presenter;
             }
