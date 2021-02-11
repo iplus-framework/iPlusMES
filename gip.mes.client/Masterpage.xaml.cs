@@ -908,7 +908,52 @@ namespace gip.mes.client
             get { return _InFullscreen; }
         }
 
-#region Touchscreen
+        public void SwitchFullScreen()
+        {
+            if (!_InFullscreen)
+            {
+                if (_RootVBDesign != null
+                    && DockingManager != null
+                    && DockingManager.vbDockingPanelTabbedDoc_TabControl != null
+                    && DockingManager.vbDockingPanelTabbedDoc_TabControl.SelectedItem != null)
+                {
+                    TabItem tabItem = DockingManager.vbDockingPanelTabbedDoc_TabControl.SelectedItem as TabItem;
+                    _FullscreenContent = tabItem.Content;
+                    tabItem.Content = null;
+                    this.Content = _FullscreenContent;
+                    (this.Content as FrameworkElement).LayoutTransform = SubMainDockPanel.LayoutTransform;
+                    (this.Content as FrameworkElement).PreviewTouchDown += new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchDown);
+                    (this.Content as FrameworkElement).PreviewTouchMove += new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchMove);
+                    (this.Content as FrameworkElement).PreviewTouchUp += new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchUp);
+                    this.WindowStyle = System.Windows.WindowStyle.None;
+                    this.WindowState = System.Windows.WindowState.Maximized;
+                    _InFullscreen = true;
+                }
+            }
+            else
+            {
+                if (_RootVBDesign != null
+                    && _FullscreenContent != null
+                    && DockingManager != null
+                    && DockingManager.vbDockingPanelTabbedDoc_TabControl != null
+                    && DockingManager.vbDockingPanelTabbedDoc_TabControl.SelectedItem != null)
+                {
+                    this.Content = MainDockPanel;
+                    TabItem tabItem = DockingManager.vbDockingPanelTabbedDoc_TabControl.SelectedItem as TabItem;
+                    (this.Content as FrameworkElement).PreviewTouchDown -= new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchDown);
+                    (this.Content as FrameworkElement).PreviewTouchMove -= new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchMove);
+                    (this.Content as FrameworkElement).PreviewTouchUp -= new EventHandler<TouchEventArgs>(FullscreenContent_PreviewTouchUp);
+                    (_FullscreenContent as FrameworkElement).LayoutTransform = null;
+                    tabItem.Content = _FullscreenContent;
+                    _FullscreenContent = null;
+                    this.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
+                    this.WindowState = System.Windows.WindowState.Normal;
+                    _InFullscreen = false;
+                }
+            }
+        }
+
+        #region Touchscreen
         private Dictionary<int, Point> _LastPositionDict = new Dictionary<int, Point>();
         private void SubMainDockPanel_PreviewTouchDown(object sender, TouchEventArgs e)
         {
