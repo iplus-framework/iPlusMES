@@ -555,7 +555,7 @@ namespace gip.mes.processapplication
                             return false;
 
                         var materialsToProcess = queryOpenMaterials.Where(c => c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
-                                                                                 && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Blocked);
+                                                                                 || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
 
                         if (materialsToProcess == null || !materialsToProcess.Any())
                             return false;

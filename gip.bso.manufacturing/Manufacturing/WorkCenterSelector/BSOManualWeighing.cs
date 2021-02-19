@@ -1178,7 +1178,7 @@ namespace gip.bso.manufacturing
             }
 
             var alarmsAsText = CurrentProcessModule.GetPropertyNet("AlarmsAsText");
-            if(alarmsAsText == null)
+            if (alarmsAsText == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
@@ -1188,9 +1188,10 @@ namespace gip.bso.manufacturing
 
             LoadPAFManualWeighing(pafManWeighingRef);
 
-            if (_ProcessModuleScales != null && _ProcessModuleScales.Any())
-                ActivateScale(_ProcessModuleScales.FirstOrDefault());
-
+            if (ScaleObjectsList != null && ScaleObjectsList.Any())
+            {
+                SelectActiveScaleObject(true);
+            }
 
             _OrderInfo = orderInfo as IACContainerTNet<string>;
             (_OrderInfo as IACPropertyNetBase).PropertyChanged += OrderInfoPropertyChanged;
@@ -1287,6 +1288,11 @@ namespace gip.bso.manufacturing
             _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
             (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged += ActWeightProp_PropertyChanged;
             ScaleRealWeight = _ScaleActualWeight.ValueT;
+
+            if (CurrentPAFManualWeighing != null && scale != null && scale.ValueT != null)
+            {
+                CurrentPAFManualWeighing.ACUrlCommand("!SetActiveScaleObject", scale.ValueT.ACIdentifier);
+            }
 
             OnPropertyChanged("CurrentScaleObject");
         }
@@ -2169,18 +2175,28 @@ namespace gip.bso.manufacturing
         {
             if (ScaleObjectsList != null && weighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
             {
-                if (ScaleObjectsList.Count > 1)
+                SelectActiveScaleObject();
+            }
+            else
+                OnPropertyChanged("CurrentScaleObject");
+        }
+
+        private void SelectActiveScaleObject(bool setIfNotSelected = false)
+        {
+            if (ScaleObjectsList == null)
+                return;
+
+            if (ScaleObjectsList.Count > 1)
+            {
+                string activeScaleACUrl = CurrentPAFManualWeighing?.ACUrlCommand("!GetActiveScaleObjectACUrl") as string;
+                if (!string.IsNullOrEmpty(activeScaleACUrl))
                 {
-                    string activeScaleACUrl = CurrentPAFManualWeighing?.ACUrlCommand("!GetActiveScaleObjectACUrl") as string;
-                    if (!string.IsNullOrEmpty(activeScaleACUrl))
+                    MainSyncContext.Send((object state) =>
                     {
-                        MainSyncContext.Send((object state) =>
-                        {
-                            CurrentScaleObject = ScaleObjectsList.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
-                        }, new object());
-                    }
+                        CurrentScaleObject = ScaleObjectsList.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
+                    }, new object());
                 }
-                else
+                else if (setIfNotSelected)
                 {
                     MainSyncContext.Send((object state) =>
                     {
@@ -2189,7 +2205,12 @@ namespace gip.bso.manufacturing
                 }
             }
             else
-                OnPropertyChanged("CurrentScaleObject");
+            {
+                MainSyncContext.Send((object state) =>
+                {
+                    CurrentScaleObject = ScaleObjectsList.FirstOrDefault();
+                }, new object());
+            }
         }
 
         public virtual void OnComponentStateChanged(WeighingMaterial weighingMaterial)
