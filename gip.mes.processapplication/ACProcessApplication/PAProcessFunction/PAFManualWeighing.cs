@@ -165,9 +165,12 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 999)]
         public void SetActiveScaleObject(string scaleACIdentifier)
         {
-            PAEScaleGravimetric targetScale = ParentACComponent.ACUrlCommand(scaleACIdentifier) as PAEScaleGravimetric;
-            if (targetScale != null)
-                ActiveScaleObject = targetScale;
+            if (ActiveScaleObject == null || ActiveScaleObject.ACIdentifier != scaleACIdentifier)
+            {
+                PAEScaleGravimetric targetScale = ParentACComponent.ACUrlCommand(scaleACIdentifier) as PAEScaleGravimetric;
+                if (targetScale != null)
+                    ActiveScaleObject = targetScale;
+            }
         }
 
         public PAEScaleGravimetric GetActiveScaleObject()
@@ -815,12 +818,6 @@ namespace gip.mes.processapplication
         public void TareActiveScale()
         {
             TareScale(GetActiveScaleObject());
-
-            //var scale = GetActiveScaleObject();
-            //if (scale == null)
-            //    return;
-
-            //scale.TareScale(true, this.IsSimulationOn);
         }
 
         private void TareScale(PAEScaleGravimetric scale)
@@ -829,7 +826,10 @@ namespace gip.mes.processapplication
                 return;
 
             scale.TareScale(true, IsSimulationOn);
-            TareScaleState.ValueT = (short)TareScaleStateEnum.TareReq;
+            if(ManualWeighingPW != null)
+                TareScaleState.ValueT = (short)TareScaleStateEnum.TareReq;
+            else if(TareScaleState.ValueT != (short)TareScaleStateEnum.None)
+                TareScaleState.ValueT = (short)TareScaleStateEnum.None;
             scale.TareScale(false, IsSimulationOn);
         }
 
@@ -893,7 +893,7 @@ namespace gip.mes.processapplication
                 CurrentWeighingMaterial.ValueT = "";
 
             ManuallyAddedQuantity.ValueT = 0;
-            ActiveScaleObject = null;
+            //ActiveScaleObject = null;
             TareScaleState.ValueT = (short)TareScaleStateEnum.None;
 
             using (ACMonitor.Lock(_65000_IsManCompLock))
@@ -938,7 +938,7 @@ namespace gip.mes.processapplication
                 CurrentACMethod.ValueT.ParameterValueList["FacilityCharge"] = null;
                 CurrentACMethod.ValueT.ParameterValueList["Facility"] = null;
             }
-            ActiveScaleObject = null;
+            //ActiveScaleObject = null;
             TareScaleState.ValueT = (short)TareScaleStateEnum.None;
             base.Reset();
         }
