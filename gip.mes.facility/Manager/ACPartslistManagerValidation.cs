@@ -669,10 +669,11 @@ namespace gip.mes.facility
                                                     MsgWithDetails detailMessages)
         {
             ProdOrderPartslistPos poPos = mat4Dosing.I_SourcePartslistPos as ProdOrderPartslistPos;
-            return  !mat4Dosing.I_SourcePartslistPos.Material.IsIntermediate
-                 &&  poPos != null
-                 && (   poPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState < MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
-                     || poPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState > MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
+            return (   poPos != null
+                    && !mat4Dosing.I_SourcePartslistPos.Material.IsIntermediate
+                    && (poPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState < MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                        || poPos.MDProdOrderPartslistPosState.ProdOrderPartslistPosState > MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
+                || (!mat4Dosing.I_SourcePartslistPos.Material.IsIntermediate);
         }
         #endregion
 

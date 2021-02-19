@@ -69,10 +69,12 @@ namespace gip.mes.processapplication
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _MyConfiguration = null;
+                _SkipInvocTries = 0;
             }
             this.HasRules.ValueT = 0;
         }
 
+        private int _SkipInvocTries = 0;
         protected int SkipIfCountComp
         {
             get
@@ -92,6 +94,12 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Methods
+        public override void SMIdle()
+        {
+            _SkipInvocTries = 0;
+            base.SMIdle();
+        }
+
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
         public override void SMStarting()
         {
@@ -154,7 +162,17 @@ namespace gip.mes.processapplication
 #endif
                     if (!module.TaskInvocationPoint.AddTask(paramMethod, this))
                     {
-                        SubscribeToProjectWorkCycle();
+                        _SkipInvocTries++;
+                        if (_SkipInvocTries > 3)
+                        {
+                            _SkipInvocTries = 0;
+                            UnSubscribeToProjectWorkCycle();
+                            if (CurrentACState == ACStateEnum.SMStarting)
+                                CurrentACState = ACStateEnum.SMCompleted;
+                            return;
+                        }
+                        else
+                            SubscribeToProjectWorkCycle();
                         return;
                     }
                     else
