@@ -15,6 +15,7 @@ namespace gip.mes.processapplication
     {
         #region config
         public const string Config_LPHF = @"LPHF";
+        public const string Config_LPFW = @"LPFW";
         #endregion
 
         #region c'tors
@@ -490,6 +491,12 @@ namespace gip.mes.processapplication
                     binSelectionModel.FacilityID = new Guid(id);
                     break;
             }
+            return DoInwardBooking(binSelectionModel);
+        }
+
+        public Msg DoInwardBooking(BinSelectionModel binSelectionModel)
+        {
+            Msg msg = null;
             using (DatabaseApp dbApp = new DatabaseApp())
             {
 

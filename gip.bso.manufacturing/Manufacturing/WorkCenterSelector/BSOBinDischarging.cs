@@ -7,12 +7,15 @@ using vb = gip.mes.datamodel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using gip.mes.facility;
 
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Bin discharging'}de{'Gebinde entleeren'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 300)]
     public class BSOBinDischarging : BSOWorkCenterChild
     {
+        public static string ClassName = @"BSOBinDischarging";
+
         #region ctor's
 
         public BSOBinDischarging(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
@@ -22,7 +25,17 @@ namespace gip.bso.manufacturing
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            return base.ACInit(startChildMode);
+            bool init = base.ACInit(startChildMode);
+
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
+            return init;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
@@ -39,16 +52,55 @@ namespace gip.bso.manufacturing
             //    _InToleranceError.PropertyChanged += _InToleranceError_PropertyChanged;
             //_InToleranceError = null;
 
+            if (_ProdOrderManager != null)
+                ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
+
+            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            _ACFacilityManager = null;
+
+
             return base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
 
+        #region Managers
+
+        /// <summary>
+        /// The _ facility manager
+        /// </summary>
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        public ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
+            }
+        }
+
+        public DischargingItemManager DischargingItemManager { get; private set; }
+
+        #endregion
+
+
         #region Properties
 
         #region Properties -> Other
 
-        public DischargingItemManager DischargingItemManager { get; set; }
 
         public string _InputSourceCode;
         [ACPropertyInfo(609, "InputSourceCode", "en{'Code'}de{'Code'}")]
@@ -166,14 +218,14 @@ namespace gip.bso.manufacturing
             if (ItemFunction == null || ItemFunction.ProcessFunction == null)
                 return;
 
-            DischargingItemManager = new DischargingItemManager();
-
             object[] selectedItems = ItemFunction?.ProcessFunction?.ACUrlCommand("!GetSelection") as object[];
             if (selectedItems != null)
             {
                 _IntermediateChildPosID = (Guid)selectedItems[0];
                 _SourceInfoType = (ManualPreparationSourceInfoTypeEnum)selectedItems[1];
             }
+
+            DischargingItemManager = new DischargingItemManager(Root, this, ClassName, ACFacilityManager, ProdOrderManager, null);
 
             LoadDischargingItemList();
 
@@ -186,6 +238,7 @@ namespace gip.bso.manufacturing
                 _WaitForConfirm_PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(Const.ValueT));
                 _WaitForConfirm.PropertyChanged += _WaitForConfirm_PropertyChanged;
             }
+
         }
 
         ACStateEnum tmpState = ACStateEnum.SMStarting;

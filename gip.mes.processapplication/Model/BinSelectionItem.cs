@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -25,13 +26,13 @@ namespace gip.mes.processapplication
         {
             get
             {
-                if (!LastInwardFBDateTime.HasValue)
+                if (LastInwardFBC == null)
                     return false;
 
-                if (!LastOutwardFBDateTime.HasValue)
+                if (LastOutwardFBC == null)
                     return true;
 
-                return LastOutwardFBDateTime < LastInwardFBDateTime;
+                return LastOutwardFBC.InsertDate < LastInwardFBC.InsertDate;
             }
         }
 
@@ -40,24 +41,24 @@ namespace gip.mes.processapplication
 
         public string BatchNo { get; set; }
 
-        private DateTime? _LastInwardFBDateTime;
-        public DateTime? LastInwardFBDateTime
+        private FacilityBooking _LastInwardFBC;
+        public FacilityBooking LastInwardFBC
         {
-            get => _LastInwardFBDateTime;
+            get => _LastInwardFBC;
             set
             {
-                _LastInwardFBDateTime = value;
+                _LastInwardFBC = value;
                 OnPropertyChanged("IsReserved");
             }
         }
 
-        private DateTime? _LastOutwardFBDateTime;
-        public DateTime? LastOutwardFBDateTime
+        private FacilityBooking _LastOutwardFBC;
+        public FacilityBooking LastOutwardFBC
         {
-            get => _LastOutwardFBDateTime;
+            get => _LastOutwardFBC;
             set
             {
-                _LastOutwardFBDateTime = value;
+                _LastOutwardFBC = value;
                 OnPropertyChanged("IsReserved");
             }
         }
@@ -68,5 +69,6 @@ namespace gip.mes.processapplication
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
     }
 }

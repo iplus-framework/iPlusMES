@@ -36,7 +36,7 @@ namespace gip.mes.processapplication
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            DischargingItemManager = new DischargingItemManager();
+            DischargingItemManager = new DischargingItemManager(Root, this, ClassName, null, null, null);
             DischargingItemNoValidator = new DischargingItemNoValidator(this, ClassName);
             return base.ACInit(startChildMode);
         }

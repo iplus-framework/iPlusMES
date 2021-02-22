@@ -49,7 +49,7 @@ namespace gip.mes.processapplication
             if (!base.ACInit(startChildMode))
                 return false;
 
-            DischargingItemManager = new DischargingItemManager();
+            DischargingItemManager = new DischargingItemManager(Root, this, PWClassName, ACFacilityManager, ProdOrderManager, ProcessAlarm);
             return true;
         }
 
@@ -67,7 +67,6 @@ namespace gip.mes.processapplication
 
         #region Properties
 
-        public DischargingItemManager DischargingItemManager { get; set; }
 
         #region Properties -> Configuration
 
@@ -196,6 +195,8 @@ namespace gip.mes.processapplication
                 return ParentPWMethodVBBase.ACFacilityManager as FacilityManager;
             }
         }
+
+        public DischargingItemManager DischargingItemManager { get; set; }
 
         #endregion
 
@@ -530,6 +531,11 @@ namespace gip.mes.processapplication
                     }
                     else if (function.CurrentACState == ACStateEnum.SMCompleted)
                     {
+                        if (IntermediateChildPosKey == null)
+                        {
+                            PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
+                            PreparePosition(module, pwMethodProduction);
+                        }
                         Guid intermediateChildPosID = (Guid)IntermediateChildPosKey.EntityKeyValues[0].Value;
                         List<DischargingItem> dischargingItems = DischargingItemManager.LoadDischargingItemList(intermediateChildPosID, SourceInfoType);
                         string id = "";
@@ -539,7 +545,12 @@ namespace gip.mes.processapplication
                         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out testGUID))
                         {
                             DischargingItem dischargingItem = dischargingItems.FirstOrDefault(c => c.ItemID == new Guid(id));
-                            KeyValuePair<Msg, DischargingItem> bookingResult = ProceeedBooking(id, dischargingItem);
+                            string propertyACUrl = "";
+                            if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                                propertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                            DischargingItemManager.FacilityManager = ACFacilityManager;
+                            DischargingItemManager.ProdOrderManager = ProdOrderManager;
+                            KeyValuePair<Msg, DischargingItem> bookingResult = DischargingItemManager.ProceeedBooking(SourceInfoType, id, dischargingItem, propertyACUrl);
                             function.SendChangedACMethod();
 
                             if (bookingResult.Key != null && !bookingResult.Key.IsSucceded())
@@ -547,8 +558,6 @@ namespace gip.mes.processapplication
                             else if (!dischargingItems.Any(c => !c.IsDischarged))
                             {
                                 SubscribeToProjectWorkCycle();
-                                //UnSubscribeToProjectWorkCycle();
-                                //CurrentACState = ACStateEnum.SMCompleted;
                             }
                         }
                     }
@@ -755,135 +764,6 @@ namespace gip.mes.processapplication
             }
         }
 
-        private KeyValuePair<Msg, DischargingItem> ProceeedBooking(string id, DischargingItem dischargingItem)
-        {
-            BinSelectionModel binSelectionModel = new BinSelectionModel();
-            binSelectionModel.ProdorderPartslistPosRelationID = dischargingItem.ProdorderPartslistPosRelationID ?? Guid.Empty;
-            binSelectionModel.RestQuantity = dischargingItem.InwardBookingQuantityUOM;
-            switch (SourceInfoType)
-            {
-                case ManualPreparationSourceInfoTypeEnum.FacilityChargeID:
-                    binSelectionModel.FacilityChargeID = new Guid(id);
-                    break;
-                case ManualPreparationSourceInfoTypeEnum.FacilityID:
-                    binSelectionModel.FacilityID = new Guid(id);
-                    break;
-                default:
-                    break;
-            }
-            return DoOutwardBooking(binSelectionModel);
-        }
-
-        public virtual KeyValuePair<Msg, DischargingItem> DoOutwardBooking(BinSelectionModel binSelectionModel)
-        {
-            MsgWithDetails collectedMessages = new MsgWithDetails();
-            Msg msg = null;
-            DischargingItem outwardDischargingItem = null;
-            bool changePosState = true;
-            using (var dbIPlus = new Database())
-            using (var dbApp = new DatabaseApp(dbIPlus))
-            {
-                try
-                {
-                    MDProdOrderPartslistPosState posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
-                    Facility facility = null;
-                    FacilityCharge facilityCharge = null;
-                    if (binSelectionModel.FacilityChargeID != null)
-                    {
-                        facilityCharge = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == (binSelectionModel.FacilityChargeID ?? Guid.Empty));
-                        facility = facilityCharge.Facility;
-                    }
-                    else
-                    {
-                        facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == (binSelectionModel.FacilityID ?? Guid.Empty));
-                        facilityCharge = facility.FacilityCharge_Facility.FirstOrDefault();
-                    }
-                    ProdOrderPartslistPosRelation relation = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == (binSelectionModel.ProdorderPartslistPosRelationID ?? Guid.Empty));
-                    FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(ACFacilityManager, dbApp, relation);
-                    ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                    bookingParam.OutwardQuantity = binSelectionModel.RestQuantity;
-                    bookingParam.OutwardFacility = facility;
-                    string propertyACUrl = "";
-                    if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-                        propertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-                    bookingParam.PropertyACUrl = propertyACUrl;
-                    msg = dbApp.ACSaveChangesWithRetry();
-                    if (msg != null)
-                    {
-                        collectedMessages.AddDetailMessage(msg);
-                        Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(50)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoOutwardBooking(40)", 991), false);
-                        changePosState = false;
-                    }
-                    else
-                    {
-                        bookingParam.IgnoreIsEnabled = true;
-                        ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) as ACMethodEventArgs;
-                        if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
-                        {
-                            collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                            OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoOutwardBooking(60)", 1016), false);
-                            changePosState = false;
-                        }
-                        else
-                        {
-                            if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
-                            {
-                                Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(70)", bookingParam.ValidMessage.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoOutwardBooking(70)", 1024), false);
-                                changePosState = false;
-                            }
-                            changePosState = true;
-                            if (bookingParam.ValidMessage.IsSucceded())
-                            {
-                                FacilityBooking facilityBooking = relation.FacilityBooking_ProdOrderPartslistPosRelation.FirstOrDefault();
-                                outwardDischargingItem = new DischargingItem();
-                                outwardDischargingItem.OutwardBookingNo = facilityBooking.FacilityBookingNo;
-                                outwardDischargingItem.OutwardBookingQuantityUOM = facilityBooking.OutwardQuantity;
-                                outwardDischargingItem.OutwardBookingTime = facilityBooking.InsertDate;
-
-                                facilityPreBooking.DeleteACObject(dbApp, true);
-                                relation.IncreaseActualQuantityUOM(bookingParam.OutwardQuantity.Value);
-                                msg = dbApp.ACSaveChangesWithRetry();
-                                if (msg != null)
-                                {
-                                    collectedMessages.AddDetailMessage(msg);
-                                    Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(80)", msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoOutwardBooking(80)", 1036), false);
-                                }
-                            }
-                            else
-                            {
-                                collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                            }
-
-                            if (changePosState)
-                                relation.MDProdOrderPartslistPosState = posState;
-
-                            msg = dbApp.ACSaveChangesWithRetry();
-                            if (msg != null)
-                            {
-                                collectedMessages.AddDetailMessage(msg);
-                                Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(90)", msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoOutwardBooking(90)", 1048), false);
-                            }
-                            else
-                            {
-                                relation.RecalcActualQuantityFast();
-                                if (dbApp.IsChanged)
-                                    dbApp.ACSaveChangesWithRetry();
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    collectedMessages.AddDetailMessage(new Msg(eMsgLevel.Exception, e.Message));
-                    Root.Messages.LogException(GetACUrl(), "DoOutwardBooking(100)", e);
-                }
-            }
-            return new KeyValuePair<Msg, DischargingItem>(collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null, outwardDischargingItem);
-        }
 
         #endregion
 
