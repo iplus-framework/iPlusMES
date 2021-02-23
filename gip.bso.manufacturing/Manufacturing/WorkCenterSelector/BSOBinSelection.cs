@@ -526,6 +526,9 @@ namespace gip.bso.manufacturing
                 case "DblClickBin":
                     DblClickBin();
                     return true;
+                case "BinFreeUp":
+                    BinFreeUp();
+                    return true;
                 case "IsEnabledDblClickBin":
                     result = IsEnabledDblClickBin();
                     return true;
@@ -574,11 +577,12 @@ namespace gip.bso.manufacturing
             KeyValuePair<Msg, DischargingItem> dischOutwardRez = MakeOutwardBooking(dischargingItem);
             if (dischOutwardRez.Key == null || dischOutwardRez.Key.MessageLevel < eMsgLevel.Warning)
             {
-                OnPropertyChanged("SelectedBinFacility\\IsReserved");
                 if (action == BinFreeUpActionEnum.Ausschuss)
                     MakeNegativeOutwardBookingOnAusschuss(dischOutwardRez.Value);
                 else if (action == BinFreeUpActionEnum.BackToStock)
                     MakeNegativeOutwardBooking(dischOutwardRez.Value);
+
+                LoadList();
             }
         }
 
