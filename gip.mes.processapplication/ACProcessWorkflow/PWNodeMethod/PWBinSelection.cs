@@ -479,7 +479,6 @@ namespace gip.mes.processapplication
 
         private Msg CreateReservationBooking(string id)
         {
-            Msg msg = null;
             Guid intermediateChildPosID = (Guid)IntermediateChildPosKey.EntityKeyValues[0].Value;
             BinSelectionModel binSelectionModel = new BinSelectionModel() { ProdorderPartslistPosID = intermediateChildPosID, RestQuantity = PWBinSelection.BinSelectionReservationQuantity, FacilityChargeID = null, Comment = PWBinSelection.BinSelectionReservationComment };
             switch (SourceInfoType)
