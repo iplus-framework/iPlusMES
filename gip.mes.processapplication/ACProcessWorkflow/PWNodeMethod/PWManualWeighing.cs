@@ -1877,7 +1877,7 @@ namespace gip.mes.processapplication
                 return StartNextCompResult.CycleWait;
             }
 
-            RecalcTimeInfo();
+            RecalcTimeInfo(true);
             if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
                 return StartNextCompResult.CycleWait;
             _ExecutingACMethod = acMethod;
@@ -1966,6 +1966,12 @@ namespace gip.mes.processapplication
                                         Msg msgResult = SetRelationState(CurrentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed, true);
                                         if (msgResult != null)
                                             ActivateProcessAlarmWithLog(msgResult);
+                                    }
+
+                                    if (CurrentACMethod?.ValueT != null)
+                                    {
+                                        RecalcTimeInfo();
+                                        FinishProgramLog(CurrentACMethod.ValueT);
                                     }
 
                                     if (_IsBinChangeActivated)
@@ -2435,11 +2441,11 @@ namespace gip.mes.processapplication
 
         protected override void OnNewProgramLogAddedToQueue(ACMethod acMethod, gip.core.datamodel.ACProgramLog currentProgramLog)
         {
-            if (_NewAddedProgramLog == null)
-            {
-                _NewAddedProgramLog = currentProgramLog;
-                //ACClassTaskQueue.TaskQueue.ObjectContext.ACChangesExecuted += ACClassTaskQueue_ChangesSaved;
-            }
+            //if (_NewAddedProgramLog == null)
+            //{
+            //    _NewAddedProgramLog = currentProgramLog;
+            //    //ACClassTaskQueue.TaskQueue.ObjectContext.ACChangesExecuted += ACClassTaskQueue_ChangesSaved;
+            //}
         }
 
 
