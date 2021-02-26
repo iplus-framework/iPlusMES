@@ -664,104 +664,117 @@ namespace gip.mes.processapplication
             }
         }
 
-        public Guid[] GetCachedDestinations(bool refreshCache, out short errorCode, out string errorMsg)
+        public virtual Guid[] GetCachedDestinations(bool refreshCache, out short errorCode, out string errorMsg)
         {
             errorMsg = null;
             try
             {
-                BatchPlanTargets targetCache = null;
-                Guid batchPlanID = CurrentProdOrderBatch.ProdOrderBatchPlanID.Value;
-                lock (_TargetCacheLock)
+                if (CurrentProdOrderBatch != null
+                    && CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
                 {
-                    if (!_BatchPlanTargetCache.TryGetValue(batchPlanID, out targetCache))
+                    BatchPlanTargets targetCache = null;
+                    Guid batchPlanID = CurrentProdOrderBatch.ProdOrderBatchPlanID.Value;
+                    lock (_TargetCacheLock)
                     {
-                        targetCache = new BatchPlanTargets() { _NextTargetQuery = DateTime.Now.AddSeconds(20) };
-                        _BatchPlanTargetCache.Add(batchPlanID, targetCache);
+                        if (!_BatchPlanTargetCache.TryGetValue(batchPlanID, out targetCache))
+                        {
+                            targetCache = new BatchPlanTargets() { _NextTargetQuery = DateTime.Now.AddSeconds(20) };
+                            _BatchPlanTargetCache.Add(batchPlanID, targetCache);
+                        }
+                        int myHashCode = this.GetHashCode();
+                        if (!targetCache._PWMethods.Contains(myHashCode))
+                            targetCache._PWMethods.Add(myHashCode);
                     }
-                    int myHashCode = this.GetHashCode();
-                    if (!targetCache._PWMethods.Contains(myHashCode))
-                        targetCache._PWMethods.Add(myHashCode);
-                }
 
-                if (targetCache._NextTargetQuery == null || DateTime.Now > targetCache._NextTargetQuery.Value || targetCache._LastTargets == null || refreshCache)
-                {
-                    using (var dbApp = new DatabaseApp())
+                    if (targetCache._NextTargetQuery == null || DateTime.Now > targetCache._NextTargetQuery.Value || targetCache._LastTargets == null || refreshCache)
                     {
-                        ProdOrderPartslistPos currentBatchPos = CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
-                        var batchPlan = dbApp.ProdOrderBatchPlan.Where(c => c.ProdOrderBatchPlanID == batchPlanID).FirstOrDefault();
-                        if (batchPlan == null)
+                        using (var dbApp = new DatabaseApp())
                         {
-                            errorCode = 1;
-                            return null;
-                        }
-                        IList<FacilityReservation> plannedSilos = batchPlan.FacilityReservation_ProdOrderBatchPlan.OrderBy(c => c.Sequence).ToArray();
-                        if (plannedSilos == null || !plannedSilos.Any())
-                        {
-                            errorCode = 2;
-                            return null;
-                        }
-
-                        PWDischarging lastDischargingNode = null;
-                        var disNodes = FindChildComponents<PWDischarging>(c => c is PWDischarging);
-                        if (disNodes != null && disNodes.Any())
-                        {
-                            lastDischargingNode = disNodes.Where(c => c.IsLastDischargingNode).FirstOrDefault();
-                            if (lastDischargingNode == null)
+                            ProdOrderPartslistPos currentBatchPos = CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
+                            var batchPlan = dbApp.ProdOrderBatchPlan.Where(c => c.ProdOrderBatchPlanID == batchPlanID).FirstOrDefault();
+                            if (batchPlan == null)
                             {
-                                foreach (PWDischarging disNode in disNodes)
-                                {
-                                    MaterialWFConnection connectionToDischarging = null;
-                                    if (disNode.IsLastDisNode(dbApp, batchPlan, out connectionToDischarging))
-                                    {
-                                        lastDischargingNode = disNode;
-                                        break;
-                                    }
-                                }
+                                errorCode = 1;
+                                return null;
                             }
-                            if (lastDischargingNode == null)
+                            IList<FacilityReservation> plannedSilos = batchPlan.FacilityReservation_ProdOrderBatchPlan.OrderBy(c => c.Sequence).ToArray();
+                            if (plannedSilos == null || !plannedSilos.Any())
                             {
-                                var endNode = FindChildComponents<PWNodeEnd>(c => c is PWNodeEnd, null, 1).FirstOrDefault();
-                                if (endNode != null)
+                                errorCode = 2;
+                                return null;
+                            }
+
+                            PWDischarging lastDischargingNode = null;
+                            var disNodes = FindChildComponents<PWDischarging>(c => c is PWDischarging);
+                            if (disNodes != null && disNodes.Any())
+                            {
+                                lastDischargingNode = disNodes.Where(c => c.IsLastDischargingNode).FirstOrDefault();
+                                if (lastDischargingNode == null)
                                 {
-                                    var sourceGroups = endNode.PWPointIn.ConnectionList
-                                                    .Where(c => c.ValueT is PWGroup)
-                                                    .Select(c => c.ValueT as PWGroup).ToList();
-                                    foreach (var pwGroup in sourceGroups)
+                                    foreach (PWDischarging disNode in disNodes)
                                     {
-                                        lastDischargingNode = pwGroup.FindChildComponents<PWDischarging>(c => c is PWDischarging).FirstOrDefault();
-                                        if (lastDischargingNode != null)
+                                        MaterialWFConnection connectionToDischarging = null;
+                                        if (disNode.IsLastDisNode(dbApp, batchPlan, out connectionToDischarging))
+                                        {
+                                            lastDischargingNode = disNode;
                                             break;
+                                        }
                                     }
                                 }
+                                if (lastDischargingNode == null)
+                                {
+                                    var endNode = FindChildComponents<PWNodeEnd>(c => c is PWNodeEnd, null, 1).FirstOrDefault();
+                                    if (endNode != null)
+                                    {
+                                        var sourceGroups = endNode.PWPointIn.ConnectionList
+                                                        .Where(c => c.ValueT is PWGroup)
+                                                        .Select(c => c.ValueT as PWGroup).ToList();
+                                        foreach (var pwGroup in sourceGroups)
+                                        {
+                                            lastDischargingNode = pwGroup.FindChildComponents<PWDischarging>(c => c is PWDischarging).FirstOrDefault();
+                                            if (lastDischargingNode != null)
+                                                break;
+                                        }
+                                    }
+                                }
+                                if (lastDischargingNode == null)
+                                    lastDischargingNode = disNodes.FirstOrDefault();
                             }
-                            if (lastDischargingNode == null)
-                                lastDischargingNode = disNodes.FirstOrDefault();
-                        }
 
-                        FacilityReservation facilityReservation = null;
-                        if (lastDischargingNode != null)
-                        {
-                            facilityReservation = lastDischargingNode.GetNextFreeDestination(plannedSilos, currentBatchPos, false);
-                        }
-                        else
-                        {
-                            facilityReservation = PWDischarging.GetNextFreeDestination(this, plannedSilos, currentBatchPos, false);
-                        }
+                            FacilityReservation facilityReservation = null;
+                            if (lastDischargingNode != null)
+                            {
+                                facilityReservation = lastDischargingNode.GetNextFreeDestination(plannedSilos, currentBatchPos, false);
+                            }
+                            else
+                            {
+                                facilityReservation = PWDischarging.GetNextFreeDestination(this, plannedSilos, currentBatchPos, false);
+                            }
 
-                        if (facilityReservation != null)
-                        {
-                            targetCache._LastTargets = new Guid[] { facilityReservation.VBiACClassID.Value };
+                            if (facilityReservation != null)
+                            {
+                                targetCache._LastTargets = new Guid[] { facilityReservation.VBiACClassID.Value };
+                            }
+                            else
+                            {
+                                targetCache._LastTargets = plannedSilos.OrderBy(c => c.VBiACClassID.Value).Select(c => c.VBiACClassID.Value).ToArray();
+                            }
                         }
-                        else
-                        {
-                            targetCache._LastTargets = plannedSilos.OrderBy(c => c.VBiACClassID.Value).Select(c => c.VBiACClassID.Value).ToArray();
-                        }
+                        // Alle 20 Sekunden abfragen um Datenbankbelastung zu reduzieren
+                        targetCache._NextTargetQuery = DateTime.Now.AddSeconds(20);
                     }
-                    // Alle 20 Sekunden abfragen um Datenbankbelastung zu reduzieren
-                    targetCache._NextTargetQuery = DateTime.Now.AddSeconds(20);
+                    errorCode = 0;
+                    return targetCache._LastTargets;
                 }
-                errorCode = 0;
-                return targetCache._LastTargets;
+                else if (ParentTaskExecComp != null && CurrentTask != null)
+                {
+                    PWNodeProcessWorkflow invoker = CurrentTask.ValueT as PWNodeProcessWorkflow;
+                    if (invoker != null)
+                    {
+                        var result = invoker.GetCachedDestinations(refreshCache, out errorCode, out errorMsg);
+                        return result;
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -769,10 +782,14 @@ namespace gip.mes.processapplication
                 errorCode = -1;
                 return null;
             }
+            errorMsg = "No targets found";
+            errorCode = -1;
+            return null;
         }
-#endregion
 
-#region User Interaction Methods
+        #endregion
+
+        #region User Interaction Methods
         [ACMethodInteraction("", "en{'End current batch plan/Order'}de{'Beende aktuellen Batchplan/Auftrag'}", 296, true)]
         public virtual void EndBatchPlan()
         {
