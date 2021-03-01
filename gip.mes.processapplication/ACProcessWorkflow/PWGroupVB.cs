@@ -332,32 +332,36 @@ namespace gip.mes.processapplication
                     // Überprüfe ob über die möglichen Module ein Weg zu dem geplanten Ziel möglich ist
                     if (IsProduction
                         && ParentPWMethod<PWMethodProduction>().CurrentProdOrderPartslistPos != null
-                        && ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch != null
-                        && ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
+                        && ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch != null)
                     {
                         short destError = 0;
                         string errorMsg;
                         Guid[] targets = ParentPWMethod<PWMethodProduction>().GetCachedDestinations(false/*addedModules.Any()*/, out destError, out errorMsg);
                         if (targets == null || !targets.Any())
                         {
-                            if (destError == -1)
+                            if (ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
                             {
-                                Msg msg = new Msg(errorMsg, this, eMsgLevel.Error, PWClassName, "ProcessModuleList", 1010);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                if (destError == -1)
+                                {
+                                    Msg msg = new Msg(errorMsg, this, eMsgLevel.Error, PWClassName, "ProcessModuleList", 1010);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                }
+                                else if (destError == 1)
+                                {
+                                    // Error50150: Batchplan is empty.
+                                    Msg msg = msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1020, "Error50150");
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                }
+                                else if (destError == 2)
+                                {
+                                    // Error00126: No route found to planned destination
+                                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(3)", 1030, "Error00126");
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                }
+                                return new List<PAProcessModule>();
                             }
-                            else if (destError == 1)
-                            {
-                                // Error50150: Batchplan is empty.
-                                Msg msg = msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1020, "Error50150");
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                            }
-                            else if (destError == 2)
-                            {
-                                // Error00126: No route found to planned destination
-                                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(3)", 1030, "Error00126");
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                            }
-                            return new List<PAProcessModule>();
+                            else
+                                return modulesInAutomaticMode;
                         }
 
                         if (targets != null && targets.Any())

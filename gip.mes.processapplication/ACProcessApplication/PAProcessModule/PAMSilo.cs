@@ -58,6 +58,7 @@ namespace gip.mes.processapplication
         {
             _PAPointMatIn1 = new PAPoint(this, Const.PAPointMatIn1);
             _PAPointMatOut1 = new PAPoint(this, Const.PAPointMatOut1);
+            _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, "InvertMatSensorValue", true);
         }
 
 
@@ -78,6 +79,7 @@ namespace gip.mes.processapplication
                 }
             }
 
+            _ = InvertMatSensorValue;
             return true;
         }
 
@@ -202,6 +204,34 @@ namespace gip.mes.processapplication
                     return sensor;
                 }
                 return null;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _InvertMatSensorValue;
+        [ACPropertyConfig("en{'Invert material sensor signal'}de{'Invertiere Materialsensor Signal'}")]
+        public bool InvertMatSensorValue
+        {
+            get
+            {
+                return _InvertMatSensorValue.ValueT;
+            }
+            set
+            {
+                _InvertMatSensorValue.ValueT = value;
+            }
+        }
+
+        public bool IsFillingRequested
+        {
+            get
+            {
+                if (   MatSensorFilling == null
+                    || MatSensorFilling.SensorState == null)
+                    return false;
+                if (InvertMatSensorValue)
+                    return MatSensorFilling.SensorState.ValueT == PANotifyState.Off;
+                else
+                    return MatSensorFilling.SensorState.ValueT != PANotifyState.Off;
             }
         }
 
