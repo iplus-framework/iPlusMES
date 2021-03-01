@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using gip.core.reporthandler.Flowdoc;
 
 namespace gip.bso.sales
 {
@@ -31,6 +32,8 @@ namespace gip.bso.sales
         {
             if (!base.ACInit(startChildMode))
                 return false;
+
+            TempReportData = new ReportData();
 
             Search();
             return true;
@@ -94,6 +97,8 @@ namespace gip.bso.sales
                     CurrentOutOffering.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentOutOffering_PropertyChanged);
                 }
                 CurrentOutOfferingPos = null;
+
+                CurrentOutOfferingPos = OutOfferingPosList.FirstOrDefault();
                 OnPropertyChanged("CurrentOutOffering");
                 OnPropertyChanged("OutOfferingPosList");
                 OnPropertyChanged("CompanyList");
@@ -335,6 +340,39 @@ namespace gip.bso.sales
             }
         }
 
+        [ACPropertyInfo(9999)]
+        public string XMLDesign
+        {
+            get 
+            {
+                if (CurrentOutOfferingPos != null)
+                    return CurrentOutOfferingPos.XMLConfig;
+                return "";
+            }
+            set
+            {
+                if (CurrentOutOfferingPos != null)
+                    CurrentOutOfferingPos.XMLConfig = value;
+                OnPropertyChanged("XMLDesign");
+            }
+        }
+
+        private ReportData _TempReportData;
+        [ACPropertyInfo(9999)]
+        public ReportData TempReportData
+        {
+            get
+            {
+                return _TempReportData;
+            }
+            set
+            {
+                _TempReportData = value;
+                OnPropertyChanged("TempReportData");
+            }
+        }
+
+
         #endregion
 
         #region BSO->ACMethod
@@ -452,6 +490,7 @@ namespace gip.bso.sales
             CurrentOutOfferingPos = OutOfferingPos.NewACObject(DatabaseApp, CurrentOutOffering);
             CurrentOutOfferingPos.OutOffering = CurrentOutOffering;
             CurrentOutOffering.OutOfferingPos_OutOffering.Add(CurrentOutOfferingPos);
+            OnPropertyChanged("OutOfferingPosList");
             PostExecute("NewOutOfferingPos");
         }
 
@@ -479,6 +518,49 @@ namespace gip.bso.sales
             return CurrentOutOffering != null && CurrentOutOfferingPos != null;
         }
         #endregion
+
+        public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
+        {
+            base.OnPrintingPhase(reportEngine, printingPhase);
+
+            ReportDocument reportDocument = reportEngine as ReportDocument;
+            if(reportDocument != null && printingPhase == ACPrintingPhase.Started)
+            {
+                string xamlData = reportDocument.XamlData;
+                string dynamicComment = ExtractDynamicContent(CurrentOutOffering.Comment);
+
+
+                xamlData = xamlData.Replace("<Paragraph>DynamicComment</Paragraph>", dynamicComment);
+
+                reportDocument.XamlData = xamlData;
+            }
+        }
+
+        private string ExtractDynamicContent(string content)
+        {
+            string result = "";
+
+            int startIndex = content.IndexOf('<');
+            int endIndex = content.IndexOf('>');
+
+
+
+            if (startIndex >= 0 && endIndex > startIndex)
+            {
+                result = content.Remove(startIndex, endIndex - startIndex+1);
+                startIndex = result.IndexOf('<');
+                endIndex = result.IndexOf('>');
+
+                result = result.Remove(startIndex, endIndex - startIndex + 1);
+
+                int lastStartIndex = result.LastIndexOf('<');
+                int lastEndIndex = result.LastIndexOf('>');
+                result = result.Remove(lastStartIndex, lastEndIndex - lastStartIndex+1);
+                
+            }
+
+            return result;
+        }
 
 
         #region Execute-Helper-Handlers

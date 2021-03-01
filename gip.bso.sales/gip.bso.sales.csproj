@@ -105,6 +105,10 @@
       <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
       <Name>gip.core.datamodel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
+      <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\gip.bso.manufacturing\gip.bso.manufacturing.csproj">
       <Project>{33d19b80-129b-44fd-9662-282772bcd4dc}</Project>
       <Name>gip.bso.manufacturing</Name>
