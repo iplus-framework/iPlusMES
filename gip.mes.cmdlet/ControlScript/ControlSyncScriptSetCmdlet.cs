@@ -7,7 +7,7 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
-    [Cmdlet(VerbsCommon.Set, "ControlSyncScript")]
+    [Cmdlet(VerbsCommon.Set, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptSetCmdlet : Cmdlet, IMsgObserver
     {
         #region Config

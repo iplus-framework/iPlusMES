@@ -7,7 +7,7 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
-    [Cmdlet(VerbsCommon.New, "ControlSyncScript")]
+    [Cmdlet(VerbsCommon.New, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptNewCmdlet : Cmdlet
     {
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;

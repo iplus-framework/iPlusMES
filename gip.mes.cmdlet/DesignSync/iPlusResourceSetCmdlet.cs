@@ -1,5 +1,4 @@
-﻿using System;
-using gip.core.datamodel;
+﻿using gip.core.datamodel;
 using System.Linq;
 using System.Management.Automation;
 using gip.bso.iplus;
@@ -8,8 +7,8 @@ using gip.mes.cmdlet.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
-    [Cmdlet(VerbsCommon.Set, "VariobatchResource")]
-    public class VariobatchResourceSetCmdlet : Cmdlet
+    [Cmdlet(VerbsCommon.Set, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    public class iPlusResourceSetCmdlet : Cmdlet
     {
 
         #region Mandatory Parameters
@@ -70,8 +69,8 @@ namespace gip.mes.cmdlet.DesignSync
                 ACProjectManager aCProjectManager = new ACProjectManager(database, ACRoot.SRoot);
                 ACClassImporter importer = new ACClassImporter(rootFolder, aCProjectManager, database, UserName, !OmitExportACClassDesign, !OmitExportACClassText, !OmitExportACClassMessage);
                 importer.OnImportMessage += Importer_OnImportMessage;
-                ACProject variobatchProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
-                importer.Import(variobatchProject, ClassNames, ItemNames);
+                ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                importer.Import(acRootProject, ClassNames, ItemNames);
             }
 
         }

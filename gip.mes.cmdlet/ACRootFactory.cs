@@ -1,9 +1,4 @@
 ﻿using gip.core.autocomponent;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.cmdlet
 {
@@ -22,8 +17,8 @@ namespace gip.mes.cmdlet
             bool PropPersistenceOff = false;
             #endregion
 
-            ACStartUpRoot startupVariobatch = new ACStartUpRoot();
-            startupVariobatch.LoginUser(userName, password, registerACObjects, PropPersistenceOff, ref errorMsg);
+            ACStartUpRoot startupRoot = new ACStartUpRoot();
+            startupRoot.LoginUser(userName, password, registerACObjects, PropPersistenceOff, ref errorMsg);
             return errorMsg;
         }
     }

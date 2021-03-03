@@ -10,7 +10,7 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.DBSync
 {
-    [Cmdlet(VerbsCommon.Add, "VariobatchDBSync")]
+    [Cmdlet(VerbsCommon.Add, CmdLetSettings.DBSyncCmdlet_Name)]
     public class DBSyncScriptAddCmdlet : Cmdlet
     {
         #region Config

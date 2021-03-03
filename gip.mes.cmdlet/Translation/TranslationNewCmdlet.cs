@@ -8,7 +8,7 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.New, "VariobatchTranslation")]
+    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationCmdlet_Name)]
     public class TranslationNewCmdlet : Cmdlet
     {
         #region Configuration

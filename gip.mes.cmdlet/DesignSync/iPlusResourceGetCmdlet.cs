@@ -8,8 +8,8 @@ using gip.mes.cmdlet.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
-    [Cmdlet(VerbsCommon.Get, "VariobatchResource")]
-    public class VariobatchResourceGetCmdlet : Cmdlet
+    [Cmdlet(VerbsCommon.Get, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    public class iPlusResourceGetCmdlet : Cmdlet
     {
 
         #region Mandatory parameters
@@ -72,8 +72,8 @@ namespace gip.mes.cmdlet.DesignSync
                     ACClassExporter exporter = new ACClassExporter(rootFolder, aCProjectManager, database, exportCommand);
                     exporter.OnImportMessage += Exporter_OnImportMessage;
                     exporter.ExportCommand.ExportProgressEvent += ExportCommand_ExportProgressEvent;
-                    ACProject variobatchProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
-                    exporter.Export(variobatchProject, ClassNames);
+                    ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                    exporter.Export(acRootProject, ClassNames);
                 }
             }
             catch(Exception ec)

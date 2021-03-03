@@ -6,7 +6,7 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.Set, "VariobatchTranslation")]
+    [Cmdlet(VerbsCommon.Set, CmdLetSettings.TranslationCmdlet_Name)]
 
     public class TranslationSetCmdlet : Cmdlet
     {
