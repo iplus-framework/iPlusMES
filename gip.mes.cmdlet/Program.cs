@@ -15,8 +15,8 @@ namespace gip.mes.cmdlet
         static void Main(string[] args)
         {
             Console.Write("Make complete export");
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VBPowerShellSettings.VarioDataDefault);
-            string rootFolder = Path.Combine(designSettings.VarioData, "TestExport");
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VBPowerShellSettings.VarioDataDefault);
+            string rootFolder = Path.Combine(iPlusCmdLetSettings.VarioData, "TestExport");
             if (!Directory.Exists(rootFolder))
                 Directory.CreateDirectory(rootFolder);
             ACRootFactory.Factory();

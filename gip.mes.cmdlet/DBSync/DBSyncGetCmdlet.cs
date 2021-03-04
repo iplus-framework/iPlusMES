@@ -21,9 +21,9 @@ namespace gip.mes.cmdlet.DBSync
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string connectionString = DbSyncerSettings.GetDefaultConnectionString(CommandLineHelper.ConfigCurrentDir);
-            string rootFolder = Path.Combine(designSettings.TrunkFolder);
+            string rootFolder = Path.Combine(iPlusCmdLetSettings.DLLBinFolder);
 
             SyncTask syncTask = new SyncTask();
             syncTask.OnStatusChange += syncTask_OnStatusChange;

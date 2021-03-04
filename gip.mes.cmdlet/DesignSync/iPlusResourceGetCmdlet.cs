@@ -55,11 +55,11 @@ namespace gip.mes.cmdlet.DesignSync
         {
             try
             {
-                VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
-                string rootFolder = designSettings.RootFolder;
+                VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
+                string rootFolder = iPlusCmdLetSettings.RootFolder;
 
                 if (gip.core.datamodel.Database.Root == null)
-                    ACRootFactory.Factory(designSettings.username, designSettings.password);
+                    ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
 
                 ExportCommandExtended exportCommand = new ExportCommandExtended();
                 exportCommand.IsExportACClassDesign = !OmitExportACClassDesign;

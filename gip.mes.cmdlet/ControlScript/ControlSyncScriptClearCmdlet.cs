@@ -17,28 +17,26 @@ namespace gip.mes.cmdlet.ControlScript
         public bool IsLogDisabled { get; set; }
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public string RootFolder { get; set; }
+        public string SavePath { get; set; }
 
 
-        private string ReportPath { get; set; }
         #endregion
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
-            if (string.IsNullOrEmpty(RootFolder))
-                RootFolder = designSettings.VarioData;
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
+            if (string.IsNullOrEmpty(SavePath))
+                SavePath = iPlusCmdLetSettings.VarioData;
             using (Database database = new Database())
             {
                 Translator.DefaultVBLanguageCode = "en";
-                ACClassCleanManager cleanManager = new ACClassCleanManager(database, designSettings.DLLBin);
+                ACClassCleanManager cleanManager = new ACClassCleanManager(database, iPlusCmdLetSettings.DLLBinFolder);
                 cleanManager.CollectData();
                 MsgWithDetails msg = cleanManager.RemoveAssembiles(true);
                 List<RemoveClassReport> removeClassReports = cleanManager.RemoveClasses(true);
                 if (!IsLogDisabled)
                 {
-                    RootFolder = designSettings.VarioData;
-                    ACCleanManagerJsonReport aCCleanManagerJsonReport = new ACCleanManagerJsonReport(RootFolder);
+                    ACCleanManagerJsonReport aCCleanManagerJsonReport = new ACCleanManagerJsonReport(SavePath);
                     aCCleanManagerJsonReport.WriteACClassCleanManagerJsonData(cleanManager);
                     aCCleanManagerJsonReport.WriteRemoveClassesReport(removeClassReports);
                 }

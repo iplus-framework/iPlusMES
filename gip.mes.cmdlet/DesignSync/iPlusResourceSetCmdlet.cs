@@ -58,11 +58,11 @@ namespace gip.mes.cmdlet.DesignSync
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
-            string rootFolder = designSettings.RootFolder;
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
+            string rootFolder = iPlusCmdLetSettings.RootFolder;
 
             if (gip.core.datamodel.Database.Root == null)
-                ACRootFactory.Factory(designSettings.username, designSettings.password);
+                ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
 
             using (Database database = new Database())
             {

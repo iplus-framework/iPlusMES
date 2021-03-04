@@ -9,10 +9,9 @@
         public string VarioData { get; set; }
 
         public string RootFolder { get; set; }
-        public string TrunkFolder { get; set; }
         public string ConnectionStringFileName { get; set; }
 
-        public string DLLBin { get; set; }
+        public string DLLBinFolder { get; set; }
 
         public string FullConnectionStringConfigurationPaht { get; set; }
 

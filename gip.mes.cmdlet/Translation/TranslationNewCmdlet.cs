@@ -49,7 +49,7 @@ namespace gip.mes.cmdlet.Translation
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string identifier = ACIdentifier;
             string aCCaptionTranslation = "";
             using (Database database = new Database())

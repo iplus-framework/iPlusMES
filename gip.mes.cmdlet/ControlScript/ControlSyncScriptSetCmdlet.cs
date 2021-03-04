@@ -18,10 +18,10 @@ namespace gip.mes.cmdlet.ControlScript
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string connectionString = DbSyncerSettings.GetDefaultConnectionString(CommandLineHelper.ConfigCurrentDir);
             if (gip.core.datamodel.Database.Root == null)
-                ACRootFactory.Factory(designSettings.username, designSettings.password);
+                ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
             ControlSync controlSync = new ControlSync();
             ACRoot.SRoot.PrepareQueriesAndResoruces();
             controlSync.OnMessage += controlSync_OnMessage;
@@ -30,7 +30,7 @@ namespace gip.mes.cmdlet.ControlScript
             rootResources.MsgObserver = this;
             using (ACMonitor.Lock(ACRoot.SRoot.Database.QueryLock_1X000))
             {
-                importSuccess = controlSync.Sync(ACRoot.SRoot, Database.GlobalDatabase, designSettings.TrunkFolder, connectionString);
+                importSuccess = controlSync.Sync(ACRoot.SRoot, Database.GlobalDatabase, iPlusCmdLetSettings.DLLBinFolder, connectionString);
             }
         }
 
