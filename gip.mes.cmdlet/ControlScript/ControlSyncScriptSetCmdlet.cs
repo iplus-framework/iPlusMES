@@ -7,6 +7,10 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
+    /// <summary>
+    /// Import new .zip designs & resources into database:
+    /// call same import procedure for .zip file as in CTRL load
+    /// </summary>
     [Cmdlet(VerbsCommon.Set, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptSetCmdlet : Cmdlet, IMsgObserver
     {

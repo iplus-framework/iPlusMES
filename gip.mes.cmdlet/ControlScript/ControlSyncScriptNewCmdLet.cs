@@ -7,6 +7,10 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
+    /// <summary>
+    /// For specified project and ACClass build export zip file same
+    /// as generated from BSOiPlusExport
+    /// </summary>
     [Cmdlet(VerbsCommon.New, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptNewCmdlet : Cmdlet
     {

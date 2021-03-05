@@ -6,6 +6,9 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
+    /// <summary>
+    /// Set translation value to field ACCaptionTranslation field in field having tables
+    /// </summary>
     [Cmdlet(VerbsCommon.Set, CmdLetSettings.TranslationCmdlet_Name)]
 
     public class TranslationSetCmdlet : Cmdlet

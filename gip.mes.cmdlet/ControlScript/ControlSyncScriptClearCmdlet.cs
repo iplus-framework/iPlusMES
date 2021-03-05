@@ -6,6 +6,10 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
+
+    /// <summary>
+    /// call ACClassCleanManager to delete unused ACClasses or ACClass members: Methods, Properties etc
+    /// </summary>
     [Cmdlet(VerbsCommon.Clear, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptClearCmdlet : Cmdlet
     {

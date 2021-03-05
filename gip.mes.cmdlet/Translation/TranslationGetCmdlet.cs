@@ -6,6 +6,9 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
+    /// <summary>
+    /// Search for translated resources stored in ACCaptionTranslation field in tables: ACClass, ACClassProperty etc.
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, CmdLetSettings.TranslationCmdlet_Name)]
 
     public class TranslationGetCmdlet : Cmdlet

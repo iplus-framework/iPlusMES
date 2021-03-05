@@ -10,8 +10,12 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.DBSync
 {
-    [Cmdlet(VerbsCommon.Get, CmdLetSettings.DBSyncCmdlet_Name)]
-    public class DBSyncGetCmdlet : Cmdlet
+    /// <summary>
+    /// Call DBSyncer update procedure same 
+    /// as in CTRL Load
+    /// </summary>
+    [Cmdlet(VerbsCommon.Set, CmdLetSettings.DBSyncCmdlet_Name)]
+    public class DBSyncSetCmdlet : Cmdlet
     {
 
         #region Config

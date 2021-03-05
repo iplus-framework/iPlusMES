@@ -1,0 +1,8 @@
+{
+	"VarioData" : "C:\\VarioData",
+	"RootFolder" : "c:\\Aleksandar\\gipSoft\\Source\\XAMLEditing\\XAMLDesigns\\Items",
+	"DLLBinFolder":"c:\\Aleksandar\\gipSoft\\Source\\iPlusV4\\trunk\\iPlusMES\\bin\\Debug",
+	"ConnectionStringFileName": "ConnectionStrings.config",
+	"username":"superuser",
+	"password":"superuser"
+}

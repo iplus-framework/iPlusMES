@@ -69,7 +69,7 @@
     <Compile Include="DBSync\DBSyncScriptAddCmdlet.cs" />
     <Compile Include="DBSync\DBSyncScriptRemoveCmdLet.cs" />
     <Compile Include="ControlScript\ControlSyncScriptSetCmdlet.cs" />
-    <Compile Include="DBSync\DBSyncGetCmdlet.cs" />
+    <Compile Include="DBSync\DBSyncSetCmdlet.cs" />
     <Compile Include="Settings\CmdLetSettings.cs" />
     <Compile Include="Translation\MessageTypeEnum.cs" />
     <Compile Include="Translation\TranslationGetCmdlet.cs" />
@@ -121,6 +121,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="_doc\README.md" />
+    <None Include="_doc\VBPowerShellSettings.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="_doc\ControlSyncScriptCmdlet.txt" />

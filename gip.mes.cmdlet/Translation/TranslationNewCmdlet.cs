@@ -8,6 +8,9 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
+    /// <summary>
+    /// Add new translation item into ACClassText or ACClassMessage
+    /// </summary>
     [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationCmdlet_Name)]
     public class TranslationNewCmdlet : Cmdlet
     {
