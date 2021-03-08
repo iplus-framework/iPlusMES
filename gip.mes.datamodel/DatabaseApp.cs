@@ -640,11 +640,11 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
-        public IEnumerable<ACValueItem> OutOfferingStatesList
+        public IEnumerable<ACValueItem> OutOfferStatesList
         {
             get
             {
-                return gip.mes.datamodel.MDOutOfferingState.OutOfferingStatesList;
+                return gip.mes.datamodel.MDOutOfferState.OutOfferStatesList;
             }
         }
 

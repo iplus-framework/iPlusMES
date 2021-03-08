@@ -92,11 +92,11 @@ namespace gip.mes.autocomponent
             ----------------------------------------------------------------------------------------------------------
             | MaterialWFConnection          | MaterialWFACClassMethodID             | uniqueidentifier | NO          |
             ----------------------------------------------------------------------------------------------------------
-            | OutOfferingConfig             | VBiACClassID                          | uniqueidentifier | YES         |
+            | OutOfferConfig             | VBiACClassID                          | uniqueidentifier | YES         |
             ----------------------------------------------------------------------------------------------------------
-            | OutOfferingConfig             | VBiACClassPropertyRelationID          | uniqueidentifier | YES         |
+            | OutOfferConfig             | VBiACClassPropertyRelationID          | uniqueidentifier | YES         |
             ----------------------------------------------------------------------------------------------------------
-            | OutOfferingConfig             | VBiValueTypeACClassID                 | uniqueidentifier | NO          |
+            | OutOfferConfig             | VBiValueTypeACClassID                 | uniqueidentifier | NO          |
             ----------------------------------------------------------------------------------------------------------
             | OutOrderConfig                | VBiACClassID                          | uniqueidentifier | YES         |
             ----------------------------------------------------------------------------------------------------------
@@ -269,14 +269,14 @@ namespace gip.mes.autocomponent
             foreach (MaterialWFACClassMethodConfig typeConfig in typeConfigs)
                 typeConfig.DeleteACObject(databaseApp, withCheck);
 
-            //  OutOfferingConfig/VBiACClassID  |Null 
-            List<OutOfferingConfig> outOfferingConfigs = databaseApp.OutOfferingConfig.Where(c => (c.VBiACClassID ?? Guid.Empty) == aCClass.ACClassID).ToList();
-            foreach (OutOfferingConfig outOfferingConfig in outOfferingConfigs)
-                outOfferingConfig.VBiACClassID = null;
+            //  OutOfferConfig/VBiACClassID  |Null 
+            List<OutOfferConfig> OutOfferConfigs = databaseApp.OutOfferConfig.Where(c => (c.VBiACClassID ?? Guid.Empty) == aCClass.ACClassID).ToList();
+            foreach (OutOfferConfig OutOfferConfig in OutOfferConfigs)
+                OutOfferConfig.VBiACClassID = null;
 
-            //  OutOfferingConfig/VBiValueTypeACClassID  |NotNull 
-            List<OutOfferingConfig> valueTypeCls = databaseApp.OutOfferingConfig.Where(c => c.VBiValueTypeACClassID == aCClass.ACClassID).ToList();
-            foreach (OutOfferingConfig valueTypeCl in valueTypeCls)
+            //  OutOfferConfig/VBiValueTypeACClassID  |NotNull 
+            List<OutOfferConfig> valueTypeCls = databaseApp.OutOfferConfig.Where(c => c.VBiValueTypeACClassID == aCClass.ACClassID).ToList();
+            foreach (OutOfferConfig valueTypeCl in valueTypeCls)
                 valueTypeCl.DeleteACObject(databaseApp, withCheck);
 
             //  OutOrderConfig/VBiACClassID  |Null 
@@ -407,10 +407,10 @@ namespace gip.mes.autocomponent
             foreach (MaterialWFACClassMethodConfig materialWFACClassMethodConfig in materialWFACClassMethodConfigs)
                 materialWFACClassMethodConfig.VBiACClassPropertyRelationID = null;
 
-            //  OutOfferingConfig/VBiACClassPropertyRelationID  |Null 
-            List<OutOfferingConfig> outOfferingConfigs = databaseApp.OutOfferingConfig.Where(c => relations.Contains(c.VBiACClassPropertyRelationID ?? Guid.Empty)).ToList();
-            foreach (OutOfferingConfig outOfferingConfig in outOfferingConfigs)
-                outOfferingConfig.VBiACClassPropertyRelationID = null;
+            //  OutOfferConfig/VBiACClassPropertyRelationID  |Null 
+            List<OutOfferConfig> OutOfferConfigs = databaseApp.OutOfferConfig.Where(c => relations.Contains(c.VBiACClassPropertyRelationID ?? Guid.Empty)).ToList();
+            foreach (OutOfferConfig OutOfferConfig in OutOfferConfigs)
+                OutOfferConfig.VBiACClassPropertyRelationID = null;
 
             //  OutOrderConfig/VBiACClassPropertyRelationID  |Null 
             List<OutOrderConfig> outOrderConfigs = databaseApp.OutOrderConfig.Where(c => relations.Contains(c.VBiACClassPropertyRelationID ?? Guid.Empty)).ToList();

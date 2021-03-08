@@ -142,11 +142,11 @@ namespace gip.mes.datamodel
             this.FacilityBooking_CPartnerCompany.Clear();
 
             //database.ExecuteStoreCommand("UPDATE Facility SET IncomingFacilityID = NULL WHERE IncomingFacilityID={0}", this.FacilityID);
-            foreach (OutOffering outOff in this.OutOffering_CustomerCompany.ToArray())
+            foreach (OutOffer outOff in this.OutOffer_CustomerCompany.ToArray())
             {
                 outOff.CustomerCompany = null;
             }
-            this.OutOffering_CustomerCompany.Clear();
+            this.OutOffer_CustomerCompany.Clear();
 
             //database.ExecuteStoreCommand("UPDATE Facility SET IncomingFacilityID = NULL WHERE IncomingFacilityID={0}", this.FacilityID);
             foreach (OutOrder outOrder in this.OutOrder_CPartnerCompany.ToArray())
