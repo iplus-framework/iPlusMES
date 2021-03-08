@@ -20453,7 +20453,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="MDInOrderTypeID" Type="Guid" Nullable="false" />
           <Property Name="MDInRequestStateID" Type="Guid" Nullable="false" />
           <Property Name="DistributorCompanyID" Type="Guid" Nullable="false" />
-          <Property Name="DistributorOfferingNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DistributorOfferNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="DeliveryCompanyAddressID" Type="Guid" Nullable="false" />
           <Property Name="BillingCompanyAddressID" Type="Guid" Nullable="false" />
           <Property Name="TargetDeliveryDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -20480,7 +20480,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_InRequest_MDTimeRangeID" FromRole="InRequest" ToRole="MDTimeRange" />
           <NavigationProperty Name="InRequestConfig_InRequest" Relationship="iPlusMESV4_Model.FK_InRequestConfig_InRequestID" FromRole="InRequest" ToRole="InRequestConfig" />
           <NavigationProperty Name="InRequestPos_InRequest" Relationship="iPlusMESV4_Model.FK_InRequestPos_InRequestID" FromRole="InRequest" ToRole="InRequestPos" />
-          <Property Name="DistributorOfferNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="InRequestConfig">
           <Key>
