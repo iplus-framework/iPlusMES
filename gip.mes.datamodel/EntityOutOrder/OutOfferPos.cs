@@ -23,6 +23,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(16, "Comment2", "en{'Comment 2'}de{'Bemerkung 2'}", "", "", true)]
     [ACPropertyEntity(9999, OutOffer.ClassName, "en{'Offer'}de{'Angebot'}", "", "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Posistionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
+    [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -71,6 +72,7 @@ namespace gip.mes.datamodel
             }
             entity.MaterialPosTypeIndex = (Int16)GlobalApp.MaterialPosTypes.OutwardRoot;
             entity.TargetQuantityUOM = 1;
+            entity.XMLDesign = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
@@ -206,6 +208,23 @@ namespace gip.mes.datamodel
             get
             {
                 return "Position " + Sequence.ToString();
+            }
+        }
+
+        [ACPropertyInfo (9999)]
+        public List<OutOfferPos> Items
+        {
+            get
+            {
+                return OutOfferPos_GroupOutOfferPos?.ToList();
+            }
+        }
+
+        public double TotalPrice
+        {
+            get
+            {
+                return 0.0;
             }
         }
     }

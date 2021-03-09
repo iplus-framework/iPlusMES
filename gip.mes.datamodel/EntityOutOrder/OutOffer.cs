@@ -27,6 +27,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
+    [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOffer.ClassName, "en{'Offering'}de{'Angebot'}", typeof(OutOffer), OutOffer.ClassName, "OutOfferNo", "OutOfferNo", new object[]
         {
                 new object[] {Const.QueryPrefix + OutOfferPos.ClassName, "en{'Offer Position'}de{'Angebotsposition'}", typeof(OutOfferPos), OutOfferPos.ClassName + "_" + OutOffer.ClassName, "Sequence", "Sequence"}
@@ -54,6 +55,9 @@ namespace gip.mes.datamodel
             entity.MDDelivType = MDDelivType.DefaultMDDelivType(dbApp);
             entity.OutOfferNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+
+            entity.XMLDesign = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
+
             return entity;
         }
 

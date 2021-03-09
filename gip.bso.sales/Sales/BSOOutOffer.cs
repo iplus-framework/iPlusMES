@@ -221,11 +221,7 @@ namespace gip.bso.sales
         {
             get
             {
-                if (CurrentOutOffer == null)
-                    return null;
-                return from c in CurrentOutOffer.OutOfferPos_OutOffer
-                       select c;
-
+                return CurrentOutOffer?.OutOfferPos_OutOffer.Where(c => c.OutOfferPos1_GroupOutOfferPos == null);
             }
         }
 
@@ -426,6 +422,7 @@ namespace gip.bso.sales
             CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer);
             CurrentOutOfferPos.OutOffer = CurrentOutOffer;
             CurrentOutOffer.OutOfferPos_OutOffer.Add(CurrentOutOfferPos);
+            OnPropertyChanged("OutOfferPosList");
             ACState = Const.SMNew;
             PostExecute("New");
 
@@ -499,6 +496,25 @@ namespace gip.bso.sales
             return CurrentOutOffer != null;
         }
 
+        [ACMethodInteraction("OutOfferPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        public void NewSubOutOfferPos()
+        {
+            if (!PreExecute("NewOutOfferPos")) return;
+            // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
+            OutOfferPos subOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer);
+            subOutOfferPos.OutOfferPos1_GroupOutOfferPos = CurrentOutOfferPos;
+            subOutOfferPos.OutOffer = CurrentOutOffer;
+            CurrentOutOffer.OutOfferPos_OutOffer.Add(subOutOfferPos);
+            OnPropertyChanged("OutOfferPosList");
+            CurrentOutOfferPos = subOutOfferPos;
+            PostExecute("NewOutOfferPos");
+        }
+
+        public bool IsEnabledSubOutOfferPos()
+        {
+            return SelectedOutOfferPos != null;
+        }
+
         [ACMethodInteraction("OutOfferPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost)]
         public void DeleteOutOfferPos()
         {
@@ -518,49 +534,6 @@ namespace gip.bso.sales
             return CurrentOutOffer != null && CurrentOutOfferPos != null;
         }
         #endregion
-
-        public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
-        {
-            base.OnPrintingPhase(reportEngine, printingPhase);
-
-            ReportDocument reportDocument = reportEngine as ReportDocument;
-            if(reportDocument != null && printingPhase == ACPrintingPhase.Started)
-            {
-                string xamlData = reportDocument.XamlData;
-                string dynamicComment = ExtractDynamicContent(CurrentOutOffer.Comment);
-
-
-                xamlData = xamlData.Replace("<Paragraph>DynamicComment</Paragraph>", dynamicComment);
-
-                reportDocument.XamlData = xamlData;
-            }
-        }
-
-        private string ExtractDynamicContent(string content)
-        {
-            string result = "";
-
-            int startIndex = content.IndexOf('<');
-            int endIndex = content.IndexOf('>');
-
-
-
-            if (startIndex >= 0 && endIndex > startIndex)
-            {
-                result = content.Remove(startIndex, endIndex - startIndex+1);
-                startIndex = result.IndexOf('<');
-                endIndex = result.IndexOf('>');
-
-                result = result.Remove(startIndex, endIndex - startIndex + 1);
-
-                int lastStartIndex = result.LastIndexOf('<');
-                int lastEndIndex = result.LastIndexOf('>');
-                result = result.Remove(lastStartIndex, lastEndIndex - lastStartIndex+1);
-                
-            }
-
-            return result;
-        }
 
 
         #region Execute-Helper-Handlers
