@@ -146,7 +146,7 @@ namespace gip.mes.facility.TandTv3
                 if (filter.CheckCancelWork())
                     return null;
                 stepNo++;
-                if(filter.BackgroundWorker != null)
+                if (filter.BackgroundWorker != null)
                 {
                     filter.BackgroundWorker.ProgressInfo.ReportProgress("DoSelect", stepNo);
                     filter.BackgroundWorker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"Tracking: [{0}] | DoSelect() {1} / {2} steps...", filter.ItemSystemNo, stepNo, stepCount);
@@ -652,10 +652,13 @@ namespace gip.mes.facility.TandTv3
                 .Value
                 .AsEnumerable()
                 .SelectMany(c => c.OutwardLotsList)
-                .GroupBy(c => new { c.LotNo, c.InsertDate, c.MaterialNo, c.MaterialName1 })
+                .GroupBy(c => new { c.LotNo, c.ExternLotNo, c.ExternLotNo2, c.InsertDate, c.MaterialNo, c.MaterialName1, c.Comment })
                 .Select(c => new FacilityLotModel()
                 {
                     LotNo = c.Key.LotNo,
+                    ExternLotNo = c.Key.ExternLotNo,
+                    ExternLotNo2 = c.Key.ExternLotNo2,
+                    Comment = c.Key.Comment,
                     MaterialNo = c.Key.MaterialNo,
                     MaterialName1 = c.Key.MaterialName1,
                     InsertDate = c.Key.InsertDate,
@@ -672,10 +675,13 @@ namespace gip.mes.facility.TandTv3
                 .Value
                 .AsEnumerable()
                 .Select(c => c.InwardLot)
-                .GroupBy(c => new { c.LotNo, c.InsertDate, c.MaterialNo, c.MaterialName1 })
+                .GroupBy(c => new { c.LotNo, c.ExternLotNo, c.ExternLotNo2, c.InsertDate, c.MaterialNo, c.MaterialName1, c.Comment })
                 .Select(c => new FacilityLotModel()
                 {
                     LotNo = c.Key.LotNo,
+                    ExternLotNo = c.Key.ExternLotNo,
+                    ExternLotNo2 = c.Key.ExternLotNo2,
+                    Comment = c.Key.Comment,
                     MaterialNo = c.Key.MaterialNo,
                     MaterialName1 = c.Key.MaterialName1,
                     InsertDate = c.Key.InsertDate,

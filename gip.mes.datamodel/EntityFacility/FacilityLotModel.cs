@@ -13,6 +13,9 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(999, "ExternLotNo", ConstApp.ExternLotNo)]
         public string ExternLotNo { get; set; }
 
+        [ACPropertyInfo(999, "ExternLotNo2", ConstApp.ExternLotNo2)]
+        public string ExternLotNo2 { get; set; }
+
         [ACPropertyInfo(999, "MaterialNo", ConstApp.MaterialNo)]
         public string MaterialNo { get; set; }
 
@@ -24,6 +27,9 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999, "ActualQuantity", ConstApp.ActualQuantity)]
         public double ActualQuantity { get; set; }
+
+        [ACPropertyInfo(999, "Comment", ConstApp.Comment)]
+        public string Comment { get; set; }
 
         public Guid FacilityLotID { get; set; }
 
