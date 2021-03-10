@@ -215,7 +215,7 @@
     <Compile Include="EntityMD\MDMaterialGroup.cs" />
     <Compile Include="EntityMD\MDMaterialType.cs" />
     <Compile Include="EntityMD\MDMovementReason.cs" />
-    <Compile Include="EntityMD\MDOutOfferingState.cs" />
+    <Compile Include="EntityMD\MDOutOfferState.cs" />
     <Compile Include="EntityMD\MDOutOrderPlanState.cs" />
     <Compile Include="EntityMD\MDOutOrderPosState.cs" />
     <Compile Include="EntityMD\MDOutOrderState.cs" />
@@ -238,9 +238,9 @@
     <Compile Include="EntityMD\MDZeroStockState.cs" />
     <Compile Include="EntityLab\LabOrder.cs" />
     <Compile Include="EntityLab\LabOrderPos.cs" />
-    <Compile Include="EntityOutOrder\OutOffering.cs" />
-    <Compile Include="EntityOutOrder\OutOfferingConfig.cs" />
-    <Compile Include="EntityOutOrder\OutOfferingPos.cs" />
+    <Compile Include="EntityOutOrder\OutOffer.cs" />
+    <Compile Include="EntityOutOrder\OutOfferConfig.cs" />
+    <Compile Include="EntityOutOrder\OutOfferPos.cs" />
     <Compile Include="EntityOutOrder\OutOrder.cs" />
     <Compile Include="EntityOutOrder\OutOrderConfig.cs" />
     <Compile Include="EntityOutOrder\OutOrderPos.cs" />
@@ -358,6 +358,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="VBControlScripts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-08_12-50_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

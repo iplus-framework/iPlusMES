@@ -186,6 +186,9 @@ namespace gip.mes.facility
             {
                 facilityLotModel = new FacilityLotModel();
                 facilityLotModel.LotNo = facilityLot.LotNo;
+                facilityLotModel.ExternLotNo = facilityLot.ExternLotNo;
+                facilityLotModel.ExternLotNo2 = facilityLot.ExternLotNo2;
+                facilityLotModel.Comment = facilityLot.Comment;
                 facilityLotModel.InsertDate = facilityLot.InsertDate;
                 if (facilityLot.MaterialID != null)
                 {
@@ -224,6 +227,9 @@ namespace gip.mes.facility
         {
             InwardLot = new FacilityLotModel();
             InwardLot.LotNo = facilityLot.LotNo;
+            InwardLot.ExternLotNo = facilityLot.ExternLotNo;
+            InwardLot.ExternLotNo2 = facilityLot.ExternLotNo2;
+            InwardLot.Comment = facilityLot.Comment;
             InwardLot.InsertDate = facilityLot.InsertDate;
             if (facilityLot.MaterialID != null)
             {

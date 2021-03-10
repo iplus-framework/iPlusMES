@@ -13,7 +13,7 @@ namespace gip.mes.cmdlet.DesignSync
 			}
 		}
 
-		public  string VariobatchRoot
+		public  string ACRoot
 		{
 			get
 			{

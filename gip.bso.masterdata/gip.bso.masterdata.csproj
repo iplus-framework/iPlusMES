@@ -129,7 +129,7 @@
     <Compile Include="Material\MDBSOMaterialType.cs" />
     <Compile Include="Production\MDBSODemandOrderState.cs" />
     <Compile Include="Purchase\MDBSOInRequestState.cs" />
-    <Compile Include="Sales\MDBSOOutOfferingState.cs" />
+    <Compile Include="Sales\MDBSOOutOfferState.cs" />
     <Compile Include="System\BSOCompany.cs" />
     <Compile Include="System\BSOCtrlUpdateMessageInfo.cs" />
     <Compile Include="System\BSOMedia.cs" />
@@ -237,8 +237,10 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="VBControlScripts\2021-03-05 15-06_dlisak.zip">
+    <None Include="packages.config" />    <None Include="VBControlScripts\2021-03-08 14-03_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>    
+	<None Include="VBControlScripts\2021-03-05 15-06_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

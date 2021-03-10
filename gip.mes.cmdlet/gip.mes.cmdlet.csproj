@@ -69,7 +69,8 @@
     <Compile Include="DBSync\DBSyncScriptAddCmdlet.cs" />
     <Compile Include="DBSync\DBSyncScriptRemoveCmdLet.cs" />
     <Compile Include="ControlScript\ControlSyncScriptSetCmdlet.cs" />
-    <Compile Include="DBSync\DBSyncGetCmdlet.cs" />
+    <Compile Include="DBSync\DBSyncSetCmdlet.cs" />
+    <Compile Include="Settings\CmdLetSettings.cs" />
     <Compile Include="Translation\MessageTypeEnum.cs" />
     <Compile Include="Translation\TranslationGetCmdlet.cs" />
     <Compile Include="DesignSync\ACClassExporter.cs" />
@@ -83,8 +84,8 @@
     <Compile Include="Settings\VBPowerShellSettings.cs" />
     <Compile Include="Settings\FactorySettings.cs" />
     <Compile Include="Settings\ProjectsEnum.cs" />
-    <Compile Include="DesignSync\VariobatchResourceGetCmdlet.cs" />
-    <Compile Include="DesignSync\VariobatchResourceSetCmdlet.cs" />
+    <Compile Include="DesignSync\iPlusResourceGetCmdlet.cs" />
+    <Compile Include="DesignSync\iPlusResourceSetCmdlet.cs" />
     <Compile Include="DesignSync\XAMLOperationClass.cs" />
     <Compile Include="ControlScript\ExportIncludedEnum.cs" />
     <Compile Include="Program.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Translation\TranslationNewCmdlet.cs" />
     <Compile Include="Translation\TranslationSetCmdlet.cs" />
     <Compile Include="Translation\TranslationPresentation.cs" />
-    <Compile Include="VariobatchFactory.cs" />
+    <Compile Include="ACRootFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
@@ -120,6 +121,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="_doc\README.md" />
+    <None Include="_doc\VBPowerShellSettings.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="_doc\ControlSyncScriptCmdlet.txt" />

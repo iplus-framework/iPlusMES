@@ -8,7 +8,10 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.New, "VariobatchTranslation")]
+    /// <summary>
+    /// Add new translation item into ACClassText or ACClassMessage
+    /// </summary>
+    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationCmdlet_Name)]
     public class TranslationNewCmdlet : Cmdlet
     {
         #region Configuration
@@ -49,7 +52,7 @@ namespace gip.mes.cmdlet.Translation
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string identifier = ACIdentifier;
             string aCCaptionTranslation = "";
             using (Database database = new Database())

@@ -45,7 +45,7 @@
         public const string ESMaterialGroup              = "en{'Material Group'}de{'Material Gruppe'}";
         public const string ESMaterialType               = "en{'Material Type'}de{'Materialart'}";
         public const string ESMovementReason             = "en{'Movement Reason'}de{'Bewegungsgrund'}";
-        public const string ESOutOfferingState           = "en{'Offering Status'}de{'Angebotsstatus'}";
+        public const string ESOutOfferState           = "en{'Offering Status'}de{'Angebotsstatus'}";
         public const string ESOutOrderPlanState          = "en{'Sales Order Plan Status'}de{'Verkaufsauftragsplan Status'}";
         public const string ESOutOrderPosState           = "en{'Sales Order Pos. Status'}de{'Verkaufsauftrag Positionstatus'}";
         public const string ESOutOrderState              = "en{'Sales Order Status'}de{'Verkaufsauftragstatus'}";

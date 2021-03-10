@@ -112,8 +112,13 @@ namespace gip.mes.facility
             return result;
         }
 
-        public virtual TandTv3.TandTResult DoSelect(DatabaseApp databaseApp, TandTv3FilterTracking filter, bool useGroupResult)
+        public virtual TandTv3.TandTResult DoSelect(DatabaseApp databaseApp, TandTv3FilterTracking filter, string vbUserNo, bool useGroupResult)
         {
+            if(filter.RecalcAgain)
+            {
+                DoTracking(databaseApp, filter, vbUserNo, useGroupResult);
+            }
+
             TandTv3.TandTResult result = TandTv3Command.DoSelect(databaseApp, filter);
             if (filter.CheckCancelWork())
                 return null;

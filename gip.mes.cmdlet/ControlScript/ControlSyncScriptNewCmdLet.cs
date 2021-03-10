@@ -7,12 +7,16 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
-    [Cmdlet(VerbsCommon.New, "ControlSyncScript")]
+    /// <summary>
+    /// For specified project and ACClass build export zip file same
+    /// as generated from BSOiPlusExport
+    /// </summary>
+    [Cmdlet(VerbsCommon.New, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptNewCmdlet : Cmdlet
     {
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
-        #region Basic input parameters
+        #region Parameters -> Mandatory
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string UserName { get; set; }
@@ -21,14 +25,14 @@ namespace gip.mes.cmdlet.ControlScript
         public string ProjectName { get; set; }
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string RootFolder { get; set; }
-
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string[] ClassNames { get; set; }
 
         #endregion
 
-        #region Filters
+        #region Parameters -> Not Mandatory
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public string SavePath { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClass { get; private set; }
@@ -55,19 +59,16 @@ namespace gip.mes.cmdlet.ControlScript
         public bool IsExportACClassDesign { get; private set; }
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public bool UseExportFromTime { get; private set; }
-
-        [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public DateTime ExportFromTime { get; set; }
+        public DateTime? ExportFromTime { get; set; }
 
         #endregion
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
 
             if (gip.core.datamodel.Database.Root == null)
-                ACRootFactory.Factory(designSettings.username, designSettings.password);
+                ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
 
             using (Database database = new Database())
             {
@@ -81,9 +82,9 @@ namespace gip.mes.cmdlet.ControlScript
                 ACClassInfoRecursive rootClassItem = rootItem.ItemsT.FirstOrDefault() as ACClassInfoRecursive;
                 ExportCommand exportCommand = new ExportCommand();
                 LoadExportCommandConfig(exportCommand);
-                string subExportFolderName = exportCommand.DoFolder(null, null, aCEntitySerializer, qryACProject, qryACClass, aCProject, rootClassItem, RootFolder, 0, 0, UserName);
-                exportCommand.DoPackage(RootFolder, subExportFolderName);
-                string exportedFile = Path.Combine(RootFolder, subExportFolderName + ".zip");
+                string subExportFolderName = exportCommand.DoFolder(null, null, aCEntitySerializer, qryACProject, qryACClass, aCProject, rootClassItem, SavePath, 0, 0, UserName);
+                exportCommand.DoPackage(SavePath, subExportFolderName);
+                string exportedFile = Path.Combine(SavePath, subExportFolderName + ".zip");
                 WriteObject("Exported file:");
                 WriteObject(exportedFile);
             }
@@ -99,8 +100,11 @@ namespace gip.mes.cmdlet.ControlScript
             exportCommand.IsExportACClassMessage = IsExportACClassMessage;
             exportCommand.IsExportACClassText = IsExportACClassText;
             exportCommand.IsExportACClassDesign = IsExportACClassDesign;
-            exportCommand.UseExportFromTime = UseExportFromTime;
-            exportCommand.ExportFromTime = ExportFromTime;
+            if (ExportFromTime != null)
+            {
+                exportCommand.UseExportFromTime = true;
+                exportCommand.ExportFromTime = ExportFromTime.Value;
+            }
         }
     }
 }

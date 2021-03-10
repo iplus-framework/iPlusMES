@@ -21,7 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(13, "TargetDeliveryMaxDate", ConstApp.TargetDeliveryMaxDate, "", "", true)]
     [ACPropertyEntity(14, MDTimeRange.ClassName, "en{'Shift'}de{'Schicht'}", Const.ContextDatabase + "\\" + MDTimeRange.ClassName, "", true)]
     [ACPropertyEntity(15, MDDelivType.ClassName, "en{'Delivery Type'}de{'Lieferart'}", Const.ContextDatabase + "\\" + MDDelivType.ClassName, "", true)]
-    [ACPropertyEntity(16, "BasedOnOutOffering", "en{'Sales Offer'}de{'Angebot'}", Const.ContextDatabase + "\\" + OutOffering.ClassName, "", true)]
+    [ACPropertyEntity(16, "BasedOnOutOffering", "en{'Sales Offer'}de{'Angebot'}", Const.ContextDatabase + "\\" + OutOffer.ClassName, "", true)]
     [ACPropertyEntity(17, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(18, "CPartnerCompany", "en{'Contract Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\CPartnerCompanyList", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]

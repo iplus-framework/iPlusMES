@@ -12,10 +12,6 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(5, "FacilityName", ConstApp.Facility)]
         public string FacilityName { get; set; }
-
-        [ACPropertyInfo(6, "Comment", ConstApp.Comment)]
-        public string Comment { get; set; }
-
        
         [ACPropertyInfo(8, "ProdOrderProgramNo", ConstApp.ProdOrderProgramNo)]
         public string ProdOrderProgramNo { get; set; }

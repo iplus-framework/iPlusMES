@@ -7,7 +7,11 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.ControlScript
 {
-    [Cmdlet(VerbsCommon.Set, "ControlSyncScript")]
+    /// <summary>
+    /// Import new .zip designs & resources into database:
+    /// call same import procedure for .zip file as in CTRL load
+    /// </summary>
+    [Cmdlet(VerbsCommon.Set, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
     public class ControlSyncScriptSetCmdlet : Cmdlet, IMsgObserver
     {
         #region Config
@@ -18,10 +22,10 @@ namespace gip.mes.cmdlet.ControlScript
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string connectionString = DbSyncerSettings.GetDefaultConnectionString(CommandLineHelper.ConfigCurrentDir);
             if (gip.core.datamodel.Database.Root == null)
-                ACRootFactory.Factory(designSettings.username, designSettings.password);
+                ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
             ControlSync controlSync = new ControlSync();
             ACRoot.SRoot.PrepareQueriesAndResoruces();
             controlSync.OnMessage += controlSync_OnMessage;
@@ -30,7 +34,7 @@ namespace gip.mes.cmdlet.ControlScript
             rootResources.MsgObserver = this;
             using (ACMonitor.Lock(ACRoot.SRoot.Database.QueryLock_1X000))
             {
-                importSuccess = controlSync.Sync(ACRoot.SRoot, Database.GlobalDatabase, designSettings.TrunkFolder, connectionString);
+                importSuccess = controlSync.Sync(ACRoot.SRoot, Database.GlobalDatabase, iPlusCmdLetSettings.DLLBinFolder, connectionString);
             }
         }
 

@@ -1551,7 +1551,7 @@ namespace gip.bso.facility
             if (SelectedFilter == null) return null;
             SelectedFilter.BackgroundWorker = worker;
             SelectedFilter.DoWorkEventArgs = e;
-            TandTv3.TandTResult result = TandTv3Manager.DoSelect(DatabaseApp, SelectedFilter, UseGroupResult);
+            TandTv3.TandTResult result = TandTv3Manager.DoSelect(DatabaseApp, SelectedFilter, Root.CurrentInvokingUser.Initials, UseGroupResult);
             return result;
         }
 
@@ -1563,7 +1563,7 @@ namespace gip.bso.facility
             TandTv3FilterTracking nextFilter = FilterList.FirstOrDefault(c => c.TandTv3FilterTrackingID != SelectedFilter.TandTv3FilterTrackingID);
             TandTv3.TandTResult result = null;
             if (nextFilter != null)
-                result = TandTv3Manager.DoSelect(DatabaseApp, nextFilter, UseGroupResult);
+                result = TandTv3Manager.DoSelect(DatabaseApp, nextFilter, Root.CurrentInvokingUser.Initials, UseGroupResult);
             else
                 result = new TandTv3.TandTResult() { Success = false };
             return new KeyValuePair<TandTv3.TandTResult, MsgWithDetails>(result, msg);
@@ -1614,17 +1614,14 @@ namespace gip.bso.facility
             {
                 TandTv3FilterTracking tmpFilterTracking = DatabaseApp.TandTv3FilterTracking.FirstOrDefault(c => c.TandTv3FilterTrackingID == result.Filter.TandTv3FilterTrackingID);
                 WriteFilter(tmpFilterTracking);
-                if (SelectedFilter != null && SelectedFilter.RecalcAgain)
-                    AccessPrimary.NavList.Remove(SelectedFilter);
+
+                if (result.Filter.RecalcAgain)
+                    AccessPrimary.NavList.Remove(tmpFilterTracking);
                 bool addToList = !AccessPrimary.NavList.Any(c => c.MDTrackingDirectionEnum == tmpFilterTracking.MDTrackingDirectionEnum && c.ItemSystemNo == tmpFilterTracking.ItemSystemNo);
                 if (addToList)
                     AccessPrimary.NavList.Add(tmpFilterTracking);
-                else if (result.Filter.RecalcAgain)
-                {
-                    TandTv3FilterTracking tmpOld = AccessPrimary.NavList.FirstOrDefault(c => c.MDTrackingDirectionEnum == tmpFilterTracking.MDTrackingDirectionEnum && c.ItemSystemNo == tmpFilterTracking.ItemSystemNo);
-                    AccessPrimary.NavList.Remove(tmpOld);
-                    AccessPrimary.NavList.Add(tmpFilterTracking);
-                }
+                if (result.Filter.RecalcAgain || addToList)
+                    OnPropertyChanged("FilterList");
                 SelectedFilter = tmpFilterTracking;
                 var graphModel = GraphCommand.BuildGraphResult(result, IncludedGraphItems, GetGraphModel());
                 ProcessGraph(graphModel);

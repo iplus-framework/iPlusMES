@@ -6,7 +6,10 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.Get, "VariobatchTranslation")]
+    /// <summary>
+    /// Search for translated resources stored in ACCaptionTranslation field in tables: ACClass, ACClassProperty etc.
+    /// </summary>
+    [Cmdlet(VerbsCommon.Get, CmdLetSettings.TranslationCmdlet_Name)]
 
     public class TranslationGetCmdlet : Cmdlet
     {
@@ -16,6 +19,7 @@ namespace gip.mes.cmdlet.Translation
         #endregion
 
         #region Parameters
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string ClassACIdentifer { get; set; }
 
@@ -24,11 +28,15 @@ namespace gip.mes.cmdlet.Translation
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string SearchText { get; set; }
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ItemTypeEnum[] ItemTypes { get; set; }
+
         #endregion
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
 
             List<TranslationPresentation> presentations = new List<TranslationPresentation>();
 
@@ -41,76 +49,87 @@ namespace gip.mes.cmdlet.Translation
 
                     // ACClass
                     ItemTypeEnum itemType = ItemTypeEnum.ACClass;
-                    List<ACClass> classes =
-                        database
-                        .ACClass
-                        .Where(c =>
-                            (ClassACIdentifer == null || c.ACIdentifier.Contains(ClassACIdentifer))
-                            &&
-                            (ACIdentifer == null || c.ACIdentifier.Contains(ACIdentifer))
-                            &&
-                            (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
-                         )
-                        .ToList();
-                    presentations.AddRange(classes.Select(c => new TranslationPresentation()
+                    if (ItemTypes == null || ItemTypes.Contains(itemType))
                     {
-                        ItemType = itemType,
-                        ClassACIdentifier = c.ACIdentifier,
-                        ACIdentifier = c.ACIdentifier,
-                        ACCaptionTranslation = c.ACCaptionTranslation,
-                        UpdateDate = c.UpdateDate,
-                        UpdateName = c.UpdateName
-                    }));
+                        List<ACClass> classes =
+                       database
+                       .ACClass
+                       .Where(c =>
+                           (ClassACIdentifer == null || c.ACIdentifier.Contains(ClassACIdentifer))
+                           &&
+                           (ACIdentifer == null || c.ACIdentifier.Contains(ACIdentifer))
+                           &&
+                           (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
+                        )
+                       .ToList();
+                        presentations.AddRange(classes.Select(c => new TranslationPresentation()
+                        {
+                            ItemType = itemType,
+                            ClassACIdentifier = c.ACIdentifier,
+                            ACIdentifier = c.ACIdentifier,
+                            ACCaptionTranslation = c.ACCaptionTranslation,
+                            UpdateDate = c.UpdateDate,
+                            UpdateName = c.UpdateName
+                        }));
+                    }
 
                     // ACClassDesign
                     itemType = ItemTypeEnum.ACClassDesign;
-                    List<ACClassDesign> designs =
-                        database
-                        .ACClassDesign
-                        .Where(c =>
-                            (ClassACIdentifer == null || c.ACClass.ACIdentifier.Contains(ClassACIdentifer))
-                            &&
-                            (ACIdentifer == null || c.ACIdentifier.Contains(ACIdentifer))
-                            &&
-                            (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
-                         )
-                        .ToList();
-                    presentations.AddRange(designs.Select(c => new TranslationPresentation()
+                    if (ItemTypes == null || ItemTypes.Contains(itemType))
                     {
-                        ItemType = itemType,
-                        ClassACIdentifier = c.ACClass.ACIdentifier,
-                        ACIdentifier = c.ACIdentifier,
-                        ACCaptionTranslation = c.ACCaptionTranslation,
-                        UpdateDate = c.UpdateDate,
-                        UpdateName = c.UpdateName
-                    }));
+                        List<ACClassDesign> designs =
+                       database
+                       .ACClassDesign
+                       .Where(c =>
+                           (ClassACIdentifer == null || c.ACClass.ACIdentifier.Contains(ClassACIdentifer))
+                           &&
+                           (ACIdentifer == null || c.ACIdentifier.Contains(ACIdentifer))
+                           &&
+                           (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
+                        )
+                       .ToList();
+                        presentations.AddRange(designs.Select(c => new TranslationPresentation()
+                        {
+                            ItemType = itemType,
+                            ClassACIdentifier = c.ACClass.ACIdentifier,
+                            ACIdentifier = c.ACIdentifier,
+                            ACCaptionTranslation = c.ACCaptionTranslation,
+                            UpdateDate = c.UpdateDate,
+                            UpdateName = c.UpdateName
+                        }));
+                    }
 
                     // ACClassMessage
                     itemType = ItemTypeEnum.ACClassMessage;
-                    List<ACClassMessage> messages =
-                        database
-                        .ACClassMessage
-                        .Where(c =>
-                            (ClassACIdentifer == null || c.ACClass.ACIdentifier.Contains(ClassACIdentifer))
-                            &&
-                            (ACIdentifer == null || c.ACIdentifier.Contains(ACIdentifer))
-                            &&
-                            (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
-                         )
-                        .ToList();
-                    presentations.AddRange(messages.Select(c => new TranslationPresentation()
+                    if (ItemTypes == null || ItemTypes.Contains(itemType))
                     {
-                        ItemType = itemType,
-                        ClassACIdentifier = c.ACClass.ACIdentifier,
-                        ACIdentifier = c.ACIdentifier,
-                        ACCaptionTranslation = c.ACCaptionTranslation,
-                        UpdateDate = c.UpdateDate,
-                        UpdateName = c.UpdateName
-                    }));
+                        List<ACClassMessage> messages =
+                       database
+                       .ACClassMessage
+                       .Where(c =>
+                           (ClassACIdentifer == null || c.ACClass.ACIdentifier.Contains(ClassACIdentifer))
+                           &&
+                           (ACIdentifer == null || c.ACIdentifier.Contains(ACIdentifer))
+                           &&
+                           (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
+                        )
+                       .ToList();
+                        presentations.AddRange(messages.Select(c => new TranslationPresentation()
+                        {
+                            ItemType = itemType,
+                            ClassACIdentifier = c.ACClass.ACIdentifier,
+                            ACIdentifier = c.ACIdentifier,
+                            ACCaptionTranslation = c.ACCaptionTranslation,
+                            UpdateDate = c.UpdateDate,
+                            UpdateName = c.UpdateName
+                        }));
+                    }
 
                     // ACClassProperty
                     itemType = ItemTypeEnum.ACClassProperty;
-                    List<ACClassProperty> properties =
+                    if (ItemTypes == null || ItemTypes.Contains(itemType))
+                    {
+                        List<ACClassProperty> properties =
                         database
                         .ACClassProperty
                         .Where(c =>
@@ -121,19 +140,22 @@ namespace gip.mes.cmdlet.Translation
                             (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
                          )
                         .ToList();
-                    presentations.AddRange(properties.Select(c => new TranslationPresentation()
-                    {
-                        ItemType = itemType,
-                        ClassACIdentifier = c.ACClass.ACIdentifier,
-                        ACIdentifier = c.ACIdentifier,
-                        ACCaptionTranslation = c.ACCaptionTranslation,
-                        UpdateDate = c.UpdateDate,
-                        UpdateName = c.UpdateName
-                    }));
+                        presentations.AddRange(properties.Select(c => new TranslationPresentation()
+                        {
+                            ItemType = itemType,
+                            ClassACIdentifier = c.ACClass.ACIdentifier,
+                            ACIdentifier = c.ACIdentifier,
+                            ACCaptionTranslation = c.ACCaptionTranslation,
+                            UpdateDate = c.UpdateDate,
+                            UpdateName = c.UpdateName
+                        }));
+                    }
 
                     // ACClassText
-                    itemType = ItemTypeEnum.ACClassMessage;
-                    List<ACClassText> texts =
+                    itemType = ItemTypeEnum.ACClassText;
+                    if (ItemTypes == null || ItemTypes.Contains(itemType))
+                    {
+                        List<ACClassText> texts =
                         database
                         .ACClassText
                         .Where(c =>
@@ -144,16 +166,16 @@ namespace gip.mes.cmdlet.Translation
                             (SearchText == null || c.ACCaptionTranslation.Contains(SearchText))
                          )
                         .ToList();
-                    presentations.AddRange(texts.Select(c => new TranslationPresentation()
-                    {
-                        ItemType = itemType,
-                        ClassACIdentifier = c.ACClass.ACIdentifier,
-                        ACIdentifier = c.ACIdentifier,
-                        ACCaptionTranslation = c.ACCaptionTranslation,
-                        UpdateDate = c.UpdateDate,
-                        UpdateName = c.UpdateName
-                    }));
-
+                        presentations.AddRange(texts.Select(c => new TranslationPresentation()
+                        {
+                            ItemType = itemType,
+                            ClassACIdentifier = c.ACClass.ACIdentifier,
+                            ACIdentifier = c.ACIdentifier,
+                            ACCaptionTranslation = c.ACCaptionTranslation,
+                            UpdateDate = c.UpdateDate,
+                            UpdateName = c.UpdateName
+                        }));
+                    }
                 }
             }
 

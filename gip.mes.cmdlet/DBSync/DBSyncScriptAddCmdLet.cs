@@ -10,7 +10,7 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.DBSync
 {
-    [Cmdlet(VerbsCommon.Add, "VariobatchDBSync")]
+    [Cmdlet(VerbsCommon.Add, CmdLetSettings.DBSyncCmdlet_Name)]
     public class DBSyncScriptAddCmdlet : Cmdlet
     {
         #region Config
@@ -30,10 +30,10 @@ namespace gip.mes.cmdlet.DBSync
 
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings designSettings = FactorySettings.Factory(VarioData);
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string connectionString = DbSyncerSettings.GetDefaultConnectionString(CommandLineHelper.ConfigCurrentDir);
 
-            string rootFolder = Path.Combine(designSettings.TrunkFolder, "DbScripts", DbSyncerInfoContextID);
+            string rootFolder = Path.Combine(iPlusCmdLetSettings.DLLBinFolder, "DbScripts", DbSyncerInfoContextID);
             DbSyncerInfoContext dbSyncerInfoContext = new DbSyncerInfoContext() { DbSyncerInfoContextID = DbSyncerInfoContextID };
             FileInfo fi = new FileInfo(Path.Combine(rootFolder, FileName));
             ScriptFileInfo scriptFileInfo = new ScriptFileInfo(dbSyncerInfoContext, fi, rootFolder);

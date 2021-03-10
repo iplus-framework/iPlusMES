@@ -38,9 +38,9 @@ namespace gip.mes.cmdlet.DesignSync
             IsExportACClassMessage = isExportACClassMessage;
         }
 
-        internal void Import(ACProject variobatchProject, string[] classNames, string[] filterItemNames)
+        internal void Import(ACProject acRootProject, string[] classNames, string[] filterItemNames)
         {
-            PrepareProjectTree(variobatchProject, classNames);
+            PrepareProjectTree(acRootProject, classNames);
             foreach (var acIdentifer in classNames)
             {
                 SendImportMessage(string.Format("Importing class {0}...", acIdentifer));
