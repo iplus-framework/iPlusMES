@@ -1621,7 +1621,10 @@ namespace gip.bso.facility
                 if (addToList)
                     AccessPrimary.NavList.Add(tmpFilterTracking);
                 if (result.Filter.RecalcAgain || addToList)
+                {
+                    AccessPrimary.NavSearch();
                     OnPropertyChanged("FilterList");
+                }
                 SelectedFilter = tmpFilterTracking;
                 var graphModel = GraphCommand.BuildGraphResult(result, IncludedGraphItems, GetGraphModel());
                 ProcessGraph(graphModel);
