@@ -97,6 +97,11 @@
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
+    <Compile Include="EntityPriceList\PriceList.cs" />
+    <Compile Include="EntityPriceList\PriceListMaterial.cs" />
+    <Compile Include="EntityPriceList\Tax.cs" />
+    <Compile Include="EntityPriceList\TaxMaterial.cs" />
+    <Compile Include="EntityPriceList\TaxMDMaterialGroup.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
     <Compile Include="TandT\StartItemTypeComparer.cs" />
     <Compile Include="TrackingCommon\TrackingEngineList.cs" />
@@ -361,6 +366,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DbScripts\iPlusMES\dbsync_2021-03-08_12-50_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-11_10-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

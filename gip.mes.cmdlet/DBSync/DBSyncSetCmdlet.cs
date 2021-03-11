@@ -28,6 +28,8 @@ namespace gip.mes.cmdlet.DBSync
             VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             string connectionString = DbSyncerSettings.GetDefaultConnectionString(CommandLineHelper.ConfigCurrentDir);
             string rootFolder = Path.Combine(iPlusCmdLetSettings.DLLBinFolder);
+            
+            DbSyncerSettings.ConfigCurrentDir = CommandLineHelper.ConfigCurrentDir;
 
             SyncTask syncTask = new SyncTask();
             syncTask.OnStatusChange += syncTask_OnStatusChange;

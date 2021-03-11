@@ -70,6 +70,11 @@
         public const string ESVisitorCardState           = "en{'Visitor Card Status'}de{'Besucherausweisstatus'}";
         public const string ESVisitorVoucherState        = "en{'Visitor Voucher Status'}de{'Besucherbelegstatus'}";
         public const string ESZeroStockState             = "en{'Zero Stock Status'}de{'Nullbestand-Status'}";
+        public const string ESTax                        = "en{'Tax'}de{'MwSt'}";
+        public const string ESTaxMaterial                = "en{'Tax Material'}de{'MwSt Material'}";
+        public const string ESTaxMDMaterialGroup         = "en{'Tax Material Group'}de{'MwSt Materialgruppe'}";
+        public const string ESPriceList                  = "en{'Price list'}de{'Preisliste'}";
+        public const string ESPriceListMaterial          = "en{'Price list material'}de{'Preislistematerial'}";
         #endregion
 
         #region Labels

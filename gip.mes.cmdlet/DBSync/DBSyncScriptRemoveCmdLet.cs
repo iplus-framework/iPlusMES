@@ -39,16 +39,22 @@ namespace gip.mes.cmdlet.DBSync
             string rootFolder = Path.Combine(iPlusCmdLetSettings.DLLBinFolder, "DbScripts", DbSyncerInfoContextID);
             DbSyncerInfoContext dbSyncerInfoContext = new DbSyncerInfoContext() { DbSyncerInfoContextID = DbSyncerInfoContextID };
             FileInfo fi = new FileInfo(Path.Combine(rootFolder, FileName));
-            ScriptFileInfo scriptFileInfo = new ScriptFileInfo(dbSyncerInfoContext, fi, rootFolder);
-            using (DbContext db = new DbContext(connectionString))
+            if (fi.Exists)
             {
-                DbSyncerInfoCommand.DeleteScriptFile(db, scriptFileInfo);
-                WriteObject("Script removed:");
-                WriteObject(string.Format("{0}\\{1}", DbSyncerInfoContextID, FileName));
-                WriteObject("Now last script:");
-                var result = db.Database.SqlQuery<DbSyncerInfo>("select top 1 * from [dbo].[@DbSyncerInfo] order by [ScriptDate] desc");
-                WriteObject(result.FirstOrDefault());
+                ScriptFileInfo scriptFileInfo = new ScriptFileInfo(dbSyncerInfoContext, fi, rootFolder);
+                using (DbContext db = new DbContext(connectionString))
+                {
+                    DbSyncerInfoCommand.DeleteScriptFile(db, scriptFileInfo);
+                    WriteObject("Script removed:");
+                    WriteObject(string.Format("{0}\\{1}", DbSyncerInfoContextID, FileName));
+                    WriteObject("Now last script into [dbo].[@DbSyncerInfo]:");
+                    var result = db.Database.SqlQuery<DbSyncerInfo>("select top 1 * from [dbo].[@DbSyncerInfo] order by [ScriptDate] desc");
+                    WriteObject(result.FirstOrDefault());
+                }
             }
+            else
+                WriteObject(string.Format(@"File {0} not exist!", fi.FullName));
+
         }
     }
 }
