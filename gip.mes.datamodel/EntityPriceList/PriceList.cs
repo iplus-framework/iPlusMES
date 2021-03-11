@@ -31,6 +31,7 @@ namespace gip.mes.datamodel
             entity.PriceListID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.PriceListNo = secondaryKey;
+            entity.DateFrom = DateTime.Now;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }

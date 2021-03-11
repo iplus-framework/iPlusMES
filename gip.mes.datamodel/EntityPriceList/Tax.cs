@@ -8,6 +8,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, "TaxNo", "en{'TaxNo'}de{'MwStNr'}", "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, "DateFrom", "en{'Start time'}de{'Startzeit'}", "", "", true)]
     [ACPropertyEntity(3, "DateTo", "en{'End Time'}de{'Endzeit'}", "", "", true)]
+    [ACPropertyEntity(4, "DefaultTaxValue", "en{'Tax'}de{'MwStr'}", "", "", true)]
 
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
@@ -31,6 +32,7 @@ namespace gip.mes.datamodel
             entity.TaxID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.TaxNo = secondaryKey;
+            entity.DateFrom = DateTime.Now;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }

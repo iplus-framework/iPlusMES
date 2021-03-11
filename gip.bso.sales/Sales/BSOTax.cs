@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Collections.ObjectModel;
+using gip.bso.masterdata;
 
 namespace gip.bso.sales
 {
@@ -26,6 +27,7 @@ namespace gip.bso.sales
 
 
             Search();
+            LoadTaxPositions();
             return true;
         }
 
@@ -81,23 +83,28 @@ namespace gip.bso.sales
                     AccessPrimary.Selected = value;
                     OnPropertyChanged("SelectedTax");
 
-                    TaxMDMaterialGroupList = LoadTaxMDMaterialGroupList();
-                    if (TaxMDMaterialGroupList == null)
-                        SelectedTaxMDMaterialGroup = null;
-                    else
-                        SelectedTaxMDMaterialGroup = TaxMDMaterialGroupList.FirstOrDefault();
-
-                    TaxMaterialList = LoadTaxMaterialList();
-                    if (TaxMaterialList == null)
-                        SelectedTaxMaterial = null;
-                    else
-                        SelectedTaxMaterial = TaxMaterialList.FirstOrDefault();
+                    LoadTaxPositions();
                 }
             }
         }
 
-        #endregion
+        private void LoadTaxPositions()
+        {
+            TaxMDMaterialGroupList = LoadTaxMDMaterialGroupList();
+            if (TaxMDMaterialGroupList == null)
+                SelectedTaxMDMaterialGroup = null;
+            else
+                SelectedTaxMDMaterialGroup = TaxMDMaterialGroupList.FirstOrDefault();
 
+            TaxMaterialList = LoadTaxMaterialList();
+            if (TaxMaterialList == null)
+                SelectedTaxMaterial = null;
+            else
+                SelectedTaxMaterial = TaxMaterialList.FirstOrDefault();
+            SelectedTaxMaterial = TaxMaterialList.FirstOrDefault();
+        }
+
+        #endregion
 
         #region TaxMDMaterialGroup
 
@@ -137,6 +144,8 @@ namespace gip.bso.sales
         {
             get
             {
+                if (_TaxMDMaterialGroupList == null)
+                    _TaxMDMaterialGroupList = new List<TaxMDMaterialGroup>();
                 return _TaxMDMaterialGroupList;
             }
             set
@@ -159,6 +168,7 @@ namespace gip.bso.sales
         public void AddTaxMDMaterialGroup()
         {
             TaxMDMaterialGroup entity = TaxMDMaterialGroup.NewACObject(DatabaseApp, SelectedTax);
+            entity.MDMaterialGroup = SelectedMDMaterialGroup;
             TaxMDMaterialGroupList.Add(entity);
             OnPropertyChanged("TaxMDMaterialGroupList");
             SelectedTaxMDMaterialGroup = entity;
@@ -185,7 +195,9 @@ namespace gip.bso.sales
 
         public bool IsEnabledAddTaxMDMaterialGroup()
         {
-            return SelectedTax != null;
+            return SelectedTax != null
+                && SelectedMDMaterialGroup != null
+                && (TaxMDMaterialGroupList == null || !TaxMDMaterialGroupList.Where(c => c.MDMaterialGroupID == SelectedMDMaterialGroup.MDMaterialGroupID).Any());
         }
 
         public bool IsEnabledDeleteTaxMDMaterialGroup()
@@ -234,6 +246,8 @@ namespace gip.bso.sales
         {
             get
             {
+                if (_TaxMaterialList == null)
+                    _TaxMaterialList = new List<TaxMaterial>();
                 return _TaxMaterialList;
             }
             set
@@ -256,6 +270,7 @@ namespace gip.bso.sales
         public void AddTaxMaterial()
         {
             TaxMaterial entity = TaxMaterial.NewACObject(DatabaseApp, SelectedTax);
+            entity.Material = BSOMaterialExplorer_Child.Value.SelectedMaterial;
             TaxMaterialList.Add(entity);
             OnPropertyChanged("TaxMaterialList");
             SelectedTaxMaterial = entity;
@@ -281,7 +296,11 @@ namespace gip.bso.sales
 
         public bool IsEnabledAddTaxMaterial()
         {
-            return SelectedTax != null;
+            return SelectedTax != null
+                && BSOMaterialExplorer_Child != null
+                && BSOMaterialExplorer_Child.Value != null
+                && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
+                && (TaxMaterialList == null || !TaxMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
         }
 
         public bool IsEnabledDeleteTaxMaterial()
@@ -348,6 +367,68 @@ namespace gip.bso.sales
         #endregion
 
         #endregion
+
+        #region Material
+        ACChildItem<BSOMaterialExplorer> _BSOMaterialExplorer_Child;
+        [ACPropertyInfo(9999)]
+        [ACChildInfo("BSOMaterialExplorer_Child", typeof(BSOMaterialExplorer))]
+        public ACChildItem<BSOMaterialExplorer> BSOMaterialExplorer_Child
+        {
+            get
+            {
+                if (_BSOMaterialExplorer_Child == null)
+                    _BSOMaterialExplorer_Child = new ACChildItem<BSOMaterialExplorer>(this, "BSOMaterialExplorer_Child");
+                return _BSOMaterialExplorer_Child;
+            }
+        }
+        #endregion
+
+        #region MDMaterialGroup
+        private MDMaterialGroup _SelectedMDMaterialGroup;
+        /// <summary>
+        /// Selected property for MDMaterialGroup
+        /// </summary>
+        /// <value>The selected MDMaterialGroup</value>
+        [ACPropertySelected(9999, "MDMaterialGroup", "en{'TODO: MDMaterialGroup'}de{'TODO: MDMaterialGroup'}")]
+        public MDMaterialGroup SelectedMDMaterialGroup
+        {
+            get
+            {
+                return _SelectedMDMaterialGroup;
+            }
+            set
+            {
+                if (_SelectedMDMaterialGroup != value)
+                {
+                    _SelectedMDMaterialGroup = value;
+                    OnPropertyChanged("SelectedMDMaterialGroup");
+                }
+            }
+        }
+
+
+        private List<MDMaterialGroup> _MDMaterialGroupList;
+        /// <summary>
+        /// List property for MDMaterialGroup
+        /// </summary>
+        /// <value>The MDMaterialGroup list</value>
+        [ACPropertyList(9999, "MDMaterialGroup")]
+        public List<MDMaterialGroup> MDMaterialGroupList
+        {
+            get
+            {
+                if (_MDMaterialGroupList == null)
+                    _MDMaterialGroupList = LoadMDMaterialGroupList();
+                return _MDMaterialGroupList;
+            }
+        }
+
+        private List<MDMaterialGroup> LoadMDMaterialGroupList()
+        {
+            return DatabaseApp.MDMaterialGroup.OrderBy(c => c.SortIndex).ToList();
+        }
+        #endregion
+
 
         #region Methods
         [ACMethodCommand(Tax.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
@@ -459,8 +540,12 @@ namespace gip.bso.sales
                         DatabaseApp
                         .Tax
                         .Where(c =>
-                                    c.DateFrom <= SelectedTax.DateFrom && (c.DateTo ?? DateTime.Now) >= SelectedTax.DateFrom
-                                    || c.DateFrom >= (SelectedTax.DateTo ?? DateTime.Now) && (c.DateTo ?? DateTime.Now) <= (SelectedTax.DateTo ?? DateTime.Now)
+                                    c.TaxID != SelectedTax.TaxID
+                                    &&
+                                    (
+                                        c.DateFrom <= SelectedTax.DateFrom && (c.DateTo ?? DateTime.Now) >= SelectedTax.DateFrom
+                                        || c.DateFrom >= (SelectedTax.DateTo ?? DateTime.Now) && (c.DateTo ?? DateTime.Now) <= (SelectedTax.DateTo ?? DateTime.Now)
+                                    )
                                 )
                         .FirstOrDefault();
                     if (concurentTax != null)

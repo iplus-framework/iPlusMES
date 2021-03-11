@@ -115,6 +115,10 @@
       <Project>{33d19b80-129b-44fd-9662-282772bcd4dc}</Project>
       <Name>gip.bso.manufacturing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj">
+      <Project>{64342646-DAD9-441C-A270-2A7DD2228A42}</Project>
+      <Name>gip.bso.masterdata</Name>
+    </ProjectReference>
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
       <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
       <Name>gip.mes.autocomponent</Name>
@@ -153,6 +157,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="VBControlScripts\2021-03-11 13-20_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-03-11 22-35_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
