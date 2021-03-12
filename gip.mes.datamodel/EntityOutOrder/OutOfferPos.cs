@@ -38,7 +38,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer wird automatisch bei der Anlage durchgeführt
         /// </summary>
-        public static OutOfferPos NewACObject(DatabaseApp dbApp, IACObject parentACObject)
+        public static OutOfferPos NewACObject(DatabaseApp dbApp, IACObject parentACObject, OutOfferPos parentGroupPos)
         {
             OutOfferPos entity = new OutOfferPos();
             entity.OutOfferPosID = Guid.NewGuid();
@@ -64,10 +64,20 @@ namespace gip.mes.datamodel
                         Database.Root.Messages.LogException(ClassName, Const.MN_NewACObject, msg);
                 }
 
-                if (OutOffer.OutOfferPos_OutOffer != null && OutOffer.OutOfferPos_OutOffer.Select(c => c.Sequence).Any())
-                    entity.Sequence = OutOffer.OutOfferPos_OutOffer.Select(c => c.Sequence).Max() + 1;
+                if (parentGroupPos == null)
+                {
+                    if (OutOffer.OutOfferPos_OutOffer != null && OutOffer.OutOfferPos_OutOffer.Where(c => !c.GroupOutOfferPosID.HasValue).Select(c => c.Sequence).Any())
+                        entity.Sequence = OutOffer.OutOfferPos_OutOffer.Where(c => !c.GroupOutOfferPosID.HasValue).Select(c => c.Sequence).Max() + 1;
+                    else
+                        entity.Sequence = 1;
+                }
                 else
-                    entity.Sequence = 1;
+                {
+                    if (OutOffer.OutOfferPos_OutOffer != null && OutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == parentGroupPos.OutOfferPosID).Select(c => c.Sequence).Any())
+                        entity.Sequence = OutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == parentGroupPos.OutOfferPosID).Select(c => c.Sequence).Max() + 1;
+                    else
+                        entity.Sequence = 1;
+                }
                 entity.OutOffer = OutOffer;
             }
             entity.MaterialPosTypeIndex = (Int16)GlobalApp.MaterialPosTypes.OutwardRoot;
@@ -202,16 +212,21 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(30)]
         public string Position
         {
             get
             {
-                return "Position " + Sequence.ToString();
+                if (OutOfferPos1_GroupOutOfferPos == null)
+                    return Sequence.ToString();
+                else
+                {
+                    return OutOfferPos1_GroupOutOfferPos.Position + "." + Sequence.ToString();
+                }
             }
         }
 
-        [ACPropertyInfo (9999)]
+        [ACPropertyInfo (31)]
         public List<OutOfferPos> Items
         {
             get
@@ -220,11 +235,12 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(32)]
         public double TotalPrice
         {
             get
             {
-                return 0.0;
+                return TargetQuantity * (double)PriceNet;
             }
         }
     }

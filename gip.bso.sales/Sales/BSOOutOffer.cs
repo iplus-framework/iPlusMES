@@ -221,7 +221,7 @@ namespace gip.bso.sales
         {
             get
             {
-                return CurrentOutOffer?.OutOfferPos_OutOffer.Where(c => c.OutOfferPos1_GroupOutOfferPos == null);
+                return CurrentOutOffer?.OutOfferPos_OutOffer.OrderBy(c => c.Position);
             }
         }
 
@@ -336,23 +336,6 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(9999)]
-        public string XMLDesign
-        {
-            get 
-            {
-                if (CurrentOutOfferPos != null)
-                    return CurrentOutOfferPos.XMLConfig;
-                return "";
-            }
-            set
-            {
-                if (CurrentOutOfferPos != null)
-                    CurrentOutOfferPos.XMLConfig = value;
-                OnPropertyChanged("XMLDesign");
-            }
-        }
-
         private ReportData _TempReportData;
         [ACPropertyInfo(9999)]
         public ReportData TempReportData
@@ -368,10 +351,17 @@ namespace gip.bso.sales
             }
         }
 
+        [ACPropertyInfo(650)]
+        public List<OutOfferPosData> OutOfferPosDataList
+        {
+            get;
+            set;
+        }
 
         #endregion
 
         #region BSO->ACMethod
+
         [ACMethodCommand(OutOffer.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
@@ -419,10 +409,6 @@ namespace gip.bso.sales
             CurrentOutOffer = OutOffer.NewACObject(DatabaseApp, null, secondaryKey);
             DatabaseApp.OutOffer.AddObject(CurrentOutOffer);
 
-            CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer);
-            CurrentOutOfferPos.OutOffer = CurrentOutOffer;
-            CurrentOutOffer.OutOfferPos_OutOffer.Add(CurrentOutOfferPos);
-            OnPropertyChanged("OutOfferPosList");
             ACState = Const.SMNew;
             PostExecute("New");
 
@@ -484,7 +470,7 @@ namespace gip.bso.sales
         {
             if (!PreExecute("NewOutOfferPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer);
+            CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, null);
             CurrentOutOfferPos.OutOffer = CurrentOutOffer;
             CurrentOutOffer.OutOfferPos_OutOffer.Add(CurrentOutOfferPos);
             OnPropertyChanged("OutOfferPosList");
@@ -496,12 +482,12 @@ namespace gip.bso.sales
             return CurrentOutOffer != null;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
         public void NewSubOutOfferPos()
         {
             if (!PreExecute("NewOutOfferPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            OutOfferPos subOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer);
+            OutOfferPos subOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, CurrentOutOfferPos);
             subOutOfferPos.OutOfferPos1_GroupOutOfferPos = CurrentOutOfferPos;
             subOutOfferPos.OutOffer = CurrentOutOffer;
             CurrentOutOffer.OutOfferPos_OutOffer.Add(subOutOfferPos);
@@ -533,8 +519,39 @@ namespace gip.bso.sales
         {
             return CurrentOutOffer != null && CurrentOutOfferPos != null;
         }
-        #endregion
 
+        private void BuildOutOfferPosData()
+        {
+            List<OutOfferPosData> posData = new List<OutOfferPosData>();
+
+            foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null).OrderBy(p => p.Position))
+            {
+                posData.Add(new OutOfferPosData(outOfferPos));
+                BuildOutOfferPosDataRecursive(posData, outOfferPos.Items);
+            }
+
+            OutOfferPosDataList = posData;
+        }
+
+        private void BuildOutOfferPosDataRecursive(List<OutOfferPosData> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
+        {
+            foreach (var outOfferPos in outOfferPosList.OrderBy(p => p.Position))
+            {
+                posDataList.Add(new OutOfferPosData(outOfferPos));
+                BuildOutOfferPosDataRecursive(posDataList, outOfferPos.Items);
+            }
+        }
+
+        public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
+        {
+            if(printingPhase == ACPrintingPhase.Started)
+            {
+                BuildOutOfferPosData();
+            }
+            base.OnPrintingPhase(reportEngine, printingPhase);
+        }
+
+        #endregion
 
         #region Execute-Helper-Handlers
 
@@ -599,7 +616,64 @@ namespace gip.bso.sales
         }
 
         #endregion
+    }
+
+    [ACClassInfo(Const.PackName_VarioSales, "en{'OutOfferPosData'}de{'OutOfferPosData'}", Global.ACKinds.TACSimpleClass)]
+    public class OutOfferPosData
+    {
+        public OutOfferPosData(OutOfferPos pos)
+        {
+            OutOfferPos = pos;
+        }
+
+        [ACPropertyInfo(1)]
+        public OutOfferPos OutOfferPos
+        {
+            get;
+            set;
+        }
 
 
+        [ACPropertyInfo(4)]
+        public double? Quantity
+        {
+            get => OutOfferPos?.TargetQuantity;
+        }
+
+        [ACPropertyInfo(5)]
+        public string QuantityUnit
+        {
+            get
+            {
+                if(Quantity > 0)
+                    return Quantity + " " + OutOfferPos?.MDUnit.Symbol;
+
+                return "";
+            }
+        }
+
+        [ACPropertyInfo(6)]
+        public string Price
+        {
+            get
+            {
+                if(OutOfferPos != null && OutOfferPos.PriceNet > 0)
+                    return OutOfferPos.PriceNet.ToString();
+
+                return "";
+            }
+        }
+
+        [ACPropertyInfo(7)]
+        public string TotalPrice
+        {
+            get
+            {
+                if (OutOfferPos != null && OutOfferPos.TotalPrice > 0)
+                    return OutOfferPos.TotalPrice.ToString();
+
+                return "";
+            }
+        }
     }
 }
