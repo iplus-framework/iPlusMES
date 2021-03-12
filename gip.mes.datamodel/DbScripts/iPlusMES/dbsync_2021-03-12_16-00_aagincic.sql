@@ -9,8 +9,6 @@ GO
 alter table  dbo.OutOfferPos alter column GroupSum bit not null;
 alter table  dbo.OutOrderPos alter column GroupSum bit not null;
 GO
-USE [OutOrderPosModelV4]
-GO
 CREATE TABLE [dbo].[Invoice](
 	[InvoiceID] [uniqueidentifier] NOT NULL,
 	[MDInvoiceTypeID] [uniqueidentifier] NOT NULL,
