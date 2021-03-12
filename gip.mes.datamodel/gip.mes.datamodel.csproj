@@ -378,6 +378,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-12_16-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
