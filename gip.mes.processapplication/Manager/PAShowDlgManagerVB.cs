@@ -310,6 +310,53 @@ namespace gip.mes.processapplication
             }
         }
 
+        public override void ShowDialogOrder(IACComponent caller, PAOrderInfo orderInfo = null)
+        {
+            if (orderInfo == null)
+            {
+                PWNodeProxy pwNode = caller as PWNodeProxy;
+                if (pwNode != null)
+                {
+                    orderInfo = pwNode.ACUrlCommand("!GetPAOrderInfo") as PAOrderInfo;
+                }
+                else
+                {
+                    PWBaseExecutable baseExe = caller as PWBaseExecutable;
+                    orderInfo = baseExe.GetPAOrderInfo();
+                }
+            }
+
+            base.ShowDialogOrder(caller, orderInfo);
+        }
+
+        public override bool IsEnabledShowDialogOrder(IACComponent caller)
+        {
+            bool result =  base.IsEnabledShowDialogOrder(caller);
+            if (result)
+                return result;
+
+            PWNodeProxy pwNode = caller as PWNodeProxy;
+            if (pwNode != null)
+            {
+                var orderInfo = pwNode.ACUrlCommand("!GetPAOrderInfo") as PAOrderInfo;
+                if (orderInfo != null)
+                    return true;
+            }
+            else
+            {
+                PWBaseExecutable baseExe = caller as PWBaseExecutable;
+                if (baseExe != null)
+                {
+                    var orderInfo = baseExe.GetPAOrderInfo();
+                    if (orderInfo != null)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+
         #endregion
 
         #endregion
