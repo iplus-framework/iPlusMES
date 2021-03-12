@@ -96,7 +96,6 @@
     <Compile Include="Sales\BSOOutOfferOverview.cs" />
     <Compile Include="Sales\BSOOutOrderPos.cs" />
     <Compile Include="Sales\BSOPriceList.cs" />
-    <Compile Include="Sales\BSOTax.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
@@ -156,14 +155,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="VBControlScripts\2021-03-11 13-20_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-03-11 22-35_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="VBControlScripts\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

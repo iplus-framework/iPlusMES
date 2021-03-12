@@ -15,6 +15,9 @@
         public const string ESCountry                    = "en{'Country'}de{'Land'}";
         public const string ESCountryLand                = "en{'Federal State'}de{'Bundesland'}";
         public const string ESCountrySalesTax            = "en{'VAT'}de{'Mehrwertsteuer'}";
+        public const string ESCountrySalesTaxMaterial    = "en{'Tax Material'}de{'MwSt Material'}";
+        public const string ESCountrySalesTaxMDMaterialGroup = "en{'Tax Material Group'}de{'MwSt Materialgruppe'}";
+
         public const string ESCurrency                   = "en{'Currency'}de{'Währung'}";
         public const string ESCurrencyExchange           = "en{'Exchange Rate'}de{'Wechselkurs'}";
         public const string ESDelivNoteState             = "en{'Delivery Note Status'}de{'Lieferscheinstatus'}";
@@ -70,9 +73,6 @@
         public const string ESVisitorCardState           = "en{'Visitor Card Status'}de{'Besucherausweisstatus'}";
         public const string ESVisitorVoucherState        = "en{'Visitor Voucher Status'}de{'Besucherbelegstatus'}";
         public const string ESZeroStockState             = "en{'Zero Stock Status'}de{'Nullbestand-Status'}";
-        public const string ESTax                        = "en{'Tax'}de{'MwSt'}";
-        public const string ESTaxMaterial                = "en{'Tax Material'}de{'MwSt Material'}";
-        public const string ESTaxMDMaterialGroup         = "en{'Tax Material Group'}de{'MwSt Materialgruppe'}";
         public const string ESPriceList                  = "en{'Price list'}de{'Preisliste'}";
         public const string ESPriceListMaterial          = "en{'Price list material'}de{'Preislistematerial'}";
         #endregion

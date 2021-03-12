@@ -156,6 +156,7 @@
     <Compile Include="Logistics\MDBSODelivType.cs" />
     <Compile Include="Facility\BSOFacilityLocation.cs" />
     <Compile Include="Facility\BSOFacilityVehicle.cs" />
+    <Compile Include="Sales\MDBSOCountrySalesTax.cs" />
     <Compile Include="System\MDBSORatingComplaintType.cs" />
     <Compile Include="System\MDBSOTermOfPayment.cs" />
     <Compile Include="Material\MDBSOGMPAdditive.cs" />
@@ -237,10 +238,14 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />    <None Include="VBControlScripts\2021-03-08 14-03_aagincic.zip">
+    <None Include="packages.config" />
+    <None Include="VBControlScripts\2021-03-08 14-03_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>    
-	<None Include="VBControlScripts\2021-03-05 15-06_dlisak.zip">
+    </None>
+    <None Include="VBControlScripts\2021-03-05 15-06_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-03-12 13-08_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

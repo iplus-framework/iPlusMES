@@ -7,10 +7,17 @@ using System.Data.Objects;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSystem, ConstApp.ESCountrySalesTax, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACPropertyEntity(9999, MDCountry.ClassName, ConstApp.ESCountry, Const.ContextDatabase + "\\" + MDCountry.ClassName, "", true)]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
-    [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
-    [ACPropertyEntity(2, MDCountrySalesTax.ClassName, ConstApp.ESCountrySalesTax, "", "", true)]
-    [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
+    [ACPropertyEntity(1, "SalesTax", ConstApp.ESCountrySalesTax, "", "", true)]
+    [ACPropertyEntity(2, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
+    [ACPropertyEntity(3, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
+    [ACPropertyEntity(4, "DateFrom", "en{'Start time'}de{'Startzeit'}", "", "", true)]
+    [ACPropertyEntity(5, "DateTo", "en{'End Time'}de{'Endzeit'}", "", "", true)]
+    [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
+    [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
+    [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
+    [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSystem, Const.QueryPrefix + MDCountrySalesTax.ClassName, ConstApp.ESCountrySalesTax, typeof(MDCountrySalesTax), MDCountrySalesTax.ClassName, Const.MDNameTrans, Const.MDKey)]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<MDCountrySalesTax>) })]
     public partial class MDCountrySalesTax : IACObjectEntity
@@ -27,6 +34,7 @@ namespace gip.mes.datamodel
             {
                 entity.MDCountry = parentACObject as MDCountry;
             }
+            entity.DateFrom = DateTime.Now;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
@@ -121,7 +129,7 @@ namespace gip.mes.datamodel
             }
         }
 
-#endregion
+        #endregion
 
     }
 }
