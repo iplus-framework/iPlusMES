@@ -487,7 +487,6 @@ namespace gip.bso.masterdata
         }
         #endregion
 
-
         #region Methods
         [ACMethodCommand(MDCountrySalesTax.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()

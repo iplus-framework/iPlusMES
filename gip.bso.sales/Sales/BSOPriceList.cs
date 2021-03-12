@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Collections.ObjectModel;
+using gip.bso.masterdata;
 
 namespace gip.bso.sales.Sales
 {
@@ -26,6 +27,7 @@ namespace gip.bso.sales.Sales
 
 
             Search();
+            LoadPriceListPositions();
             return true;
         }
 
@@ -81,18 +83,25 @@ namespace gip.bso.sales.Sales
                     AccessPrimary.Selected = value;
                     OnPropertyChanged("SelectedPriceList");
 
-                    PriceListMaterialList = LoadPriceListMaterialList();
-                    if (PriceListMaterialList == null)
-                        SelectedPriceListMaterial = null;
-                    else
-                        SelectedPriceListMaterial = PriceListMaterialList.FirstOrDefault();
+                    LoadPriceListPositions();
                 }
             }
+        }
+
+        private void LoadPriceListPositions()
+        {
+            PriceListMaterialList = LoadPriceListMaterialList();
+            if (PriceListMaterialList == null)
+                SelectedPriceListMaterial = null;
+            else
+                SelectedPriceListMaterial = PriceListMaterialList.FirstOrDefault();
         }
 
         #endregion
 
         #region PriceListMaterial
+
+        #region PriceListMaterial -> Properties
 
         private PriceListMaterial _SelectedPriceListMaterial;
         /// <summary>
@@ -142,6 +151,66 @@ namespace gip.bso.sales.Sales
 
         #endregion
 
+        #region PriceListMaterial -> Methods
+        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999)]
+        public void AddPriceListMaterial()
+        {
+            PriceListMaterial entity = PriceListMaterial.NewACObject(DatabaseApp, SelectedPriceList);
+            entity.Material = BSOMaterialExplorer_Child.Value.SelectedMaterial;
+            PriceListMaterialList.Add(entity);
+            OnPropertyChanged("PriceListMaterialList");
+            SelectedPriceListMaterial = entity;
+        }
+
+        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'Delete Position'}de{'Position löschen'}", 999)]
+        public void DeletePriceListMaterial()
+        {
+            PriceListMaterialList.Remove(SelectedPriceListMaterial);
+            Msg msg = SelectedPriceListMaterial.DeleteACObject(DatabaseApp, true);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                PriceListMaterialList.Add(SelectedPriceListMaterial);
+                return;
+            }
+            else
+            {
+                SelectedPriceListMaterial = PriceListMaterialList != null ? PriceListMaterialList.FirstOrDefault() : null;
+                OnPropertyChanged("PriceListMaterialList");
+            }
+        }
+
+        public bool IsEnabledAddPriceListMaterial()
+        {
+            return SelectedPriceList != null
+                && BSOMaterialExplorer_Child != null
+                && BSOMaterialExplorer_Child.Value != null
+                && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
+                && (PriceListMaterialList == null || !PriceListMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
+        }
+
+        public bool IsEnabledDeletePriceListMaterial()
+        {
+            return SelectedPriceList != null && SelectedPriceListMaterial != null;
+        }
+        #endregion
+
+        #endregion
+
+        #region Material
+        ACChildItem<BSOMaterialExplorer> _BSOMaterialExplorer_Child;
+        [ACPropertyInfo(9999)]
+        [ACChildInfo("BSOMaterialExplorer_Child", typeof(BSOMaterialExplorer))]
+        public ACChildItem<BSOMaterialExplorer> BSOMaterialExplorer_Child
+        {
+            get
+            {
+                if (_BSOMaterialExplorer_Child == null)
+                    _BSOMaterialExplorer_Child = new ACChildItem<BSOMaterialExplorer>(this, "BSOMaterialExplorer_Child");
+                return _BSOMaterialExplorer_Child;
+            }
+        }
+        #endregion
 
         #region Messages
 
@@ -312,13 +381,13 @@ namespace gip.bso.sales.Sales
                                         c.DateFrom <= SelectedPriceList.DateFrom && (c.DateTo ?? DateTime.Now) >= SelectedPriceList.DateFrom
                                         || c.DateFrom >= (SelectedPriceList.DateTo ?? DateTime.Now) && (c.DateTo ?? DateTime.Now) <= (SelectedPriceList.DateTo ?? DateTime.Now)
                                     )
-                                    && c.PriceListMaterial_PriceList.Select(x=>x.Material.MaterialNo).Intersect(currentMaterialNos).Any()
+                                    && c.PriceListMaterial_PriceList.Select(x => x.Material.MaterialNo).Intersect(currentMaterialNos).Any()
                                 )
                        .FirstOrDefault();
 
                     if (concurentPriceList != null)
                     {
-                        List<string> materialNos = concurentPriceList.PriceListMaterial_PriceList.Select(c=>c.Material.MaterialNo).Intersect(currentMaterialNos).ToList();
+                        List<string> materialNos = concurentPriceList.PriceListMaterial_PriceList.Select(c => c.Material.MaterialNo).Intersect(currentMaterialNos).ToList();
                         result = new Msg()
                         {
                             Message = Root.Environment.TranslateMessage(this, "Error50399", concurentPriceList.PriceListNo, string.Join(",", materialNos)),
