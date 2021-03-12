@@ -337,8 +337,16 @@ namespace gip.mes.processapplication
                         && ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch != null)
                     {
                         short destError = 0;
-                        string errorMsg;
-                        Guid[] targets = ParentPWMethod<PWMethodProduction>().GetCachedDestinations(false/*addedModules.Any()*/, out destError, out errorMsg);
+                        string errorMsg = "";
+                        Guid[] targets = null;
+                        if (IsInEmptyingMode)
+                        {
+                            var extraDest = ExtraDisTargetComp;
+                            if (extraDest != null)
+                                targets = new Guid[] { extraDest.ComponentClass.ACClassID };
+                        }
+                        if (targets == null)
+                            targets = ParentPWMethod<PWMethodProduction>().GetCachedDestinations(false/*addedModules.Any()*/, out destError, out errorMsg);
                         if (targets == null || !targets.Any())
                         {
                             if (ParentPWMethod<PWMethodProduction>().CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
@@ -439,8 +447,16 @@ namespace gip.mes.processapplication
                                 else if (notePos != null)
                                 {
                                     short destError = 0;
-                                    string errorMsg;
-                                    Guid[] targets = pwMethod.GetCachedDestinationsForDN(false/*addedModules.Any()*/, out destError, out errorMsg);
+                                    string errorMsg = "";
+                                    Guid[] targets = null;
+                                    if (IsInEmptyingMode)
+                                    {
+                                        var extraDest = ExtraDisTargetComp;
+                                        if (extraDest != null)
+                                            targets = new Guid[] { extraDest.ComponentClass.ACClassID };
+                                    }
+                                    if (targets == null)
+                                        targets = pwMethod.GetCachedDestinationsForDN(false/*addedModules.Any()*/, out destError, out errorMsg);
                                     if (targets == null || !targets.Any())
                                     {
                                         if (destError == -1)
