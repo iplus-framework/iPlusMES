@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, MDCountrySalesTax.ClassName, "en{'Sales Tax'}de{'Umsatzsteuer'}", Const.ContextDatabase + "\\" + MDCountrySalesTax.ClassName, "", true)]
     [ACPropertyEntity(15, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(16, "Comment2", "en{'Comment 2'}de{'Bemerkung 2'}", "", "", true)]
+    [ACPropertyEntity(17, "GroupSum", "en{'Group subtotal'}de{'Zwischensummengruppe '}", "", "", true)]
     [ACPropertyEntity(9999, OutOffer.ClassName, "en{'Offer'}de{'Angebot'}", "", "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Posistionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
@@ -243,5 +244,40 @@ namespace gip.mes.datamodel
                 return TargetQuantity * (double)PriceNet;
             }
         }
+
+        [ACPropertyInfo(5)]
+        public string QuantityUnit
+        {
+            get
+            {
+                if (TargetQuantity > 0)
+                    return TargetQuantity + " " + MDUnit?.Symbol;
+                return "";
+            }
+        }
+
+        [ACPropertyInfo(6)]
+        public string Price
+        {
+            get
+            {
+                if (PriceNet > 0)
+                    return PriceNet.ToString("N");
+                return "";
+            }
+        }
+
+        [ACPropertyInfo(7)]
+        public string Total
+        {
+            get
+            {
+                if (TotalPrice > 0)
+                    return TotalPrice.ToString("N");
+                return "";
+            }
+        }
+
+
     }
 }

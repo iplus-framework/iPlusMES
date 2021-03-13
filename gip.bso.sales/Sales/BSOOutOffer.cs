@@ -98,7 +98,7 @@ namespace gip.bso.sales
                 }
                 CurrentOutOfferPos = null;
 
-                CurrentOutOfferPos = OutOfferPosList.FirstOrDefault();
+                CurrentOutOfferPos = OutOfferPosList?.FirstOrDefault();
                 OnPropertyChanged("CurrentOutOffer");
                 OnPropertyChanged("OutOfferPosList");
                 OnPropertyChanged("CompanyList");
@@ -196,23 +196,26 @@ namespace gip.bso.sales
         {
             switch (e.PropertyName)
             {
-                case "MaterialID":
-                    {
-                        OnPropertyChanged("MDUnitList");
-                        if (CurrentOutOfferPos.Material != null && CurrentOutOfferPos.Material.BaseMDUnit != null)
-                            CurrentMDUnit = CurrentOutOfferPos.Material.BaseMDUnit;
-                        else
-                            CurrentMDUnit = null;
-                        OnPropertyChanged("CurrentOutOfferPos");
-                    }
-                    break;
-                case "TargetQuantityUOM":
-                case "MDUnitID":
-                    {
-                        CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertToBaseQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-                        CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-                    }
-                    break;
+            //    case "MaterialID":
+            //        {
+            //            OnPropertyChanged("MDUnitList");
+            //            if (CurrentOutOfferPos.Material != null && CurrentOutOfferPos.Material.BaseMDUnit != null)
+            //                CurrentMDUnit = CurrentOutOfferPos.Material.BaseMDUnit;
+            //            else
+            //                CurrentMDUnit = null;
+            //            OnPropertyChanged("CurrentOutOfferPos");
+            //        }
+            //        break;
+            //    case "TargetQuantityUOM":
+            //    case "MDUnitID":
+            //        {
+            //            if (CurrentOutOfferPos != null && CurrentOutOfferPos.Material != null)
+            //            {
+            //                CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertToBaseQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+            //                CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+            //            }
+            //        }
+            //        break;
             }
         }
 
@@ -352,7 +355,7 @@ namespace gip.bso.sales
         }
 
         [ACPropertyInfo(650)]
-        public List<OutOfferPosData> OutOfferPosDataList
+        public List<OutOfferPos> OutOfferPosDataList
         {
             get;
             set;
@@ -522,22 +525,26 @@ namespace gip.bso.sales
 
         private void BuildOutOfferPosData()
         {
-            List<OutOfferPosData> posData = new List<OutOfferPosData>();
+            List<OutOfferPos> posData = new List<OutOfferPos>();
 
             foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null).OrderBy(p => p.Position))
             {
-                posData.Add(new OutOfferPosData(outOfferPos));
+                posData.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posData, outOfferPos.Items);
+                if(outOfferPos.GroupSum)
+                {
+
+                }
             }
 
             OutOfferPosDataList = posData;
         }
 
-        private void BuildOutOfferPosDataRecursive(List<OutOfferPosData> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
+        private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
         {
             foreach (var outOfferPos in outOfferPosList.OrderBy(p => p.Position))
             {
-                posDataList.Add(new OutOfferPosData(outOfferPos));
+                posDataList.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posDataList, outOfferPos.Items);
             }
         }
@@ -616,64 +623,5 @@ namespace gip.bso.sales
         }
 
         #endregion
-    }
-
-    [ACClassInfo(Const.PackName_VarioSales, "en{'OutOfferPosData'}de{'OutOfferPosData'}", Global.ACKinds.TACSimpleClass)]
-    public class OutOfferPosData
-    {
-        public OutOfferPosData(OutOfferPos pos)
-        {
-            OutOfferPos = pos;
-        }
-
-        [ACPropertyInfo(1)]
-        public OutOfferPos OutOfferPos
-        {
-            get;
-            set;
-        }
-
-
-        [ACPropertyInfo(4)]
-        public double? Quantity
-        {
-            get => OutOfferPos?.TargetQuantity;
-        }
-
-        [ACPropertyInfo(5)]
-        public string QuantityUnit
-        {
-            get
-            {
-                if(Quantity > 0)
-                    return Quantity + " " + OutOfferPos?.MDUnit.Symbol;
-
-                return "";
-            }
-        }
-
-        [ACPropertyInfo(6)]
-        public string Price
-        {
-            get
-            {
-                if(OutOfferPos != null && OutOfferPos.PriceNet > 0)
-                    return OutOfferPos.PriceNet.ToString();
-
-                return "";
-            }
-        }
-
-        [ACPropertyInfo(7)]
-        public string TotalPrice
-        {
-            get
-            {
-                if (OutOfferPos != null && OutOfferPos.TotalPrice > 0)
-                    return OutOfferPos.TotalPrice.ToString();
-
-                return "";
-            }
-        }
     }
 }
