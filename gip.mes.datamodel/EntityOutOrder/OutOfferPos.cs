@@ -245,7 +245,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(5)]
+        [ACPropertyInfo(33)]
         public string QuantityUnit
         {
             get
@@ -256,7 +256,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(6)]
+        [ACPropertyInfo(34)]
         public string Price
         {
             get
@@ -267,17 +267,39 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(7)]
+        public string _Total;
+        [ACPropertyInfo(35)]
         public string Total
         {
             get
             {
+                if (_Total != null)
+                    return _Total;
                 if (TotalPrice > 0)
                     return TotalPrice.ToString("N");
                 return "";
             }
+            set
+            {
+                _Total = value;
+            }
         }
 
+        private string _MaterialNo;
+        [ACPropertyInfo(36)]
+        public string MaterialNo
+        {
+            get
+            {
+                if (_MaterialNo != null)
+                    return _MaterialNo;
 
+                return Material?.MaterialNo;
+            }
+            set
+            {
+                _MaterialNo = value;
+            }
+        }
     }
 }

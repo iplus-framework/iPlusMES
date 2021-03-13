@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using gip.core.reporthandler.Flowdoc;
+using System.Windows.Media;
+using System.Windows.Documents;
 
 namespace gip.bso.sales
 {
@@ -533,7 +535,12 @@ namespace gip.bso.sales
                 BuildOutOfferPosDataRecursive(posData, outOfferPos.Items);
                 if(outOfferPos.GroupSum)
                 {
-
+                    OutOfferPos sumPos = new OutOfferPos();
+                    sumPos.Total = outOfferPos.Items.Sum(c => c.TotalPrice).ToString("N");
+                    sumPos.MaterialNo = "SubTotal " + outOfferPos.Material.MaterialNo;
+                    sumPos.Sequence = outOfferPos.Sequence;
+                    sumPos.GroupSum = outOfferPos.GroupSum;
+                    posData.Add(sumPos);
                 }
             }
 
@@ -553,10 +560,48 @@ namespace gip.bso.sales
         {
             if(printingPhase == ACPrintingPhase.Started)
             {
-                BuildOutOfferPosData();
+                ReportDocument doc = reportEngine as ReportDocument;
+                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null && c.ACClassDesign.ACIdentifier == "OfferDe"))
+                {
+                    doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
+
+                    BuildOutOfferPosData();
+                }
             }
+            else
+            {
+                ReportDocument doc = reportEngine as ReportDocument;
+                if (doc != null)
+                {
+                    doc.SetFlowDocObjValue -= Doc_SetFlowDocObjValue;
+                }
+            }
+
             base.OnPrintingPhase(reportEngine, printingPhase);
         }
+
+        private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
+        {
+            OutOfferPos pos = e.ParentDataRow as OutOfferPos;
+            if(pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
+            {
+                var inlineCell = e.FlowDocObj as InlineTableCellValue;
+                if (inlineCell != null)
+                {
+                    var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
+                    if (tableCell != null)
+                    {
+                        if (inlineCell.VBContent == "Total")
+                        {
+                            tableCell.BorderBrush = Brushes.Black;
+                            tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
+                        }
+                        //tableCell.FontWeight = Windows.UI.Text.FontWeights.Bold;
+                    }
+                }
+            }
+        }
+
 
         #endregion
 
