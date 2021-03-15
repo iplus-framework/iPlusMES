@@ -280,5 +280,22 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        #region Additional properties
+
+        [ACPropertyInfo(100, "", "en{'Neto total'}de{'Neto total'}")]
+        public double PosPriceNetTotal
+        {
+            get
+            {
+                if (OutOfferPos_OutOffer != null && OutOfferPos_OutOffer.Any())
+                {
+                    return (double)(OutOfferPos_OutOffer.Where(c => !c.GroupSum).Sum(o => o.PriceNet));
+                }
+                return 0;
+            }
+        }
+
+        #endregion
+
     }
 }
