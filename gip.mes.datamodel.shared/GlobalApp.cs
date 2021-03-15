@@ -197,6 +197,68 @@ namespace gip.mes.datamodel
 #endif
         #endregion
 
+
+         #region InvoiceTypes
+        /// <summary>
+        /// Enum für das Feld OrderTypeIndex
+        /// </summary>
+#if NETFRAMEWORK
+        [ACSerializeableInfo]
+        [ACClassInfo(Const.PackName_VarioSystem, "en{'InvoiceTypes'}de{'InvoiceTypes'}", Global.ACKinds.TACEnum)]
+#else
+        [DataContract]
+#endif
+
+        public enum InvoiceTypes : short
+        {
+            /// <summary>
+            /// Order
+            /// Auftrag/Bestellung
+            /// </summary>
+            Invoice = 1,
+            
+            /// <summary>
+            /// Purchase agreement (Contract) 
+            /// Rahmenvertrag (Kontrakt)
+            /// </summary>
+            Contract = 2,  
+
+            /// <summary>
+            /// Internal Order
+            /// Interner Auftrag
+            /// </summary>
+            InternalInvoice = 3,
+
+            /// <summary>
+            /// Release Order
+            /// Kontraktabruf
+            /// </summary>
+            ReleaseInvoice = 4,
+        }
+
+#if NETFRAMEWORK
+        static ACValueItemList _InvoiceTypesList = null;
+        /// <summary>
+        /// Gibt eine Liste mit Übersetzungen an die GUI zurück
+        /// </summary>
+        public static ACValueItemList InvoiceTypesList
+        {
+            get
+            {
+                if (GlobalApp._InvoiceTypesList == null)
+                {
+                    GlobalApp._InvoiceTypesList = new ACValueItemList("OrderTypeIndex");
+                    GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.Invoice, "en{'Invoice'}de{'Rechnung'}");
+                    GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.Contract, "en{'Purchase agreement (Contract)'}de{'Rahmenvertrag (Kontrakt)'}");
+                    GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.InternalInvoice, "en{'Internal Invoice'}de{'Interner Rechnung'}");
+                    GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.ReleaseInvoice, "en{'Release Invoice'}de{'Rechnungbruf'}");
+                }
+                return GlobalApp._InvoiceTypesList;
+            }
+        }
+#endif
+        #endregion
+
         #region MaterialPosTypes
         /// <summary>
         /// Enum für Positionstypen

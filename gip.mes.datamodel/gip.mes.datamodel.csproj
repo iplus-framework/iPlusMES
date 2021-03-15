@@ -94,8 +94,12 @@
     <Compile Include="EntityACProgram\OrderLogPosView.cs" />
     <Compile Include="EntityACProgram\OrderLogRelView.cs" />
     <Compile Include="EntityFacility\FacilityLotModel.cs" />
+    <Compile Include="EntityInvoice\Invoice.cs" />
+    <Compile Include="EntityInvoice\InvoicePos.cs" />
     <Compile Include="EntityMD\MDCountrySalesTaxMaterial.cs" />
     <Compile Include="EntityMD\MDCountrySalesTaxMDMaterialGroup.cs" />
+    <Compile Include="EntityMD\MDInvoiceState.cs" />
+    <Compile Include="EntityMD\MDInvoiceType.cs" />
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
@@ -380,6 +384,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DbScripts\iPlusMES\dbsync_2021-03-12_16-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-15_13-28_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

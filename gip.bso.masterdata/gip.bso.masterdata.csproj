@@ -111,6 +111,8 @@
     <Compile Include="Partslist\BSOPartsList.cs" />
     <Compile Include="Partslist\BSOPartslistExplorer.cs" />
     <Compile Include="Production\MDBSOProdOrderPartslistPosState.cs" />
+    <Compile Include="Sales\MDBSOInvoiceState.cs" />
+    <Compile Include="Sales\MDBSOInvoiceType.cs" />
     <Compile Include="Scheduling\BSOCalendar.cs" />
     <Compile Include="Facility\MDBSOFacilityInventoryPosState.cs" />
     <Compile Include="Facility\MDBSOFacilityInventoryState.cs" />

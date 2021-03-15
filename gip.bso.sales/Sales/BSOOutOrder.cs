@@ -175,7 +175,6 @@ namespace gip.bso.sales
 
         #endregion
 
-
         #region Managers
 
         protected ACRef<ACOutDeliveryNoteManager> _OutDeliveryNoteManager = null;
@@ -201,7 +200,6 @@ namespace gip.bso.sales
         }
 
         #endregion
-
 
         #region BSO->ACProperty
         #region 1. OutOrder
@@ -622,7 +620,6 @@ namespace gip.bso.sales
             }
         }
         #endregion
-
 
         #region 1.2 OpenContractPos
         /// <summary>

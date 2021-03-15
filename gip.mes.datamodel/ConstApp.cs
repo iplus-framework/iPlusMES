@@ -48,9 +48,13 @@
         public const string ESMaterialGroup              = "en{'Material Group'}de{'Material Gruppe'}";
         public const string ESMaterialType               = "en{'Material Type'}de{'Materialart'}";
         public const string ESMovementReason             = "en{'Movement Reason'}de{'Bewegungsgrund'}";
-        public const string ESOutOfferState           = "en{'Offering Status'}de{'Angebotsstatus'}";
+        public const string ESOutOfferState              = "en{'Offering Status'}de{'Angebotsstatus'}";
         public const string ESOutOrderPlanState          = "en{'Sales Order Plan Status'}de{'Verkaufsauftragsplan Status'}";
         public const string ESOutOrderPosState           = "en{'Sales Order Pos. Status'}de{'Verkaufsauftrag Positionstatus'}";
+        public const string ESInvoiceType                = "en{'Invoice Type'}de{'Rechnungsart'}";
+        public const string ESInvoiceState               = "en{'Invoice Status'}de{'Rechnungsstatus'}";
+        public const string ESInvoice                    = "en{'Invoice'}de{'Rechnung'}";
+        public const string ESInvoicePos                 = "en{'Invoice linie'}de{'Rechnungposition'}";
         public const string ESOutOrderState              = "en{'Sales Order Status'}de{'Verkaufsauftragstatus'}";
         public const string ESOutOrderType               = "en{'Sales Order Type'}de{'Verkaufsauftragsart'}";
         public const string ESProcessErrorAction         = "en{'Process Error Action'}de{'Prozessfehleraktion'}";
