@@ -475,8 +475,10 @@ namespace gip.bso.sales
         {
             if (!PreExecute("NewOutOfferPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, null);
+            OutOfferPos groupPos = CurrentOutOfferPos?.OutOfferPos1_GroupOutOfferPos;
+            CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, groupPos);
             CurrentOutOfferPos.OutOffer = CurrentOutOffer;
+            CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos = groupPos;
             CurrentOutOffer.OutOfferPos_OutOffer.Add(CurrentOutOfferPos);
             OnPropertyChanged("OutOfferPosList");
             PostExecute("NewOutOfferPos");
@@ -592,7 +594,7 @@ namespace gip.bso.sales
                     if (tableCell != null)
                     {
                         if (inlineCell.VBContent == "Total")
-                        {
+                         {
                             tableCell.BorderBrush = Brushes.Black;
                             tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
                         }
