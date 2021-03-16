@@ -817,7 +817,7 @@ namespace gip.bso.sales
 
         #endregion
 
-        #region OutOrder
+        #region Invoice
         [ACMethodCommand(Invoice.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
@@ -929,7 +929,7 @@ namespace gip.bso.sales
         }
         #endregion
 
-        #region OutOrderPos
+        #region InvoicePos
 
 
         [ACMethodInteraction(InvoicePos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInvoicePos", Global.ACKinds.MSMethodPrePost)]
@@ -1008,42 +1008,14 @@ namespace gip.bso.sales
         {
             if (!IsEnabledAssignContractPos())
                 return;
-            List<object> resultNewEntities = new List<object>();
-            try
-            {
+            InvoicePos pos = null;
+            if(IsCreateNewPosition)
+                pos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
+            else
+                pos = CurrentInvoicePos;
 
-                Msg result = null; //OutDeliveryNoteManager.AssignContractOutOrderPos(CurrentOpenContractPos, CurrentOutOrder, PartialQuantity, DatabaseApp, ACFacilityManager, resultNewEntities);
-                if (result != null)
-                {
-                    Messages.Msg(result);
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                string msg = e.Message;
-                if (e.InnerException != null && e.InnerException.Message != null)
-                    msg += " Inner:" + e.InnerException.Message;
-
-                Messages.LogException("BSOOutOrder", "AssignContractPos", msg);
-
-                return;
-            }
-
-            //if (_UnSavedUnAssignedContractPos.Contains(CurrentOpenContractPos))
-            //    _UnSavedUnAssignedContractPos.Remove(CurrentOpenContractPos);
-            //OnPropertyChanged("OutOrderPosList");
-
-            //RefreshOpenContractPosList();
-            //PartialQuantity = null;
-            //foreach (object item in resultNewEntities)
-            //{
-            //    if (item is OutOrderPos)
-            //    {
-            //        SelectedOutOrderPos = item as OutOrderPos;
-            //        break;
-            //    }
-            //}
+            OutOrderPos childPos = OutOrderPos.NewACObject(DatabaseApp, SelectedOpenContractPos);
+            pos.OutOrderPos = childPos;
         }
 
         /// <summary>
@@ -1052,12 +1024,44 @@ namespace gip.bso.sales
         /// <returns><c>true</c> if [is enabled assign in order pos]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledAssignContractPos()
         {
-            if (CurrentOpenContractPos == null
-                || CurrentInvoice == null
-                || CurrentInvoice.MDInvoiceType == null
-                || CurrentInvoice.MDInvoiceType.InvoiceType == GlobalApp.InvoiceTypes.Invoice)
-                return false;
-            return true;
+            return
+                 SelectedOpenContractPos != null
+                 && IsSelectedOpenContractPosNotAssigned
+                 && CurrentInvoice != null
+                 &&
+                 (
+                    IsCreateNewPosition
+                    || (CurrentInvoicePos != null && CurrentInvoicePos.OutOrderPos == null)
+                 );
+        }
+
+        public bool IsSelectedOpenContractPosNotAssigned
+        {
+            get
+            {
+                if(SelectedOpenContractPos == null) return false;
+                Guid[] outOrderPosIDs = CurrentInvoice.InvoicePos_Invoice.Select(c=>c.OutOrderPos.ParentOutOrderPosID ?? Guid.Empty).ToArray();
+                return !outOrderPosIDs.Contains(SelectedOpenContractPos.OutOrderPosID);
+            }
+        }
+
+
+        private bool _IsCreateNewPosition;
+
+        public bool IsCreateNewPosition
+        {
+            get
+            {
+                return _IsCreateNewPosition;
+            }
+            set
+            {
+                if (_IsCreateNewPosition != value)
+                {
+                    _IsCreateNewPosition = value;
+                    OnPropertyChanged("IsCreateNewPosition");
+                }
+            }
         }
 
         /// <summary>
