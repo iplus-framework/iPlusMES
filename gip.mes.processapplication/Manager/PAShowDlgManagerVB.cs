@@ -322,7 +322,8 @@ namespace gip.mes.processapplication
                 else
                 {
                     PWBaseExecutable baseExe = caller as PWBaseExecutable;
-                    orderInfo = baseExe.GetPAOrderInfo();
+                    if (baseExe != null)
+                        orderInfo = baseExe.GetPAOrderInfo();
                 }
             }
 

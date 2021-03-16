@@ -596,7 +596,7 @@ namespace gip.bso.sales
                             tableCell.BorderBrush = Brushes.Black;
                             tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
                         }
-                        //tableCell.FontWeight = Windows.UI.Text.FontWeights.Bold;
+                        tableCell.FontWeight = System.Windows.FontWeights.Bold;
                     }
                 }
             }
