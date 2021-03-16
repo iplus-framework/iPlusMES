@@ -7,7 +7,7 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSales, ConstApp.ESInvoiceType, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "MDBSOInvoiceType")]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
-    [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
+    [ACPropertyEntity(1, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACPropertyEntity(4, "InvoiceTypeIndex", ConstApp.ESInvoiceType, typeof(GlobalApp.InvoiceTypes), Const.ContextDatabase + "\\InvoiceTypesList", "", true, MinValue = (short)GlobalApp.InvoiceTypes.Invoice)]

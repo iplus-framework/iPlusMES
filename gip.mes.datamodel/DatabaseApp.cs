@@ -622,6 +622,15 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        public IEnumerable<ACValueItem> InvoiceStatesList
+        {
+            get
+            {
+                return gip.mes.datamodel.MDInvoiceState.InvoiceStatesList;
+            }
+        }
+
+        [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> OutOrderPosStatesList
         {
             get
@@ -897,6 +906,15 @@ namespace gip.mes.datamodel
             get
             {
                 return GlobalApp.OrderTypesList;
+            }
+        }
+
+        [ACPropertyInfo(9999)]
+        public IEnumerable<ACValueItem> InvoiceTypesList
+        {
+            get
+            {
+                return GlobalApp.InvoiceTypesList;
             }
         }
 

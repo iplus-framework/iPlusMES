@@ -247,7 +247,7 @@ namespace gip.mes.datamodel
             {
                 if (GlobalApp._InvoiceTypesList == null)
                 {
-                    GlobalApp._InvoiceTypesList = new ACValueItemList("OrderTypeIndex");
+                    GlobalApp._InvoiceTypesList = new ACValueItemList("InvoiceTypeIndex");
                     GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.Invoice, "en{'Invoice'}de{'Rechnung'}");
                     GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.Contract, "en{'Purchase agreement (Contract)'}de{'Rahmenvertrag (Kontrakt)'}");
                     GlobalApp._InvoiceTypesList.AddEntry((short)InvoiceTypes.InternalInvoice, "en{'Internal Invoice'}de{'Interner Rechnung'}");

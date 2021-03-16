@@ -8,7 +8,7 @@ namespace gip.mes.datamodel
 
     [ACClassInfo(Const.PackName_VarioSales, ConstApp.ESInvoiceState, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "MDBSOInvoiceState")]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
-    [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
+    [ACPropertyEntity(1, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACPropertyEntity(4, "InvoiceStateIndex", ConstApp.ESInvoiceState, typeof(MDInvoiceState.InvoiceStates), Const.ContextDatabase + "\\InvoiceStatesList", "", true, MinValue = (short)MDInvoiceState.InvoiceStates.Created)]
@@ -171,7 +171,7 @@ namespace gip.mes.datamodel
             {
                 if (_InvoiceStatesList == null)
                 {
-                    _InvoiceStatesList = new ACValueItemList("InvoiceStates");
+                    _InvoiceStatesList = new ACValueItemList("InvoiceStateIndex");
                     _InvoiceStatesList.AddEntry((short)InvoiceStates.Created, "en{'Created'}de{'Neu Angelegt'}");
                     _InvoiceStatesList.AddEntry((short)InvoiceStates.InProcess, "en{'In Process'}de{'In Bearbeitung'}");
                     _InvoiceStatesList.AddEntry((short)InvoiceStates.Completed, "en{'Completed'}de{'Fertiggestellt'}");
