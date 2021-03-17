@@ -84,6 +84,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sales\BSOInvoice.cs" />
     <Compile Include="Sales\BSOOutDelivNote.cs" />
     <Compile Include="Sales\BSOOutDelivProposal.cs" />
     <Compile Include="Sales\BSOOutLoading.cs" />
@@ -156,6 +157,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="VBControlScripts\2021-03-12 13-46_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-03-17 13-14_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

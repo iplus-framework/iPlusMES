@@ -751,7 +751,7 @@ namespace gip.bso.sales
                 {
                     if (_CurrentACMethodBookingDummy != null)
                         return _CurrentACMethodBookingDummy;
-                    ACMethodBooking acMethodClone = this.OutDeliveryNoteManager.BookParamOutwardMovementClone(this.ACFacilityManager, this.DatabaseApp);
+                    ACMethodBooking acMethodClone = OutDeliveryNoteManager?.BookParamOutwardMovementClone(this.ACFacilityManager, this.DatabaseApp);
                     if (acMethodClone != null)
                         _CurrentACMethodBookingDummy = acMethodClone.Clone() as ACMethodBooking;
                     return _CurrentACMethodBookingDummy;

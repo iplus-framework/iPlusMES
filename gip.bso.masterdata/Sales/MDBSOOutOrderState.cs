@@ -25,7 +25,7 @@ namespace gip.bso.masterdata
     /// Allgemeine Stammdatenmaske für MDOutOrderState
     /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Status'}de{'Verkaufsauftragsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "MDOutOrderState")]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Status'}de{'Verkaufsauftragsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOrderState.ClassName)]
     public class MDBSOOutOrderState : ACBSOvbNav
     {
         #region c´tors

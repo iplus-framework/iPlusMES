@@ -113,9 +113,19 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer ist nach dem Löschen aufzurufen
         /// </summary>
-        public static void RenumberSequence(OutOffer OutOffer, int sequence)
+        public static void RenumberSequence(OutOffer OutOffer, int sequence, OutOfferPos groupPos = null)
         {
-            var elements = from c in OutOffer.OutOfferPos_OutOffer where c.Sequence > sequence orderby c.Sequence select c;
+            IEnumerable<OutOfferPos> elements = null;
+
+            if (groupPos != null)
+            {
+                elements = groupPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Where(c => c.Sequence > sequence).ToList();
+            }
+            else
+            {
+                elements = OutOffer.OutOfferPos_OutOffer.Where(c => c.Sequence > sequence).ToList();
+            }
+
             int sequenceCount = sequence;
             foreach (var element in elements)
             {
@@ -245,7 +255,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(5)]
+        [ACPropertyInfo(33)]
         public string QuantityUnit
         {
             get
@@ -256,7 +266,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(6)]
+        [ACPropertyInfo(34)]
         public string Price
         {
             get
@@ -267,17 +277,39 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(7)]
+        public string _Total;
+        [ACPropertyInfo(35)]
         public string Total
         {
             get
             {
+                if (_Total != null)
+                    return _Total;
                 if (TotalPrice > 0)
                     return TotalPrice.ToString("N");
                 return "";
             }
+            set
+            {
+                _Total = value;
+            }
         }
 
+        private string _MaterialNo;
+        [ACPropertyInfo(36)]
+        public string MaterialNo
+        {
+            get
+            {
+                if (_MaterialNo != null)
+                    return _MaterialNo;
 
+                return Material?.MaterialNo;
+            }
+            set
+            {
+                _MaterialNo = value;
+            }
+        }
     }
 }

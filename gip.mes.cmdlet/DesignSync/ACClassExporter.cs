@@ -32,7 +32,7 @@ namespace gip.mes.cmdlet.DesignSync
             ACQueryDefinition qryACClass = qryACProject.ACUrlCommand(Const.QueryPrefix + ACClass.ClassName) as ACQueryDefinition;
 
             SendImportMessage(string.Format("Start export {0} to folder{1}...", acIdentifers, RootFolder));
-            ExportCommand.DoExport(null, null, aCEntitySerializer, qryACProject, qryACClass, project, ProjectManager.CurrentProjectItemRoot, RootFolder, 0, 0);
+            ExportCommand.DoExport(null, null, aCEntitySerializer, qryACProject, qryACClass, project, ProjectManager.CurrentProjectItemRoot, RootFolder, 0, acIdentifers.Count());
         }
 
 
