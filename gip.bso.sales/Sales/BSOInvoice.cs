@@ -29,6 +29,7 @@ namespace gip.bso.sales
                 throw new Exception("FacilityManager not configured");
 
             Search();
+            SetSelectedPos();
             return true;
         }
 
@@ -168,7 +169,7 @@ namespace gip.bso.sales
         #region 1. Invoice
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<Invoice> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, Invoice.ClassName)]
+        [ACPropertyAccessPrimary(100, Invoice.ClassName)]
         public ACAccessNav<Invoice> AccessPrimary
         {
             get
@@ -200,7 +201,7 @@ namespace gip.bso.sales
             return result;
         }
 
-        [ACPropertyCurrent(600, Invoice.ClassName)]
+        [ACPropertyCurrent(101, Invoice.ClassName)]
         public Invoice CurrentInvoice
         {
             get
@@ -219,7 +220,7 @@ namespace gip.bso.sales
 
                 if (CurrentInvoice != null)
                     CurrentInvoice.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentInvoice_PropertyChanged);
-                CurrentInvoicePos = null;
+
                 OnPropertyChanged("CurrentInvoice");
                 OnPropertyChanged("InvoicePosList");
                 OnPropertyChanged("CompanyList");
@@ -227,7 +228,18 @@ namespace gip.bso.sales
                 OnPropertyChanged("DeliveryCompanyAddressList");
                 OnPropertyChanged("CurrentBillingCompanyAddress");
                 OnPropertyChanged("CurrentDeliveryCompanyAddress");
+
+                SetSelectedPos();
             }
+        }
+
+        public void SetSelectedPos()
+        {
+            InvoicePos pos = null;
+            if (CurrentInvoice != null)
+                pos = CurrentInvoice.InvoicePos_Invoice.OrderBy(c => c.Sequence).FirstOrDefault();
+            CurrentInvoicePos = pos;
+            SelectedInvoicePos = pos;
         }
 
         void CurrentInvoice_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -254,7 +266,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, Invoice.ClassName)]
+        [ACPropertyList(103, Invoice.ClassName)]
         public IEnumerable<Invoice> InvoiceList
         {
             get
@@ -263,7 +275,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, Invoice.ClassName)]
+        [ACPropertySelected(102, Invoice.ClassName)]
         public Invoice SelectedInvoice
         {
             get
@@ -284,7 +296,7 @@ namespace gip.bso.sales
 
         #region 1.1 InvoicePos
         ACAccess<InvoicePos> _AccessInvoicePos;
-        [ACPropertyAccess(691, InvoicePos.ClassName)]
+        [ACPropertyAccess(200, InvoicePos.ClassName)]
         public ACAccess<InvoicePos> AccessInvoicePos
         {
             get
@@ -299,7 +311,7 @@ namespace gip.bso.sales
         }
 
         InvoicePos _CurrentInvoicePos;
-        [ACPropertyCurrent(603, InvoicePos.ClassName)]
+        [ACPropertyCurrent(201, InvoicePos.ClassName)]
         public InvoicePos CurrentInvoicePos
         {
             get
@@ -336,7 +348,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(604, InvoicePos.ClassName)]
+        [ACPropertyList(203, InvoicePos.ClassName)]
         public IEnumerable<InvoicePos> InvoicePosList
         {
             get
@@ -348,7 +360,7 @@ namespace gip.bso.sales
         }
 
         InvoicePos _SelectedInvoicePos;
-        [ACPropertySelected(605, InvoicePos.ClassName)]
+        [ACPropertySelected(202, InvoicePos.ClassName)]
         public InvoicePos SelectedInvoicePos
         {
             get
@@ -365,7 +377,7 @@ namespace gip.bso.sales
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
-        [ACPropertyList(606, MDUnit.ClassName)]
+        [ACPropertyList(205, MDUnit.ClassName)]
         public IEnumerable<MDUnit> MDUnitList
         {
             get
@@ -381,7 +393,7 @@ namespace gip.bso.sales
         /// Gets or sets the current MU quantity unit.
         /// </summary>
         /// <value>The current MU quantity unit.</value>
-        [ACPropertyCurrent(607, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}")]
+        [ACPropertyCurrent(206, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}")]
         public MDUnit CurrentMDUnit
         {
             get
@@ -401,6 +413,25 @@ namespace gip.bso.sales
             }
         }
 
+        Nullable<double> _ChangeTargetQuantity = null;
+        [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
+        public Nullable<double> ChangeTargetQuantity
+        {
+            get
+            {
+                return _ChangeTargetQuantity;
+            }
+            set
+            {
+                _ChangeTargetQuantity = value;
+                if (_ChangeTargetQuantity.HasValue && (_ChangeTargetQuantity.Value > 0) && CurrentInvoicePos != null && CurrentInvoicePos.Material != null)
+                {
+                    CurrentInvoicePos.TargetQuantity = _ChangeTargetQuantity.Value;
+                }
+                _ChangeTargetQuantity = null;
+                OnPropertyChanged("ChangeTargetQuantity");
+            }
+        }
 
         #endregion
 
@@ -410,7 +441,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind
         /// </summary>
-        [ACPropertyList(614, Company.ClassName)]
+        [ACPropertyList(300, Company.ClassName)]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -421,7 +452,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(615, "BillingCompanyAddress")]
+        [ACPropertyList(301, "BillingCompanyAddress")]
         public IEnumerable<CompanyAddress> BillingCompanyAddressList
         {
             get
@@ -436,7 +467,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(616, "DeliveryCompanyAddress")]
+        [ACPropertyList(302, "DeliveryCompanyAddress")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -451,7 +482,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(617, "BillingCompanyAddress", "en{'Billing Address'}de{'Rechnungsadresse'}")]
+        [ACPropertyCurrent(303, "BillingCompanyAddress", "en{'Billing Address'}de{'Rechnungsadresse'}")]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -470,7 +501,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(618, "DeliveryCompanyAddress", "en{'Delivery Address'}de{'Lieferandresse'}")]
+        [ACPropertyCurrent(304, "DeliveryCompanyAddress", "en{'Delivery Address'}de{'Lieferandresse'}")]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -499,7 +530,7 @@ namespace gip.bso.sales
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(692, "OpenContractPos")]
+        [ACPropertyAccess(400, "OpenContractPos")]
         public ACAccessNav<OutOrderPos> AccessOpenContractPos
         {
             get
@@ -556,7 +587,7 @@ namespace gip.bso.sales
         #region Filter
         public const string _CMaterialNoProperty = Material.ClassName + "\\MaterialNo";
         public const string _CMaterialNameProperty = Material.ClassName + "\\MaterialName1";
-        [ACPropertyInfo(713, "Filter", "en{'Material'}de{'Material'}")]
+        [ACPropertyInfo(500, "FilterMaterial", "en{'Material'}de{'Material'}")]
         public string FilterMaterial
         {
             get
@@ -577,7 +608,7 @@ namespace gip.bso.sales
 
         public const string _CTargetDeliveryDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryDate";
 
-        [ACPropertyInfo(618, "", "en{'Contract date from'}de{'Kontraktdatum von'}")]
+        [ACPropertyInfo(501, "FilterDelivDateFrom", "en{'Contract date from'}de{'Kontraktdatum von'}")]
         public DateTime? FilterDelivDateFrom
         {
             get
@@ -619,7 +650,7 @@ namespace gip.bso.sales
         }
 
         public const string _CTargetDeliveryMaxDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryMaxDate";
-        [ACPropertyInfo(619, "", "en{'Contract date to'}de{'Kontraktdatum bis'}")]
+        [ACPropertyInfo(502, "FilterDelivDateTo", "en{'Contract date to'}de{'Kontraktdatum bis'}")]
         public DateTime? FilterDelivDateTo
         {
             get
@@ -661,10 +692,8 @@ namespace gip.bso.sales
         }
         #endregion
 
-
-
         Nullable<double> _PartialQuantity;
-        [ACPropertyInfo(637, "", "en{'Partial Quantity'}de{'Teilmenge'}")]
+        [ACPropertyInfo(503, "PartialQuantity", "en{'Partial Quantity'}de{'Teilmenge'}")]
         public Nullable<double> PartialQuantity
         {
             get
@@ -678,12 +707,11 @@ namespace gip.bso.sales
             }
         }
 
-
         /// <summary>
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(613, "OpenContractPos")]
+        [ACPropertyCurrent(401, "OpenContractPos")]
         public OutOrderPos CurrentOpenContractPos
         {
             get
@@ -719,7 +747,7 @@ namespace gip.bso.sales
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(614, "OpenContractPos")]
+        [ACPropertyList(403, "OpenContractPos")]
         public IEnumerable<OutOrderPos> OpenContractPosList
         {
             get
@@ -728,12 +756,12 @@ namespace gip.bso.sales
                     return null;
                 if (CurrentInvoicePos != null)
                 {
-                    IEnumerable<OutOrderPos> addedPositions = CurrentInvoicePos.OutOrderPos.OutOrderPos_ParentOutOrderPos.Where(c => c.EntityState == System.Data.EntityState.Added
-                        && c != null
-                        && c.OutOrderPos1_ParentOutOrderPos != null
-                        && c.OutOrderPos1_ParentOutOrderPos.MDDelivPosState == StateCompletelyAssigned
-                        ).Select(c => c.OutOrderPos1_ParentOutOrderPos);
-                    if (addedPositions.Any())
+                    Guid[] outOrderPosIDs = CurrentInvoice.InvoicePos_Invoice.Select(c => c.OutOrderPos?.ParentOutOrderPosID ?? Guid.Empty).ToArray();
+                    IEnumerable<OutOrderPos> addedPositions =
+                        DatabaseApp
+                        .OutOrderPos
+                        .Where(c => outOrderPosIDs.Contains(c.OutOrderPosID));
+                    if (addedPositions != null && addedPositions.Any())
                     {
                         if (_UnSavedUnAssignedContractPos.Any())
                             return AccessOpenContractPos.NavList.Except(addedPositions).Union(_UnSavedUnAssignedContractPos);
@@ -753,7 +781,7 @@ namespace gip.bso.sales
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(615, "OpenContractPos")]
+        [ACPropertySelected(402, "OpenContractPos")]
         public OutOrderPos SelectedOpenContractPos
         {
             get
@@ -792,7 +820,7 @@ namespace gip.bso.sales
         }
 
         protected bool _ActivateInOpen = false;
-        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(Invoice.ClassName, "en{'Activate'}de{'Aktivieren'}", 700, true, Global.ACKinds.MSMethodPrePost)]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))
@@ -812,8 +840,6 @@ namespace gip.bso.sales
             }
             PostExecute("OnActivate");
         }
-
-
 
         #endregion
 
@@ -980,7 +1006,7 @@ namespace gip.bso.sales
 
         #region Assign / Unassign Contract lines
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
+        [ACMethodInteraction("OpenContractPos", "en{'Filter'}de{'Filter'}", 800, false)]
         public bool FilterDialogContractPos()
         {
             bool result = AccessOpenContractPos.ShowACQueryDialog();
@@ -992,7 +1018,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 602, false)]
+        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 801, false)]
         public void RefreshOpenContractPosList()
         {
             if (_ActivateInOpen && AccessOpenContractPos != null)
@@ -1003,63 +1029,77 @@ namespace gip.bso.sales
         /// <summary>
         /// Assigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 603, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 802, true)]
         public virtual void AssignContractPos()
         {
             if (!IsEnabledAssignContractPos())
                 return;
-            InvoicePos pos = null;
-            if(IsCreateNewPosition)
-                pos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
-            else
-                pos = CurrentInvoicePos;
 
-            OutOrderPos childPos = OutOrderPos.NewACObject(DatabaseApp, SelectedOpenContractPos);
+            double quantity = PartialQuantity != null ? (PartialQuantity ?? 0) : CurrentOpenContractPos.TargetQuantityUOM;
+            InvoicePos pos = null;
+            if (AssignToCurrentPosition)
+            {
+                pos = CurrentInvoicePos;
+                pos.TargetQuantityUOM += quantity;
+            }
+            else
+            {
+                pos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
+                pos.Material = CurrentOpenContractPos.Material;
+                pos.TargetQuantityUOM = quantity;
+                InvoicePos.RenumberSequence(pos.Invoice, 1);
+            }
+
+            if (_UnSavedUnAssignedContractPos.Contains(CurrentOpenContractPos))
+                _UnSavedUnAssignedContractPos.Remove(CurrentOpenContractPos);
+
+            OutOrderPos childPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOpenContractPos);
+            childPos.TargetQuantityUOM = quantity;
             pos.OutOrderPos = childPos;
+
+            OnPropertyChanged("InvoicePosList");
+            RefreshOpenContractPosList();
+            PartialQuantity = null;
         }
 
-        /// <summary>
-        /// Determines whether [is enabled assign in order pos].
-        /// </summary>
-        /// <returns><c>true</c> if [is enabled assign in order pos]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledAssignContractPos()
         {
             return
-                 SelectedOpenContractPos != null
-                 && IsSelectedOpenContractPosNotAssigned
+                 CurrentOpenContractPos != null
+                 && IsCurrentContractPosNotAssigned
                  && CurrentInvoice != null
                  &&
                  (
-                    IsCreateNewPosition
-                    || (CurrentInvoicePos != null && CurrentInvoicePos.OutOrderPos == null)
+                    !AssignToCurrentPosition
+                    || (CurrentInvoicePos != null && CurrentInvoicePos.OutOrderPos == null && CurrentInvoicePos.MaterialID == CurrentOpenContractPos.MaterialID)
                  );
         }
 
-        public bool IsSelectedOpenContractPosNotAssigned
+        public bool IsCurrentContractPosNotAssigned
         {
             get
             {
-                if(SelectedOpenContractPos == null) return false;
-                Guid[] outOrderPosIDs = CurrentInvoice.InvoicePos_Invoice.Select(c=>c.OutOrderPos.ParentOutOrderPosID ?? Guid.Empty).ToArray();
-                return !outOrderPosIDs.Contains(SelectedOpenContractPos.OutOrderPosID);
+                if (CurrentOpenContractPos == null) return false;
+                Guid[] outOrderPosIDs = CurrentInvoice.InvoicePos_Invoice.Select(c => c.OutOrderPos?.ParentOutOrderPosID ?? Guid.Empty).ToArray();
+                return !outOrderPosIDs.Contains(CurrentOpenContractPos.OutOrderPosID);
             }
         }
 
+        private bool _AssignToCurrentPosition;
 
-        private bool _IsCreateNewPosition;
-
-        public bool IsCreateNewPosition
+        [ACPropertyInfo(805, "AssignToCurrentPosition", "en{'Assign to current position'}de{'Der aktuellen Position zuweisen'}")]
+        public bool AssignToCurrentPosition
         {
             get
             {
-                return _IsCreateNewPosition;
+                return _AssignToCurrentPosition;
             }
             set
             {
-                if (_IsCreateNewPosition != value)
+                if (_AssignToCurrentPosition != value)
                 {
-                    _IsCreateNewPosition = value;
-                    OnPropertyChanged("IsCreateNewPosition");
+                    _AssignToCurrentPosition = value;
+                    OnPropertyChanged("AssignToCurrentPosition");
                 }
             }
         }
@@ -1067,17 +1107,17 @@ namespace gip.bso.sales
         /// <summary>
         /// Unassigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 604, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 803, true)]
         public void UnAssignContractPos()
         {
             if (!IsEnabledUnAssignContractPos())
                 return;
-
-
+            OutOrderPos parentOutOrderPos = null;
             Msg result = null;
             try
             {
-                result = null; //OutDeliveryNoteManager.UnassignContractOutOrderPos(currentOutOrderPos, DatabaseApp);
+                parentOutOrderPos = CurrentInvoicePos.OutOrderPos.OutOrderPos1_ParentOutOrderPos;
+                result = CurrentInvoicePos.OutOrderPos.DeleteACObject(DatabaseApp, false);
                 if (result != null)
                 {
                     Messages.Msg(result);
@@ -1090,15 +1130,17 @@ namespace gip.bso.sales
                 if (e.InnerException != null && e.InnerException.Message != null)
                     msg += " Inner:" + e.InnerException.Message;
 
-                Messages.LogException("BSOOutOrder", "UnAssignContractPos", msg);
+                Messages.LogException("BSOInvoice", "UnAssignContractPos", msg);
                 return;
             }
 
-            //if (result == null && parentOutOrderPos != null)
-            //{
-            //    if (!_UnSavedUnAssignedContractPos.Contains(parentOutOrderPos))
-            //        _UnSavedUnAssignedContractPos.Add(parentOutOrderPos);
-            //}
+            if (result == null && parentOutOrderPos != null)
+            {
+                CurrentInvoicePos.OutOrderPos = null;
+                CurrentInvoicePos.OutOrderPos = null;
+                if (!_UnSavedUnAssignedContractPos.Contains(parentOutOrderPos))
+                    _UnSavedUnAssignedContractPos.Add(parentOutOrderPos);
+            }
 
             OnPropertyChanged("OutOrderPosList");
             RefreshOpenContractPosList();

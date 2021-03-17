@@ -1762,7 +1762,7 @@
           <Property Name="MDCountrySalesTaxMaterialID" Type="uniqueidentifier" />
           <Property Name="PriceNet" Type="money" Nullable="false" />
           <Property Name="PriceGross" Type="money" Nullable="false" />
-          <Property Name="SalexTax" Type="real" />
+          <Property Name="SalesTax" Type="real" />
           <Property Name="OutOrderPosID" Type="uniqueidentifier" />
           <Property Name="Comment" Type="varchar(max)" />
           <Property Name="XMLConfig" Type="text" />
@@ -19010,6 +19010,16 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
             <End Role="Weighing" EntitySet="Weighing" />
           </AssociationSet>
+          <EntitySet Name="MDInvoiceState" EntityType="iPlusMESV4_Model.MDInvoiceState" />
+          <EntitySet Name="MDInvoiceType" EntityType="iPlusMESV4_Model.MDInvoiceType" />
+          <AssociationSet Name="FK_Invoice_MDInvoiceState" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceState">
+            <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDInvoiceType" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceType">
+            <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
           <EntitySet Name="InvoicePos" EntityType="iPlusMESV4_Model.InvoicePos" />
           <AssociationSet Name="FK_InvoicePos_Invoice" Association="iPlusMESV4_Model.FK_InvoicePos_Invoice">
             <End Role="Invoice" EntitySet="Invoice" />
@@ -19034,16 +19044,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <AssociationSet Name="FK_InvoicePos_OutOrderPos" Association="iPlusMESV4_Model.FK_InvoicePos_OutOrderPos">
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
             <End Role="InvoicePos" EntitySet="InvoicePos" />
-          </AssociationSet>
-          <EntitySet Name="MDInvoiceState" EntityType="iPlusMESV4_Model.MDInvoiceState" />
-          <EntitySet Name="MDInvoiceType" EntityType="iPlusMESV4_Model.MDInvoiceType" />
-          <AssociationSet Name="FK_Invoice_MDInvoiceState" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceState">
-            <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDInvoiceType" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceType">
-            <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
-            <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -22573,7 +22573,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="FacilityBookingCharge_MDUnit" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_MDUnitID" FromRole="MDUnit" ToRole="FacilityBookingCharge" />
           <NavigationProperty Name="OutOfferPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDUnitID" FromRole="MDUnit" ToRole="OutOrderPos" />
-          <NavigationProperty Name="InvoicePos_MDUnit" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDUnit" FromRole="MDUnit" ToRole="InvoicePos" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDUnit" FromRole="MDUnit" ToRole="InvoicePos" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -30268,7 +30268,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="MDCountrySalesTaxMaterial_Material" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_Material" FromRole="Material" ToRole="MDCountrySalesTaxMaterial" />
           <NavigationProperty Name="OutOfferPos_Material" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="Material" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_Material" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" FromRole="Material" ToRole="OutOrderPos" />
-          <NavigationProperty Name="InvoicePos_Material" Relationship="iPlusMESV4_Model.FK_InvoicePos_Material" FromRole="Material" ToRole="InvoicePos" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_Material" FromRole="Material" ToRole="InvoicePos" />
         </EntityType>
         <EntityType Name="PartslistPos">
           <Key>
@@ -32503,7 +32503,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="SalesTax" Type="Single" Nullable="false" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_Material" FromRole="MDCountrySalesTaxMaterial" ToRole="Material" />
           <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_MDCountrySalesTax" FromRole="MDCountrySalesTaxMaterial" ToRole="MDCountrySalesTax" />
-          <NavigationProperty Name="InvoicePos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMaterial" FromRole="MDCountrySalesTaxMaterial" ToRole="InvoicePos" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMaterial" FromRole="MDCountrySalesTaxMaterial" ToRole="InvoicePos" />
         </EntityType>
         <EntityType Name="MDCountrySalesTaxMDMaterialGroup">
           <Key>
@@ -32515,7 +32515,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="SalesTax" Type="Single" Nullable="false" />
           <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="MDCountrySalesTax" />
           <NavigationProperty Name="MDMaterialGroup" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="MDMaterialGroup" />
-          <NavigationProperty Name="InvoicePos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMDMaterialGroup" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="InvoicePos" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMDMaterialGroup" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="InvoicePos" />
         </EntityType>
         <Association Name="FK_InOrderPos_MDCountrySalesTaxID">
           <End Type="iPlusMESV4_Model.MDCountrySalesTax" Role="MDCountrySalesTax" Multiplicity="0..1" />
@@ -32630,9 +32630,9 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress1" FromRole="Invoice" ToRole="CompanyAddress" />
           <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_Invoice_MDCountrySalesTax" FromRole="Invoice" ToRole="MDCountrySalesTax" />
           <NavigationProperty Name="OutOrderOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrder" FromRole="Invoice" ToRole="OutOrder" />
-          <NavigationProperty Name="InvoicePos_Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_Invoice" FromRole="Invoice" ToRole="InvoicePos" />
           <NavigationProperty Name="MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceState" FromRole="Invoice" ToRole="MDInvoiceState" />
           <NavigationProperty Name="MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceType" FromRole="Invoice" ToRole="MDInvoiceType" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_Invoice" FromRole="Invoice" ToRole="InvoicePos" />
         </EntityType>
         <EntityType Name="OutOfferPos">
           <Key>
@@ -32750,7 +32750,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="TandTv2StepItem_OutOrderPos" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_OutOrderPosID" FromRole="OutOrderPos" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="TandTv3MixPointOutOrderPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointOutOrderPos_OutOrderPosID" FromRole="OutOrderPos" ToRole="TandTv3MixPointOutOrderPos" />
           <NavigationProperty Name="Weighing_OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="OutOrderPos" ToRole="Weighing" />
-          <NavigationProperty Name="InvoicePos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_InvoicePos_OutOrderPos" FromRole="OutOrderPos" ToRole="InvoicePos" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_OutOrderPos" FromRole="OutOrderPos" ToRole="InvoicePos" />
         </EntityType>
         <Association Name="FK_Invoice_Company">
           <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
@@ -33238,6 +33238,64 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="MDInvoiceState">
+          <Key>
+            <PropertyRef Name="MDInvoiceStateID" />
+          </Key>
+          <Property Name="MDInvoiceStateID" Type="Guid" Nullable="false" />
+          <Property Name="InvoiceStateIndex" Type="Int16" Nullable="false" />
+          <Property Name="MDNameTrans" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="SortIndex" Type="Int16" Nullable="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoice_MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceState" FromRole="MDInvoiceState" ToRole="Invoice" />
+        </EntityType>
+        <EntityType Name="MDInvoiceType">
+          <Key>
+            <PropertyRef Name="MDInvoiceTypeID" />
+          </Key>
+          <Property Name="MDInvoiceTypeID" Type="Guid" Nullable="false" />
+          <Property Name="InvoiceTypeIndex" Type="Int16" Nullable="false" />
+          <Property Name="MDNameTrans" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="SortIndex" Type="Int16" Nullable="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoice_MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceType" FromRole="MDInvoiceType" ToRole="Invoice" />
+        </EntityType>
+        <Association Name="FK_Invoice_MDInvoiceState">
+          <End Type="iPlusMESV4_Model.MDInvoiceState" Role="MDInvoiceState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDInvoiceState">
+              <PropertyRef Name="MDInvoiceStateID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDInvoiceStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDInvoiceType">
+          <End Type="iPlusMESV4_Model.MDInvoiceType" Role="MDInvoiceType" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDInvoiceType">
+              <PropertyRef Name="MDInvoiceTypeID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDInvoiceTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityType Name="InvoicePos">
           <Key>
             <PropertyRef Name="InvoicePosID" />
@@ -33253,7 +33311,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="MDCountrySalesTaxMaterialID" Type="Guid" />
           <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
           <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="SalexTax" Type="Single" />
+          <Property Name="SalesTax" Type="Single" />
           <Property Name="OutOrderPosID" Type="Guid" />
           <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
@@ -33338,64 +33396,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="InvoicePos">
               <PropertyRef Name="OutOrderPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="MDInvoiceState">
-          <Key>
-            <PropertyRef Name="MDInvoiceStateID" />
-          </Key>
-          <Property Name="MDInvoiceStateID" Type="Guid" Nullable="false" />
-          <Property Name="InvoiceStateIndex" Type="Int16" Nullable="false" />
-          <Property Name="MDNameTrans" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="SortIndex" Type="Int16" Nullable="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceState" FromRole="MDInvoiceState" ToRole="Invoice" />
-        </EntityType>
-        <EntityType Name="MDInvoiceType">
-          <Key>
-            <PropertyRef Name="MDInvoiceTypeID" />
-          </Key>
-          <Property Name="MDInvoiceTypeID" Type="Guid" Nullable="false" />
-          <Property Name="InvoiceTypeIndex" Type="Int16" Nullable="false" />
-          <Property Name="MDNameTrans" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="SortIndex" Type="Int16" Nullable="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceType" FromRole="MDInvoiceType" ToRole="Invoice" />
-        </EntityType>
-        <Association Name="FK_Invoice_MDInvoiceState">
-          <End Type="iPlusMESV4_Model.MDInvoiceState" Role="MDInvoiceState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDInvoiceState">
-              <PropertyRef Name="MDInvoiceStateID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDInvoiceStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDInvoiceType">
-          <End Type="iPlusMESV4_Model.MDInvoiceType" Role="MDInvoiceType" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDInvoiceType">
-              <PropertyRef Name="MDInvoiceTypeID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDInvoiceTypeID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -38383,32 +38383,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="InvoicePos">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.InvoicePos">
-              <MappingFragment StoreEntitySet="InvoicePos">
-                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="OutOrderPosID" ColumnName="OutOrderPosID" />
-                <ScalarProperty Name="SalexTax" ColumnName="SalexTax" />
-                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
-                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
-                <ScalarProperty Name="MDCountrySalesTaxMaterialID" ColumnName="MDCountrySalesTaxMaterialID" />
-                <ScalarProperty Name="MDCountrySalesTaxMDMaterialGroupID" ColumnName="MDCountrySalesTaxMDMaterialGroupID" />
-                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
-                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
-                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
-                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
-                <ScalarProperty Name="InvoicePosID" ColumnName="InvoicePosID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="MDInvoiceState">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.MDInvoiceState">
               <MappingFragment StoreEntitySet="MDInvoiceState">
@@ -38440,6 +38414,32 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
                 <ScalarProperty Name="MDNameTrans" ColumnName="MDNameTrans" />
                 <ScalarProperty Name="InvoiceTypeIndex" ColumnName="InvoiceTypeIndex" />
                 <ScalarProperty Name="MDInvoiceTypeID" ColumnName="MDInvoiceTypeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InvoicePos">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.InvoicePos">
+              <MappingFragment StoreEntitySet="InvoicePos">
+                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="OutOrderPosID" ColumnName="OutOrderPosID" />
+                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
+                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
+                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
+                <ScalarProperty Name="MDCountrySalesTaxMaterialID" ColumnName="MDCountrySalesTaxMaterialID" />
+                <ScalarProperty Name="MDCountrySalesTaxMDMaterialGroupID" ColumnName="MDCountrySalesTaxMDMaterialGroupID" />
+                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
+                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
+                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
+                <ScalarProperty Name="InvoicePosID" ColumnName="InvoicePosID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -39361,6 +39361,10 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_OutOrderPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointOutOrderPos_OutOrderPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.MDInvoiceState" Width="1.5" PointX="58" PointY="255.5" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.MDInvoiceType" Width="1.5" PointX="13.375" PointY="1" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceState" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceType" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.InvoicePos" Width="1.5" PointX="62.5" PointY="271.125" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_Invoice" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_Material" />
@@ -39368,10 +39372,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMDMaterialGroup" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_MDUnit" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_OutOrderPos" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.MDInvoiceState" Width="1.5" PointX="58" PointY="255.5" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.MDInvoiceType" Width="1.5" PointX="13.375" PointY="1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceState" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceType" />
       </Diagram>
     </Diagrams>
   </Designer>

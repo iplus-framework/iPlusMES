@@ -16,7 +16,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(7, MDCountrySalesTaxMaterial.ClassName, ConstApp.ESCountrySalesTaxMaterial, Const.ContextDatabase + "\\" + MDCountrySalesTaxMaterial.ClassName, "", true)]
     [ACPropertyEntity(8, "PriceNet", ConstApp.PriceNet, "", "", true)]
     [ACPropertyEntity(9, "PriceGross", ConstApp.PriceGross, "", "", true)]
-    [ACPropertyEntity(10, "SalexTax", ConstApp.ESCountrySalesTax, "", "", true)]
+    [ACPropertyEntity(10, "SalesTax", ConstApp.ESCountrySalesTax, "", "", true)]
     [ACPropertyEntity(11, OutOrderPos.ClassName, "en{'Sales Order'}de{'Kundenauftrag'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
     [ACPropertyEntity(12, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
@@ -81,7 +81,6 @@ namespace gip.mes.datamodel
         public static void RenumberSequence(Invoice invoice, int sequence)
         {
             var elements = from c in invoice.InvoicePos_Invoice where c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted orderby c.Sequence select c;
-            int sequenceCount = sequence;
             foreach (var element in elements)
             {
                 element.Sequence = sequence;
