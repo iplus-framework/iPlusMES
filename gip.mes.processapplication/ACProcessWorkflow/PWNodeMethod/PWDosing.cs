@@ -122,7 +122,7 @@ namespace gip.mes.processapplication
                 _MaxWeightAlarmSet = false;
                 _EmptyScaleAlarm = EmptyScaleAlarmState.None;
             }
-
+            ClearMyConfiguration();
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
         #endregion
@@ -486,7 +486,6 @@ namespace gip.mes.processapplication
 
         public void ClearMyConfiguration()
         {
-
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _MyConfiguration = null;
@@ -1889,6 +1888,24 @@ namespace gip.mes.processapplication
                 xmlChild = doc.CreateElement("CheckScaleEmpty");
                 if (xmlChild != null)
                     xmlChild.InnerText = CheckScaleEmpty.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList["BookTargetQIfZero"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("BookTargetQIfZero");
+                if (xmlChild != null)
+                    xmlChild.InnerText = BookTargetQIfZero.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList["DoseFromFillingSilo"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("DoseFromFillingSilo");
+                if (xmlChild != null)
+                    xmlChild.InnerText = DoseFromFillingSilo.HasValue ? DoseFromFillingSilo.ToString() : "null";
                 xmlACPropertyList.AppendChild(xmlChild);
             }
         }
