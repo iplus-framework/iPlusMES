@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -150,6 +151,23 @@ namespace gip.mes.datamodel
                 ACProperties.Refresh();
         }
 
+        #endregion
+
+        #region Additional
+        private ReportData _TempReportData;
+        [ACPropertyInfo(9999)]
+        public ReportData TempReportData
+        {
+            get
+            {
+                return _TempReportData;
+            }
+            set
+            {
+                _TempReportData = value;
+                OnPropertyChanged("TempReportData");
+            }
+        }
         #endregion
 
     }
