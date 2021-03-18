@@ -245,6 +245,9 @@ namespace gip.mes.facility
 
 
         #region Delivery-Note
+
+        #region DeliveryNote -> Public methods
+
         [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public Msg AssignOutOrderPos(OutOrderPos currentOutOrderPos, DeliveryNote currentDeliveryNote, Nullable<double> enteredPartialQuantity, DatabaseApp dbApp, ACComponent facilityManager, List<object> resultNewEntities)
         {
@@ -457,6 +460,10 @@ namespace gip.mes.facility
             return null;
         }
 
+
+        #endregion
+
+        #region Delivery-Note -> Helper methods
         public FacilityPreBooking NewFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, DeliveryNotePos deliveryNotePos)
         {
             ACMethodBooking acMethodClone = BookParamOutwardMovementClone(facilityManager, dbApp);
@@ -557,6 +564,69 @@ namespace gip.mes.facility
             }
             return result;
         }
+        #endregion
+
+        #endregion
+
+        #region Invoice
+
+        [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        public Msg GenerateInvoiceFromOutOrder(Guid outOrderID, DatabaseApp dbApp)
+        {
+            if (!PreExecute("GenerateInvoice"))
+            {
+                return new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Info,
+                    ACIdentifier = "GenerateInvoice(0)",
+                    Message = Root.Environment.TranslateMessage(this, "Info50002")
+                };
+            }
+
+            OutOrder outOrder = dbApp.OutOrder.FirstOrDefault(c => c.OutOrderID == outOrderID);
+
+            if (outOrder == null || outOrder == null)
+            {
+                throw new ArgumentNullException(Root.Environment.TranslateMessage(this, "Error50009"));
+            }
+
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
+            Invoice invoice = Invoice.NewACObject(dbApp, null, secondaryKey);
+            invoice.OutOrderOrder = outOrder;
+            invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(dbApp);
+            invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(dbApp);
+            invoice.InvoiceDate = DateTime.Now;
+            invoice.CustomerCompany = outOrder.CustomerCompany;
+            invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
+            invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
+            invoice.MDCountrySalesTax = outOrder.OutOrderPos_OutOrder.Select(c => c.MDCountrySalesTax).FirstOrDefault();
+
+            foreach (OutOrderPos outOrderPos in outOrder.OutOrderPos_OutOrder)
+            {
+                InvoicePos invoicePos = InvoicePos.NewACObject(dbApp, invoice);
+                invoicePos.Sequence = outOrderPos.Sequence;
+                invoicePos.Material = outOrderPos.Material;
+
+                invoicePos.MDUnit = outOrderPos.MDUnit;
+                invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
+
+                // MDCountrySalesTaxMDMaterialGroupID
+                // MDCountrySalesTaxMaterialID
+
+                invoicePos.PriceNet = outOrderPos.PriceNet;
+                invoicePos.PriceGross = outOrderPos.PriceGross;
+                invoicePos.SalesTax = 0;
+                invoicePos.OutOrderPos = outOrderPos;
+
+                invoice.InvoicePos_Invoice.Add(invoicePos);
+            }
+
+
+            PostExecute("GenerateInvoice");
+            return null;
+        }
+
         #endregion
 
         #endregion
