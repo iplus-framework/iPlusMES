@@ -424,6 +424,80 @@ namespace gip.bso.sales
             return true;
         }
 
+        [ACMethodInteraction(OutOffer.ClassName, "en{'New version'}de{'Neue Version'}", (short)MISort.New+1, true, "", Global.ACKinds.MSMethodPrePost)]
+        public void NewVersion()
+        {
+            OutOffer newOfferVersion = OutOffer.NewACObject(DatabaseApp, null, CurrentOutOffer.OutOfferNo);
+            newOfferVersion.OutOfferDate = DateTime.Now;
+            newOfferVersion.OutOfferVersion = DatabaseApp.OutOffer.Where(c => c.OutOfferNo == CurrentOutOffer.OutOfferNo).Max(v => v.OutOfferVersion) + 1;
+            newOfferVersion.BillingCompanyAddress = CurrentOutOffer.BillingCompanyAddress;
+            newOfferVersion.Comment = CurrentOutOffer.Comment;
+            newOfferVersion.CustomerCompany = CurrentOutOffer.CustomerCompany;
+            newOfferVersion.CustRequestNo = CurrentOutOffer.CustRequestNo;
+            newOfferVersion.DeliveryCompanyAddress = CurrentOutOffer.DeliveryCompanyAddress;
+            newOfferVersion.MDDelivType = CurrentOutOffer.MDDelivType;
+            //newVersion.MDOutOfferState = CurrentOutOffer.MDOutOfferState;
+            newOfferVersion.MDOutOrderType = CurrentOutOffer.MDOutOrderType;
+            newOfferVersion.MDTermOfPayment = CurrentOutOffer.MDTermOfPayment;
+            newOfferVersion.MDTimeRange = CurrentOutOffer.MDTimeRange;
+            newOfferVersion.PriceGross = CurrentOutOffer.PriceGross;
+            newOfferVersion.PriceNet = CurrentOutOffer.PriceNet;
+            newOfferVersion.TargetDeliveryDate = CurrentOutOffer.TargetDeliveryDate;
+            newOfferVersion.TargetDeliveryMaxDate = CurrentOutOffer.TargetDeliveryMaxDate;
+            newOfferVersion.XMLConfig = CurrentOutOffer.XMLConfig;
+            newOfferVersion.XMLDesign = CurrentOutOffer.XMLDesign;
+
+            DatabaseApp.OutOffer.AddObject(newOfferVersion);
+
+
+            foreach (OutOfferPos pos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => !c.GroupOutOfferPosID.HasValue))
+            {
+                NewVersionPos(newOfferVersion, pos, null);
+            }
+
+            DatabaseApp.ACSaveChanges();
+            Search();
+            SelectedOutOffer = newOfferVersion;
+        }
+
+        public bool IsEnabledNewVersion()
+        {
+            return CurrentOutOffer != null;
+        }
+
+        private void NewVersionPos(OutOffer outOffer, OutOfferPos pos, OutOfferPos groupPos)
+        {
+            OutOfferPos newPos = OutOfferPos.NewACObject(DatabaseApp, null, groupPos);
+            newPos.OutOfferPos1_GroupOutOfferPos = groupPos;
+            newPos.Comment = pos.Comment;
+            newPos.Comment2 = pos.Comment2;
+            newPos.GroupSum = pos.GroupSum;
+            newPos.Material = pos.Material;
+            newPos.MDCountrySalesTax = pos.MDCountrySalesTax;
+            newPos.MDTimeRange = pos.MDTimeRange;
+            newPos.MDUnit = pos.MDUnit;
+            newPos.OutOffer = outOffer;
+            newPos.PriceGross = pos.PriceGross;
+            newPos.PriceNet = pos.PriceNet;
+            newPos.Sequence = pos.Sequence;
+            newPos.TargetDeliveryDate = pos.TargetDeliveryDate;
+            newPos.TargetDeliveryMaxDate = pos.TargetDeliveryMaxDate;
+            newPos.TargetDeliveryPriority = pos.TargetDeliveryPriority;
+            newPos.TargetQuantity = pos.TargetQuantity;
+            newPos.TargetQuantityUOM = pos.TargetQuantityUOM;
+            newPos.TargetWeight = pos.TargetWeight;
+            newPos.XMLConfig = pos.XMLConfig;
+            newPos.XMLDesign = pos.XMLDesign;
+
+            outOffer.OutOfferPos_OutOffer.Add(newPos);
+            DatabaseApp.OutOfferPos.AddObject(newPos);
+
+            foreach(OutOfferPos subPos in pos.OutOfferPos_GroupOutOfferPos)
+            {
+                NewVersionPos(outOffer, subPos, newPos);
+            }
+        }
+
         [ACMethodInteraction(OutOffer.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentOutOffer", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
@@ -525,6 +599,26 @@ namespace gip.bso.sales
         public bool IsEnabledDeleteOutOfferPos()
         {
             return CurrentOutOffer != null && CurrentOutOfferPos != null;
+        }
+
+        [ACMethodInteraction("OutOfferPos", "en{'Position up'}de{'Position oben'}", 100, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        public void OutOrderPosUp()
+        {
+            int sequencePre = 0;
+            if(SelectedOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
+            {
+                //sequencePre = SelectedOutOfferPos.OutOfferPos1_GroupOutOfferPos.outoffpos
+            }
+            else
+            {
+
+            }
+        }
+
+        [ACMethodInteraction("OutOfferPos", "en{'Position down'}de{'Position unten'}", 101, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        public void OutOrderPosDown()
+        {
+
         }
 
         private void BuildOutOfferPosData()
