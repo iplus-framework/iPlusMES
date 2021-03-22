@@ -139,9 +139,12 @@ namespace gip.mes.processapplication
                                             batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                             batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                        Messages.LogError(this.GetACUrl(), "StartDischarging(3)", msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    if (OnCheckFullSiloNoSiloFound(null, null, msg))
+                                    {
+                                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                            Messages.LogError(this.GetACUrl(), "StartDischarging(3)", msg.InnerMessage);
+                                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    }
 
                                     var lastTargets = plannedSilos.OrderBy(c => c.VBiACClassID.Value).Select(c => c.VBiACClassID.Value).ToArray();
                                     LastTargets = lastTargets;
@@ -169,9 +172,12 @@ namespace gip.mes.processapplication
                                                     batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                                     batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                        Messages.LogError(this.GetACUrl(), "StartDischarging(4)", msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    if (OnCheckFullSiloNoSiloFound(null, null, msg))
+                                    {
+                                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                            Messages.LogError(this.GetACUrl(), "StartDischarging(4)", msg.InnerMessage);
+                                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    }
                                     return StartDisResult.CycleWait;
                                 }
 
@@ -184,9 +190,12 @@ namespace gip.mes.processapplication
                                             batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                             batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                        Messages.LogError(this.GetACUrl(), "StartDischarging(5)", msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    if (OnCheckFullSiloNoSiloFound(null, null, msg))
+                                    {
+                                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                            Messages.LogError(this.GetACUrl(), "StartDischarging(5)", msg.InnerMessage);
+                                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    }
                                     return StartDisResult.CycleWait;
                                 }
                                 Type typeOfSilo = typeof(PAMSilo);
@@ -755,10 +764,12 @@ namespace gip.mes.processapplication
                                 batchPlan == null ? "" : batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan == null ? "" : batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(2)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(2)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -770,10 +781,12 @@ namespace gip.mes.processapplication
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(3)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(3)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
                     targetContainer = TargetPAModule(null);
@@ -785,10 +798,12 @@ namespace gip.mes.processapplication
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(4)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(4)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -804,10 +819,12 @@ namespace gip.mes.processapplication
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(5)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(5)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -839,10 +856,12 @@ namespace gip.mes.processapplication
                                 fullSiloReservation != null ? fullSiloReservation.Facility.FacilityNo : "",
                                 targetContainer.GetACUrl());
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(6)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(6)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
                     else
@@ -860,11 +879,13 @@ namespace gip.mes.processapplication
                                         batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
- 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(7)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(7)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -877,10 +898,12 @@ namespace gip.mes.processapplication
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(8)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(8)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -892,21 +915,25 @@ namespace gip.mes.processapplication
                                         batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
-  
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(9)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(9)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
                     msg = OnPrepareSwitchToNextSilo(discharging, targetContainer, targetSiloACComp);
                     if (msg != null)
                     {
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo.OnPrepareSwitchToNextSilo(1)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo.OnPrepareSwitchToNextSilo(1)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -929,10 +956,12 @@ namespace gip.mes.processapplication
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(10)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(10)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -945,10 +974,12 @@ namespace gip.mes.processapplication
                                 batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo,
                                 batchPlan.ProdOrderPartslistPos.BookingMaterial.MaterialName1);
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(11)", msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                        OnCheckFullSiloNoSiloFound(discharging, targetContainer);
+                        if (OnCheckFullSiloNoSiloFound(discharging, targetContainer, msg))
+                        {
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), "OnHandleStateCheckFullSilo(11)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        }
                         return StartDisResult.CycleWait;
                     }
 
@@ -1062,11 +1093,20 @@ namespace gip.mes.processapplication
             return StartDisResult.WaitForCallback;
         }
 
-        protected virtual void OnCheckFullSiloNoSiloFound(PAFDischarging discharging, PAProcessModule targetContainer)
+        /// <summary>
+        /// Method for informing derivations, that a new/alternative destination couldn't be found.
+        /// The method sets the discharging-function to the pause-state.
+        /// If the method returns false, then the passed message will not be added to the alarm list.
+        /// </summary>
+        /// <param name="discharging">Null, if called from StartDischargingProd()</param>
+        /// <param name="targetContainer">Null, if called from StartDischargingProd()</param>
+        /// <param name="msg"></param>
+        /// <returns>true, if passed Message should be added to the alarm list</returns>
+        protected virtual bool OnCheckFullSiloNoSiloFound(PAFDischarging discharging, PAProcessModule targetContainer, Msg msg)
         {
-            if (discharging == null)
-                return;
-            discharging.Pause();
+            if (discharging != null)
+                discharging.Pause();
+            return true;
         }
 
         protected virtual Msg OnPrepareSwitchToNextSilo(PAFDischarging discharging, PAProcessModule currentDestination, ACComponent nextDestination)

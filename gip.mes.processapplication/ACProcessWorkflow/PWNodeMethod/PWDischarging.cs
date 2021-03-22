@@ -40,7 +40,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("PrePostQOnDest", typeof(double), 0.0, Global.ParamOption.Optional));
             paramTranslation.Add("PrePostQOnDest", "en{'Pre posting quantity to destination at start'}de{'Vorbuchungsmenge auf Ziel bei Start'}");
             method.ParameterValueList.Add(new ACValue("NoPostingOnRelocation", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("NoPostingOnRelocation", "en{'No posting at relocation'}de{'KEine Buchung bei Umlagerung'}");
+            paramTranslation.Add("NoPostingOnRelocation", "en{'No posting at relocation'}de{'Keine Buchung bei Umlagerung'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWDischarging), HandleExecuteACMethod_PWDischarging);
