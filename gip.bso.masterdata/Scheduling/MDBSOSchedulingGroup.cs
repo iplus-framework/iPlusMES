@@ -38,8 +38,9 @@ namespace gip.bso.masterdata.Scheduling
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            _AvailableACClassWFList = LoadAvailableACClassWFList();
+
             Search();
+            AccessAvailableACClassWF.NavSearch();
             LoadMDSchedulingGroupWFList();
             return true;
         }
@@ -82,7 +83,6 @@ namespace gip.bso.masterdata.Scheduling
         }
 
 
-
         /// <summary>
         /// Gets or sets the selected time range model.
         /// </summary>
@@ -96,14 +96,26 @@ namespace gip.bso.masterdata.Scheduling
             }
             set
             {
-                if (AccessPrimary == null)
-                    return;
-                if (AccessPrimary.Selected != value)
-                {
-                    AccessPrimary.Selected = value;
-                    OnPropertyChanged("SelectedMDSchedulingGroup");
-                    LoadMDSchedulingGroupWFList();
-                }
+                if (AccessPrimary == null) return; AccessPrimary.Selected = value;
+                OnPropertyChanged("SelectedMDSchedulingGroup");
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the type of the current out order.
+        /// </summary>
+        /// <value>The type of the current out order.</value>
+        [ACPropertyCurrent(9999, MDSchedulingGroup.ClassName)]
+        public MDSchedulingGroup CurrentMDSchedulingGroup
+        {
+            get
+            {
+                if (AccessPrimary == null) return null; return AccessPrimary.Current;
+            }
+            set
+            {
+                if (AccessPrimary == null) return; AccessPrimary.Current = value;
+                OnPropertyChanged("CurrentMDSchedulingGroup");
             }
         }
 
@@ -132,7 +144,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Selected property for MDSchedulingGroupWF
         /// </summary>
         /// <value>The selected MDSchedulingGroupWF</value>
-        [ACPropertySelected(9999, "MDSchedulingGroupWF", "en{'TODO: MDSchedulingGroupWF'}de{'TODO: MDSchedulingGroupWF'}")]
+        [ACPropertySelected(9999, MDSchedulingGroupWF.ClassName, "en{'TODO: MDSchedulingGroupWF'}de{'TODO: MDSchedulingGroupWF'}")]
         public MDSchedulingGroupWF SelectedMDSchedulingGroupWF
         {
             get
@@ -155,7 +167,7 @@ namespace gip.bso.masterdata.Scheduling
         /// List property for MDSchedulingGroupWF
         /// </summary>
         /// <value>The MDSchedulingGroupWF list</value>
-        [ACPropertyList(9999, "MDSchedulingGroupWF")]
+        [ACPropertyList(9999, MDSchedulingGroupWF.ClassName)]
         public List<MDSchedulingGroupWF> MDSchedulingGroupWFList
         {
             get
@@ -174,16 +186,16 @@ namespace gip.bso.masterdata.Scheduling
             }
             else
             {
-                _MDSchedulingGroupWFList = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.ToList();
+                _MDSchedulingGroupWFList = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.AsEnumerable().OrderBy(c => c.ACClassWF.ACCaption).ToList();
                 _SelectedMDSchedulingGroupWF = _MDSchedulingGroupWFList.FirstOrDefault();
             }
-                
+
             if (_SelectedMDSchedulingGroupWF != null)
                 acclasWFID = _SelectedMDSchedulingGroupWF.VBiACClassWFID;
 
-            _SelectedAvailableACClassWF = null;
-            if (_AvailableACClassWFList != null)
-                _SelectedAvailableACClassWF = _AvailableACClassWFList.FirstOrDefault(c => acclasWFID == null || c.ACClassWFID == acclasWFID);
+            SelectedAvailableACClassWF = null;
+            if (AvailableACClassWFList != null)
+                SelectedAvailableACClassWF = AvailableACClassWFList.FirstOrDefault(c => acclasWFID == null || c.ACClassWFID == acclasWFID);
 
             OnPropertyChanged("MDSchedulingGroupWFList");
             OnPropertyChanged("SelectedMDSchedulingGroupWF");
@@ -193,71 +205,76 @@ namespace gip.bso.masterdata.Scheduling
 
         #region 1.2.2 AvaialbleACClassWF
 
-
-        #region AvailableACClassWF
-        private core.datamodel.ACClassWF _SelectedAvailableACClassWF;
-        /// <summary>
-        /// Selected property for ACClassWF
-        /// </summary>
-        /// <value>The selected AvailableACClassWF</value>
-        [ACPropertySelected(9999, "AvailableACClassWF", "en{'Product linie'}de{'Product linie'}")]
-        public core.datamodel.ACClassWF SelectedAvailableACClassWF
+        ACAccessNav<core.datamodel.ACClassWF> _AccessFilterAvailableACClassWF;
+        [ACPropertyAccess(100, "AvailableACClassWF")]
+        public ACAccessNav<core.datamodel.ACClassWF> AccessAvailableACClassWF
         {
             get
             {
-                return _SelectedAvailableACClassWF;
-            }
-            set
-            {
-                if (_SelectedAvailableACClassWF != value)
+                if (_AccessFilterAvailableACClassWF == null)
                 {
-                    _SelectedAvailableACClassWF = value;
-                    OnPropertyChanged("SelectedAvailableACClassWF");
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + core.datamodel.ACClassWF.ClassName, "ACCaption");
+                    _AccessFilterAvailableACClassWF = navACQueryDefinition.NewAccessNav<core.datamodel.ACClassWF>("AvailableACClassWF", this);
+                    _AccessFilterAvailableACClassWF.NavSearchExecuting += _AccessFilterAvailableACClassWF_NavSearchExecuting;
+                    _AccessFilterAvailableACClassWF.AutoSaveOnNavigation = false;
                 }
-                if (SelectedMDSchedulingGroupWF != null)
-                {
-                    if (SelectedMDSchedulingGroupWF.VBiACClassWFID != ((_SelectedAvailableACClassWF != null) ? _SelectedAvailableACClassWF.ACClassWFID : Guid.Empty))
-                    {
-                        SelectedMDSchedulingGroupWF.ACClassWF = value;
-                        OnPropertyChanged("MDSchedulingGroupWFList");
-                    }
-                }
+                return _AccessFilterAvailableACClassWF;
             }
         }
 
-
-        private List<core.datamodel.ACClassWF> _AvailableACClassWFList;
-        /// <summary>
-        /// List property for ACClassWF
-        /// </summary>
-        /// <value>The AvailableACClassWF list</value>
-        [ACPropertyList(9999, "AvailableACClassWF")]
-        public List<core.datamodel.ACClassWF> AvailableACClassWFList
+        private IQueryable<core.datamodel.ACClassWF> _AccessFilterAvailableACClassWF_NavSearchExecuting(IQueryable<core.datamodel.ACClassWF> result)
         {
-            get
+            if (result != null)
             {
-                if (_AvailableACClassWFList == null)
-                    _AvailableACClassWFList = LoadAvailableACClassWFList();
-                return _AvailableACClassWFList;
-            }
-        }
-
-        private List<core.datamodel.ACClassWF> LoadAvailableACClassWFList()
-        {
-            var query = DatabaseApp.ContextIPlus
-             .ACClassWF
-             .Where(c =>
+                result = result
+                    .Where(c =>
                  c.RefPAACClassMethodID.HasValue
                  && c.RefPAACClassID.HasValue
                  && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
                  && c.RefPAACClassMethod.PWACClass != null
                  && (c.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
                      || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
-                 && !string.IsNullOrEmpty(c.Comment))
-             .ToArray();
-            return query.ToList();
+                 && !string.IsNullOrEmpty(c.Comment));
+            }
+            return result;
         }
-        #endregion
+
+        /// <summary>
+        /// Gets or sets the selected FilterPropertyName.
+        /// </summary>
+        /// <value>The selected FilterPropertyName.</value>
+        [ACPropertySelected(101, "AvailableACClassWF")]
+        public core.datamodel.ACClassWF SelectedAvailableACClassWF
+        {
+            get
+            {
+                if (AccessAvailableACClassWF == null)
+                    return null;
+                return AccessAvailableACClassWF.Selected;
+            }
+            set
+            {
+                if (AccessAvailableACClassWF == null)
+                    return;
+                AccessAvailableACClassWF.Selected = value;
+                OnPropertyChanged("SelectedAvailableACClassWF");
+            }
+        }
+
+        /// <summary>
+        /// Gets the FilterPropertyName list.
+        /// </summary>
+        /// <value>The facility list.</value>
+        [ACPropertyList(102, "AvailableACClassWF")]
+        public IEnumerable<core.datamodel.ACClassWF> AvailableACClassWFList
+        {
+            get
+            {
+                if (AccessAvailableACClassWF == null)
+                    return null;
+                return AccessAvailableACClassWF.NavList;
+            }
+        }
 
 
         #endregion
@@ -309,14 +326,13 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTimeRangeModel", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
                 return;
-            LoadEntity<MDSchedulingGroup>(requery, () => SelectedMDSchedulingGroup, null, c => SelectedMDSchedulingGroup = c,
-                        DatabaseApp
-                        .MDSchedulingGroup
+            LoadEntity<MDSchedulingGroup>(requery, () => SelectedMDSchedulingGroup, () => CurrentMDSchedulingGroup, c => CurrentMDSchedulingGroup = c,
+                        DatabaseApp.MDSchedulingGroup
                         .Where(c => c.MDSchedulingGroupID == SelectedMDSchedulingGroup.MDSchedulingGroupID));
             PostExecute("Load");
         }
@@ -333,12 +349,12 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedTimeRange", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
-            SelectedMDSchedulingGroup = MDSchedulingGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDSchedulingGroup.AddObject(SelectedMDSchedulingGroup);
+            CurrentMDSchedulingGroup = MDSchedulingGroup.NewACObject(DatabaseApp, null);
+            DatabaseApp.MDSchedulingGroup.AddObject(CurrentMDSchedulingGroup);
             ACState = Const.SMNew;
             PostExecute("Neu");
 
@@ -356,19 +372,19 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
-            Msg msg = SelectedMDSchedulingGroup.DeleteACObject(DatabaseApp, true);
+            Msg msg = CurrentMDSchedulingGroup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.Msg(msg);
                 return;
             }
 
-            if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(SelectedMDSchedulingGroup);
-            SelectedMDSchedulingGroup = AccessPrimary.NavList.FirstOrDefault();
+            if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMDSchedulingGroup);
+            CurrentMDSchedulingGroup = AccessPrimary.NavList.FirstOrDefault();
             Load();
             PostExecute("Delete");
         }
@@ -379,7 +395,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <returns><c>true</c> if this instance is enabled; otherwise, <c>false</c>.</returns>
         public bool IsEnabled()
         {
-            return SelectedMDSchedulingGroup != null;
+            return CurrentMDSchedulingGroup != null;
         }
 
         /// <summary>
@@ -391,6 +407,7 @@ namespace gip.bso.masterdata.Scheduling
             if (AccessPrimary == null) return; if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("MDSchedulingGroupList");
         }
+
         #endregion
 
         #region 2. MDSchedulingGroupWF
@@ -411,7 +428,15 @@ namespace gip.bso.masterdata.Scheduling
 
         public bool IsEnabledAddMDSchedulingGroupWF()
         {
-            return SelectedMDSchedulingGroup != null && AvailableACClassWFList != null && AvailableACClassWFList.Any();
+            return
+                SelectedMDSchedulingGroup != null
+                && AvailableACClassWFList != null
+                && AvailableACClassWFList.Any()
+                && (
+                        (MDSchedulingGroupWFList == null || !MDSchedulingGroupWFList.Any())
+                        ||
+                        !MDSchedulingGroupWFList.Any(c => c.MDSchedulingGroupID == SelectedMDSchedulingGroup.MDSchedulingGroupID)
+                    );
         }
 
         [ACMethodInfo("DeleteMDSchedulingGroupWF", "en{'Delete'}de{'Löschen'}", 9999, false)]
