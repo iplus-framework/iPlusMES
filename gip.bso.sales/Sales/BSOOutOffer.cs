@@ -445,7 +445,7 @@ namespace gip.bso.sales
             newOfferVersion.TargetDeliveryDate = CurrentOutOffer.TargetDeliveryDate;
             newOfferVersion.TargetDeliveryMaxDate = CurrentOutOffer.TargetDeliveryMaxDate;
             newOfferVersion.XMLConfig = CurrentOutOffer.XMLConfig;
-            newOfferVersion.XMLDesign = CurrentOutOffer.XMLDesign;
+            newOfferVersion.XMLDesignStart = CurrentOutOffer.XMLDesignStart;
 
             DatabaseApp.OutOffer.AddObject(newOfferVersion);
 

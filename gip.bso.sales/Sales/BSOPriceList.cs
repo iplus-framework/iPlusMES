@@ -273,6 +273,7 @@ namespace gip.bso.sales.Sales
         public void Save()
         {
             OnSave();
+            var temp = ACSaveChanges();
         }
 
         public bool IsEnabledSave()
@@ -377,6 +378,8 @@ namespace gip.bso.sales.Sales
                         DatabaseApp
                         .PriceList
                         .Where(c =>
+                                    c.PriceListID != SelectedPriceList.PriceListID 
+                                    &&
                                     (
                                         c.DateFrom <= SelectedPriceList.DateFrom && (c.DateTo ?? DateTime.Now) >= SelectedPriceList.DateFrom
                                         || c.DateFrom >= (SelectedPriceList.DateTo ?? DateTime.Now) && (c.DateTo ?? DateTime.Now) <= (SelectedPriceList.DateTo ?? DateTime.Now)

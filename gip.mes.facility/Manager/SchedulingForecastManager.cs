@@ -363,7 +363,7 @@ namespace gip.mes.facility
                 .Where(c =>
                     c.BatchSize > 0
                     && c.BatchTargetCount > 0
-                    && c.DurationSecAVG > 0
+                    //&& c.DurationSecAVG > 0
                     && c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == mdSchedulingGroupID)
                     && c.ProdOrderBatch_ProdOrderBatchPlan.Any(x => x.InsertDate >= startTime && x.InsertDate < endTime)
                     && c.ProdOrderPartslist.PartslistID == partslistID
