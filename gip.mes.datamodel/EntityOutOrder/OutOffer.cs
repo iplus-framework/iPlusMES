@@ -287,9 +287,31 @@ namespace gip.mes.datamodel
         {
             get
             {
+                return PosPriceNetSum + PosPriceNetDiscount;
+            }
+        }
+
+        [ACPropertyInfo(100, "", "en{'Discount'}de{'Rabatt'}")]
+        public double PosPriceNetDiscount
+        {
+            get
+            {
                 if (OutOfferPos_OutOffer != null && OutOfferPos_OutOffer.Any())
                 {
-                    return (double)(OutOfferPos_OutOffer.Where(c => !c.GroupSum).Sum(o => o.PriceNet));
+                    return (double)(OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet));
+                }
+                return 0;
+            }
+        }
+
+        [ACPropertyInfo(100, "", "en{'Neto'}de{'Neto'}")]
+        public double PosPriceNetSum
+        {
+            get
+            {
+                if (OutOfferPos_OutOffer != null && OutOfferPos_OutOffer.Any())
+                {
+                    return (double)(OutOfferPos_OutOffer.Where(c => c.PriceNet >= 0).Sum(o => o.PriceNet));
                 }
                 return 0;
             }

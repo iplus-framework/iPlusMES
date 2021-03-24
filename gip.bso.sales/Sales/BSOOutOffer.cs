@@ -214,7 +214,15 @@ namespace gip.bso.sales
                         if (CurrentOutOfferPos != null && CurrentOutOfferPos.Material != null)
                         {
                             CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertToBaseQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-                            CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                            //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                        }
+                    }
+                    break;
+                case "PriceNet":
+                    {
+                        if (CurrentOutOffer != null)
+                        {
+                            CurrentOutOffer.OnEntityPropertyChanged("PosPriceNetTotal");
                         }
                     }
                     break;
@@ -341,6 +349,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Properties => Report
+
         private ReportData _TempReportData;
         [ACPropertyInfo(9999)]
         public ReportData TempReportData
@@ -362,6 +372,8 @@ namespace gip.bso.sales
             get;
             set;
         }
+
+        #endregion
 
         #endregion
 
@@ -594,6 +606,11 @@ namespace gip.bso.sales
             }
 
             PostExecute("DeleteOutOfferPos");
+            OnPropertyChanged("OutOfferPosList");
+            if (CurrentOutOffer != null)
+            {
+                CurrentOutOffer.OnEntityPropertyChanged("PosPriceNetTotal");
+            }
         }
 
         public bool IsEnabledDeleteOutOfferPos()
@@ -683,11 +700,13 @@ namespace gip.bso.sales
                    : CurrentOutOfferPos.Sequence < CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Max(x => x.Sequence);
         }
 
+        #region Methods => Report
+
         private void BuildOutOfferPosData()
         {
             List<OutOfferPos> posData = new List<OutOfferPos>();
 
-            foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null).OrderBy(p => p.Position))
+            foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posData.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posData, outOfferPos.Items);
@@ -707,7 +726,7 @@ namespace gip.bso.sales
 
         private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
         {
-            foreach (var outOfferPos in outOfferPosList.OrderBy(p => p.Position))
+            foreach (var outOfferPos in outOfferPosList.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posDataList.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posDataList, outOfferPos.Items);
@@ -761,6 +780,7 @@ namespace gip.bso.sales
             }
         }
 
+        #endregion
 
         #endregion
 
