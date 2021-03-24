@@ -222,7 +222,7 @@ namespace gip.bso.sales
                     {
                         if (CurrentOutOffer != null)
                         {
-                            CurrentOutOffer.OnEntityPropertyChanged("PosPriceNetTotal");
+                            CurrentOutOffer.OnPricePropertyChanged();
                         }
                     }
                     break;
@@ -609,7 +609,7 @@ namespace gip.bso.sales
             OnPropertyChanged("OutOfferPosList");
             if (CurrentOutOffer != null)
             {
-                CurrentOutOffer.OnEntityPropertyChanged("PosPriceNetTotal");
+                CurrentOutOffer.OnPricePropertyChanged();
             }
         }
 
