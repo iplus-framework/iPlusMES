@@ -187,7 +187,12 @@ namespace gip.bso.sales
                     _CurrentOutOfferPos.PropertyChanged -= CurrentOutOfferPos_PropertyChanged;
                 _CurrentOutOfferPos = value;
                 if (_CurrentOutOfferPos != null)
+                {
                     _CurrentOutOfferPos.PropertyChanged += CurrentOutOfferPos_PropertyChanged;
+                    //if(_CurrentOutOfferPos.Material != null)
+                    //    PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < DateTime.Now
+                    //                                                                 && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > DateTime.Now)).ToList();
+                }
                 OnPropertyChanged("MDUnitList");
                 OnPropertyChanged("CurrentOutOfferPos");
                 OnPropertyChanged("CurrentMDUnit");
@@ -206,6 +211,13 @@ namespace gip.bso.sales
                         else
                             CurrentMDUnit = null;
                         OnPropertyChanged("CurrentOutOfferPos");
+
+                        if (CurrentOutOfferPos.Material != null)
+                        {
+                            SelectedPriceListMaterial = null;
+                            PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < DateTime.Now
+                                                                                         && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > DateTime.Now)).ToList();
+                        }
                     }
                     break;
                 case "TargetQuantityUOM":
@@ -372,6 +384,41 @@ namespace gip.bso.sales
             get;
             set;
         }
+
+        #endregion
+
+        #region Properties => Pricelist
+
+        private PriceListMaterial _SelectedPriceListMaterial;
+        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}")]
+        public PriceListMaterial SelectedPriceListMaterial
+        {
+            get => _SelectedPriceListMaterial;
+            set
+            {
+                _SelectedPriceListMaterial = value;
+                if(_SelectedPriceListMaterial != null)
+                {
+                    CurrentOutOfferPos.PriceNet = _SelectedPriceListMaterial.Price;
+                }
+            }
+        }
+
+        private List<PriceListMaterial> _PriceListMaterialItems;
+        [ACPropertyList(671, "PriceListMaterial")]
+        public List<PriceListMaterial> PriceListMaterialItems
+        {
+            get
+            {
+                return _PriceListMaterialItems;
+            }
+            set
+            {
+                _PriceListMaterialItems = value;
+                OnPropertyChanged("PriceListMaterialItems");
+            }
+        }
+
 
         #endregion
 
