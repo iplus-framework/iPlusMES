@@ -198,26 +198,34 @@ namespace gip.bso.sales
         {
             switch (e.PropertyName)
             {
-            //    case "MaterialID":
-            //        {
-            //            OnPropertyChanged("MDUnitList");
-            //            if (CurrentOutOfferPos.Material != null && CurrentOutOfferPos.Material.BaseMDUnit != null)
-            //                CurrentMDUnit = CurrentOutOfferPos.Material.BaseMDUnit;
-            //            else
-            //                CurrentMDUnit = null;
-            //            OnPropertyChanged("CurrentOutOfferPos");
-            //        }
-            //        break;
-            //    case "TargetQuantityUOM":
-            //    case "MDUnitID":
-            //        {
-            //            if (CurrentOutOfferPos != null && CurrentOutOfferPos.Material != null)
-            //            {
-            //                CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertToBaseQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-            //                CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-            //            }
-            //        }
-            //        break;
+                case "MaterialID":
+                    {
+                        OnPropertyChanged("MDUnitList");
+                        if (CurrentOutOfferPos.Material != null && CurrentOutOfferPos.Material.BaseMDUnit != null)
+                            CurrentMDUnit = CurrentOutOfferPos.Material.BaseMDUnit;
+                        else
+                            CurrentMDUnit = null;
+                        OnPropertyChanged("CurrentOutOfferPos");
+                    }
+                    break;
+                case "TargetQuantityUOM":
+                case "MDUnitID":
+                    {
+                        if (CurrentOutOfferPos != null && CurrentOutOfferPos.Material != null)
+                        {
+                            CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertToBaseQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                            //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                        }
+                    }
+                    break;
+                case "PriceNet":
+                    {
+                        if (CurrentOutOffer != null)
+                        {
+                            CurrentOutOffer.OnPricePropertyChanged();
+                        }
+                    }
+                    break;
             }
         }
 
@@ -341,6 +349,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Properties => Report
+
         private ReportData _TempReportData;
         [ACPropertyInfo(9999)]
         public ReportData TempReportData
@@ -362,6 +372,8 @@ namespace gip.bso.sales
             get;
             set;
         }
+
+        #endregion
 
         #endregion
 
@@ -445,7 +457,7 @@ namespace gip.bso.sales
             newOfferVersion.TargetDeliveryDate = CurrentOutOffer.TargetDeliveryDate;
             newOfferVersion.TargetDeliveryMaxDate = CurrentOutOffer.TargetDeliveryMaxDate;
             newOfferVersion.XMLConfig = CurrentOutOffer.XMLConfig;
-            newOfferVersion.XMLDesign = CurrentOutOffer.XMLDesign;
+            newOfferVersion.XMLDesignStart = CurrentOutOffer.XMLDesignStart;
 
             DatabaseApp.OutOffer.AddObject(newOfferVersion);
 
@@ -594,6 +606,11 @@ namespace gip.bso.sales
             }
 
             PostExecute("DeleteOutOfferPos");
+            OnPropertyChanged("OutOfferPosList");
+            if (CurrentOutOffer != null)
+            {
+                CurrentOutOffer.OnPricePropertyChanged();
+            }
         }
 
         public bool IsEnabledDeleteOutOfferPos()
@@ -601,31 +618,95 @@ namespace gip.bso.sales
             return CurrentOutOffer != null && CurrentOutOfferPos != null;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'Position up'}de{'Position oben'}", 100, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'Position up'}de{'Position oben'}", 10, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost)]
         public void OutOrderPosUp()
         {
             int sequencePre = 0;
-            if(SelectedOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
+            if(CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
             {
-                //sequencePre = SelectedOutOfferPos.OutOfferPos1_GroupOutOfferPos.outoffpos
+                var posPre = CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos
+                                                 .Where(c => c.Sequence < CurrentOutOfferPos.Sequence).OrderByDescending(x => x.Sequence)
+                                                 .FirstOrDefault();
+
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+
+                posPre.Sequence = CurrentOutOfferPos.Sequence;
+                CurrentOutOfferPos.Sequence = sequencePre;
             }
             else
             {
+                var posPre = OutOfferPosList.Where(c => c.OutOfferPos1_GroupOutOfferPos == null && c.Sequence < CurrentOutOfferPos.Sequence)
+                                            .OrderByDescending(x => x.Sequence)
+                                            .FirstOrDefault();
 
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+                posPre.Sequence = CurrentOutOfferPos.Sequence;
+                CurrentOutOfferPos.Sequence = sequencePre;
             }
+            OnPropertyChanged("OutOfferPosList");
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'Position down'}de{'Position unten'}", 101, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        public bool IsEnabledOutOrderPosUp()
+        {
+            return CurrentOutOfferPos != null && CurrentOutOfferPos.Sequence > 1;
+        }
+
+        [ACMethodInteraction("OutOfferPos", "en{'Position down'}de{'Position unten'}", 11, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost)]
         public void OutOrderPosDown()
         {
+            int sequencePre = 0;
+            if (CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
+            {
+                var posPre = CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos
+                                                 .Where(c => c.Sequence > CurrentOutOfferPos.Sequence)
+                                                 .OrderBy(x => x.Sequence)
+                                                 .FirstOrDefault();
 
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+
+                posPre.Sequence = CurrentOutOfferPos.Sequence;
+                CurrentOutOfferPos.Sequence = sequencePre;
+            }
+            else
+            {
+                var posPre = OutOfferPosList.Where(c => c.OutOfferPos1_GroupOutOfferPos == null && c.Sequence > CurrentOutOfferPos.Sequence)
+                                            .OrderBy(x => x.Sequence)
+                                            .FirstOrDefault();
+
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+                posPre.Sequence = CurrentOutOfferPos.Sequence;
+                CurrentOutOfferPos.Sequence = sequencePre;
+            }
+            OnPropertyChanged("OutOfferPosList");
         }
+
+        public bool IsEnabledOutOrderPosDown()
+        {
+            return CurrentOutOfferPos != null
+                && CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos == null
+                   ? CurrentOutOfferPos.Sequence < OutOfferPosList.Where(x => x.OutOfferPos1_GroupOutOfferPos == null).Max(c => c.Sequence)
+                   : CurrentOutOfferPos.Sequence < CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Max(x => x.Sequence);
+        }
+
+        #region Methods => Report
 
         private void BuildOutOfferPosData()
         {
             List<OutOfferPos> posData = new List<OutOfferPos>();
 
-            foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null).OrderBy(p => p.Position))
+            foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posData.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posData, outOfferPos.Items);
@@ -645,7 +726,7 @@ namespace gip.bso.sales
 
         private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
         {
-            foreach (var outOfferPos in outOfferPosList.OrderBy(p => p.Position))
+            foreach (var outOfferPos in outOfferPosList.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posDataList.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posDataList, outOfferPos.Items);
@@ -657,7 +738,8 @@ namespace gip.bso.sales
             if(printingPhase == ACPrintingPhase.Started)
             {
                 ReportDocument doc = reportEngine as ReportDocument;
-                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null && c.ACClassDesign.ACIdentifier == "OfferDe"))
+                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null 
+                                                                                 && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn"))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
 
@@ -698,6 +780,7 @@ namespace gip.bso.sales
             }
         }
 
+        #endregion
 
         #endregion
 

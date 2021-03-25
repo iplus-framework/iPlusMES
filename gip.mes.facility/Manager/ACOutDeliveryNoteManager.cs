@@ -593,14 +593,13 @@ namespace gip.mes.facility
 
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
             Invoice invoice = Invoice.NewACObject(dbApp, null, secondaryKey);
-            invoice.OutOrderOrder = outOrder;
+            invoice.OutOrder = outOrder;
             invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(dbApp);
             invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(dbApp);
             invoice.InvoiceDate = DateTime.Now;
             invoice.CustomerCompany = outOrder.CustomerCompany;
             invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
             invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
-            invoice.MDCountrySalesTax = outOrder.OutOrderPos_OutOrder.Select(c => c.MDCountrySalesTax).FirstOrDefault();
 
             foreach (OutOrderPos outOrderPos in outOrder.OutOrderPos_OutOrder)
             {
