@@ -86,7 +86,7 @@ namespace gip.mes.processapplication
         #region Properties
 
         #region Tolerance State
-        [ACPropertyBindingTarget(635, "Read from PLC", "en{'State of Tolerance'}de{'Status Toleranz'}", "", false, false, RemotePropID=19)]
+        [ACPropertyBindingTarget(635, "Read from PLC", "en{'State of Tolerance'}de{'Status Toleranz'}", "", false, false, RemotePropID = 19)]
         public IACContainerTNet<PANotifyState> StateTolerance { get; set; }
         public void OnSetStateTolerance(IACPropertyNetValueEvent valueEvent)
         {
@@ -115,7 +115,7 @@ namespace gip.mes.processapplication
                 _StateToleranceAlarmChanged = PAAlarmChangeState.NoChange;
             }
         }
-        [ACPropertyBindingTarget(654, "Write to PLC", "en{'Fault acknowledge Tolerance'}de{'Toleranzquittung'}", "", true, false, RemotePropID=20)]
+        [ACPropertyBindingTarget(654, "Write to PLC", "en{'Fault acknowledge Tolerance'}de{'Toleranzquittung'}", "", true, false, RemotePropID = 20)]
         public IACContainerTNet<bool> FaultAckTolerance { get; set; }
         #endregion
 
@@ -129,7 +129,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACPropertyBindingTarget(636, "Read from PLC", "en{'State of lack of material'}de{'Status Materialmangel'}", "", false, false, RemotePropID=21)]
+        [ACPropertyBindingTarget(636, "Read from PLC", "en{'State of lack of material'}de{'Status Materialmangel'}", "", false, false, RemotePropID = 21)]
         public IACContainerTNet<PANotifyState> StateLackOfMaterial { get; set; }
         public void OnSetStateLackOfMaterial(IACPropertyNetValueEvent valueEvent)
         {
@@ -158,7 +158,7 @@ namespace gip.mes.processapplication
                 _StateLackOfMaterialAlarmChanged = PAAlarmChangeState.NoChange;
             }
         }
-        [ACPropertyBindingTarget(655, "Write to PLC", "en{'Fault acknowledge lack of material'}de{'Materialmangelquittung'}", "", true, false, RemotePropID=22)]
+        [ACPropertyBindingTarget(655, "Write to PLC", "en{'Fault acknowledge lack of material'}de{'Materialmangelquittung'}", "", true, false, RemotePropID = 22)]
         public IACContainerTNet<bool> FaultAckLackOfMaterial { get; set; }
 
         [ACPropertyBindingSource(656, "", "en{'Dosing abortion reason'}de{'Grund des Dosierabbruchs'}", "", false, true)]
@@ -182,7 +182,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region DosingTime State
-        [ACPropertyBindingTarget(637, "Read from PLC", "en{'State of dosingtime-fault'}de{'Status Dosierzeitfehler'}", "", false, false, RemotePropID=23)]
+        [ACPropertyBindingTarget(637, "Read from PLC", "en{'State of dosingtime-fault'}de{'Status Dosierzeitfehler'}", "", false, false, RemotePropID = 23)]
         public IACContainerTNet<PANotifyState> StateDosingTime { get; set; }
         public void OnSetStateDosingTime(IACPropertyNetValueEvent valueEvent)
         {
@@ -211,7 +211,7 @@ namespace gip.mes.processapplication
                 _StateDosingTimeAlarmChanged = PAAlarmChangeState.NoChange;
             }
         }
-        [ACPropertyBindingTarget(656, "Write to PLC", "en{'Fault acknowledge dosingtime-fault'}de{'Dosierzeitfehlerquittung'}", "", true, false, RemotePropID=24)]
+        [ACPropertyBindingTarget(656, "Write to PLC", "en{'Fault acknowledge dosingtime-fault'}de{'Dosierzeitfehlerquittung'}", "", true, false, RemotePropID = 24)]
         public IACContainerTNet<bool> FaultAckDosingTime { get; set; }
         #endregion
 

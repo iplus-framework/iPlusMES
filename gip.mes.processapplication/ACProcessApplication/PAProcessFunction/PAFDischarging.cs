@@ -17,7 +17,7 @@ namespace gip.mes.processapplication
         #region Properties
 
         #region Tolerance State
-        [ACPropertyBindingTarget(635, "Read from PLC", "en{'State of Tolerance'}de{'Status Toleranz'}", "", false, false, RemotePropID=19)]
+        [ACPropertyBindingTarget(635, "Read from PLC", "en{'State of Tolerance'}de{'Status Toleranz'}", "", false, false, RemotePropID = 19)]
         public IACContainerTNet<PANotifyState> StateTolerance { get; set; }
         public void OnSetStateTolerance(IACPropertyNetValueEvent valueEvent)
         {
@@ -46,7 +46,7 @@ namespace gip.mes.processapplication
                 _StateToleranceAlarmChanged = PAAlarmChangeState.NoChange;
             }
         }
-        [ACPropertyBindingTarget(654, "Write to PLC", "en{'Fault acknowledge Tolerance'}de{'Toeranzquittung'}", "", true, false, RemotePropID=20)]
+        [ACPropertyBindingTarget(654, "Write to PLC", "en{'Fault acknowledge Tolerance'}de{'Toeranzquittung'}", "", true, false, RemotePropID = 20)]
         public IACContainerTNet<bool> FaultAckTolerance { get; set; }
         #endregion
 
@@ -61,7 +61,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACPropertyBindingTarget(635, "Read from PLC", "en{'State of DestinationFull'}de{'Ziel voll'}", "", false, false, RemotePropID=21)]
+        [ACPropertyBindingTarget(635, "Read from PLC", "en{'State of DestinationFull'}de{'Ziel voll'}", "", false, false, RemotePropID = 21)]
         public IACContainerTNet<PANotifyState> StateDestinationFull { get; set; }
         public void OnSetStateDestinationFull(IACPropertyNetValueEvent valueEvent)
         {
@@ -90,7 +90,7 @@ namespace gip.mes.processapplication
                 _StateDestinationFullAlarmChanged = PAAlarmChangeState.NoChange;
             }
         }
-        [ACPropertyBindingTarget(654, "Write to PLC", "en{'Fault acknowledge DestinationFull'}de{'Ziel voll Quittung'}", "", true, false, RemotePropID=22)]
+        [ACPropertyBindingTarget(654, "Write to PLC", "en{'Fault acknowledge DestinationFull'}de{'Ziel voll Quittung'}", "", true, false, RemotePropID = 22)]
         public IACContainerTNet<bool> FaultAckDestinationFull { get; set; }
         #endregion
 

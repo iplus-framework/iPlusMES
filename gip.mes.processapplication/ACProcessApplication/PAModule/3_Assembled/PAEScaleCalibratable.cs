@@ -15,14 +15,14 @@ namespace gip.mes.processapplication
 
         public const string ClassName = "PAEScaleCalibratable";
 
-        [ACPropertyBindingTarget(810, "Read from PLC", "en{'Alibi weight [kg]'}de{'Alibigewicht [kg]'}", "", false, false, RemotePropID = 85)]
+        [ACPropertyBindingTarget(810, "Read from PLC", "en{'Alibi weight [kg]'}de{'Alibigewicht [kg]'}", "", false, false, RemotePropID = 86)]
         public IACContainerTNet<double> AlibiWeight
         {
             get;
             set;
         }
 
-        [ACPropertyBindingTarget(820, "Read from PLC", "en{'Alibi No'}de{'Alibi Nr'}", "", false, false, RemotePropID = 86)]
+        [ACPropertyBindingTarget(820, "Read from PLC", "en{'Alibi No'}de{'Alibi Nr'}", "", false, false, RemotePropID = 87)]
         public IACContainerTNet<string> AlibiNo
         {
             get;

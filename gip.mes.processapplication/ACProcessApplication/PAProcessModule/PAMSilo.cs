@@ -356,22 +356,22 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(401, "Configuration", "en{'Facility'}de{'Lagerplatz'}", "", true, false)]
         public IACContainerTNet<ACRef<Facility>> Facility { get; set; }
 
-        [ACPropertyBindingTarget(441, "Read from PLC", "en{'Fill level'}de{'Füllstand'}", "", false, false, RemotePropID=20)]
+        [ACPropertyBindingTarget(441, "Read from PLC", "en{'Fill level'}de{'Füllstand'}", "", false, false, RemotePropID = 20)]
         public IACContainerTNet<Double> FillLevel { get; set; }
 
-        [ACPropertyBindingTarget(442, "Read from PLC", "en{'Materialname'}de{'Materialname'}", "", false, false, RemotePropID=21)]
+        [ACPropertyBindingTarget(442, "Read from PLC", "en{'Materialname'}de{'Materialname'}", "", false, false, RemotePropID = 21)]
         public IACContainerTNet<String> MaterialName { get; set; }
 
-        [ACPropertyBindingTarget(443, "Read from PLC", "en{'Inward enabled'}de{'Einlagerung freigegeben'}", "", false, false, RemotePropID=22)]
+        [ACPropertyBindingTarget(443, "Read from PLC", "en{'Inward enabled'}de{'Einlagerung freigegeben'}", "", false, false, RemotePropID = 22)]
         public IACContainerTNet<Boolean> InwardEnabled { get; set; }
 
-        [ACPropertyBindingTarget(444, "Read from PLC", "en{'Outward enabled'}de{'Auslagerung freigegeben'}", "", false, false, RemotePropID=23)]
+        [ACPropertyBindingTarget(444, "Read from PLC", "en{'Outward enabled'}de{'Auslagerung freigegeben'}", "", false, false, RemotePropID = 23)]
         public IACContainerTNet<Boolean> OutwardEnabled { get; set; }
 
-        [ACPropertyBindingTarget(445, "Read from PLC", "en{'Materialno'}de{'Material-Nr.'}", "", false, false, RemotePropID=24)]
+        [ACPropertyBindingTarget(445, "Read from PLC", "en{'Materialno'}de{'Material-Nr.'}", "", false, false, RemotePropID = 24)]
         public IACContainerTNet<String> MaterialNo { get; set; }
 
-        [ACPropertyBindingTarget(446, "Read from PLC", "en{'Dosing learning mode'}de{'Dosierung Lernmodus'}", "", false, true, RemotePropID=25)]
+        [ACPropertyBindingTarget(446, "Read from PLC", "en{'Dosing learning mode'}de{'Dosierung Lernmodus'}", "", false, true, RemotePropID = 25)]
         public IACContainerTNet<Boolean> LearnDosing { get; set; }
 
         [ACPropertyBindingTarget(447, "Read from PLC", "en{'Has hint'}de{'Hat Hinweis'}", "", false, false)]
