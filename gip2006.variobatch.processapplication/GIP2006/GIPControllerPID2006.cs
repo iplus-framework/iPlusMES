@@ -798,7 +798,7 @@ namespace gip2006.variobatch.processapplication
         #endregion
 
         #region Read-Values from PLC
-        [ACPropertyBindingTarget(500, "Read from PLC", "en{'Controller data'}de{'Regler Daten'}", "", false, true, RemotePropID=11)]
+        [ACPropertyBindingTarget(500, "Read from PLC", "en{'Controller data'}de{'Regler Daten'}", "", false, true)]
         public IACContainerTNet<GIPControllerPIDData2006> CData { get; set; }
         #endregion
 

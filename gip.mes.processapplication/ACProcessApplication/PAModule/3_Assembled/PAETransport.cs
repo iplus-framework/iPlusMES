@@ -134,10 +134,10 @@ namespace gip.mes.processapplication
 
         #region Properties, Range: 400
         #region Read-Values from PLC
-        [ACPropertyBindingTarget(441, "Read from PLC", "en{'Allocated by Way'}de{'Belegt von Wegesteuerung'}", "", false, false, RemotePropID=19)]
+        [ACPropertyBindingTarget(441, "Read from PLC", "en{'Allocated by Way'}de{'Belegt von Wegesteuerung'}", "", false, false)]
         public IACContainerTNet<BitAccessForAllocatedByWay> AllocatedByWay { get; set; }
 
-        [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", false, false, RemotePropID=20)]
+        [ACPropertyBindingTarget(442, "Configuration", "en{'Depleting time'}de{'Leerfahrzeit'}", "", false, false)]
         public IACContainerTNet<TimeSpan> DepletingTime { get; set; }
         #endregion
 

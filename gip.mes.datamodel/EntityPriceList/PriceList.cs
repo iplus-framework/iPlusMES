@@ -5,6 +5,8 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioSales, ConstApp.ESPriceList, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPriceList")]
     [ACPropertyEntity(1, "PriceListNo", "en{'Price list No'}de{'Preislistenummer'}", "", "", true, MinLength = 1)]
+    [ACPropertyEntity(9999, "PriceListNameTrans", Const.EntityNameTrans, "", "", true, MinLength = 1)]
+    [ACPropertyEntity(9999, "MDCurrency", "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
     [ACPropertyEntity(2, "DateFrom", "en{'Start time'}de{'Startzeit'}", "", "", true)]
     [ACPropertyEntity(3, "DateTo", "en{'End Time'}de{'Endzeit'}", "", "", true)]
     [ACPropertyEntity(4, "Comment", "en{'Comment'}de{'Kommentar'}", "", "", true)]
@@ -36,6 +38,22 @@ namespace gip.mes.datamodel
             return entity;
         }
 
+        #endregion
+
+        #region Properties
+        [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
+        public String PriceListName
+        {
+            get
+            {
+                return Translator.GetTranslation(PriceListNameTrans);
+            }
+            set
+            {
+                PriceListNameTrans = Translator.SetTranslation(PriceListNameTrans, value);
+                OnPropertyChanged("PriceListName");
+            }
+        }
         #endregion
     }
 }

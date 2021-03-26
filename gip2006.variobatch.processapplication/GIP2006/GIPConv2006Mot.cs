@@ -493,7 +493,7 @@ namespace gip2006.variobatch.processapplication
         #region Properties
 
         #region Read-Values from PLC
-        [ACPropertyBindingTarget(240, "Read from PLC", "en{'Response'}de{'Rückmeldung'}", "", false, false, RemotePropID=17)]
+        [ACPropertyBindingTarget(240, "Read from PLC", "en{'Response'}de{'Rückmeldung'}", "", false, false)]
         public IACContainerTNet<GIPConv2006MotMaskRes> Response { get; set; }
         protected override IACPropertyNetTarget _Response 
         {
@@ -589,7 +589,7 @@ namespace gip2006.variobatch.processapplication
         #endregion
 
         #region Write-Value to PLC
-        [ACPropertyBindingTarget(250, "Read from PLC", "en{'Request'}de{'Kommando'}", "", false, false, RemotePropID=18)]
+        [ACPropertyBindingTarget(250, "Read from PLC", "en{'Request'}de{'Kommando'}", "", false, false)]
         public IACContainerTNet<GIPConv2006MotMaskReq> Request { get; set; }
         protected override IACPropertyNetTarget _Request
         {

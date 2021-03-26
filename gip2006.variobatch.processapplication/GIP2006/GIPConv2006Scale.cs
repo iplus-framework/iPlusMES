@@ -376,7 +376,7 @@ namespace gip2006.variobatch.processapplication
         public IACContainerTNet<Boolean> IsFlow { get; set; }
 
 
-        [ACPropertyBindingTarget(240, "Read from PLC", "en{'Response'}de{'Rückmeldung'}", "", false, false, RemotePropID=14)]
+        [ACPropertyBindingTarget(240, "Read from PLC", "en{'Response'}de{'Rückmeldung'}", "", false, false)]
         public IACContainerTNet<GIPConv2006ScaleMaskRes> Response { get; set; }
         protected virtual IACPropertyNetTarget _Response
         {
@@ -415,7 +415,7 @@ namespace gip2006.variobatch.processapplication
         public IACContainerTNet<Int32> TareCounterReq { get; set; }
 
 
-        [ACPropertyBindingTarget(250, "Read from PLC", "en{'Request'}de{'Kommando'}", "", false, false, RemotePropID=15)]
+        [ACPropertyBindingTarget(250, "Read from PLC", "en{'Request'}de{'Kommando'}", "", false, false)]
         public IACContainerTNet<GIPConv2006ScaleMaskReq> Request { get; set; }
 
         protected virtual IACPropertyNetTarget _Request
