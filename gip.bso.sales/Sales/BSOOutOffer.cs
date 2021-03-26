@@ -214,9 +214,19 @@ namespace gip.bso.sales
 
                         if (CurrentOutOfferPos.Material != null)
                         {
+                            DateTime now = DateTime.Now;
+
                             SelectedPriceListMaterial = null;
-                            PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < DateTime.Now
-                                                                                         && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > DateTime.Now)).ToList();
+                            PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < now
+                                                                                         && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)).ToList();
+
+                            if (CurrentOutOffer != null && CurrentOutOffer.BillingCompanyAddress != null)
+                            {
+
+                                var tax = CurrentOutOfferPos.Material.MDCountrySalesTaxMaterial_Material
+                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == CurrentOutOffer.BillingCompanyAddress.MDCountryID
+                                                                                       && c.MDCountrySalesTax.DateFrom < now)
+                            }
                         }
                     }
                     break;
