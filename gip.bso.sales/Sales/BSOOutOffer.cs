@@ -189,9 +189,9 @@ namespace gip.bso.sales
                 if (_CurrentOutOfferPos != null)
                 {
                     _CurrentOutOfferPos.PropertyChanged += CurrentOutOfferPos_PropertyChanged;
-                    //if(_CurrentOutOfferPos.Material != null)
-                    //    PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < DateTime.Now
-                    //                                                                 && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > DateTime.Now)).ToList();
+                    if (_CurrentOutOfferPos.Material != null)
+                        PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < DateTime.Now
+                                                                                     && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > DateTime.Now)).ToList();
                 }
                 OnPropertyChanged("MDUnitList");
                 OnPropertyChanged("CurrentOutOfferPos");
@@ -225,7 +225,41 @@ namespace gip.bso.sales
 
                                 var tax = CurrentOutOfferPos.Material.MDCountrySalesTaxMaterial_Material
                                                                      .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == CurrentOutOffer.BillingCompanyAddress.MDCountryID
-                                                                                       && c.MDCountrySalesTax.DateFrom < now)
+                                                                                       && c.MDCountrySalesTax.DateFrom < now
+                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
+                                if (tax != null)
+                                {
+                                    CurrentOutOfferPos.SalesTax = tax.SalesTax;
+                                    CurrentOutOfferPos.MDCountrySalesTaxMaterial = tax;
+                                }
+                                else
+                                {
+                                    var taxGroup = CurrentOutOfferPos.Material.MDMaterialGroup.MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
+                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == CurrentOutOffer.BillingCompanyAddress.MDCountryID
+                                                                                       && c.MDCountrySalesTax.DateFrom < now
+                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
+                                    
+                                    if (taxGroup != null)
+                                    {
+                                        CurrentOutOfferPos.SalesTax = taxGroup.SalesTax;
+                                        CurrentOutOfferPos.MDCountrySalesTaxMDMaterialGroup = taxGroup;
+                                    }
+                                    else
+                                    {
+                                        var mainTax = CurrentOutOffer.BillingCompanyAddress.MDCountry.MDCountrySalesTax_MDCountry
+                                                                     .FirstOrDefault(c => !c.MDCountrySalesTaxMaterial_MDCountrySalesTax.Any() 
+                                                                                       && !c.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.Any()
+                                                                                       && c.DateFrom < now
+                                                                                       && (!c.DateTo.HasValue || c.DateTo > now));
+
+                                        if (mainTax != null)
+                                        {
+                                            CurrentOutOfferPos.SalesTax = mainTax.SalesTax;
+                                            CurrentOutOfferPos.MDCountrySalesTax = mainTax;
+                                        }
+                                    }
+                                    
+                                }
                             }
                         }
                     }
@@ -245,6 +279,20 @@ namespace gip.bso.sales
                         if (CurrentOutOffer != null)
                         {
                             CurrentOutOffer.OnPricePropertyChanged();
+                        }
+                        if(CurrentOutOfferPos != null)
+                        {
+                            CurrentOutOfferPos.OnEntityPropertyChanged("SalesTaxAmount");
+                            CurrentOutOfferPos.PriceGross = CurrentOutOfferPos.PriceNet + (decimal)CurrentOutOfferPos.SalesTaxAmount;
+                        }
+                    }
+                    break;
+                case "SalesTax":
+                    {
+                        if (CurrentOutOfferPos != null)
+                        {
+                            CurrentOutOfferPos.OnEntityPropertyChanged("SalesTaxAmount");
+                            CurrentOutOfferPos.PriceGross = CurrentOutOfferPos.PriceNet + (decimal)CurrentOutOfferPos.SalesTaxAmount;
                         }
                     }
                     break;
@@ -395,6 +443,13 @@ namespace gip.bso.sales
             set;
         }
 
+        [ACPropertyInfo(651)]
+        public List<OutOfferPos> OutOfferPosDiscountList
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #region Properties => Pricelist
@@ -411,6 +466,8 @@ namespace gip.bso.sales
                 {
                     CurrentOutOfferPos.PriceNet = _SelectedPriceListMaterial.Price;
                 }
+                _SelectedPriceListMaterial = null;
+                OnPropertyChanged("SelectedPriceListMaterial");
             }
         }
 
@@ -761,6 +818,9 @@ namespace gip.bso.sales
 
         private void BuildOutOfferPosData()
         {
+            if (CurrentOutOffer == null)
+                return;
+
             List<OutOfferPos> posData = new List<OutOfferPos>();
 
             foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
@@ -779,6 +839,7 @@ namespace gip.bso.sales
             }
 
             OutOfferPosDataList = posData;
+            OutOfferPosDiscountList = CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
         }
 
         private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
