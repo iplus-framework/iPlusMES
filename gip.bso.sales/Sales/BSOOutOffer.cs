@@ -450,6 +450,13 @@ namespace gip.bso.sales
             set;
         }
 
+        [ACPropertyInfo(652)]
+        public List<MDCountrySalesTax> TaxOverviewList
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #region Properties => Pricelist
@@ -840,6 +847,30 @@ namespace gip.bso.sales
 
             OutOfferPosDataList = posData;
             OutOfferPosDiscountList = CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
+
+            var salesTax = CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
+                                                 .GroupBy(g => g.SalesTax);
+
+            if (CurrentOutOffer.PosPriceNetDiscount < 0)
+            {
+                List<Tuple<OutOfferPos, double>> helperList = new List<Tuple<OutOfferPos, double>>();
+
+                var percent = (Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100;
+
+                var taxBase = CurrentOutOffer.OutOfferPos_OutOffer
+                                             .Where(c => c.PriceNet > 0)
+                                             .Select(x => new Tuple<float, double>(x.SalesTax, ((double)x.PriceNet - ((double)x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
+                                             .GroupBy(t => t.Item1)
+                                             .ToList();
+
+                TaxOverviewList = taxBase.Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.Item2) })
+                                         .ToList();
+            }
+            else
+            {
+                TaxOverviewList = salesTax.Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.SalesTaxAmount) })
+                                          .ToList();
+            }                                 
         }
 
         private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
@@ -887,8 +918,22 @@ namespace gip.bso.sales
                     var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
                     if (tableCell != null)
                     {
-                        if (inlineCell.VBContent == "Total")
-                         {
+                        if (inlineCell.VBContent == "MaterialNo")
+                        {
+                            TableRow tableRow = tableCell.Parent as TableRow;
+                            if (tableRow != null && tableRow.Cells.Count > 6)
+                            {
+                                tableRow.Cells.RemoveAt(2);
+                                tableRow.Cells.RemoveAt(2);
+                                tableRow.Cells.RemoveAt(2);
+                                tableRow.Cells.RemoveAt(2);
+                            }
+                            tableCell.ColumnSpan = 2;
+                        }
+
+                        else if (inlineCell.VBContent == "Total")
+                        {
+                            tableCell.ColumnSpan = 4;
                             tableCell.BorderBrush = Brushes.Black;
                             tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
                         }
