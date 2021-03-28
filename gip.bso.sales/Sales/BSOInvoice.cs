@@ -9,7 +9,7 @@ using System.Linq;
 namespace gip.bso.sales
 {
     [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechunungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName)]
-    public class BSOInvoice : ACBSOvbNav
+    public class BSOInvoice : ACBSOvbNav, IOutOrderPosBSO
     {
         #region c´tors
 
@@ -23,10 +23,9 @@ namespace gip.bso.sales
             if (!base.ACInit(startChildMode))
                 return false;
 
-
-            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
-            if (_ACFacilityManager == null)
-                throw new Exception("FacilityManager not configured");
+            _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_OutDeliveryNoteManager == null)
+                throw new Exception("OutDeliveryNoteManager not configured");
 
             Search();
             SetSelectedPos();
@@ -35,8 +34,11 @@ namespace gip.bso.sales
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
-            _ACFacilityManager = null;
+            if (_OutDeliveryNoteManager != null)
+            {
+                ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
+                _OutDeliveryNoteManager = null;
+            }
 
             this._CurrentMDUnit = null;
             this._CurrentInvoicePos = null;
@@ -152,14 +154,14 @@ namespace gip.bso.sales
 
         #region Managers
 
-        protected ACRef<ACComponent> _ACFacilityManager = null;
-        public FacilityManager ACFacilityManager
+        protected ACRef<ACOutDeliveryNoteManager> _OutDeliveryNoteManager = null;
+        protected ACOutDeliveryNoteManager OutDeliveryNoteManager
         {
             get
             {
-                if (_ACFacilityManager == null)
+                if (_OutDeliveryNoteManager == null)
                     return null;
-                return _ACFacilityManager.ValueT as FacilityManager;
+                return _OutDeliveryNoteManager.ValueT;
             }
         }
 
@@ -336,15 +338,14 @@ namespace gip.bso.sales
 
         void CurrentInvoicePos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
+            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoicePos, CurrentInvoice?.BillingCompanyAddress);
+        }
+
+        public void OnPricePropertyChanged()
+        {
+            if (CurrentInvoice != null)
             {
-                case "MaterialID":
-                    {
-                        if (CurrentInvoicePos.Material != null && CurrentInvoicePos.Material.BaseMDUnit != null)
-                            CurrentMDUnit = CurrentInvoicePos.Material.BaseMDUnit;
-                        OnPropertyChanged("CurrentInvoicePos");
-                    }
-                    break;
+                CurrentInvoice.OnPricePropertyChanged();
             }
         }
 
@@ -799,6 +800,43 @@ namespace gip.bso.sales
             }
         }
 
+
+        #endregion
+
+
+        #region Properties => Pricelist
+
+        private PriceListMaterial _SelectedPriceListMaterial;
+        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}")]
+        public PriceListMaterial SelectedPriceListMaterial
+        {
+            get => _SelectedPriceListMaterial;
+            set
+            {
+                _SelectedPriceListMaterial = value;
+                if (_SelectedPriceListMaterial != null)
+                {
+                    CurrentInvoicePos.PriceNet = _SelectedPriceListMaterial.Price;
+                }
+                _SelectedPriceListMaterial = null;
+                OnPropertyChanged("SelectedPriceListMaterial");
+            }
+        }
+
+        private List<PriceListMaterial> _PriceListMaterialItems;
+        [ACPropertyList(671, "PriceListMaterial")]
+        public List<PriceListMaterial> PriceListMaterialItems
+        {
+            get
+            {
+                return _PriceListMaterialItems;
+            }
+            set
+            {
+                _PriceListMaterialItems = value;
+                OnPropertyChanged("PriceListMaterialItems");
+            }
+        }
 
         #endregion
 

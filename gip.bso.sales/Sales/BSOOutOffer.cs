@@ -8,6 +8,7 @@ using System.Linq;
 using gip.core.reporthandler.Flowdoc;
 using System.Windows.Media;
 using System.Windows.Documents;
+using gip.mes.facility;
 
 namespace gip.bso.sales
 {
@@ -20,7 +21,7 @@ namespace gip.bso.sales
     /// TODO: Betroffene Tabellen: OutOffer, OutOfferPos
     /// </summary>
     [ACClassInfo(Const.PackName_VarioSales, "en{'Offering'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
-    public class BSOOutOffer : ACBSOvbNav
+    public class BSOOutOffer : ACBSOvbNav, IOutOrderPosBSO
     {
         #region c´tors
 
@@ -37,12 +38,22 @@ namespace gip.bso.sales
 
             TempReportData = new ReportData();
 
+            _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_OutDeliveryNoteManager == null)
+                throw new Exception("OutDeliveryNoteManager not configured");
+
             Search();
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_OutDeliveryNoteManager != null)
+            {
+                ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
+                _OutDeliveryNoteManager = null;
+            }
+
             this._AccessOutOfferPos = null;
             this._CurrentOutOfferPos = null;
             this._SelectedOutOfferPos = null;
@@ -58,6 +69,21 @@ namespace gip.bso.sales
                 _AccessPrimary = null;
             }
             return b;
+        }
+
+        #endregion
+
+        #region Managers
+       
+        protected ACRef<ACOutDeliveryNoteManager> _OutDeliveryNoteManager = null;
+        protected ACOutDeliveryNoteManager OutDeliveryNoteManager
+        {
+            get
+            {
+                if (_OutDeliveryNoteManager == null)
+                    return null;
+                return _OutDeliveryNoteManager.ValueT;
+            }
         }
 
         #endregion
@@ -193,6 +219,8 @@ namespace gip.bso.sales
                         PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < DateTime.Now
                                                                                      && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > DateTime.Now)).ToList();
                 }
+                else
+                    PriceListMaterialItems = null;
                 OnPropertyChanged("MDUnitList");
                 OnPropertyChanged("CurrentOutOfferPos");
                 OnPropertyChanged("CurrentMDUnit");
@@ -201,101 +229,14 @@ namespace gip.bso.sales
 
         void CurrentOutOfferPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
+            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOfferPos, CurrentOutOffer?.BillingCompanyAddress);
+        }
+
+        public void OnPricePropertyChanged()
+        {
+            if (CurrentOutOffer != null)
             {
-                case "MaterialID":
-                    {
-                        OnPropertyChanged("MDUnitList");
-                        if (CurrentOutOfferPos.Material != null && CurrentOutOfferPos.Material.BaseMDUnit != null)
-                            CurrentMDUnit = CurrentOutOfferPos.Material.BaseMDUnit;
-                        else
-                            CurrentMDUnit = null;
-                        OnPropertyChanged("CurrentOutOfferPos");
-
-                        if (CurrentOutOfferPos.Material != null)
-                        {
-                            DateTime now = DateTime.Now;
-
-                            SelectedPriceListMaterial = null;
-                            PriceListMaterialItems = DatabaseApp.PriceListMaterial.Where(c => c.MaterialID == _CurrentOutOfferPos.MaterialID && c.PriceList.DateFrom < now
-                                                                                         && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)).ToList();
-
-                            if (CurrentOutOffer != null && CurrentOutOffer.BillingCompanyAddress != null)
-                            {
-
-                                var tax = CurrentOutOfferPos.Material.MDCountrySalesTaxMaterial_Material
-                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == CurrentOutOffer.BillingCompanyAddress.MDCountryID
-                                                                                       && c.MDCountrySalesTax.DateFrom < now
-                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
-                                if (tax != null)
-                                {
-                                    CurrentOutOfferPos.SalesTax = tax.SalesTax;
-                                    CurrentOutOfferPos.MDCountrySalesTaxMaterial = tax;
-                                }
-                                else
-                                {
-                                    var taxGroup = CurrentOutOfferPos.Material.MDMaterialGroup.MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
-                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == CurrentOutOffer.BillingCompanyAddress.MDCountryID
-                                                                                       && c.MDCountrySalesTax.DateFrom < now
-                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
-                                    
-                                    if (taxGroup != null)
-                                    {
-                                        CurrentOutOfferPos.SalesTax = taxGroup.SalesTax;
-                                        CurrentOutOfferPos.MDCountrySalesTaxMDMaterialGroup = taxGroup;
-                                    }
-                                    else
-                                    {
-                                        var mainTax = CurrentOutOffer.BillingCompanyAddress.MDCountry.MDCountrySalesTax_MDCountry
-                                                                     .FirstOrDefault(c => !c.MDCountrySalesTaxMaterial_MDCountrySalesTax.Any() 
-                                                                                       && !c.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.Any()
-                                                                                       && c.DateFrom < now
-                                                                                       && (!c.DateTo.HasValue || c.DateTo > now));
-
-                                        if (mainTax != null)
-                                        {
-                                            CurrentOutOfferPos.SalesTax = mainTax.SalesTax;
-                                            CurrentOutOfferPos.MDCountrySalesTax = mainTax;
-                                        }
-                                    }
-                                    
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case "TargetQuantityUOM":
-                case "MDUnitID":
-                    {
-                        if (CurrentOutOfferPos != null && CurrentOutOfferPos.Material != null)
-                        {
-                            CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertToBaseQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-                            //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
-                        }
-                    }
-                    break;
-                case "PriceNet":
-                    {
-                        if (CurrentOutOffer != null)
-                        {
-                            CurrentOutOffer.OnPricePropertyChanged();
-                        }
-                        if(CurrentOutOfferPos != null)
-                        {
-                            CurrentOutOfferPos.OnEntityPropertyChanged("SalesTaxAmount");
-                            CurrentOutOfferPos.PriceGross = CurrentOutOfferPos.PriceNet + (decimal)CurrentOutOfferPos.SalesTaxAmount;
-                        }
-                    }
-                    break;
-                case "SalesTax":
-                    {
-                        if (CurrentOutOfferPos != null)
-                        {
-                            CurrentOutOfferPos.OnEntityPropertyChanged("SalesTaxAmount");
-                            CurrentOutOfferPos.PriceGross = CurrentOutOfferPos.PriceNet + (decimal)CurrentOutOfferPos.SalesTaxAmount;
-                        }
-                    }
-                    break;
+                CurrentOutOffer.OnPricePropertyChanged();
             }
         }
 
@@ -462,7 +403,7 @@ namespace gip.bso.sales
             set
             {
                 _SelectedPriceListMaterial = value;
-                if(_SelectedPriceListMaterial != null)
+                if (_SelectedPriceListMaterial != null)
                 {
                     CurrentOutOfferPos.PriceNet = _SelectedPriceListMaterial.Price;
                 }
@@ -485,7 +426,6 @@ namespace gip.bso.sales
                 OnPropertyChanged("PriceListMaterialItems");
             }
         }
-
 
         #endregion
 
@@ -550,7 +490,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(OutOffer.ClassName, "en{'New version'}de{'Neue Version'}", (short)MISort.New+1, true, "", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOffer.ClassName, "en{'New version'}de{'Neue Version'}", (short)MISort.New + 1, true, "", Global.ACKinds.MSMethodPrePost)]
         public void NewVersion()
         {
             OutOffer newOfferVersion = OutOffer.NewACObject(DatabaseApp, null, CurrentOutOffer.OutOfferNo);
@@ -618,7 +558,7 @@ namespace gip.bso.sales
             outOffer.OutOfferPos_OutOffer.Add(newPos);
             DatabaseApp.OutOfferPos.AddObject(newPos);
 
-            foreach(OutOfferPos subPos in pos.OutOfferPos_GroupOutOfferPos)
+            foreach (OutOfferPos subPos in pos.OutOfferPos_GroupOutOfferPos)
             {
                 NewVersionPos(outOffer, subPos, newPos);
             }
@@ -660,8 +600,8 @@ namespace gip.bso.sales
             if (!PreExecute("LoadOutOfferPos")) return;
             // Laden des aktuell selektierten OutOfferPos 
             CurrentOutOfferPos = (from c in CurrentOutOffer.OutOfferPos_OutOffer
-                                     where c.OutOfferPosID == SelectedOutOfferPos.OutOfferPosID
-                                     select c).First();
+                                  where c.OutOfferPosID == SelectedOutOfferPos.OutOfferPosID
+                                  select c).First();
             PostExecute("LoadOutOfferPos");
         }
 
@@ -736,7 +676,7 @@ namespace gip.bso.sales
         public void OutOrderPosUp()
         {
             int sequencePre = 0;
-            if(CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
+            if (CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
             {
                 var posPre = CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos
                                                  .Where(c => c.Sequence < CurrentOutOfferPos.Sequence).OrderByDescending(x => x.Sequence)
@@ -823,11 +763,11 @@ namespace gip.bso.sales
 
             List<OutOfferPos> posData = new List<OutOfferPos>();
 
-            foreach(var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
+            foreach (var outOfferPos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.GroupOutOfferPosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posData.Add(outOfferPos);
                 BuildOutOfferPosDataRecursive(posData, outOfferPos.Items);
-                if(outOfferPos.GroupSum)
+                if (outOfferPos.GroupSum)
                 {
                     OutOfferPos sumPos = new OutOfferPos();
                     sumPos.Total = outOfferPos.Items.Sum(c => c.TotalPrice).ToString("N");
@@ -853,10 +793,10 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            if(printingPhase == ACPrintingPhase.Started)
+            if (printingPhase == ACPrintingPhase.Started)
             {
                 ReportDocument doc = reportEngine as ReportDocument;
-                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null 
+                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null
                                                                                  && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn"))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
@@ -879,7 +819,7 @@ namespace gip.bso.sales
         private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
         {
             OutOfferPos pos = e.ParentDataRow as OutOfferPos;
-            if(pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
+            if (pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
             {
                 var inlineCell = e.FlowDocObj as InlineTableCellValue;
                 if (inlineCell != null)
@@ -888,7 +828,7 @@ namespace gip.bso.sales
                     if (tableCell != null)
                     {
                         if (inlineCell.VBContent == "Total")
-                         {
+                        {
                             tableCell.BorderBrush = Brushes.Black;
                             tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
                         }

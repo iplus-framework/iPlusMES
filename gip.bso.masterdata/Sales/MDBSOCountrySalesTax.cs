@@ -598,7 +598,7 @@ namespace gip.bso.masterdata
                         .MDCountrySalesTax
                         .Where(c =>
                                     c.MDCountrySalesTaxID != SelectedMDCountrySalesTax.MDCountrySalesTaxID
-                                    && c.MDCountryID != SelectedMDCountrySalesTax.MDCountryID
+                                    && c.MDCountryID == SelectedMDCountrySalesTax.MDCountryID
                                     &&
                                     (
                                         c.DateFrom <= SelectedMDCountrySalesTax.DateFrom && (c.DateTo ?? DateTime.Now) >= SelectedMDCountrySalesTax.DateFrom

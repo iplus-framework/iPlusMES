@@ -32,7 +32,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOfferPos.ClassName, "en{'Offer Position'}de{'Angebotsposition'}", typeof(OutOfferPos), OutOfferPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOfferPos>) })]
-    public partial class OutOfferPos
+    public partial class OutOfferPos : IOutOrderPos
     {
         public const string ClassName = "OutOfferPos";
 
@@ -150,7 +150,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return Sequence.ToString() + " " + Material.ACCaption;
+                return Sequence.ToString() + " " + Material?.ACCaption;
             }
         }
 

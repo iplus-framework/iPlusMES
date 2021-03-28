@@ -26,7 +26,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + InvoicePos.ClassName, ConstApp.ESInvoicePos, typeof(InvoicePos), InvoicePos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<InvoicePos>) })]
-    public partial class InvoicePos
+    public partial class InvoicePos : IOutOrderPos
     {
         public const string ClassName = "InvoicePos";
         #region New/Delete
@@ -203,6 +203,16 @@ namespace gip.mes.datamodel
             {
                 _TempReportData = value;
                 OnPropertyChanged("TempReportData");
+            }
+        }
+
+
+        [ACPropertyInfo(999, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
+        public double SalesTaxAmount
+        {
+            get
+            {
+                return (double)PriceNet * (SalesTax / 100);
             }
         }
         #endregion

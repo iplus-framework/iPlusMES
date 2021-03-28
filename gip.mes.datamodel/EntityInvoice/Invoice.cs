@@ -27,7 +27,7 @@ namespace gip.mes.datamodel
         {
                 new object[] {Const.QueryPrefix +  InvoicePos.ClassName, ConstApp.ESInvoicePos, typeof(InvoicePos), InvoicePos.ClassName + "_" + InvoicePos.ClassName, "Sequence", "Sequence", new object[]
                     {
-                        
+
                     }
                 }
         })
@@ -132,7 +132,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        
+
         #endregion
 
         #region IEntityProperty Members
@@ -167,6 +167,13 @@ namespace gip.mes.datamodel
                 _TempReportData = value;
                 OnPropertyChanged("TempReportData");
             }
+        }
+
+        public void OnPricePropertyChanged()
+        {
+            OnPropertyChanged("PosPriceNetTotal");
+            OnPropertyChanged("PosPriceNetDiscount");
+            OnPropertyChanged("PosPriceNetSum");
         }
         #endregion
 

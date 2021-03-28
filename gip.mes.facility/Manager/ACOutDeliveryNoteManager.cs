@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Data.Objects;
+using System.ComponentModel;
 
 namespace gip.mes.facility
 {
@@ -242,7 +243,6 @@ namespace gip.mes.facility
             return null;
         }
         #endregion
-
 
         #region Delivery-Note
 
@@ -624,6 +624,104 @@ namespace gip.mes.facility
 
             PostExecute("GenerateInvoice");
             return null;
+        }
+
+        [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrderPos posItem, CompanyAddress billingCompanyAddress)
+        {
+            switch (propertyName)
+            {
+                case "MaterialID":
+                    {
+                        callerObject.OnPropertyChanged("MDUnitList");
+                        if (posItem.Material != null && posItem.Material.BaseMDUnit != null)
+                            callerObject.CurrentMDUnit = posItem.Material.BaseMDUnit;
+                        else
+                            callerObject.CurrentMDUnit = null;
+                        OnPropertyChanged("CurrentOutOfferPos");
+
+                        if (posItem.Material != null)
+                        {
+                            DateTime now = DateTime.Now;
+
+                            callerObject.SelectedPriceListMaterial = null;
+                            callerObject.PriceListMaterialItems = databaseApp.PriceListMaterial.Where(c => c.MaterialID == posItem.Material.MaterialID && c.PriceList.DateFrom < now
+                                                                                         && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)).ToList();
+
+                            if (billingCompanyAddress != null)
+                            {
+
+                                var tax = posItem.Material.MDCountrySalesTaxMaterial_Material
+                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == billingCompanyAddress.MDCountryID
+                                                                                       && c.MDCountrySalesTax.DateFrom < now
+                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
+                                if (tax != null)
+                                {
+                                    posItem.SalesTax = tax.SalesTax;
+                                    posItem.MDCountrySalesTaxMaterial = tax;
+                                }
+                                else
+                                {
+                                    var taxGroup = posItem.Material.MDMaterialGroup.MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
+                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == billingCompanyAddress.MDCountryID
+                                                                                       && c.MDCountrySalesTax.DateFrom < now
+                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
+
+                                    if (taxGroup != null)
+                                    {
+                                        posItem.SalesTax = taxGroup.SalesTax;
+                                        posItem.MDCountrySalesTaxMDMaterialGroup = taxGroup;
+                                    }
+                                    else
+                                    {
+                                        var mainTax = billingCompanyAddress.MDCountry.MDCountrySalesTax_MDCountry
+                                                                     .FirstOrDefault(c => !c.MDCountrySalesTaxMaterial_MDCountrySalesTax.Any()
+                                                                                       && !c.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.Any()
+                                                                                       && c.DateFrom < now
+                                                                                       && (!c.DateTo.HasValue || c.DateTo > now));
+
+                                        if (mainTax != null)
+                                        {
+                                            posItem.SalesTax = mainTax.SalesTax;
+                                            posItem.MDCountrySalesTax = mainTax;
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "TargetQuantityUOM":
+                case "MDUnitID":
+                    {
+                        if (posItem != null && posItem.Material != null)
+                        {
+                            posItem.TargetQuantity = posItem.Material.ConvertToBaseQuantity(posItem.TargetQuantityUOM, posItem.MDUnit);
+                            //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                        }
+                    }
+                    break;
+                case "PriceNet":
+                    {
+                        callerObject.OnPricePropertyChanged();
+                        if (posItem != null)
+                        {
+                            posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                            posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                        }
+                    }
+                    break;
+                case "SalesTax":
+                    {
+                        if (posItem != null)
+                        {
+                            posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                            posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                        }
+                    }
+                    break;
+            }
         }
 
         #endregion

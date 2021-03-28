@@ -23,7 +23,7 @@ namespace gip.bso.sales
     /// </summary>
     [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order'}de{'Kundenauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrder.ClassName)]
     [ACQueryInfo(Const.PackName_VarioSales, Const.QueryPrefix + "OutOpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}", typeof(OutOrderPos), OutOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "Material\\MaterialNo,TargetDeliveryDate")]
-    public class BSOOutOrder : ACBSOvbNav
+    public class BSOOutOrder : ACBSOvbNav, IOutOrderPosBSO
     {
         #region c´tors
 
@@ -74,7 +74,7 @@ namespace gip.bso.sales
 
             bool result = base.ACDeInit(deleteACClassTask);
 
-            
+
             if (_AccessOutOrderPos != null)
             {
                 _AccessOutOrderPos.ACDeInit(false);
@@ -202,6 +202,7 @@ namespace gip.bso.sales
         #endregion
 
         #region BSO->ACProperty
+
         #region 1. OutOrder
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOrder> _AccessPrimary;
@@ -242,16 +243,16 @@ namespace gip.bso.sales
         {
             get
             {
-                if (AccessPrimary == null) 
-                    return null; 
+                if (AccessPrimary == null)
+                    return null;
                 return AccessPrimary.Current;
             }
             set
             {
                 if (CurrentOutOrder != null)
                     CurrentOutOrder.PropertyChanged -= CurrentOutOrder_PropertyChanged;
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.Current = value;
 
                 if (CurrentOutOrder != null)
@@ -291,6 +292,14 @@ namespace gip.bso.sales
             }
         }
 
+        public void OnPricePropertyChanged()
+        {
+            if (CurrentOutOrder != null)
+            {
+                CurrentOutOrder.OnPricePropertyChanged();
+            }
+        }
+
         [ACPropertyList(601, OutOrder.ClassName)]
         public IEnumerable<OutOrder> OutOrderList
         {
@@ -305,14 +314,14 @@ namespace gip.bso.sales
         {
             get
             {
-                if (AccessPrimary == null) 
-                    return null; 
+                if (AccessPrimary == null)
+                    return null;
                 return AccessPrimary.Selected;
             }
             set
             {
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.Selected = value;
                 OnPropertyChanged("SelectedOutOrder");
             }
@@ -362,16 +371,7 @@ namespace gip.bso.sales
 
         void CurrentOutOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
-            {
-                case "MaterialID":
-                    {
-                        if (CurrentOutOrderPos.Material != null && CurrentOutOrderPos.Material.BaseMDUnit != null)
-                            CurrentMDUnit = CurrentOutOrderPos.Material.BaseMDUnit;
-                        OnPropertyChanged("CurrentOutOrderPos");
-                    }
-                    break;
-            }
+            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOrderPos, CurrentOutOrder?.BillingCompanyAddress);
         }
 
         [ACPropertyList(604, OutOrderPos.ClassName)]
@@ -914,6 +914,42 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Properties => Pricelist
+
+        private PriceListMaterial _SelectedPriceListMaterial;
+        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}")]
+        public PriceListMaterial SelectedPriceListMaterial
+        {
+            get => _SelectedPriceListMaterial;
+            set
+            {
+                _SelectedPriceListMaterial = value;
+                if (_SelectedPriceListMaterial != null)
+                {
+                    CurrentOutOrderPos.PriceNet = _SelectedPriceListMaterial.Price;
+                }
+                _SelectedPriceListMaterial = null;
+                OnPropertyChanged("SelectedPriceListMaterial");
+            }
+        }
+
+        private List<PriceListMaterial> _PriceListMaterialItems;
+        [ACPropertyList(671, "PriceListMaterial")]
+        public List<PriceListMaterial> PriceListMaterialItems
+        {
+            get
+            {
+                return _PriceListMaterialItems;
+            }
+            set
+            {
+                _PriceListMaterialItems = value;
+                OnPropertyChanged("PriceListMaterialItems");
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -1038,7 +1074,7 @@ namespace gip.bso.sales
         [ACMethodInteraction(OutOrder.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
-            if (!PreExecute("New")) 
+            if (!PreExecute("New"))
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOrder), OutOrder.NoColumnName, OutOrder.FormatNewNo, this);
             CurrentOutOrder = OutOrder.NewACObject(DatabaseApp, null, secondaryKey);
@@ -1059,7 +1095,7 @@ namespace gip.bso.sales
         [ACMethodInteraction(OutOrder.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if (!PreExecute("Delete")) 
+            if (!PreExecute("Delete"))
                 return;
             Msg msg = CurrentOutOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
@@ -1067,8 +1103,8 @@ namespace gip.bso.sales
                 Messages.Msg(msg);
                 return;
             }
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavList.Remove(CurrentOutOrder);
             SelectedOutOrder = AccessPrimary.NavList.FirstOrDefault();
             Load();
@@ -1084,8 +1120,8 @@ namespace gip.bso.sales
         [ACMethodCommand(OutOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("OutOrderList");
         }
@@ -1097,7 +1133,7 @@ namespace gip.bso.sales
         [ACMethodInteraction(OutOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
         public void NewOutOrderPos()
         {
-            if (!PreExecute("NewOutOrderPos")) 
+            if (!PreExecute("NewOutOrderPos"))
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var outOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder);
@@ -1115,7 +1151,7 @@ namespace gip.bso.sales
         [ACMethodInteraction(OutOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
         public void DeleteOutOrderPos()
         {
-            if (!PreExecute("DeleteOutOrderPos")) 
+            if (!PreExecute("DeleteOutOrderPos"))
                 return;
             if (IsEnabledUnAssignContractPos())
             {
@@ -1170,7 +1206,7 @@ namespace gip.bso.sales
         {
             if (!IsEnabledLoadCompanyMaterialPickup())
                 return;
-            if (!PreExecute("LoadCompanyMaterialPickup")) 
+            if (!PreExecute("LoadCompanyMaterialPickup"))
                 return;
             // Laden des aktuell selektierten CompanyMaterialPickup 
             CurrentCompanyMaterialPickup = CurrentOutOrderPos.CompanyMaterialPickup_OutOrderPos
@@ -1187,7 +1223,7 @@ namespace gip.bso.sales
         [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
         public void NewCompanyMaterialPickup()
         {
-            if (!PreExecute("NewCompanyMaterialPickup")) 
+            if (!PreExecute("NewCompanyMaterialPickup"))
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var companyMaterialPickup = CompanyMaterialPickup.NewACObject(DatabaseApp, CurrentOutOrderPos);
@@ -1208,7 +1244,7 @@ namespace gip.bso.sales
         [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete Pick Up'}de{'Verladestamm löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
         public void DeleteCompanyMaterialPickup()
         {
-            if (!PreExecute("DeleteCompanyMaterialPickup")) 
+            if (!PreExecute("DeleteCompanyMaterialPickup"))
                 return;
             Msg msg = CurrentCompanyMaterialPickup.DeleteACObject(DatabaseApp, true);
             if (msg != null)

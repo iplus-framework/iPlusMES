@@ -83,7 +83,9 @@
     <Compile Include="ACInterfaces\Document\DocumentSettings.cs" />
     <Compile Include="ACInterfaces\Document\DocumentTypesEnum.cs" />
     <Compile Include="ACInterfaces\Document\DoumentFilter.cs" />
+    <Compile Include="ACInterfaces\IOutOrderPos.cs" />
     <Compile Include="ACInterfaces\FacilityManager\IFacilityManager.cs" />
+    <Compile Include="ACInterfaces\IOutOrderPosBSO.cs" />
     <Compile Include="ACInterfaces\ITargetQuantity.cs" />
     <Compile Include="ACInterfaces\PartslistPos\IPartslist.cs" />
     <Compile Include="ACInterfaces\PartslistPos\IPartslistPosRelation.cs" />
@@ -399,6 +401,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DbScripts\iPlusMES\dbsync_2021-03-24_15-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-03-26_18-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

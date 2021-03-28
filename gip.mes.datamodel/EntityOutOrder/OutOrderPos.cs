@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOrderPos.ClassName, "en{'Sales Order Pos.'}de{'Auftragsposition'}", typeof(OutOrderPos), OutOrderPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOrderPos>) })]
-    public partial class OutOrderPos
+    public partial class OutOrderPos : IOutOrderPos
     {
         public const string ClassName = "OutOrderPos";
 
@@ -285,6 +285,14 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(999, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
+        public double SalesTaxAmount
+        {
+            get
+            {
+                return (double)PriceNet * (SalesTax / 100);
+            }
+        }
 
         #region partial methods
         bool _OnCalledUpQuantityChanging = false;
