@@ -232,25 +232,7 @@ namespace gip.bso.sales
             OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOfferPos, CurrentOutOffer?.BillingCompanyAddress);
             if (e.PropertyName == "PriceGross")
             {
-                if (CurrentOutOffer.PosPriceNetDiscount < 0)
-                {
-                    var percent = (Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100;
-
-                    TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
-                                                     .Where(c => c.PriceNet > 0)
-                                                     .Select(x => new Tuple<float, double>(x.SalesTax, ((double)x.PriceNet - ((double)x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
-                                                     .GroupBy(t => t.Item1)
-                                                     .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.Item2) })
-                                                     .ToList();
-                }
-                else
-                {
-                    TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
-                                                     .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
-                                                     .GroupBy(g => g.SalesTax)
-                                                     .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.SalesTaxAmount) })
-                                                     .ToList();
-                }
+                CalculateTaxOverview();
 
                 double totalTax = TaxOverviewList.Sum(c => c.SalesTax);
 
@@ -698,6 +680,12 @@ namespace gip.bso.sales
             if (CurrentOutOffer != null)
             {
                 CurrentOutOffer.OnPricePropertyChanged();
+                CalculateTaxOverview();
+
+                double totalTax = TaxOverviewList.Sum(c => c.SalesTax);
+
+                CurrentOutOffer.PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal;
+                CurrentOutOffer.PriceGross = (decimal)(CurrentOutOffer.PosPriceNetTotal + totalTax);
             }
         }
 
@@ -788,6 +776,29 @@ namespace gip.bso.sales
                    : CurrentOutOfferPos.Sequence < CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Max(x => x.Sequence);
         }
 
+        private void CalculateTaxOverview()
+        {
+            if (CurrentOutOffer.PosPriceNetDiscount < 0)
+            {
+                var percent = (Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100;
+
+                TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
+                                                 .Where(c => c.PriceNet > 0)
+                                                 .Select(x => new Tuple<float, double>(x.SalesTax, ((double)x.PriceNet - ((double)x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
+                                                 .GroupBy(t => t.Item1)
+                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.Item2) })
+                                                 .ToList();
+            }
+            else
+            {
+                TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
+                                                 .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
+                                                 .GroupBy(g => g.SalesTax)
+                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.SalesTaxAmount) })
+                                                 .ToList();
+            }
+        }
+
         #region Methods => Report
 
         private void BuildOutOfferPosData()
@@ -816,29 +827,11 @@ namespace gip.bso.sales
             OutOfferPosDiscountList = CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
             if(OutOfferPosDiscountList != null && OutOfferPosDiscountList.Any())
             {
-                OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
+                //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
                 OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Zwischensumme inkl. Rabatt:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal });
             }
 
-            if (CurrentOutOffer.PosPriceNetDiscount < 0)
-            {
-                var percent = (Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100;
-
-                TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
-                                                 .Where(c => c.PriceNet > 0)
-                                                 .Select(x => new Tuple<float, double>(x.SalesTax, ((double)x.PriceNet - ((double)x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
-                                                 .GroupBy(t => t.Item1)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.Item2) })
-                                                 .ToList();
-            }
-            else
-            {
-                TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
-                                                 .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
-                                                 .GroupBy(g => g.SalesTax)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.SalesTaxAmount) })
-                                                 .ToList();
-            }
+            CalculateTaxOverview();
         }
 
         private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)

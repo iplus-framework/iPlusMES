@@ -107,7 +107,7 @@ namespace gip.mes.datamodel
             int sequence = Sequence;
             OutOffer outOffer = OutOffer;
             database.DeleteObject(this);
-            OutOfferPos.RenumberSequence(outOffer, sequence);
+            OutOfferPos.RenumberSequence(outOffer, sequence, OutOfferPos1_GroupOutOfferPos);
             return null;
         }
 
