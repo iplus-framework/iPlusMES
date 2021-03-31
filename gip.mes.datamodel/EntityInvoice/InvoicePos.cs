@@ -72,21 +72,7 @@ namespace gip.mes.datamodel
             if (invoice.InvoicePos_Invoice.IsLoaded)
                 invoice.InvoicePos_Invoice.Remove(this);
             database.DeleteObject(this);
-            InvoicePos.RenumberSequence(Invoice, sequence);
             return null;
-        }
-
-        /// <summary>
-        /// Handling von Sequencenummer ist nach dem Löschen aufzurufen
-        /// </summary>
-        public static void RenumberSequence(Invoice invoice, int sequence)
-        {
-            var elements = from c in invoice.InvoicePos_Invoice where c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted orderby c.Sequence select c;
-            foreach (var element in elements)
-            {
-                element.Sequence = sequence;
-                sequence++;
-            }
         }
 
         #endregion
@@ -212,9 +198,11 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return (double)PriceNet * (SalesTax / 100);
+                return (double)PriceNet * SalesTax;
             }
         }
+
+        public bool InRecalculation { get; set; }
         #endregion
 
     }

@@ -629,99 +629,162 @@ namespace gip.mes.facility
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrderPos posItem, CompanyAddress billingCompanyAddress)
         {
-            switch (propertyName)
-            {
-                case "MaterialID":
-                    {
-                        callerObject.OnPropertyChanged("MDUnitList");
-                        if (posItem.Material != null && posItem.Material.BaseMDUnit != null)
-                            callerObject.CurrentMDUnit = posItem.Material.BaseMDUnit;
-                        else
-                            callerObject.CurrentMDUnit = null;
-                        OnPropertyChanged("CurrentOutOfferPos");
-
-                        if (posItem.Material != null)
+            if (posItem != null)
+                switch (propertyName)
+                {
+                    case "MaterialID":
                         {
-                            DateTime now = DateTime.Now;
+                            posItem.InRecalculation = true;
+                            callerObject.OnPropertyChanged("MDUnitList");
+                            if (posItem.Material != null && posItem.Material.BaseMDUnit != null)
+                                callerObject.CurrentMDUnit = posItem.Material.BaseMDUnit;
+                            else
+                                callerObject.CurrentMDUnit = null;
+                            OnPropertyChanged("CurrentOutOfferPos");
 
-                            callerObject.SelectedPriceListMaterial = null;
-                            callerObject.PriceListMaterialItems = databaseApp.PriceListMaterial.Where(c => c.MaterialID == posItem.Material.MaterialID && c.PriceList.DateFrom < now
-                                                                                         && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)).ToList();
-
-                            if (billingCompanyAddress != null)
+                            if (posItem.Material != null)
                             {
 
-                                var tax = posItem.Material.MDCountrySalesTaxMaterial_Material
-                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == billingCompanyAddress.MDCountryID
-                                                                                       && c.MDCountrySalesTax.DateFrom < now
-                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
-                                if (tax != null)
-                                {
-                                    posItem.SalesTax = tax.SalesTax;
-                                    posItem.MDCountrySalesTaxMaterial = tax;
-                                }
-                                else
-                                {
-                                    var taxGroup = posItem.Material.MDMaterialGroup.MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
-                                                                     .FirstOrDefault(c => c.MDCountrySalesTax.MDCountryID == billingCompanyAddress.MDCountryID
-                                                                                       && c.MDCountrySalesTax.DateFrom < now
-                                                                                       && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > now));
+                                // TODO: scenario if past document is updated: Valid time is document time
+                                DateTime now = DateTime.Now;
 
-                                    if (taxGroup != null)
+                                callerObject.SelectedPriceListMaterial = null;
+                                callerObject.PriceListMaterialItems = databaseApp.PriceListMaterial.Where(c => c.MaterialID == posItem.Material.MaterialID && c.PriceList.DateFrom < now
+                                                                                             && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)).ToList();
+
+                                if (billingCompanyAddress != null)
+                                {
+
+                                    CountrySalesTaxModel countrySalesTaxModel = GetCountrSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
+
+                                    if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null)
                                     {
-                                        posItem.SalesTax = taxGroup.SalesTax;
-                                        posItem.MDCountrySalesTaxMDMaterialGroup = taxGroup;
+                                        posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax;
+                                        posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
                                     }
-                                    else
+                                    else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null)
                                     {
-                                        var mainTax = billingCompanyAddress.MDCountry.MDCountrySalesTax_MDCountry
-                                                                     .FirstOrDefault(c => !c.MDCountrySalesTaxMaterial_MDCountrySalesTax.Any()
-                                                                                       && !c.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax.Any()
-                                                                                       && c.DateFrom < now
-                                                                                       && (!c.DateTo.HasValue || c.DateTo > now));
-
-                                        if (mainTax != null)
-                                        {
-                                            posItem.SalesTax = mainTax.SalesTax;
-                                            posItem.MDCountrySalesTax = mainTax;
-                                        }
+                                        posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax;
+                                        posItem.MDCountrySalesTaxMDMaterialGroup = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup;
+                                    }
+                                    else if (countrySalesTaxModel.MDCountrySalesTax != null)
+                                    {
+                                        posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTax.SalesTax;
+                                        posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
                                     }
 
+                                    if (posItem.SalesTax > 0)
+                                        posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
                                 }
                             }
+                            posItem.InRecalculation = false;
                         }
-                    }
-                    break;
-                case "TargetQuantityUOM":
-                case "MDUnitID":
-                    {
-                        if (posItem != null && posItem.Material != null)
+                        break;
+                    case "TargetQuantityUOM":
+                    case "MDUnitID":
                         {
-                            posItem.TargetQuantity = posItem.Material.ConvertToBaseQuantity(posItem.TargetQuantityUOM, posItem.MDUnit);
-                            //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                            if (posItem.Material != null)
+                            {
+                                posItem.TargetQuantity = posItem.Material.ConvertToBaseQuantity(posItem.TargetQuantityUOM, posItem.MDUnit);
+                                //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
+                            }
                         }
-                    }
-                    break;
-                case "PriceNet":
-                    {
-                        callerObject.OnPricePropertyChanged();
-                        if (posItem != null)
+                        break;
+                    case "PriceNet":
                         {
-                            posItem.OnEntityPropertyChanged("SalesTaxAmount");
-                            posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                            if (!posItem.InRecalculation)
+                            {
+                                posItem.InRecalculation = true;
+                                posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                                posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                                callerObject.OnPricePropertyChanged();
+                                posItem.InRecalculation = false;
+                            }
                         }
-                    }
-                    break;
-                case "SalesTax":
-                    {
-                        if (posItem != null)
+                        break;
+                    case "PriceGross":
                         {
-                            posItem.OnEntityPropertyChanged("SalesTaxAmount");
-                            posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                            if (!posItem.InRecalculation)
+                            {
+                                posItem.InRecalculation = true;
+                                posItem.PriceNet = posItem.PriceGross - (decimal)posItem.SalesTaxAmount;
+                                posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                                callerObject.OnPricePropertyChanged();
+                                posItem.InRecalculation = false;
+                            }
                         }
-                    }
-                    break;
-            }
+                        break;
+                    case "SalesTax":
+                        {
+                            if (!posItem.InRecalculation)
+                            {
+                                posItem.InRecalculation = true;
+                                posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                                posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+
+                                if (posItem.MDCountrySalesTaxMaterial != null
+                                   || posItem.MDCountrySalesTaxMDMaterialGroup != null
+                                   || posItem.MDCountrySalesTax != null)
+                                {
+                                    if (posItem.MDCountrySalesTaxMaterial != null && posItem.MDCountrySalesTax.SalesTax != posItem.SalesTax)
+                                        posItem.MDCountrySalesTaxMaterial = null;
+                                    else if (posItem.MDCountrySalesTaxMDMaterialGroup != null && posItem.MDCountrySalesTaxMDMaterialGroup.SalesTax != posItem.SalesTax)
+                                        posItem.MDCountrySalesTaxMDMaterialGroup = null;
+                                    else if (posItem.MDCountrySalesTax != null && posItem.MDCountrySalesTax.SalesTax != posItem.SalesTax)
+                                        posItem.MDCountrySalesTax = null;
+                                }
+                                else if (billingCompanyAddress != null)
+                                {
+                                    DateTime now = DateTime.Now;
+                                    CountrySalesTaxModel countrySalesTaxModel = GetCountrSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
+                                    if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null && countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax == posItem.SalesTax)
+                                        posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
+                                    else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null && countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax == posItem.SalesTax)
+                                        posItem.MDCountrySalesTaxMDMaterialGroup = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup;
+                                    else if (countrySalesTaxModel.MDCountrySalesTax != null && countrySalesTaxModel.MDCountrySalesTax.SalesTax == posItem.SalesTax)
+                                        posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
+                                }
+
+                                posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                                posItem.InRecalculation = false;
+                            }
+                        }
+                        break;
+                }
+        }
+
+
+        public CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
+        {
+            CountrySalesTaxModel model = new CountrySalesTaxModel();
+            model.MDCountrySalesTax =
+                   country
+                   .MDCountrySalesTax_MDCountry
+                   .FirstOrDefault(c =>
+                           c.MDCountryID == country.MDCountryID
+                           && c.DateFrom < dateTime
+                           && (!c.DateTo.HasValue || c.DateTo > dateTime)
+                   );
+
+            model.MDCountrySalesTaxMDMaterialGroup =
+                material
+                .MDMaterialGroup
+                .MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup
+                .FirstOrDefault(c =>
+                        c.MDCountrySalesTax.MDCountryID == country.MDCountryID
+                        && c.MDCountrySalesTax.DateFrom < dateTime
+                        && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > dateTime)
+                );
+
+            model.MDCountrySalesTaxMaterial =
+                material
+                .MDCountrySalesTaxMaterial_Material
+                .FirstOrDefault(c =>
+                        c.MDCountrySalesTax.MDCountryID == country.MDCountryID
+                        && c.MDCountrySalesTax.DateFrom < dateTime
+                        && (!c.MDCountrySalesTax.DateTo.HasValue || c.MDCountrySalesTax.DateTo > dateTime)
+                );
+            return model;
         }
 
         #endregion

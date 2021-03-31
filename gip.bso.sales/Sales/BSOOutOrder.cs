@@ -371,7 +371,8 @@ namespace gip.bso.sales
 
         void CurrentOutOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOrderPos, CurrentOutOrder?.BillingCompanyAddress);
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOrderPos, CurrentOutOrder?.BillingCompanyAddress);
         }
 
         [ACPropertyList(604, OutOrderPos.ClassName)]

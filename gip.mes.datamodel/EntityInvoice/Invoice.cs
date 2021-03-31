@@ -151,6 +151,8 @@ namespace gip.mes.datamodel
                 ACProperties.Refresh();
         }
 
+
+
         #endregion
 
         #region Additional
@@ -174,6 +176,21 @@ namespace gip.mes.datamodel
             OnPropertyChanged("PosPriceNetTotal");
             OnPropertyChanged("PosPriceNetDiscount");
             OnPropertyChanged("PosPriceNetSum");
+        }
+
+
+        /// <summary>
+        /// Handling von Sequencenummer ist nach dem Löschen aufzurufen
+        /// </summary>
+        public void RenumberSequence(int sequence)
+        {
+            var elements = from c in InvoicePos_Invoice where c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted orderby c.Sequence select c;
+            int nr = 0;
+            foreach (var element in elements)
+            {
+                element.Sequence = sequence;
+                sequence++;
+            }
         }
         #endregion
 

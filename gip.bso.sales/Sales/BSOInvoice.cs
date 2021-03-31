@@ -338,7 +338,8 @@ namespace gip.bso.sales
 
         void CurrentInvoicePos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoicePos, CurrentInvoice?.BillingCompanyAddress);
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoicePos, CurrentInvoice?.BillingCompanyAddress);
         }
 
         public void OnPricePropertyChanged()
@@ -1031,6 +1032,7 @@ namespace gip.bso.sales
                     Messages.Msg(msg);
                     return;
                 }
+                CurrentInvoice.RenumberSequence(1);
                 OnPropertyChanged("InvoicePosList");
             }
             PostExecute("DeleteInvoicePos");
@@ -1085,7 +1087,7 @@ namespace gip.bso.sales
                 pos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
                 pos.Material = CurrentOpenContractPos.Material;
                 pos.TargetQuantityUOM = quantity;
-                InvoicePos.RenumberSequence(pos.Invoice, 1);
+                CurrentInvoice.RenumberSequence(1);
             }
 
             if (_UnSavedUnAssignedContractPos.Contains(CurrentOpenContractPos))

@@ -290,9 +290,11 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return (double)PriceNet * (SalesTax / 100);
+                return (double)PriceNet * SalesTax;
             }
         }
+
+        public bool InRecalculation { get; set; }
 
         #region partial methods
         bool _OnCalledUpQuantityChanging = false;

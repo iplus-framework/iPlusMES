@@ -229,7 +229,8 @@ namespace gip.bso.sales
 
         void CurrentOutOfferPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOfferPos, CurrentOutOffer?.BillingCompanyAddress);
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOfferPos, CurrentOutOffer?.BillingCompanyAddress);
             if (e.PropertyName == "PriceGross")
             {
                 CalculateTaxOverview();
@@ -825,7 +826,7 @@ namespace gip.bso.sales
 
             OutOfferPosDataList = posData;
             OutOfferPosDiscountList = CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
-            if(OutOfferPosDiscountList != null && OutOfferPosDiscountList.Any())
+            if (OutOfferPosDiscountList != null && OutOfferPosDiscountList.Any())
             {
                 //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
                 OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Zwischensumme inkl. Rabatt:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal });

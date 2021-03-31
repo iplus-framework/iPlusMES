@@ -16,7 +16,9 @@
 
         void OnEntityPropertyChanged(string property);
 
-        double SalesTaxAmount{ get; }
+        double SalesTaxAmount { get; }
+
+        bool InRecalculation { get; set; }
 
     }
 }
