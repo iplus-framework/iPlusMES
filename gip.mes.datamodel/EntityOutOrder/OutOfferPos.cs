@@ -242,7 +242,7 @@ namespace gip.mes.datamodel
 
         #region Report helper
 
-        [ACPropertyInfo (31)]
+        [ACPropertyInfo(31)]
         public List<OutOfferPos> Items
         {
             get
@@ -324,7 +324,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return (double)PriceNet * SalesTax;
+                return (double)PriceNet * (double)(SalesTax / 100);
             }
         }
 

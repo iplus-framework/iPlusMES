@@ -290,7 +290,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return (double)PriceNet * SalesTax;
+                return (double)PriceNet * (double)(SalesTax / 100);
             }
         }
 

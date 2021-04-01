@@ -12,7 +12,7 @@
         double TargetQuantity { get; set; }
         decimal PriceNet { get; set; }
         decimal PriceGross { get; set; }
-        float SalesTax { get; set; }
+        decimal SalesTax { get; set; }
 
         void OnEntityPropertyChanged(string property);
 

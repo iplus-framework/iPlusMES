@@ -1247,8 +1247,8 @@ namespace gip.bso.sales
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("DeliveryNoteList");
             RefreshOutOrderPosList();
@@ -1375,6 +1375,28 @@ namespace gip.bso.sales
             if (!DeliveryNotePosList.Any())
                 return false;
             return true;
+        }
+
+
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung machen'}", (short)MISort.Cancel)]
+        public void CreateInvoice()
+        {
+            if (!PreExecute("CreateInvoice"))
+                return;
+            if (Root.Messages.Question(this, "Question50058") == Global.MsgResult.OK)
+            {
+                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
+                if(msg != null && !msg.IsSucceded())
+                    Root.Messages.Msg(msg);
+            }
+            PostExecute("CreateInvoice");
+        }
+
+        public bool IsEnabledCreateInvoice()
+        {
+            return CurrentDeliveryNote != null
+                && OutDeliveryNoteManager != null
+                && !CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null);
         }
 
         #endregion

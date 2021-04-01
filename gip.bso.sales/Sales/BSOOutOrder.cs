@@ -1464,6 +1464,30 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Invoice
+
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung machen'}", (short)MISort.Cancel)]
+        public void CreateInvoice()
+        {
+            if (!PreExecute("CreateInvoice"))
+                return;
+            if (Root.Messages.Question(this, "Question50058") == Global.MsgResult.OK)
+            {
+                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder);
+                if(msg != null && !msg.IsSucceded())
+                    Root.Messages.Msg(msg);
+            }
+            PostExecute("CreateInvoice");
+        }
+
+        public bool IsEnabledCreateInvoice()
+        {
+            return CurrentOutOrder != null
+                && OutDeliveryNoteManager != null
+                && !CurrentOutOrder.OutOrderPos_OutOrder.SelectMany(c=>c.InvoicePos_OutOrderPos).Any();
+        }
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers

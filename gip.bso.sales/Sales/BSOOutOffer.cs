@@ -235,10 +235,10 @@ namespace gip.bso.sales
             {
                 CalculateTaxOverview();
 
-                double totalTax = TaxOverviewList.Sum(c => c.SalesTax);
+                decimal totalTax = TaxOverviewList.Sum(c => c.SalesTax);
 
                 CurrentOutOffer.PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal;
-                CurrentOutOffer.PriceGross = (decimal)(CurrentOutOffer.PosPriceNetTotal + totalTax);
+                CurrentOutOffer.PriceGross = ((decimal)CurrentOutOffer.PosPriceNetTotal + totalTax);
             }
         }
 
@@ -683,10 +683,10 @@ namespace gip.bso.sales
                 CurrentOutOffer.OnPricePropertyChanged();
                 CalculateTaxOverview();
 
-                double totalTax = TaxOverviewList.Sum(c => c.SalesTax);
+                decimal totalTax = TaxOverviewList.Sum(c => c.SalesTax);
 
                 CurrentOutOffer.PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal;
-                CurrentOutOffer.PriceGross = (decimal)(CurrentOutOffer.PosPriceNetTotal + totalTax);
+                CurrentOutOffer.PriceGross = ((decimal)CurrentOutOffer.PosPriceNetTotal + totalTax);
             }
         }
 
@@ -781,13 +781,13 @@ namespace gip.bso.sales
         {
             if (CurrentOutOffer.PosPriceNetDiscount < 0)
             {
-                var percent = (Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100;
+                var percent = (decimal)((Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100);
 
                 TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
                                                  .Where(c => c.PriceNet > 0)
-                                                 .Select(x => new Tuple<float, double>(x.SalesTax, ((double)x.PriceNet - ((double)x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
+                                                 .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
                                                  .GroupBy(t => t.Item1)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.Item2) })
+                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = o.Sum(s => s.Item2) })
                                                  .ToList();
             }
             else
@@ -795,7 +795,7 @@ namespace gip.bso.sales
                 TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
                                                  .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
                                                  .GroupBy(g => g.SalesTax)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (float)o.Sum(s => s.SalesTaxAmount) })
+                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount) })
                                                  .ToList();
             }
         }
