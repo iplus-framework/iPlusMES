@@ -2124,8 +2124,13 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledRecalcIntermediateSum()) return;
             ProdOrderPartslistPos lastIntermediateProduct = IntermediateList.Where(c => c.IsFinalMixure).FirstOrDefault();
-            ProdOrderManager.RecalcIntermediateItem(lastIntermediateProduct);
-            ProdOrderManager.RecalcRemainingQuantity(lastIntermediateProduct);
+            Global.MsgResult mr = Root.Messages.YesNoCancel(this, "Question50059", Global.MsgResult.Yes);
+            if (mr != Global.MsgResult.Cancel)
+            {
+                ProdOrderManager.RecalcIntermediateItem(lastIntermediateProduct, mr == Global.MsgResult.Yes);
+                ProdOrderManager.RecalcRemainingQuantity(lastIntermediateProduct);
+            }
+
             OnPropertyChanged("IntermediateList");
         }
 

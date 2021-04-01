@@ -1225,7 +1225,13 @@ namespace gip.mes.facility
 
         #region RecalcTargetQuantity
 
-        public MsgWithDetails RecalcIntermediateItem(ProdOrderPartslistPos inwardPos)
+        /// <summary>
+        /// RecalcIntermediateItem
+        /// </summary>
+        /// <param name="inwardPos">mixure for recalculation</param>
+        /// <param name="updateMixureRelations">if true expected is for relations of mixure to sum all input mixure quantities</param>
+        /// <returns></returns>
+        public MsgWithDetails RecalcIntermediateItem(ProdOrderPartslistPos inwardPos, bool updateMixureRelations)
         {
             MsgWithDetails msgWithDetails = null;
             try
@@ -1237,7 +1243,7 @@ namespace gip.mes.facility
                    .Select(c => c.SourceProdOrderPartslistPos)
                    .ToList();
                 foreach (ProdOrderPartslistPos inputMixure in inputMixures)
-                    RecalcIntermediateItem(inputMixure);
+                    RecalcIntermediateItem(inputMixure, updateMixureRelations);
 
                 // fix child relations
                 double newTargetQuantityUOM = 0;
@@ -1245,23 +1251,33 @@ namespace gip.mes.facility
                     newTargetQuantityUOM = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
                 else
                     newTargetQuantityUOM = 0;
+
                 bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
                 double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
+                inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
                 double factor = 0;
                 if (inwardPos.TargetQuantityUOM > 0)
                     factor = diffQuantity / inwardPos.TargetQuantityUOM;
-                inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
-
                 //mixure distrubutes it's quantity to target mixures
                 if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
                     if (factor == 0 && !noChange)
                         factor = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-                    if (factor != 0)
-                        foreach (var rel in inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                    foreach (var rel in inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                    {
+                        if (
+                            updateMixureRelations
+                            &&
+                            (rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                                || rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern)
+                           )
                         {
-                            rel.TargetQuantityUOM = rel.TargetQuantityUOM + factor * rel.TargetQuantityUOM;
+                            int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+                            rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM / count;
                         }
+                        else
+                            rel.TargetQuantityUOM = rel.TargetQuantityUOM + factor * rel.TargetQuantityUOM;
+                    }
                 }
             }
             catch (Exception ec)
