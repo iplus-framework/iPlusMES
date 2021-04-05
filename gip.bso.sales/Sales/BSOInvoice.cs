@@ -964,17 +964,23 @@ namespace gip.bso.sales
         {
             if (!PreExecute("Delete"))
                 return;
-            Msg msg = CurrentInvoice.DeleteACObject(DatabaseApp, true);
-            if (msg != null)
+            if (Root.Messages.Question(this, "Question50061", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
             {
-                Messages.Msg(msg);
-                return;
+                List<InvoicePos> items = CurrentInvoice.InvoicePos_Invoice.ToList();
+                foreach(var item in items)
+                    item.DeleteACObject(DatabaseApp, false);
+                Msg msg = CurrentInvoice.DeleteACObject(DatabaseApp, true);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    return;
+                }
+                if (AccessPrimary == null)
+                    return;
+                AccessPrimary.NavList.Remove(CurrentInvoice);
+                SelectedInvoice = AccessPrimary.NavList.FirstOrDefault();
+                Load();
             }
-            if (AccessPrimary == null)
-                return;
-            AccessPrimary.NavList.Remove(CurrentInvoice);
-            SelectedInvoice = AccessPrimary.NavList.FirstOrDefault();
-            Load();
             PostExecute("Delete");
 
         }

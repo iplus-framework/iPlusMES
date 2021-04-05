@@ -1471,10 +1471,10 @@ namespace gip.bso.sales
         {
             if (!PreExecute("CreateInvoice"))
                 return;
-            if (Root.Messages.Question(this, "Question50058") == Global.MsgResult.OK)
+            if (Root.Messages.Question(this, "Question50060", Global.MsgResult.Yes, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.Yes)
             {
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder);
-                if(msg != null && !msg.IsSucceded())
+                if (msg != null)
                     Root.Messages.Msg(msg);
             }
             PostExecute("CreateInvoice");
@@ -1484,7 +1484,7 @@ namespace gip.bso.sales
         {
             return CurrentOutOrder != null
                 && OutDeliveryNoteManager != null
-                && !CurrentOutOrder.OutOrderPos_OutOrder.SelectMany(c=>c.InvoicePos_OutOrderPos).Any();
+                && !CurrentOutOrder.OutOrderPos_OutOrder.SelectMany(c => c.InvoicePos_OutOrderPos).Any();
         }
         #endregion
 
@@ -1580,6 +1580,12 @@ namespace gip.bso.sales
                     return true;
                 case "ShowDialogOrder":
                     ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
+                    return true;
+                case "CreateInvoice":
+                    CreateInvoice();
+                    return true;
+                case "IsEnabledCreateInvoice":
+                    result = IsEnabledCreateInvoice();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

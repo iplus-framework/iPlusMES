@@ -623,6 +623,12 @@ namespace gip.mes.facility
                 InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
                 invoice.InvoicePos_Invoice.Add(invoicePos);
             }
+            msg = databaseApp.ACSaveChanges();
+            if (msg == null || msg.IsSucceded())
+            {
+                string message = this.Root.Environment.TranslateMessage(this, "Info50062", secondaryKey);
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = message };
+            }
             return msg;
         }
 
@@ -630,6 +636,7 @@ namespace gip.mes.facility
         [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public Msg NewInvoiceFromOutOrder(DatabaseApp databaseApp, OutOrder outOrder)
         {
+            Msg msg = null;
             if (!PreExecute("NewInvoiceFromOutOrder"))
             {
                 return new Msg
@@ -657,7 +664,6 @@ namespace gip.mes.facility
             invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
             invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
 
-
             List<OutOrderPos> items =
                 outOrder
                 .OutOrderPos_OutOrder
@@ -672,9 +678,14 @@ namespace gip.mes.facility
                 InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
                 invoice.InvoicePos_Invoice.Add(invoicePos);
             }
-
+            msg = databaseApp.ACSaveChanges();
+            if (msg == null || msg.IsSucceded())
+            {
+                string message = this.Root.Environment.TranslateMessage(this, "Info50062", secondaryKey);
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = message };
+            }
             PostExecute("GenerateInvoice");
-            return null;
+            return msg;
         }
 
         private InvoicePos GetInvoicePos(DatabaseApp databaseApp, Invoice invoice, int nr, OutOrderPos outOrderPos)
@@ -698,7 +709,7 @@ namespace gip.mes.facility
             invoicePos.MDCountrySalesTaxMaterial = outOrderPos.MDCountrySalesTaxMaterial;
 
             OutOrderPos topPos = outOrderPos.TopParentOutOrderPos;
-            OutOrderPos invoicePosRelation = 
+            OutOrderPos invoicePosRelation =
                 OutOrderPos.NewACObject(databaseApp, topPos);
 
             invoicePosRelation.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
@@ -771,7 +782,7 @@ namespace gip.mes.facility
                     case "TargetQuantityUOM":
                     case "MDUnitID":
                         {
-                            if (posItem.Material != null)
+                            if (posItem.Material != null && posItem.MDUnit != null)
                             {
                                 posItem.TargetQuantity = posItem.Material.ConvertToBaseQuantity(posItem.TargetQuantityUOM, posItem.MDUnit);
                                 //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
@@ -814,7 +825,7 @@ namespace gip.mes.facility
                                    || posItem.MDCountrySalesTaxMDMaterialGroup != null
                                    || posItem.MDCountrySalesTax != null)
                                 {
-                                    if (posItem.MDCountrySalesTaxMaterial != null && posItem.MDCountrySalesTax.SalesTax != posItem.SalesTax)
+                                    if (posItem.MDCountrySalesTaxMaterial != null && posItem.MDCountrySalesTaxMaterial.SalesTax != posItem.SalesTax)
                                         posItem.MDCountrySalesTaxMaterial = null;
                                     else if (posItem.MDCountrySalesTaxMDMaterialGroup != null && posItem.MDCountrySalesTaxMDMaterialGroup.SalesTax != posItem.SalesTax)
                                         posItem.MDCountrySalesTaxMDMaterialGroup = null;
