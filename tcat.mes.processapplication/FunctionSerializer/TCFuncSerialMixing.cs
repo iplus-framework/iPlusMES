@@ -12,7 +12,7 @@ using gip.core.autocomponent;
 
 namespace tcat.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_TwinCAT, "en{'Serializer for Mixing'}de{'Serialisierer für Mischen'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.Required, false, false)]
+    [ACClassInfo(Const.PackName_TwinCAT, "en{'TwinCAT Ser. Mixing'}de{'TwinCAT Ser. Mischen'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
     public class TCFuncSerialMixing : ACSessionObjSerializer
     {
         public TCFuncSerialMixing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -82,10 +82,8 @@ namespace tcat.mes.processapplication
             int iOffset = 0;
             byte[] paramPackage = new byte[length];
 
-            string instanceACUrl = instanceInfo.ACUrlParent + "._" + instanceInfo.ACIdentifier;
-            instanceACUrl = "_VB" + instanceACUrl.Replace("\\", "._");
+            string instanceACUrl = TCSession.ResolveACUrlToTwinCATUrl(instanceInfo.ACUrlParent + GCL.Delimiter_DirSeperator + instanceInfo.ACIdentifier);
             int instanceIndex = session.Metadata.IndexWhere(c => c._ACUrl == instanceACUrl);
-
             if (instanceIndex == -1)
                 return false;
 
@@ -191,7 +189,7 @@ namespace tcat.mes.processapplication
                 _waitHandles.Add(newWaitHandle);
             }
 
-            session.ReadResult(childInfo.ACUrlParent + "\\" + childInfo.ACIdentifier, length, readParameter, _RequestCounter, request.ACIdentifier);
+            session.ReadResult(childInfo.ACUrlParent + ACUrlHelper.Delimiter_DirSeperator + childInfo.ACIdentifier, length, readParameter, _RequestCounter, request.ACIdentifier);
             if (!newWaitHandle.WaitOne(5000))
                 newWaitHandle.TimedOut = true;
 

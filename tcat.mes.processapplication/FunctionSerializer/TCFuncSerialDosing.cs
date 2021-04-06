@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace tcat.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_TwinCAT, "en{'Serializer for Dosing'}de{'Serialisierer für Dosieren'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.Required, false, false)]
+    [ACClassInfo(Const.PackName_TwinCAT, "en{'TwinCAT Ser. Dosing'}de{'TwinCAT Ser. Dosieren'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
     public class TCFuncSerialDosing : ACSessionObjSerializer
     {
         public TCFuncSerialDosing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -128,8 +128,7 @@ namespace tcat.mes.processapplication
             byte[] paramPackage = new byte[length];
             byte[] stringTemp;
 
-            string instanceACUrl = instanceInfo.ACUrlParent + "._" + instanceInfo.ACIdentifier;
-            instanceACUrl = "_VB" + instanceACUrl.Replace("\\", "._");
+            string instanceACUrl = TCSession.ResolveACUrlToTwinCATUrl(instanceInfo.ACUrlParent + GCL.Delimiter_DirSeperator + instanceInfo.ACIdentifier);
             int instanceIndex = session.Metadata.IndexWhere(c => c._ACUrl == instanceACUrl);
 
             if (instanceIndex == -1)
@@ -152,8 +151,8 @@ namespace tcat.mes.processapplication
             iOffset += TCDataTypeLength.String(81);
 
             string plPosRelationParam = "";
-            if (request.ParameterValueList.FirstOrDefault(c => c.ACIdentifier == "PLPosRelation").Value != null)
-                plPosRelationParam = request.ParameterValueList.GetString("PLPosRelation");
+            //if (request.ParameterValueList.FirstOrDefault(c => c.ACIdentifier == "PLPosRelation").Value != null)
+                //plPosRelationParam = request.ParameterValueList.GetString("PLPosRelation");
             stringTemp = Encoding.UTF8.GetBytes(plPosRelationParam);
             Array.Copy(stringTemp, 0, paramPackage, iOffset, stringTemp.Length);
             iOffset += TCDataTypeLength.String(81);
@@ -410,7 +409,7 @@ namespace tcat.mes.processapplication
                 _waitHandles.Add(newWaitHandle);
             }
 
-            session.ReadResult(childInfo.ACUrlParent + "\\" + childInfo.ACIdentifier, length, readParameter, _RequestCounter, request.ACIdentifier);
+            session.ReadResult(childInfo.ACUrlParent + ACUrlHelper.Delimiter_DirSeperator + childInfo.ACIdentifier, length, readParameter, _RequestCounter, request.ACIdentifier);
             if (!newWaitHandle.WaitOne(5000))
                 newWaitHandle.TimedOut = true;
 

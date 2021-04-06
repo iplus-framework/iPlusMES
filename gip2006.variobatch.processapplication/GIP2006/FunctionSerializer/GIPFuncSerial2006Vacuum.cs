@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace gip2006.variobatch.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Serializer for Vacuum'}de{'Serialisierer für Vakuum'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.Required, false, false)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Serializer for Vacuum'}de{'Serialisierer für Vakuum'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
     public class GIPFuncSerial2006Vacuum : ACSessionObjSerializer
     {
         public GIPFuncSerial2006Vacuum(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

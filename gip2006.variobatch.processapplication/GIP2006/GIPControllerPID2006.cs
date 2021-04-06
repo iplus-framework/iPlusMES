@@ -548,7 +548,7 @@ namespace gip2006.variobatch.processapplication
 
 
     #region Serializer
-    [ACClassInfo(ConstGIP2006.PackName_VarioGIP2006, "en{'Serializer for PID-Controller'}de{'Serialisierer für PID Regler'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.Required, false, false)]
+    [ACClassInfo(ConstGIP2006.PackName_VarioGIP2006, "en{'Serializer for PID-Controller'}de{'Serialisierer für PID Regler'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
     public class GIPSerialControllerPID2006 : ACSessionObjSerializer
     {
         #region c´tors

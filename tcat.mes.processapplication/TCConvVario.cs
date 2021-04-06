@@ -9,7 +9,7 @@ using gip.core.communication;
 
 namespace tcat.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_TwinCAT, "en{'TC Conv Vario'}de{'TC Conv Vario'}", Global.ACKinds.TPABGModule, Global.ACStorableTypes.NotStorable, false, false)]
+    [ACClassInfo(Const.PackName_TwinCAT, "en{'TwinCAT Converter'}de{'TwinCAT Converter'}", Global.ACKinds.TPABGModule, Global.ACStorableTypes.NotStorable, false, false)]
     public class TCConvVario : PAFuncStateConvBase
     {
         public TCConvVario(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
