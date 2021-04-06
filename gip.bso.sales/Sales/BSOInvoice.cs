@@ -437,6 +437,93 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region 1.2 Pos extended
+
+        #region 1.2 Pos extended -> InvoicePosData
+        private InvoicePos _SelectedInvoicePosData;
+        /// <summary>
+        /// Selected property for InvoicePos
+        /// </summary>
+        /// <value>The selected InvoicePosData</value>
+        [ACPropertySelected(9999, "InvoicePosData", "en{'TODO: InvoicePosData'}de{'TODO: InvoicePosData'}")]
+        public InvoicePos SelectedInvoicePosData
+        {
+            get
+            {
+                return _SelectedInvoicePosData;
+            }
+            set
+            {
+                if (_SelectedInvoicePosData != value)
+                {
+                    _SelectedInvoicePosData = value;
+                    OnPropertyChanged("SelectedInvoicePosData");
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// List property for InvoicePos
+        /// </summary>
+        /// <value>The InvoicePosData list</value>
+        [ACPropertyList(9999, "InvoicePosData")]
+        public List<InvoicePos> InvoicePosDataList
+        {
+            get
+            {
+                if (InvoicePosList == null)
+                    return null;
+                return InvoicePosList.Where(c => c.PriceNet >= 0).OrderBy(c => c.Sequence).ToList();
+            }
+        }
+
+        #endregion
+
+
+        #region 1.2 Pos extended -> InvoicePosDiscount
+        private InvoicePos _SelectedInvoicePosDiscount;
+        /// <summary>
+        /// Selected property for InvoicePos
+        /// </summary>
+        /// <value>The selected InvoicePosDiscount</value>
+        [ACPropertySelected(9999, "InvoicePosDiscount", "en{'TODO: InvoicePosDiscount'}de{'TODO: InvoicePosDiscount'}")]
+        public InvoicePos SelectedInvoicePosDiscount
+        {
+            get
+            {
+                return _SelectedInvoicePosDiscount;
+            }
+            set
+            {
+                if (_SelectedInvoicePosDiscount != value)
+                {
+                    _SelectedInvoicePosDiscount = value;
+                    OnPropertyChanged("SelectedInvoicePosDiscount");
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// List property for InvoicePos
+        /// </summary>
+        /// <value>The InvoicePosDiscount list</value>
+        [ACPropertyList(9999, "InvoicePosDiscount")]
+        public List<InvoicePos> InvoicePosDiscountList
+        {
+            get
+            {
+                if (InvoicePosList == null)
+                    return null;
+                return InvoicePosList.Where(c => c.PriceNet < 0).OrderBy(c => c.Sequence).ToList();
+            }
+        }
+
+        #endregion
+
+        #endregion
+
         #endregion
 
         #region Company
@@ -967,7 +1054,7 @@ namespace gip.bso.sales
             if (Root.Messages.Question(this, "Question50061", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
             {
                 List<InvoicePos> items = CurrentInvoice.InvoicePos_Invoice.ToList();
-                foreach(var item in items)
+                foreach (var item in items)
                     item.DeleteACObject(DatabaseApp, false);
                 Msg msg = CurrentInvoice.DeleteACObject(DatabaseApp, true);
                 if (msg != null)

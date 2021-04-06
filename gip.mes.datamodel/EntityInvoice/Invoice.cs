@@ -171,6 +171,68 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(100, "", "en{'Neto total'}de{'Neto total'}")]
+        public double PosPriceNetTotal
+        {
+            get
+            {
+                return PosPriceNetSum + PosPriceNetDiscount;
+            }
+        }
+
+        [ACPropertyInfo(100, "", "en{'Discount'}de{'Rabatt'}")]
+        public double PosPriceNetDiscount
+        {
+            get
+            {
+                if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
+                {
+                    return (double)(InvoicePos_Invoice.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet));
+                }
+                return 0;
+            }
+        }
+
+        [ACPropertyInfo(100, "", "en{'Neto'}de{'Neto'}")]
+        public double PosPriceNetSum
+        {
+            get
+            {
+                if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
+                {
+                    return (double)(InvoicePos_Invoice.Where(c => c.PriceNet >= 0).Sum(o => o.PriceNet));
+                }
+                return 0;
+            }
+        }
+
+        [ACPropertyInfo(101, "", "en{'Neto'}de{'Neto'}")]
+        public double PosTotalSalesTax
+        {
+            get
+            {
+                if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
+                {
+                    return (double)(InvoicePos_Invoice.Sum(o => o.TotalSalesTax));
+                }
+                return 0;
+            }
+        }
+
+        [ACPropertyInfo(999)]
+        public double PosTotalPriceWithTax
+        {
+            get
+            {
+                if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
+                {
+                    return (double)(InvoicePos_Invoice.Sum(o => o.TotalPriceWithTax));
+                }
+                return 0;
+            }
+        }
+
+
         public void OnPricePropertyChanged()
         {
             OnPropertyChanged("PosPriceNetTotal");
