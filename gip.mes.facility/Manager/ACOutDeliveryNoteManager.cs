@@ -663,6 +663,8 @@ namespace gip.mes.facility
             invoice.CustomerCompany = outOrder.CustomerCompany;
             invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
             invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
+            invoice.XMLDesignStart = outOrder.XMLDesignStart;
+            invoice.XMLDesignEnd = outOrder.XMLDesignEnd;
 
             List<OutOrderPos> items =
                 outOrder
@@ -722,6 +724,7 @@ namespace gip.mes.facility
             invoicePosRelation.ExternQuantity = outOrderPos.ExternQuantity;
 
             invoicePos.OutOrderPos = invoicePosRelation;
+            invoicePos.XMLDesign = outOrderPos.XMLDesign;
             return invoicePos;
         }
 
