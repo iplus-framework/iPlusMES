@@ -22,7 +22,7 @@ namespace gip.bso.sales
         {
             if (!base.ACInit(startChildMode))
                 return false;
-
+            TempReportData = new ReportData();
             _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("OutDeliveryNoteManager not configured");
@@ -215,7 +215,14 @@ namespace gip.bso.sales
             set
             {
                 if (CurrentInvoice != null)
+                {
                     CurrentInvoice.PropertyChanged -= CurrentInvoice_PropertyChanged;
+                    if (string.IsNullOrEmpty(CurrentInvoice.XMLDesignStart))
+                        CurrentInvoice.XMLDesignStart = Invoice.Const_XMLDesign;
+                    if (string.IsNullOrEmpty(CurrentInvoice.XMLDesignEnd))
+                        CurrentInvoice.XMLDesignEnd = Invoice.Const_XMLDesign;
+                }
+
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Current = value;
@@ -325,7 +332,12 @@ namespace gip.bso.sales
                 if (_CurrentInvoicePos != value)
                 {
                     if (_CurrentInvoicePos != null)
+                    {
                         _CurrentInvoicePos.PropertyChanged -= CurrentInvoicePos_PropertyChanged;
+                        if (string.IsNullOrEmpty(CurrentInvoicePos.XMLDesign))
+                            CurrentInvoicePos.XMLDesign = Invoice.Const_XMLDesign;
+                    }
+
                     _CurrentInvoicePos = value;
                     if (_CurrentInvoicePos != null)
                         _CurrentInvoicePos.PropertyChanged += CurrentInvoicePos_PropertyChanged;
@@ -889,6 +901,23 @@ namespace gip.bso.sales
         }
 
 
+        #endregion
+
+        #region Report
+        private ReportData _TempReportData;
+        [ACPropertyInfo(9999)]
+        public ReportData TempReportData
+        {
+            get
+            {
+                return _TempReportData;
+            }
+            set
+            {
+                _TempReportData = value;
+                OnPropertyChanged("TempReportData");
+            }
+        }
         #endregion
 
 

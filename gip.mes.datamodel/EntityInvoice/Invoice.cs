@@ -22,7 +22,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
-    [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
+    [ACPropertyEntity(9999, "XMLDesignStart", "en{'Design'}de{'Design'}")]
+    [ACPropertyEntity(9999, "XMLDesignEnd", "en{'Design'}de{'Design'}")]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + Invoice.ClassName, ConstApp.ESInvoice, typeof(Invoice), Invoice.ClassName, "InvoiceNo", "InvoiceNo", new object[]
         {
                 new object[] {Const.QueryPrefix +  InvoicePos.ClassName, ConstApp.ESInvoicePos, typeof(InvoicePos), InvoicePos.ClassName + "_" + InvoicePos.ClassName, "Sequence", "Sequence", new object[]
@@ -39,6 +40,7 @@ namespace gip.mes.datamodel
         public const string NoColumnName = "InvoiceNo";
         public const string FormatNewNo = "O{0}";
 
+        public const string Const_XMLDesign = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
 
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
@@ -55,6 +57,10 @@ namespace gip.mes.datamodel
             entity.InvoiceNo = secondaryKey;
             entity.InvoiceDate = DateTime.Now;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+
+            entity.XMLDesignStart = Const_XMLDesign;
+            entity.XMLDesignEnd = Const_XMLDesign;
+
             return entity;
         }
 
@@ -156,20 +162,6 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Additional
-        private ReportData _TempReportData;
-        [ACPropertyInfo(9999)]
-        public ReportData TempReportData
-        {
-            get
-            {
-                return _TempReportData;
-            }
-            set
-            {
-                _TempReportData = value;
-                OnPropertyChanged("TempReportData");
-            }
-        }
 
         [ACPropertyInfo(100, "", "en{'Neto total'}de{'Neto total'}")]
         public double PosPriceNetTotal

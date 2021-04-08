@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
                     entity.Sequence = 1 + invoice.InvoicePos_Invoice.Max(x => x.Sequence);
                 invoice.InvoicePos_Invoice.Add(entity);
             }
-
+            entity.XMLDesign = Invoice.Const_XMLDesign;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
@@ -177,21 +177,6 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Additional
-        private ReportData _TempReportData;
-        [ACPropertyInfo(9999)]
-        public ReportData TempReportData
-        {
-            get
-            {
-                return _TempReportData;
-            }
-            set
-            {
-                _TempReportData = value;
-                OnPropertyChanged("TempReportData");
-            }
-        }
-
 
         [ACPropertyInfo(999, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
         public double SalesTaxAmount
@@ -220,7 +205,7 @@ namespace gip.mes.datamodel
             }
         }
 
-         [ACPropertyInfo(999)]
+        [ACPropertyInfo(999)]
         public double TotalPriceWithTax
         {
             get
