@@ -131,7 +131,8 @@ namespace gip.bso.manufacturing
         public void CalculateMaterialsRequirement()
         {
             OnPropertyChanged("ProdOrderBatchPlanList");
-            MatReqResultList = MatRequirementManager.CalculateMaterialsRequirement(ProdOrderBatchPlanList);
+            MatReqResultList = MatRequirementManager.CheckMaterialsRequirementOverAllOrders(DatabaseApp, ProdOrderBatchPlanList);
+            //MatReqResultList = MatRequirementManager.CalculateMaterialsRequirement(ProdOrderBatchPlanList);
         }
 
         public bool IsEnabledCalculateMaterialsRequirement()
