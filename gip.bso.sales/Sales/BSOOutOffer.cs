@@ -233,6 +233,9 @@ namespace gip.bso.sales
                 OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOfferPos, CurrentOutOffer?.BillingCompanyAddress);
             if (e.PropertyName == "PriceGross")
             {
+                if (CurrentOutOfferPos.PriceGross < 0)
+                    CurrentOutOfferPos.SalesTax = 0;
+
                 CalculateTaxOverview();
 
                 decimal totalTax = TaxOverviewList.Sum(c => c.SalesTax);
@@ -779,6 +782,10 @@ namespace gip.bso.sales
 
         private void CalculateTaxOverview()
         {
+            string vatFormat = "VAT with {0} %";
+            if (CurrentBillingCompanyAddress?.MDCountry?.MDCountryName == "DE")
+                vatFormat = "MwSt. mit {0} %";
+
             if (CurrentOutOffer.PosPriceNetDiscount < 0)
             {
                 var percent = (decimal)((Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100);
@@ -787,7 +794,8 @@ namespace gip.bso.sales
                                                  .Where(c => c.PriceNet > 0)
                                                  .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
                                                  .GroupBy(t => t.Item1)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = o.Sum(s => s.Item2) })
+                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format(vatFormat, o.Key.ToString("N2")), 
+                                                                                        SalesTax = o.Sum(s => s.Item2) })
                                                  .ToList();
             }
             else
@@ -795,7 +803,8 @@ namespace gip.bso.sales
                 TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
                                                  .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
                                                  .GroupBy(g => g.SalesTax)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format("MwSt. mit {0} %", o.Key), SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount) })
+                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format(vatFormat, o.Key.ToString("N2")), 
+                                                                                        SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount) })
                                                  .ToList();
             }
         }
