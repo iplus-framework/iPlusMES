@@ -28,6 +28,9 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(9999, "DosedQuantity", "en{'Dosed quantity'}de{'Dosierte Menge'}", "", false)]
         public double DosedQuantity { get; set; }
 
+        [ACPropertyInfo(9999, "MDUnitName", "en{'Unit'}de{'Einheit'}")]
+        public string MDUnitName { get; set; }
+
         public ProdOrderPartslistPos IntermediateItem { get; set; }
 
         public bool IsFinalOutput { get; set; }
