@@ -40,7 +40,7 @@ namespace gip.mes.datamodel
             {
                 entity.Company = parentACObject as Company;
             }
-                entity.CompanyPersonNo = secondaryKey;
+            entity.CompanyPersonNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
@@ -129,7 +129,20 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(999, "Operator", "en{'Operator'}de{'Operator'}")]
+        public gip.core.datamodel.VBUser Operator
+        {
+            get
+            {
+                if (VBUserID == null) return null;
+                return VBUser.FromIPlusContext<gip.core.datamodel.VBUser>();
+            }
+        }
 
+        partial void OnVBUserIDChanged()
+        {
+            OnPropertyChanged("Operator");
+        }
         #endregion
 
         #region IEntityProperty Members

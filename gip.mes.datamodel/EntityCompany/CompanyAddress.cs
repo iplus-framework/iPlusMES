@@ -141,5 +141,24 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Mandant
+
+        [ACPropertyInfo(999, "Mandant", "en{'Mandant'}de{'Mandant'}")]
+        public gip.core.datamodel.VBUser Mandant
+        {
+            get
+            {
+                if (VBUserID == null) return null;
+                return VBUser.FromIPlusContext<gip.core.datamodel.VBUser>();
+            }
+        }
+
+        partial void OnVBUserIDChanged()
+        {
+            OnPropertyChanged("Mandant");
+        }
+
+        #endregion
+
     }
 }

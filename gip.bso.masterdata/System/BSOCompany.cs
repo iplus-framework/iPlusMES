@@ -886,6 +886,54 @@ namespace gip.bso.masterdata
         }
         #endregion
 
+        #region 1.6 VBUser list
+
+        private gip.core.datamodel.VBUser _SelectedVBUser;
+        /// <summary>
+        /// Selected property for gip.core.datamodel.VBUser
+        /// </summary>
+        /// <value>The selected VBUser</value>
+        [ACPropertySelected(9999, "VBUser", "en{'TODO: VBUser'}de{'TODO: VBUser'}")]
+        public gip.core.datamodel.VBUser SelectedVBUser
+        {
+            get
+            {
+                return _SelectedVBUser;
+            }
+            set
+            {
+                if (_SelectedVBUser != value)
+                {
+                    _SelectedVBUser = value;
+                    OnPropertyChanged("SelectedVBUser");
+                }
+            }
+        }
+
+
+        private List<gip.core.datamodel.VBUser> _VBUserList;
+        /// <summary>
+        /// List property for gip.core.datamodel.VBUser
+        /// </summary>
+        /// <value>The VBUser list</value>
+        [ACPropertyList(9999, "VBUser")]
+        public List<gip.core.datamodel.VBUser> VBUserList
+        {
+            get
+            {
+                if (_VBUserList == null)
+                    _VBUserList = LoadVBUserList();
+                return _VBUserList;
+            }
+        }
+
+        private List<gip.core.datamodel.VBUser> LoadVBUserList()
+        {
+            return DatabaseApp.ContextIPlus.VBUser.OrderBy(c => c.VBUserName).ToList();
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -1509,7 +1557,119 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region 1.5 Mandant & Operator
+
+
+        #region 1.5 Mandant & Operator -> Mandant
+        [ACMethodInfo("SetCurrentAddressAsMandant", "en{'Set as mandant'}de{'Stelle as Mandant'}", 701)]
+        public void SetCurrentAddressAsMandant()
+        {
+            if (!IsEnabledSetCurrentAddressAsMandant())
+                return;
+            SetMandant(SelectedVBUser, CurrentCompanyAddress);
+            OnPropertyChanged("CurrentCompanyAddress\\Mandant");
+        }
+
+        public bool IsEnabledSetCurrentAddressAsMandant()
+        {
+            return
+                    SelectedVBUser != null
+                    && CurrentCompanyAddress != null
+                    && CurrentCompanyAddress.VBUserID != SelectedVBUser.VBUserID;
+        }
+
+        [ACMethodInfo("UnsetCurrentAddressAsMandant", "en{'Unset as mandant'}de{'Unstelle as Mandant'}", 701)]
+        public void UnsetCurrentAddressAsMandant()
+        {
+            if (!IsEnabledUnsetCurrentAddressAsMandant())
+                return;
+            CurrentCompanyAddress.VBUser = null;
+            OnPropertyChanged("CurrentCompanyAddress\\Mandant");
+        }
+
+        public bool IsEnabledUnsetCurrentAddressAsMandant()
+        {
+            return CurrentCompanyAddress != null && CurrentCompanyAddress.VBUser != null;
+        }
+
         #endregion
+
+        #region 1.5 Mandant & Operator -> Operatror
+
+        [ACMethodInfo("SetCurrentCompanyPersonAsOperater", "en{'Set as opeater'}de{'Stelle as Operator'}", 701)]
+        public void SetCurrentCompanyPersonAsOperater()
+        {
+            if (!IsEnabledSetCurrentCompanyPersonAsOperater())
+                return;
+            SetOperator(SelectedVBUser, CurrentCompanyPerson);
+            OnPropertyChanged("CurrentCompanyPerson\\Operator");
+        }
+
+        public bool IsEnabledSetCurrentCompanyPersonAsOperater()
+        {
+            return
+                   SelectedVBUser != null
+                   && CurrentCompanyPerson != null
+                   && CurrentCompanyPerson.VBUserID != SelectedVBUser.VBUserID;
+        }
+
+        [ACMethodInfo("UnsetCurrentCompanyPersonAsOperater", "en{'Unset as opeater'}de{'Unstelle as Operator'}", 701)]
+        public void UnsetCurrentCompanyPersonAsOperater()
+        {
+            if (!IsEnabledUnsetCurrentCompanyPersonAsOperater())
+                return;
+            CurrentCompanyPerson.VBUser = null;
+            OnPropertyChanged("CurrentCompanyPerson\\Operator");
+        }
+
+        public bool IsEnabledUnsetCurrentCompanyPersonAsOperater()
+        {
+            return CurrentCompanyPerson != null && CurrentCompanyPerson.VBUser != null;
+        }
+
+        #endregion
+
+        #region 1.5 Mandant & Operator -> Helper
+        [ACMethodInfo("SetCurrentVBUser", "en{'xx'}de{'xx'}", 701)]
+        public void SetCurrentVBUser(gip.core.datamodel.VBUser vBUser)
+        {
+            SelectedVBUser = vBUser;
+        }
+
+        public void SetMandant(gip.core.datamodel.VBUser vBUser, CompanyAddress companyAddress)
+        {
+            CompanyAddress otherMandant = GetMandant(vBUser);
+            if (otherMandant != null && otherMandant.CompanyAddressID != companyAddress.CompanyAddressID)
+                otherMandant.VBUser = null;
+            gip.mes.datamodel.VBUser mesVBUser = vBUser.FromAppContext<gip.mes.datamodel.VBUser>(DatabaseApp);
+            companyAddress.VBUser = mesVBUser;
+        }
+
+        public void SetOperator(gip.core.datamodel.VBUser vBUser, CompanyPerson companyPerson)
+        {
+            CompanyPerson otherOperater = GetOperator(vBUser);
+            if (otherOperater != null && otherOperater.CompanyPersonID != otherOperater.CompanyPersonID)
+                otherOperater.VBUser = null;
+            gip.mes.datamodel.VBUser mesVBUser = vBUser.FromAppContext<gip.mes.datamodel.VBUser>(DatabaseApp);
+            companyPerson.VBUser = mesVBUser;
+        }
+
+        public CompanyAddress GetMandant(gip.core.datamodel.VBUser vBUser)
+        {
+            return DatabaseApp.CompanyAddress.FirstOrDefault(c => c.VBUserID == vBUser.VBUserID);
+        }
+
+        public CompanyPerson GetOperator(gip.core.datamodel.VBUser vBUser)
+        {
+            return DatabaseApp.CompanyPerson.FirstOrDefault(c => c.VBUserID == vBUser.VBUserID);
+        }
+        #endregion
+
+        #endregion
+
+        #endregion
+
+
 
         #region Execute-Helper-Handlers
 
@@ -1518,143 +1678,143 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case "Save":
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case "IsEnabledSave":
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case "UndoSave":
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case "IsEnabledUndoSave":
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
+                case "Load":
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case "IsEnabledLoad":
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case "New":
                     New();
                     return true;
-                case"IsEnabledNew":
+                case "IsEnabledNew":
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case "Delete":
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case "IsEnabledDelete":
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case "Search":
                     Search();
                     return true;
-                case"LoadCompanyAddress":
+                case "LoadCompanyAddress":
                     LoadCompanyAddress();
                     return true;
-                case"IsEnabledLoadCompanyAddress":
+                case "IsEnabledLoadCompanyAddress":
                     result = IsEnabledLoadCompanyAddress();
                     return true;
-                case"NewCompanyAddress":
+                case "NewCompanyAddress":
                     NewCompanyAddress();
                     return true;
-                case"IsEnabledNewCompanyAddress":
+                case "IsEnabledNewCompanyAddress":
                     result = IsEnabledNewCompanyAddress();
                     return true;
-                case"DeleteCompanyAddress":
+                case "DeleteCompanyAddress":
                     DeleteCompanyAddress();
                     return true;
-                case"IsEnabledDeleteCompanyAddress":
+                case "IsEnabledDeleteCompanyAddress":
                     result = IsEnabledDeleteCompanyAddress();
                     return true;
-                case"NewCompanyAddressDepartment":
+                case "NewCompanyAddressDepartment":
                     NewCompanyAddressDepartment();
                     return true;
-                case"IsEnabledNewCompanyAddressDepartment":
+                case "IsEnabledNewCompanyAddressDepartment":
                     result = IsEnabledNewCompanyAddressDepartment();
                     return true;
-                case"DeleteCompanyAddressDepartment":
+                case "DeleteCompanyAddressDepartment":
                     DeleteCompanyAddressDepartment();
                     return true;
-                case"IsEnabledDeleteCompanyAddressDepartment":
+                case "IsEnabledDeleteCompanyAddressDepartment":
                     result = IsEnabledDeleteCompanyAddressDepartment();
                     return true;
-                case"LoadCompanyPerson":
+                case "LoadCompanyPerson":
                     LoadCompanyPerson();
                     return true;
-                case"IsEnabledLoadCompanyPerson":
+                case "IsEnabledLoadCompanyPerson":
                     result = IsEnabledLoadCompanyPerson();
                     return true;
-                case"NewCompanyPerson":
+                case "NewCompanyPerson":
                     NewCompanyPerson();
                     return true;
-                case"IsEnabledNewCompanyPerson":
+                case "IsEnabledNewCompanyPerson":
                     result = IsEnabledNewCompanyPerson();
                     return true;
-                case"DeleteCompanyPerson":
+                case "DeleteCompanyPerson":
                     DeleteCompanyPerson();
                     return true;
-                case"IsEnabledDeleteCompanyPerson":
+                case "IsEnabledDeleteCompanyPerson":
                     result = IsEnabledDeleteCompanyPerson();
                     return true;
-                case"NewFactory":
+                case "NewFactory":
                     NewFactory();
                     return true;
-                case"IsEnabledNewFactory":
+                case "IsEnabledNewFactory":
                     result = IsEnabledNewFactory();
                     return true;
-                case"LoadFactory":
+                case "LoadFactory":
                     LoadFactory();
                     return true;
-                case"IsEnabledLoadFactory":
+                case "IsEnabledLoadFactory":
                     result = IsEnabledLoadFactory();
                     return true;
-                case"DeleteFactory":
+                case "DeleteFactory":
                     DeleteFactory();
                     return true;
-                case"IsEnabledDeleteFactory":
+                case "IsEnabledDeleteFactory":
                     result = IsEnabledDeleteFactory();
                     return true;
-                case"LoadCompanyMaterial":
+                case "LoadCompanyMaterial":
                     LoadCompanyMaterial();
                     return true;
-                case"IsEnabledLoadCompanyMaterial":
+                case "IsEnabledLoadCompanyMaterial":
                     result = IsEnabledLoadCompanyMaterial();
                     return true;
-                case"NewCompanyMaterial":
+                case "NewCompanyMaterial":
                     NewCompanyMaterial();
                     return true;
-                case"IsEnabledNewCompanyMaterial":
+                case "IsEnabledNewCompanyMaterial":
                     result = IsEnabledNewCompanyMaterial();
                     return true;
-                case"DeleteCompanyMaterial":
+                case "DeleteCompanyMaterial":
                     DeleteCompanyMaterial();
                     return true;
-                case"IsEnabledDeleteCompanyMaterial":
+                case "IsEnabledDeleteCompanyMaterial":
                     result = IsEnabledDeleteCompanyMaterial();
                     return true;
-                case"LoadCompanyMaterialPickup":
+                case "LoadCompanyMaterialPickup":
                     LoadCompanyMaterialPickup();
                     return true;
-                case"IsEnabledLoadCompanyMaterialPickup":
+                case "IsEnabledLoadCompanyMaterialPickup":
                     result = IsEnabledLoadCompanyMaterialPickup();
                     return true;
-                case"NewCompanyMaterialPickup":
+                case "NewCompanyMaterialPickup":
                     NewCompanyMaterialPickup();
                     return true;
-                case"IsEnabledNewCompanyMaterialPickup":
+                case "IsEnabledNewCompanyMaterialPickup":
                     result = IsEnabledNewCompanyMaterialPickup();
                     return true;
-                case"DeleteCompanyMaterialPickup":
+                case "DeleteCompanyMaterialPickup":
                     DeleteCompanyMaterialPickup();
                     return true;
-                case"IsEnabledDeleteCompanyMaterialPickup":
+                case "IsEnabledDeleteCompanyMaterialPickup":
                     result = IsEnabledDeleteCompanyMaterialPickup();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

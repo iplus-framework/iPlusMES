@@ -22,9 +22,11 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(10, "MachineName", "en{'Machine Name'}de{'Maschinename'}")]
         public string MachineName { get; set; }
 
-
         [ACPropertyInfo(999, "InOrderNo", "en{'Purchase order number'}de{'Bestellnummer'}")]
         public string InOrderNo { get; set; }
+
+        [ACPropertyInfo(9999, "DosedQuantity", "en{'Dosed quantity'}de{'Dosierte Menge'}", "", false)]
+        public double DosedQuantity { get; set; }
 
         public ProdOrderPartslistPos IntermediateItem { get; set; }
 

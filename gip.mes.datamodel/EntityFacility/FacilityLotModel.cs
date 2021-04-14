@@ -28,6 +28,9 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(9999, "ActualQuantity", ConstApp.ActualQuantity)]
         public double ActualQuantity { get; set; }
 
+        [ACPropertyInfo(9999, "TargetQuantity", ConstApp.TargetQuantity)]
+        public double TargetQuantity { get; set; }
+
         [ACPropertyInfo(999, "Comment", ConstApp.Comment)]
         public string Comment { get; set; }
 

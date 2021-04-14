@@ -18,7 +18,6 @@ ALTER TABLE dbo.OutOffer DROP CONSTRAINT FK_OutOffer_MDOutOfferStateID;
 ALTER TABLE dbo.OutOffer DROP CONSTRAINT FK_OutOffer_MDDelivTypeID;
 ALTER TABLE dbo.CompanyAddress DROP CONSTRAINT FK_CompanyAddress_MDDelivTypeID;
 ALTER TABLE dbo.OutOrder DROP CONSTRAINT FK_OutOrder_MDDelivTypeID;
-ALTER TABLE dbo.Company DROP CONSTRAINT DF__Company__IsTenan__58671BC9;
 ALTER TABLE dbo.Tourplan DROP CONSTRAINT FK_Tourplan_CompanyID;
 ALTER TABLE dbo.OutOffer DROP CONSTRAINT FK_OutOffer_CompanyID;
 ALTER TABLE dbo.TourplanPos DROP CONSTRAINT FK_TourplanPos_CompanyID;
