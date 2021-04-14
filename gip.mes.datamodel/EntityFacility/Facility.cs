@@ -57,6 +57,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(32, "MinStockQuantity", ConstApp.MinStockQuantity, "", "", true)]
     [ACPropertyEntity(33, "OptStockQuantity", ConstApp.OptStockQuantity, "", "", true)]
     [ACPropertyEntity(34, "Comment", ConstApp.Comment, "", "", true)]
+    [ACPropertyEntity(35, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
@@ -79,6 +80,7 @@ namespace gip.mes.datamodel
             {
                 entity.Facility1_ParentFacility = parentACObject as Facility;
             }
+            entity.OrderPostingOnEmptying = false;
             //entity.MDUnit = MDUnit.DefaultMDWeightUnit(database);
             // AClass darf Facility-Entität nicht kennen
             //ACClass.NewACObjectForFacility(database, entity);
