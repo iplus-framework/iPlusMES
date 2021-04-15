@@ -17,7 +17,9 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(8, "BillingCompanyAddress", "en{'Billing Address'}de{'Rechnungsadresse'}", Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
     [ACPropertyEntity(9, OutOrder.ClassName, "en{'Sales Order'}de{'Kundenauftrag'}", Const.ContextDatabase + "\\" + OutOrder.ClassName, "", true)]
     [ACPropertyEntity(10, MDCountrySalesTax.ClassName, ConstApp.ESCountrySalesTax, Const.ContextDatabase + "\\" + MDCountrySalesTax.ClassName, "", true)]
-    [ACPropertyEntity(11, "Comment", ConstApp.Comment, "", "", true)]
+    [ACPropertyEntity(11, "IssuerCompanyAddress", "en{'Issuer Address'}de{'Emittentenadresse'}", Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
+    [ACPropertyEntity(12, "IssuerCompanyPerson", "en{'Issuer Person'}de{'Emittentenperson'}", Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
+    [ACPropertyEntity(13, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -34,7 +36,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Invoice>) })]
-    public partial class Invoice
+    public partial class Invoice: IOutOrder
     {
         public const string ClassName = "Invoice";
         public const string NoColumnName = "InvoiceNo";
@@ -53,6 +55,9 @@ namespace gip.mes.datamodel
 
             entity.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(dbApp);
             entity.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(dbApp);
+
+            entity.IssuerCompanyAddress = null;
+            entity.IssuerCompanyPerson = null;
 
             entity.InvoiceNo = secondaryKey;
             entity.InvoiceDate = DateTime.Now;

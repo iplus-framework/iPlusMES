@@ -35,7 +35,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOffer>) })]
-    public partial class OutOffer : IACConfigStore
+    public partial class OutOffer : IACConfigStore, IOutOrder
     {
         public const string ClassName = "OutOffer";
         public const string NoColumnName = "OutOfferNo";

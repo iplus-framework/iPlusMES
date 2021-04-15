@@ -29,6 +29,8 @@ namespace gip.bso.sales
 
             Search();
             SetSelectedPos();
+
+            LoadIssuer();
             return true;
         }
 
@@ -51,7 +53,6 @@ namespace gip.bso.sales
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
             bool result = base.ACDeInit(deleteACClassTask);
-
 
             if (_AccessInvoicePos != null)
             {
@@ -76,6 +77,19 @@ namespace gip.bso.sales
 
             return result;
 
+        }
+
+        private void LoadIssuer()
+        {
+            IssuerCompanyAddress = DatabaseApp.CompanyAddress.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
+            if (IssuerCompanyAddress != null)
+            {
+                _IssuerCompanyPersonList = LoadIssuerCompanyPersonList();
+                SelectedIssuerCompanyPerson = DatabaseApp.CompanyPerson.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
+                IssuerCompanyAddressMessage = string.Format(@"{0} | {1} | {2}", Root.Environment.User.VBUserName, IssuerCompanyAddress.ACCaption, IssuerCompanyAddress.InvoiceIssuerNo);
+            }
+            else
+                IssuerCompanyAddressMessage = Root.Environment.TranslateMessage(this, "Warning50039", Root.Environment.User.VBUserNo);
         }
 
         #endregion
@@ -253,19 +267,13 @@ namespace gip.bso.sales
 
         void CurrentInvoice_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoice, IssuerCompanyAddress);
+        
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
-                    if (CurrentInvoice.CustomerCompany != null)
-                    {
-                        CurrentInvoice.BillingCompanyAddress = CurrentInvoice.CustomerCompany.BillingCompanyAddress;
-                        CurrentInvoice.DeliveryCompanyAddress = CurrentInvoice.CustomerCompany.DeliveryCompanyAddress;
-                    }
-                    else
-                    {
-                        CurrentInvoice.BillingCompanyAddress = null;
-                        CurrentInvoice.DeliveryCompanyAddress = null;
-                    }
+                   
                     OnPropertyChanged("BillingCompanyAddressList");
                     OnPropertyChanged("DeliveryCompanyAddressList");
                     OnPropertyChanged("CurrentBillingCompanyAddress");
@@ -620,6 +628,98 @@ namespace gip.bso.sales
                 }
             }
         }
+        #endregion
+
+        #region Issuer
+        private CompanyAddress _IssuerCompanyAddress;
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'IssuerCompanyAddress'}de{'IssuerCompanyAddress'}")]
+        public CompanyAddress IssuerCompanyAddress
+        {
+            get
+            {
+                return _IssuerCompanyAddress;
+            }
+            set
+            {
+                if (_IssuerCompanyAddress != value)
+                {
+                    _IssuerCompanyAddress = value;
+                    OnPropertyChanged("IssuerCompanyAddress");
+                }
+            }
+        }
+
+        private string _IssuerCompanyAddressMessage;
+        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}")]
+        public string IssuerCompanyAddressMessage
+
+        {
+            get
+            {
+                return _IssuerCompanyAddressMessage;
+            }
+            set
+            {
+                if (_IssuerCompanyAddressMessage != value)
+                {
+                    _IssuerCompanyAddressMessage = value;
+                    OnPropertyChanged("IssuerCompanyAddressMessage");
+                }
+            }
+        }
+
+        #region Issuer -> Company persons //IssuerCompanyPerson
+
+        #region IssuerCompanyPerson
+        private CompanyPerson _SelectedIssuerCompanyPerson;
+        /// <summary>
+        /// Selected property for CompanyPerson
+        /// </summary>
+        /// <value>The selected IssuerCompanyPerson</value>
+        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}")]
+        public CompanyPerson SelectedIssuerCompanyPerson
+        {
+            get
+            {
+                return _SelectedIssuerCompanyPerson;
+            }
+            set
+            {
+                if (_SelectedIssuerCompanyPerson != value)
+                {
+                    _SelectedIssuerCompanyPerson = value;
+                    OnPropertyChanged("SelectedIssuerCompanyPerson");
+                }
+            }
+        }
+
+
+        private List<CompanyPerson> _IssuerCompanyPersonList;
+        /// <summary>
+        /// List property for CompanyPerson
+        /// </summary>
+        /// <value>The IssuerCompanyPerson list</value>
+        [ACPropertyList(9999, "IssuerCompanyPerson")]
+        public List<CompanyPerson> IssuerCompanyPersonList
+        {
+            get
+            {
+                if (_IssuerCompanyPersonList == null)
+                    _IssuerCompanyPersonList = LoadIssuerCompanyPersonList();
+                return _IssuerCompanyPersonList;
+            }
+        }
+
+        private List<CompanyPerson> LoadIssuerCompanyPersonList()
+        {
+            if (IssuerCompanyAddress == null)
+                return new List<CompanyPerson>();
+            return DatabaseApp.CompanyPerson.Where(c => c.CompanyID == IssuerCompanyAddress.CompanyID).OrderBy(c => c.Name1).ToList();
+        }
+        #endregion
+
+        #endregion
+
         #endregion
 
         #region 1.2 OpenContractPos
@@ -1057,17 +1157,14 @@ namespace gip.bso.sales
         [ACMethodInteraction(Invoice.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
-            if (!PreExecute("New"))
-                return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
-            CurrentInvoice = Invoice.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.Invoice.AddObject(CurrentInvoice);
-            SelectedInvoice = CurrentInvoice;
+            Invoice newInvoice = Invoice.NewACObject(DatabaseApp, null, secondaryKey);
+            newInvoice.IssuerCompanyAddress = IssuerCompanyAddress;
+            newInvoice.IssuerCompanyPerson = SelectedIssuerCompanyPerson;
+            DatabaseApp.Invoice.AddObject(newInvoice);
             if (AccessPrimary != null)
-                AccessPrimary.NavList.Add(CurrentInvoice);
-            ACState = Const.SMNew;
-            PostExecute("New");
-
+                AccessPrimary.NavList.Add(newInvoice);
+            CurrentInvoice = newInvoice;
         }
 
         public bool IsEnabledNew()

@@ -729,6 +729,34 @@ namespace gip.mes.facility
         }
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        public void HandleIOrderPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrder item, CompanyAddress issuerCompanyAddress)
+        {
+            if (item != null)
+            {
+                switch (propertyName)
+                {
+                    case "CustomerCompanyID":
+                        if (item.CustomerCompany != null)
+                        {
+                            item.BillingCompanyAddress = item.CustomerCompany.BillingCompanyAddress;
+                            item.DeliveryCompanyAddress = item.CustomerCompany.DeliveryCompanyAddress;
+                        }
+                        else
+                        {
+                            item.BillingCompanyAddress = null;
+                            item.DeliveryCompanyAddress = null;
+                        }
+                        break;
+                    case "IssuerCompanyPersonID":
+                        item.IssuerCompanyAddress = issuerCompanyAddress;
+                        break;
+                }
+            }
+
+        }
+
+
+        [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrderPos posItem, CompanyAddress billingCompanyAddress)
         {
             if (posItem != null)
