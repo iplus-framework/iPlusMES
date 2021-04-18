@@ -22,7 +22,9 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, "TargetDeliveryMaxDate", ConstApp.TargetDeliveryMaxDate, "", "", true)]
     [ACPropertyEntity(15, MDTimeRange.ClassName, ConstApp.ESTimeRange, Const.ContextDatabase + "\\" + MDTimeRange.ClassName, "", true)]
     [ACPropertyEntity(16, MDDelivType.ClassName, ConstApp.ESDelivType, Const.ContextDatabase + "\\" + MDDelivType.ClassName, "", true)]
-    [ACPropertyEntity(17, "Comment", ConstApp.Comment, "", "", true)]
+    [ACPropertyEntity(17, ConstApp.IssuerCompanyAddress, ConstApp.IssuerCompanyAddress_ACCaption, Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
+    [ACPropertyEntity(18, ConstApp.IssuerCompanyPerson, ConstApp.IssuerCompanyPerson_ACCaption, Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
+    [ACPropertyEntity(19, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -59,7 +61,10 @@ namespace gip.mes.datamodel
 
             entity.XMLDesignStart = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
             entity.XMLDesignEnd = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
-
+            
+            entity.IssuerCompanyAddress = null;
+            entity.IssuerCompanyPerson = null;
+            
             return entity;
         }
 

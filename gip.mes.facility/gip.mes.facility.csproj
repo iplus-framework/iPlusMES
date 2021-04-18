@@ -120,6 +120,7 @@
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPos.cs" />
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
     <Compile Include="Model\CountrySalesTaxModel.cs" />
+    <Compile Include="Model\IssuerResult.cs" />
     <Compile Include="Model\SchedulingBatchPlanDuration.cs" />
     <Compile Include="Model\BatchSizeCalculation\BatchPercentageModel.cs" />
     <Compile Include="Model\BatchSizeCalculation\BatchQuantityModel.cs" />

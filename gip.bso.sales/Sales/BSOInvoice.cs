@@ -30,7 +30,13 @@ namespace gip.bso.sales
             Search();
             SetSelectedPos();
 
-            LoadIssuer();
+            IssuerResult issuerResult = OutDeliveryNoteManager.GetIssuer(DatabaseApp, Root.Environment.User.VBUserID);
+            IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
+            _IssuerCompanyPersonList = issuerResult.CompanyPeople;
+            OnPropertyChanged("IssuerCompanyPersonList");
+             IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
+            SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
+
             return true;
         }
 
@@ -77,19 +83,6 @@ namespace gip.bso.sales
 
             return result;
 
-        }
-
-        private void LoadIssuer()
-        {
-            IssuerCompanyAddress = DatabaseApp.CompanyAddress.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
-            if (IssuerCompanyAddress != null)
-            {
-                _IssuerCompanyPersonList = LoadIssuerCompanyPersonList();
-                SelectedIssuerCompanyPerson = DatabaseApp.CompanyPerson.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
-                IssuerCompanyAddressMessage = string.Format(@"{0} | {1} | {2}", Root.Environment.User.VBUserName, IssuerCompanyAddress.ACCaption, IssuerCompanyAddress.InvoiceIssuerNo);
-            }
-            else
-                IssuerCompanyAddressMessage = Root.Environment.TranslateMessage(this, "Warning50039", Root.Environment.User.VBUserNo);
         }
 
         #endregion
@@ -269,11 +262,11 @@ namespace gip.bso.sales
         {
             if (OutDeliveryNoteManager != null)
                 OutDeliveryNoteManager.HandleIOrderPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoice, IssuerCompanyAddress);
-        
+
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
-                   
+
                     OnPropertyChanged("BillingCompanyAddressList");
                     OnPropertyChanged("DeliveryCompanyAddressList");
                     OnPropertyChanged("CurrentBillingCompanyAddress");
@@ -631,6 +624,9 @@ namespace gip.bso.sales
         #endregion
 
         #region Issuer
+
+        #region Issuer -> IssuerCompanyAddress
+
         private CompanyAddress _IssuerCompanyAddress;
         [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'IssuerCompanyAddress'}de{'IssuerCompanyAddress'}")]
         public CompanyAddress IssuerCompanyAddress
@@ -668,9 +664,10 @@ namespace gip.bso.sales
             }
         }
 
-        #region Issuer -> Company persons //IssuerCompanyPerson
+        #endregion
 
-        #region IssuerCompanyPerson
+        #region Issuer -> IssuerCompanyPerson
+
         private CompanyPerson _SelectedIssuerCompanyPerson;
         /// <summary>
         /// Selected property for CompanyPerson
@@ -704,19 +701,9 @@ namespace gip.bso.sales
         {
             get
             {
-                if (_IssuerCompanyPersonList == null)
-                    _IssuerCompanyPersonList = LoadIssuerCompanyPersonList();
                 return _IssuerCompanyPersonList;
             }
         }
-
-        private List<CompanyPerson> LoadIssuerCompanyPersonList()
-        {
-            if (IssuerCompanyAddress == null)
-                return new List<CompanyPerson>();
-            return DatabaseApp.CompanyPerson.Where(c => c.CompanyID == IssuerCompanyAddress.CompanyID).OrderBy(c => c.Name1).ToList();
-        }
-        #endregion
 
         #endregion
 

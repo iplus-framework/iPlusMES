@@ -748,7 +748,12 @@ namespace gip.mes.facility
                         }
                         break;
                     case "IssuerCompanyPersonID":
-                        item.IssuerCompanyAddress = issuerCompanyAddress;
+                        if (item.IssuerCompanyPerson != null)
+                        {
+                            item.IssuerCompanyAddress = issuerCompanyAddress;
+                        }
+                        else
+                            item.IssuerCompanyAddress = null;
                         break;
                 }
             }
@@ -883,6 +888,23 @@ namespace gip.mes.facility
                 }
         }
 
+        public IssuerResult GetIssuer(DatabaseApp databaseApp, Guid vbUserID)
+        {
+            IssuerResult result = new IssuerResult();
+            result.IssuerCompanyAddress = databaseApp.CompanyAddress.Where(c => c.VBUserID == vbUserID).FirstOrDefault();
+            if (result.IssuerCompanyAddress != null)
+            {
+                result.CompanyPeople = databaseApp.CompanyPerson.Where(c => c.CompanyID == result.IssuerCompanyAddress.CompanyID).OrderBy(c => c.Name1).ToList();
+                result.IssuerCompanyPerson = databaseApp.CompanyPerson.Where(c => c.VBUserID == vbUserID).FirstOrDefault();
+                string issuerCompanyPerson = "-";
+                if (result.IssuerCompanyPerson != null)
+                    issuerCompanyPerson = result.IssuerCompanyPerson.Name1 + " " + result.IssuerCompanyPerson.Name2;
+                result.IssuerMessage = string.Format(@"{0} - {1} | {2}", result.IssuerCompanyAddress.ACCaption, result.IssuerCompanyAddress.InvoiceIssuerNo, issuerCompanyPerson);
+            }
+            else
+                result.IssuerMessage = Root.Environment.TranslateMessage(this, "Warning50039", Root.Environment.User.VBUserNo);
+            return result;
+        }
 
         public CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
         {
