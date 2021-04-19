@@ -457,7 +457,7 @@ namespace gip.bso.sales
         #region Issuer -> IssuerCompanyAddress
 
         private CompanyAddress _IssuerCompanyAddress;
-        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'IssuerCompanyAddress'}de{'IssuerCompanyAddress'}")]
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}")]
         public CompanyAddress IssuerCompanyAddress
         {
             get
@@ -905,7 +905,7 @@ namespace gip.bso.sales
 
         #region Methods => Report
 
-        private void BuildOutOfferPosData()
+        private void BuildOutOfferPosData(string langCode)
         {
             if (CurrentOutOffer == null)
                 return;
@@ -920,7 +920,7 @@ namespace gip.bso.sales
                 {
                     OutOfferPos sumPos = new OutOfferPos();
                     sumPos.Total = outOfferPos.Items.Sum(c => c.TotalPrice).ToString("N");
-                    sumPos.MaterialNo = "SubTotal " + outOfferPos.Material.MaterialNo;
+                    sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50063", langCode) + outOfferPos.Material.MaterialNo; // Info50063.
                     sumPos.Sequence = outOfferPos.Sequence;
                     sumPos.GroupSum = outOfferPos.GroupSum;
                     posData.Add(sumPos);
@@ -932,7 +932,7 @@ namespace gip.bso.sales
             if (OutOfferPosDiscountList != null && OutOfferPosDiscountList.Any())
             {
                 //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
-                OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Zwischensumme inkl. Rabatt:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal });
+                OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50064", langCode), PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal }); //Info50064.
             }
 
             CalculateTaxOverview();
@@ -956,7 +956,16 @@ namespace gip.bso.sales
                                                                                  && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn" || c.ACClassDesign.ACIdentifier == "OfferHr"))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
-                    BuildOutOfferPosData();
+                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c=>c.ACClassDesign).FirstOrDefault();
+                    string langCode  = "de";
+                    if(design != null)
+                    {
+                        if(design.ACIdentifier == "OfferHr")
+                            langCode = "hr";
+                         if(design.ACIdentifier == "OfferEn")
+                            langCode = "en";
+                    }
+                    BuildOutOfferPosData(langCode);
                 }
             }
             else

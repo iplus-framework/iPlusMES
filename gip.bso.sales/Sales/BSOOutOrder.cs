@@ -955,7 +955,7 @@ namespace gip.bso.sales
         #region Issuer -> IssuerCompanyAddress
 
         private CompanyAddress _IssuerCompanyAddress;
-        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'IssuerCompanyAddress'}de{'IssuerCompanyAddress'}")]
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}")]
         public CompanyAddress IssuerCompanyAddress
         {
             get
