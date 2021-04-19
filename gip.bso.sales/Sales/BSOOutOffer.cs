@@ -48,7 +48,7 @@ namespace gip.bso.sales
             IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
             _IssuerCompanyPersonList = issuerResult.CompanyPeople;
             OnPropertyChanged("IssuerCompanyPersonList");
-             IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
+            IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
             SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
 
             return true;
@@ -956,13 +956,13 @@ namespace gip.bso.sales
                                                                                  && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn" || c.ACClassDesign.ACIdentifier == "OfferHr"))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
-                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c=>c.ACClassDesign).FirstOrDefault();
-                    string langCode  = "de";
-                    if(design != null)
+                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
+                    string langCode = "de";
+                    if (design != null)
                     {
-                        if(design.ACIdentifier == "OfferHr")
+                        if (design.ACIdentifier == "OfferHr")
                             langCode = "hr";
-                         if(design.ACIdentifier == "OfferEn")
+                        if (design.ACIdentifier == "OfferEn")
                             langCode = "en";
                     }
                     BuildOutOfferPosData(langCode);
@@ -1014,6 +1014,28 @@ namespace gip.bso.sales
                     }
                 }
             }
+        }
+
+        #endregion
+
+        #region Methods -> Invoice
+
+        [ACMethodCommand(OutOffer.ClassName, "en{'Create Order'}de{'Angebot machen'}", (short)MISort.Cancel)]
+        public void CreateOutOrder()
+        {
+            if (!IsEnabledCreateOutOrder())
+                return;
+            Msg msg = OutDeliveryNoteManager.NewOutOrderFromOutOffer(DatabaseApp, CurrentOutOffer);
+            if (msg != null)
+                Root.Messages.Msg(msg);
+        }
+
+        public bool IsEnabledCreateOutOrder()
+        {
+            return
+                OutDeliveryNoteManager != null
+                && CurrentOutOffer != null
+                && !CurrentOutOffer.OutOfferConfig_OutOffer.Any();
         }
 
         #endregion
