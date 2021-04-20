@@ -120,6 +120,17 @@ namespace gip.mes.facility
             return _BookParamOutCancelClone;
         }
 
+        ACMethodBooking _BookParamOutwardMovementOnEmptyingFacilityClone;
+        public ACMethodBooking BookParamOutwardMovementOnEmptyingFacilityClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamOutwardMovementOnEmptyingFacilityClone != null)
+                return _BookParamOutwardMovementOnEmptyingFacilityClone;
+            if (facilityManager == null)
+                return null;
+            _BookParamOutwardMovementOnEmptyingFacilityClone = facilityManager.ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutwardOnEmptyingFacility.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            return _BookParamOutwardMovementOnEmptyingFacilityClone;
+        }
+
         private ACPropertyConfigValue<double> _TolRemainingCallQ;
         [ACPropertyConfig("en{'Tolerance in called up quantity %'}de{'Toleranz Abrufmenge %'}")]
         public double TolRemainingCallQ
@@ -1005,9 +1016,13 @@ namespace gip.mes.facility
         #endregion
 
         #region BookingOutward
-        public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation)
+        public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation, 
+                                                               bool onEmptyingFacility = false)
         {
             ACMethodBooking acMethodClone = BookParamOutwardMovementClone(facilityManager, dbApp);
+            if (onEmptyingFacility)
+                acMethodClone = BookParamOutwardMovementOnEmptyingFacilityClone(facilityManager, dbApp);
+
             partsListPosRelation.AutoRefresh(dbApp);
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
             FacilityPreBooking facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, partsListPosRelation, secondaryKey); // TODO später: Child-Instanz erzeugen
@@ -1050,7 +1065,8 @@ namespace gip.mes.facility
                 return null;
             foreach (FacilityBooking previousBooking in partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation)
             {
-                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward)
+                if (   previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
+                    || previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                     continue;
                 // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
                 // da der Positionsstatus auch MDOutOrderPosState.OutOrderPosStates.Cancelled sein müsste
@@ -1060,7 +1076,8 @@ namespace gip.mes.facility
 
             foreach (FacilityBooking previousBooking in partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation)
             {
-                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward)
+                if (   previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
+                    || previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                     continue;
                 acMethodClone = BookParamOutCancelClone(facilityManager, dbApp);
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
