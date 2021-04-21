@@ -569,6 +569,17 @@ namespace gip.mes.facility
         #endregion
 
         #region Invoice
+
+        /*
+         
+        Info50062	en{'Invoice {0} created!'}de{'Rechnung {0} gemacht!'}
+        Info50065	en{'Sales Order {0} created!'}de{'Kundenauftrag {0} gemacht!'}
+
+        */
+
+        #region Invoice -> OutOrder
+
+
         [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public Msg NewOutOrderFromOutOffer(DatabaseApp databaseApp, OutOffer outOffer)
         {
@@ -646,7 +657,10 @@ namespace gip.mes.facility
                     }
                 }
 
+                databaseApp.OutOrder.AddObject(outOrder);
                 databaseApp.SaveChanges();
+
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50065", outOrder.OutOrderNo)};
             }
             catch (Exception ec)
             {
@@ -655,6 +669,10 @@ namespace gip.mes.facility
 
             return msg;
         }
+
+        #endregion
+
+        #region Invoice -> Invoice
 
         [ACMethodInfo("", "en{'NewInvoiceFromOutDeliveryNote'}de{'NewInvoiceFromOutDeliveryNote'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public Msg NewInvoiceFromOutDeliveryNote(DatabaseApp databaseApp, DeliveryNote deliveryNote)
@@ -707,6 +725,7 @@ namespace gip.mes.facility
                     invoice.InvoicePos_Invoice.Add(invoicePos);
                 }
                 databaseApp.SaveChanges();
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", invoice.InvoiceNo)};
             }
             catch (Exception ec)
             {
@@ -768,46 +787,12 @@ namespace gip.mes.facility
             return msg;
         }
 
-        private InvoicePos GetInvoicePos(DatabaseApp databaseApp, Invoice invoice, int nr, OutOrderPos outOrderPos)
-        {
-            InvoicePos invoicePos = InvoicePos.NewACObject(databaseApp, invoice);
-            invoicePos.Sequence = nr;
+        #endregion
 
-            invoicePos.Material = outOrderPos.Material;
-            invoicePos.MDUnit = outOrderPos.MDUnit;
-            invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
-            invoicePos.TargetQuantity = invoicePos.MDUnit != null ?
-                invoicePos.MDUnit.ConvertToUnit(invoicePos.TargetQuantityUOM, invoicePos.Material.BaseMDUnit)
-                : invoicePos.TargetQuantityUOM;
-
-            invoicePos.PriceNet = outOrderPos.PriceNet;
-            invoicePos.PriceGross = outOrderPos.PriceGross;
-            invoicePos.SalesTax = outOrderPos.SalesTax;
-
-            invoicePos.MDCountrySalesTax = outOrderPos.MDCountrySalesTax;
-            invoicePos.MDCountrySalesTaxMDMaterialGroup = outOrderPos.MDCountrySalesTaxMDMaterialGroup;
-            invoicePos.MDCountrySalesTaxMaterial = outOrderPos.MDCountrySalesTaxMaterial;
-
-            OutOrderPos topPos = outOrderPos.TopParentOutOrderPos;
-            OutOrderPos invoicePosRelation =
-                OutOrderPos.NewACObject(databaseApp, topPos);
-
-            invoicePosRelation.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
-            invoicePosRelation.TargetQuantity = outOrderPos.TargetQuantity;
-            invoicePosRelation.ActualQuantityUOM = outOrderPos.ActualQuantityUOM;
-            invoicePosRelation.ActualQuantity = outOrderPos.ActualQuantity;
-            invoicePosRelation.CalledUpQuantityUOM = outOrderPos.CalledUpQuantityUOM;
-            invoicePosRelation.CalledUpQuantity = outOrderPos.CalledUpQuantity;
-            invoicePosRelation.ExternQuantityUOM = outOrderPos.ExternQuantityUOM;
-            invoicePosRelation.ExternQuantity = outOrderPos.ExternQuantity;
-
-            invoicePos.OutOrderPos = invoicePosRelation;
-            invoicePos.XMLDesign = outOrderPos.XMLDesign;
-            return invoicePos;
-        }
+        #region Invoice -> IOutOrder & IOutOrderPosBSO
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public void HandleIOrderPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrder item, CompanyAddress issuerCompanyAddress)
+        public void HandleIOrderPropertyChange(string propertyName, IOutOrder item, CompanyAddress issuerCompanyAddress)
         {
             if (item != null)
             {
@@ -837,7 +822,6 @@ namespace gip.mes.facility
             }
 
         }
-
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrderPos posItem, CompanyAddress billingCompanyAddress)
@@ -983,8 +967,11 @@ namespace gip.mes.facility
                 result.IssuerMessage = Root.Environment.TranslateMessage(this, "Warning50039", Root.Environment.User.VBUserNo);
             return result;
         }
+        #endregion
 
-        public CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
+        #region Invoice -> Private
+
+        private CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
         {
             CountrySalesTaxModel model = new CountrySalesTaxModel();
             model.MDCountrySalesTax =
@@ -1016,6 +1003,46 @@ namespace gip.mes.facility
                 );
             return model;
         }
+
+        private InvoicePos GetInvoicePos(DatabaseApp databaseApp, Invoice invoice, int nr, OutOrderPos outOrderPos)
+        {
+            InvoicePos invoicePos = InvoicePos.NewACObject(databaseApp, invoice);
+            invoicePos.Sequence = nr;
+
+            invoicePos.Material = outOrderPos.Material;
+            invoicePos.MDUnit = outOrderPos.MDUnit;
+            invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
+            invoicePos.TargetQuantity = invoicePos.MDUnit != null ?
+                invoicePos.MDUnit.ConvertToUnit(invoicePos.TargetQuantityUOM, invoicePos.Material.BaseMDUnit)
+                : invoicePos.TargetQuantityUOM;
+
+            invoicePos.PriceNet = outOrderPos.PriceNet;
+            invoicePos.PriceGross = outOrderPos.PriceGross;
+            invoicePos.SalesTax = outOrderPos.SalesTax;
+
+            invoicePos.MDCountrySalesTax = outOrderPos.MDCountrySalesTax;
+            invoicePos.MDCountrySalesTaxMDMaterialGroup = outOrderPos.MDCountrySalesTaxMDMaterialGroup;
+            invoicePos.MDCountrySalesTaxMaterial = outOrderPos.MDCountrySalesTaxMaterial;
+
+            OutOrderPos topPos = outOrderPos.TopParentOutOrderPos;
+            OutOrderPos invoicePosRelation =
+                OutOrderPos.NewACObject(databaseApp, topPos);
+
+            invoicePosRelation.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
+            invoicePosRelation.TargetQuantity = outOrderPos.TargetQuantity;
+            invoicePosRelation.ActualQuantityUOM = outOrderPos.ActualQuantityUOM;
+            invoicePosRelation.ActualQuantity = outOrderPos.ActualQuantity;
+            invoicePosRelation.CalledUpQuantityUOM = outOrderPos.CalledUpQuantityUOM;
+            invoicePosRelation.CalledUpQuantity = outOrderPos.CalledUpQuantity;
+            invoicePosRelation.ExternQuantityUOM = outOrderPos.ExternQuantityUOM;
+            invoicePosRelation.ExternQuantity = outOrderPos.ExternQuantity;
+
+            invoicePos.OutOrderPos = invoicePosRelation;
+            invoicePos.XMLDesign = outOrderPos.XMLDesign;
+            return invoicePos;
+        }
+
+        #endregion
 
         #endregion
 

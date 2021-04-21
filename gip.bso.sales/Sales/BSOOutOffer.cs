@@ -148,7 +148,7 @@ namespace gip.bso.sales
         void CurrentOutOffer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
@@ -1035,7 +1035,7 @@ namespace gip.bso.sales
             return
                 OutDeliveryNoteManager != null
                 && CurrentOutOffer != null
-                && !CurrentOutOffer.OutOfferConfig_OutOffer.Any();
+                && !CurrentOutOffer.OutOrder_BasedOnOutOffer.Any();
         }
 
         #endregion

@@ -38,6 +38,8 @@ namespace gip.bso.sales
             if (!base.ACInit(startChildMode))
                 return false;
 
+            TempReportData = new ReportData();
+
             _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("InDeliveryNoteManager not configured");
@@ -279,7 +281,7 @@ namespace gip.bso.sales
         void CurrentOutOrder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOrder, IssuerCompanyAddress);
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOrder, IssuerCompanyAddress);
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
@@ -1033,6 +1035,25 @@ namespace gip.bso.sales
         }
 
         #endregion
+
+        #endregion
+
+        #region Properties => Report
+
+        private ReportData _TempReportData;
+        [ACPropertyInfo(9999)]
+        public ReportData TempReportData
+        {
+            get
+            {
+                return _TempReportData;
+            }
+            set
+            {
+                _TempReportData = value;
+                OnPropertyChanged("TempReportData");
+            }
+        }
 
         #endregion
 

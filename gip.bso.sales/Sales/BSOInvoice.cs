@@ -261,7 +261,7 @@ namespace gip.bso.sales
         void CurrentInvoice_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoice, IssuerCompanyAddress);
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentInvoice, IssuerCompanyAddress);
 
             switch (e.PropertyName)
             {

@@ -294,16 +294,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="TrackingCommon\2021-04-05 22-12_aaginic.zip">
+    <None Include="VBControlScripts\2021-04-21 22-11_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Manager\SchedulingForecastManager-UpdateBatchPlan.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="VBControlScripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\gip.mes.facility.shared\gip.mes.facility.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
