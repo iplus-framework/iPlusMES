@@ -1540,10 +1540,7 @@ namespace gip.mes.processapplication
                                                         string dis2SpecialDest, double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
                                                         bool isEndlessDosing, bool thisDosingIsInTol, Msg msg, MDProdOrderPartslistPosState posState, ref bool changePosState)
         {
-            if (outwardFacility != null && outwardFacility.OrderPostingOnEmptying 
-              && ( dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
-                || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
-                || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait))
+            if (outwardFacility != null && outwardFacility.OrderPostingOnEmptying)
             {
                 actualQuantity = outwardFacility.CurrentFacilityStock.StockQuantity;
 
