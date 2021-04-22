@@ -394,7 +394,7 @@ namespace gip.mes.processapplication
                                 {
                                     if (!LastCalculatedRouteablePMList.Contains(module))
                                     {
-                                        Guid[] allPossibleModulesinThisWF = RootPW.AllPossibleModules.Select(c => c.ComponentClass.ACClassID).ToArray();
+                                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
                                         RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
                                             module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
                                             (c, p, r) => targets.Contains(c.ACClassID),
@@ -500,7 +500,7 @@ namespace gip.mes.processapplication
                                             if (!LastCalculatedRouteablePMList.Contains(module)
                                                 && selectedModules.Where(c => c.ACClassID == module.ComponentClass.ACClassID).Any())
                                             {
-                                                Guid[] allPossibleModulesinThisWF = RootPW.AllPossibleModules.Select(c => c.ComponentClass.ACClassID).ToArray();
+                                                Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
                                                 RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
                                                     module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
                                                                     (c, p, r) => targets.Contains(c.ACClassID),
@@ -632,7 +632,7 @@ namespace gip.mes.processapplication
                 {
                     if (!LastCalculatedRouteablePMList.Contains(module))
                     {
-                        Guid[] allPossibleModulesinThisWF = RootPW.AllPossibleModules.Select(c => c.ComponentClass.ACClassID).ToArray();
+                        Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
                         RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false,
                             module, SelRuleID_ReachableDest, RouteDirections.Forwards, new object[] { targets, allPossibleModulesinThisWF },
                                             (c, p, r) => c.ACClassID == pickingPos.ToFacility.VBiFacilityACClassID.Value,
