@@ -24,7 +24,7 @@ namespace gip.mes.webservices
                                    .Include("Partslist")
                                    .Include("Partslist.Material")
                                    .Include("Partslist.Material.BaseMDUnit")
-                                   .Where(c =>    (prodOrderPartslistID.HasValue && c.ProdOrderPartslistID == prodOrderPartslistID.Value)
+                                   .Where(c => (prodOrderPartslistID.HasValue && c.ProdOrderPartslistID == prodOrderPartslistID.Value)
                                                || (!prodOrderPartslistID.HasValue && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex == (short)MDProdOrderState.ProdOrderStates.InProduction)
                                    )
                                    .OrderByDescending(x => x.UpdateDate)
@@ -123,10 +123,10 @@ namespace gip.mes.webservices
                                                            .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
                                                            .Include("ProdOrderPartslistPos1_ParentProdOrderPartslistPos")
                                                            .Include("Material.MaterialWFRelation_SourceMaterial")
-                                                           .Where(c =>  (    prodOrderPartslistID.HasValue 
+                                                           .Where(c => (prodOrderPartslistID.HasValue
                                                                           && c.ProdOrderPartslistID == prodOrderPartslistID
                                                                           && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
-                                                                      || (   prodOrderPartslistPosID.HasValue
+                                                                      || (prodOrderPartslistPosID.HasValue
                                                                           && c.ProdOrderPartslistPosID == prodOrderPartslistPosID)
                                                                  )
                                                            .OrderBy(x => x.Sequence)
@@ -368,12 +368,12 @@ namespace gip.mes.webservices
                                                    .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos")
                                                    .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos.Material")
                                                    .Include("Material.MaterialWFRelation_SourceMaterial")
-                                                   .Where(c => (       parentIntermediateID.HasValue
+                                                   .Where(c => (parentIntermediateID.HasValue
                                                                     && c.ParentProdOrderPartslistPosID == parentIntermediateID
                                                                     && c.ProdOrderBatch != null
-                                                                    && (   c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                    && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
                                                                         || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
-                                                            || (       batchIntermediateID.HasValue
+                                                            || (batchIntermediateID.HasValue
                                                                     && c.ProdOrderPartslistPosID == batchIntermediateID)
                                                    )
                                                    .OrderBy(x => x.Sequence)
@@ -689,7 +689,7 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(intermBatchID, out batchID))
                 return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "The given parameter intermBatchID is incorrect!"));
 
-            List<Facility> result;
+            List<Facility> result = new List<Facility>();
 
             try
             {
@@ -707,10 +707,10 @@ namespace gip.mes.webservices
                                                       .Where(x => x.FacilityID.HasValue)
                                                       .Select(c => new Facility()
                                                       {
-                                                        FacilityID = c.Facility.FacilityID,
-                                                        FacilityNo = c.Facility.FacilityNo,
-                                                        FacilityName = c.Facility.FacilityName,
-                                                        ParentFacilityID = c.Facility.ParentFacilityID
+                                                          FacilityID = c.Facility.FacilityID,
+                                                          FacilityNo = c.Facility.FacilityNo,
+                                                          FacilityName = c.Facility.FacilityName,
+                                                          ParentFacilityID = c.Facility.ParentFacilityID
                                                       })
                                                       .ToList();
                 }

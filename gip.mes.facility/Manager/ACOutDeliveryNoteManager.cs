@@ -569,7 +569,112 @@ namespace gip.mes.facility
         #endregion
 
         #region Invoice
+
+        /*
+         
+        Info50062	en{'Invoice {0} created!'}de{'Rechnung {0} gemacht!'}
+        Info50065	en{'Sales Order {0} created!'}de{'Kundenauftrag {0} gemacht!'}
+
+        */
+
+        #region Invoice -> OutOrder
+
+
         [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        public Msg NewOutOrderFromOutOffer(DatabaseApp databaseApp, OutOffer outOffer)
+        {
+            Msg msg = null;
+            try
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOrder), OutOrder.NoColumnName, OutOrder.FormatNewNo, this);
+                OutOrder outOrder = OutOrder.NewACObject(databaseApp, null, secondaryKey);
+                outOrder.OutOrderDate = DateTime.Now;
+                outOrder.BasedOnOutOffer = outOffer;
+                outOrder.MDOutOrderType = outOffer.MDOutOrderType;
+                outOrder.MDTermOfPayment = outOffer.MDTermOfPayment;
+                outOrder.CustomerCompany = outOffer.CustomerCompany;
+                outOrder.IssuerCompanyAddress = outOffer.IssuerCompanyAddress;
+                outOrder.IssuerCompanyPerson = outOffer.IssuerCompanyPerson;
+                outOrder.DeliveryCompanyAddress = outOffer.DeliveryCompanyAddress;
+                outOrder.BillingCompanyAddress = outOffer.BillingCompanyAddress;
+                outOrder.TargetDeliveryDate = outOffer.TargetDeliveryDate;
+                outOrder.TargetDeliveryMaxDate = outOffer.TargetDeliveryMaxDate;
+                outOrder.MDTimeRange = outOffer.MDTimeRange;
+                outOrder.MDDelivType = outOffer.MDDelivType;
+                outOrder.PriceNet = outOffer.PriceNet;
+                outOrder.PriceGross = outOffer.PriceGross;
+                outOrder.SalesTax = outOffer.SalesTax;
+                outOrder.Comment = outOffer.Comment;
+                outOrder.XMLDesignStart = outOffer.XMLDesignStart;
+                outOrder.XMLDesignEnd = outOffer.XMLDesignEnd;
+
+                Dictionary<Guid, Guid> connection = new Dictionary<Guid, Guid>();
+
+                foreach (OutOfferPos outOfferPos in outOffer.OutOfferPos_OutOffer)
+                {
+                    OutOrderPos outOrderPos = OutOrderPos.NewACObject(databaseApp, outOrder);
+
+                    connection.Add(outOfferPos.OutOfferPosID, outOrderPos.OutOrderPosID);
+
+                    outOrderPos.MDTimeRange = outOfferPos.MDTimeRange;
+
+                    outOrderPos.MaterialPosTypeIndex = outOfferPos.MaterialPosTypeIndex;
+                    outOrderPos.MDCountrySalesTax = outOfferPos.MDCountrySalesTax;
+                    outOrderPos.MDCountrySalesTaxMDMaterialGroup = outOfferPos.MDCountrySalesTaxMDMaterialGroup;
+                    outOrderPos.MDCountrySalesTaxMaterial = outOfferPos.MDCountrySalesTaxMaterial;
+                    outOrderPos.Sequence = outOfferPos.Sequence;
+                    outOrderPos.Material = outOfferPos.Material;
+                    outOrderPos.MDUnit = outOfferPos.MDUnit;
+                    outOrderPos.TargetQuantityUOM = outOfferPos.TargetQuantityUOM;
+                    outOrderPos.TargetQuantity = outOfferPos.TargetQuantity;
+                    outOrderPos.PriceNet = outOfferPos.PriceNet;
+                    outOrderPos.PriceGross = outOfferPos.PriceGross;
+                    outOrderPos.SalesTax = outOfferPos.SalesTax;
+
+
+                    outOrderPos.GroupSum = outOfferPos.GroupSum;
+                    outOrderPos.TargetDeliveryDate = outOfferPos.TargetDeliveryDate;
+                    outOrderPos.TargetDeliveryMaxDate = outOfferPos.TargetDeliveryMaxDate;
+                    outOrderPos.TargetDeliveryPriority = outOfferPos.TargetDeliveryPriority;
+
+                    outOrderPos.Comment = outOfferPos.Comment;
+                    outOrderPos.Comment2 = outOfferPos.Comment2;
+                    outOrderPos.XMLDesign = outOfferPos.XMLDesign;
+
+                    outOrder.OutOrderPos_OutOrder.Add(outOrderPos);
+                }
+
+                // Update parents
+                foreach (OutOfferPos outOfferPos in outOffer.OutOfferPos_OutOffer)
+                {
+                    if (outOfferPos.ParentOutOfferPosID != null)
+                    {
+                        Guid outOrderPosID = connection[outOffer.OutOfferID];
+                        OutOrderPos relatedPos = outOrder.OutOrderPos_OutOrder.Where(c => c.OutOrderID == outOrderPosID).FirstOrDefault();
+                        Guid parentOutOrderPosID = connection[outOfferPos.ParentOutOfferPosID ?? Guid.Empty];
+                        OutOrderPos parentRelatedPos = outOrder.OutOrderPos_OutOrder.Where(c => c.OutOrderID == parentOutOrderPosID).FirstOrDefault();
+                        relatedPos.OutOrderPos1_ParentOutOrderPos = parentRelatedPos;
+                    }
+                }
+
+                databaseApp.OutOrder.AddObject(outOrder);
+                databaseApp.SaveChanges();
+
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50065", outOrder.OutOrderNo)};
+            }
+            catch (Exception ec)
+            {
+                msg = new Msg() { MessageLevel = eMsgLevel.Exception, Message = ec.Message };
+            }
+
+            return msg;
+        }
+
+        #endregion
+
+        #region Invoice -> Invoice
+
+        [ACMethodInfo("", "en{'NewInvoiceFromOutDeliveryNote'}de{'NewInvoiceFromOutDeliveryNote'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public Msg NewInvoiceFromOutDeliveryNote(DatabaseApp databaseApp, DeliveryNote deliveryNote)
         {
             Msg msg = null;
@@ -583,57 +688,53 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Info50002")
                 };
             }
-
-            if (deliveryNote == null || deliveryNote == null)
+            try
             {
-                throw new ArgumentNullException(Root.Environment.TranslateMessage(this, "Error50009"));
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
+                Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
+
+                // Selected first outorder but can be many
+                OutOrder outOrder =
+                    deliveryNote
+                    .DeliveryNotePos_DeliveryNote
+                    .OrderBy(c => c.Sequence)
+                    .FirstOrDefault()
+                    .OutOrderPos
+                    .OutOrder;
+                invoice.OutOrder = outOrder;
+
+                invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
+                invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
+                invoice.InvoiceDate = DateTime.Now;
+                invoice.CustomerCompany = outOrder.CustomerCompany;
+                invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
+                invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
+
+                List<OutOrderPos> items =
+                    deliveryNote
+                    .DeliveryNotePos_DeliveryNote
+                    .OrderBy(c => c.Sequence)
+                    .Select(c => c.OutOrderPos)
+                    .ToList();
+
+                int nr = 0;
+                foreach (OutOrderPos outOrderPos in items)
+                {
+                    nr++;
+                    InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
+                    invoice.InvoicePos_Invoice.Add(invoicePos);
+                }
+                databaseApp.SaveChanges();
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", invoice.InvoiceNo)};
             }
-
-            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
-            Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
-
-            // Selected first outorder but can be many
-            OutOrder outOrder =
-                deliveryNote
-                .DeliveryNotePos_DeliveryNote
-                .OrderBy(c => c.Sequence)
-                .FirstOrDefault()
-                .OutOrderPos
-                .OutOrder;
-            invoice.OutOrder = outOrder;
-
-            invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
-            invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
-            invoice.InvoiceDate = DateTime.Now;
-            invoice.CustomerCompany = outOrder.CustomerCompany;
-            invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
-            invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
-
-            List<OutOrderPos> items =
-                deliveryNote
-                .DeliveryNotePos_DeliveryNote
-                .OrderBy(c => c.Sequence)
-                .Select(c => c.OutOrderPos)
-                .ToList();
-
-            int nr = 0;
-            foreach (OutOrderPos outOrderPos in items)
+            catch (Exception ec)
             {
-                nr++;
-                InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
-                invoice.InvoicePos_Invoice.Add(invoicePos);
-            }
-            msg = databaseApp.ACSaveChanges();
-            if (msg == null || msg.IsSucceded())
-            {
-                string message = this.Root.Environment.TranslateMessage(this, "Info50062", secondaryKey);
-                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = message };
+                msg = new Msg() { MessageLevel = eMsgLevel.Exception, Message = ec.Message };
             }
             return msg;
         }
 
-
-        [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("", "en{'NewInvoiceFromOutOrder'}de{'NewInvoiceFromOutOrder'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
         public Msg NewInvoiceFromOutOrder(DatabaseApp databaseApp, OutOrder outOrder)
         {
             Msg msg = null;
@@ -647,85 +748,79 @@ namespace gip.mes.facility
                     Message = Root.Environment.TranslateMessage(this, "Info50002")
                 };
             }
-
-
-            if (outOrder == null || outOrder == null)
+            try
             {
-                throw new ArgumentNullException(Root.Environment.TranslateMessage(this, "Error50009"));
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
+                Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
+                invoice.OutOrder = outOrder;
+                invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
+                invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
+                invoice.InvoiceDate = DateTime.Now;
+                invoice.CustomerCompany = outOrder.CustomerCompany;
+                invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
+                invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
+                invoice.XMLDesignStart = outOrder.XMLDesignStart;
+                invoice.XMLDesignEnd = outOrder.XMLDesignEnd;
+
+                List<OutOrderPos> items =
+                    outOrder
+                    .OutOrderPos_OutOrder
+                    .Where(c => c.ParentOutOrderPosID == null)
+                    .OrderBy(c => c.Sequence)
+                    .ToList();
+
+                int nr = 0;
+                foreach (OutOrderPos outOrderPos in items)
+                {
+                    nr++;
+                    InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
+                    invoice.InvoicePos_Invoice.Add(invoicePos);
+                }
+                databaseApp.SaveChanges();
+            }
+            catch (Exception ec)
+            {
+                msg = new Msg() { MessageLevel = eMsgLevel.Exception, Message = ec.Message };
             }
 
-            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
-            Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
-            invoice.OutOrder = outOrder;
-            invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
-            invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
-            invoice.InvoiceDate = DateTime.Now;
-            invoice.CustomerCompany = outOrder.CustomerCompany;
-            invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
-            invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
-            invoice.XMLDesignStart = outOrder.XMLDesignStart;
-            invoice.XMLDesignEnd = outOrder.XMLDesignEnd;
-
-            List<OutOrderPos> items =
-                outOrder
-                .OutOrderPos_OutOrder
-                .Where(c => c.ParentOutOrderPosID == null)
-                .OrderBy(c => c.Sequence)
-                .ToList();
-
-            int nr = 0;
-            foreach (OutOrderPos outOrderPos in items)
-            {
-                nr++;
-                InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
-                invoice.InvoicePos_Invoice.Add(invoicePos);
-            }
-            msg = databaseApp.ACSaveChanges();
-            if (msg == null || msg.IsSucceded())
-            {
-                string message = this.Root.Environment.TranslateMessage(this, "Info50062", secondaryKey);
-                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = message };
-            }
             PostExecute("GenerateInvoice");
             return msg;
         }
 
-        private InvoicePos GetInvoicePos(DatabaseApp databaseApp, Invoice invoice, int nr, OutOrderPos outOrderPos)
+        #endregion
+
+        #region Invoice -> IOutOrder & IOutOrderPosBSO
+
+        [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        public void HandleIOrderPropertyChange(string propertyName, IOutOrder item, CompanyAddress issuerCompanyAddress)
         {
-            InvoicePos invoicePos = InvoicePos.NewACObject(databaseApp, invoice);
-            invoicePos.Sequence = nr;
+            if (item != null)
+            {
+                switch (propertyName)
+                {
+                    case "CustomerCompanyID":
+                        if (item.CustomerCompany != null)
+                        {
+                            item.BillingCompanyAddress = item.CustomerCompany.BillingCompanyAddress;
+                            item.DeliveryCompanyAddress = item.CustomerCompany.DeliveryCompanyAddress;
+                        }
+                        else
+                        {
+                            item.BillingCompanyAddress = null;
+                            item.DeliveryCompanyAddress = null;
+                        }
+                        break;
+                    case "IssuerCompanyPersonID":
+                        if (item.IssuerCompanyPerson != null)
+                        {
+                            item.IssuerCompanyAddress = issuerCompanyAddress;
+                        }
+                        else
+                            item.IssuerCompanyAddress = null;
+                        break;
+                }
+            }
 
-            invoicePos.Material = outOrderPos.Material;
-            invoicePos.MDUnit = outOrderPos.MDUnit;
-            invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
-            invoicePos.TargetQuantity = invoicePos.MDUnit != null ?
-                invoicePos.MDUnit.ConvertToUnit(invoicePos.TargetQuantityUOM, invoicePos.Material.BaseMDUnit)
-                : invoicePos.TargetQuantityUOM;
-
-            invoicePos.PriceNet = outOrderPos.PriceNet;
-            invoicePos.PriceGross = outOrderPos.PriceGross;
-            invoicePos.SalesTax = outOrderPos.SalesTax;
-
-            invoicePos.MDCountrySalesTax = outOrderPos.MDCountrySalesTax;
-            invoicePos.MDCountrySalesTaxMDMaterialGroup = outOrderPos.MDCountrySalesTaxMDMaterialGroup;
-            invoicePos.MDCountrySalesTaxMaterial = outOrderPos.MDCountrySalesTaxMaterial;
-
-            OutOrderPos topPos = outOrderPos.TopParentOutOrderPos;
-            OutOrderPos invoicePosRelation =
-                OutOrderPos.NewACObject(databaseApp, topPos);
-
-            invoicePosRelation.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
-            invoicePosRelation.TargetQuantity = outOrderPos.TargetQuantity;
-            invoicePosRelation.ActualQuantityUOM = outOrderPos.ActualQuantityUOM;
-            invoicePosRelation.ActualQuantity = outOrderPos.ActualQuantity;
-            invoicePosRelation.CalledUpQuantityUOM = outOrderPos.CalledUpQuantityUOM;
-            invoicePosRelation.CalledUpQuantity = outOrderPos.CalledUpQuantity;
-            invoicePosRelation.ExternQuantityUOM = outOrderPos.ExternQuantityUOM;
-            invoicePosRelation.ExternQuantity = outOrderPos.ExternQuantity;
-
-            invoicePos.OutOrderPos = invoicePosRelation;
-            invoicePos.XMLDesign = outOrderPos.XMLDesign;
-            return invoicePos;
         }
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
@@ -855,8 +950,28 @@ namespace gip.mes.facility
                 }
         }
 
+        public IssuerResult GetIssuer(DatabaseApp databaseApp, Guid vbUserID)
+        {
+            IssuerResult result = new IssuerResult();
+            result.IssuerCompanyAddress = databaseApp.CompanyAddress.Where(c => c.VBUserID == vbUserID).FirstOrDefault();
+            if (result.IssuerCompanyAddress != null)
+            {
+                result.CompanyPeople = databaseApp.CompanyPerson.Where(c => c.CompanyID == result.IssuerCompanyAddress.CompanyID).OrderBy(c => c.Name1).ToList();
+                result.IssuerCompanyPerson = databaseApp.CompanyPerson.Where(c => c.VBUserID == vbUserID).FirstOrDefault();
+                string issuerCompanyPerson = "-";
+                if (result.IssuerCompanyPerson != null)
+                    issuerCompanyPerson = result.IssuerCompanyPerson.Name1 + " " + result.IssuerCompanyPerson.Name2;
+                result.IssuerMessage = string.Format(@"{0} - {1} | {2}", result.IssuerCompanyAddress.ACCaption, result.IssuerCompanyAddress.InvoiceIssuerNo, issuerCompanyPerson);
+            }
+            else
+                result.IssuerMessage = Root.Environment.TranslateMessage(this, "Warning50039", Root.Environment.User.VBUserNo);
+            return result;
+        }
+        #endregion
 
-        public CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
+        #region Invoice -> Private
+
+        private CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
         {
             CountrySalesTaxModel model = new CountrySalesTaxModel();
             model.MDCountrySalesTax =
@@ -888,6 +1003,46 @@ namespace gip.mes.facility
                 );
             return model;
         }
+
+        private InvoicePos GetInvoicePos(DatabaseApp databaseApp, Invoice invoice, int nr, OutOrderPos outOrderPos)
+        {
+            InvoicePos invoicePos = InvoicePos.NewACObject(databaseApp, invoice);
+            invoicePos.Sequence = nr;
+
+            invoicePos.Material = outOrderPos.Material;
+            invoicePos.MDUnit = outOrderPos.MDUnit;
+            invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
+            invoicePos.TargetQuantity = invoicePos.MDUnit != null ?
+                invoicePos.MDUnit.ConvertToUnit(invoicePos.TargetQuantityUOM, invoicePos.Material.BaseMDUnit)
+                : invoicePos.TargetQuantityUOM;
+
+            invoicePos.PriceNet = outOrderPos.PriceNet;
+            invoicePos.PriceGross = outOrderPos.PriceGross;
+            invoicePos.SalesTax = outOrderPos.SalesTax;
+
+            invoicePos.MDCountrySalesTax = outOrderPos.MDCountrySalesTax;
+            invoicePos.MDCountrySalesTaxMDMaterialGroup = outOrderPos.MDCountrySalesTaxMDMaterialGroup;
+            invoicePos.MDCountrySalesTaxMaterial = outOrderPos.MDCountrySalesTaxMaterial;
+
+            OutOrderPos topPos = outOrderPos.TopParentOutOrderPos;
+            OutOrderPos invoicePosRelation =
+                OutOrderPos.NewACObject(databaseApp, topPos);
+
+            invoicePosRelation.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
+            invoicePosRelation.TargetQuantity = outOrderPos.TargetQuantity;
+            invoicePosRelation.ActualQuantityUOM = outOrderPos.ActualQuantityUOM;
+            invoicePosRelation.ActualQuantity = outOrderPos.ActualQuantity;
+            invoicePosRelation.CalledUpQuantityUOM = outOrderPos.CalledUpQuantityUOM;
+            invoicePosRelation.CalledUpQuantity = outOrderPos.CalledUpQuantity;
+            invoicePosRelation.ExternQuantityUOM = outOrderPos.ExternQuantityUOM;
+            invoicePosRelation.ExternQuantity = outOrderPos.ExternQuantity;
+
+            invoicePos.OutOrderPos = invoicePosRelation;
+            invoicePos.XMLDesign = outOrderPos.XMLDesign;
+            return invoicePos;
+        }
+
+        #endregion
 
         #endregion
 

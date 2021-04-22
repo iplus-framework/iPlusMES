@@ -503,6 +503,7 @@ namespace gip.mes.datamodel
             ProdOrderPosInwardCancel = 42,               // Wareneingang für Auftragsposition (Bestand+, Reservierter Bestand-)
             ProdOrderPosOutward = 51,              // Warenausgang für Auftragsposition (Bestand-, Reservierter Bestand+)
             ProdOrderPosOutwardCancel = 52,              // Warenausgang für Auftragsposition (Bestand-, Reservierter Bestand+)
+            ProdOrderPosOutwardOnEmptyingFacility = 53,   // // Warenausgang für Auftragsposition (Bestand-, Reservierter Bestand+)
             //ProdOrderInwardActivate = 16,               // Aktivierung einer geplanten Herstellmenge (Reservierter Bestand+)
             //ProdOrderOutwardActivate = 16,              // Aktivierung eines geplanten Materialabgangs (Reservierter Bestand-)
 
@@ -569,6 +570,7 @@ namespace gip.mes.datamodel
         public const string FBT_ProdOrderPosInwardCancel = "ProdOrderPosInwardCancel";
         public const string FBT_ProdOrderPosOutward = "ProdOrderPosOutward";
         public const string FBT_ProdOrderPosOutwardCancel = "ProdOrderPosOutwardCancel";
+        public const string FBT_ProdOrderPosOutwardOnEmptyingFacility = "ProdOrderPosOutwardOnEmptyingFacility";
 
 #if NETFRAMEWORK
         static ACValueItemList _FacilityBookingTypeList = null;
@@ -637,6 +639,7 @@ namespace gip.mes.datamodel
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosInwardCancel, "en{'Cancellation of production receipt (Stock-)'}de{'Stornierung Produktionszugang (Bestand-)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosOutward, "en{'Consumption of production (Stock-, Reserved Stock-)'}de{'Verbrauch von Produktion (Bestand-, Reservierter Bestand-)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosOutwardCancel, "en{'Cancellation of production consumption (Stock+)'}de{'Stornierung Produktionsverbrauch (Bestand+)'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility, "en{'Consumption of production on emptying facility (Stock-, Reserved Stock-)'}de{'Verbrauch von Produktion an Entleerungseinrichtung (Bestand-, Reservierter Bestand-)'}");
                 }
                 return GlobalApp._FacilityBookingTypeList;
             }

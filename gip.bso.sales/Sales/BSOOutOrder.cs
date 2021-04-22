@@ -38,6 +38,8 @@ namespace gip.bso.sales
             if (!base.ACInit(startChildMode))
                 return false;
 
+            TempReportData = new ReportData();
+
             _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("InDeliveryNoteManager not configured");
@@ -47,6 +49,14 @@ namespace gip.bso.sales
                 throw new Exception("FacilityManager not configured");
 
             Search();
+
+            IssuerResult issuerResult = OutDeliveryNoteManager.GetIssuer(DatabaseApp, Root.Environment.User.VBUserID);
+            IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
+            _IssuerCompanyPersonList = issuerResult.CompanyPeople;
+            OnPropertyChanged("IssuerCompanyPersonList");
+            IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
+            SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
+
             return true;
         }
 
@@ -270,24 +280,15 @@ namespace gip.bso.sales
 
         void CurrentOutOrder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOrder, IssuerCompanyAddress);
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
-                    if (CurrentOutOrder.CustomerCompany != null)
-                    {
-                        CurrentOutOrder.BillingCompanyAddress = CurrentOutOrder.CustomerCompany.BillingCompanyAddress;
-                        CurrentOutOrder.DeliveryCompanyAddress = CurrentOutOrder.CustomerCompany.DeliveryCompanyAddress;
-                    }
-                    else
-                    {
-                        CurrentOutOrder.BillingCompanyAddress = null;
-                        CurrentOutOrder.DeliveryCompanyAddress = null;
-                    }
                     OnPropertyChanged("BillingCompanyAddressList");
                     OnPropertyChanged("DeliveryCompanyAddressList");
                     OnPropertyChanged("CurrentBillingCompanyAddress");
                     OnPropertyChanged("CurrentDeliveryCompanyAddress");
-
                     break;
             }
         }
@@ -951,6 +952,111 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Issuer
+
+        #region Issuer -> IssuerCompanyAddress
+
+        private CompanyAddress _IssuerCompanyAddress;
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}")]
+        public CompanyAddress IssuerCompanyAddress
+        {
+            get
+            {
+                return _IssuerCompanyAddress;
+            }
+            set
+            {
+                if (_IssuerCompanyAddress != value)
+                {
+                    _IssuerCompanyAddress = value;
+                    OnPropertyChanged("IssuerCompanyAddress");
+                }
+            }
+        }
+
+        private string _IssuerCompanyAddressMessage;
+        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}")]
+        public string IssuerCompanyAddressMessage
+
+        {
+            get
+            {
+                return _IssuerCompanyAddressMessage;
+            }
+            set
+            {
+                if (_IssuerCompanyAddressMessage != value)
+                {
+                    _IssuerCompanyAddressMessage = value;
+                    OnPropertyChanged("IssuerCompanyAddressMessage");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Issuer -> IssuerCompanyPerson
+
+        private CompanyPerson _SelectedIssuerCompanyPerson;
+        /// <summary>
+        /// Selected property for CompanyPerson
+        /// </summary>
+        /// <value>The selected IssuerCompanyPerson</value>
+        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}")]
+        public CompanyPerson SelectedIssuerCompanyPerson
+        {
+            get
+            {
+                return _SelectedIssuerCompanyPerson;
+            }
+            set
+            {
+                if (_SelectedIssuerCompanyPerson != value)
+                {
+                    _SelectedIssuerCompanyPerson = value;
+                    OnPropertyChanged("SelectedIssuerCompanyPerson");
+                }
+            }
+        }
+
+
+        private List<CompanyPerson> _IssuerCompanyPersonList;
+        /// <summary>
+        /// List property for CompanyPerson
+        /// </summary>
+        /// <value>The IssuerCompanyPerson list</value>
+        [ACPropertyList(9999, "IssuerCompanyPerson")]
+        public List<CompanyPerson> IssuerCompanyPersonList
+        {
+            get
+            {
+                return _IssuerCompanyPersonList;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Properties => Report
+
+        private ReportData _TempReportData;
+        [ACPropertyInfo(9999)]
+        public ReportData TempReportData
+        {
+            get
+            {
+                return _TempReportData;
+            }
+            set
+            {
+                _TempReportData = value;
+                OnPropertyChanged("TempReportData");
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -1014,7 +1120,6 @@ namespace gip.bso.sales
         }
 
         #endregion
-
 
         #region OutOrder
         [ACMethodCommand(OutOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]

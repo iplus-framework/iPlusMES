@@ -43,6 +43,14 @@ namespace gip.bso.sales
                 throw new Exception("OutDeliveryNoteManager not configured");
 
             Search();
+
+            IssuerResult issuerResult = OutDeliveryNoteManager.GetIssuer(DatabaseApp, Root.Environment.User.VBUserID);
+            IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
+            _IssuerCompanyPersonList = issuerResult.CompanyPeople;
+            OnPropertyChanged("IssuerCompanyPersonList");
+            IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
+            SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
+
             return true;
         }
 
@@ -139,24 +147,15 @@ namespace gip.bso.sales
 
         void CurrentOutOffer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
-                    if (CurrentOutOffer.CustomerCompany != null)
-                    {
-                        CurrentOutOffer.BillingCompanyAddress = CurrentOutOffer.CustomerCompany.BillingCompanyAddress;
-                        CurrentOutOffer.DeliveryCompanyAddress = CurrentOutOffer.CustomerCompany.DeliveryCompanyAddress;
-                    }
-                    else
-                    {
-                        CurrentOutOffer.BillingCompanyAddress = null;
-                        CurrentOutOffer.DeliveryCompanyAddress = null;
-                    }
                     OnPropertyChanged("BillingCompanyAddressList");
                     OnPropertyChanged("DeliveryCompanyAddressList");
                     OnPropertyChanged("CurrentBillingCompanyAddress");
                     OnPropertyChanged("CurrentDeliveryCompanyAddress");
-
                     break;
             }
         }
@@ -446,6 +445,95 @@ namespace gip.bso.sales
                 OnPropertyChanged("PriceListMaterialItems");
             }
         }
+
+        #endregion
+
+        #endregion
+
+        #region Properties
+
+        #region Issuer
+
+        #region Issuer -> IssuerCompanyAddress
+
+        private CompanyAddress _IssuerCompanyAddress;
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}")]
+        public CompanyAddress IssuerCompanyAddress
+        {
+            get
+            {
+                return _IssuerCompanyAddress;
+            }
+            set
+            {
+                if (_IssuerCompanyAddress != value)
+                {
+                    _IssuerCompanyAddress = value;
+                    OnPropertyChanged("IssuerCompanyAddress");
+                }
+            }
+        }
+
+        private string _IssuerCompanyAddressMessage;
+        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}")]
+        public string IssuerCompanyAddressMessage
+
+        {
+            get
+            {
+                return _IssuerCompanyAddressMessage;
+            }
+            set
+            {
+                if (_IssuerCompanyAddressMessage != value)
+                {
+                    _IssuerCompanyAddressMessage = value;
+                    OnPropertyChanged("IssuerCompanyAddressMessage");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Issuer -> IssuerCompanyPerson
+
+        private CompanyPerson _SelectedIssuerCompanyPerson;
+        /// <summary>
+        /// Selected property for CompanyPerson
+        /// </summary>
+        /// <value>The selected IssuerCompanyPerson</value>
+        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}")]
+        public CompanyPerson SelectedIssuerCompanyPerson
+        {
+            get
+            {
+                return _SelectedIssuerCompanyPerson;
+            }
+            set
+            {
+                if (_SelectedIssuerCompanyPerson != value)
+                {
+                    _SelectedIssuerCompanyPerson = value;
+                    OnPropertyChanged("SelectedIssuerCompanyPerson");
+                }
+            }
+        }
+
+        private List<CompanyPerson> _IssuerCompanyPersonList;
+        /// <summary>
+        /// List property for CompanyPerson
+        /// </summary>
+        /// <value>The IssuerCompanyPerson list</value>
+        [ACPropertyList(9999, "IssuerCompanyPerson")]
+        public List<CompanyPerson> IssuerCompanyPersonList
+        {
+            get
+            {
+                return _IssuerCompanyPersonList;
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -794,8 +882,11 @@ namespace gip.bso.sales
                                                  .Where(c => c.PriceNet > 0)
                                                  .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
                                                  .GroupBy(t => t.Item1)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format(vatFormat, o.Key.ToString("N2")), 
-                                                                                        SalesTax = o.Sum(s => s.Item2) })
+                                                 .Select(o => new MDCountrySalesTax()
+                                                 {
+                                                     MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
+                                                     SalesTax = o.Sum(s => s.Item2)
+                                                 })
                                                  .ToList();
             }
             else
@@ -803,15 +894,18 @@ namespace gip.bso.sales
                 TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
                                                  .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
                                                  .GroupBy(g => g.SalesTax)
-                                                 .Select(o => new MDCountrySalesTax() { MDKey = string.Format(vatFormat, o.Key.ToString("N2")), 
-                                                                                        SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount) })
+                                                 .Select(o => new MDCountrySalesTax()
+                                                 {
+                                                     MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
+                                                     SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount)
+                                                 })
                                                  .ToList();
             }
         }
 
         #region Methods => Report
 
-        private void BuildOutOfferPosData()
+        private void BuildOutOfferPosData(string langCode)
         {
             if (CurrentOutOffer == null)
                 return;
@@ -826,7 +920,7 @@ namespace gip.bso.sales
                 {
                     OutOfferPos sumPos = new OutOfferPos();
                     sumPos.Total = outOfferPos.Items.Sum(c => c.TotalPrice).ToString("N");
-                    sumPos.MaterialNo = "SubTotal " + outOfferPos.Material.MaterialNo;
+                    sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50063", langCode) + outOfferPos.Material.MaterialNo; // Info50063.
                     sumPos.Sequence = outOfferPos.Sequence;
                     sumPos.GroupSum = outOfferPos.GroupSum;
                     posData.Add(sumPos);
@@ -838,7 +932,7 @@ namespace gip.bso.sales
             if (OutOfferPosDiscountList != null && OutOfferPosDiscountList.Any())
             {
                 //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
-                OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Zwischensumme inkl. Rabatt:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal });
+                OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50064", langCode), PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal }); //Info50064.
             }
 
             CalculateTaxOverview();
@@ -859,10 +953,19 @@ namespace gip.bso.sales
             {
                 ReportDocument doc = reportEngine as ReportDocument;
                 if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null
-                                                                                 && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn"))
+                                                                                 && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn" || c.ACClassDesign.ACIdentifier == "OfferHr"))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
-                    BuildOutOfferPosData();
+                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
+                    string langCode = "de";
+                    if (design != null)
+                    {
+                        if (design.ACIdentifier == "OfferHr")
+                            langCode = "hr";
+                        if (design.ACIdentifier == "OfferEn")
+                            langCode = "en";
+                    }
+                    BuildOutOfferPosData(langCode);
                 }
             }
             else
@@ -911,6 +1014,28 @@ namespace gip.bso.sales
                     }
                 }
             }
+        }
+
+        #endregion
+
+        #region Methods -> Invoice
+
+        [ACMethodCommand(OutOffer.ClassName, "en{'Create Order'}de{'Angebot machen'}", (short)MISort.Cancel)]
+        public void CreateOutOrder()
+        {
+            if (!IsEnabledCreateOutOrder())
+                return;
+            Msg msg = OutDeliveryNoteManager.NewOutOrderFromOutOffer(DatabaseApp, CurrentOutOffer);
+            if (msg != null)
+                Root.Messages.Msg(msg);
+        }
+
+        public bool IsEnabledCreateOutOrder()
+        {
+            return
+                OutDeliveryNoteManager != null
+                && CurrentOutOffer != null
+                && !CurrentOutOffer.OutOrder_BasedOnOutOffer.Any();
         }
 
         #endregion

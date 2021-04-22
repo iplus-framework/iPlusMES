@@ -2208,6 +2208,7 @@ namespace gip.mes.facility
                                     || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosInwardCancel)
                                     || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutward)
                                     || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel)
+                                    || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                                     || this.BookingType == GlobalApp.FacilityBookingType.InventoryStockCorrection
                                     ))
                                 {
@@ -2235,6 +2236,7 @@ namespace gip.mes.facility
                                     || this.BookingType == GlobalApp.FacilityBookingType.OutOrderPosActivate
                                     || this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutward
                                     || this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel
+                                    || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                                     || this.BookingType == GlobalApp.FacilityBookingType.InventoryStockCorrection
                                     ))
                                     subResult = Global.ControlModesInfo.EnabledRequired;
@@ -2436,6 +2438,7 @@ namespace gip.mes.facility
                         || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosInwardCancel)
                         || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutward)
                         || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel)
+                        || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                         || this.BookingType == GlobalApp.FacilityBookingType.InventoryStockCorrection
                     ))
                 {
@@ -2462,6 +2465,7 @@ namespace gip.mes.facility
                         || this.BookingType == GlobalApp.FacilityBookingType.OutOrderPosActivate
                         || this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutward
                         || this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel
+                        || (this.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                         || this.BookingType == GlobalApp.FacilityBookingType.InventoryStockCorrection
                         ))
                         AddBookingMessage(eResultCodes.DependingParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50010"));

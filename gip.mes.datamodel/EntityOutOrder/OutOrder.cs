@@ -24,6 +24,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(16, "BasedOnOutOffering", "en{'Sales Offer'}de{'Angebot'}", Const.ContextDatabase + "\\" + OutOffer.ClassName, "", true)]
     [ACPropertyEntity(17, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(18, "CPartnerCompany", "en{'Contract Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\CPartnerCompanyList", "", true)]
+    [ACPropertyEntity(19, ConstApp.IssuerCompanyAddress, ConstApp.IssuerCompanyAddress_ACCaption, Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
+    [ACPropertyEntity(20, ConstApp.IssuerCompanyPerson, ConstApp.IssuerCompanyPerson_ACCaption, Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -38,7 +40,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOrder>) })]
-    public partial class OutOrder : IACConfigStore
+    public partial class OutOrder : IACConfigStore, IOutOrder
     {
         public const string ClassName = "OutOrder";
         public const string NoColumnName = "OutOrderNo";

@@ -41,7 +41,6 @@ namespace gip.bso.masterdata.Scheduling
 
             Search();
             AccessAvailableACClassWF.NavSearch();
-            LoadMDSchedulingGroupWFList();
             return true;
         }
 
@@ -114,7 +113,9 @@ namespace gip.bso.masterdata.Scheduling
             }
             set
             {
-                if (AccessPrimary == null) return; AccessPrimary.Current = value;
+                if (AccessPrimary == null) return; 
+                AccessPrimary.Current = value;
+                LoadMDSchedulingGroupWFList();
                 OnPropertyChanged("CurrentMDSchedulingGroup");
             }
         }

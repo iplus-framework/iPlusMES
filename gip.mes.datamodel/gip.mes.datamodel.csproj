@@ -83,6 +83,7 @@
     <Compile Include="ACInterfaces\Document\DocumentSettings.cs" />
     <Compile Include="ACInterfaces\Document\DocumentTypesEnum.cs" />
     <Compile Include="ACInterfaces\Document\DoumentFilter.cs" />
+    <Compile Include="ACInterfaces\IOutOrder.cs" />
     <Compile Include="ACInterfaces\IOutOrderPos.cs" />
     <Compile Include="ACInterfaces\FacilityManager\IFacilityManager.cs" />
     <Compile Include="ACInterfaces\IOutOrderPosBSO.cs" />

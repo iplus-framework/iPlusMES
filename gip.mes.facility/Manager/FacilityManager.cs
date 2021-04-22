@@ -201,6 +201,7 @@ namespace gip.mes.facility
 
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_ProdOrderPosOutward, GlobalApp.FacilityBookingType.ProdOrderPosOutward));
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_ProdOrderPosOutwardCancel, GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel));
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_ProdOrderPosOutwardOnEmptyingFacility, GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility));
 
             #endregion
         }
@@ -902,6 +903,7 @@ namespace gip.mes.facility
 
                 case GlobalApp.FacilityBookingType.ProdOrderPosOutward:
                 case GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel:
+                case GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility:
                     Prefix = "Out";
                     TMP.ParameterValueList.Add(new ACValue("PartslistPosRelation", typeof(PartslistPosRelation), null, Global.ParamOption.Required));
                     TMP.ParameterValueList.Add(new ACValue("ProdOrderPartslistPosFacilityLot", typeof(ProdOrderPartslistPosFacilityLot), null, Global.ParamOption.Optional));
@@ -962,6 +964,7 @@ namespace gip.mes.facility
         public const string MN_ProdOrderPosInwardCancel = GlobalApp.FBT_ProdOrderPosInwardCancel;
         public const string MN_ProdOrderPosOutward = GlobalApp.FBT_ProdOrderPosOutward;
         public const string MN_ProdOrderPosOutwardCancel = GlobalApp.FBT_ProdOrderPosOutwardCancel;
+        public const string MN_ProdOrderPosOutwardOnEmptyingFacility = GlobalApp.FBT_ProdOrderPosOutwardOnEmptyingFacility;
 
         #endregion
 
