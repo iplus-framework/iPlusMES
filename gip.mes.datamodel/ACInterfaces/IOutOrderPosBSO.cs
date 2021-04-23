@@ -12,5 +12,7 @@ namespace gip.mes.datamodel
         List<PriceListMaterial> PriceListMaterialItems { get; set; }
         PriceListMaterial SelectedPriceListMaterial { get; set; }
 
+        List<MDCountrySalesTax> TaxOverviewList{ get; set; }
+
     }
 }

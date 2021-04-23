@@ -147,8 +147,7 @@ namespace gip.bso.sales
 
         void CurrentOutOffer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
+            OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":
@@ -228,30 +227,22 @@ namespace gip.bso.sales
 
         void CurrentOutOfferPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOfferPos, CurrentOutOffer?.BillingCompanyAddress);
-            if (e.PropertyName == "PriceGross")
-            {
-                if (CurrentOutOfferPos.PriceGross < 0)
-                    CurrentOutOfferPos.SalesTax = 0;
-
-                CalculateTaxOverview();
-
-                decimal totalTax = TaxOverviewList.Sum(c => c.SalesTax);
-
-                CurrentOutOffer.PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal;
-                CurrentOutOffer.PriceGross = ((decimal)CurrentOutOffer.PosPriceNetTotal + totalTax);
-            }
+            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName,
+                CurrentOutOffer, CurrentOutOfferPos, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList(), CurrentOutOffer?.BillingCompanyAddress);
         }
 
+        /// <summary>
+        /// Handle price changes
+        /// </summary>
         public void OnPricePropertyChanged()
         {
             if (CurrentOutOffer != null)
-            {
                 CurrentOutOffer.OnPricePropertyChanged();
-            }
         }
 
+        /// <summary>
+        /// OutOffer list
+        /// </summary>
         [ACPropertyList(605, "OutOfferPos")]
         public IEnumerable<OutOfferPos> OutOfferPosList
         {
@@ -262,6 +253,9 @@ namespace gip.bso.sales
         }
 
         OutOfferPos _SelectedOutOfferPos;
+        /// <summary>
+        /// 
+        /// </summary>
         [ACPropertySelected(606, "OutOfferPos")]
         public OutOfferPos SelectedOutOfferPos
         {
@@ -276,6 +270,9 @@ namespace gip.bso.sales
             }
         }
 
+        /// <summary>
+        /// Unit list
+        /// </summary>
         [ACPropertyList(607, MDUnit.ClassName)]
         public IEnumerable<MDUnit> MDUnitList
         {
@@ -287,6 +284,9 @@ namespace gip.bso.sales
             }
         }
 
+        /// <summary>
+        /// Current MDUnit
+        /// </summary>
         [ACPropertyCurrent(608, MDUnit.ClassName)]
         public MDUnit CurrentMDUnit
         {
@@ -772,12 +772,7 @@ namespace gip.bso.sales
             if (CurrentOutOffer != null)
             {
                 CurrentOutOffer.OnPricePropertyChanged();
-                CalculateTaxOverview();
-
-                decimal totalTax = TaxOverviewList.Sum(c => c.SalesTax);
-
-                CurrentOutOffer.PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal;
-                CurrentOutOffer.PriceGross = ((decimal)CurrentOutOffer.PosPriceNetTotal + totalTax);
+                OutDeliveryNoteManager.CalculateTaxOverview(this, CurrentOutOffer, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList());
             }
         }
 
@@ -868,41 +863,6 @@ namespace gip.bso.sales
                    : CurrentOutOfferPos.Sequence < CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Max(x => x.Sequence);
         }
 
-        private void CalculateTaxOverview()
-        {
-            string vatFormat = "VAT with {0} %";
-            if (CurrentBillingCompanyAddress?.MDCountry?.MDCountryName == "DE")
-                vatFormat = "MwSt. mit {0} %";
-
-            if (CurrentOutOffer.PosPriceNetDiscount < 0)
-            {
-                var percent = (decimal)((Math.Abs(CurrentOutOffer.PosPriceNetDiscount) / CurrentOutOffer.PosPriceNetSum) * 100);
-
-                TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
-                                                 .Where(c => c.PriceNet > 0)
-                                                 .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
-                                                 .GroupBy(t => t.Item1)
-                                                 .Select(o => new MDCountrySalesTax()
-                                                 {
-                                                     MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
-                                                     SalesTax = o.Sum(s => s.Item2)
-                                                 })
-                                                 .ToList();
-            }
-            else
-            {
-                TaxOverviewList = CurrentOutOffer.OutOfferPos_OutOffer
-                                                 .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
-                                                 .GroupBy(g => g.SalesTax)
-                                                 .Select(o => new MDCountrySalesTax()
-                                                 {
-                                                     MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
-                                                     SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount)
-                                                 })
-                                                 .ToList();
-            }
-        }
-
         #region Methods => Report
 
         private void BuildOutOfferPosData(string langCode)
@@ -935,7 +895,7 @@ namespace gip.bso.sales
                 OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50064", langCode), PriceNet = (decimal)CurrentOutOffer.PosPriceNetTotal }); //Info50064.
             }
 
-            CalculateTaxOverview();
+            OutDeliveryNoteManager.CalculateTaxOverview(this, CurrentOutOffer, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList());
         }
 
         private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
@@ -1032,10 +992,7 @@ namespace gip.bso.sales
 
         public bool IsEnabledCreateOutOrder()
         {
-            return
-                OutDeliveryNoteManager != null
-                && CurrentOutOffer != null
-                && !CurrentOutOffer.OutOrder_BasedOnOutOffer.Any();
+            return CurrentOutOffer != null && !CurrentOutOffer.OutOrder_BasedOnOutOffer.Any();
         }
 
         #endregion

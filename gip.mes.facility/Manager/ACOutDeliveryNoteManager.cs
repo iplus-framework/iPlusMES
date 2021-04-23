@@ -660,7 +660,7 @@ namespace gip.mes.facility
                 databaseApp.OutOrder.AddObject(outOrder);
                 databaseApp.SaveChanges();
 
-                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50065", outOrder.OutOrderNo)};
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50065", outOrder.OutOrderNo) };
             }
             catch (Exception ec)
             {
@@ -725,7 +725,7 @@ namespace gip.mes.facility
                     invoice.InvoicePos_Invoice.Add(invoicePos);
                 }
                 databaseApp.SaveChanges();
-                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", invoice.InvoiceNo)};
+                msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", invoice.InvoiceNo) };
             }
             catch (Exception ec)
             {
@@ -824,7 +824,8 @@ namespace gip.mes.facility
         }
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName, IOutOrderPos posItem, CompanyAddress billingCompanyAddress)
+        public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName,
+            IOutOrder outOrder, IOutOrderPos posItem, List<IOutOrderPos> posItems, CompanyAddress billingCompanyAddress)
         {
             if (posItem != null)
                 switch (propertyName)
@@ -852,7 +853,7 @@ namespace gip.mes.facility
                                 if (billingCompanyAddress != null)
                                 {
 
-                                    CountrySalesTaxModel countrySalesTaxModel = GetCountrSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
+                                    ActualSalesTax countrySalesTaxModel = GetActualSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
 
                                     if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null)
                                     {
@@ -904,9 +905,16 @@ namespace gip.mes.facility
                             if (!posItem.InRecalculation)
                             {
                                 posItem.InRecalculation = true;
+
+                                if (posItem.PriceGross < 0)
+                                    posItem.SalesTax = 0;
+
                                 posItem.PriceNet = posItem.PriceGross - (decimal)posItem.SalesTaxAmount;
                                 posItem.OnEntityPropertyChanged("SalesTaxAmount");
                                 callerObject.OnPricePropertyChanged();
+
+                                CalculateTaxOverview(callerObject, outOrder, posItems);
+
                                 posItem.InRecalculation = false;
                             }
                         }
@@ -916,24 +924,19 @@ namespace gip.mes.facility
                             if (!posItem.InRecalculation)
                             {
                                 posItem.InRecalculation = true;
+
                                 posItem.OnEntityPropertyChanged("SalesTaxAmount");
                                 posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
 
-                                if (posItem.MDCountrySalesTaxMaterial != null
-                                   || posItem.MDCountrySalesTaxMDMaterialGroup != null
-                                   || posItem.MDCountrySalesTax != null)
-                                {
-                                    if (posItem.MDCountrySalesTaxMaterial != null && posItem.MDCountrySalesTaxMaterial.SalesTax != posItem.SalesTax)
-                                        posItem.MDCountrySalesTaxMaterial = null;
-                                    else if (posItem.MDCountrySalesTaxMDMaterialGroup != null && posItem.MDCountrySalesTaxMDMaterialGroup.SalesTax != posItem.SalesTax)
-                                        posItem.MDCountrySalesTaxMDMaterialGroup = null;
-                                    else if (posItem.MDCountrySalesTax != null && posItem.MDCountrySalesTax.SalesTax != posItem.SalesTax)
-                                        posItem.MDCountrySalesTax = null;
-                                }
-                                else if (billingCompanyAddress != null)
+                                // clean up tax connections
+                                posItem.MDCountrySalesTaxMaterial = null;
+                                posItem.MDCountrySalesTaxMDMaterialGroup = null;
+                                posItem.MDCountrySalesTax = null;
+
+                                if (billingCompanyAddress != null)
                                 {
                                     DateTime now = DateTime.Now;
-                                    CountrySalesTaxModel countrySalesTaxModel = GetCountrSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
+                                    ActualSalesTax countrySalesTaxModel = GetActualSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
                                     if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null && countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax == posItem.SalesTax)
                                         posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
                                     else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null && countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax == posItem.SalesTax)
@@ -942,12 +945,22 @@ namespace gip.mes.facility
                                         posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
                                 }
 
-                                posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
                                 posItem.InRecalculation = false;
                             }
                         }
                         break;
                 }
+        }
+
+        public void CalculateTaxOverview(IOutOrderPosBSO callerObject, IOutOrder outOrder, List<IOutOrderPos> posItems)
+        {
+            string documentLangCode = GetDocumentLangCode(outOrder);
+            string langCode = !string.IsNullOrEmpty(documentLangCode) ? documentLangCode : Root.CurrentInvokingUser.VBLanguage.VBLanguageCode;
+            List<MDCountrySalesTax> mdCountrySalesTax = GetTaxOverviewList(langCode, outOrder, posItems);
+            callerObject.TaxOverviewList = mdCountrySalesTax;
+            decimal totalTax = mdCountrySalesTax.Sum(c => c.SalesTax);
+            outOrder.PriceNet = (decimal)outOrder.PosPriceNetTotal;
+            outOrder.PriceGross = ((decimal)outOrder.PosPriceNetTotal + totalTax);
         }
 
         public IssuerResult GetIssuer(DatabaseApp databaseApp, Guid vbUserID)
@@ -971,9 +984,9 @@ namespace gip.mes.facility
 
         #region Invoice -> Private
 
-        private CountrySalesTaxModel GetCountrSalesTax(MDCountry country, Material material, DateTime dateTime)
+        private ActualSalesTax GetActualSalesTax(MDCountry country, Material material, DateTime dateTime)
         {
-            CountrySalesTaxModel model = new CountrySalesTaxModel();
+            ActualSalesTax model = new ActualSalesTax();
             model.MDCountrySalesTax =
                    country
                    .MDCountrySalesTax_MDCountry
@@ -1040,6 +1053,62 @@ namespace gip.mes.facility
             invoicePos.OutOrderPos = invoicePosRelation;
             invoicePos.XMLDesign = outOrderPos.XMLDesign;
             return invoicePos;
+        }
+
+        private List<MDCountrySalesTax> GetTaxOverviewList(string langCode, IOutOrder outOrder, List<IOutOrderPos> poses)
+        {
+            List<MDCountrySalesTax> mDCountrySalesTaxes = new List<MDCountrySalesTax>();
+            string vatFormat = Root.Environment.TranslateMessageLC(this, "Info50066", langCode);
+            //string vatFormat = "VAT with {0} %";
+            //if (billingcompanyAddress?.MDCountry?.MDCountryName == "DE")
+            //    vatFormat = "MwSt. mit {0} %";
+
+            if (outOrder.PosPriceNetDiscount < 0)
+            {
+                var percent = (decimal)((Math.Abs(outOrder.PosPriceNetDiscount) / outOrder.PosPriceNetSum) * 100);
+
+                mDCountrySalesTaxes = poses
+                                        .Where(c => c.PriceNet > 0)
+                                        .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
+                                        .GroupBy(t => t.Item1)
+                                        .Select(o => new MDCountrySalesTax()
+                                        {
+                                            MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
+                                            SalesTax = o.Sum(s => s.Item2)
+                                        })
+                                        .ToList();
+            }
+            else
+            {
+                mDCountrySalesTaxes = poses
+                                        .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
+                                        .GroupBy(g => g.SalesTax)
+                                        .Select(o => new MDCountrySalesTax()
+                                        {
+                                            MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
+                                            SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount)
+                                        })
+                                        .ToList();
+            }
+            return mDCountrySalesTaxes;
+        }
+
+        private string GetDocumentLangCode(IOutOrder outOrder)
+        {
+            if (outOrder.BillingCompanyAddress == null)
+                return null;
+            string langCode = "en";
+            string countryMDKey = outOrder.BillingCompanyAddress.MDCountry.MDKey;
+            switch (countryMDKey)
+            {
+                case "HR":
+                    langCode = "hr";
+                    break;
+                case "D":
+                    langCode = "de";
+                    break;
+            }
+            return langCode;
         }
 
         #endregion

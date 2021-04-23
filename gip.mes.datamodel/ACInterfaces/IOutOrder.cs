@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace gip.mes.datamodel
 {
     public interface IOutOrder
@@ -12,7 +7,15 @@ namespace gip.mes.datamodel
         CompanyAddress DeliveryCompanyAddress { get; set; }
         CompanyAddress BillingCompanyAddress { get; set; }
 
-        CompanyAddress IssuerCompanyAddress{get; set;}
-        CompanyPerson IssuerCompanyPerson{get; set;}
+        CompanyAddress IssuerCompanyAddress { get; set; }
+        CompanyPerson IssuerCompanyPerson { get; set; }
+
+        double PosPriceNetDiscount { get; }
+        double PosPriceNetSum { get; }
+        double PosPriceNetTotal { get;  }
+
+        decimal PriceNet { get; set; }
+        decimal PriceGross { get; set; }
+
     }
 }

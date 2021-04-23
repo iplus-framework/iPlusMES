@@ -264,15 +264,7 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        [ACPropertyInfo(9999)]
-        public string Position
-        {
-            get
-            {
-                return "Position " + Sequence.ToString();
-            }
-        }
-
+        #region IOutOrderPos
         public GlobalApp.MaterialPosTypes MaterialPosType
         {
             get
@@ -294,7 +286,47 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(999)]
+        public double TotalPrice
+        {
+            get
+            {
+                return TargetQuantity * (double)PriceNet;
+            }
+        }
+
+        [ACPropertyInfo(999)]
+        public double TotalSalesTax
+        {
+            get
+            {
+                return TargetQuantity * (double)SalesTaxAmount;
+            }
+        }
+
+        [ACPropertyInfo(999)]
+        public double TotalPriceWithTax
+        {
+            get
+            {
+                return TotalPrice + TotalSalesTax;
+            }
+        }
+
+        [ACPropertyInfo(999)]
+        public string QuantityUnit
+        {
+            get
+            {
+                if (TargetQuantity > 0)
+                    return TargetQuantity + " " + MDUnit?.Symbol;
+                return "";
+            }
+        }
+
         public bool InRecalculation { get; set; }
+
+        #endregion
 
         #region partial methods
         bool _OnCalledUpQuantityChanging = false;

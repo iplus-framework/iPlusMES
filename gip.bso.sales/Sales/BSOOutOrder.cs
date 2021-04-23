@@ -1,11 +1,14 @@
 using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.reporthandler.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace gip.bso.sales
 {
@@ -373,9 +376,13 @@ namespace gip.bso.sales
         void CurrentOutOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentOutOrderPos, CurrentOutOrder?.BillingCompanyAddress);
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName,
+                    CurrentOutOrder, CurrentOutOrderPos, CurrentOutOrder.OutOrderPos_OutOrder.Select(c => (IOutOrderPos)c).ToList(), CurrentOutOrder?.BillingCompanyAddress);
         }
 
+        /// <summary>
+        /// OutOrderPos list of lines
+        /// </summary>
         [ACPropertyList(604, OutOrderPos.ClassName)]
         public IEnumerable<OutOrderPos> OutOrderPosList
         {
@@ -388,6 +395,9 @@ namespace gip.bso.sales
         }
 
         OutOrderPos _SelectedOutOrderPos;
+        /// <summary>
+        /// Selected OutOrderPos
+        /// </summary>
         [ACPropertySelected(605, OutOrderPos.ClassName)]
         public OutOrderPos SelectedOutOrderPos
         {
@@ -1055,6 +1065,27 @@ namespace gip.bso.sales
             }
         }
 
+        [ACPropertyInfo(650)]
+        public List<OutOrderPos> OutOrderPosDataList
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(651)]
+        public List<OutOrderPos> OutOrderPosDiscountList
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(652)]
+        public List<MDCountrySalesTax> TaxOverviewList
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #endregion
@@ -1565,6 +1596,128 @@ namespace gip.bso.sales
                 || CurrentOutOrderPos.OutOrderPos1_ParentOutOrderPos.OutOrder.MDOutOrderType.OrderType != GlobalApp.OrderTypes.Contract)
                 return false;
             return true;
+        }
+
+        #endregion
+
+         #region Methods => Report
+
+        private void BuildOutOrderPosData(string langCode)
+        {
+            if (CurrentOutOrder == null)
+                return;
+
+            List<OutOrderPos> posData = new List<OutOrderPos>();
+
+            foreach (var outOrderPos in CurrentOutOrder.OutOrderPos_OutOrder.Where(c => c.PriceNet >= 0).OrderBy(p => p.Sequence))
+            {
+                posData.Add(outOrderPos);
+                //BuildOutOfferPosDataRecursive(posData, outOrderPos.Items);
+                //if (outOrderPos.GroupSum)
+                //{
+                //    OutOrderPos sumPos = new OutOrderPos();
+                //    sumPos.Total = outOrderPos.Items.Sum(c => c.TotalPrice).ToString("N");
+                //    sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50063", langCode) + outOrderPos.Material.MaterialNo; // Info50063.
+                //    sumPos.Sequence = outOrderPos.Sequence;
+                //    sumPos.GroupSum = outOrderPos.GroupSum;
+                //    posData.Add(sumPos);
+                //}
+            }
+
+            OutOrderPosDataList = posData;
+            OutOrderPosDiscountList = CurrentOutOrder.OutOrderPos_OutOrder.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
+            if (OutOrderPosDiscountList != null && OutOrderPosDiscountList.Any())
+            {
+                //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
+                OutOrderPosDiscountList.Add(new OutOrderPos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50064", langCode), PriceNet = (decimal)CurrentOutOrder.PosPriceNetTotal }); //Info50064.
+            }
+
+            OutDeliveryNoteManager.CalculateTaxOverview(this, CurrentOutOrder, CurrentOutOrder.OutOrderPos_OutOrder.Select(c => (IOutOrderPos)c).ToList());
+        }
+
+        private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
+        {
+            foreach (var outOfferPos in outOfferPosList.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
+            {
+                posDataList.Add(outOfferPos);
+                BuildOutOfferPosDataRecursive(posDataList, outOfferPos.Items);
+            }
+        }
+
+        public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
+        {
+            if (printingPhase == ACPrintingPhase.Started)
+            {
+                ReportDocument doc = reportEngine as ReportDocument;
+                if (
+                    doc != null 
+                    && doc.ReportData != null 
+                    && doc.ReportData.Any(c => 
+                                                c.ACClassDesign != null
+                                                && (
+                                                        c.ACClassDesign.ACIdentifier == "OutOrderDe") 
+                                                        || c.ACClassDesign.ACIdentifier == "OutOrderEn" 
+                                                        || c.ACClassDesign.ACIdentifier == "OutOrderHr"))
+                {
+                    doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
+                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
+                    string langCode = "de";
+                    if (design != null)
+                    {
+                        if (design.ACIdentifier == "OutOrderHr")
+                            langCode = "hr";
+                        if (design.ACIdentifier == "OutOrderEn")
+                            langCode = "en";
+                    }
+                    BuildOutOrderPosData(langCode);
+                }
+            }
+            else
+            {
+                ReportDocument doc = reportEngine as ReportDocument;
+                if (doc != null)
+                {
+                    doc.SetFlowDocObjValue -= Doc_SetFlowDocObjValue;
+                }
+            }
+
+            base.OnPrintingPhase(reportEngine, printingPhase);
+        }
+
+        private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
+        {
+            OutOfferPos pos = e.ParentDataRow as OutOfferPos;
+            if (pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
+            {
+                var inlineCell = e.FlowDocObj as InlineTableCellValue;
+                if (inlineCell != null)
+                {
+                    var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
+                    if (tableCell != null)
+                    {
+                        if (inlineCell.VBContent == "MaterialNo")
+                        {
+                            TableRow tableRow = tableCell.Parent as TableRow;
+                            if (tableRow != null && tableRow.Cells.Count > 6)
+                            {
+                                tableRow.Cells.RemoveAt(2);
+                                tableRow.Cells.RemoveAt(2);
+                                tableRow.Cells.RemoveAt(2);
+                                tableRow.Cells.RemoveAt(2);
+                            }
+                            tableCell.ColumnSpan = 2;
+                        }
+
+                        else if (inlineCell.VBContent == "Total")
+                        {
+                            tableCell.ColumnSpan = 4;
+                            tableCell.BorderBrush = Brushes.Black;
+                            tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
+                        }
+                        tableCell.FontWeight = System.Windows.FontWeights.Bold;
+                    }
+                }
+            }
         }
 
         #endregion

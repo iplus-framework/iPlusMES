@@ -119,7 +119,7 @@
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslist.cs" />
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPos.cs" />
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
-    <Compile Include="Model\CountrySalesTaxModel.cs" />
+    <Compile Include="Model\ActualSalesTax.cs" />
     <Compile Include="Model\IssuerResult.cs" />
     <Compile Include="Model\SchedulingBatchPlanDuration.cs" />
     <Compile Include="Model\BatchSizeCalculation\BatchPercentageModel.cs" />
@@ -294,7 +294,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="VBControlScripts\2021-04-21 22-11_aaginic.zip">
+    <None Include="VBControlScripts\2021-04-23 15-27_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

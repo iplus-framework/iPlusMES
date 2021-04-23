@@ -176,7 +176,7 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        #region Additional
+        #region IOutOrder
 
         [ACPropertyInfo(999, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
         public double SalesTaxAmount

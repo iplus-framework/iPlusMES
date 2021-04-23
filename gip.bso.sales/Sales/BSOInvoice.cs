@@ -34,7 +34,7 @@ namespace gip.bso.sales
             IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
             _IssuerCompanyPersonList = issuerResult.CompanyPeople;
             OnPropertyChanged("IssuerCompanyPersonList");
-             IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
+            IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
             SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
 
             return true;
@@ -352,7 +352,8 @@ namespace gip.bso.sales
         void CurrentInvoicePos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (OutDeliveryNoteManager != null)
-                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, CurrentInvoicePos, CurrentInvoice?.BillingCompanyAddress);
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName, 
+                    CurrentInvoice, CurrentInvoicePos, CurrentInvoice.InvoicePos_Invoice.Select(c=>(IOutOrderPos) c).ToList(), CurrentInvoice?.BillingCompanyAddress);
         }
 
         public void OnPricePropertyChanged()
@@ -1005,6 +1006,14 @@ namespace gip.bso.sales
                 OnPropertyChanged("TempReportData");
             }
         }
+
+        [ACPropertyInfo(652)]
+        public List<MDCountrySalesTax> TaxOverviewList
+        {
+            get;
+            set;
+        }
+
         #endregion
 
 
