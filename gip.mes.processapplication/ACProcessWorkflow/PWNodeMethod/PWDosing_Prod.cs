@@ -1257,146 +1257,9 @@ namespace gip.mes.processapplication
                         changePosState = true;
                         // Falls dosiert
 
-                        if (actualQuantity > 0.00001 || actualQuantity < -0.00001)
-                        {
-                            // 1. Bereite Buchung vor
-                            FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(this.ACFacilityManager, dbApp, dosingPosRelation);
-                            ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                            bookingParam.OutwardQuantity = (double)actualQuantity;
-                            bookingParam.OutwardFacility = outwardFacility;
-                            bookingParam.SetCompleted = dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait;
-
-                            if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-                                bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-                            msg = dbApp.ACSaveChangesWithRetry();
-
-                            // 2. Führe Buchung durch
-                            if (msg != null)
-                            {
-                                collectedMessages.AddDetailMessage(msg);
-                                Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(5)", msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1190), true);
-                                changePosState = false;
-                            }
-                            else if (facilityPreBooking != null)
-                            {
-                                bookingParam.IgnoreIsEnabled = true;
-                                ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
-                                if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
-                                {
-                                    collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1210), true);
-                                    changePosState = false;
-                                }
-                                else
-                                {
-                                    if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
-                                    {
-                                        Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(6)", bookingParam.ValidMessage.InnerMessage);
-                                        OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1200), true);
-                                        changePosState = false;
-                                    }
-                                    changePosState = true;
-                                    if (bookingParam.ValidMessage.IsSucceded())
-                                    {
-                                        facilityPreBooking.DeleteACObject(dbApp, true);
-                                        dosingPosRelation.IncreaseActualQuantityUOM(bookingParam.OutwardQuantity.Value);
-                                        msg = dbApp.ACSaveChangesWithRetry();
-                                        if (msg != null)
-                                        {
-                                            collectedMessages.AddDetailMessage(msg);
-                                            Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(7b)", msg.InnerMessage);
-                                            OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1211), true);
-                                        }
-                                        //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
-                                        //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
-                                    }
-                                    else
-                                    {
-                                        collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                                    }
-
-                                    posState = OnReEvaluatePosState(collectedMessages, reEvaluatePosState, posState,
-                                        sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState, dosing, dis2SpecialDest,
-                                        actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol);
-
-                                    if (ScaleOtherComp && !thisDosingIsInTol && dosingPosRelation.ProdOrderBatch != null)
-                                    {
-                                        posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
-                                        //dosingPosRelation.MDProdOrderPartslistPosState = posState;
-
-                                        var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                                            .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                                            && c.MDProdOrderPartslistPosState != null
-                                            && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
-                                                || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
-
-                                        //ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
-                                        //    .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
-                                        //        && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-                                        //        && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
-
-                                        //var queryOpenDosings = batchPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-                                        //   .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                                        //   && c.MDProdOrderPartslistPosState != null
-                                        //   && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
-                                        //       || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
-                                        //   .OrderBy(c => c.Sequence);
-                                        // Chargengröße anpassen für die anderen Komponenten
-                                        if (dosingPosRelation.ActualQuantityUOM > 0.1 && queryOpenDosings.Any())
-                                        {
-                                            double scaleFactor = dosingPosRelation.ActualQuantityUOM / dosingPosRelation.TargetQuantityUOM;
-                                            foreach (var plPos in queryOpenDosings)
-                                            {
-                                                if (plPos != dosingPosRelation)
-                                                {
-                                                    plPos.TargetQuantityUOM = plPos.TargetQuantityUOM * scaleFactor;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    msg = dbApp.ACSaveChangesWithRetry();
-                                    if (msg != null)
-                                    {
-                                        collectedMessages.AddDetailMessage(msg);
-                                        Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(8)", msg.InnerMessage);
-                                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1220), true);
-                                    }
-                                    else
-                                    {
-                                        dosingPosRelation.RecalcActualQuantityFast();
-                                        if (dbApp.IsChanged)
-                                            dbApp.ACSaveChanges();
-                                        // Bei Restentleerung wird in ein Sonderziel gefahren
-                                        // => Es muss die selbe Menge wieder zurückgebucht werden auf ein Sonderlagerplatz
-                                        if (!String.IsNullOrEmpty(dis2SpecialDest))
-                                        {
-                                            Facility specialDest = dbApp.Facility.Where(c => c.FacilityNo == dis2SpecialDest).FirstOrDefault();
-                                            if (specialDest == null && outwardFacility.Facility1_ParentFacility != null)
-                                            {
-                                                specialDest = dbApp.Facility.Where(c => c.ParentFacilityID.HasValue
-                                                    && c.ParentFacilityID == outwardFacility.ParentFacilityID
-                                                    && c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).FirstOrDefault();
-                                            }
-                                            if (specialDest != null && specialDest.MDFacilityType != null && specialDest.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin)
-                                            {
-                                                var queryDoneOutwardBookings = dbApp.FacilityBookingCharge.Where(c => c.ProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelationID == dosingPosRelation.ProdOrderPartslistPosRelationID).ToArray();
-                                                foreach (FacilityBookingCharge fbc in queryDoneOutwardBookings)
-                                                {
-                                                    ReveseBookingToExtraFacility(collectedMessages, dbApp, fbc, specialDest, dosingPosRelation);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-
-                        //ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
-                        //               dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, 
-                        //               isEndlessDosing, thisDosingIsInTol, msg, posState, ref changePosState);
+                        ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
+                                       dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
+                                       isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState);
 
                         bool odbd = OnDosingBookingDone(collectedMessages, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState);
 
@@ -1413,12 +1276,12 @@ namespace gip.mes.processapplication
                                 bool zeroBookSucceeded = false;
                                 if (hasQuants)
                                 {
-                                    //if (outwardFacility.OrderPostingOnEmptying)
-                                    //{
-                                    //    OnBookingToOrderOnEmptying(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
-                                    //                               dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
-                                    //                               isEndlessDosing, thisDosingIsInTol, msg, posState, ref changePosState);
-                                    //}
+                                    if (outwardFacility.OrderPostingOnEmptying)
+                                    {
+                                        OnBookingToOrderOnEmptying(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
+                                                                   dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
+                                                                   isEndlessDosing, thisDosingIsInTol, msg, posState, ref changePosState);
+                                    }
 
                                     zeroBookSucceeded = true;
                                     ACMethodBooking zeroBooking = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
@@ -1684,160 +1547,160 @@ namespace gip.mes.processapplication
 
                 if (actualQuantity > 0)
                 {
-                    //ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
-                    //               dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol, msg,
-                    //               posState, ref changePosState, true);
+                    ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
+                                   dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol, msg,
+                                   ref posState, ref changePosState, true);
                 }
             }
         }
 
 
-        //protected void ProcessBooking(MsgWithDetails collectedMessages, bool reEvaluatePosState,
-        //                            IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
-        //                            DatabaseApp dbApp, ProdOrderPartslistPosRelation dosingPosRelation, Facility outwardFacility,
-        //                            PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
-        //                            string dis2SpecialDest, double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
-        //                            bool isEndlessDosing, bool thisDosingIsInTol, Msg msg, MDProdOrderPartslistPosState posState, ref bool changePosState, 
-        //                            bool onEmptyingFacility = false)
-        //{
-        //    if (actualQuantity > 0.00001 || actualQuantity < -0.00001)
-        //    {
-        //        // 1. Bereite Buchung vor
-        //        FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(this.ACFacilityManager, dbApp, dosingPosRelation, onEmptyingFacility);
-        //        ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-        //        bookingParam.OutwardQuantity = (double)actualQuantity;
-        //        bookingParam.OutwardFacility = outwardFacility;
-        //        bookingParam.SetCompleted = dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource 
-        //                                 || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan 
-        //                                 || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait;
+        protected void ProcessBooking(MsgWithDetails collectedMessages, bool reEvaluatePosState,
+                                    IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
+                                    DatabaseApp dbApp, ProdOrderPartslistPosRelation dosingPosRelation, Facility outwardFacility,
+                                    PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
+                                    string dis2SpecialDest, double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
+                                    bool isEndlessDosing, bool thisDosingIsInTol, Msg msg, ref MDProdOrderPartslistPosState posState, ref bool changePosState,
+                                    bool onEmptyingFacility = false)
+        {
+            if (actualQuantity > 0.00001 || actualQuantity < -0.00001)
+            {
+                // 1. Bereite Buchung vor
+                FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(this.ACFacilityManager, dbApp, dosingPosRelation, onEmptyingFacility);
+                ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                bookingParam.OutwardQuantity = (double)actualQuantity;
+                bookingParam.OutwardFacility = outwardFacility;
+                bookingParam.SetCompleted = dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
+                                         || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
+                                         || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait;
 
-        //        if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-        //            bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-        //        msg = dbApp.ACSaveChangesWithRetry();
+                if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                    bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                msg = dbApp.ACSaveChangesWithRetry();
 
-        //        // 2. Führe Buchung durch
-        //        if (msg != null)
-        //        {
-        //            collectedMessages.AddDetailMessage(msg);
-        //            Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(5)", msg.InnerMessage);
-        //            OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1190), true);
-        //            changePosState = false;
-        //        }
-        //        else if (facilityPreBooking != null)
-        //        {
-        //            bookingParam.IgnoreIsEnabled = true;
-        //            ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
-        //            if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
-        //            {
-        //                collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-        //                OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1210), true);
-        //                changePosState = false;
-        //            }
-        //            else
-        //            {
-        //                if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
-        //                {
-        //                    Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(6)", bookingParam.ValidMessage.InnerMessage);
-        //                    OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1200), true);
-        //                    changePosState = false;
-        //                }
-        //                changePosState = true;
-        //                if (bookingParam.ValidMessage.IsSucceded())
-        //                {
-        //                    facilityPreBooking.DeleteACObject(dbApp, true);
-        //                    dosingPosRelation.IncreaseActualQuantityUOM(bookingParam.OutwardQuantity.Value);
-        //                    msg = dbApp.ACSaveChangesWithRetry();
-        //                    if (msg != null)
-        //                    {
-        //                        collectedMessages.AddDetailMessage(msg);
-        //                        Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(7b)", msg.InnerMessage);
-        //                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1211), true);
-        //                    }
-        //                    //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
-        //                    //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
-        //                }
-        //                else
-        //                {
-        //                    collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-        //                }
+                // 2. Führe Buchung durch
+                if (msg != null)
+                {
+                    collectedMessages.AddDetailMessage(msg);
+                    Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(5)", msg.InnerMessage);
+                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1190), true);
+                    changePosState = false;
+                }
+                else if (facilityPreBooking != null)
+                {
+                    bookingParam.IgnoreIsEnabled = true;
+                    ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
+                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                    {
+                        collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1210), true);
+                        changePosState = false;
+                    }
+                    else
+                    {
+                        if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
+                        {
+                            Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(6)", bookingParam.ValidMessage.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1200), true);
+                            changePosState = false;
+                        }
+                        changePosState = true;
+                        if (bookingParam.ValidMessage.IsSucceded())
+                        {
+                            facilityPreBooking.DeleteACObject(dbApp, true);
+                            dosingPosRelation.IncreaseActualQuantityUOM(bookingParam.OutwardQuantity.Value);
+                            msg = dbApp.ACSaveChangesWithRetry();
+                            if (msg != null)
+                            {
+                                collectedMessages.AddDetailMessage(msg);
+                                Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(7b)", msg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1211), true);
+                            }
+                            //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
+                            //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
+                        }
+                        else
+                        {
+                            collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                        }
 
-        //                posState = OnReEvaluatePosState(collectedMessages, reEvaluatePosState, posState,
-        //                    sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState, dosing, dis2SpecialDest,
-        //                    actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol);
+                        posState = OnReEvaluatePosState(collectedMessages, reEvaluatePosState, posState,
+                            sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState, dosing, dis2SpecialDest,
+                            actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol);
 
-        //                if (ScaleOtherComp && !thisDosingIsInTol && dosingPosRelation.ProdOrderBatch != null)
-        //                {
-        //                    posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
-        //                    //dosingPosRelation.MDProdOrderPartslistPosState = posState;
+                        if (ScaleOtherComp && !thisDosingIsInTol && dosingPosRelation.ProdOrderBatch != null)
+                        {
+                            posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
+                            //dosingPosRelation.MDProdOrderPartslistPosState = posState;
 
-        //                    var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-        //                        .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-        //                        && c.MDProdOrderPartslistPosState != null
-        //                        && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
-        //                            || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
+                            var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
+                                .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                && c.MDProdOrderPartslistPosState != null
+                                && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
+                                    || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
 
-        //                    //ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
-        //                    //    .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
-        //                    //        && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-        //                    //        && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
+                            //ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                            //    .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
+                            //        && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                            //        && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
 
-        //                    //var queryOpenDosings = batchPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-        //                    //   .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-        //                    //   && c.MDProdOrderPartslistPosState != null
-        //                    //   && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
-        //                    //       || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
-        //                    //   .OrderBy(c => c.Sequence);
-        //                    // Chargengröße anpassen für die anderen Komponenten
-        //                    if (dosingPosRelation.ActualQuantityUOM > 0.1 && queryOpenDosings.Any())
-        //                    {
-        //                        double scaleFactor = dosingPosRelation.ActualQuantityUOM / dosingPosRelation.TargetQuantityUOM;
-        //                        foreach (var plPos in queryOpenDosings)
-        //                        {
-        //                            if (plPos != dosingPosRelation)
-        //                            {
-        //                                plPos.TargetQuantityUOM = plPos.TargetQuantityUOM * scaleFactor;
-        //                            }
-        //                        }
-        //                    }
-        //                }
+                            //var queryOpenDosings = batchPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
+                            //   .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                            //   && c.MDProdOrderPartslistPosState != null
+                            //   && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
+                            //       || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
+                            //   .OrderBy(c => c.Sequence);
+                            // Chargengröße anpassen für die anderen Komponenten
+                            if (dosingPosRelation.ActualQuantityUOM > 0.1 && queryOpenDosings.Any())
+                            {
+                                double scaleFactor = dosingPosRelation.ActualQuantityUOM / dosingPosRelation.TargetQuantityUOM;
+                                foreach (var plPos in queryOpenDosings)
+                                {
+                                    if (plPos != dosingPosRelation)
+                                    {
+                                        plPos.TargetQuantityUOM = plPos.TargetQuantityUOM * scaleFactor;
+                                    }
+                                }
+                            }
+                        }
 
-        //                msg = dbApp.ACSaveChangesWithRetry();
-        //                if (msg != null)
-        //                {
-        //                    collectedMessages.AddDetailMessage(msg);
-        //                    Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(8)", msg.InnerMessage);
-        //                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1220), true);
-        //                }
-        //                else
-        //                {
-        //                    dosingPosRelation.RecalcActualQuantityFast();
-        //                    if (dbApp.IsChanged)
-        //                        dbApp.ACSaveChanges();
-        //                    // Bei Restentleerung wird in ein Sonderziel gefahren
-        //                    // => Es muss die selbe Menge wieder zurückgebucht werden auf ein Sonderlagerplatz
-        //                    if (!String.IsNullOrEmpty(dis2SpecialDest))
-        //                    {
-        //                        Facility specialDest = dbApp.Facility.Where(c => c.FacilityNo == dis2SpecialDest).FirstOrDefault();
-        //                        if (specialDest == null && outwardFacility.Facility1_ParentFacility != null)
-        //                        {
-        //                            specialDest = dbApp.Facility.Where(c => c.ParentFacilityID.HasValue
-        //                                && c.ParentFacilityID == outwardFacility.ParentFacilityID
-        //                                && c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).FirstOrDefault();
-        //                        }
-        //                        if (specialDest != null && specialDest.MDFacilityType != null && specialDest.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin)
-        //                        {
-        //                            var queryDoneOutwardBookings = dbApp.FacilityBookingCharge.Where(c => c.ProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelationID == dosingPosRelation.ProdOrderPartslistPosRelationID).ToArray();
-        //                            foreach (FacilityBookingCharge fbc in queryDoneOutwardBookings)
-        //                            {
-        //                                ReveseBookingToExtraFacility(collectedMessages, dbApp, fbc, specialDest, dosingPosRelation);
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+                        msg = dbApp.ACSaveChangesWithRetry();
+                        if (msg != null)
+                        {
+                            collectedMessages.AddDetailMessage(msg);
+                            Messages.LogError(this.GetACUrl(), "DoDosingBookingProd(8)", msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingProd", 1220), true);
+                        }
+                        else
+                        {
+                            dosingPosRelation.RecalcActualQuantityFast();
+                            if (dbApp.IsChanged)
+                                dbApp.ACSaveChanges();
+                            // Bei Restentleerung wird in ein Sonderziel gefahren
+                            // => Es muss die selbe Menge wieder zurückgebucht werden auf ein Sonderlagerplatz
+                            if (!String.IsNullOrEmpty(dis2SpecialDest))
+                            {
+                                Facility specialDest = dbApp.Facility.Where(c => c.FacilityNo == dis2SpecialDest).FirstOrDefault();
+                                if (specialDest == null && outwardFacility.Facility1_ParentFacility != null)
+                                {
+                                    specialDest = dbApp.Facility.Where(c => c.ParentFacilityID.HasValue
+                                        && c.ParentFacilityID == outwardFacility.ParentFacilityID
+                                        && c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).FirstOrDefault();
+                                }
+                                if (specialDest != null && specialDest.MDFacilityType != null && specialDest.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin)
+                                {
+                                    var queryDoneOutwardBookings = dbApp.FacilityBookingCharge.Where(c => c.ProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelationID == dosingPosRelation.ProdOrderPartslistPosRelationID).ToArray();
+                                    foreach (FacilityBookingCharge fbc in queryDoneOutwardBookings)
+                                    {
+                                        ReveseBookingToExtraFacility(collectedMessages, dbApp, fbc, specialDest, dosingPosRelation);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 
         /// <summary>
