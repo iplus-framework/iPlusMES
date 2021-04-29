@@ -251,7 +251,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(32)]
+        [ACPropertyInfo(32, "", "en{'Neto total'}de{'Neto total'}")]
         public double TotalPrice
         {
             get
@@ -328,12 +328,21 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(32, "", "en{'VAT amount total'}de{'Mehrwertsteuerbetrag total'}")]
+        [ACPropertyInfo(32, "", "en{'VAT total'}de{'MwSt. total'}")]
         public double TotalSalesTax
         {
             get
             {
                 return SalesTaxAmount * this.TargetQuantity;
+            }
+        }
+
+        [ACPropertyInfo(33, "", "en{'Bruto total'}de{'Bruto total'}")]
+        public double TotalPriceWithTax
+        {
+            get
+            {
+                return TotalPrice + TotalSalesTax;
             }
         }
 

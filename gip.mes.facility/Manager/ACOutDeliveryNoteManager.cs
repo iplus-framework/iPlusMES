@@ -888,6 +888,8 @@ namespace gip.mes.facility
                             }
 
                             posItem.OnEntityPropertyChanged("TotalPrice");
+                            posItem.OnEntityPropertyChanged("TotalSalesTax");
+                            posItem.OnEntityPropertyChanged("TotalPriceWithTax");
                             callerObject.OnPricePropertyChanged();
                             CalculateTaxOverview(callerObject, outOrder, posItems);
                         }
@@ -902,6 +904,10 @@ namespace gip.mes.facility
                                 callerObject.OnPricePropertyChanged();
 
                                 CalculateTaxOverview(callerObject, outOrder, posItems);
+
+                                posItem.OnEntityPropertyChanged("TotalPrice");
+                                posItem.OnEntityPropertyChanged("TotalSalesTax");
+                                posItem.OnEntityPropertyChanged("TotalPriceWithTax");
 
                                 posItem.InRecalculation = false;
                             }
@@ -921,6 +927,10 @@ namespace gip.mes.facility
                                 callerObject.OnPricePropertyChanged();
 
                                 CalculateTaxOverview(callerObject, outOrder, posItems);
+
+                                posItem.OnEntityPropertyChanged("TotalPrice");
+                                posItem.OnEntityPropertyChanged("TotalSalesTax");
+                                posItem.OnEntityPropertyChanged("TotalPriceWithTax");
 
                                 posItem.InRecalculation = false;
                             }
@@ -955,6 +965,10 @@ namespace gip.mes.facility
                                 callerObject.OnPricePropertyChanged();
 
                                 CalculateTaxOverview(callerObject, outOrder, posItems);
+
+                                posItem.OnEntityPropertyChanged("TotalPrice");
+                                posItem.OnEntityPropertyChanged("TotalSalesTax");
+                                posItem.OnEntityPropertyChanged("TotalPriceWithTax");
 
                                 posItem.InRecalculation = false;
                             }

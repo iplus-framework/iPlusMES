@@ -229,8 +229,11 @@ namespace gip.bso.sales
 
         void CurrentOutOfferPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName,
-                CurrentOutOffer, CurrentOutOfferPos, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList(), CurrentOutOffer?.BillingCompanyAddress);
+            if (OutDeliveryNoteManager != null)
+            {
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName,
+                    CurrentOutOffer, CurrentOutOfferPos, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList(), CurrentOutOffer?.BillingCompanyAddress);
+            }
         }
 
         /// <summary>
