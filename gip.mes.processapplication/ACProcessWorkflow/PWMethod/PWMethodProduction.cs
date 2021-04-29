@@ -233,50 +233,75 @@ namespace gip.mes.processapplication
         {
             get
             {
-                using (ACMonitor.Lock(_20015_LockStoreList))
+                try
                 {
-                    if (_MandatoryConfigStores != null)
+                    using (ACMonitor.Lock(_20015_LockStoreList))
+                    {
+                        if (_MandatoryConfigStores != null
+                            && _MandatoryConfigStores.Any()
+                            && _ExpectedConfigStoresCount >= 1)
+                            return _MandatoryConfigStores.ToList();
+                        _ExpectedConfigStoresCount = 0;
+                        _RecalcExpectedConfigStoresCount = true;
+                    }
+                    var mandatoryConfigStores = new List<IACConfigStore>();
+
+                    mandatoryConfigStores.AddRange(ACConfigMethodHierarchy.Select(x => x as IACConfigStore));
+
+                    IACComponentPWNode invoker = null;
+                    if (this.ContentACClassWF != null)
+                    {
+                        if (RootPW != null && CurrentTask != null && CurrentTask.ValueT != null)
+                        {
+                            invoker = CurrentTask.ValueT as IACComponentPWNode;
+                        }
+                    }
+                    Guid acClassMethodID = invoker != null ? invoker.ContentACClassWF.ACClassMethodID : ContentACClassWF.ACClassMethodID;
+                    if (CurrentProdOrderPartslistPos != null)
+                    {
+                        ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
+
+                        string errorMessage = null;
+                        int expectedConfigStoresCount = 0;
+                        List<IACConfigStore> prodPartslistOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetProductionPartslistConfigStoreOfflineList(ContentTask.ACClassTaskID, acClassMethodID, out expectedConfigStoresCount, out errorMessage);
+                        if (prodPartslistOfflineList != null)
+                            mandatoryConfigStores.AddRange(prodPartslistOfflineList);
+                        else
+                        {
+                            ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                            if (String.IsNullOrEmpty(errorMessage))
+                                errorMessage = "";
+                            errorMessage = errorMessage + " Configuration could not be loaded. Workflownodes will run with wrong parameters. If you acknowledge the alarm, the workflow will continue otherwise reset the Workflow manually!";
+                            OnNewAlarmOccurred(ProcessAlarm, new Msg(errorMessage, this, eMsgLevel.Error, PWClassName, "MandatoryConfigStores", 1000), true);
+                            Messages.LogError(this.GetACUrl(), "Start(0)", errorMessage);
+                        }
+                        using (ACMonitor.Lock(_20015_LockStoreList))
+                        {
+                            if (_RecalcExpectedConfigStoresCount)
+                                _ExpectedConfigStoresCount += expectedConfigStoresCount;
+                        }
+                    }
+
+                    using (ACMonitor.Lock(_20015_LockStoreList))
+                    {
+                        if (_RecalcExpectedConfigStoresCount)
+                            _ExpectedConfigStoresCount++;
+                    }
+                    if (CurrentACProgram != null)
+                        mandatoryConfigStores.Add(CurrentACProgram);
+
+                    using (ACMonitor.Lock(_20015_LockStoreList)) 
+                    {
+                        _MandatoryConfigStores = mandatoryConfigStores;
                         return _MandatoryConfigStores.ToList();
-                }
-                var mandatoryConfigStores = new List<IACConfigStore>();
-
-                mandatoryConfigStores.AddRange(ACConfigMethodHierarchy.Select(x => x as IACConfigStore));
-
-                IACComponentPWNode invoker = null;
-                if (this.ContentACClassWF != null)
-                {
-                    if (RootPW != null && CurrentTask != null && CurrentTask.ValueT != null)
-                    {
-                        invoker = CurrentTask.ValueT as IACComponentPWNode;
                     }
                 }
-                Guid acClassMethodID = invoker != null ? invoker.ContentACClassWF.ACClassMethodID : ContentACClassWF.ACClassMethodID;
-                if (CurrentProdOrderPartslistPos != null)
+                finally
                 {
-                    ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
-
-                    string errorMessage = null;
-                    List<IACConfigStore> prodPartslistOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetProductionPartslistConfigStoreOfflineList(ContentTask.ACClassTaskID, acClassMethodID, out errorMessage);
-                    if (prodPartslistOfflineList != null)
-                        mandatoryConfigStores.AddRange(prodPartslistOfflineList);
-                    else
+                    using (ACMonitor.Lock(_20015_LockStoreList))
                     {
-                        ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                        if (String.IsNullOrEmpty(errorMessage))
-                            errorMessage = "";
-                        errorMessage = errorMessage + " Configuration could not be loaded. Workflownodes will run with wrong parameters. If you acknowledge the alarm, the workflow will continue otherwise reset the Workflow manually!";
-                        OnNewAlarmOccurred(ProcessAlarm, new Msg(errorMessage, this, eMsgLevel.Error, PWClassName, "MandatoryConfigStores", 1000), true);
-                        Messages.LogError(this.GetACUrl(), "Start(0)", errorMessage);
+                        _RecalcExpectedConfigStoresCount = false;
                     }
-                }
-
-                if (CurrentACProgram != null)
-                    mandatoryConfigStores.Add(CurrentACProgram);
-
-                using (ACMonitor.Lock(_20015_LockStoreList)) 
-                {
-                    _MandatoryConfigStores = mandatoryConfigStores;
-                    return _MandatoryConfigStores.ToList();
                 }
             }
         }

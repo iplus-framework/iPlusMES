@@ -153,8 +153,9 @@ namespace gip.mes.processapplication
 
         #region other methods
 
-        public List<IACConfigStore> GetProductionPartslistConfigStoreOfflineList(Guid acClassTaskID, Guid acClassMethodID, out string message)
+        public List<IACConfigStore> GetProductionPartslistConfigStoreOfflineList(Guid acClassTaskID, Guid acClassMethodID, out int expectedConfigStoresCount, out string message)
         {
+            expectedConfigStoresCount = 4;
             message = "";
             MaterialWFACClassMethod configStageMatWF = null;
             Partslist configStagePartslist = null;
@@ -202,10 +203,14 @@ namespace gip.mes.processapplication
 
             if (configStageMatWF != null)
                 mandatoryConfigStores.Add(configStageMatWF);
+            else
+                expectedConfigStoresCount--;
             if (configStagePartslist != null)
                 mandatoryConfigStores.Add(configStagePartslist);
             if (configMaterialWF != null)
                 mandatoryConfigStores.Add(configMaterialWF);
+            else
+                expectedConfigStoresCount--;
             if (configStageProdPartslist != null)
             {
                 configStageProdPartslist.OverridingOrder = 1;
@@ -214,10 +219,10 @@ namespace gip.mes.processapplication
             return mandatoryConfigStores;
         }
 
-        public override List<IACConfigStore> DeserializeMandatoryConfigStores(IACEntityObjectContext db, List<ACConfigStoreInfo> rmiResult)
+        public override List<IACConfigStore> AttachConfigStoresToDatabase(IACEntityObjectContext db, List<ACConfigStoreInfo> rmiResult)
         {
             ObjectContext obContext = db as ObjectContext;
-            List<IACConfigStore> mandatoryConfigStore = base.DeserializeMandatoryConfigStores(db, rmiResult);
+            List<IACConfigStore> mandatoryConfigStore = base.AttachConfigStoresToDatabase(db, rmiResult);
             List<ACConfigStoreInfo> subsetRMIresult = rmiResult.Where(x => !mandatoryConfigStore.Select(a => (a as EntityObject).EntityKey).Contains(x.ConfigStoreEntity)).ToList();
             if (rmiResult != null)
             {

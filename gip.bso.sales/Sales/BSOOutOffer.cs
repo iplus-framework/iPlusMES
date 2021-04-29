@@ -147,7 +147,8 @@ namespace gip.bso.sales
 
         void CurrentOutOffer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
+            if (OutDeliveryNoteManager != null)
+                OutDeliveryNoteManager.HandleIOrderPropertyChange(e.PropertyName, CurrentOutOffer, IssuerCompanyAddress);
             switch (e.PropertyName)
             {
                 case "CustomerCompanyID":

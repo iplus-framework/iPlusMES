@@ -435,8 +435,14 @@ namespace gip.mes.processapplication
                         using (var dbIPlus = new Database())
                         {
                             bool validationSuccess = true;
+                            var mandantoryConfigStores = MandatoryConfigStores;
+                            if (!ValidateExpectedConfigStores())
+                            {
+                                validationSuccess = false;
+                                return StartNextBatchResult.CycleWait;
+                            }
                             MsgWithDetails msg2 = ProdOrderManager.ValidateStart(dbApp, dbIPlus, this,
-                                                                        currentProdOrderPartslist, this.MandatoryConfigStores,
+                                                                        currentProdOrderPartslist, mandantoryConfigStores,
                                                                         PARole.ValidationBehaviour.Strict, PartslistManager, MatReqManager);
                             if (msg2 != null)
                             {

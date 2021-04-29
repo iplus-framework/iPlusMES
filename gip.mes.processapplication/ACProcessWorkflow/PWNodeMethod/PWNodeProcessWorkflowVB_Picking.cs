@@ -87,7 +87,13 @@ namespace gip.mes.processapplication
             {
                 Picking picking = detachedPicking.FromAppContext<Picking>(dbApp);
                 bool validationSuccess = true;
-                MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, this.MandatoryConfigStores, PARole.ValidationBehaviour.Strict);
+                var mandantoryConfigStores = MandatoryConfigStores;
+                if (!ValidateExpectedConfigStores())
+                {
+                    validationSuccess = false;
+                    return StartNextBatchResult.CycleWait;
+                }
+                MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, mandantoryConfigStores, PARole.ValidationBehaviour.Strict);
                 if (msg2 != null)
                 {
                     if (!msg2.IsSucceded())
