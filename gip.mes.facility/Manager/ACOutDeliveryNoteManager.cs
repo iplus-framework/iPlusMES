@@ -886,6 +886,10 @@ namespace gip.mes.facility
                                 posItem.TargetQuantity = posItem.Material.ConvertToBaseQuantity(posItem.TargetQuantityUOM, posItem.MDUnit);
                                 //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
                             }
+
+                            posItem.OnEntityPropertyChanged("TotalPrice");
+                            callerObject.OnPricePropertyChanged();
+                            CalculateTaxOverview(callerObject, outOrder, posItems);
                         }
                         break;
                     case "PriceNet":
@@ -896,6 +900,9 @@ namespace gip.mes.facility
                                 posItem.OnEntityPropertyChanged("SalesTaxAmount");
                                 posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
                                 callerObject.OnPricePropertyChanged();
+
+                                CalculateTaxOverview(callerObject, outOrder, posItems);
+
                                 posItem.InRecalculation = false;
                             }
                         }
@@ -944,6 +951,10 @@ namespace gip.mes.facility
                                     else if (countrySalesTaxModel.MDCountrySalesTax != null && countrySalesTaxModel.MDCountrySalesTax.SalesTax == posItem.SalesTax)
                                         posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
                                 }
+
+                                callerObject.OnPricePropertyChanged();
+
+                                CalculateTaxOverview(callerObject, outOrder, posItems);
 
                                 posItem.InRecalculation = false;
                             }
@@ -1069,7 +1080,7 @@ namespace gip.mes.facility
 
                 mDCountrySalesTaxes = poses
                                         .Where(c => c.PriceNet > 0)
-                                        .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
+                                        .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (decimal)x.TargetQuantity * (x.SalesTax / 100)))
                                         .GroupBy(t => t.Item1)
                                         .Select(o => new MDCountrySalesTax()
                                         {
@@ -1086,7 +1097,7 @@ namespace gip.mes.facility
                                         .Select(o => new MDCountrySalesTax()
                                         {
                                             MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
-                                            SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount)
+                                            SalesTax = (decimal)o.Sum(s => s.TotalSalesTax)
                                         })
                                         .ToList();
             }

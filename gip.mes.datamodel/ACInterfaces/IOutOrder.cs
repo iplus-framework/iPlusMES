@@ -17,5 +17,6 @@ namespace gip.mes.datamodel
         decimal PriceNet { get; set; }
         decimal PriceGross { get; set; }
 
+        void OnEntityPropertyChanged(string property);
     }
 }

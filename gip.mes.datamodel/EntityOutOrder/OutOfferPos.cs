@@ -328,6 +328,15 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(32, "", "en{'VAT amount total'}de{'Mehrwertsteuerbetrag total'}")]
+        public double TotalSalesTax
+        {
+            get
+            {
+                return SalesTaxAmount * this.TargetQuantity;
+            }
+        }
+
         public bool InRecalculation { get; set; }
 
         #endregion
