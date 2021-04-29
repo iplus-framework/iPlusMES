@@ -20,6 +20,9 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(11, ConstApp.IssuerCompanyAddress, ConstApp.IssuerCompanyAddress_ACCaption, Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
     [ACPropertyEntity(12, ConstApp.IssuerCompanyPerson, ConstApp.IssuerCompanyPerson_ACCaption, Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
     [ACPropertyEntity(13, "Comment", ConstApp.Comment, "", "", true)]
+    [ACPropertyEntity(14, "PriceNet", ConstApp.PriceNet, "", "", true)]
+    [ACPropertyEntity(15, "PriceGross", ConstApp.PriceGross, "", "", true)]
+    [ACPropertyEntity(16, MDTermOfPayment.ClassName, ConstApp.TermsOfPayment, Const.ContextDatabase + "\\" + MDTermOfPayment.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -36,7 +39,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Invoice>) })]
-    public partial class Invoice: IOutOrder
+    public partial class Invoice : IOutOrder
     {
         public const string ClassName = "Invoice";
         public const string NoColumnName = "InvoiceNo";
@@ -162,13 +165,11 @@ namespace gip.mes.datamodel
                 ACProperties.Refresh();
         }
 
-
-
         #endregion
 
         #region Additional
 
-        [ACPropertyInfo(100, "", "en{'Neto total'}de{'Neto total'}")]
+        [ACPropertyInfo(31, "", "en{'Neto total'}de{'Neto total'}")]
         public double PosPriceNetTotal
         {
             get
@@ -177,7 +178,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(100, "", "en{'Discount'}de{'Rabatt'}")]
+        [ACPropertyInfo(32, "", "en{'Discount'}de{'Rabatt'}")]
         public double PosPriceNetDiscount
         {
             get
@@ -190,45 +191,18 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(100, "", "en{'Neto'}de{'Neto'}")]
+        [ACPropertyInfo(33, "", "en{'Neto'}de{'Neto'}")]
         public double PosPriceNetSum
         {
             get
             {
                 if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
                 {
-                    return (double)(InvoicePos_Invoice.Where(c => c.PriceNet >= 0).Sum(o => o.PriceNet));
+                    return (double)(InvoicePos_Invoice.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice));
                 }
                 return 0;
             }
         }
-
-        [ACPropertyInfo(101, "", "en{'Neto'}de{'Neto'}")]
-        public double PosTotalSalesTax
-        {
-            get
-            {
-                if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
-                {
-                    return (double)(InvoicePos_Invoice.Sum(o => o.TotalSalesTax));
-                }
-                return 0;
-            }
-        }
-
-        [ACPropertyInfo(999)]
-        public double PosTotalPriceWithTax
-        {
-            get
-            {
-                if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
-                {
-                    return (double)(InvoicePos_Invoice.Sum(o => o.TotalPriceWithTax));
-                }
-                return 0;
-            }
-        }
-
 
         public void OnPricePropertyChanged()
         {

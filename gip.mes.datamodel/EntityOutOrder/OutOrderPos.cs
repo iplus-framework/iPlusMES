@@ -28,7 +28,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(20, MDDelivPosLoadState.ClassName, "en{'Loading State'}de{'Beladungszustand'}", Const.ContextDatabase + "\\" + MDDelivPosLoadState.ClassName, "", true)]
     [ACPropertyEntity(21, "PriceNet", ConstApp.PriceNet, "", "", true)]
     [ACPropertyEntity(22, "PriceGross", ConstApp.PriceGross, "", "", true)]
-    [ACPropertyEntity(23, MDCountrySalesTax.ClassName, "en{'Sales Tax'}de{'Steuersatz'}", Const.ContextDatabase + "\\" + MDCountrySalesTax.ClassName, "", true)]
+    [ACPropertyEntity(23, "SalesTax", ConstApp.ESCountrySalesTax, "", "", true)]
     [ACPropertyEntity(24, MDToleranceState.ClassName, "en{'Tolerance Status'}de{'Toleranz Status'}", Const.ContextDatabase + "\\" + MDToleranceState.ClassName, "", true)]
     [ACPropertyEntity(25, MDOutOrderPlanState.ClassName, "en{'Production Status'}de{'Status Produktion'}", Const.ContextDatabase + "\\" + MDOutOrderPlanState.ClassName, "", true)]
     [ACPropertyEntity(26, MDTourplanPosState.ClassName, "en{'Picking Status'}de{'Status Kommissionierung'}", Const.ContextDatabase + "\\" + MDTourplanPosState.ClassName, "", true)]
@@ -277,7 +277,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
+        [ACPropertyInfo(32, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
         public double SalesTaxAmount
         {
             get
@@ -286,7 +286,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(33, "", "en{'Neto total'}de{'Neto total'}")]
         public double TotalPrice
         {
             get
@@ -295,7 +295,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(34, "", "en{'VAT total'}de{'MwSt. total'}")]
         public double TotalSalesTax
         {
             get
@@ -304,7 +304,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(35, "", "en{'Bruto total'}de{'Bruto total'}")]
         public double TotalPriceWithTax
         {
             get
@@ -313,7 +313,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(36)]
         public string QuantityUnit
         {
             get

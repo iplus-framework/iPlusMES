@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(15, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(16, "Comment2", "en{'Comment 2'}de{'Bemerkung 2'}", "", "", true)]
     [ACPropertyEntity(17, "GroupSum", "en{'Group subtotal'}de{'Zwischensummengruppe '}", "", "", true)]
-    [ACPropertyEntity(18, "SalesTax", "en{'VAT'}de{'Mehrwertsteuer'}", "", "", true)]
+    [ACPropertyEntity(18, "SalesTax", ConstApp.ESCountrySalesTax, "", "", true)]
     [ACPropertyEntity(9999, OutOffer.ClassName, "en{'Offer'}de{'Angebot'}", "", "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Posistionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]

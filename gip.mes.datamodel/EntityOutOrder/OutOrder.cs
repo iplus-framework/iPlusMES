@@ -343,37 +343,13 @@ namespace gip.mes.datamodel
             {
                 if (OutOrderPos_OutOrder != null && OutOrderPos_OutOrder.Any())
                 {
-                    return (double)(OutOrderPos_OutOrder.Where(c => c.PriceNet >= 0).Sum(o => o.PriceNet));
+                    return (double)(OutOrderPos_OutOrder.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice));
                 }
                 return 0;
             }
         }
 
-        [ACPropertyInfo(101, "", "en{'Neto'}de{'Neto'}")]
-        public double PosTotalSalesTax
-        {
-            get
-            {
-                if (OutOrderPos_OutOrder != null && OutOrderPos_OutOrder.Any())
-                {
-                    return (double)(OutOrderPos_OutOrder.Sum(o => o.TotalSalesTax));
-                }
-                return 0;
-            }
-        }
-
-        [ACPropertyInfo(999)]
-        public double PosTotalPriceWithTax
-        {
-            get
-            {
-                if (OutOrderPos_OutOrder != null && OutOrderPos_OutOrder.Any())
-                {
-                    return (double)(OutOrderPos_OutOrder.Sum(o => o.TotalPriceWithTax));
-                }
-                return 0;
-            }
-        }
+       
         #endregion
 
         public void OnPricePropertyChanged()
