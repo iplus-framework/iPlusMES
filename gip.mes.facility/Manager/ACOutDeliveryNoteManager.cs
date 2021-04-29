@@ -759,6 +759,9 @@ namespace gip.mes.facility
                 invoice.CustomerCompany = outOrder.CustomerCompany;
                 invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
                 invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
+                invoice.IssuerCompanyAddress = outOrder.IssuerCompanyAddress;
+                invoice.IssuerCompanyPerson = outOrder.IssuerCompanyPerson;
+                invoice.MDTermOfPayment = outOrder.MDTermOfPayment;
                 invoice.XMLDesignStart = outOrder.XMLDesignStart;
                 invoice.XMLDesignEnd = outOrder.XMLDesignEnd;
 
@@ -827,12 +830,13 @@ namespace gip.mes.facility
         public void HandleIOrderPosPropertyChange(DatabaseApp databaseApp, IOutOrderPosBSO callerObject, string propertyName,
             IOutOrder outOrder, IOutOrderPos posItem, List<IOutOrderPos> posItems, CompanyAddress billingCompanyAddress)
         {
-            if (posItem != null)
+            if (posItem != null && !posItem.InRecalculation)
+            {
+                posItem.InRecalculation = true;
                 switch (propertyName)
                 {
                     case "MaterialID":
                         {
-                            posItem.InRecalculation = true;
                             callerObject.OnPropertyChanged("MDUnitList");
                             if (posItem.Material != null && posItem.Material.BaseMDUnit != null)
                                 callerObject.CurrentMDUnit = posItem.Material.BaseMDUnit;
@@ -875,7 +879,6 @@ namespace gip.mes.facility
                                         posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
                                 }
                             }
-                            posItem.InRecalculation = false;
                         }
                         break;
                     case "TargetQuantityUOM":
@@ -886,70 +889,65 @@ namespace gip.mes.facility
                                 posItem.TargetQuantity = posItem.Material.ConvertToBaseQuantity(posItem.TargetQuantityUOM, posItem.MDUnit);
                                 //CurrentOutOfferPos.TargetWeight = CurrentOutOfferPos.Material.ConvertToBaseWeight(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.MDUnit);
                             }
+
+                            posItem.OnEntityPropertyChanged("TotalPrice");
+                            posItem.OnEntityPropertyChanged("TotalSalesTax");
+                            posItem.OnEntityPropertyChanged("TotalPriceWithTax");
+                            callerObject.OnPricePropertyChanged();
+                            CalculateTaxOverview(callerObject, outOrder, posItems);
                         }
                         break;
                     case "PriceNet":
-                        {
-                            if (!posItem.InRecalculation)
-                            {
-                                posItem.InRecalculation = true;
-                                posItem.OnEntityPropertyChanged("SalesTaxAmount");
-                                posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
-                                callerObject.OnPricePropertyChanged();
-                                posItem.InRecalculation = false;
-                            }
-                        }
+                        posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                        posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                        callerObject.OnPricePropertyChanged();
+                        CalculateTaxOverview(callerObject, outOrder, posItems);
+                        posItem.OnEntityPropertyChanged("TotalPrice");
+                        posItem.OnEntityPropertyChanged("TotalSalesTax");
+                        posItem.OnEntityPropertyChanged("TotalPriceWithTax");
                         break;
                     case "PriceGross":
-                        {
-                            if (!posItem.InRecalculation)
-                            {
-                                posItem.InRecalculation = true;
+                        if (posItem.PriceGross < 0)
+                            posItem.SalesTax = 0;
 
-                                if (posItem.PriceGross < 0)
-                                    posItem.SalesTax = 0;
+                        posItem.PriceNet = posItem.PriceGross - (decimal)posItem.SalesTaxAmount;
+                        posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                        callerObject.OnPricePropertyChanged();
 
-                                posItem.PriceNet = posItem.PriceGross - (decimal)posItem.SalesTaxAmount;
-                                posItem.OnEntityPropertyChanged("SalesTaxAmount");
-                                callerObject.OnPricePropertyChanged();
+                        CalculateTaxOverview(callerObject, outOrder, posItems);
 
-                                CalculateTaxOverview(callerObject, outOrder, posItems);
-
-                                posItem.InRecalculation = false;
-                            }
-                        }
+                        posItem.OnEntityPropertyChanged("TotalPrice");
+                        posItem.OnEntityPropertyChanged("TotalSalesTax");
+                        posItem.OnEntityPropertyChanged("TotalPriceWithTax");
                         break;
                     case "SalesTax":
+                        posItem.OnEntityPropertyChanged("SalesTaxAmount");
+                        posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
+                        // clean up tax connections
+                        posItem.MDCountrySalesTaxMaterial = null;
+                        posItem.MDCountrySalesTaxMDMaterialGroup = null;
+                        posItem.MDCountrySalesTax = null;
+                        if (billingCompanyAddress != null)
                         {
-                            if (!posItem.InRecalculation)
-                            {
-                                posItem.InRecalculation = true;
-
-                                posItem.OnEntityPropertyChanged("SalesTaxAmount");
-                                posItem.PriceGross = posItem.PriceNet + (decimal)posItem.SalesTaxAmount;
-
-                                // clean up tax connections
-                                posItem.MDCountrySalesTaxMaterial = null;
-                                posItem.MDCountrySalesTaxMDMaterialGroup = null;
-                                posItem.MDCountrySalesTax = null;
-
-                                if (billingCompanyAddress != null)
-                                {
-                                    DateTime now = DateTime.Now;
-                                    ActualSalesTax countrySalesTaxModel = GetActualSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
-                                    if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null && countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax == posItem.SalesTax)
-                                        posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
-                                    else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null && countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax == posItem.SalesTax)
-                                        posItem.MDCountrySalesTaxMDMaterialGroup = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup;
-                                    else if (countrySalesTaxModel.MDCountrySalesTax != null && countrySalesTaxModel.MDCountrySalesTax.SalesTax == posItem.SalesTax)
-                                        posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
-                                }
-
-                                posItem.InRecalculation = false;
-                            }
+                            DateTime now = DateTime.Now;
+                            ActualSalesTax countrySalesTaxModel = GetActualSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
+                            if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null && countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax == posItem.SalesTax)
+                                posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
+                            else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null && countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax == posItem.SalesTax)
+                                posItem.MDCountrySalesTaxMDMaterialGroup = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup;
+                            else if (countrySalesTaxModel.MDCountrySalesTax != null && countrySalesTaxModel.MDCountrySalesTax.SalesTax == posItem.SalesTax)
+                                posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
                         }
+                        callerObject.OnPricePropertyChanged();
+                        CalculateTaxOverview(callerObject, outOrder, posItems);
+                        posItem.OnEntityPropertyChanged("TotalPrice");
+                        posItem.OnEntityPropertyChanged("TotalSalesTax");
+                        posItem.OnEntityPropertyChanged("TotalPriceWithTax");
                         break;
                 }
+                posItem.InRecalculation = false;
+            }
+
         }
 
         public void CalculateTaxOverview(IOutOrderPosBSO callerObject, IOutOrder outOrder, List<IOutOrderPos> posItems)
@@ -1069,7 +1067,7 @@ namespace gip.mes.facility
 
                 mDCountrySalesTaxes = poses
                                         .Where(c => c.PriceNet > 0)
-                                        .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (x.SalesTax / 100)))
+                                        .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (decimal)x.TargetQuantity * (x.SalesTax / 100)))
                                         .GroupBy(t => t.Item1)
                                         .Select(o => new MDCountrySalesTax()
                                         {
@@ -1086,7 +1084,7 @@ namespace gip.mes.facility
                                         .Select(o => new MDCountrySalesTax()
                                         {
                                             MDKey = string.Format(vatFormat, o.Key.ToString("N2")),
-                                            SalesTax = (decimal)o.Sum(s => s.SalesTaxAmount)
+                                            SalesTax = (decimal)o.Sum(s => s.TotalSalesTax)
                                         })
                                         .ToList();
             }

@@ -489,9 +489,19 @@ namespace gip.mes.processapplication
                         {
                             if (!IsSimulationOn || IsManualSimulation)
                             {
-                                // Error50324: Weighing-Check-Alarm: The scale measures a total weight of {0} kg. But {1} kg material must appear in it. The difference of {2} kg is too high (Min-Tol.: {3}, Max-Tol.: {4}).
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(4)", 493, "Error50324",
-                                                scale.ActualValue.ValueT, weightForToleranceCalc, diff, maxDiff, minDiff);
+                                if (CompareWithSum)
+                                {
+                                    // Error50404: Weighing-Check-Alarm: At this point is posted {0} kg material, but the target quantity is {1} kg.The difference of {2} kg is too high (Min-Tol.: {3}, Max-Tol.: {4}).
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(4)", 495, "Error50404",
+                                                  actualBatchWeight, weightForToleranceCalc, diff, maxDiff, minDiff);
+                                }
+
+                                else
+                                {
+                                    // Error50324: Weighing-Check-Alarm: The scale measures a total weight of {0} kg. But {1} kg material must appear in it. The difference of {2} kg is too high (Min-Tol.: {3}, Max-Tol.: {4}).
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(4)", 502, "Error50324",
+                                                    scale.ActualValue.ValueT, weightForToleranceCalc, diff, maxDiff, minDiff);
+                                }
 
                                 if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                     Messages.LogError(this.GetACUrl(), "StartNextProdComponent(4)", msg.InnerMessage);

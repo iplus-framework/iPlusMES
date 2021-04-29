@@ -18,6 +18,8 @@
 
         double SalesTaxAmount { get; }
 
+        double TotalSalesTax { get; }
+
         bool InRecalculation { get; set; }
 
     }

@@ -318,7 +318,7 @@ namespace gip.mes.datamodel
             {
                 if (OutOfferPos_OutOffer != null && OutOfferPos_OutOffer.Any())
                 {
-                    return (double)(OutOfferPos_OutOffer.Where(c => c.PriceNet >= 0).Sum(o => o.PriceNet));
+                    return (double)(OutOfferPos_OutOffer.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice));
                 }
                 return 0;
             }

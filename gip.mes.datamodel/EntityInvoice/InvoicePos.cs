@@ -178,7 +178,7 @@ namespace gip.mes.datamodel
 
         #region IOutOrder
 
-        [ACPropertyInfo(999, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
+        [ACPropertyInfo(31, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
         public double SalesTaxAmount
         {
             get
@@ -187,7 +187,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(32, "", "en{'Neto total'}de{'Neto total'}")]
         public double TotalPrice
         {
             get
@@ -196,7 +196,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(32, "", "en{'VAT total'}de{'MwSt. total'}")]
         public double TotalSalesTax
         {
             get
@@ -205,7 +205,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(33, "", "en{'Bruto total'}de{'Bruto total'}")]
         public double TotalPriceWithTax
         {
             get
@@ -214,7 +214,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(34)]
         public string QuantityUnit
         {
             get

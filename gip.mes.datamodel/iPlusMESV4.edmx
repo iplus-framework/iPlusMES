@@ -1745,6 +1745,7 @@
           <Property Name="IssuerCompanyAddressID" Type="uniqueidentifier" />
           <Property Name="IssuerCompanyPersonID" Type="uniqueidentifier" />
           <Property Name="OutOrderID" Type="uniqueidentifier" />
+          <Property Name="MDTermOfPaymentID" Type="uniqueidentifier" />
           <Property Name="PriceNet" Type="money" Nullable="false" />
           <Property Name="PriceGross" Type="money" Nullable="false" />
           <Property Name="SalesTax" Type="real" Nullable="false" />
@@ -4171,7 +4172,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4685,7 +4686,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a pri
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4718,7 +4719,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4742,7 +4743,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4766,7 +4767,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4791,7 +4792,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4820,7 +4821,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4850,7 +4851,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -8616,6 +8617,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="Invoice">
               <PropertyRef Name="MDInvoiceTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDTermOfPayment">
+          <End Role="MDTermOfPayment" Type="Self.MDTermOfPayment" Multiplicity="0..1" />
+          <End Role="Invoice" Type="Self.Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDTermOfPayment">
+              <PropertyRef Name="MDTermOfPaymentID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDTermOfPaymentID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14862,6 +14875,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
             <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDTermOfPayment" Association="Self.FK_Invoice_MDTermOfPayment">
+            <End Role="MDTermOfPayment" EntitySet="MDTermOfPayment" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
           <AssociationSet Name="FK_Invoice_OutOrderID" Association="Self.FK_Invoice_OutOrderID">
             <End Role="OutOrder" EntitySet="OutOrder" />
             <End Role="Invoice" EntitySet="Invoice" />
@@ -18956,7 +18973,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="InvoicePos" EntitySet="InvoicePos" />
           </AssociationSet>
           <EntitySet Name="CompanyAddress" EntityType="iPlusMESV4_Model.CompanyAddress" />
-          <EntitySet Name="Invoice" EntityType="iPlusMESV4_Model.Invoice" />
           <EntitySet Name="OutOffer" EntityType="iPlusMESV4_Model.OutOffer" />
           <EntitySet Name="OutOrder" EntityType="iPlusMESV4_Model.OutOrder" />
           <AssociationSet Name="FK_Company_VBUser" Association="iPlusMESV4_Model.FK_Company_VBUser">
@@ -18966,10 +18982,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <AssociationSet Name="FK_CompanyAddress_CompanyID" Association="iPlusMESV4_Model.FK_CompanyAddress_CompanyID">
             <End Role="Company" EntitySet="Company" />
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyID" Association="iPlusMESV4_Model.FK_Invoice_CompanyID">
-            <End Role="Company" EntitySet="Company" />
-            <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOffer_CompanyID" Association="iPlusMESV4_Model.FK_OutOffer_CompanyID">
             <End Role="Company" EntitySet="Company" />
@@ -19035,18 +19047,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="InRequest" EntitySet="InRequest" />
           </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyAddress" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress">
-            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyAddressID" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID">
-            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyAddressID1" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1">
-            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
           <AssociationSet Name="FK_OutOffer_BillingCompanyAddressID" Association="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID">
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="OutOffer" EntitySet="OutOffer" />
@@ -19074,22 +19074,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <AssociationSet Name="FK_TourplanPos_CompanyAddressID" Association="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID">
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="TourplanPos" EntitySet="TourplanPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDInvoiceStateID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID">
-            <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDInvoiceTypeID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID">
-            <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_OutOrderID" Association="iPlusMESV4_Model.FK_Invoice_OutOrderID">
-            <End Role="OutOrder" EntitySet="OutOrder" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InvoicePos_InvoiceID" Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID">
-            <End Role="Invoice" EntitySet="Invoice" />
-            <End Role="InvoicePos" EntitySet="InvoicePos" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOffer_MDDelivTypeID" Association="iPlusMESV4_Model.FK_OutOffer_MDDelivTypeID">
             <End Role="MDDelivType" EntitySet="MDDelivType" />
@@ -19179,10 +19163,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <AssociationSet Name="FK_CompanyPersonRole_CompanyPersonID" Association="iPlusMESV4_Model.FK_CompanyPersonRole_CompanyPersonID">
             <End Role="CompanyPerson" EntitySet="CompanyPerson" />
             <End Role="CompanyPersonRole" EntitySet="CompanyPersonRole" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyPerson" Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson">
-            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
-            <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOffer_CompanyPerson" Association="iPlusMESV4_Model.FK_OutOffer_CompanyPerson">
             <End Role="CompanyPerson" EntitySet="CompanyPerson" />
@@ -19352,6 +19332,47 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <AssociationSet Name="FK_VisitorVoucher_VehicleFacilityID" Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID">
             <End Role="Facility" EntitySet="Facility" />
             <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
+          </AssociationSet>
+          <EntitySet Name="Invoice" EntityType="iPlusMESV4_Model.Invoice" />
+          <AssociationSet Name="FK_Invoice_CompanyID" Association="iPlusMESV4_Model.FK_Invoice_CompanyID">
+            <End Role="Company" EntitySet="Company" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyAddress" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress">
+            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyAddressID" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID">
+            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyAddressID1" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1">
+            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyPerson" Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson">
+            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDInvoiceStateID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID">
+            <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDInvoiceTypeID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID">
+            <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDTermOfPayment" Association="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment">
+            <End Role="MDTermOfPayment" EntitySet="MDTermOfPayment" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_OutOrderID" Association="iPlusMESV4_Model.FK_Invoice_OutOrderID">
+            <End Role="OutOrder" EntitySet="OutOrder" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InvoicePos_InvoiceID" Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID">
+            <End Role="Invoice" EntitySet="Invoice" />
+            <End Role="InvoicePos" EntitySet="InvoicePos" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -20228,12 +20249,12 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="VBUserID" Type="Guid" />
           <NavigationProperty Name="VBUser" Relationship="iPlusMESV4_Model.FK_Company_VBUser" FromRole="Company" ToRole="VBUser" />
           <NavigationProperty Name="CompanyAddress_Company" Relationship="iPlusMESV4_Model.FK_CompanyAddress_CompanyID" FromRole="Company" ToRole="CompanyAddress" />
-          <NavigationProperty Name="Invoice_CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Company" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_CustomerCompany" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyID" FromRole="Company" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_CustomerCompany" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyID" FromRole="Company" ToRole="OutOrder" />
           <NavigationProperty Name="OutOrder_CPartnerCompany" Relationship="iPlusMESV4_Model.FK_OutOrder_CPartnerCompanyID" FromRole="Company" ToRole="OutOrder" />
           <NavigationProperty Name="CompanyPerson_Company" Relationship="iPlusMESV4_Model.FK_CompanyPerson_CompanyID" FromRole="Company" ToRole="CompanyPerson" />
           <NavigationProperty Name="Facility_Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Company" ToRole="Facility" />
+          <NavigationProperty Name="Invoice_CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Company" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
@@ -22482,6 +22503,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="InRequest_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_InRequest_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="InRequest" />
           <NavigationProperty Name="OutOffer_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOrder_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="OutOrder" />
+          <NavigationProperty Name="Invoice_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="MDTermOfPayment" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDTimeRange">
           <Key>
@@ -32460,9 +32482,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="InOrder_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="InOrder" />
           <NavigationProperty Name="InRequest_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_InRequest_BillingCompanyAddressID" FromRole="CompanyAddress" ToRole="InRequest" />
           <NavigationProperty Name="InRequest_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InRequest_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="InRequest" />
-          <NavigationProperty Name="Invoice_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
-          <NavigationProperty Name="Invoice_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
-          <NavigationProperty Name="Invoice_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID" FromRole="CompanyAddress" ToRole="OutOffer" />
           <NavigationProperty Name="OutOffer_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyAddress" FromRole="CompanyAddress" ToRole="OutOffer" />
           <NavigationProperty Name="OutOffer_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="OutOffer" />
@@ -32470,43 +32489,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="OutOrder_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyAddress" FromRole="CompanyAddress" ToRole="OutOrder" />
           <NavigationProperty Name="OutOrder_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="OutOrder" />
           <NavigationProperty Name="TourplanPos_CompanyAddress" Relationship="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID" FromRole="CompanyAddress" ToRole="TourplanPos" />
-        </EntityType>
-        <EntityType Name="Invoice">
-          <Key>
-            <PropertyRef Name="InvoiceID" />
-          </Key>
-          <Property Name="InvoiceID" Type="Guid" Nullable="false" />
-          <Property Name="MDInvoiceTypeID" Type="Guid" Nullable="false" />
-          <Property Name="MDInvoiceStateID" Type="Guid" Nullable="false" />
-          <Property Name="InvoiceNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="InvoiceDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CustomerCompanyID" Type="Guid" Nullable="false" />
-          <Property Name="CustRequestNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="DeliveryCompanyAddressID" Type="Guid" />
-          <Property Name="BillingCompanyAddressID" Type="Guid" />
-          <Property Name="IssuerCompanyAddressID" Type="Guid" />
-          <Property Name="IssuerCompanyPersonID" Type="Guid" />
-          <Property Name="OutOrderID" Type="Guid" />
-          <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="SalesTax" Type="Single" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesignStart" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesignEnd" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
-          <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="Invoice" ToRole="MDInvoiceState" />
-          <NavigationProperty Name="MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="Invoice" ToRole="MDInvoiceType" />
-          <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="Invoice" ToRole="OutOrder" />
-          <NavigationProperty Name="InvoicePos_Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="Invoice" ToRole="InvoicePos" />
-          <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
+          <NavigationProperty Name="Invoice_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="OutOffer">
           <Key>
@@ -32592,7 +32577,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_BillingCompanyAddressID" FromRole="OutOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyAddress" FromRole="OutOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_DeliveryCompanyAddressID" FromRole="OutOrder" ToRole="CompanyAddress" />
-          <NavigationProperty Name="Invoice_OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="OutOrder" ToRole="Invoice" />
           <NavigationProperty Name="MDDelivType" Relationship="iPlusMESV4_Model.FK_OutOrder_MDDelivTypeID" FromRole="OutOrder" ToRole="MDDelivType" />
           <NavigationProperty Name="MDOutOrderState" Relationship="iPlusMESV4_Model.FK_OutOrder_MDOutOrderStateID" FromRole="OutOrder" ToRole="MDOutOrderState" />
           <NavigationProperty Name="MDOutOrderType" Relationship="iPlusMESV4_Model.FK_OutOrder_MDOutOrderTypeID" FromRole="OutOrder" ToRole="MDOutOrderType" />
@@ -32603,6 +32587,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="OutOrderPos_OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderPos_OutOrderID" FromRole="OutOrder" ToRole="OutOrderPos" />
           <NavigationProperty Name="TandTv2StepItem_OutOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_OutOrderID" FromRole="OutOrder" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" FromRole="OutOrder" ToRole="CompanyPerson" />
+          <NavigationProperty Name="Invoice_OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="OutOrder" ToRole="Invoice" />
         </EntityType>
         <Association Name="FK_Company_VBUser">
           <End Type="iPlusMESV4_Model.VBUser" Role="VBUser" Multiplicity="0..1" />
@@ -32625,18 +32610,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="CompanyAddress">
               <PropertyRef Name="CompanyID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyID">
-          <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Company">
-              <PropertyRef Name="CompanyID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="CustomerCompanyID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -32836,42 +32809,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Invoice_CompanyAddress">
-          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyAddress">
-              <PropertyRef Name="CompanyAddressID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="IssuerCompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyAddressID">
-          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyAddress">
-              <PropertyRef Name="CompanyAddressID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="DeliveryCompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyAddressID1">
-          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyAddress">
-              <PropertyRef Name="CompanyAddressID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="BillingCompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_OutOffer_BillingCompanyAddressID">
           <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.OutOffer" Role="OutOffer" Multiplicity="*" />
@@ -32953,54 +32890,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="TourplanPos">
               <PropertyRef Name="CompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDInvoiceStateID">
-          <End Type="iPlusMESV4_Model.MDInvoiceState" Role="MDInvoiceState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDInvoiceState">
-              <PropertyRef Name="MDInvoiceStateID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDInvoiceStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDInvoiceTypeID">
-          <End Type="iPlusMESV4_Model.MDInvoiceType" Role="MDInvoiceType" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDInvoiceType">
-              <PropertyRef Name="MDInvoiceTypeID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDInvoiceTypeID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_OutOrderID">
-          <End Type="iPlusMESV4_Model.OutOrder" Role="OutOrder" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="OutOrder">
-              <PropertyRef Name="OutOrderID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="OutOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InvoicePos_InvoiceID">
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.InvoicePos" Role="InvoicePos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Invoice">
-              <PropertyRef Name="InvoiceID" />
-            </Principal>
-            <Dependent Role="InvoicePos">
-              <PropertyRef Name="InvoiceID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -33235,13 +33124,13 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_CompanyPerson_MDTimeRangeID" FromRole="CompanyPerson" ToRole="MDTimeRange" />
           <NavigationProperty Name="VBUser" Relationship="iPlusMESV4_Model.FK_CompanyPerson_VBUser" FromRole="CompanyPerson" ToRole="VBUser" />
           <NavigationProperty Name="CompanyPersonRole_CompanyPerson" Relationship="iPlusMESV4_Model.FK_CompanyPersonRole_CompanyPersonID" FromRole="CompanyPerson" ToRole="CompanyPersonRole" />
-          <NavigationProperty Name="Invoice_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="CompanyPerson" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" FromRole="CompanyPerson" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" FromRole="CompanyPerson" ToRole="OutOrder" />
           <NavigationProperty Name="Rating_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Rating_CompanyPerson" FromRole="CompanyPerson" ToRole="Rating" />
           <NavigationProperty Name="Visitor_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="CompanyPerson" ToRole="Facility" />
+          <NavigationProperty Name="Invoice_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="CompanyPerson" ToRole="Invoice" />
         </EntityType>
         <Association Name="FK_CalendarShiftPerson_CompanyPersonID">
           <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="1">
@@ -33318,18 +33207,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="CompanyPersonRole">
               <PropertyRef Name="CompanyPersonID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyPerson">
-          <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyPerson">
-              <PropertyRef Name="CompanyPersonID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="IssuerCompanyPersonID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -33927,6 +33804,165 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="VisitorVoucher">
               <PropertyRef Name="VehicleFacilityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Invoice">
+          <Key>
+            <PropertyRef Name="InvoiceID" />
+          </Key>
+          <Property Name="InvoiceID" Type="Guid" Nullable="false" />
+          <Property Name="MDInvoiceTypeID" Type="Guid" Nullable="false" />
+          <Property Name="MDInvoiceStateID" Type="Guid" Nullable="false" />
+          <Property Name="InvoiceNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="InvoiceDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CustomerCompanyID" Type="Guid" Nullable="false" />
+          <Property Name="CustRequestNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DeliveryCompanyAddressID" Type="Guid" />
+          <Property Name="BillingCompanyAddressID" Type="Guid" />
+          <Property Name="IssuerCompanyAddressID" Type="Guid" />
+          <Property Name="IssuerCompanyPersonID" Type="Guid" />
+          <Property Name="OutOrderID" Type="Guid" />
+          <Property Name="MDTermOfPaymentID" Type="Guid" />
+          <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="SalesTax" Type="Single" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesignStart" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesignEnd" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
+          <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
+          <NavigationProperty Name="MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="Invoice" ToRole="MDInvoiceState" />
+          <NavigationProperty Name="MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="Invoice" ToRole="MDInvoiceType" />
+          <NavigationProperty Name="MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="Invoice" ToRole="MDTermOfPayment" />
+          <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="Invoice" ToRole="OutOrder" />
+          <NavigationProperty Name="InvoicePos_Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="Invoice" ToRole="InvoicePos" />
+        </EntityType>
+        <Association Name="FK_Invoice_CompanyID">
+          <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Company">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="CustomerCompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyAddress">
+          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyAddress">
+              <PropertyRef Name="CompanyAddressID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="IssuerCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyAddressID">
+          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyAddress">
+              <PropertyRef Name="CompanyAddressID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="DeliveryCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyAddressID1">
+          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyAddress">
+              <PropertyRef Name="CompanyAddressID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="BillingCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyPerson">
+          <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyPerson">
+              <PropertyRef Name="CompanyPersonID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="IssuerCompanyPersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDInvoiceStateID">
+          <End Type="iPlusMESV4_Model.MDInvoiceState" Role="MDInvoiceState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDInvoiceState">
+              <PropertyRef Name="MDInvoiceStateID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDInvoiceStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDInvoiceTypeID">
+          <End Type="iPlusMESV4_Model.MDInvoiceType" Role="MDInvoiceType" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDInvoiceType">
+              <PropertyRef Name="MDInvoiceTypeID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDInvoiceTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDTermOfPayment">
+          <End Type="iPlusMESV4_Model.MDTermOfPayment" Role="MDTermOfPayment" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDTermOfPayment">
+              <PropertyRef Name="MDTermOfPaymentID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDTermOfPaymentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_OutOrderID">
+          <End Type="iPlusMESV4_Model.OutOrder" Role="OutOrder" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrder">
+              <PropertyRef Name="OutOrderID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="OutOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InvoicePos_InvoiceID">
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.InvoicePos" Role="InvoicePos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Invoice">
+              <PropertyRef Name="InvoiceID" />
+            </Principal>
+            <Dependent Role="InvoicePos">
+              <PropertyRef Name="InvoiceID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -38827,35 +38863,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Invoice">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.Invoice">
-              <MappingFragment StoreEntitySet="Invoice">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="XMLDesignEnd" ColumnName="XMLDesignEnd" />
-                <ScalarProperty Name="XMLDesignStart" ColumnName="XMLDesignStart" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
-                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
-                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
-                <ScalarProperty Name="OutOrderID" ColumnName="OutOrderID" />
-                <ScalarProperty Name="IssuerCompanyPersonID" ColumnName="IssuerCompanyPersonID" />
-                <ScalarProperty Name="IssuerCompanyAddressID" ColumnName="IssuerCompanyAddressID" />
-                <ScalarProperty Name="BillingCompanyAddressID" ColumnName="BillingCompanyAddressID" />
-                <ScalarProperty Name="DeliveryCompanyAddressID" ColumnName="DeliveryCompanyAddressID" />
-                <ScalarProperty Name="CustRequestNo" ColumnName="CustRequestNo" />
-                <ScalarProperty Name="CustomerCompanyID" ColumnName="CustomerCompanyID" />
-                <ScalarProperty Name="InvoiceDate" ColumnName="InvoiceDate" />
-                <ScalarProperty Name="InvoiceNo" ColumnName="InvoiceNo" />
-                <ScalarProperty Name="MDInvoiceStateID" ColumnName="MDInvoiceStateID" />
-                <ScalarProperty Name="MDInvoiceTypeID" ColumnName="MDInvoiceTypeID" />
-                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="OutOffer">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.OutOffer">
               <MappingFragment StoreEntitySet="OutOffer">
@@ -38998,6 +39005,36 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
                 <ScalarProperty Name="VBiFacilityACClassID" ColumnName="VBiFacilityACClassID" />
                 <ScalarProperty Name="ParentFacilityID" ColumnName="ParentFacilityID" />
                 <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Invoice">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.Invoice">
+              <MappingFragment StoreEntitySet="Invoice">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="XMLDesignEnd" ColumnName="XMLDesignEnd" />
+                <ScalarProperty Name="XMLDesignStart" ColumnName="XMLDesignStart" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
+                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
+                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
+                <ScalarProperty Name="MDTermOfPaymentID" ColumnName="MDTermOfPaymentID" />
+                <ScalarProperty Name="OutOrderID" ColumnName="OutOrderID" />
+                <ScalarProperty Name="IssuerCompanyPersonID" ColumnName="IssuerCompanyPersonID" />
+                <ScalarProperty Name="IssuerCompanyAddressID" ColumnName="IssuerCompanyAddressID" />
+                <ScalarProperty Name="BillingCompanyAddressID" ColumnName="BillingCompanyAddressID" />
+                <ScalarProperty Name="DeliveryCompanyAddressID" ColumnName="DeliveryCompanyAddressID" />
+                <ScalarProperty Name="CustRequestNo" ColumnName="CustRequestNo" />
+                <ScalarProperty Name="CustomerCompanyID" ColumnName="CustomerCompanyID" />
+                <ScalarProperty Name="InvoiceDate" ColumnName="InvoiceDate" />
+                <ScalarProperty Name="InvoiceNo" ColumnName="InvoiceNo" />
+                <ScalarProperty Name="MDInvoiceStateID" ColumnName="MDInvoiceStateID" />
+                <ScalarProperty Name="MDInvoiceTypeID" ColumnName="MDInvoiceTypeID" />
+                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -39841,12 +39878,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_OutOrderPosID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.CompanyAddress" Width="1.5" PointX="21.75" PointY="245.375" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.Invoice" Width="1.5" PointX="60.25" PointY="141.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOffer" Width="1.5" PointX="44" PointY="289.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOrder" Width="1.5" PointX="46.25" PointY="283.5" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Company_VBUser" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_CompanyAddress_CompanyID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CPartnerCompanyID" />
@@ -39863,9 +39898,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequest_BillingCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequest_DeliveryCompanyAddressID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_CompanyAddress" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" />
@@ -39873,10 +39905,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CompanyAddress" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_DeliveryCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_OutOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_MDDelivTypeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_MDDelivTypeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_MDOutOfferStateID" />
@@ -39900,7 +39928,6 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_CompanyPerson_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_CompanyPerson_VBUser" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_CompanyPersonRole_CompanyPersonID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Rating_CompanyPerson" />
@@ -39944,6 +39971,17 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.Invoice" Width="1.5" PointX="60.25" PointY="143.25" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_OutOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" />
       </Diagram>
     </Diagrams>
   </Designer>
