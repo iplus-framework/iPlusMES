@@ -86,7 +86,6 @@ namespace gip.mes.datamodel
 
         #endregion
 
-
         #region IACWorkflowDesignContext
 
         public Material FromNode;
@@ -157,6 +156,77 @@ namespace gip.mes.datamodel
         {
             return PWACClass.ACType.GetDesign(PWACClass, acUsage, acKind, vbDesignName);
         }
+
+        #region IACWorkflowDesignContext -> IACConfigStore
+
+        public string ConfigStoreName
+        {
+            get
+            {
+                ACClassInfo acClassInfo = (ACClassInfo)GetType().GetCustomAttributes(typeof(ACClassInfo), false)[0];
+                string caption = Translator.GetTranslation(acClassInfo.ACCaptionTranslation);
+                return caption;
+            }
+        }
+
+        /// <summary>
+        /// ACConfigKeyACUrl returns the relative Url to the "main table" in group a group of semantically related tables.
+        /// This property is used when NewACConfig() is called. NewACConfig() creates a new IACConfig-Instance and set the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
+        /// </summary>
+        public string ACConfigKeyACUrl
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates and adds a new IACConfig-Entry to ConfigItemsSource.
+        /// The implementing class creates a new entity object an add it to its "own Configuration-Table".
+        /// It sets automatically the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
+        /// </summary>
+        /// <param name="acObject">Optional: Reference to another Entity-Object that should be related for this new configuration entry.</param>
+        /// <param name="valueTypeACClass">The iPlus-Type of the "Value"-Property.</param>
+        /// <returns>IACConfig as a new entry</returns>
+        public IACConfig NewACConfig(IACObjectEntity acObject = null, gip.core.datamodel.ACClass valueTypeACClass = null, string localConfigACUrl = null)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Deletes all IACConfig-Entries in the Database-Context as well as in ConfigurationEntries.
+        /// </summary>
+        public void DeleteAllConfig()
+        {
+        }
+
+        public decimal OverridingOrder { get; set; }
+
+        /// <summary>
+        /// A thread-safe and cached list of Configuration-Values of type IACConfig.
+        /// </summary>
+        public IEnumerable<IACConfig> ConfigurationEntries
+        {
+            get
+            {
+                return new List<IACConfig>();
+            }
+        }
+
+        /// <summary>Clears the cache of configuration entries. (ConfigurationEntries)
+        /// Re-accessing the ConfigurationEntries property rereads all configuration entries from the database.</summary>
+        public void ClearCacheOfConfigurationEntries()
+        {
+        }
+
+        /// <summary>Removes a configuration from ConfigurationEntries and the database-context.</summary>
+        /// <param name="acObject">Entry as IACConfig</param>
+        public void RemoveACConfig(IACConfig acObject)
+        {
+        }
+
+        #endregion
 
         #endregion
 
@@ -293,77 +363,7 @@ namespace gip.mes.datamodel
         }
         #endregion
 
-        #region IACConfigStore
 
-        public string ConfigStoreName
-        {
-            get
-            {
-                ACClassInfo acClassInfo = (ACClassInfo)GetType().GetCustomAttributes(typeof(ACClassInfo), false)[0];
-                string caption = Translator.GetTranslation(acClassInfo.ACCaptionTranslation);
-                return caption;
-            }
-        }
-
-        /// <summary>
-        /// ACConfigKeyACUrl returns the relative Url to the "main table" in group a group of semantically related tables.
-        /// This property is used when NewACConfig() is called. NewACConfig() creates a new IACConfig-Instance and set the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
-        /// </summary>
-        public string ACConfigKeyACUrl
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Creates and adds a new IACConfig-Entry to ConfigItemsSource.
-        /// The implementing class creates a new entity object an add it to its "own Configuration-Table".
-        /// It sets automatically the IACConfig.KeyACUrl-Property with this ACConfigKeyACUrl.
-        /// </summary>
-        /// <param name="acObject">Optional: Reference to another Entity-Object that should be related for this new configuration entry.</param>
-        /// <param name="valueTypeACClass">The iPlus-Type of the "Value"-Property.</param>
-        /// <returns>IACConfig as a new entry</returns>
-        public IACConfig NewACConfig(IACObjectEntity acObject = null, gip.core.datamodel.ACClass valueTypeACClass = null, string localConfigACUrl = null)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Deletes all IACConfig-Entries in the Database-Context as well as in ConfigurationEntries.
-        /// </summary>
-        public void DeleteAllConfig()
-        {
-        }
-
-        public decimal OverridingOrder { get; set; }
-
-        /// <summary>
-        /// A thread-safe and cached list of Configuration-Values of type IACConfig.
-        /// </summary>
-        public IEnumerable<IACConfig> ConfigurationEntries
-        {
-            get
-            {
-                return new List<IACConfig>();
-            }
-        }
-
-        /// <summary>Clears the cache of configuration entries. (ConfigurationEntries)
-        /// Re-accessing the ConfigurationEntries property rereads all configuration entries from the database.</summary>
-        public void ClearCacheOfConfigurationEntries()
-        {
-        }
-
-        /// <summary>Removes a configuration from ConfigurationEntries and the database-context.</summary>
-        /// <param name="acObject">Entry as IACConfig</param>
-        public void RemoveACConfig(IACConfig acObject)
-        {
-        }
-
-
-        #endregion
 
         #region Loading material WF content
 

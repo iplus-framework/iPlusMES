@@ -148,18 +148,17 @@ namespace gip.mes.processapplication
             return callingConfigStoreList;
         }
 
-       
+
         #endregion
 
         #region other methods
 
         public List<IACConfigStore> GetProductionPartslistConfigStoreOfflineList(Guid acClassTaskID, Guid acClassMethodID, out int expectedConfigStoresCount, out string message)
         {
-            expectedConfigStoresCount = 4;
+            expectedConfigStoresCount = 3;
             message = "";
             MaterialWFACClassMethod configStageMatWF = null;
             Partslist configStagePartslist = null;
-            MaterialWF configMaterialWF = null;
             ProdOrderPartslist configStageProdPartslist = null;
             List<IACConfigStore> mandatoryConfigStores = new List<IACConfigStore>();
             using (var dbApp = new DatabaseApp())
@@ -182,7 +181,6 @@ namespace gip.mes.processapplication
                 if (configStageProdPartslist != null)
                 {
                     configStagePartslist = configStageProdPartslist.Partslist;
-                    configMaterialWF = configStagePartslist.MaterialWF;
                     if (configStagePartslist != null && configStagePartslist.MaterialWFID.HasValue)
                     {
                         configStageMatWF = dbApp.MaterialWFACClassMethod.Include(c => c.MaterialWFACClassMethodConfig_MaterialWFACClassMethod)
@@ -193,7 +191,7 @@ namespace gip.mes.processapplication
 
                 IEnumerable<IACConfig> cfSource = null;
                 if (configStageMatWF != null)
-                    cfSource = configStageMatWF.ConfigurationEntries; // Read Cache, because afterwards config-entities will be detached
+                    cfSource = configStageMatWF.ConfigurationEntries;// Read Cache, because afterwards config-entities will be detached
                 if (configStagePartslist != null)
                     cfSource = configStagePartslist.ConfigurationEntries; // Read Cache, because afterwards config-entities will be detached
                 if (configStageProdPartslist != null)
@@ -207,10 +205,6 @@ namespace gip.mes.processapplication
                 expectedConfigStoresCount--;
             if (configStagePartslist != null)
                 mandatoryConfigStores.Add(configStagePartslist);
-            if (configMaterialWF != null)
-                mandatoryConfigStores.Add(configMaterialWF);
-            else
-                expectedConfigStoresCount--;
             if (configStageProdPartslist != null)
             {
                 configStageProdPartslist.OverridingOrder = 1;
@@ -259,14 +253,14 @@ namespace gip.mes.processapplication
                         .ToList();
                     break;
                 case "MaterialWFACClassMethod":
-                    result = 
+                    result =
                         ACConfigQuery<MaterialWFACClassMethodConfig>.QueryConfigSource(dbApp.MaterialWFACClassMethodConfig, preConfigACUrl, localConfigACUrl, vbiACClassID)
                         .ToList()
                         .Select(c => (IACConfig)c)
                         .ToList();
                     break;
                 case "Partslist":
-                    result = 
+                    result =
                         ACConfigQuery<PartslistConfig>.QueryConfigSource(dbApp.PartslistConfig, preConfigACUrl, localConfigACUrl, vbiACClassID)
                         .ToList()
                         .Select(c => (IACConfig)c)
@@ -280,6 +274,72 @@ namespace gip.mes.processapplication
                     break;
             }
             return result;
+        }
+        #endregion
+
+        #region Additional
+        public override ValidateConfigStoreModel ValidateConfigStores(List<IACConfigStore> mandatoryConfigStores)
+        {
+            ValidateConfigStoreModel model = base.ValidateConfigStores(mandatoryConfigStores);
+            try
+            {
+                foreach (IACConfigStore configStore in mandatoryConfigStores)
+                {
+                    if (!configStore.ConfigurationEntries.Any())
+                    {
+                        if (configStore is MaterialWFACClassMethod)
+                        {
+                            MaterialWFACClassMethod materialWFACClassMethod = configStore as MaterialWFACClassMethod;
+                            using (DatabaseApp database = new DatabaseApp())
+                            {
+                                int configCount = database.MaterialWFACClassMethodConfig.Where(c => c.MaterialWFACClassMethodID == materialWFACClassMethod.MaterialWFACClassMethodID).Count();
+                                if (configCount != 0)
+                                {
+                                    model.IsValid = model.IsValid && false;
+                                    model.NotValidConfigStores.Add(configStore);
+                                }
+                            }
+                        }
+                        else if (configStore is Partslist)
+                        {
+                            Partslist partslist = configStore as Partslist;
+                            using (DatabaseApp database = new DatabaseApp())
+                            {
+                                int configCount = database.PartslistConfig.Where(c => c.PartslistID == partslist.PartslistID).Count();
+                                if (configCount != 0)
+                                {
+                                    model.IsValid = model.IsValid && false;
+                                    model.NotValidConfigStores.Add(configStore);
+                                }
+                            }
+                        }
+                        else if (configStore is ProdOrderPartslist)
+                        {
+                            ProdOrderPartslist prodOrderPartslist = configStore as ProdOrderPartslist;
+                            using (DatabaseApp database = new DatabaseApp())
+                            {
+                                int configCount = database.ProdOrderPartslistConfig.Where(c => c.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID).Count();
+                                if (configCount != 0)
+                                {
+                                    model.IsValid = model.IsValid && false;
+                                    model.NotValidConfigStores.Add(configStore);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                model.IsValid = false;
+                string msg = e.Message;
+                if (e.InnerException != null && e.InnerException.Message != null)
+                    msg += " Inner:" + e.InnerException.Message;
+
+                if (Root != null && Root.Messages != null && Root.InitState == ACInitState.Initialized)
+                    Root.Messages.LogException("ConfigManagerIPlusMES", "ValidateConfigStoreModel", msg);
+            }
+            return model;
         }
         #endregion
 
