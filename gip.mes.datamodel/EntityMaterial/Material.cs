@@ -806,6 +806,31 @@ namespace gip.mes.datamodel
             }
         }
 
+        /// <summary>
+        /// Checks if cached configuration entries are loaded from database successfully
+        /// </summary>
+        public bool ValidateConfigurationEntriesWithDB(ConfigEntriesValidationMode mode = ConfigEntriesValidationMode.AnyCheck)
+        {
+            if (mode == ConfigEntriesValidationMode.AnyCheck)
+            {
+                if (ConfigurationEntries.Any())
+                    return true;
+            }
+            using (DatabaseApp database = new DatabaseApp())
+            {
+                var query = database.MaterialConfig.Where(c => c.MaterialID == this.MaterialID);
+                if (mode == ConfigEntriesValidationMode.AnyCheck)
+                {
+                    if (query.Any())
+                        return false;
+                }
+                else if (mode == ConfigEntriesValidationMode.CompareCount
+                         || mode == ConfigEntriesValidationMode.CompareContent)
+                    return query.Count() == ConfigurationEntries.Count();
+            }
+            return true;
+        }
+
         #endregion
 
         #region VBIplus-Context

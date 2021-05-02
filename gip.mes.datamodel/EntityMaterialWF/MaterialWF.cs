@@ -220,6 +220,14 @@ namespace gip.mes.datamodel
         {
         }
 
+        /// <summary>
+        /// Checks if cached configuration entries are loaded from database successfully
+        /// </summary>
+        public bool ValidateConfigurationEntriesWithDB(ConfigEntriesValidationMode mode = ConfigEntriesValidationMode.AnyCheck)
+        {
+            return true;
+        }
+
         /// <summary>Removes a configuration from ConfigurationEntries and the database-context.</summary>
         /// <param name="acObject">Entry as IACConfig</param>
         public void RemoveACConfig(IACConfig acObject)
