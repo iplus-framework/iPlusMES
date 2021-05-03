@@ -747,6 +747,16 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// With this method you can show additional tabs on the interface according a selected process module.
+        /// </summary>
+        /// <param name="item">Represents the work center item (process module)</param>
+        /// <param name="dynamicContent">Represents the dynamic content on the user interface.</param>
+        public virtual void OnWorkcenterItemSelected(WorkCenterItem item, ref string dynamicContent)
+        {
+
+        }
+
         #endregion
 
         #region Execute helper handlers
@@ -1001,6 +1011,8 @@ namespace gip.bso.manufacturing
             }
 
             parentBSO.LoadPartslist();
+
+            parentBSO.OnWorkcenterItemSelected(this, ref dynamicContent);
 
             ItemLayout = DefaultLayout.Replace("[dynamicContent]", dynamicContent);
         }
