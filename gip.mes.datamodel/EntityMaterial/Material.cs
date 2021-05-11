@@ -68,6 +68,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(39, "ZeroBookingTolerance", "en{'ZeroBooking Tolerance'}de{'Null-Buchungstoleranz'}", "", "", true)]
     [ACPropertyEntity(40, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(41, "ExplosionOff", "en{'Explosion Off'}de{'Stoprückauflösung'}", "", "", true)]
+    [ACPropertyEntity(42, "SpecHeatCapacity", "en{'Specific heat capacity J/kgK'}de{'Spezifische Wärmekapazität J/kgK'}", "", "", true)]
     //QRYMaterialCalculation", "en{'MaterialCalculation'}de{'Materialkalkulation'}", typeof(MaterialCalculation), "MaterialCalculation", "Material\\MaterialName1", "Material\\MaterialName1")]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + Material.ClassName, ConstApp.Material, typeof(Material), Material.ClassName, "MaterialNo,MaterialName1", "MaterialNo", new object[]
         {
@@ -109,6 +110,7 @@ namespace gip.mes.datamodel
             entity.IsActive = true;
             entity.IsIntermediate = false;
             entity.ZeroBookingTolerance = 0;
+            entity.SpecHeatCapacity = 0;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }

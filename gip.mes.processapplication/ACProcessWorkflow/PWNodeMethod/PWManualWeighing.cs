@@ -194,7 +194,7 @@ namespace gip.mes.processapplication
         #region Properties => Configuration
 
         private ACMethod _MyConfiguration;
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(9999)]
         public ACMethod MyConfiguration
         {
             get

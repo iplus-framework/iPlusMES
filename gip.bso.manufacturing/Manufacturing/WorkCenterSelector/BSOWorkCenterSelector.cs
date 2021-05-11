@@ -69,6 +69,8 @@ namespace gip.bso.manufacturing
                 childBSO.DeActivate();
             }
 
+            BSOManualWeighingType = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -427,6 +429,8 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public Type BSOManualWeighingType = typeof(BSOManualWeighing);
+
         #endregion
 
         #region Methods
@@ -665,19 +669,30 @@ namespace gip.bso.manufacturing
                 if (workCenterItem.ProcessModule == null)
                     continue;
 
+                BSOs = OnAddFunctionBSOs(paf, BSOs);
+
                 WorkCenterItemFunction func = new WorkCenterItemFunction(workCenterItem.ProcessModule, paf.ACIdentifier);
                 func.RelatedBSOs = BSOs.ToList();
                 //func.PAFName = paf.ACUrlComponent;
 
                 workCenterItem.AddItemFunction(func);
 
-
-                if (BSOs.Any(c => c.ACIdentifier == "BSOManualWeighing"))
+                if (BSOs.Any(c => BSOManualWeighingType.IsAssignableFrom((c.ValueT as core.datamodel.ACClass)?.ObjectType)))
+                {
                     workCenterItem.RegisterItemForUserAck();
+                }
+
+                //if (BSOs.Any(c => c.ACIdentifier == "BSOManualWeighing"))
+                //    workCenterItem.RegisterItemForUserAck();
             }
 
             AccessPrimary.ToNavList(workCenterItems.OrderBy(c => c.ACCaption));
             SelectedWorkCenterItem = WorkCenterItems.FirstOrDefault();
+        }
+
+        public virtual ACComposition[] OnAddFunctionBSOs(core.datamodel.ACClass pafACClass, ACComposition[] bsos)
+        {
+            return bsos;
         }
 
         public override void ACAction(ACActionArgs actionArgs)

@@ -1226,6 +1226,11 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public virtual void OnGetPWGroup(IACComponentPWNode pwGroup)
+        {
+
+        }
+
         private void LoadPAFManualWeighing(ACRef<IACComponent> pafManWeighing)
         {
             UnloadPAFManualWeighing();
@@ -1325,6 +1330,8 @@ namespace gip.bso.manufacturing
                     pwGroup = Root.ACUrlCommand(pwGroupACUrl) as IACComponentPWNode;
                     if (pwGroup == null)
                         return;
+
+                    OnGetPWGroup(pwGroup);
 
                     IEnumerable<ACChildInstanceInfo> pwNodes;
 
