@@ -838,11 +838,15 @@ namespace gip.mes.facility
                     case "MaterialID":
                         {
                             callerObject.OnPropertyChanged("MDUnitList");
-                            if (posItem.Material != null && posItem.Material.BaseMDUnit != null)
-                                callerObject.CurrentMDUnit = posItem.Material.BaseMDUnit;
-                            else
-                                callerObject.CurrentMDUnit = null;
-                            OnPropertyChanged("CurrentOutOfferPos");
+                            //if (posItem.Material != null && posItem.Material.BaseMDUnit != null)
+                            //    callerObject.CurrentMDUnit = posItem.Material.BaseMDUnit;
+                            //else
+                            //    callerObject.CurrentMDUnit = null;
+
+                            posItem.MDUnit = posItem.Material?.BaseMDUnit;
+                            posItem.OnEntityPropertyChanged("MDUnit");
+
+                            callerObject.OnPropertyChanged("CurrentOutOfferPos");
 
                             if (posItem.Material != null)
                             {
