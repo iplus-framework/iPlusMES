@@ -135,6 +135,7 @@
     <Compile Include="System\BSOCompany.cs" />
     <Compile Include="System\BSOCtrlUpdateMessageInfo.cs" />
     <Compile Include="System\BSOMedia.cs" />
+    <Compile Include="System\BSOUserSettings.cs" />
     <Compile Include="System\MDBSOCountry.cs" />
     <Compile Include="Logistics\MDBSOTourplanPosState.cs" />
     <Compile Include="Logistics\MDBSOTour.cs" />
@@ -259,10 +260,13 @@
     <None Include="VBControlScripts\2021-04-14 16-23_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-04-15 16-22_aaginic.zip">
+    <None Include="VBControlScripts\2021-05-11 14-14_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-05-11 14-14_ihrastinski.zip">
+    <None Include="VBControlScripts\2021-05-14 16-00_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-05-14 17-05_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

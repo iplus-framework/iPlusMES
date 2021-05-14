@@ -795,7 +795,7 @@ namespace gip.mes.facility
         #region Invoice -> IOutOrder & IOutOrderPosBSO
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public void HandleIOrderPropertyChange(string propertyName, IOutOrder item, CompanyAddress issuerCompanyAddress)
+        public void HandleIOrderPropertyChange(string propertyName, IOutOrder item)
         {
             if (item != null)
             {
@@ -813,14 +813,7 @@ namespace gip.mes.facility
                             item.DeliveryCompanyAddress = null;
                         }
                         break;
-                    case "IssuerCompanyPersonID":
-                        if (item.IssuerCompanyPerson != null)
-                        {
-                            item.IssuerCompanyAddress = issuerCompanyAddress;
-                        }
-                        else
-                            item.IssuerCompanyAddress = null;
-                        break;
+                    
                 }
             }
 
@@ -965,23 +958,6 @@ namespace gip.mes.facility
             outOrder.PriceGross = ((decimal)outOrder.PosPriceNetTotal + totalTax);
         }
 
-        public IssuerResult GetIssuer(DatabaseApp databaseApp, Guid vbUserID)
-        {
-            IssuerResult result = new IssuerResult();
-            result.IssuerCompanyAddress = databaseApp.CompanyAddress.Where(c => c.VBUserID == vbUserID).FirstOrDefault();
-            if (result.IssuerCompanyAddress != null)
-            {
-                result.CompanyPeople = databaseApp.CompanyPerson.Where(c => c.CompanyID == result.IssuerCompanyAddress.CompanyID).OrderBy(c => c.Name1).ToList();
-                result.IssuerCompanyPerson = databaseApp.CompanyPerson.Where(c => c.VBUserID == vbUserID).FirstOrDefault();
-                string issuerCompanyPerson = "-";
-                if (result.IssuerCompanyPerson != null)
-                    issuerCompanyPerson = result.IssuerCompanyPerson.Name1 + " " + result.IssuerCompanyPerson.Name2;
-                result.IssuerMessage = string.Format(@"{0} - {1} | {2}", result.IssuerCompanyAddress.ACCaption, result.IssuerCompanyAddress.InvoiceIssuerNo, issuerCompanyPerson);
-            }
-            else
-                result.IssuerMessage = Root.Environment.TranslateMessage(this, "Warning50039", Root.Environment.User.VBUserNo);
-            return result;
-        }
         #endregion
 
         #region Invoice -> Private

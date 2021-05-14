@@ -108,6 +108,7 @@
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
+    <Compile Include="EntityUser\UserSettings.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
     <Compile Include="TandT\StartItemTypeComparer.cs" />
     <Compile Include="TrackingCommon\TrackingEngineList.cs" />
@@ -441,6 +442,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DbScripts\iPlusMES\dbsync_2021-05-14_12-19_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DbScripts\iPlusMES\dbsync_2021-05-11_13-32_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -79,6 +79,7 @@
         public const string ESZeroStockState = "en{'Zero Stock Status'}de{'Nullbestand-Status'}";
         public const string ESPriceList = "en{'Price list'}de{'Preisliste'}";
         public const string ESPriceListMaterial = "en{'Price list material'}de{'Preislistematerial'}";
+        public const string ESUserSettings = "en{'User settings'}de{'Benutzereinstellungen'}";
 
         // Issuer
         public const string IssuerCompanyAddress = "IssuerCompanyAddress";
