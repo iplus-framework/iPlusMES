@@ -170,13 +170,13 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="VBControlScripts\2021-01-19 15-54_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="VBControlScripts\2021-01-27 15-33_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-03-09 13-39_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-05-15 09-02_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
