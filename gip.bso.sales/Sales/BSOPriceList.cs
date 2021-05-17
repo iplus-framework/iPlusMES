@@ -142,6 +142,7 @@ namespace gip.bso.sales.Sales
             set
             {
                 _PriceListMaterialList = value;
+                OnPropertyChanged("PriceListMaterialList");
             }
         }
 
