@@ -25,6 +25,8 @@ namespace gip.bso.sales.Sales
             if (!base.ACInit(startChildMode))
                 return false;
 
+            if (BSOMaterialExplorer_Child != null && BSOMaterialExplorer_Child.Value != null)
+                BSOMaterialExplorer_Child.Value.Search();
 
             Search();
             LoadPriceListPositions();
@@ -378,7 +380,7 @@ namespace gip.bso.sales.Sales
                         DatabaseApp
                         .PriceList
                         .Where(c =>
-                                    c.PriceListID != SelectedPriceList.PriceListID 
+                                    c.PriceListID != SelectedPriceList.PriceListID
                                     &&
                                     (
                                         c.DateFrom <= SelectedPriceList.DateFrom && (c.DateTo ?? DateTime.Now) >= SelectedPriceList.DateFrom
