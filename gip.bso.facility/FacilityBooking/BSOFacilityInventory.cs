@@ -51,6 +51,8 @@ namespace gip.bso.facility
             if (!base.ACInit(startChildMode))
                 return false;
 
+            AutoStartPosition = true;
+
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
@@ -508,6 +510,27 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Properties -> other
+        private bool _AutoStartPosition;
+        [ACPropertyInfo(106, "FilterInventoryPosLotNo", "en{'Autostart position'}de{'Autostart-Position'}")]
+        public bool AutoStartPosition
+        {
+            get
+            {
+                return _AutoStartPosition;
+            }
+            set
+            {
+                if(_AutoStartPosition != value)
+                {
+                    _AutoStartPosition = value;
+                    OnPropertyChanged("AutoStartPosition");
+                }
+            }
+        }
+
+        #endregion
+
         #region Properties -> InputCode
 
 
@@ -761,6 +784,11 @@ namespace gip.bso.facility
                 if (_SelectedFacilityInventoryPos != value)
                 {
                     _SelectedFacilityInventoryPos = value;
+                    if(_SelectedFacilityInventoryPos != null && AutoStartPosition)
+                    {
+                        if(_SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.New)
+                            SetInventoryPosState(_SelectedFacilityInventoryPos, MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
+                    }
                     IsEnabledInventoryPosEdit = IsInventoryPosEnabledEdit();
                     OnPropertyChanged("SelectedFacilityInventoryPos");
 
@@ -1262,6 +1290,20 @@ namespace gip.bso.facility
             MDFacilityInventoryPosState inventoryState = DatabaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)posState);
             pos.MDFacilityInventoryPosState = inventoryState;
             DatabaseApp.ACSaveChanges();
+        }
+
+        [ACMethodInfo("CopyQuantityFromStock", "en{'Quantity same'}de{'Menge gleich'}", 112)]
+        public void CopyQuantityFromStock()
+        {
+            SelectedFacilityInventoryPos.NewStockQuantity = 
+                SelectedFacilityInventoryPos.StockQuantity;
+            OnPropertyChanged("SelectedFacilityInventoryPos\\NewStockQuantity");
+        }
+
+        public bool IsEnabledCopyQuantityFromStock()
+        {
+            return SelectedFacilityInventoryPos != null
+                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short) MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress;
         }
 
         #endregion
