@@ -806,8 +806,11 @@ namespace gip.bso.sales
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOffer), OutOffer.NoColumnName, OutOffer.FormatNewNo, this);
             OutOffer outOffer = OutOffer.NewACObject(DatabaseApp, null, secondaryKey);
             DatabaseApp.OutOffer.AddObject(outOffer);
-            outOffer.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
-            outOffer.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            if (CurrentUserSettings != null)
+            {
+                outOffer.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
+                outOffer.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            }
             CurrentOutOffer = outOffer;
             ACState = Const.SMNew;
             PostExecute("New");

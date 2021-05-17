@@ -813,7 +813,7 @@ namespace gip.mes.facility
                             item.DeliveryCompanyAddress = null;
                         }
                         break;
-                    
+
                 }
             }
 
@@ -853,23 +853,32 @@ namespace gip.mes.facility
 
                                 if (billingCompanyAddress != null)
                                 {
-
-                                    ActualSalesTax countrySalesTaxModel = GetActualSalesTax(billingCompanyAddress.MDCountry, posItem.Material, now);
-
-                                    if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null)
+                                    ActualSalesTax countrySalesTaxModel = null;
+                                    // Fetch sales tax for same country if Tendant 
+                                    UserSettings userSettings = databaseApp.UserSettings.FirstOrDefault(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID);
+                                    if (userSettings != null && userSettings.InvoiceCompanyAddress != null)
                                     {
-                                        posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax;
-                                        posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
+                                        if (userSettings.InvoiceCompanyAddress.MDCountryID == billingCompanyAddress.MDCountryID)
+                                            countrySalesTaxModel = GetActualSalesTax(userSettings.InvoiceCompanyAddress.MDCountry, posItem.Material, now);
                                     }
-                                    else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null)
+
+                                    if (countrySalesTaxModel != null)
                                     {
-                                        posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax;
-                                        posItem.MDCountrySalesTaxMDMaterialGroup = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup;
-                                    }
-                                    else if (countrySalesTaxModel.MDCountrySalesTax != null)
-                                    {
-                                        posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTax.SalesTax;
-                                        posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
+                                        if (countrySalesTaxModel.MDCountrySalesTaxMaterial != null)
+                                        {
+                                            posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTaxMaterial.SalesTax;
+                                            posItem.MDCountrySalesTaxMaterial = countrySalesTaxModel.MDCountrySalesTaxMaterial;
+                                        }
+                                        else if (countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup != null)
+                                        {
+                                            posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup.SalesTax;
+                                            posItem.MDCountrySalesTaxMDMaterialGroup = countrySalesTaxModel.MDCountrySalesTaxMDMaterialGroup;
+                                        }
+                                        else if (countrySalesTaxModel.MDCountrySalesTax != null)
+                                        {
+                                            posItem.SalesTax = countrySalesTaxModel.MDCountrySalesTax.SalesTax;
+                                            posItem.MDCountrySalesTax = countrySalesTaxModel.MDCountrySalesTax;
+                                        }
                                     }
 
                                     if (posItem.SalesTax > 0)

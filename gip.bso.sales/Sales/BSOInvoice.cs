@@ -1282,8 +1282,11 @@ namespace gip.bso.sales
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
             Invoice newInvoice = Invoice.NewACObject(DatabaseApp, null, secondaryKey);
-            newInvoice.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
-            newInvoice.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            if (CurrentUserSettings != null)
+            {
+                newInvoice.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
+                newInvoice.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            }
             DatabaseApp.Invoice.AddObject(newInvoice);
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(newInvoice);

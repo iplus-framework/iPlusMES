@@ -1429,8 +1429,11 @@ namespace gip.bso.sales
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOrder), OutOrder.NoColumnName, OutOrder.FormatNewNo, this);
             OutOrder outOrder = OutOrder.NewACObject(DatabaseApp, null, secondaryKey);
-            outOrder.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
-            outOrder.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            if (CurrentUserSettings != null)
+            {
+                outOrder.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
+                outOrder.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            }
             DatabaseApp.OutOrder.AddObject(outOrder);
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(CurrentOutOrder);
