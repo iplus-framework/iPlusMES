@@ -41,6 +41,8 @@ namespace gip.bso.masterdata
             OnPropertyChanged("MDCountryList");
             _MDMaterialGroupList = LoadMDMaterialGroupList();
             OnPropertyChanged("MDMaterialGroupList");
+            if (BSOMaterialExplorer_Child != null && BSOMaterialExplorer_Child.Value != null)
+                BSOMaterialExplorer_Child.Value.Search();
             Search();
             LoadTaxPositions();
             return true;
@@ -187,6 +189,15 @@ namespace gip.bso.masterdata
             SelectedMDCountrySalesTaxMaterial = entity;
         }
 
+        public bool IsEnabledAddMDCountrySalesTaxMaterial()
+        {
+            return SelectedMDCountrySalesTax != null
+                && BSOMaterialExplorer_Child != null
+                && BSOMaterialExplorer_Child.Value != null
+                && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
+                && (MDCountrySalesTaxMaterialList == null || !MDCountrySalesTaxMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
+        }
+
         [ACMethodInfo(MDCountrySalesTaxMaterial.ClassName, "en{'Delete Position'}de{'Position löschen'}", 999)]
         public void DeleteMDCountrySalesTaxMaterial()
         {
@@ -203,15 +214,6 @@ namespace gip.bso.masterdata
                 SelectedMDCountrySalesTaxMaterial = MDCountrySalesTaxMaterialList != null ? MDCountrySalesTaxMaterialList.FirstOrDefault() : null;
                 OnPropertyChanged("MDCountrySalesTaxMaterialList");
             }
-        }
-
-        public bool IsEnabledAddAddMDCountrySalesTaxMaterial()
-        {
-            return SelectedMDCountrySalesTax != null
-                && BSOMaterialExplorer_Child != null
-                && BSOMaterialExplorer_Child.Value != null
-                && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
-                && (MDCountrySalesTaxMaterialList == null || !MDCountrySalesTaxMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
         }
 
         public bool IsEnabledDeleteMDCountrySalesTaxMaterial()
@@ -267,6 +269,7 @@ namespace gip.bso.masterdata
             set
             {
                 _MDCountrySalesTaxMDMaterialGroupList = value;
+                OnPropertyChanged("MDCountrySalesTaxMDMaterialGroupList");
             }
         }
 
@@ -401,7 +404,7 @@ namespace gip.bso.masterdata
         /// Selected property for MDMaterialGroup
         /// </summary>
         /// <value>The selected MDMaterialGroup</value>
-        [ACPropertySelected(9999, "MDMaterialGroup", "en{'TODO: MDMaterialGroup'}de{'TODO: MDMaterialGroup'}")]
+        [ACPropertySelected(9999, "MDMaterialGroup", ConstApp.ESMaterialGroup)]
         public MDMaterialGroup SelectedMDMaterialGroup
         {
             get
