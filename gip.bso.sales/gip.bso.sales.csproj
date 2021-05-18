@@ -156,13 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="VBControlScripts\2021-03-30 08-42_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="VBControlScripts\2021-04-06 17-42_aaginic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-04-29 12-05_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-04-29 16-07_aaginic.zip">
@@ -174,7 +168,13 @@
     <None Include="VBControlScripts\2021-05-14 16-55_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-05-17 15-35_aaginic.zip">
+    <None Include="VBControlScripts\2021-05-18 14-34_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-05-18 14-42_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-05-18 16-06_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -43,12 +43,14 @@ namespace gip.mes.facility
                     progressCallback(0, count);
                 List<FacilityInventoryPos> poses = new List<FacilityInventoryPos>();
                 int nr = 0;
+                MDFacilityInventoryPosState activePosState = databaseApp.MDFacilityInventoryPosState.FirstOrDefault(c=>c.MDFacilityInventoryPosStateIndex == (short) MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
                 foreach (FacilityCharge facilityCharge in facilityCharges)
                 {
                     nr++;
                     FacilityInventoryPos inventoryPos = FacilityInventoryPos.NewACObject(databaseApp, facilityInventory);
                     inventoryPos.FacilityCharge = facilityCharge;
                     inventoryPos.StockQuantity = facilityCharge.StockQuantity;
+                    inventoryPos.MDFacilityInventoryPosState = activePosState;
                     if (progressCallback != null)
                         progressCallback(nr, count);
                 }

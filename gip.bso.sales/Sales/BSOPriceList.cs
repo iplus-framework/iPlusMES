@@ -123,8 +123,21 @@ namespace gip.bso.sales.Sales
                 {
                     _SelectedPriceListMaterial = value;
                     OnPropertyChanged("SelectedPriceListMaterial");
+
+                    if (_SelectedPriceListMaterial != null)
+                    {
+                        AccessQueueMaterial.Selected = _SelectedPriceListMaterial.Material;
+                    }
+                    else
+                        AccessQueueMaterial.Selected = null;
+                    OnPropertyChanged("SelectedQueueMaterial");
                 }
             }
+        }
+
+        private void _SelectedPriceListMaterial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private List<PriceListMaterial> _PriceListMaterialList;
@@ -155,14 +168,40 @@ namespace gip.bso.sales.Sales
         #endregion
 
         #region PriceListMaterial -> Methods
+
         [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999)]
-        public void AddPriceListMaterial()
+        public void NewPriceListMaterial()
         {
             PriceListMaterial entity = PriceListMaterial.NewACObject(DatabaseApp, SelectedPriceList);
-            entity.Material = BSOMaterialExplorer_Child.Value.SelectedMaterial;
             PriceListMaterialList.Add(entity);
             OnPropertyChanged("PriceListMaterialList");
             SelectedPriceListMaterial = entity;
+        }
+
+        public bool IsEnabledPriceListMaterial()
+        {
+            return SelectedPriceList != null;
+        }
+
+        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999)]
+        public void  AssignMaterialToPriceList()
+        {
+            PriceListMaterial entity = PriceListMaterial.NewACObject(DatabaseApp, SelectedPriceList);
+            entity.Material = BSOMaterialExplorer_Child.Value.SelectedMaterial;
+            entity.Price = AssignedMaterialPrice.Value;
+            PriceListMaterialList.Add(entity);
+            OnPropertyChanged("PriceListMaterialList");
+            SelectedPriceListMaterial = entity;
+        }
+        public bool IsEnabledAssignMaterialToPriceList()
+        {
+            return SelectedPriceList != null
+                && BSOMaterialExplorer_Child != null
+                && BSOMaterialExplorer_Child.Value != null
+                && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
+                && AssignedMaterialPrice != null
+                && AssignedMaterialPrice.Value > 0
+                && (PriceListMaterialList == null || !PriceListMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
         }
 
         [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'Delete Position'}de{'Position löschen'}", 999)]
@@ -180,16 +219,10 @@ namespace gip.bso.sales.Sales
             {
                 SelectedPriceListMaterial = PriceListMaterialList != null ? PriceListMaterialList.FirstOrDefault() : null;
                 OnPropertyChanged("PriceListMaterialList");
-            }
-        }
 
-        public bool IsEnabledAddPriceListMaterial()
-        {
-            return SelectedPriceList != null
-                && BSOMaterialExplorer_Child != null
-                && BSOMaterialExplorer_Child.Value != null
-                && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
-                && (PriceListMaterialList == null || !PriceListMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
+                AccessQueueMaterial.NavSearch();
+                OnPropertyChanged("QueueMaterialList");
+            }
         }
 
         public bool IsEnabledDeletePriceListMaterial()
@@ -201,6 +234,7 @@ namespace gip.bso.sales.Sales
         #endregion
 
         #region Material
+        #region Material -> BSO
         ACChildItem<BSOMaterialExplorer> _BSOMaterialExplorer_Child;
         [ACPropertyInfo(9999)]
         [ACChildInfo("BSOMaterialExplorer_Child", typeof(BSOMaterialExplorer))]
@@ -213,6 +247,103 @@ namespace gip.bso.sales.Sales
                 return _BSOMaterialExplorer_Child;
             }
         }
+
+        #endregion
+
+        #region Material -> AccessNav
+
+        ACAccessNav<Material> _AccessQueueMaterial;
+        [ACPropertyAccess(100, "QueueMaterial")]
+        public ACAccessNav<Material> AccessQueueMaterial
+        {
+            get
+            {
+                if (_AccessQueueMaterial == null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Material", Material.ClassName);
+                    _AccessQueueMaterial = navACQueryDefinition.NewAccessNav<Material>("QueueMaterial", this);
+                    _AccessQueueMaterial.NavSearchExecuting += _AccessQueueMaterial_NavSearchExecuting;
+                    _AccessQueueMaterial.AutoSaveOnNavigation = false;
+                    _AccessQueueMaterial.NavSearch();
+                }
+                return _AccessQueueMaterial;
+            }
+        }
+
+        private IQueryable<Material> _AccessQueueMaterial_NavSearchExecuting(IQueryable<Material> result)
+        {
+            string[] usedMaterials = PriceListMaterialList.Where(c => c.Material != null).Select(x => x.Material.MaterialNo).ToArray();
+            return result.Where(c => !usedMaterials.Contains(c.MaterialNo));
+        }
+
+        /// <summary>
+        /// Gets or sets the selected QueueMaterial.
+        /// </summary>
+        /// <value>The selected QueueMaterial.</value>
+        [ACPropertySelected(101, "QueueMaterial", ConstApp.Material)]
+        public Material SelectedQueueMaterial
+        {
+            get
+            {
+                if (AccessQueueMaterial == null)
+                    return null;
+                return AccessQueueMaterial.Selected;
+            }
+            set
+            {
+                if (AccessQueueMaterial == null)
+                    return;
+                if (AccessQueueMaterial.Selected != value)
+                {
+                    if (SelectedPriceListMaterial != null)
+                    {
+                        SelectedPriceListMaterial.Material = value;
+                        OnPropertyChanged("SelectedPriceListMaterial");
+                    }
+                    AccessQueueMaterial.Selected = value;
+                    OnPropertyChanged("SelectedQueueMaterial");
+
+                    AccessQueueMaterial.NavSearch();
+                    OnPropertyChanged("QueueMaterialList");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the QueueMaterial list.
+        /// </summary>
+        /// <value>The facility list.</value>
+        [ACPropertyList(102, "QueueMaterial")]
+        public IEnumerable<Material> QueueMaterialList
+        {
+            get
+            {
+                if (AccessQueueMaterial == null)
+                    return null;
+                return AccessQueueMaterial.NavList;
+            }
+        }
+
+        private decimal? _AssignedMaterialPrice;
+        [ACPropertyInfo(750, "AssignedMaterialPrice", "en{'Price'}de{'Preis'}")]
+        public decimal? AssignedMaterialPrice
+        {
+            get
+            {
+                return _AssignedMaterialPrice;
+            }
+            set
+            {
+                if (_AssignedMaterialPrice != value)
+                {
+                    _AssignedMaterialPrice = value;
+                    OnPropertyChanged("AssignedMaterialPrice");
+                }
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Messages

@@ -848,11 +848,21 @@ namespace gip.mes.facility
                                 DateTime now = DateTime.Now;
 
                                 callerObject.SelectedPriceListMaterial = null;
-                                callerObject.PriceListMaterialItems = databaseApp.PriceListMaterial.Where(c => c.MaterialID == posItem.Material.MaterialID && c.PriceList.DateFrom < now
-                                                                                             && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)).ToList();
+                              
 
                                 if (billingCompanyAddress != null)
                                 {
+                                      callerObject.PriceListMaterialItems = 
+                                    databaseApp
+                                    .PriceListMaterial
+                                    .Where(c => 
+                                                c.PriceList.MDCurrencyID == billingCompanyAddress.Company.MDCurrencyID
+                                                && c.MaterialID == posItem.Material.MaterialID 
+                                                && c.PriceList.DateFrom < now
+                                                && (!c.PriceList.DateTo.HasValue || c.PriceList.DateTo > now)
+                                           )
+                                    .ToList();
+
                                     ActualSalesTax countrySalesTaxModel = null;
                                     // Fetch sales tax for same country if Tendant 
                                     UserSettings userSettings = databaseApp.UserSettings.FirstOrDefault(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID);

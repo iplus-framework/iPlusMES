@@ -144,10 +144,17 @@ namespace gip.bso.masterdata
                 {
                     _SelectedMDCountrySalesTaxMaterial = value;
                     OnPropertyChanged("SelectedMDCountrySalesTaxMaterial");
+
+                    if (_SelectedMDCountrySalesTaxMaterial != null)
+                    {
+                        AccessQueueMaterial.Selected = _SelectedMDCountrySalesTaxMaterial.Material;
+                    }
+                    else
+                        AccessQueueMaterial.Selected = null;
+                    OnPropertyChanged("SelectedQueueMaterial");
                 }
             }
         }
-
 
         private List<MDCountrySalesTaxMaterial> _MDCountrySalesTaxMaterialList;
         /// <summary>
@@ -169,6 +176,25 @@ namespace gip.bso.masterdata
                 OnPropertyChanged("MDCountrySalesTaxMaterialList");
             }
         }
+
+        private decimal? _AssignedMaterialSalesTax;
+        [ACPropertyInfo(750, "AssignedMaterialSalesTax", "en{'VAT'}de{'MwStr'}")]
+        public decimal? AssignedMaterialSalesTax
+        {
+            get
+            {
+                return _AssignedMaterialSalesTax;
+            }
+            set
+            {
+                if (_AssignedMaterialSalesTax != value)
+                {
+                    _AssignedMaterialSalesTax = value;
+                    OnPropertyChanged("AssignedMaterialSalesTax");
+                }
+            }
+        }
+
         #endregion
 
         #region MDCountrySalesTaxMaterial -> Methods
@@ -179,23 +205,43 @@ namespace gip.bso.masterdata
             return SelectedMDCountrySalesTax.MDCountrySalesTaxMaterial_MDCountrySalesTax.OrderBy(c => c.Material.MaterialNo).ToList();
         }
 
-        [ACMethodInfo(MDCountrySalesTaxMaterial.ClassName, "en{'New Position'}de{'Neue Position'}", 999)]
-        public void AddMDCountrySalesTaxMaterial()
+        [ACMethodInfo(MDCountrySalesTaxMaterial.ClassName, "en{'Assign material'}de{'Material zuweisen'}", 999)]
+        public void AssignMaterialToCountryTax()
         {
             MDCountrySalesTaxMaterial entity = MDCountrySalesTaxMaterial.NewACObject(DatabaseApp, SelectedMDCountrySalesTax);
             entity.Material = BSOMaterialExplorer_Child.Value.SelectedMaterial;
+            entity.SalesTax = AssignedMaterialSalesTax.Value;
             MDCountrySalesTaxMaterialList.Add(entity);
             OnPropertyChanged("MDCountrySalesTaxMaterialList");
             SelectedMDCountrySalesTaxMaterial = entity;
+
+            AccessQueueMaterial.NavSearch();
+            OnPropertyChanged("QueueMaterialList");
         }
 
-        public bool IsEnabledAddMDCountrySalesTaxMaterial()
+        public bool IsEnabledAssignMaterialToCountryTax()
         {
             return SelectedMDCountrySalesTax != null
                 && BSOMaterialExplorer_Child != null
                 && BSOMaterialExplorer_Child.Value != null
                 && BSOMaterialExplorer_Child.Value.SelectedMaterial != null
+                && AssignedMaterialSalesTax != null
+                && AssignedMaterialSalesTax.Value > 0
                 && (MDCountrySalesTaxMaterialList == null || !MDCountrySalesTaxMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
+        }
+
+        [ACMethodInfo("NewMDCountrySalesTaxMaterial", "en{'New'}de{'Neu'}", 999)]
+        public void NewMDCountrySalesTaxMaterial()
+        {
+            MDCountrySalesTaxMaterial entity = MDCountrySalesTaxMaterial.NewACObject(DatabaseApp, SelectedMDCountrySalesTax);
+            MDCountrySalesTaxMaterialList.Add(entity);
+            OnPropertyChanged("MDCountrySalesTaxMaterialList");
+            SelectedMDCountrySalesTaxMaterial = entity;
+        }
+
+        public bool IsEnabledNewMDCountrySalesTaxMaterial()
+        {
+            return SelectedMDCountrySalesTax != null;
         }
 
         [ACMethodInfo(MDCountrySalesTaxMaterial.ClassName, "en{'Delete Position'}de{'Position löschen'}", 999)]
@@ -213,6 +259,9 @@ namespace gip.bso.masterdata
             {
                 SelectedMDCountrySalesTaxMaterial = MDCountrySalesTaxMaterialList != null ? MDCountrySalesTaxMaterialList.FirstOrDefault() : null;
                 OnPropertyChanged("MDCountrySalesTaxMaterialList");
+
+                AccessQueueMaterial.NavSearch();
+                OnPropertyChanged("QueueMaterialList");
             }
         }
 
@@ -384,6 +433,9 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Material
+
+        #region Material -> Child BSO
+
         ACChildItem<BSOMaterialExplorer> _BSOMaterialExplorer_Child;
         [ACPropertyInfo(9999)]
         [ACChildInfo("BSOMaterialExplorer_Child", typeof(BSOMaterialExplorer))]
@@ -396,6 +448,85 @@ namespace gip.bso.masterdata
                 return _BSOMaterialExplorer_Child;
             }
         }
+
+        #endregion
+
+        #region Material -> AccessNav
+
+        ACAccessNav<Material> _AccessQueueMaterial;
+        [ACPropertyAccess(100, "QueueMaterial")]
+        public ACAccessNav<Material> AccessQueueMaterial
+        {
+            get
+            {
+                if (_AccessQueueMaterial == null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Material", Material.ClassName);
+                    _AccessQueueMaterial = navACQueryDefinition.NewAccessNav<Material>("QueueMaterial", this);
+                    _AccessQueueMaterial.NavSearchExecuting += _AccessQueueMaterial_NavSearchExecuting;
+                    _AccessQueueMaterial.AutoSaveOnNavigation = false;
+                    _AccessQueueMaterial.NavSearch();
+                }
+                return _AccessQueueMaterial;
+            }
+        }
+
+        private IQueryable<Material> _AccessQueueMaterial_NavSearchExecuting(IQueryable<Material> result)
+        {
+            string[] usedMaterials = MDCountrySalesTaxMaterialList.Where(c => c.Material != null).Select(x => x.Material.MaterialNo).ToArray();
+            return result.Where(c => !usedMaterials.Contains(c.MaterialNo));
+        }
+
+        /// <summary>
+        /// Gets or sets the selected QueueMaterial.
+        /// </summary>
+        /// <value>The selected QueueMaterial.</value>
+        [ACPropertySelected(101, "QueueMaterial", ConstApp.Material)]
+        public Material SelectedQueueMaterial
+        {
+            get
+            {
+                if (AccessQueueMaterial == null)
+                    return null;
+                return AccessQueueMaterial.Selected;
+            }
+            set
+            {
+                if (AccessQueueMaterial == null)
+                    return;
+                if (AccessQueueMaterial.Selected != value)
+                {
+                    if (SelectedMDCountrySalesTaxMaterial != null)
+                    {
+                        SelectedMDCountrySalesTaxMaterial.Material = value;
+                        OnPropertyChanged("SelectedMDCountrySalesTaxMaterial");
+                    }
+                    AccessQueueMaterial.Selected = value;
+                    OnPropertyChanged("SelectedQueueMaterial");
+
+                    AccessQueueMaterial.NavSearch();
+                    OnPropertyChanged("QueueMaterialList");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the QueueMaterial list.
+        /// </summary>
+        /// <value>The facility list.</value>
+        [ACPropertyList(102, "QueueMaterial")]
+        public IEnumerable<Material> QueueMaterialList
+        {
+            get
+            {
+                if (AccessQueueMaterial == null)
+                    return null;
+                return AccessQueueMaterial.NavList;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region MDMaterialGroup

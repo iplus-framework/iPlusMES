@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return FacilityCharge.ACCaption;
+                return FacilityCharge?.ACCaption;
             }
         }
 
