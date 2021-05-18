@@ -1545,12 +1545,9 @@ namespace gip.mes.processapplication
             {
                 actualQuantity = outwardFacility.CurrentFacilityStock.StockQuantity;
 
-                if (actualQuantity > 0)
-                {
-                    ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
-                                   dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol, msg,
-                                   ref posState, ref changePosState, true);
-                }
+                ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
+                                dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol, msg,
+                                ref posState, ref changePosState, true);
             }
         }
 

@@ -1143,7 +1143,7 @@ namespace gip.bso.manufacturing
 
             if (userPWNodeAckInfo.Any())
             {
-                var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => x.ACIdentifier == BSOManualWeighing.ClassName));
+                var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => ParentBSO.BSOManualWeighingType.IsAssignableFrom((x.ValueT as core.datamodel.ACClass)?.ObjectType)));
                 if (func != null && !func.IsFunctionActive)
                 {
                     func.IsFunctionActive = true;
@@ -1152,7 +1152,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => x.ACIdentifier == BSOManualWeighing.ClassName));
+                var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => ParentBSO.BSOManualWeighingType.IsAssignableFrom((x.ValueT as core.datamodel.ACClass)?.ObjectType)));
                 if (func != null && func.IsFunctionActive && func.ACStateProperty != null)
                 {
                     var acStateProp = (func.ACStateProperty as IACContainerTNet<ACStateEnum>);
