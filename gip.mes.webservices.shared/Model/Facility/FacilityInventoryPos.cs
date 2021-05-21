@@ -1,10 +1,11 @@
-﻿using System;
+﻿using gip.core.datamodel;
+using System;
 using System.Runtime.Serialization;
 
 namespace gip.mes.webservices
 {
     [DataContract(Name = "cFIPOS")]
-    public class FacilityInventoryPos
+    public class FacilityInventoryPos : EntityBase
     {
         [DataMember(Name = "ID")]
         public Guid FacilityInventoryPosID
@@ -79,16 +80,39 @@ namespace gip.mes.webservices
             get; set;
         }
 
+
+        private double? _NewStockQuantity;
         [DataMember(Name = "NStQ")]
         public double? NewStockQuantity
         {
-            get; set;
+            get
+            {
+                return _NewStockQuantity;
+            }
+            set
+            {
+                if(_NewStockQuantity != value)
+                {
+                    SetProperty<double?>(ref _NewStockQuantity, value);
+                }
+            }
         }
 
+        private bool _NotAvailable;
         [DataMember(Name = "NA")]
         public bool NotAvailable
         {
-            get; set;
+            get
+            {
+                return _NotAvailable;
+            }
+            set
+            {
+                if(_NotAvailable != value)
+                {
+                    SetProperty<bool>(ref _NotAvailable, value);
+                }
+            }
         }
 
         [DataMember(Name = "UN")]
