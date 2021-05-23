@@ -236,9 +236,7 @@ namespace gip.bso.sales
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "OutOrderNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
@@ -246,6 +244,28 @@ namespace gip.bso.sales
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
+            }
+        }
+
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, OutOrder.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem(OutOrder.NoColumnName, Global.SortDirections.descending, true)
+                };
             }
         }
 

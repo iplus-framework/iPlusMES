@@ -114,9 +114,37 @@ namespace gip.bso.sales
                 if (_AccessPrimary == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
+                        if (navACQueryDefinition.TakeCount == 0)
+                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                    }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<OutOffer>(OutOffer.ClassName, this);
                 }
                 return _AccessPrimary;
+            }
+        }
+
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, OutOffer.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem(OutOffer.NoColumnName, Global.SortDirections.descending, true)
+                };
             }
         }
 
