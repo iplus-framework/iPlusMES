@@ -1648,7 +1648,7 @@ namespace gip.bso.manufacturing
             ComponentPWNode = null;
         }
 
-        public void UnloadWFNode()
+        public virtual void UnloadWFNode()
         {
             IsBinChangeAvailable = false;
 
