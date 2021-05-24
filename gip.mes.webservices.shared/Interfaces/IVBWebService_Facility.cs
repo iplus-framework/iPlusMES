@@ -285,9 +285,9 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryPoses, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock);
+        WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
 #elif NETSTANDARD
-        Task<WSResponse<List<FacilityInventoryPos>>> GetFacilityInventoryPosesAsync(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock);
+        Task<WSResponse<List<FacilityInventoryPos>>> GetFacilityInventoryPosesAsync(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
 #endif
 
         #endregion

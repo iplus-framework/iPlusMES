@@ -109,6 +109,9 @@ namespace gip.mes.webservices
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrder), typeof(webservices.ProdOrder)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderBatch), typeof(webservices.ProdOrderBatch)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslistPosRelation), typeof(webservices.ProdOrderPartslistPosRelation)));
+
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityInventory), typeof(webservices.FacilityInventory)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityInventoryPos), typeof(webservices.FacilityInventoryPos)));
         }
     }
 }

@@ -1221,9 +1221,9 @@ namespace gip.mes.webservices
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
 
-        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryPoses =
-        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, IQueryable<FacilityInventoryPos>>(
-            (dbApp, facilityInventoryNo, inputCode, facilityNo, lotNo, materialNo, inventoryPosState, notAvailable, zeroStock) =>
+        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryPoses =
+        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
+            (dbApp, facilityInventoryNo, inputCode, facilityNo, lotNo, materialNo, inventoryPosState, notAvailable, zeroStock, notProcessed) =>
                 dbApp.FacilityInventoryPos
                         .Where(c =>
                            (inputCode == null || c.FacilityChargeID == inputCode)
@@ -1233,6 +1233,7 @@ namespace gip.mes.webservices
                             && (inventoryPosState == null || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == inventoryPosState)
                             && (notAvailable == null || c.NotAvailable == (notAvailable ?? false))
                             && (zeroStock == null || (c.FacilityCharge.StockQuantity == 0) == (zeroStock ?? false))
+                            && (!notProcessed || (!c.NotAvailable && c.NewStockQuantity == null))
                         )
                         .Select(c => new FacilityInventoryPos()
                         {
@@ -1254,7 +1255,8 @@ namespace gip.mes.webservices
                             MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
                         })
         );
-        public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock)
+        public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, 
+            string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed)
         {
             WSResponse<List<FacilityInventoryPos>> response = new WSResponse<List<FacilityInventoryPos>>();
             try
@@ -1277,6 +1279,9 @@ namespace gip.mes.webservices
                     if (!string.IsNullOrEmpty(zeroStock) && zeroStock != CoreWebServiceConst.EmptyParam)
                         zeroStockVal = bool.Parse(zeroStock);
 
+                    bool notProcessedVal = false;
+                    if (!string.IsNullOrEmpty(notProcessed) && notProcessed != CoreWebServiceConst.EmptyParam)
+                        notProcessedVal = bool.Parse(notProcessed);
                     Guid? inputCodeVal = null;
                     if (!string.IsNullOrEmpty(inputCode) && inputCode != CoreWebServiceConst.EmptyParam)
                     {
@@ -1337,7 +1342,8 @@ namespace gip.mes.webservices
                             }
                         }
                     }
-                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryPoses(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal).OrderBy(c => c.Sequence).ToList();
+                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryPoses(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo, 
+                        lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal).OrderBy(c => c.Sequence).ToList();
                     response.Data = items;
                 }
             }
