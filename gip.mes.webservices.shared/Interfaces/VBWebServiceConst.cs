@@ -180,8 +180,8 @@ namespace gip.mes.webservices
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
         // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses (string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock)
-        public const string UrlInventory_InventoryPoses = "FacilityInventory/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}";
-        public const string UrlInventory_InventoryPoses_F = "FacilityInventory/FacilityInventoryNo/{0}/InputCode/{1}/FacilityNo/{2}/LotNo/{3}/MaterialNo/{4}/InventoryPosState/{5}/NotAvailable/{6}/ZeroStock/{7}";
+        public const string UrlInventory_InventoryPoses = "FacilityInventory/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}/NotProcessed/{notProcessed}";
+        public const string UrlInventory_InventoryPoses_F = "FacilityInventory/FacilityInventoryNo/{0}/InputCode/{1}/FacilityNo/{2}/LotNo/{3}/MaterialNo/{4}/InventoryPosState/{5}/NotAvailable/{6}/ZeroStock/{7}/NotProcessed/{8}";
 
         #endregion
 
