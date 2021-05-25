@@ -280,14 +280,14 @@ namespace gip.mes.webservices
 
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
-        // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses (string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock);
-        //public const string UrlInventory_InventoryPoses = "FacilityInventory/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}";
+        // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines (string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock);
+        //public const string UrlInventory_InventoryLines = "FacilityInventory/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}";
 #if NETFRAMEWORK
         [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryPoses, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
+        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryLines, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
 #elif NETSTANDARD
-        Task<WSResponse<List<FacilityInventoryPos>>> GetFacilityInventoryPosesAsync(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
+        Task<WSResponse<List<FacilityInventoryPos>>> GetFacilityInventoryLinesAsync(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
 #endif
 
         #endregion

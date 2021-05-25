@@ -1076,13 +1076,13 @@ namespace gip.mes.webservices
                 if (!string.IsNullOrEmpty(inventoryState) && inventoryState != CoreWebServiceConst.EmptyParam)
                     inventoryStateVal = short.Parse(inventoryState);
 
-                DateTime dtFrom;
-                if (String.IsNullOrWhiteSpace(dateFrom) || !DateTime.TryParseExact(dateFrom, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtFrom))
-                    dtFrom = DateTime.Now.AddDays(-1);
-
                 DateTime dtTo;
                 if (String.IsNullOrWhiteSpace(dateTo) || !DateTime.TryParseExact(dateTo, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtTo))
-                    dtTo = DateTime.Now;
+                    dtTo = new DateTime(DateTime.Now.Year + 1, 1, 1);
+
+                DateTime dtFrom;
+                if (String.IsNullOrWhiteSpace(dateFrom) || !DateTime.TryParseExact(dateFrom, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtFrom))
+                    dtFrom = dtTo.AddYears(-1);
 
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
@@ -1221,7 +1221,7 @@ namespace gip.mes.webservices
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
 
-        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryPoses =
+        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
         CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
             (dbApp, facilityInventoryNo, inputCode, facilityNo, lotNo, materialNo, inventoryPosState, notAvailable, zeroStock, notProcessed) =>
                 dbApp.FacilityInventoryPos
@@ -1255,7 +1255,7 @@ namespace gip.mes.webservices
                             MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
                         })
         );
-        public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryPoses(string facilityInventoryNo, string inputCode, string facilityNo, 
+        public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string facilityNo,
             string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed)
         {
             WSResponse<List<FacilityInventoryPos>> response = new WSResponse<List<FacilityInventoryPos>>();
@@ -1288,6 +1288,7 @@ namespace gip.mes.webservices
                         Guid testParseInputCode = Guid.Empty;
                         if (Guid.TryParse(inputCode, out testParseInputCode))
                         {
+                            inputCodeVal = testParseInputCode;
                             bool isFacilityCharge = databaseApp.FacilityCharge.Any(c => c.FacilityChargeID == inputCodeVal);
                             if (!isFacilityCharge)
                             {
@@ -1342,7 +1343,7 @@ namespace gip.mes.webservices
                             }
                         }
                     }
-                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryPoses(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo, 
+                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryLines(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo,
                         lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal).OrderBy(c => c.Sequence).ToList();
                     response.Data = items;
                 }
@@ -1351,10 +1352,10 @@ namespace gip.mes.webservices
             {
                 PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                 if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryPoses(1090)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryLines(1090)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: GetFacilityInventoryPoses");
+            Console.WriteLine("web service: GetFacilityInventoryLines");
             return response;
         }
 
@@ -1366,7 +1367,6 @@ namespace gip.mes.webservices
             WSResponse<bool> response = new WSResponse<bool>();
             try
             {
-
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
                     mes.datamodel.FacilityInventoryPos dbFacilityInventoryPos =
@@ -1397,10 +1397,16 @@ namespace gip.mes.webservices
                         if (!newInventory && !finishedInventory)
                         {
                             gip.mes.datamodel.MDFacilityInventoryPosState inProgressState = databaseApp.MDFacilityInventoryPosState.Where(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress).FirstOrDefault();
+                            gip.mes.datamodel.MDFacilityInventoryPosState finishedState = databaseApp.MDFacilityInventoryPosState.Where(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished).FirstOrDefault();
                             dbFacilityInventoryPos.NewStockQuantity = facilityInventoryPos.NewStockQuantity;
                             dbFacilityInventoryPos.NotAvailable = facilityInventoryPos.NotAvailable;
                             dbFacilityInventoryPos.Comment = facilityInventoryPos.Comment;
-                            dbFacilityInventoryPos.MDFacilityInventoryPosState = inProgressState;
+                            dbFacilityInventoryPos.UpdateDate=  DateTime.Now;
+                            dbFacilityInventoryPos.UpdateName = facilityInventoryPos.UpdateName;
+                            if(facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress)
+                                dbFacilityInventoryPos.MDFacilityInventoryPosState = inProgressState;
+                             if(facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
+                                dbFacilityInventoryPos.MDFacilityInventoryPosState = finishedState;
 
                             MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
                             if (saveMsg == null || saveMsg.IsSucceded())
