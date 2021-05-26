@@ -369,6 +369,25 @@ namespace gip.bso.facility
             }
         }
 
+        private bool? _FilterOpenLines;
+        [ACPropertyInfo(106, "FilterOpenLines", "en{'View open lines'}de{'Offene Zeilen anzeigen'}")]
+        public bool? FilterOpenLines
+        {
+            get
+            {
+                return _FilterOpenLines;
+            }
+            set
+            {
+                if (_FilterOpenLines != value)
+                {
+                    _FilterOpenLines = value;
+                    OnPropertyChanged("FilterOpenLines");
+                    SearchPos();
+                }
+            }
+        }
+
         #region Properties -> Filter-> FilterInventoryPosState (MDFacilityInventoryPosState)
 
         private MDFacilityInventoryPosState _SelectedFilterInventoryPosState;
@@ -841,6 +860,10 @@ namespace gip.bso.facility
                             FilterInventoryPosZeroQuantity == null
                             || !((c.StockQuantity == 0) ^ (FilterInventoryPosZeroQuantity ?? false))
                        )
+                     && (
+                            FilterOpenLines == null
+                            || !((c.NotAvailable || c.NewStockQuantity == null) ^ (FilterOpenLines ?? false))
+                       )
                  )
                 .OrderBy(c => c.Sequence)
                 .ToList();
@@ -1061,6 +1084,7 @@ namespace gip.bso.facility
             SelectedFilterInventoryPosState = null;
             FilterInventoryPosNotAvailable = null;
             FilterInventoryPosZeroQuantity = null;
+            FilterOpenLines = null;
             SearchPos();
         }
 
