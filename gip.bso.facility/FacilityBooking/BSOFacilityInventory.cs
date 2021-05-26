@@ -603,10 +603,8 @@ namespace gip.bso.facility
                         //navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
-                        //if (navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter))
-                        //{
-                        //    //SetMaterialIDFilter();
-                        //}
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         _AccessPrimary = navACQueryDefinition.NewAccessNav<FacilityInventory>(FacilityInventory.ClassName, this);
                         _AccessPrimary.NavSearchExecuting += AccessPrimaryNavSearchExecuting;
                     }
@@ -621,7 +619,7 @@ namespace gip.bso.facility
             {
                 List<ACSortItem> acSortItems = new List<ACSortItem>();
 
-                ACSortItem facilityInventoryNo = new ACSortItem("FacilityInventoryNo", SortDirections.ascending, true);
+                ACSortItem facilityInventoryNo = new ACSortItem("FacilityInventoryNo", SortDirections.descending, true);
                 acSortItems.Add(facilityInventoryNo);
 
                 return acSortItems;
@@ -637,14 +635,16 @@ namespace gip.bso.facility
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
                 // MDFacilityInventoryStateID
-                ACFilterItem stateFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityInventoryStateID", Global.LogicalOperators.isNull, Global.Operators.and, null, true);
+                ACFilterItem stateFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityInventoryState\\MDKey", Global.LogicalOperators.equal, Global.Operators.and, null, true);
                 aCFilterItems.Add(stateFilter);
 
                 // FilterInventoryStartDate
-                ACFilterItem fromDate = new ACFilterItem(Global.FilterTypes.filter, "InsertDate", Global.LogicalOperators.isNull, Global.Operators.and, null, true);
+                ACFilterItem fromDate = new ACFilterItem(Global.FilterTypes.filter, "InsertDate", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, null, true);
                 aCFilterItems.Add(fromDate);
 
                 // FilterInventoryEndDate
+                ACFilterItem toDate = new ACFilterItem(Global.FilterTypes.filter, "InsertDate", Global.LogicalOperators.lessThan, Global.Operators.and, null, true);
+                aCFilterItems.Add(toDate);
 
                 return aCFilterItems;
             }
