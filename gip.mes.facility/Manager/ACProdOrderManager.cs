@@ -1016,7 +1016,7 @@ namespace gip.mes.facility
         #endregion
 
         #region BookingOutward
-        public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation, 
+        public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation,
                                                                bool onEmptyingFacility = false)
         {
             ACMethodBooking acMethodClone = BookParamOutwardMovementClone(facilityManager, dbApp);
@@ -1065,7 +1065,7 @@ namespace gip.mes.facility
                 return null;
             foreach (FacilityBooking previousBooking in partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation)
             {
-                if (   previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
+                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
                     || previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                     continue;
                 // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
@@ -1076,7 +1076,7 @@ namespace gip.mes.facility
 
             foreach (FacilityBooking previousBooking in partsListPosRelation.FacilityBooking_ProdOrderPartslistPosRelation)
             {
-                if (   previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
+                if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
                     || previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
                     continue;
                 acMethodClone = BookParamOutCancelClone(facilityManager, dbApp);
@@ -1262,6 +1262,7 @@ namespace gip.mes.facility
                 foreach (ProdOrderPartslistPos inputMixure in inputMixures)
                     RecalcIntermediateItem(inputMixure, updateMixureRelations);
 
+
                 // fix child relations
                 double newTargetQuantityUOM = 0;
                 if (inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any())
@@ -1272,28 +1273,53 @@ namespace gip.mes.facility
                 bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
                 double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
                 inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
-                double factor = 0;
-                if (inwardPos.TargetQuantityUOM > 0)
-                    factor = diffQuantity / inwardPos.TargetQuantityUOM;
+
                 //mixure distrubutes it's quantity to target mixures
                 if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
-                    if (factor == 0 && !noChange)
-                        factor = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-                    foreach (var rel in inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                    double ratioInwardPosQuantityGrowth = 0;
+                    if (inwardPos.TargetQuantityUOM > 0)
+                        ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
+                    if (ratioInwardPosQuantityGrowth == 0 && !noChange)
+                        ratioInwardPosQuantityGrowth = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+
+                    List<ProdOrderPartslistPosRelation> mixureDestinationRelations =
+                        inwardPos
+                        .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                        .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                        .ToList();
+                    foreach (var rel in mixureDestinationRelations)
                     {
-                        if (
-                            updateMixureRelations
-                            &&
-                            (rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-                                || rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern)
-                           )
+                        if (updateMixureRelations /*&& rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern*/)
                         {
-                            int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-                            rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM / count;
+                            // Find pos relation
+                            PartslistPosRelation plRel = null;
+                            if (inwardPos.BasedOnPartslistPos != null)
+                                plRel = inwardPos
+                                                   .BasedOnPartslistPos
+                                                   .PartslistPosRelation_SourcePartslistPos
+                                                   .Where(c =>
+                                                               c.TargetPartslistPos.MaterialID == rel.TargetProdOrderPartslistPos.MaterialID
+                                                         )
+                                                   .FirstOrDefault();
+
+                            // calculate ratio of relation quantity in source quantity of partslist
+                            double plRelQueryRatio = 0;
+                            if (plRel != null)
+                                plRelQueryRatio = plRel.TargetQuantityUOM / plRel.SourcePartslistPos.TargetQuantityUOM;
+                            if (plRel == null || plRelQueryRatio == 0)
+                            {
+                                // if no pl connection or ratio -> quantity divide equally
+                                int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+                                plRelQueryRatio = 1 / count;
+                            }
+
+                            // Distribute new SourceProdOrderPartslistPos.TargetQuantityUOM with ratio from partslist
+                            if (plRelQueryRatio > 0)
+                                rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * plRelQueryRatio;
                         }
                         else
-                            rel.TargetQuantityUOM = rel.TargetQuantityUOM + factor * rel.TargetQuantityUOM;
+                            rel.TargetQuantityUOM = rel.TargetQuantityUOM + ratioInwardPosQuantityGrowth * rel.TargetQuantityUOM;
                     }
                 }
             }
