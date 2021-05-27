@@ -35,22 +35,21 @@ namespace gip.mes.facility
                     databaseApp
                     .FacilityCharge
                     .Where(c => !c.NotAvailable)
+                    // TODO: @aagincic remove limit
+                    // .Take(10)
                     .OrderBy(c => c.FacilityLot.LotNo)
-                    .Take(10) // for test purpose
                    .ToList();
                 int count = facilityCharges.Count();
                 if (progressCallback != null)
                     progressCallback(0, count);
                 List<FacilityInventoryPos> poses = new List<FacilityInventoryPos>();
                 int nr = 0;
-                MDFacilityInventoryPosState activePosState = databaseApp.MDFacilityInventoryPosState.FirstOrDefault(c=>c.MDFacilityInventoryPosStateIndex == (short) MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
                 foreach (FacilityCharge facilityCharge in facilityCharges)
                 {
                     nr++;
                     FacilityInventoryPos inventoryPos = FacilityInventoryPos.NewACObject(databaseApp, facilityInventory);
                     inventoryPos.FacilityCharge = facilityCharge;
                     inventoryPos.StockQuantity = facilityCharge.StockQuantity;
-                    inventoryPos.MDFacilityInventoryPosState = activePosState;
                     if (progressCallback != null)
                         progressCallback(nr, count);
                 }
