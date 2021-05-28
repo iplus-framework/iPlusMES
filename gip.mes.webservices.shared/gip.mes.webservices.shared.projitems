@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Sales.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\VBWebServiceConst.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\ACMethodBooking.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityChargeStateEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventoryPos.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MaterialStock.cs" />
@@ -35,6 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilitySumOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MaterialSumOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDReleaseState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\SearchFacilityCharge.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeSequence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\Picking.cs" />

@@ -37,6 +37,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "pFCNo")]
+        public string ParentFacilityNo
+        {
+            get; set;
+        }
+
         [DataMember(Name = "FCNo")]
         public string FacilityNo
         {
@@ -91,7 +97,7 @@ namespace gip.mes.webservices
             }
             set
             {
-                if(_NewStockQuantity != value)
+                if (_NewStockQuantity != value)
                 {
                     SetProperty<double?>(ref _NewStockQuantity, value);
                 }
@@ -108,7 +114,7 @@ namespace gip.mes.webservices
             }
             set
             {
-                if(_NotAvailable != value)
+                if (_NotAvailable != value)
                 {
                     SetProperty<bool>(ref _NotAvailable, value);
                 }

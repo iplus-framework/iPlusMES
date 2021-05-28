@@ -1062,7 +1062,7 @@ namespace gip.bso.sales
         }
 
 
-        private List<CompanyPerson> _IssuerCompanyPersonList;
+        private List<CompanyPerson> _IssuerCompanyPersonList = null;
         /// <summary>
         /// List property for CompanyPerson
         /// </summary>

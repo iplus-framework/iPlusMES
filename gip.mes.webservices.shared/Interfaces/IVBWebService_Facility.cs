@@ -234,60 +234,16 @@ namespace gip.mes.webservices
 
         #endregion
 
-        #region Inventory -> New
-        // WSResponse<string> GetFacilityInventoryNo ()
-        //public const string UrlInventory_GetInventoryNo = "FacilityInventory/Get/FacilityInventoryNo";
-#if NETFRAMEWORK
-        [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_GetInventoryNo, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<string> GetFacilityInventoryNo();
-#elif NETSTANDARD
-       Task<WSResponse<string>> GetFacilityInventoryNoAsync();
-#endif
-
-        // WSResponse NewFacilityInventory (string facilityInventoryNo, string facilityInventoryName)
-        // public const string UrlInventory_New = "FacilityInventory/New/FacilityInventoryNo/{facilityInventoryNo}/FacilityInventoryName/{facilityInventoryName}";
-#if NETFRAMEWORK
-        [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_New, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> NewFacilityInventory(string facilityInventoryNo, string facilityInventoryName);
-#elif NETSTANDARD
-       Task<WSResponse<bool>> NewFacilityInventoryAsync(string facilityInventoryNo, string facilityInventoryName);
-#endif
-        #endregion
-
-        #region Inventory -> Lifecycle
-        // WSResponse<bool> StartFacilityInventory (string facilityInventoryNo)
-        //public const string UrlInventory_Start = "FacilityInventory/Start/FacilityInventoryNo/{facilityInventoryNo}";
-#if NETFRAMEWORK
-        [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_Start, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> StartFacilityInventory(string facilityInventoryNo);
-#elif NETSTANDARD
-       Task<WSResponse<bool>> StartFacilityInventoryAsync(string facilityInventoryNo);
-#endif
-
-        // WSResponse<bool> CloseFacilityInventory (string facilityInventoryNo)
-        //public const string UrlInventory_Close = "FacilityInventory/Close/FacilityInventoryNo/{facilityInventoryNo}";
-#if NETFRAMEWORK
-        [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_Close, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> CloseFacilityInventory(string facilityInventoryNo);
-#elif NETSTANDARD
-       Task<WSResponse<bool>> CloseFacilityInventoryAsync(string facilityInventoryNo);
-#endif
-        #endregion
-
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
-        // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines (string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock);
-        //public const string UrlInventory_InventoryLines = "FacilityInventory/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}";
+        // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines (string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock);
+        //public const string UrlInventory_InventoryLines = "FacilityInventory/StorageLocationNo/{storageLocationNo}/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}";
 #if NETFRAMEWORK
         [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryLines, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
+        WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
 #elif NETSTANDARD
-        Task<WSResponse<List<FacilityInventoryPos>>> GetFacilityInventoryLinesAsync(string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
+        Task<WSResponse<List<FacilityInventoryPos>>> GetFacilityInventoryLinesAsync(string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed);
 #endif
 
         #endregion
@@ -303,36 +259,24 @@ namespace gip.mes.webservices
         Task<WSResponse<bool>> UpdateFacilityInventoryPosAsync(FacilityInventoryPos facilityInventoryPos);
 #endif
 
-        // WSResponse<bool> StartFacilityInventoryPos (string facilityInventoryNo, Guid facilityChargeID)
-        //public const string UrlInventory_InventoryPos_Start = "FacilityInventoryPos/Start/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
+        // WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID)
+        // public const string UrlInventory_SearchCharge = "FacilityInventoryPos/FacilityInventoryNo/{facilityInventoryNo}/StorageLocationNo/{storageLocationNo}/FacilityNo/{facilityNo}/FacilityChargeID/{facilityChargeID}";
 #if NETFRAMEWORK
         [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Start, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> StartFacilityInventoryPos(string facilityInventoryNo, string facilityChargeID);
+        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_SearchCharge, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo,string storageLocationNo, string facilityNo, string facilityChargeID);
 #elif NETSTANDARD
-       Task<WSResponse<bool>> StartFacilityInventoryPosAsync(string facilityInventoryNo, string facilityChargeID);
+        Task<WSResponse<SearchFacilityCharge>> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID);
 #endif
 
-        // WSResponse<bool> CloseFacilityInventoryPos (string facilityInventoryNo, Guid facilityChargeID)
-        //public const string UrlInventory_InventoryPos_Close = "FacilityInventoryPos/Close/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
+        // WSResponse<FacilityInventoryPos> SetFacilityInventoryChargeAvailable (string facilityInventoryNo, string facilityChargeID)
+        // public const string UrlInventory_SetChargeAvailable = "FacilityInventoryChargeAvailable/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
 #if NETFRAMEWORK
         [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Close, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> CloseFacilityInventoryPos(string facilityInventoryNo, string facilityChargeID);
+        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_SearchCharge, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<FacilityInventoryPos> SetFacilityInventoryChargeAvailable(string facilityInventoryNo, string facilityChargeID);
 #elif NETSTANDARD
-       Task<WSResponse<bool>> CloseFacilityInventoryPosAsync(string facilityInventoryNo, string facilityChargeID);
-#endif
-        #endregion
-
-        #region Inventory -> Pos -> Booings
-        // WSResponse<PostingOverview> GetFacilityInventoryPosBookings(string facilityInventoryNo, Guid facilityChargeID)
-        //public const string UrlInventory_InventoryPos_Bookings = "FacilityInventoryPos/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}/Bookings";
-#if NETFRAMEWORK
-        [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Bookings, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<PostingOverview> GetFacilityInventoryPosBookings(string facilityInventoryNo, string facilityChargeID);
-#elif NETSTANDARD
-       Task<WSResponse<PostingOverview>> GetFacilityInventoryPosBookingsAsync(string facilityInventoryNo, string facilityChargeID);
+        Task<WSResponse<FacilityInventoryPos>> SetFacilityInventoryChargeAvailable(string facilityInventoryNo, string facilityChargeID);
 #endif
         #endregion
 

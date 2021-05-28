@@ -1221,12 +1221,16 @@ namespace gip.mes.webservices
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
 
-        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
-        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
-            (dbApp, facilityInventoryNo, inputCode, facilityNo, lotNo, materialNo, inventoryPosState, notAvailable, zeroStock, notProcessed) =>
+        public static readonly Func<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
+        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
+            (dbApp, facilityInventoryNo, inputCode, storageLocationNo, facilityNo, lotNo, materialNo, inventoryPosState, notAvailable, zeroStock, notProcessed) =>
                 dbApp.FacilityInventoryPos
                         .Where(c =>
                            (inputCode == null || c.FacilityChargeID == inputCode)
+                            && (
+                                    (storageLocationNo ?? "") == ""
+                                    || (c.FacilityCharge.Facility.Facility1_ParentFacility != null && c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo == storageLocationNo)
+                            )
                             && ((facilityNo ?? "") == "" || c.FacilityCharge.Facility.FacilityNo == facilityNo)
                             && ((lotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == lotNo))
                             && ((materialNo ?? "") == "" || c.FacilityCharge.Material.MaterialNo == materialNo)
@@ -1243,6 +1247,7 @@ namespace gip.mes.webservices
                             LotNo = c.FacilityCharge.FacilityLot.LotNo,
                             MaterialNo = c.FacilityCharge.Material.MaterialNo,
                             MaterialName = c.FacilityCharge.Material.MaterialName1,
+                            ParentFacilityNo = c.FacilityCharge.Facility.Facility1_ParentFacility != null ? c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo : null,
                             FacilityNo = c.FacilityCharge.Facility.FacilityNo,
                             FacilityName = c.FacilityCharge.Facility.FacilityName,
                             StockQuantity = c.StockQuantity,
@@ -1255,7 +1260,7 @@ namespace gip.mes.webservices
                             MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
                         })
         );
-        public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string facilityNo,
+        public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo,
             string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed)
         {
             WSResponse<List<FacilityInventoryPos>> response = new WSResponse<List<FacilityInventoryPos>>();
@@ -1263,6 +1268,7 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
                     facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
                     lotNo = lotNo != CoreWebServiceConst.EmptyParam ? lotNo : "";
                     materialNo = materialNo != CoreWebServiceConst.EmptyParam ? materialNo : "";
@@ -1343,7 +1349,7 @@ namespace gip.mes.webservices
                             }
                         }
                     }
-                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryLines(databaseApp, facilityInventoryNo, inputCodeVal, facilityNo,
+                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryLines(databaseApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo,
                         lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal).OrderBy(c => c.Sequence).ToList();
                     response.Data = items;
                 }
@@ -1352,7 +1358,7 @@ namespace gip.mes.webservices
             {
                 PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                 if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryLines(1090)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryLines(1361)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
             Console.WriteLine("web service: GetFacilityInventoryLines");
@@ -1401,11 +1407,11 @@ namespace gip.mes.webservices
                             dbFacilityInventoryPos.NewStockQuantity = facilityInventoryPos.NewStockQuantity;
                             dbFacilityInventoryPos.NotAvailable = facilityInventoryPos.NotAvailable;
                             dbFacilityInventoryPos.Comment = facilityInventoryPos.Comment;
-                            dbFacilityInventoryPos.UpdateDate=  DateTime.Now;
+                            dbFacilityInventoryPos.UpdateDate = DateTime.Now;
                             dbFacilityInventoryPos.UpdateName = facilityInventoryPos.UpdateName;
-                            if(facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress)
+                            if (facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress)
                                 dbFacilityInventoryPos.MDFacilityInventoryPosState = inProgressState;
-                             if(facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
+                            if (facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
                                 dbFacilityInventoryPos.MDFacilityInventoryPosState = finishedState;
 
                             MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
@@ -1421,145 +1427,147 @@ namespace gip.mes.webservices
             {
                 PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                 if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "UpdateFacilityInventoryPos(1271)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "UpdateFacilityInventoryPos(1430)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
             return response;
         }
 
-        public WSResponse<bool> StartFacilityInventoryPos(string facilityInventoryNo, string facilityChargeID)
+        public WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID)
         {
-            WSResponse<bool> response = new WSResponse<bool>();
+            WSResponse<SearchFacilityCharge> response = new WSResponse<SearchFacilityCharge>();
+
+            string emptyErrorMessage = "";
+            if (string.IsNullOrEmpty(facilityInventoryNo))
+                emptyErrorMessage += "facilityInventoryNo is empty";
+            if (string.IsNullOrEmpty(facilityChargeID))
+                emptyErrorMessage += "facilityChargeID is empty";
+            if (!string.IsNullOrEmpty(emptyErrorMessage))
+                return new WSResponse<SearchFacilityCharge>(null, new Msg(eMsgLevel.Error, emptyErrorMessage));
+
+            SearchFacilityCharge result = new SearchFacilityCharge();
+            result.States = new List<FacilityChargeStateEnum>();
+            response.Data = result;
+            try
+            {
+                storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
+                facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
+                using (DatabaseApp databaseApp = new DatabaseApp())
+                {
+                    gip.mes.datamodel.FacilityInventoryPos inventoryPos =
+                        databaseApp
+                        .FacilityInventoryPos
+                        .Where(c =>
+                                c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo
+                                && c.FacilityChargeID == new Guid(facilityChargeID))
+                        .FirstOrDefault();
+                    if (inventoryPos != null)
+                    {
+                        result.FacilityInventoryPos = GetFacilityInventoryPos(inventoryPos);
+                        result.States.Add(FacilityChargeStateEnum.Available);
+
+                        if (inventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
+                            result.States.Add(FacilityChargeStateEnum.AlreadyFinished);
+
+                        if (!string.IsNullOrEmpty(facilityNo))
+                            if (inventoryPos.FacilityCharge.Facility.FacilityNo != facilityNo)
+                                result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                            else
+                            if (inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility != null
+                                && inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo != storageLocationNo)
+                                result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                    }
+                    else
+                        result.States.Add(FacilityChargeStateEnum.NotExist);
+                }
+            }
+            catch (Exception e)
+            {
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                if (myServiceHost != null)
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventorySearchCharge(1508)", e);
+                response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
+            }
+            Console.WriteLine("web service: GetFacilityInventorySearchCharge");
+            return response;
+        }
+
+        public WSResponse<FacilityInventoryPos> SetFacilityInventoryChargeAvailable(string facilityInventoryNo, string facilityChargeID)
+        {
+            WSResponse<FacilityInventoryPos> response = new WSResponse<FacilityInventoryPos>();
+
+            string emptyErrorMessage = "";
+            if (string.IsNullOrEmpty(facilityInventoryNo))
+                emptyErrorMessage += "facilityInventoryNo is empty";
+            if (string.IsNullOrEmpty(facilityChargeID))
+                emptyErrorMessage += "facilityChargeID is empty";
+            if (!string.IsNullOrEmpty(emptyErrorMessage))
+                return new WSResponse<FacilityInventoryPos>(null, new Msg(eMsgLevel.Error, emptyErrorMessage));
+
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
-                    Guid facilityChargeIDVal = Guid.Parse(facilityChargeID);
-                    mes.datamodel.MDFacilityInventoryPosState inProgressState = databaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)mes.datamodel.MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
-                    mes.datamodel.FacilityInventoryPos facilityInventoryPos =
-                        databaseApp
-                        .FacilityInventoryPos
-                        .Where(c => c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo && c.FacilityChargeID == facilityChargeIDVal)
-                        .FirstOrDefault();
+                    gip.mes.datamodel.FacilityCharge facilityCharge = databaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == new Guid(facilityChargeID));
+                    if (facilityCharge != null)
+                    {
+                        gip.mes.datamodel.FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryNo);
+                        if (facilityInventory != null)
+                        {
 
-                    if (facilityInventoryPos == null)
-                    {
-                        response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format("Missing Inventory Pos No: {0}, Charge: {1}", facilityInventoryNo, facilityChargeID) };
-                    }
-                    else
-                    {
-                        facilityInventoryPos.MDFacilityInventoryPosState = inProgressState;
-                        MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
-                        if (saveMsg == null || saveMsg.IsSucceded())
-                            response.Data = true;
+                            if (facilityCharge.NotAvailable)
+                                facilityCharge.NotAvailable = false;
+
+                            gip.mes.datamodel.FacilityInventoryPos mesPos = gip.mes.datamodel.FacilityInventoryPos.NewACObject(databaseApp, facilityInventory);
+                            mesPos.FacilityCharge = facilityCharge;
+                            mesPos.StockQuantity = facilityCharge.StockQuantityUOM;
+                            mesPos.NotAvailable = facilityCharge.NotAvailable;
+                            databaseApp.FacilityInventoryPos.AddObject(mesPos);
+
+                            response.Data = GetFacilityInventoryPos(mesPos);
+                        }
                         else
-                            response.Message = saveMsg;
-                    }
-
-                }
-            }
-            catch (Exception e)
-            {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "UpdateFacilityInventoryPos(1312)", e);
-                response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
-            }
-            return response;
-        }
-
-        public WSResponse<bool> CloseFacilityInventoryPos(string facilityInventoryNo, string facilityChargeID)
-        {
-            WSResponse<bool> response = new WSResponse<bool>();
-            try
-            {
-                Guid facilityChargeIDVal = Guid.Parse(facilityChargeID);
-                using (DatabaseApp databaseApp = new DatabaseApp())
-                {
-                    mes.datamodel.MDFacilityInventoryPosState finishedState = databaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)mes.datamodel.MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
-                    mes.datamodel.FacilityInventoryPos facilityInventoryPos =
-                        databaseApp
-                        .FacilityInventoryPos
-                        .Where(c => c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo && c.FacilityChargeID == facilityChargeIDVal)
-                        .FirstOrDefault();
-
-                    if (facilityInventoryPos == null)
-                    {
-                        response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format("Missing Inventory Pos No: {0}, Charge: {1}", facilityInventoryNo, facilityChargeID) };
+                            response.Message = new Msg(eMsgLevel.Error, string.Format("Facility inventory with no: {0} not exist!", facilityInventoryNo));
                     }
                     else
-                    {
-                        facilityInventoryPos.MDFacilityInventoryPosState = finishedState;
-                        MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
-                        if (saveMsg == null || saveMsg.IsSucceded())
-                            response.Data = true;
-                        else
-                            response.Message = saveMsg;
-                    }
-
+                        response.Message = new Msg(eMsgLevel.Error, string.Format("Quant with ID: {0} not exist!", facilityChargeID));
                 }
             }
             catch (Exception e)
             {
                 PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                 if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "CloseFacilityInventoryPos(1352)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "SetFacilityInventoryChargeAvailables(1540)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
+            Console.WriteLine("web service: SetFacilityInventoryChargeAvailables");
             return response;
         }
 
-        #endregion
-
-        #region Inventory -> Pos -> Booings
-        public WSResponse<PostingOverview> GetFacilityInventoryPosBookings(string facilityInventoryNo, string facilityChargeID)
+        private FacilityInventoryPos GetFacilityInventoryPos(gip.mes.datamodel.FacilityInventoryPos inventoryPos)
         {
-            WSResponse<PostingOverview> response = new WSResponse<PostingOverview>();
-            try
+            return new FacilityInventoryPos()
             {
-                Guid facilityChargeIDVal = Guid.Parse(facilityChargeID);
-                using (DatabaseApp databaseApp = new DatabaseApp())
-                {
-                    mes.datamodel.MDFacilityInventoryPosState finishedState = databaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)mes.datamodel.MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
-                    mes.datamodel.FacilityInventoryPos facilityInventoryPos =
-                        databaseApp
-                        .FacilityInventoryPos
-                        .Where(c => c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo && c.FacilityChargeID == facilityChargeIDVal)
-                        .FirstOrDefault();
-
-                    if (facilityInventoryPos == null)
-                    {
-                        response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format("Missing Inventory Pos No: {0}, Charge: {1}", facilityInventoryNo, facilityChargeID) };
-                    }
-                    else
-                    {
-                        FacilityQueryFilter filter = new FacilityQueryFilter() { FacilityInventoryPosID = facilityInventoryPos.FacilityInventoryPosID };
-                        filter.SearchFrom = facilityInventoryPos.FacilityInventory.UpdateDate.AddMinutes(-10);
-                        filter.SearchFrom = facilityInventoryPos.FacilityInventory.UpdateDate.AddMinutes(10);
-
-                        PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                        if (myServiceHost == null)
-                            return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
-
-                        FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-
-                        Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(databaseApp, filter);
-                        PostingOverview po = new PostingOverview();
-                        po.Postings = fbList.Keys.ToList();
-                        po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
-                        response.Data = po;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryPosBookings(1395)", e);
-                response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
-            }
-            return response;
+                FacilityInventoryPosID = inventoryPos.FacilityInventoryPosID,
+                FacilityChargeID = inventoryPos.FacilityChargeID,
+                Sequence = inventoryPos.Sequence,
+                Comment = inventoryPos.Comment,
+                LotNo = inventoryPos.FacilityCharge.FacilityLot?.LotNo,
+                ParentFacilityNo = inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility?.FacilityNo,
+                FacilityNo = inventoryPos.FacilityCharge.Facility.FacilityNo,
+                FacilityName = inventoryPos.FacilityCharge.Facility.FacilityName,
+                MaterialNo = inventoryPos.FacilityCharge.Material.MaterialNo,
+                MaterialName = inventoryPos.FacilityCharge.Material.MaterialName1,
+                FacilityInventoryNo = inventoryPos.FacilityInventory.FacilityInventoryNo,
+                MDFacilityInventoryPosStateIndex = inventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex,
+                StockQuantity = inventoryPos.StockQuantity,
+                NewStockQuantity = inventoryPos.NewStockQuantity,
+                NotAvailable = inventoryPos.NotAvailable,
+                UpdateName = inventoryPos.UpdateName,
+                UpdateDate = inventoryPos.UpdateDate
+            };
         }
+
         #endregion
 
         #endregion

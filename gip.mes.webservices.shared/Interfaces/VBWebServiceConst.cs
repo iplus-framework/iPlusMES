@@ -157,52 +157,26 @@ namespace gip.mes.webservices
 
         #endregion
 
-        #region Inventory -> New
-        // WSResponse<string> GetFacilityInventoryNo ()
-        public const string UrlInventory_GetInventoryNo = "FacilityInventory/Get/FacilityInventoryNo";
-        public const string UrlInventory_GetInventoryNo_F = "FacilityInventory/Get/FacilityInventoryNo";
-
-        // WSResponse NewFacilityInventory (string facilityInventoryNo)
-        public const string UrlInventory_New = "FacilityInventory/New/FacilityInventoryNo/{facilityInventoryNo}/FacilityInventoryName/{facilityInventoryName}";
-        public const string UrlInventory_New_F = "FacilityInventory/New/FacilityInventoryNo/{0}/FacilityInventoryName/{1}";
-        #endregion
-
-        #region Inventory -> Lifecycle
-        // WSResponse StartFacilityInventory (string facilityInventoryNo)
-        public const string UrlInventory_Start = "FacilityInventory/Start/FacilityInventoryNo/{facilityInventoryNo}";
-        public const string UrlInventory_Start_F = "FacilityInventory/Start/FacilityInventoryNo/{0}";
-
-        // WSResponse CloseFacilityInventory (string facilityInventoryNo)
-        public const string UrlInventory_Close = "FacilityInventory/Close/FacilityInventoryNo/{facilityInventoryNo}";
-        public const string UrlInventory_Close_F = "FacilityInventory/Close/FacilityInventoryNo/{0}";
-        #endregion
-
         #region Inventory -> Pos
         #region Inventory -> Pos - Get
-        // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines (string facilityInventoryNo, string inputCode, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock)
-        public const string UrlInventory_InventoryLines = "FacilityInventory/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}/NotProcessed/{notProcessed}";
-        public const string UrlInventory_InventoryLines_F = "FacilityInventory/FacilityInventoryNo/{0}/InputCode/{1}/FacilityNo/{2}/LotNo/{3}/MaterialNo/{4}/InventoryPosState/{5}/NotAvailable/{6}/ZeroStock/{7}/NotProcessed/{8}";
+        // WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines (string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo, string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock)
+        public const string UrlInventory_InventoryLines = "FacilityInventoryLines/FacilityInventoryNo/{facilityInventoryNo}/InputCode/{inputCode}/StorageLocationNo/{storageLocationNo}/FacilityNo/{facilityNo}/LotNo/{lotNo}/MaterialNo/{materialNo}/InventoryPosState/{inventoryPosState}/NotAvailable/{notAvailable}/ZeroStock/{zeroStock}/NotProcessed/{notProcessed}";
+        public const string UrlInventory_InventoryLines_F = "FacilityInventoryLines/FacilityInventoryNo/{0}/InputCode/{1}/StorageLocationNo/{2}/FacilityNo/{3}/LotNo/{4}/MaterialNo/{5}/InventoryPosState/{6}/NotAvailable/{7}/ZeroStock/{8}/NotProcessed/{9}";
+
+        // WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge (string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID)
+        public const string UrlInventory_SearchCharge = "FacilityInventoryPos/FacilityInventoryNo/{facilityInventoryNo}/StorageLocationNo/{storageLocationNo}/FacilityNo/{facilityNo}/FacilityChargeID/{facilityChargeID}";
+        public const string UrlInventory_SearchCharge_F = "FacilityInventoryPos/FacilityInventoryNo/{0}/StorageLocationNo/{1}/FacilityNo/{2}/FacilityChargeID/{3}";
+
+        // WSResponse<FacilityInventoryPos> SetFacilityInventoryChargeAvailable (string facilityInventoryNo, string facilityChargeID)
+        public const string UrlInventory_SetChargeAvailable = "FacilityInventoryChargeAvailable/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
+        public const string UrlInventory_SetChargeAvailable_F = "FacilityInventoryChargeAvailable/FacilityInventoryNo/{0}/FacilityChargeID/{1}";
+
 
         #endregion
 
         #region Inventory -> Pos -> Lifecycle
         // WSResponse UpdateFacilityInventoryPos (string facilityInventoryNo, string facilityChargeID, string newStockQuantity, string comment, string notAvailable)
         public const string UrlInventory_InventoryPos_Update = "FacilityInventoryPos/Update";
-
-        // WSResponse StartFacilityInventoryPos (string facilityInventoryNo, string facilityChargeID)
-        public const string UrlInventory_InventoryPos_Start = "FacilityInventoryPos/Start/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
-        public const string UrlInventory_InventoryPos_Start_F = "FacilityInventoryPos/Start/FacilityChargeID/{0}";
-
-        // WSResponse CloseFacilityInventoryPos (string facilityInventoryNo, string facilityChargeID)
-        public const string UrlInventory_InventoryPos_Close = "FacilityInventoryPos/Close/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
-        public const string UrlInventory_InventoryPos_Close_F = "FacilityInventoryPos/Close/FacilityChargeID/{0}";
-
-        #endregion
-
-        #region Inventory -> Pos -> Booings
-        // WSResponse<PostingOverview> GetFacilityInventoryPosBookings(string facilityInventoryNo, Guid facilityChargeID)
-        public const string UrlInventory_InventoryPos_Bookings = "FacilityInventoryPos/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}/Bookings";
-        public const string UrlInventory_InventoryPos_Bookings_F = "FacilityInventoryPos/FacilityChargeID/{0}/Bookings";
 
         #endregion
 
