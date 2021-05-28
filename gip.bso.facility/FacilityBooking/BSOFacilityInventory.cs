@@ -1519,7 +1519,7 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
         }
 
-        [ACMethodInfo("CloseAllPositions", "en{'Close all lines'}de{'Schließe alle Linien'}", 100)]
+        [ACMethodInfo("CloseAllPositions", "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 100)]
         public void CloseAllPositions()
         {
             // Question50055.
