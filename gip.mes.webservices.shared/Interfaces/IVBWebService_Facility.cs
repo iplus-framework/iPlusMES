@@ -273,7 +273,7 @@ namespace gip.mes.webservices
         // public const string UrlInventory_SetChargeAvailable = "FacilityInventoryChargeAvailable/FacilityInventoryNo/{facilityInventoryNo}/FacilityChargeID/{facilityChargeID}";
 #if NETFRAMEWORK
         [OperationContract]
-        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_SearchCharge, ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_SetChargeAvailable, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<FacilityInventoryPos> SetFacilityInventoryChargeAvailable(string facilityInventoryNo, string facilityChargeID);
 #elif NETSTANDARD
         Task<WSResponse<FacilityInventoryPos>> SetFacilityInventoryChargeAvailable(string facilityInventoryNo, string facilityChargeID);
