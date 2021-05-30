@@ -58,6 +58,8 @@ namespace gip.mes.webservices
             BarcodeEntity entityClass = null;
             if (sequence.Sequence.Count == 1)
             {
+                sequence.QuestionSequence = 0;
+
                 BarcodeEntity entity = sequence.Sequence.FirstOrDefault();
                 if (entity.ValidEntity.GetType() == typeof(FacilityCharge)
                     || entity.ValidEntity.GetType() == typeof(FacilityLot)
