@@ -1782,6 +1782,14 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override object Clone()
+        {
+            object clonedObject =  base.Clone();
+            BSOFacilityInventory cloned = clonedObject as BSOFacilityInventory;
+            cloned.SelectedFacilityInventoryPos = SelectedFacilityInventoryPos;
+            return cloned;
+        }
+
         #endregion
 
         #endregion
