@@ -1450,10 +1450,11 @@ namespace gip.mes.webservices
             response.Data = result;
             try
             {
-                storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
+                storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? storageLocationNo : "";
                 facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    gip.mes.datamodel.FacilityCharge facilityCharge = databaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == new Guid(facilityChargeID));
                     gip.mes.datamodel.FacilityInventoryPos inventoryPos =
                         databaseApp
                         .FacilityInventoryPos
@@ -1461,21 +1462,34 @@ namespace gip.mes.webservices
                                 c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo
                                 && c.FacilityChargeID == new Guid(facilityChargeID))
                         .FirstOrDefault();
-                    if (inventoryPos != null)
-                    {
-                        result.FacilityInventoryPos = GetFacilityInventoryPos(inventoryPos);
-                        result.States.Add(FacilityChargeStateEnum.Available);
 
-                        if (inventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
-                            result.States.Add(FacilityChargeStateEnum.AlreadyFinished);
+
+                    if (facilityCharge != null)
+                    {
+                        if (inventoryPos != null)
+                        {
+                            result.FacilityInventoryPos = GetFacilityInventoryPos(inventoryPos);
+                            result.States.Add(FacilityChargeStateEnum.Available);
+
+                            if (inventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
+                                result.States.Add(FacilityChargeStateEnum.AlreadyFinished);
+                        }
+                        else
+                            result.States.Add(FacilityChargeStateEnum.QuantNotAvailable);
 
                         if (!string.IsNullOrEmpty(facilityNo))
-                            if (inventoryPos.FacilityCharge.Facility.FacilityNo != facilityNo)
+                        {
+                            if (facilityCharge.Facility.FacilityNo != facilityNo)
+                            {
                                 result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
-                            else
-                            if (inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility != null
-                                && inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo != storageLocationNo)
-                                result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                                result.DifferentFacilityNo = facilityCharge.Facility.FacilityNo;
+                            }
+                        }
+                        else if (facilityCharge.Facility.Facility1_ParentFacility != null && facilityCharge.Facility.Facility1_ParentFacility.FacilityNo != storageLocationNo)
+                        {
+                            result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                            result.DifferentFacilityNo = facilityCharge.Facility.Facility1_ParentFacility.FacilityNo;
+                        }
                     }
                     else
                         result.States.Add(FacilityChargeStateEnum.NotExist);
@@ -1523,6 +1537,7 @@ namespace gip.mes.webservices
                             mesPos.StockQuantity = facilityCharge.StockQuantityUOM;
                             mesPos.NotAvailable = facilityCharge.NotAvailable;
                             databaseApp.FacilityInventoryPos.AddObject(mesPos);
+                            var rez = databaseApp.ACSaveChanges();
 
                             response.Data = GetFacilityInventoryPos(mesPos);
                         }

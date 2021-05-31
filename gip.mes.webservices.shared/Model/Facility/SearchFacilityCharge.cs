@@ -8,15 +8,21 @@ namespace gip.mes.webservices
     public class SearchFacilityCharge
     {
         [DataMember(Name = "St")]
-        public List<FacilityChargeStateEnum> States 
-        { 
-            get; set; 
+        public List<FacilityChargeStateEnum> States
+        {
+            get; set;
         }
 
         [DataMember(Name = "fPos")]
-        public FacilityInventoryPos FacilityInventoryPos 
-        { 
-            get; set; 
+        public FacilityInventoryPos FacilityInventoryPos
+        {
+            get; set;
+        }
+
+        [DataMember(Name = "diffFNo")]
+        public string DifferentFacilityNo
+        {
+            get; set;
         }
     }
 }
