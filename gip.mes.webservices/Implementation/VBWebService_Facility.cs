@@ -1229,13 +1229,13 @@ namespace gip.mes.webservices
                           c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo
                           && (inputCodeVal == null || c.FacilityChargeID == inputCodeVal)
                            && (
-                                   (storageLocationNo ?? "") == ""
+                                   storageLocationNo == null
                                    || (c.FacilityCharge.Facility.Facility1_ParentFacility != null && c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo == storageLocationNo)
                            )
-                           && ((facilityNo ?? "") == "" || c.FacilityCharge.Facility.FacilityNo == facilityNo)
-                           && ((lotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == lotNo))
-                           && ((materialNo ?? "") == "" || c.FacilityCharge.Material.MaterialNo == materialNo)
-                           && (inventoryPosStateVal == null || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == inventoryPosStateVal)
+                           && (facilityNo == null || c.FacilityCharge.Facility.FacilityNo == facilityNo)
+                           && (lotNo == null || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == lotNo))
+                           && (materialNo == null || c.FacilityCharge.Material.MaterialNo == materialNo)
+                           && (inventoryPosStateVal == null || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex <= inventoryPosStateVal)
                            && (notAvailableVal == null || c.NotAvailable == (notAvailableVal ?? false))
                            && (zeroStockVal == null || (c.FacilityCharge.StockQuantity == 0) == (zeroStockVal ?? false))
                            && (!notProcessedVal || (!c.NotAvailable && c.NewStockQuantity == null))
