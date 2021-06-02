@@ -148,6 +148,51 @@ namespace gip.mes.processapplication
         {
             return defaultBSOName;
         }
+
+        [ACMethodInfo("", "", 9999)]
+        public virtual SingleDosingItems GetDosableComponents()
+        {
+            using (Database db = new gip.core.datamodel.Database())
+            {
+                core.datamodel.ACClass compClass = null;
+
+                using (ACMonitor.Lock(core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
+                {
+                    compClass = ComponentClass.FromIPlusContext<core.datamodel.ACClass>(db);
+                }
+
+                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false, compClass, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards, 
+                                                                        null, null, null, 0, true, true);
+
+                if(rResult == null)
+                {
+                    return new SingleDosingItems() { Error = new Msg(eMsgLevel.Error, "Routing result is null!") };
+                }
+
+                if ( rResult.Message != null && rResult.Message.MessageLevel == eMsgLevel.Error)
+                {
+                    return new SingleDosingItems() { Error = rResult.Message };
+                }
+
+                SingleDosingItems result = new SingleDosingItems();
+
+                foreach(Route route in rResult.Routes)
+                {
+                    RouteItem rItem = route.GetRouteSource();
+                    if (rItem == null)
+                        continue;
+
+                    PAMSilo silo = rItem.SourceACComponent as PAMSilo;
+                    if (silo == null || string.IsNullOrEmpty(silo.Facility?.ValueT?.ValueT?.FacilityNo) || string.IsNullOrEmpty(silo.MaterialNo?.ValueT))
+                        continue;
+
+                    result.Add(new SingleDosingItem() { FacilityNo = silo.Facility.ValueT.ValueT.FacilityNo, MaterialName = silo.MaterialName?.ValueT, MaterialNo = silo.MaterialNo.ValueT });
+                }
+
+                return result;
+            }
+        }
+
         #endregion
 
         #region Helper-Methods

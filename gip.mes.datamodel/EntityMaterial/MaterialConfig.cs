@@ -431,6 +431,36 @@ namespace gip.mes.datamodel
         {
             OnPropertyChanged("ACClassPropertyRelation");
         }
+
+        private core.datamodel.ACClassWF _ACClassWF;
+        [ACPropertyInfo(9999, "", "en{'Workflow class'}de{'Workflow-Klasse'}", Const.ContextDatabaseIPlus + "\\" + core.datamodel.ACClassWF.ClassName)]
+        public core.datamodel.ACClassWF ACClassWF
+        {
+            get
+            {
+                if (VBiACClassWF == null || VBiACClassWFID == Guid.Empty)
+                    return null;
+
+                if (_ACClassWF != null)
+                    return _ACClassWF;
+
+                if (VBiACClassWF == null)
+                {
+                    DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                    using (ACMonitor.Lock(dbApp.ContextIPlus.QueryLock_1X000))
+                    {
+                        _ACClassWF = dbApp.ContextIPlus.ACClassWF.FirstOrDefault(c => c.ACClassWFID == VBiACClassWFID);
+                    }
+                    return _ACClassWF;
+                }
+                else
+                {
+                    _ACClassWF = VBiACClassWF.FromIPlusContext<core.datamodel.ACClassWF>();
+                    return _ACClassWF;
+                }
+            }
+        }
+
         #endregion
 
     }
