@@ -963,21 +963,31 @@ namespace gip.bso.facility
         private void _SelectedFacilityInventoryPos_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             FacilityInventoryPos item = sender as FacilityInventoryPos;
-            MDFacilityInventoryPosState stateInProgress =
-                FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
             if (e.PropertyName == "NotAvailable")
             {
                 if (item.NotAvailable)
                     item.NewStockQuantity = null;
                 if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
+                {
+                    MDFacilityInventoryPosState stateInProgress =
+                        item.GetObjectContext<DatabaseApp>()
+                        .MDFacilityInventoryPosState
+                        .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
                     item.MDFacilityInventoryPosState = stateInProgress;
+                }
                 OnPropertyChanged("SelectedFacilityInventoryPos");
             }
             else if (e.PropertyName == "NewStockQuantity")
             {
                 item.NotAvailable = false;
                 if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
+                {
+                    MDFacilityInventoryPosState stateInProgress =
+                      item.GetObjectContext<DatabaseApp>()
+                      .MDFacilityInventoryPosState
+                      .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
                     item.MDFacilityInventoryPosState = stateInProgress;
+                }
                 OnPropertyChanged("SelectedFacilityInventoryPos");
             }
         }
