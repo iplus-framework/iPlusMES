@@ -1416,7 +1416,7 @@ namespace gip.mes.webservices
                             if (facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
                                 dbFacilityInventoryPos.MDFacilityInventoryPosState = finishedState;
 
-                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges(true, SaveOptions.AcceptAllChangesAfterSave, false, false);
                             if (saveMsg == null || saveMsg.IsSucceded())
                                 response.Data = true;
                             else
