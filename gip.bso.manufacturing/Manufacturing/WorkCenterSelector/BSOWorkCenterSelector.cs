@@ -757,8 +757,12 @@ namespace gip.bso.manufacturing
             else
             {
                 _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
-                InputComponentList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.Where(c => c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
-                                                                                    .ToList();
+                InputComponentList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
+                                                  .Where(c => c.SourceProdOrderPartslistPos != null 
+                                                           && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                                           && c.TargetQuantityUOM > 0.00001)
+                                                  .OrderBy(p => p.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex)
+                                                  .ToList();
             }
         }
 

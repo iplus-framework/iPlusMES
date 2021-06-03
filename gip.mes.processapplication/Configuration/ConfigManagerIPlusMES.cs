@@ -191,7 +191,7 @@ namespace gip.mes.processapplication
 
                 IEnumerable<IACConfig> cfSource = null;
                 if (configStageMatWF != null)
-                    cfSource = configStageMatWF.ConfigurationEntries;// Read Cache, because afterwards config-entities will be detached
+                    cfSource = configStageMatWF.ConfigurationEntries; // Read Cache, because afterwards config-entities will be detached
                 if (configStagePartslist != null)
                     cfSource = configStagePartslist.ConfigurationEntries; // Read Cache, because afterwards config-entities will be detached
                 if (configStageProdPartslist != null)

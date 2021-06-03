@@ -145,6 +145,7 @@
     <Compile Include="Model\DischargingItem.cs" />
     <Compile Include="Model\PAScheduleForPWNodeList.cs" />
     <Compile Include="Model\PAScheduleForPWNode.cs" />
+    <Compile Include="Model\SingleDosingItem.cs" />
     <Compile Include="Model\StartNextCompResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

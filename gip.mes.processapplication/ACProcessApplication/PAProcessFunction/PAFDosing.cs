@@ -720,8 +720,9 @@ namespace gip.mes.processapplication
         [ACMethodInteraction("", "en{'Set lack of material'}de{'Materialmangel setzen'}", 820, true)]
         public virtual void ForceSetLackOfMaterial()
         {
-            if (!IsEnabledForceSetLackOfMaterial())
-                return;
+            // Enabled, for calling from background
+            //if (!IsEnabledForceSetLackOfMaterial())
+            //    return;
             this.StateLackOfMaterial.ValueT = PANotifyState.AlarmOrFault;
             _LackOfMaterialForced = true;
             string user = "Service";
