@@ -1452,17 +1452,20 @@ namespace gip.mes.webservices
             response.Data = result;
             try
             {
+                Guid facilityChargeIDVal = Guid.Empty;
+                if(!Guid.TryParse(facilityChargeID, out facilityChargeIDVal))
+                    throw new FormatException("facilityChargeID not in valid format !");
                 storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? storageLocationNo : "";
                 facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
-                    gip.mes.datamodel.FacilityCharge facilityCharge = databaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == new Guid(facilityChargeID));
+                    gip.mes.datamodel.FacilityCharge facilityCharge = databaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeIDVal);
                     gip.mes.datamodel.FacilityInventoryPos inventoryPos =
                         databaseApp
                         .FacilityInventoryPos
                         .Where(c =>
                                 c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo
-                                && c.FacilityChargeID == new Guid(facilityChargeID))
+                                && c.FacilityChargeID == facilityChargeIDVal)
                         .FirstOrDefault();
 
 
