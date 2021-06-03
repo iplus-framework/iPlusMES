@@ -1222,44 +1222,45 @@ namespace gip.mes.webservices
         #region Inventory -> Pos - Get
 
         public static readonly Func<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
-        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
-            (dbApp, facilityInventoryNo, inputCode, storageLocationNo, facilityNo, lotNo, materialNo, inventoryPosState, notAvailable, zeroStock, notProcessed) =>
-                dbApp.FacilityInventoryPos
-                        .Where(c =>
-                           (inputCode == null || c.FacilityChargeID == inputCode)
-                            && (
-                                    (storageLocationNo ?? "") == ""
-                                    || (c.FacilityCharge.Facility.Facility1_ParentFacility != null && c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo == storageLocationNo)
-                            )
-                            && ((facilityNo ?? "") == "" || c.FacilityCharge.Facility.FacilityNo == facilityNo)
-                            && ((lotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == lotNo))
-                            && ((materialNo ?? "") == "" || c.FacilityCharge.Material.MaterialNo == materialNo)
-                            && (inventoryPosState == null || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == inventoryPosState)
-                            && (notAvailable == null || c.NotAvailable == (notAvailable ?? false))
-                            && (zeroStock == null || (c.FacilityCharge.StockQuantity == 0) == (zeroStock ?? false))
-                            && (!notProcessed || (!c.NotAvailable && c.NewStockQuantity == null))
-                        )
-                        .Select(c => new FacilityInventoryPos()
-                        {
-                            FacilityInventoryPosID = c.FacilityInventoryPosID,
-                            Sequence = c.Sequence,
-                            Comment = c.Comment,
-                            LotNo = c.FacilityCharge.FacilityLot.LotNo,
-                            MaterialNo = c.FacilityCharge.Material.MaterialNo,
-                            MaterialName = c.FacilityCharge.Material.MaterialName1,
-                            ParentFacilityNo = c.FacilityCharge.Facility.Facility1_ParentFacility != null ? c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo : null,
-                            FacilityNo = c.FacilityCharge.Facility.FacilityNo,
-                            FacilityName = c.FacilityCharge.Facility.FacilityName,
-                            StockQuantity = c.StockQuantity,
-                            NewStockQuantity = c.NewStockQuantity,
-                            NotAvailable = c.NotAvailable,
-                            UpdateDate = c.UpdateDate,
-                            UpdateName = c.UpdateName,
-                            FacilityChargeID = c.FacilityChargeID,
-                            FacilityInventoryNo = c.FacilityInventory.FacilityInventoryNo,
-                            MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
-                        })
-        );
+       CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
+           (dbApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal) =>
+               dbApp.FacilityInventoryPos
+                       .Where(c =>
+                          c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo
+                          && (inputCodeVal == null || c.FacilityChargeID == inputCodeVal)
+                           && (
+                                   storageLocationNo == null
+                                   || (c.FacilityCharge.Facility.Facility1_ParentFacility != null && c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo == storageLocationNo)
+                           )
+                           && (facilityNo == null || c.FacilityCharge.Facility.FacilityNo == facilityNo)
+                           && (lotNo == null || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == lotNo))
+                           && (materialNo == null || c.FacilityCharge.Material.MaterialNo == materialNo)
+                           && (inventoryPosStateVal == null || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex <= inventoryPosStateVal)
+                           && (notAvailableVal == null || c.NotAvailable == (notAvailableVal ?? false))
+                           && (zeroStockVal == null || (c.FacilityCharge.StockQuantity == 0) == (zeroStockVal ?? false))
+                           && (!notProcessedVal || (!c.NotAvailable && c.NewStockQuantity == null))
+                       )
+                       .Select(c => new FacilityInventoryPos()
+                       {
+                           FacilityInventoryPosID = c.FacilityInventoryPosID,
+                           Sequence = c.Sequence,
+                           Comment = c.Comment,
+                           LotNo = c.FacilityCharge.FacilityLot.LotNo,
+                           MaterialNo = c.FacilityCharge.Material.MaterialNo,
+                           MaterialName = c.FacilityCharge.Material.MaterialName1,
+                           ParentFacilityNo = c.FacilityCharge.Facility.Facility1_ParentFacility != null ? c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo : null,
+                           FacilityNo = c.FacilityCharge.Facility.FacilityNo,
+                           FacilityName = c.FacilityCharge.Facility.FacilityName,
+                           StockQuantity = c.StockQuantity,
+                           NewStockQuantity = c.NewStockQuantity,
+                           NotAvailable = c.NotAvailable,
+                           UpdateDate = c.UpdateDate,
+                           UpdateName = c.UpdateName,
+                           FacilityChargeID = c.FacilityChargeID,
+                           FacilityInventoryNo = c.FacilityInventory.FacilityInventoryNo,
+                           MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
+                       })
+       );
         public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo,
             string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed)
         {
@@ -1268,10 +1269,10 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
-                    storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
-                    facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
-                    lotNo = lotNo != CoreWebServiceConst.EmptyParam ? lotNo : "";
-                    materialNo = materialNo != CoreWebServiceConst.EmptyParam ? materialNo : "";
+                    storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? storageLocationNo : null;
+                    facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : null;
+                    lotNo = lotNo != CoreWebServiceConst.EmptyParam ? lotNo : null;
+                    materialNo = materialNo != CoreWebServiceConst.EmptyParam ? materialNo : null;
 
                     short? inventoryPosStateVal = null;
                     if (!string.IsNullOrEmpty(inventoryPosState) && inventoryPosState != CoreWebServiceConst.EmptyParam)
@@ -1349,8 +1350,9 @@ namespace gip.mes.webservices
                             }
                         }
                     }
+
                     List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryLines(databaseApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo,
-                        lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal).OrderBy(c => c.Sequence).ToList();
+                       lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal).OrderBy(c => c.Sequence).ToList();
                     response.Data = items;
                 }
             }
@@ -1414,7 +1416,7 @@ namespace gip.mes.webservices
                             if (facilityInventoryPos.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
                                 dbFacilityInventoryPos.MDFacilityInventoryPosState = finishedState;
 
-                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                            MsgWithDetails saveMsg = databaseApp.ACSaveChanges(true, SaveOptions.AcceptAllChangesAfterSave, false, false);
                             if (saveMsg == null || saveMsg.IsSucceded())
                                 response.Data = true;
                             else
@@ -1450,10 +1452,11 @@ namespace gip.mes.webservices
             response.Data = result;
             try
             {
-                storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
+                storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? storageLocationNo : "";
                 facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    gip.mes.datamodel.FacilityCharge facilityCharge = databaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == new Guid(facilityChargeID));
                     gip.mes.datamodel.FacilityInventoryPos inventoryPos =
                         databaseApp
                         .FacilityInventoryPos
@@ -1461,21 +1464,34 @@ namespace gip.mes.webservices
                                 c.FacilityInventory.FacilityInventoryNo == facilityInventoryNo
                                 && c.FacilityChargeID == new Guid(facilityChargeID))
                         .FirstOrDefault();
-                    if (inventoryPos != null)
-                    {
-                        result.FacilityInventoryPos = GetFacilityInventoryPos(inventoryPos);
-                        result.States.Add(FacilityChargeStateEnum.Available);
 
-                        if (inventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
-                            result.States.Add(FacilityChargeStateEnum.AlreadyFinished);
+
+                    if (facilityCharge != null)
+                    {
+                        if (inventoryPos != null)
+                        {
+                            result.FacilityInventoryPos = GetFacilityInventoryPos(inventoryPos);
+                            result.States.Add(FacilityChargeStateEnum.Available);
+
+                            if (inventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished)
+                                result.States.Add(FacilityChargeStateEnum.AlreadyFinished);
+                        }
+                        else
+                            result.States.Add(FacilityChargeStateEnum.QuantNotAvailable);
 
                         if (!string.IsNullOrEmpty(facilityNo))
-                            if (inventoryPos.FacilityCharge.Facility.FacilityNo != facilityNo)
+                        {
+                            if (facilityCharge.Facility.FacilityNo != facilityNo)
+                            {
                                 result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
-                            else
-                            if (inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility != null
-                                && inventoryPos.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo != storageLocationNo)
-                                result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                                result.DifferentFacilityNo = facilityCharge.Facility.FacilityNo;
+                            }
+                        }
+                        else if (facilityCharge.Facility.Facility1_ParentFacility != null && facilityCharge.Facility.Facility1_ParentFacility.FacilityNo != storageLocationNo)
+                        {
+                            result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                            result.DifferentFacilityNo = facilityCharge.Facility.Facility1_ParentFacility.FacilityNo;
+                        }
                     }
                     else
                         result.States.Add(FacilityChargeStateEnum.NotExist);
@@ -1523,6 +1539,7 @@ namespace gip.mes.webservices
                             mesPos.StockQuantity = facilityCharge.StockQuantityUOM;
                             mesPos.NotAvailable = facilityCharge.NotAvailable;
                             databaseApp.FacilityInventoryPos.AddObject(mesPos);
+                            var rez = databaseApp.ACSaveChanges();
 
                             response.Data = GetFacilityInventoryPos(mesPos);
                         }

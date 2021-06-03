@@ -199,8 +199,6 @@ namespace gip.bso.facility
 
         #region Properties -> Filter -> InventoryPos -> FilterInventoryPosStorageLocation
 
-
-
         ACAccessNav<Facility> _AccessFilterInventoryPosStorageLocation;
         [ACPropertyAccess(400, "FilterInventoryPosStorageLocation")]
         public ACAccessNav<Facility> AccessFilterInventoryPosStorageLocation
@@ -406,8 +404,7 @@ namespace gip.bso.facility
 
         #endregion
 
-
-        #region FilterInventoryPosMaterial
+        #region Properties -> Filter -> InventoryPos -> Material (FilterInventoryPosMaterial)
 
         ACAccessNav<Material> _AccessFilterInventoryPosMaterial;
         [ACPropertyAccess(200, "FilterInventoryPosMaterial")]
@@ -464,6 +461,8 @@ namespace gip.bso.facility
         }
 
         #endregion
+
+        #region Properties -> Filter -> Pos (Quantity) State
 
         private string _FilterInventoryPosLotNo;
         [ACPropertyInfo(104, "FilterInventoryPosLotNo", ConstApp.LotNo)]
@@ -541,7 +540,9 @@ namespace gip.bso.facility
             }
         }
 
-        #region Properties -> Filter-> FilterInventoryPosState (MDFacilityInventoryPosState)
+        #endregion
+
+        #region Properties -> Filter-> State (FilterInventoryPosState) (MDFacilityInventoryPosState)
 
         private MDFacilityInventoryPosState _SelectedFilterInventoryPosState;
         /// <summary>
@@ -590,25 +591,31 @@ namespace gip.bso.facility
 
         #endregion
 
-
-        private bool _FilterInventoryPosFBConnected = false;
-        [ACPropertyInfo(105, "FilterInventoryPosFBConnected", "en{'Connect Position with Booking'}de{'Verbinde Pos mit Buchung'}")]
-        public bool FilterInventoryPosFBConnected
+        private int _FilterPosPageSize = 500;
+        [ACPropertyInfo(120, "FilterPosPageSize", "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}")]
+        public int FilterPosPageSize
         {
             get
             {
-                return _FilterInventoryPosFBConnected;
+                return _FilterPosPageSize;
             }
             set
             {
-                if (_FilterInventoryPosFBConnected != value)
+                if (_FilterPosPageSize != value)
                 {
-                    _FilterInventoryPosFBConnected = value;
-                    OnPropertyChanged("FilterInventoryPosFBConnected");
-                    SetFacilityBookingList();
+                    _FilterPosPageSize = value;
+                    OnPropertyChanged("FilterPosPageSize");
                 }
             }
         }
+
+        #endregion
+
+        #endregion
+
+        #region Properties -> Editor
+
+        #region Properties -> Editor -> Pos Editor Enabled
 
         private bool _IsEnabledInventoryEdit;
         public bool IsEnabledInventoryEdit
@@ -674,11 +681,10 @@ namespace gip.bso.facility
                 }
             }
         }
-        #endregion
 
         #endregion
 
-        #region Properties -> InputCode
+        #region Properties -> Editor -> InputCode
 
 
         private string _InputCode;
@@ -752,8 +758,9 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region Properties -> AccessNav
+        #endregion
 
+        #region Properties -> AccessNav
 
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
@@ -882,12 +889,15 @@ namespace gip.bso.facility
                     OnPropertyChanged("SelectedFacilityInventory");
 
                     SetFacilityInventoryPosList();
-                    SetNotUsedFacilityChargeList();
-                    SetFacilityBookingList();
+
+                    ClearFilterInventoryFacilityBookingCharge();
+                    ClearInventoryFacilityBookingCharge();
+
+                    ClearFilterNotUsedCharge();
+                    ClearNotUserdFaciltiyChargeList();
                 }
             }
         }
-
 
         private List<FacilityInventory> _FacilityInventoryList;
         /// <summary>
@@ -945,8 +955,7 @@ namespace gip.bso.facility
                         SelectedFacilityInventoryPos.PropertyChanged -= SelectedFacilityInventoryPos_PropertyChanged;
                         SelectedFacilityInventoryPos.PropertyChanged += SelectedFacilityInventoryPos_PropertyChanged;
                     }
-                    if (FilterInventoryPosFBConnected)
-                        SetFacilityBookingList();
+                    SetInventoryPosFacilityBookingList();
                 }
             }
         }
@@ -954,21 +963,31 @@ namespace gip.bso.facility
         private void _SelectedFacilityInventoryPos_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             FacilityInventoryPos item = sender as FacilityInventoryPos;
-            MDFacilityInventoryPosState stateInProgress =
-                FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
             if (e.PropertyName == "NotAvailable")
             {
                 if (item.NotAvailable)
                     item.NewStockQuantity = null;
                 if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
+                {
+                    MDFacilityInventoryPosState stateInProgress =
+                        item.GetObjectContext<DatabaseApp>()
+                        .MDFacilityInventoryPosState
+                        .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
                     item.MDFacilityInventoryPosState = stateInProgress;
+                }
                 OnPropertyChanged("SelectedFacilityInventoryPos");
             }
             else if (e.PropertyName == "NewStockQuantity")
             {
                 item.NotAvailable = false;
                 if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
+                {
+                    MDFacilityInventoryPosState stateInProgress =
+                      item.GetObjectContext<DatabaseApp>()
+                      .MDFacilityInventoryPosState
+                      .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
                     item.MDFacilityInventoryPosState = stateInProgress;
+                }
                 OnPropertyChanged("SelectedFacilityInventoryPos");
             }
         }
@@ -1011,7 +1030,18 @@ namespace gip.bso.facility
             return SelectedFacilityInventory
                 .FacilityInventoryPos_FacilityInventory
                 .Where(c =>
-                    FilterFacilityCharge(c.FacilityCharge)
+                    ((InputCode ?? "") == "" || c.FacilityCharge.FacilityChargeID == new Guid(InputCode))
+                    && (
+                            SelectedFilterInventoryPosStorageLocation == null
+                            ||
+                            (
+                             c.FacilityCharge.Facility.Facility1_ParentFacility != null
+                             && c.FacilityCharge.Facility.Facility1_ParentFacility.FacilityNo == SelectedFilterInventoryPosStorageLocation.FacilityNo
+                            )
+                        )
+                    && (SelectedFilterInventoryPosFacility == null || c.FacilityCharge.Facility.FacilityNo == SelectedFilterInventoryPosFacility.FacilityNo)
+                    && ((FilterInventoryPosLotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo))
+                    && (SelectedFilterInventoryPosMaterial == null || c.FacilityCharge.Material.MaterialNo == SelectedFilterInventoryPosMaterial.MaterialNo)
                     && (SelectedFilterInventoryPosState == null || c.MDFacilityInventoryPosState.MDKey == SelectedFilterInventoryPosState.MDKey)
                     && (
                             FilterInventoryPosNotAvailable == null
@@ -1028,6 +1058,7 @@ namespace gip.bso.facility
                        )
                  )
                 .OrderBy(c => c.Sequence)
+                .Take(FilterPosPageSize)
                 .ToList();
         }
 
@@ -1043,8 +1074,96 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region Property -> NotUsedFacilityCharge
 
+        #region Property -> FilterNotUsedCharge
+
+        private string _FilterNotUsedChargeMaterial;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeMaterial
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterNotUsedChargeMaterial", "en{'Material'}de{'Material'}")]
+        public string FilterNotUsedChargeMaterial
+        {
+            get
+            {
+                return _FilterNotUsedChargeMaterial;
+            }
+            set
+            {
+                if (_FilterNotUsedChargeMaterial != value)
+                {
+                    _FilterNotUsedChargeMaterial = value;
+                    OnPropertyChanged("FilterNotUsedChargeMaterial");
+                }
+            }
+        }
+
+        private string _FilterNotUsedChargeFacility;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeFacility
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterNotUsedChargeFacility", "en{'Facility'}de{'Lagerplatz'}")]
+        public string FilterNotUsedChargeFacility
+        {
+            get
+            {
+                return _FilterNotUsedChargeFacility;
+            }
+            set
+            {
+                if (_FilterNotUsedChargeFacility != value)
+                {
+                    _FilterNotUsedChargeFacility = value;
+                    OnPropertyChanged("FilterNotUsedChargeFacility");
+                }
+            }
+        }
+
+        private string _FilterNotUsedChargeLotNo;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeLotNo
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterNotUsedChargeLotNo", "en{'Lot'}de{'Los'}")]
+        public string FilterNotUsedChargeLotNo
+        {
+            get
+            {
+                return _FilterNotUsedChargeLotNo;
+            }
+            set
+            {
+                if (_FilterNotUsedChargeLotNo != value)
+                {
+                    _FilterNotUsedChargeLotNo = value;
+                    OnPropertyChanged("FilterNotUsedChargeLotNo");
+                }
+            }
+        }
+
+        private int _FilterNotUsedChargePageSize = 500;
+        [ACPropertyInfo(120, "FilterPosPageSize", "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}")]
+        public int FilterNotUsedChargePageSize
+        {
+            get
+            {
+                return _FilterNotUsedChargePageSize;
+            }
+            set
+            {
+                if (_FilterNotUsedChargePageSize != value)
+                {
+                    _FilterNotUsedChargePageSize = value;
+                    OnPropertyChanged("FilterNotUsedChargePageSize");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Property -> NotUsedFacilityCharge
 
         #region NotUsedFacilityCharge
         private FacilityCharge _SelectedNotUsedFacilityCharge;
@@ -1080,11 +1199,349 @@ namespace gip.bso.facility
         {
             get
             {
-                if (_NotUsedFacilityChargeList == null)
-                    _NotUsedFacilityChargeList = LoadNotUsedFacilityChargeList();
                 return _NotUsedFacilityChargeList;
             }
         }
+
+        #endregion
+
+
+        #endregion
+
+        #region Property -> FilterInventoryFaciltiyBookingCharge
+
+
+        private string _FilterInventoryFaciltiyBookingChargeMaterial;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeMaterial
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterInventoryFaciltiyBookingChargeMaterial", "en{'Material'}de{'Material'}")]
+        public string FilterInventoryFaciltiyBookingChargeMaterial
+        {
+            get
+            {
+                return _FilterInventoryFaciltiyBookingChargeMaterial;
+            }
+            set
+            {
+                if (_FilterInventoryFaciltiyBookingChargeMaterial != value)
+                {
+                    _FilterInventoryFaciltiyBookingChargeMaterial = value;
+                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargeMaterial");
+                }
+            }
+        }
+
+        private string _FilterInventoryFaciltiyBookingChargeFacility;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeFacility
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterInventoryFaciltiyBookingChargeFacility", "en{'Facility'}de{'Lagerplatz'}")]
+        public string FilterInventoryFaciltiyBookingChargeFacility
+        {
+            get
+            {
+                return _FilterInventoryFaciltiyBookingChargeFacility;
+            }
+            set
+            {
+                if (_FilterInventoryFaciltiyBookingChargeFacility != value)
+                {
+                    _FilterInventoryFaciltiyBookingChargeFacility = value;
+                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargeFacility");
+                }
+            }
+        }
+
+        private string _FilterInventoryFaciltiyBookingChargeLotNo;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeLotNo
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterInventoryFaciltiyBookingChargeLotNo", "en{'Lot'}de{'Los'}")]
+        public string FilterInventoryFaciltiyBookingChargeLotNo
+        {
+            get
+            {
+                return _FilterInventoryFaciltiyBookingChargeLotNo;
+            }
+            set
+            {
+                if (_FilterInventoryFaciltiyBookingChargeLotNo != value)
+                {
+                    _FilterInventoryFaciltiyBookingChargeLotNo = value;
+                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargeLotNo");
+                }
+            }
+        }
+
+        private int _FilterInventoryFaciltiyBookingChargePageSize = 500;
+        [ACPropertyInfo(120, "FilterInventoryFaciltiyBookingChargePageSize", "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}")]
+        public int FilterInventoryFaciltiyBookingChargePageSize
+        {
+            get
+            {
+                return _FilterInventoryFaciltiyBookingChargePageSize;
+            }
+            set
+            {
+                if (_FilterInventoryFaciltiyBookingChargePageSize != value)
+                {
+                    _FilterInventoryFaciltiyBookingChargePageSize = value;
+                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargePageSize");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Property ->  InventoryFacilityBookingCharge
+        private FacilityBookingCharge _SelectedInventoryFacilityBookingCharge;
+        /// <summary>
+        /// Selected property for FacilityBookingCharge
+        /// </summary>
+        /// <value>The selected FacilityBookingCharge</value>
+        [ACPropertySelected(400, "InventoryFacilityBookingCharge", "en{'TODO: FacilityBookingCharge'}de{'TODO: FacilityBookingCharge'}")]
+        public FacilityBookingCharge SelectedInventoryFacilityBookingCharge
+        {
+            get
+            {
+                return _SelectedInventoryFacilityBookingCharge;
+            }
+            set
+            {
+                if (_SelectedInventoryFacilityBookingCharge != value)
+                {
+                    _SelectedInventoryFacilityBookingCharge = value;
+                    OnPropertyChanged("SelectedInventoryFacilityBookingCharge");
+                }
+            }
+        }
+
+        private List<FacilityBookingCharge> _InventoryFacilityBookingChargeList;
+        /// <summary>
+        /// List property for FacilityBookingCharge
+        /// </summary>
+        /// <value>The FacilityBookingCharge list</value>
+        [ACPropertyList(401, "InventoryFacilityBookingCharge")]
+        public List<FacilityBookingCharge> InventoryFacilityBookingChargeList
+        {
+            get
+            {
+                return _InventoryFacilityBookingChargeList;
+            }
+        }
+
+        #endregion
+
+        #region Property ->  InventoryPosFacilityBooking
+
+        private FacilityBooking _SelectedInventoryPosFacilityBooking;
+        /// <summary>
+        /// Selected property for FacilityBooking
+        /// </summary>
+        /// <value>The selected FacilityBooking</value>
+        [ACPropertySelected(300, "InventoryPosFacilityBooking", "en{'TODO: FacilityBooking'}de{'TODO: FacilityBooking'}")]
+        public FacilityBooking SelectedInventoryPosFacilityBooking
+        {
+            get
+            {
+                return _SelectedInventoryPosFacilityBooking;
+            }
+            set
+            {
+                if (_SelectedInventoryPosFacilityBooking != value)
+                {
+                    _SelectedInventoryPosFacilityBooking = value;
+                    OnPropertyChanged("SelectedInventoryPosFacilityBooking");
+
+                    _InventoryPosFacilityBookingChargeList = LoadInventoryPosFacilityBookingChargeList();
+                    OnPropertyChanged("InventoryPosFacilityBookingChargeList");
+                    if (_InventoryPosFacilityBookingChargeList != null)
+                        SelectedInventoryPosFacilityBookingCharge = _InventoryPosFacilityBookingChargeList.FirstOrDefault();
+                    else
+                        SelectedInventoryPosFacilityBookingCharge = null;
+                }
+            }
+        }
+
+        private List<FacilityBooking> _InventoryPosFacilityBookingList;
+        /// <summary>
+        /// List property for FacilityBooking
+        /// </summary>
+        /// <value>The FacilityBooking list</value>
+        [ACPropertyList(301, "InventoryPosFacilityBooking")]
+        public List<FacilityBooking> InventoryPosFacilityBookingList
+        {
+            get
+            {
+                return _InventoryPosFacilityBookingList;
+            }
+        }
+
+        private List<FacilityBooking> GetInventoryPosFacilityBookingList()
+        {
+            List<FacilityBooking> bookings = null;
+            if (SelectedFacilityInventoryPos != null)
+            {
+                SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.AutoLoad();
+                bookings = SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.OrderBy(c => c.FacilityBookingNo).ToList();
+            }
+            return bookings;
+        }
+
+        public void SetInventoryPosFacilityBookingList()
+        {
+            _InventoryPosFacilityBookingList = GetInventoryPosFacilityBookingList();
+            OnPropertyChanged("InventoryPosFacilityBookingList");
+            if (_InventoryPosFacilityBookingList != null)
+                SelectedInventoryPosFacilityBooking = _InventoryPosFacilityBookingList.FirstOrDefault();
+            else
+                SelectedInventoryPosFacilityBooking = null;
+        }
+        #endregion
+
+        #region Property ->  InventoryPosFacilityBookingCharge
+        private FacilityBookingCharge _SelectedInventoryPosFacilityBookingCharge;
+        /// <summary>
+        /// Selected property for FacilityBookingCharge
+        /// </summary>
+        /// <value>The selected FacilityBookingCharge</value>
+        [ACPropertySelected(400, "InventoryPosFacilityBookingCharge", "en{'TODO: FacilityBookingCharge'}de{'TODO: FacilityBookingCharge'}")]
+        public FacilityBookingCharge SelectedInventoryPosFacilityBookingCharge
+        {
+            get
+            {
+                return _SelectedInventoryPosFacilityBookingCharge;
+            }
+            set
+            {
+                if (_SelectedInventoryPosFacilityBookingCharge != value)
+                {
+                    _SelectedInventoryPosFacilityBookingCharge = value;
+                    OnPropertyChanged("SelectedInventoryPosFacilityBookingCharge");
+                }
+            }
+        }
+
+        private List<FacilityBookingCharge> _InventoryPosFacilityBookingChargeList;
+        /// <summary>
+        /// List property for FacilityBookingCharge
+        /// </summary>
+        /// <value>The FacilityBookingCharge list</value>
+        [ACPropertyList(401, "InventoryPosFacilityBookingCharge")]
+        public List<FacilityBookingCharge> InventoryPosFacilityBookingChargeList
+        {
+            get
+            {
+                if (_InventoryPosFacilityBookingChargeList == null)
+                    _InventoryPosFacilityBookingChargeList = LoadInventoryPosFacilityBookingChargeList();
+                return _InventoryPosFacilityBookingChargeList;
+            }
+        }
+
+        private List<FacilityBookingCharge> LoadInventoryPosFacilityBookingChargeList()
+        {
+            if (SelectedInventoryPosFacilityBooking == null) return null;
+            return SelectedInventoryPosFacilityBooking.FacilityBookingCharge_FacilityBooking.ToList();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Methods
+
+        #region Methods -> InventoryFacilityBookingCharge
+
+        private List<FacilityBookingCharge> LoadInventoryFacilityBookingChargeList()
+        {
+            if (SelectedFacilityInventory == null) return null;
+            return SelectedFacilityInventory
+                .FacilityInventoryPos_FacilityInventory
+                .SelectMany(c => c.FacilityBookingCharge_FacilityInventoryPos)
+                .Where(c =>
+                    // FilterInventoryFaciltiyBookingChargeMaterial
+                    (FilterInventoryFaciltiyBookingChargeMaterial == null
+                        || (
+                            c.InwardMaterial != null
+                            && (
+                                    c.InwardMaterial.MaterialNo.ToLower().Contains(FilterInventoryFaciltiyBookingChargeMaterial.ToLower())
+                                    || c.InwardMaterial.MaterialName1.ToLower().Contains(FilterInventoryFaciltiyBookingChargeMaterial.ToLower())
+                                )
+                           )
+                        || (
+                            c.OutwardMaterial != null
+                            && (
+                                    c.OutwardMaterial.MaterialNo.ToLower().Contains(FilterInventoryFaciltiyBookingChargeMaterial.ToLower())
+                                    || c.OutwardMaterial.MaterialName1.ToLower().Contains(FilterInventoryFaciltiyBookingChargeMaterial.ToLower())
+                                )
+                            )
+                       )
+                       // FilterInventoryFaciltiyBookingChargeFacility
+                       && (FilterInventoryFaciltiyBookingChargeFacility == null
+                            || (
+                                c.InwardFacility != null
+                                && (
+                                        c.InwardFacility.FacilityNo.ToLower().Contains(FilterInventoryFaciltiyBookingChargeFacility.ToLower())
+                                        || c.InwardFacility.FacilityName.ToLower().Contains(FilterInventoryFaciltiyBookingChargeFacility.ToLower())
+                                   )
+                               )
+                            || (
+                                c.OutwardFacility != null
+                                && (
+                                        c.OutwardFacility.FacilityNo.ToLower().Contains(FilterInventoryFaciltiyBookingChargeFacility.ToLower())
+                                        || c.OutwardFacility.FacilityName.ToLower().Contains(FilterInventoryFaciltiyBookingChargeFacility.ToLower())
+                                   )
+                               )
+                           )
+                        // FilterInventoryFaciltiyBookingChargeLotNo
+                        && (FilterInventoryFaciltiyBookingChargeLotNo == null
+                        || (
+                                c.InwardFacilityCharge != null && c.InwardFacilityCharge.FacilityLot != null
+                                && c.InwardFacilityCharge.FacilityLot.LotNo.Contains(FilterInventoryFaciltiyBookingChargeLotNo)
+                            )
+                        || (
+                                c.OutwardFacilityCharge != null && c.OutwardFacilityCharge.FacilityLot != null
+                                && c.OutwardFacilityCharge.FacilityLot.LotNo.Contains(FilterInventoryFaciltiyBookingChargeLotNo)
+                            )
+                        )
+                 )
+                .OrderBy(c => c.FacilityBookingChargeNo)
+                .Take(FilterInventoryFaciltiyBookingChargePageSize)
+                .ToList();
+        }
+
+        [ACMethodInfo("SearchFacilityInventoryFacilityBookingCharge", "en{'Search'}de{'Suche'}", 321)]
+        public void SearchFacilityInventoryFacilityBookingCharge()
+        {
+            _InventoryFacilityBookingChargeList = LoadInventoryFacilityBookingChargeList();
+            OnPropertyChanged("InventoryFacilityBookingChargeList");
+            if (_InventoryFacilityBookingChargeList != null)
+                SelectedInventoryFacilityBookingCharge = _InventoryFacilityBookingChargeList.FirstOrDefault();
+            else
+                SelectedInventoryFacilityBookingCharge = null;
+        }
+
+        private void ClearInventoryFacilityBookingCharge()
+        {
+            _InventoryFacilityBookingChargeList = null;
+            OnPropertyChanged("InventoryFacilityBookingChargeList");
+        }
+
+        private void ClearFilterInventoryFacilityBookingCharge()
+        {
+            FilterInventoryFaciltiyBookingChargeMaterial = null;
+            FilterInventoryFaciltiyBookingChargeFacility = null;
+            FilterInventoryFaciltiyBookingChargeLotNo = null;
+            FilterInventoryFaciltiyBookingChargePageSize = 500;
+        }
+
+        #endregion
+
+        #region Methods -> NotUsedFacilityCharge
 
         private List<FacilityCharge> LoadNotUsedFacilityChargeList()
         {
@@ -1100,38 +1557,37 @@ namespace gip.bso.facility
                 .AsEnumerable()
                 .Where(c =>
                     !usedFacilityChargeIDs.Contains(c.FacilityChargeID)
-                    && ((InputCode ?? "") == "" || c.FacilityChargeID == new Guid(InputCode))
-                    && FilterFacilityCharge(c)
-                    && (
-                            FilterInventoryPosNotAvailable == null
-                            // both true or both false - ! exclusive OR ^
-                            || !(c.NotAvailable ^ (FilterInventoryPosNotAvailable ?? false))
-                       )
-                    && (
-                            FilterInventoryPosZeroQuantity == null
-                            || !((c.StockQuantity == 0) ^ (FilterInventoryPosZeroQuantity ?? false))
-                       )
+                    &&
+                        (
+                            FilterNotUsedChargeMaterial == null
+                            ||
+                            (
+                                c.Material.MaterialNo.ToLower().Contains(FilterNotUsedChargeMaterial.ToLower())
+                                || c.Material.MaterialName1.ToLower().Contains(FilterNotUsedChargeMaterial.ToLower())
+                            )
+                         )
+                    &&
+                        (
+                            FilterNotUsedChargeFacility == null
+                            ||
+                            (
+                                c.Facility.FacilityNo.ToLower().Contains(FilterNotUsedChargeFacility.ToLower())
+                                || c.Facility.FacilityName.ToLower().Contains(FilterNotUsedChargeFacility.ToLower())
+                            )
+                         )
+                    &&
+                        (
+                            FilterNotUsedChargeLotNo == null
+                            || c.FacilityLot.LotNo.Contains(FilterNotUsedChargeLotNo)
+                         )
+
                 ).OrderBy(c => c.FacilityLot.LotNo)
+                .Take(FilterNotUsedChargePageSize)
                 .ToList();
         }
 
-        public bool FilterFacilityCharge(FacilityCharge facilityCharge)
-        {
-            return ((InputCode ?? "") == "" || facilityCharge.FacilityChargeID == new Guid(InputCode))
-                    && (
-                            SelectedFilterInventoryPosStorageLocation == null
-                            ||
-                            (
-                             facilityCharge.Facility.Facility1_ParentFacility != null
-                             && facilityCharge.Facility.Facility1_ParentFacility.FacilityNo == SelectedFilterInventoryPosStorageLocation.FacilityNo
-                            )
-                        )
-                    && (SelectedFilterInventoryPosFacility == null || facilityCharge.Facility.FacilityNo == SelectedFilterInventoryPosFacility.FacilityNo)
-                    && ((FilterInventoryPosLotNo ?? "") == "" || (facilityCharge.FacilityLot != null && facilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo))
-                    && (SelectedFilterInventoryPosMaterial == null || facilityCharge.Material.MaterialNo == SelectedFilterInventoryPosMaterial.MaterialNo);
-        }
-
-        public void SetNotUsedFacilityChargeList()
+        [ACMethodInfo("SearchNotUsedFaciltiyCharge", "en{'Search'}de{'Suche'}", 212)]
+        public void SearchNotUsedFaciltiyCharge()
         {
             _NotUsedFacilityChargeList = LoadNotUsedFacilityChargeList();
             OnPropertyChanged("NotUsedFacilityChargeList");
@@ -1140,140 +1596,22 @@ namespace gip.bso.facility
             else
                 SelectedNotUsedFacilityCharge = null;
         }
-        #endregion
 
-
-        #endregion
-
-        #region Property ->  FacilityBooking
-        private FacilityBooking _SelectedFacilityBooking;
-        /// <summary>
-        /// Selected property for FacilityBooking
-        /// </summary>
-        /// <value>The selected FacilityBooking</value>
-        [ACPropertySelected(300, "FacilityBooking", "en{'TODO: FacilityBooking'}de{'TODO: FacilityBooking'}")]
-        public FacilityBooking SelectedFacilityBooking
+        private void ClearNotUserdFaciltiyChargeList()
         {
-            get
-            {
-                return _SelectedFacilityBooking;
-            }
-            set
-            {
-                if (_SelectedFacilityBooking != value)
-                {
-                    _SelectedFacilityBooking = value;
-                    OnPropertyChanged("SelectedFacilityBooking");
-
-                    _FacilityBookingChargeList = LoadFacilityBookingChargeList();
-                    OnPropertyChanged("FacilityBookingChargeList");
-                    if (_FacilityBookingChargeList != null)
-                        SelectedFacilityBookingCharge = _FacilityBookingChargeList.FirstOrDefault();
-                    else
-                        SelectedFacilityBookingCharge = null;
-                }
-            }
+            _NotUsedFacilityChargeList = null;
+            OnPropertyChanged("NotUsedFacilityChargeList");
         }
 
-        private List<FacilityBooking> _FacilityBookingList;
-        /// <summary>
-        /// List property for FacilityBooking
-        /// </summary>
-        /// <value>The FacilityBooking list</value>
-        [ACPropertyList(301, "FacilityBooking")]
-        public List<FacilityBooking> FacilityBookingList
+        private void ClearFilterNotUsedCharge()
         {
-            get
-            {
-                return _FacilityBookingList;
-            }
+            FilterNotUsedChargeMaterial = null;
+            FilterNotUsedChargeFacility = null;
+            FilterNotUsedChargeLotNo = null;
+            FilterNotUsedChargePageSize = 500;
         }
-
-        private List<FacilityBooking> GetFacilityBookingList()
-        {
-            List<FacilityBooking> bookings = null;
-
-            if (FilterInventoryPosFBConnected)
-            {
-                if (SelectedFacilityInventoryPos != null)
-                {
-                    SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.AutoLoad();
-                    bookings = SelectedFacilityInventoryPos.FacilityBooking_FacilityInventoryPos.OrderBy(c => c.FacilityBookingNo).ToList();
-                }
-            }
-            else
-            {
-                if (FacilityInventoryPosList != null && FacilityInventoryPosList.Any())
-                {
-                    foreach (var item in FacilityInventoryPosList)
-                        item.FacilityBooking_FacilityInventoryPos.AutoLoad();
-                    bookings = FacilityInventoryPosList.SelectMany(c => c.FacilityBooking_FacilityInventoryPos).OrderBy(c => c.FacilityBookingNo).ToList();
-                }
-            }
-            return bookings;
-        }
-
-        public void SetFacilityBookingList()
-        {
-            _FacilityBookingList = GetFacilityBookingList();
-            OnPropertyChanged("FacilityBookingList");
-            if (_FacilityBookingList != null)
-                SelectedFacilityBooking = _FacilityBookingList.FirstOrDefault();
-            else
-                SelectedFacilityBooking = null;
-        }
-        #endregion
-
-        #region Property ->  FacilityBookingCharge
-        private FacilityBookingCharge _SelectedFacilityBookingCharge;
-        /// <summary>
-        /// Selected property for FacilityBookingCharge
-        /// </summary>
-        /// <value>The selected FacilityBookingCharge</value>
-        [ACPropertySelected(400, "FacilityBookingCharge", "en{'TODO: FacilityBookingCharge'}de{'TODO: FacilityBookingCharge'}")]
-        public FacilityBookingCharge SelectedFacilityBookingCharge
-        {
-            get
-            {
-                return _SelectedFacilityBookingCharge;
-            }
-            set
-            {
-                if (_SelectedFacilityBookingCharge != value)
-                {
-                    _SelectedFacilityBookingCharge = value;
-                    OnPropertyChanged("SelectedFacilityBookingCharge");
-                }
-            }
-        }
-
-
-        private List<FacilityBookingCharge> _FacilityBookingChargeList;
-        /// <summary>
-        /// List property for FacilityBookingCharge
-        /// </summary>
-        /// <value>The FacilityBookingCharge list</value>
-        [ACPropertyList(401, "FacilityBookingCharge")]
-        public List<FacilityBookingCharge> FacilityBookingChargeList
-        {
-            get
-            {
-                if (_FacilityBookingChargeList == null)
-                    _FacilityBookingChargeList = LoadFacilityBookingChargeList();
-                return _FacilityBookingChargeList;
-            }
-        }
-
-        private List<FacilityBookingCharge> LoadFacilityBookingChargeList()
-        {
-            if (SelectedFacilityBooking == null) return null;
-            return SelectedFacilityBooking.FacilityBookingCharge_FacilityBooking.ToList();
-        }
-        #endregion
 
         #endregion
-
-        #region Methods
 
         #region Methods -> ACvbBSO
 
@@ -1310,7 +1648,6 @@ namespace gip.bso.facility
                 SelectedFacilityInventory.AutoRefresh();
                 OnPropertyChanged("SelectedFacilityInventory");
                 SetFacilityInventoryPosList();
-                SetNotUsedFacilityChargeList();
             }
         }
 
@@ -1327,7 +1664,6 @@ namespace gip.bso.facility
             if (!IsEnabledSearchPos())
                 return;
             SetFacilityInventoryPosList();
-            SetNotUsedFacilityChargeList();
         }
 
         public bool IsEnabledSearchPos()
@@ -1782,7 +2118,17 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override object Clone()
+        {
+            object clonedObject = base.Clone();
+            BSOFacilityInventory cloned = clonedObject as BSOFacilityInventory;
+            cloned.SelectedFacilityInventoryPos = SelectedFacilityInventoryPos;
+            return cloned;
+        }
+
         #endregion
+
+
 
         #endregion
 
@@ -1864,7 +2210,7 @@ namespace gip.bso.facility
                             SelectedFacilityInventory.AutoRefresh();
                             OnPropertyChanged("SelectedFacilityInventory");
                             OnPropertyChanged("FacilityInventoryList");
-                            SetFacilityBookingList();
+                            SetInventoryPosFacilityBookingList();
                         }
                         else
                         {

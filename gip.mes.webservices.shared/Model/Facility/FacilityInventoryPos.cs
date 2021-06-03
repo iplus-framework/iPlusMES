@@ -79,6 +79,11 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        public MDFacilityInventoryPosState MDFacilityInventoryPosState
+        {
+            get; set;
+        }
+
 
         [DataMember(Name = "StQ")]
         public double StockQuantity

@@ -7,6 +7,7 @@ namespace gip.mes.webservices
     public enum FacilityChargeStateEnum
     {
         NotExist,
+        QuantNotAvailable,
         Available,
         InDifferentFacility,
         AlreadyFinished
