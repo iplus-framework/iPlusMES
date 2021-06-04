@@ -30,6 +30,8 @@ namespace gip.mes.datamodel
     {
         public const string ClassName = "MaterialConfig";
 
+        public const string SingleDosingMaterialConfigKeyACUrl = "SingleDosingConfiguration";
+
         #region New/Delete
         /// <summary>
         /// Handling von Sequencenummer wird automatisch bei der Anlage durchgeführt

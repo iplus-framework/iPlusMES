@@ -239,6 +239,7 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("MaterialUnitList");
                     OnPropertyChanged("ConvertableUnits");
                     OnPropertyChanged("TranslationList");
+                    OnPropertyChanged("SingleDosingConfigList");
                 }
             }
         }
@@ -1396,6 +1397,120 @@ namespace gip.bso.masterdata
 
         #endregion
 
+
+        #endregion
+
+        #region Single dosing workflow rules
+
+        #region Properties
+
+        [ACPropertySelected(800, "SingleDosing")]
+        public gip.mes.datamodel.MaterialConfig SingleDosingConfig
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyList(800, "SingleDosing")]
+        public List<gip.mes.datamodel.MaterialConfig> SingleDosingConfigList
+        {
+            get
+            {
+                return SelectedMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.SingleDosingMaterialConfigKeyACUrl).ToList();
+            }
+        }
+
+        private core.datamodel.ACClassWF _SelectedWorkflowRoot;
+        [ACPropertySelected(800, "WF", "en{'Single dosing workflow'}de{'Einzeldosierung Workflow'}")]
+        public core.datamodel.ACClassWF SelectedWorkflowRoot
+        {
+            get => _SelectedWorkflowRoot;
+            set
+            {
+                _SelectedWorkflowRoot = value;
+                OnPropertyChanged("SelectedWorkflowRoot");
+                OnPropertyChanged("SingleDosingMachineList");
+            }
+        }
+
+        [ACPropertyList(800, "WF")]
+        public IEnumerable<core.datamodel.ACClassWF> WorkflowRootList
+        {
+            get
+            {
+                return this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue
+                                                                && (c.PWACClass.ACIdentifier == mes.processapplication.PWMethodRelocation.PWClassName
+                                                                    || (c.PWACClass.BasedOnACClassID.HasValue
+                                                                        && (c.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodRelocation.PWClassName
+                                                                            || (c.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodRelocation.PWClassName))))
+                                                                && !c.ACClassMethod.IsSubMethod);
+            }
+        }
+
+        [ACPropertyInfo(810, "SDMachine", "en{'Single dosing machine'}de{'Einzel-Dosiermaschine'}")]
+        public core.datamodel.ACClass SelectedSingleDosingMachine
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyList(810, "SDMachine")]
+        public IEnumerable<core.datamodel.ACClass> SingleDosingMachineList
+        {
+            get
+            {
+                if (SelectedWorkflowRoot == null)
+                    return null;
+
+                var subWorkflows = SelectedWorkflowRoot.ACClassWF_ParentACClassWF.Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeWorkflow);
+
+                var pwGroups = subWorkflows.SelectMany(x => x.RefPAACClassMethod.ACClassWF_ACClassMethod).Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWGroup);
+
+                var possibleMachines = pwGroups.SelectMany(c => c.RefPAACClass.ACClass_BasedOnACClass).Where(c => c.ACStartTypeIndex != (short)Global.ACStartTypes.Disabled &&
+                                                                                                                  c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application);
+
+                return possibleMachines;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        [ACMethodInfo("", "en{'Add single dosing rule'}de{'Regel für Einzeldosierung hinzufügen'}", 800)]
+        public void AddSingleDosingConfig()
+        {
+            gip.mes.datamodel.MaterialConfig singleDosConfig = gip.mes.datamodel.MaterialConfig.NewACObject(DatabaseApp, CurrentMaterial);
+            singleDosConfig.KeyACUrl = MaterialConfig.SingleDosingMaterialConfigKeyACUrl;
+            singleDosConfig.VBiACClassWFID = SelectedWorkflowRoot.ACClassWFID;
+            singleDosConfig.VBiValueTypeACClassID = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == "string").ACClassID;
+            if (SelectedSingleDosingMachine != null)
+                singleDosConfig.VBiACClassID = SelectedSingleDosingMachine.ACClassID;
+
+            DatabaseApp.MaterialConfig.AddObject(singleDosConfig);
+
+            OnPropertyChanged("SingleDosingConfigList");
+        }
+
+        public bool IsEnabledAddSingleDosingConfig()
+        {
+            return SelectedWorkflowRoot != null;
+        }
+
+        [ACMethodInfo("", "en{'Delete single dosing rule'}de{'Einzeldosierungsregel löschen'}", 800)]
+        public void DeleteSingleDosingConfig()
+        {
+            SelectedMaterial.MaterialConfig_Material.Remove(SingleDosingConfig);
+            DatabaseApp.DeleteObject(SingleDosingConfig);
+            OnPropertyChanged("SingleDosingConfigList");
+        }
+
+        public bool IsEnabledDeleteSingleDosingConfig()
+        {
+            return SingleDosingConfig != null;
+        }
+
+        #endregion
 
         #endregion
 

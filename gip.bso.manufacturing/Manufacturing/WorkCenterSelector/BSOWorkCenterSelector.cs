@@ -622,6 +622,18 @@ namespace gip.bso.manufacturing
                                 EndBatchPos = pb.ProdOrderPartslistPos_ProdOrderBatch.OrderByDescending(c => c.Sequence).FirstOrDefault();
                         }
                     }
+                    else
+                    {
+                        entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == Picking.ClassName);
+                        if (entry != null)
+                        {
+                            var picking = DatabaseApp.Picking.FirstOrDefault(c => c.PickingID == entry.EntityID);
+                            if (picking != null)
+                            {
+                                ProdOrderProgramNo = picking.ACCaption;
+                            }
+                        }
+                    }
                 }
             }
         }
