@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Data;
 using gip.core.processapplication;
 using System.Threading;
+using gip.mes.facility;
 
 namespace gip.bso.manufacturing
 {
@@ -59,6 +60,7 @@ namespace gip.bso.manufacturing
             _MScaleWFNodes = null;
 
             MainSyncContext = null;
+            this._BookParamRelocation = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -850,6 +852,129 @@ namespace gip.bso.manufacturing
             {
                 _PAFCurrentMaterial = value;
                 OnPropertyChanged("PAFCurrentMaterial");
+            }
+        }
+
+        #endregion
+
+        #region Properties => SingleDosing
+
+        private SingleDosingItem _SelectedSingleDosingItem;
+        [ACPropertySelected(650, "SingleDosing", "en{'Single dosing'}de{'Single dosing'}")]
+        public SingleDosingItem SelectedSingleDosingItem
+        {
+            get => _SelectedSingleDosingItem;
+            set
+            {
+                _SelectedSingleDosingItem = value;
+                OnPropertyChanged("SelectedSingleDosingItem");
+            }
+        }
+
+        [ACPropertyList(651, "SingleDosing", "")]
+        public SingleDosingItems SingleDosingItemList
+        {
+            get;
+            set;
+        }
+
+        private double _SingleDosTargetQuantity;
+        [ACPropertyInfo(652, "", "en{'Target weight'}de{'Sollgewicht'}")]
+        public double SingleDosTargetQuantity
+        {
+            get => _SingleDosTargetQuantity;
+            set
+            {
+                _SingleDosTargetQuantity = value;
+                OnPropertyChanged("SingleDosTargetQuantity");
+            }
+        }
+
+        protected ACClass _SelectedSingleDosTargetStorage;
+        //todo translation
+        [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Target storage'}de{'Target storage'}")]
+        public virtual ACClass SelectedSingleDosTargetStorage
+        {
+            get => _SelectedSingleDosTargetStorage;
+            set
+            {
+                _SelectedSingleDosTargetStorage = value;
+                OnPropertyChanged("SelectedSingleDosTargetStorage");
+            }
+        }
+
+        [ACPropertyList(653, "SingleDosTargetStorage")]
+        public virtual IEnumerable<ACClass> SingleDosTargetStorageList
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The _ facility manager
+        /// </summary>
+        protected ACRef<ACComponent> _ACFacilityManager = null;
+        public FacilityManager ACFacilityManager
+        {
+            get
+            {
+                if (_ACFacilityManager == null)
+                    return null;
+                return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        protected ACRef<IACPickingManager> _ACPickingManager = null;
+        public IACPickingManager ACPickingManager
+        {
+            get
+            {
+                if (_ACPickingManager == null)
+                    return null;
+                return _ACPickingManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACComponent> _RoutingService = null;
+        public ACComponent RoutingService
+        {
+            get
+            {
+                if (_RoutingService == null)
+                    return null;
+                return _RoutingService.ValueT;
+            }
+        }
+
+        public bool IsRoutingServiceAvailable
+        {
+            get
+            {
+                return RoutingService != null && RoutingService.ConnectionState != ACObjectConnectionState.DisConnected;
+            }
+        }
+
+        /// <summary>
+        /// The _ book param relocation
+        /// </summary>
+        ACMethodBooking _BookParamRelocation;
+        ACMethodBooking _BookParamRelocationClone;
+
+        /// <summary>
+        /// Gets the current book param relocation.
+        /// </summary>
+        /// <value>The current book param relocation.</value>
+        [ACPropertyCurrent(704, "BookParamRelocation")]
+        public ACMethodBooking CurrentBookParamRelocation
+        {
+            get
+            {
+                return _BookParamRelocation;
+            }
+            protected set
+            {
+                _BookParamRelocation = value;
+                OnPropertyChanged("CurrentBookParamRelocation");
             }
         }
 
@@ -2230,6 +2355,359 @@ namespace gip.bso.manufacturing
                     sel.LoadPartslist();
                 }
             }
+        }
+
+        #endregion
+
+        #region Methods => SingleDosing
+
+        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660)]
+        public virtual void ShowSingleDosingDialog()
+        {
+            if (_RoutingService == null)
+            {
+                _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
+                if (_RoutingService == null)
+                    return; //TODO error
+            }
+
+            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, CurrentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
+                                                                    RouteDirections.Forwards, null, null, null, 0, true, true);
+
+            if (rResult == null)
+            {
+                return;
+            }
+
+            SingleDosTargetStorageList = rResult.Routes.SelectMany(c => c.GetRouteTargets()).Select(x => x.Target);
+
+
+            if (_ACFacilityManager == null)
+            {
+                _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+                if (_ACFacilityManager == null)
+                    return; //TODO error
+            }
+
+            _ACPickingManager = ACRefToPickingManager();
+
+            var result = CurrentProcessModule.ACUrlCommand("!GetDosableComponents") as SingleDosingItems;
+            if (result == null)
+            {
+                //TODO message
+                return;
+            }
+
+            if (result.Error != null)
+            {
+                Messages.Msg(result.Error);
+                return;
+            }
+
+            ClearBookingData();
+
+            SingleDosingItemList = result;
+            ShowDialog(this, "SingleDosingDialog");
+        }
+
+        public bool IsEnabledShowSingleDosingDialog()
+        {
+            return CurrentProcessModule != null;
+        }
+
+        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661)]
+        public virtual void SingleDosingStart()
+        {
+            if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
+            {
+                //error
+            }
+
+            if (SingleDosTargetStorageList.Count() > 1)
+            {
+                //Show selection dialog
+            }
+            else
+            {
+                SelectedSingleDosTargetStorage = SingleDosTargetStorageList.FirstOrDefault();
+            }
+
+            vd.Facility inwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.VBiFacilityACClassID == SelectedSingleDosTargetStorage.ACClassID);
+            
+            if (inwardFacility == null)
+            {
+                //Error
+                return;
+            }
+
+            vd.Facility outwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == SelectedSingleDosingItem.FacilityNo);
+
+            if (outwardFacility == null)
+            {
+                //Error
+                return;
+            }
+
+            CurrentBookParamRelocation.InwardFacility = inwardFacility;
+            CurrentBookParamRelocation.OutwardFacility = outwardFacility;
+            CurrentBookParamRelocation.InwardQuantity = SingleDosTargetQuantity;
+            CurrentBookParamRelocation.OutwardQuantity = SingleDosTargetQuantity;
+
+            gip.core.datamodel.ACClassMethod acClassMethod = null;
+            bool wfRunsBatches = false;
+            ACComponent appManager = null;
+
+            if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches, out appManager))
+            {
+                ClearBookingData();
+                return;
+            }
+
+            if (ACPickingManager == null)
+            {
+                ClearBookingData();
+                return;
+            }
+
+            vd.Picking picking = null;
+            MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(CurrentBookParamRelocation, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking);
+            if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+            {
+                Messages.Msg(msgDetails);
+                ClearBookingData();
+                ACUndoChanges();
+                return;
+            }
+            if (picking == null)
+            {
+                ACUndoChanges();
+                ClearBookingData();
+                return;
+            }
+            ACSaveChanges();
+            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
+            if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+            {
+                Messages.Msg(msgDetails);
+                ClearBookingData();
+                return;
+            }
+
+            StartWorkflow(acClassMethod, picking, appManager);
+
+            SingleDosTargetQuantity = 0;
+
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledSingleDosingStart()
+        {
+            return SelectedSingleDosingItem != null && SingleDosTargetQuantity > 0.0001;
+        }
+
+        public void ClearBookingData()
+        {
+            if (_BookParamRelocationClone == null)
+                _BookParamRelocationClone = ACFacilityManager.ACUrlACTypeSignature("!" + mes.datamodel.GlobalApp.FBT_Relocation_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            var clone = _BookParamRelocationClone.Clone() as ACMethodBooking;
+
+            CurrentBookParamRelocation = clone;
+        }
+
+        protected ACRef<IACPickingManager> ACRefToPickingManager()
+        {
+            // Falls als Unterobjekt Konfiguriert:
+            IACPickingManager facilityMgr = this.ACUrlCommand("PickingManager") as IACPickingManager;
+
+            // Falls als lokaler Dienst konfiguriert
+            if (facilityMgr == null)
+            {
+                if (this.Root == null || this.Root.InitState == ACInitState.Destructing || this.Root.InitState == ACInitState.Destructed)
+                    return null;
+
+                facilityMgr = this.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as IACPickingManager;
+
+                // Falls als Service Konfiguriert
+                if (facilityMgr == null)
+                    facilityMgr = this.ACUrlCommand("\\Service\\PickingManager") as IACPickingManager;
+            }
+
+            if (facilityMgr != null)
+                return new ACRef<IACPickingManager>(facilityMgr, this);
+            return null;
+        }
+
+        //#region Workflow-Starting
+        protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, out gip.core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager)
+        {
+            string pwClassNameOfRoot = GetPWClassNameOfRoot(forBooking);
+            acClassMethod = null;
+            wfRunsBatches = false;
+            appManager = null;
+            //SelectedSourceModule = null;
+            Msg msg = null;
+
+            if (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
+                || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
+                return false;
+            msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return false;
+            }
+
+            vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
+            if (material == null)
+            {
+                //TODO Error
+                return false;
+            }
+
+            var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.SingleDosingMaterialConfigKeyACUrl);
+
+            if (wfConfigs == null || !wfConfigs.Any())
+            {
+                //TODO error
+                return false;
+            }
+
+            var wfConfig = wfConfigs.FirstOrDefault(c => c.VBiACClassID == CurrentProcessModule.ComponentClass.ACClassID);
+            if (wfConfig == null)
+            {
+                wfConfig = wfConfigs.FirstOrDefault(c => !c.VBiACClassID.HasValue);
+            }
+
+            if (wfConfig == null)
+            {
+                //error
+                return false;
+            }
+
+            gip.core.datamodel.ACClassWF wfNode = wfConfig.VBiACClassWF.FromIPlusContext<ACClassWF>(DatabaseApp.ContextIPlus);
+            acClassMethod = wfNode.ACClassMethod;
+
+            if (wfNode == null || wfNode.ACClassMethod == null)
+                return false;
+
+            if (acClassMethod == null)
+                return false;
+
+            Type typePWWF = typeof(PWNodeProcessWorkflow);
+            wfRunsBatches = acClassMethod.ACClassWF_ACClassMethod.ToArray().Where(c => c.RefPAACClassMethodID.HasValue && c.PWACClass != null && c.PWACClass.ObjectType != null && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)).Any();
+            gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
+
+            var AppManagersList = this.Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).ToList();
+            if (AppManagersList.Count > 1)
+            {
+                ShowDialog(this, "SelectAppManager");
+                if (appManager == null)
+                    return false;
+            }
+            else
+                appManager = AppManagersList.FirstOrDefault();
+
+            ACComponent pAppManager = appManager as ACComponent;
+            if (pAppManager == null)
+                return false;
+            if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
+            {
+                // TODO: Message
+                return false;
+            }
+            return true;
+        }
+
+        public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
+        {
+            if (this.ACFacilityManager != null)
+                return this.ACFacilityManager.C_PWMethodRelocClass;
+            return "PWMethodRelocation";
+        }
+
+        protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, vd.Picking picking, ACComponent selectedAppManager)
+        {
+            using (Database db = new core.datamodel.Database())
+            {
+                acClassMethod = acClassMethod.FromIPlusContext<ACClassMethod>(db);
+
+                ACMethod acMethod = selectedAppManager.NewACMethod(acClassMethod.ACIdentifier);
+                if (acMethod == null)
+                    return false;
+                string secondaryKey = Root.NoManager.GetNewNo(db, typeof(gip.core.datamodel.ACProgram), gip.core.datamodel.ACProgram.NoColumnName, gip.core.datamodel.ACProgram.FormatNewNo, this);
+                gip.core.datamodel.ACProgram program = gip.core.datamodel.ACProgram.NewACObject(db, null, secondaryKey);
+                program.ProgramACClassMethod = acClassMethod;
+                program.WorkflowTypeACClass = acClassMethod.WorkflowTypeACClass;
+                db.ACProgram.AddObject(program);
+                if (db.ACSaveChanges() == null)
+                {
+                    ACValue paramProgram = acMethod.ParameterValueList.GetACValue(gip.core.datamodel.ACProgram.ClassName);
+                    if (paramProgram == null)
+                        acMethod.ParameterValueList.Add(new ACValue(gip.core.datamodel.ACProgram.ClassName, typeof(Guid), program.ACProgramID));
+                    else
+                        paramProgram.Value = program.ACProgramID;
+
+                    ACValue acValue = acMethod.ParameterValueList.GetACValue(vd.Picking.ClassName);
+                    if (acValue == null)
+                        acMethod.ParameterValueList.Add(new ACValue(vd.Picking.ClassName, typeof(Guid), picking.PickingID));
+                    else
+                        acValue.Value = picking.PickingID;
+
+                    selectedAppManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected virtual Msg OnValidateRoutesForWF(ACMethodBooking forBooking, gip.core.datamodel.ACClass fromClass, gip.core.datamodel.ACClass toClass)
+        {
+            Msg msg = null;
+            string siloClass = this.ACFacilityManager.C_SiloClass;
+            gip.core.datamodel.ACClass siloACClass = this.ACFacilityManager.GetACClassForIdentifier(siloClass, this.Database.ContextIPlus);
+            if (siloACClass == null)
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "OnValidateRoutesForWF(10)",
+                    Message = String.Format("Type for {0} not found in Database or .NET-Type not loadable", siloClass)
+                };
+                return msg;
+            }
+            Type typeSilo = siloACClass.ObjectType;
+            if (typeSilo == null)
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "OnValidateRoutesForWF(20)",
+                    Message = String.Format("Type for {0} not found in Database or .NET-Type not loadable", siloClass)
+                };
+                return msg;
+            }
+
+            RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
+                                    fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
+                                    (c, p, r) => c.ACClassID == toClass.ACClassID,
+                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
+                                    0, true, true, false, false, 10);
+            if (result.Routes == null || !result.Routes.Any())
+            {
+                //Error50122: No route found for this transport.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "OnValidateRoutesForWF(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50122")
+                };
+                return msg;
+            }
+
+            return msg;
         }
 
         #endregion
