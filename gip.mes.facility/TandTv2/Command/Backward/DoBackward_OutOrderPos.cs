@@ -41,10 +41,10 @@ namespace gip.mes.facility
         {
             List<IDoItem> related = new List<IDoItem>();
             related.Add(new DoBackward_OutOrder(databaseApp, result, Item.OutOrder, jobFilter));
-            var deliveryNotePoses = Item
+            var deliveryNotePositions = Item
                 .DeliveryNotePos_OutOrderPos
                 .Select(c => new DoBackward_DeliveryNotePos(databaseApp, result, c, jobFilter));
-            related.AddRange(deliveryNotePoses);
+            related.AddRange(deliveryNotePositions);
             return related;
         }
 

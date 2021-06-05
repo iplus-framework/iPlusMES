@@ -22,17 +22,17 @@ namespace gip.mes.facility
         #region Methods
         public override void Finish()
         {
-            List<PickingPos> pickingPoses = null;
-            if (InOrderPoses.Any())
+            List<PickingPos> pickingPositions = null;
+            if (InOrderPositions.Any())
             {
-                List<DeliveryNotePos> deliveryNotePoses = InOrderPoses.SelectMany(c => c.DeliveryNotePos_InOrderPos).ToList();
-                if (deliveryNotePoses.Any())
+                List<DeliveryNotePos> deliveryNotePositions = InOrderPositions.SelectMany(c => c.DeliveryNotePos_InOrderPos).ToList();
+                if (deliveryNotePositions.Any())
                 {
-                    OtherDeliveryPreviews = deliveryNotePoses.Select(c => new DeliveryNotePosPreview(c)).ToList();
+                    OtherDeliveryPreviews = deliveryNotePositions.Select(c => new DeliveryNotePosPreview(c)).ToList();
                     DeliveryPreview = OtherDeliveryPreviews.FirstOrDefault();
                 }
 
-                InOrderPosPreviews = InOrderPoses
+                InOrderPosPreviews = InOrderPositions
                     .Select(c => new
                     {
                         InOrderNo = c.InOrder.InOrderNo,
@@ -53,13 +53,13 @@ namespace gip.mes.facility
                     })
                     .ToList();
 
-                pickingPoses = InOrderPoses.SelectMany(c => c.PickingPos_InOrderPos).ToList();
+                pickingPositions = InOrderPositions.SelectMany(c => c.PickingPos_InOrderPos).ToList();
             }
 
 
-            if (OutOrderPoses.Any())
+            if (OutOrderPositions.Any())
             {
-                List<DeliveryNotePos> dnss = OutOrderPoses.SelectMany(c => c.DeliveryNotePos_OutOrderPos).ToList();
+                List<DeliveryNotePos> dnss = OutOrderPositions.SelectMany(c => c.DeliveryNotePos_OutOrderPos).ToList();
                 if (dnss.Any())
                 {
                     OtherDeliveryPreviews = dnss.Select(c => new DeliveryNotePosPreview(c)).ToList();
@@ -67,7 +67,7 @@ namespace gip.mes.facility
                 }
 
                 OutOrderPosPreviews = null;
-                OutOrderPosPreviews = OutOrderPoses
+                OutOrderPosPreviews = OutOrderPositions
                    .Select(c => new
                    {
                        OutOrderNo = c.OutOrder.OutOrderNo,
@@ -87,14 +87,14 @@ namespace gip.mes.facility
                    })
                    .ToList();
 
-                pickingPoses = OutOrderPoses.SelectMany(c => c.PickingPos_OutOrderPos).ToList();
+                pickingPositions = OutOrderPositions.SelectMany(c => c.PickingPos_OutOrderPos).ToList();
 
             }
 
-            if (pickingPoses != null && pickingPoses.Any())
+            if (pickingPositions != null && pickingPositions.Any())
             {
                 PickingPosPreviews =
-                    pickingPoses
+                    pickingPositions
                     .Select(c =>
                         new
                         {

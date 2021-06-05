@@ -39,19 +39,19 @@ namespace gip.mes.facility
             }
         }
 
-        private List<TandTv2TempPos> _TempPoses;
-        public List<TandTv2TempPos> TempPoses
+        private List<TandTv2TempPos> _TempPositions;
+        public List<TandTv2TempPos> TempPositions
         {
             get
             {
-                if (_TempPoses == null)
-                    _TempPoses = new List<TandTv2TempPos>();
-                return _TempPoses;
+                if (_TempPositions == null)
+                    _TempPositions = new List<TandTv2TempPos>();
+                return _TempPositions;
             }
             set
 
             {
-                _TempPoses = value; ;
+                _TempPositions = value; ;
             }
         }
         public List<TandTv2StepItem> FilteredStepItems { get; set; }

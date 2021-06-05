@@ -30,7 +30,7 @@ namespace gip.mes.facility.TandTv3
         public override void AssignItemToMixPoint(List<IACObjectEntity> sameStepItems)
         {
             TandTv3Point mixPoint = Result.AddMixPoint(Step, Item);
-            mixPoint.DeliveryNotePoses.AddRange(Item.DeliveryNotePos_InOrderPos);
+            mixPoint.DeliveryNotePositions.AddRange(Item.DeliveryNotePos_InOrderPos);
             if (Item.LabOrder_InOrderPos.Any())
             {
                 DatabaseApp db_test = Item.GetObjectContext<DatabaseApp>();

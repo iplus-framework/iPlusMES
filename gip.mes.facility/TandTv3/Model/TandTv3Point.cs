@@ -35,7 +35,7 @@ namespace gip.mes.facility
             OutwardPreBookings = new List<TandTv3.FacilityPreBookingPreveiw>();
 
             // Purchase
-            DeliveryNotePoses = new List<DeliveryNotePos>();
+            DeliveryNotePositions = new List<DeliveryNotePos>();
 
             // Manufacturing
             Relations = new List<ProdOrderPartslistPosRelation>();
@@ -51,8 +51,8 @@ namespace gip.mes.facility
 
             ProductionPositions = new List<ProdOrderPartslistPos>();
             BatchNoList = new List<string>();
-            InOrderPoses = new List<InOrderPos>();
-            OutOrderPoses = new List<OutOrderPos>();
+            InOrderPositions = new List<InOrderPos>();
+            OutOrderPositions = new List<OutOrderPos>();
 
             // FacilityChargeIDs = new List<Guid>();
 
@@ -345,7 +345,7 @@ namespace gip.mes.facility
         [ACPropertyInfo(9999, "DeliveryNo", "en{'Delivery Note No.'}de{'Lieferschein-Nr.'}")]
         public string DeliveryNo { get; set; }
 
-        public List<DeliveryNotePos> DeliveryNotePoses { get; set; }
+        public List<DeliveryNotePos> DeliveryNotePositions { get; set; }
 
         #endregion
 
@@ -371,8 +371,8 @@ namespace gip.mes.facility
             }
         }
 
-        public List<InOrderPos> InOrderPoses { get; set; }
-        public List<OutOrderPos> OutOrderPoses { get; set; }
+        public List<InOrderPos> InOrderPositions { get; set; }
+        public List<OutOrderPos> OutOrderPositions { get; set; }
 
         public List<ProdOrderPartslistPosRelation> Relations { get; set; }
 

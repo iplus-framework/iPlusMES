@@ -933,8 +933,8 @@ namespace gip.mes.facility
 
                 // 1. Hole Parent-Bestellposition aus Bestellung und korrigiere Abgerufene teilmenge
                 currentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.AutoRefresh(dbApp);
-                //List<ProdOrderPartslistPos> parentProdOrderPartslistPoses = currentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos).ToList();
-                //foreach (var parentProdOrderPartslistPos in parentProdOrderPartslistPoses)
+                //List<ProdOrderPartslistPos> parentProdOrderPartslistPositions = currentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos).ToList();
+                //foreach (var parentProdOrderPartslistPos in parentProdOrderPartslistPositions)
                 //    parentProdOrderPartslistPos.AutoRefresh(dbApp);
                 //parentProdOrderPartslistPos.CalledUpQuantityUOM -= currentPickingPos.ProdOrderPartslistPos.TargetQuantityUOM;
 

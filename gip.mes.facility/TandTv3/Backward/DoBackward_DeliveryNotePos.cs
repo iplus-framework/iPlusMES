@@ -14,7 +14,7 @@ namespace gip.mes.facility.TandTv3
             ItemTypeName = "DeliveryNotePos";
             if (!Result.Ids.Keys.Contains(item.DeliveryNotePosID))
                 Result.Ids.Add(item.DeliveryNotePosID, ItemTypeName);
-            Result.DeliveryNotePoses.Add(Item);
+            Result.DeliveryNotePositions.Add(Item);
         }
         #endregion
 

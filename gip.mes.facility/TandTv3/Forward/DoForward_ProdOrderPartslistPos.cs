@@ -88,7 +88,7 @@ namespace gip.mes.facility.TandTv3
             {
                 string materialNo = Item.BookingMaterial.MaterialNo;
 
-                List<ProdOrderPartslistPos> outwardRootPosesUsingMixure
+                List<ProdOrderPartslistPos> outwardRootPositionsUsingMixure
                     = Item
                     .ProdOrderPartslist
                     .ProdOrder
@@ -97,7 +97,7 @@ namespace gip.mes.facility.TandTv3
                     .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
                     .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.SourceProdOrderPartslistID == Item.ProdOrderPartslistID)
                     .ToList();
-                nextStepItems.AddRange(outwardRootPosesUsingMixure);
+                nextStepItems.AddRange(outwardRootPositionsUsingMixure);
             }
             return nextStepItems;
         }

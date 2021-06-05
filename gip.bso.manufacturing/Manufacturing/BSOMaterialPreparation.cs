@@ -173,7 +173,7 @@ namespace gip.bso.manufacturing
                     _SelectedPreparedMaterial = value;
                     PickingQuantityUOM = SelectedPreparedMaterial.MissingQuantityUOM ?? 0;
                     LoadPreparedMaterial(value);
-                    LoadPickingPoses();
+                    LoadPickingPositions();
                     OnPropertyChanged("SelectedPreparedMaterial");
                 }
             }
@@ -318,7 +318,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedPicking != value)
                 {
                     _SelectedPicking = value;
-                    LoadPickingPoses();
+                    LoadPickingPositions();
                     OnPropertyChanged("SelectedPicking");
                 }
             }
@@ -430,7 +430,7 @@ namespace gip.bso.manufacturing
                 if (_ShowAllPickingLines != value)
                 {
                     _ShowAllPickingLines = value;
-                    LoadPickingPoses();
+                    LoadPickingPositions();
                     OnPropertyChanged("ShowAllPickingLines");
                 }
             }
@@ -501,8 +501,8 @@ namespace gip.bso.manufacturing
             pickingPos.ToFacility = SelectedTargetStorageBin.Facility;
             if (SelectedPreparedMaterial.PickingRelationType == PickingRelationTypeEnum.ProductionLine)
             {
-                List<ProdOrderPartslistPos> relatedPoses = DatabaseApp.ProdOrderPartslistPos.Where(c => SelectedPreparedMaterial.RelatedIDs.Contains(c.ProdOrderPartslistPosID)).ToList();
-                foreach (ProdOrderPartslistPos relatedPos in relatedPoses)
+                List<ProdOrderPartslistPos> relatedPositions = DatabaseApp.ProdOrderPartslistPos.Where(c => SelectedPreparedMaterial.RelatedIDs.Contains(c.ProdOrderPartslistPosID)).ToList();
+                foreach (ProdOrderPartslistPos relatedPos in relatedPositions)
                 {
                     PickingPosProdOrderPartslistPos connection = PickingPosProdOrderPartslistPos.NewACObject(DatabaseApp, pickingPos, relatedPos);
                     pickingPos.PickingPosProdOrderPartslistPos_PickingPos.Add(connection);
@@ -551,8 +551,8 @@ namespace gip.bso.manufacturing
             SelectedPreparedMaterial.MissingQuantityUOM = SelectedPreparedMaterial.TargetQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
             _PreparedMaterialList = PreparedMaterialList.ToList();
             OnPropertyChanged("PreparedMaterialList");
-            var pickingPosPoses = pickingPos.PickingPosProdOrderPartslistPos_PickingPos.ToList();
-            foreach (var pickingPosPos in pickingPosPoses)
+            var pickingPosPositions = pickingPos.PickingPosProdOrderPartslistPos_PickingPos.ToList();
+            foreach (var pickingPosPos in pickingPosPositions)
                 pickingPosPos.DeleteACObject(DatabaseApp, false);
             pickingPos.DeleteACObject(DatabaseApp, false);
             OnPropertyChanged("PickingPosList");
@@ -615,7 +615,7 @@ namespace gip.bso.manufacturing
             SelectedPreparedMaterial = _PreparedMaterialList.FirstOrDefault();
 
             LoadPickings();
-            LoadPickingPoses();
+            LoadPickingPositions();
         }
 
         public List<PreparedMaterial> GetPreparedMaterials(List<SearchBatchMaterialModel> researchedFacilities)
@@ -748,7 +748,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged("PickingList");
         }
 
-        private void LoadPickingPoses()
+        private void LoadPickingPositions()
         {
             Guid? pickingID = null;
             Guid materialID = Guid.Empty;
@@ -938,8 +938,8 @@ namespace gip.bso.manufacturing
                 UpdateDate = DateTime.Now
             };
 
-            List<ProdOrderPartslistPos> tmpPoses = DatabaseApp.ProdOrderPartslistPos.Where(c => c.Material.MaterialNo == "102").Take(2).ToList();
-            foreach (ProdOrderPartslistPos tmpPos in tmpPoses)
+            List<ProdOrderPartslistPos> tmpPositions = DatabaseApp.ProdOrderPartslistPos.Where(c => c.Material.MaterialNo == "102").Take(2).ToList();
+            foreach (ProdOrderPartslistPos tmpPos in tmpPositions)
             {
                 PickingPosProdOrderPartslistPos item = new PickingPosProdOrderPartslistPos();
                 item.PickingPos = pickingPos;

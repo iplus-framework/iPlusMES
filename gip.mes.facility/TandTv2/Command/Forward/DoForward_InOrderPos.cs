@@ -26,7 +26,7 @@ namespace gip.mes.facility
             related.Add(new DoForward_InOrder(databaseApp, result, Item.InOrder, jobFilter));
 
             // DeliveryNotePos
-            var deliveryNotePoses = Item
+            var deliveryNotePositions = Item
                 .DeliveryNotePos_InOrderPos
                 .Select(c => new DoForward_DeliveryNotePos(databaseApp, result, c, jobFilter));
 
@@ -38,7 +38,7 @@ namespace gip.mes.facility
             if (fbc.Any())
                 related.AddRange(fbc.Select(c => new DoForward_FacilityBookingCharge(databaseApp, result, c, jobFilter)).ToList());
 
-            related.AddRange(deliveryNotePoses);
+            related.AddRange(deliveryNotePositions);
 
             return related;
         }

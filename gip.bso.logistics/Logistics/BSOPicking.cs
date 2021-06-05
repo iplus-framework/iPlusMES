@@ -1470,7 +1470,7 @@ namespace gip.bso.logistics
             }
             else if (CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any())
             {
-                List<ProdOrderPartslistPos> parentProdOrderPartslistPoses =
+                List<ProdOrderPartslistPos> parentProdOrderPartslistPositions =
                     CurrentPickingPos
                     .PickingPosProdOrderPartslistPos_PickingPos
                     .Select(c => c.ProdorderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos).ToList();
@@ -1494,9 +1494,9 @@ namespace gip.bso.logistics
                     Messages.LogException("BSOPicking", "UnassignPickingPos(20)", msg);
                 }
 
-                if (result == null && parentProdOrderPartslistPoses != null && parentProdOrderPartslistPoses.Any())
+                if (result == null && parentProdOrderPartslistPositions != null && parentProdOrderPartslistPositions.Any())
                 {
-                    foreach (var parentProdOrderPartslistPos in parentProdOrderPartslistPoses)
+                    foreach (var parentProdOrderPartslistPos in parentProdOrderPartslistPositions)
                         if (!_UnSavedUnAssignedProdOrderPartslistPos.Contains(parentProdOrderPartslistPos))
                             _UnSavedUnAssignedProdOrderPartslistPos.Add(parentProdOrderPartslistPos);
                 }

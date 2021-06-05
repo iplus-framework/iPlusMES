@@ -243,9 +243,9 @@ namespace gip.bso.facility
                                     if (Content is TandTv3PointDN)
                                     {
                                         TandTv3Point tandTv3Point = Content as TandTv3Point;
-                                        if (tandTv3Point.IsInputPoint && tandTv3Point.InOrderPoses != null)
+                                        if (tandTv3Point.IsInputPoint && tandTv3Point.InOrderPositions != null)
                                         {
-                                            Guid[] inOrderPosiDs = tandTv3Point.InOrderPoses.Select(c => c.InOrderPosID).ToArray();
+                                            Guid[] inOrderPosiDs = tandTv3Point.InOrderPositions.Select(c => c.InOrderPosID).ToArray();
                                             vbModel.DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => inOrderPosiDs.Contains(c.InOrderPosID ?? Guid.Empty)).FirstOrDefault();
                                             if (dns != null)
                                                 pAOrderInfoEntry = new PAOrderInfoEntry()

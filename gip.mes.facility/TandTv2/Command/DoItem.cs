@@ -26,11 +26,11 @@ namespace gip.mes.facility
                 }
             }
 
-            List<TandTv2TempPos> tempPoses = Factory_TmpPos(result);
-            if (tempPoses != null && tempPoses.Any())
+            List<TandTv2TempPos> tempPositions = Factory_TmpPos(result);
+            if (tempPositions != null && tempPositions.Any())
             {
-                result.TempPoses.AddRange(tempPoses);
-                foreach (var tmpPosItem in tempPoses)
+                result.TempPositions.AddRange(tempPositions);
+                foreach (var tmpPosItem in tempPositions)
                     databaseApp.TandTv2TempPos.AddObject(tmpPosItem);
             }
 

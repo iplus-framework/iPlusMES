@@ -96,16 +96,16 @@ namespace gip.mes.facility.TandTv3
         {
             List<IACObjectEntity> sameStepItems = new List<IACObjectEntity>();
             #region T&Tv3 Case Without Bookings
-            var childPoses =
+            var childPositions =
                 Item
                 .ProdOrderPartslistPos_ParentProdOrderPartslistPos
                 .Where(c => c.ProdOrderBatchID != null && Result.BatchIDs.Contains(c.ProdOrderBatchID ?? Guid.Empty));
-            if (childPoses.Any())
+            if (childPositions.Any())
             {
-                bool withoutFB = !childPoses.SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPos).Any();
+                bool withoutFB = !childPositions.SelectMany(c => c.FacilityBookingCharge_ProdOrderPartslistPos).Any();
                 if (withoutFB)
                 {
-                    List<ProdOrderPartslistPos> childInBatch = childPoses.ToList();
+                    List<ProdOrderPartslistPos> childInBatch = childPositions.ToList();
                     if (childInBatch.Any())
                     {
                         ProdOrderPartslistPos firstItem = childInBatch.FirstOrDefault();
@@ -113,7 +113,7 @@ namespace gip.mes.facility.TandTv3
                         TandTv3Point mixPoint = Result.AddMixPoint(Step, firstItem, emptyLot);
                     }
                 }
-                sameStepItems.AddRange(childPoses);
+                sameStepItems.AddRange(childPositions);
             }
             #endregion
             return sameStepItems;

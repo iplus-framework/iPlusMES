@@ -1763,8 +1763,8 @@ namespace gip.bso.facility
             var questionResult = Root.Messages.Question(this, "Question50062", MsgResult.Yes, false, SelectedFacilityInventory.FacilityInventoryNo);
             if (questionResult == MsgResult.Yes)
             {
-                List<FacilityInventoryPos> poses = SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
-                foreach (var item in poses)
+                List<FacilityInventoryPos> positions = SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
+                foreach (var item in positions)
                     item.DeleteACObject(DatabaseApp, false);
                 FacilityInventoryList.Remove(SelectedFacilityInventory);
                 SelectedFacilityInventory.DeleteACObject(Database, false);

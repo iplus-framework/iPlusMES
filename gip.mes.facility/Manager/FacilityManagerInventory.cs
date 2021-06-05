@@ -42,7 +42,7 @@ namespace gip.mes.facility
                 int count = facilityCharges.Count();
                 if (progressCallback != null)
                     progressCallback(0, count);
-                List<FacilityInventoryPos> poses = new List<FacilityInventoryPos>();
+                List<FacilityInventoryPos> positions = new List<FacilityInventoryPos>();
                 int nr = 0;
                 foreach (FacilityCharge facilityCharge in facilityCharges)
                 {
@@ -73,13 +73,13 @@ namespace gip.mes.facility
                     if (progressCallback != null)
                         progressCallback(nr, count);
 
-                    List<FacilityInventoryPos> poses = facilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
+                    List<FacilityInventoryPos> positions = facilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
 
 
                     bool isNotAllowedClosing =
                         facilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex != (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress
                         ||
-                         poses.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                         positions.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
                     if (isNotAllowedClosing)
                     {
                         Msg msErrorNotAllowedClosing = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = Const_Inventory_NotAllowedClosing };
@@ -87,7 +87,7 @@ namespace gip.mes.facility
                     }
                     else
                     {
-                        List<FacilityInventoryPos> posesSWithNewQuantity = poses
+                        List<FacilityInventoryPos> positionsWithNewQuantity = positions
                             .Where(c =>
                             c.NotAvailable
                             ||
@@ -96,7 +96,7 @@ namespace gip.mes.facility
                                 && (Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > Double.Epsilon)
                             )
                         ).ToList();
-                        foreach (FacilityInventoryPos facilityInventoryPos in posesSWithNewQuantity)
+                        foreach (FacilityInventoryPos facilityInventoryPos in positionsWithNewQuantity)
                         {
                             nr++;
                             ACMethodBooking aCMethodBooking = null;

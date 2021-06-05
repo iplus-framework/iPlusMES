@@ -178,7 +178,7 @@ namespace gip.mes.facility.TandTv3
                             result.Ids.Add(facilityBookingPreveiw.FacilityBookingChargeID ?? Guid.Empty, MDTrackingStartItemTypeEnum.FacilityBookingCharge.ToString());
                     #endregion
 
-                    result.DeliveryNotePoses.AddRange(mixPoint.DeliveryNotePoses);
+                    result.DeliveryNotePositions.AddRange(mixPoint.DeliveryNotePositions);
                     result.Lots.AddRange(mixPoint.OutwardLotsList.Select(c => c.LotNo));
                     if (mixPoint.IsProductionPoint && !result.ProgramNos.Contains(mixPoint.ProgramNo))
                         result.ProgramNos.Add(mixPoint.ProgramNo);
@@ -250,7 +250,7 @@ namespace gip.mes.facility.TandTv3
                 .ToList();
             }
             result.DeliveryNotes =
-                result.DeliveryNotePoses
+                result.DeliveryNotePositions
                 .OrderBy(c => c.DeliveryNote.DeliveryNoteNo)
                 .Select(c => FactoryDeliveryPreviewModel(c))
                 .ToList();
@@ -480,7 +480,7 @@ namespace gip.mes.facility.TandTv3
             groupResult.Steps = result.Steps;
 
 
-            groupResult.DeliveryNotePoses = result.DeliveryNotePoses;
+            groupResult.DeliveryNotePositions = result.DeliveryNotePositions;
             groupResult.FacilityChargeIDs = result.FacilityChargeIDs;
             groupResult.DeliveryNotes = result.DeliveryNotes;
             groupResult.FacilityCharges = result.FacilityCharges;
@@ -545,10 +545,10 @@ namespace gip.mes.facility.TandTv3
             foreach (var subItem in item.Value.AsEnumerable())
             {
 
-                // DeliveryNotePoses
-                foreach (var dns in subItem.DeliveryNotePoses)
-                    if (!groupMixPoint.DeliveryNotePoses.Select(c => c.DeliveryNotePosID).Contains(dns.DeliveryNotePosID))
-                        groupMixPoint.DeliveryNotePoses.Add(dns);
+                // DeliveryNotePositions
+                foreach (var dns in subItem.DeliveryNotePositions)
+                    if (!groupMixPoint.DeliveryNotePositions.Select(c => c.DeliveryNotePosID).Contains(dns.DeliveryNotePosID))
+                        groupMixPoint.DeliveryNotePositions.Add(dns);
 
                 // ExistLabOrder
                 groupMixPoint.ExistLabOrder = subItem.ExistLabOrder || groupMixPoint.ExistLabOrder;
@@ -558,10 +558,10 @@ namespace gip.mes.facility.TandTv3
                 //    if (!groupMixPoint.FacilityChargeIDs.Contains(fcId))
                 //        groupMixPoint.FacilityChargeIDs.Add(fcId);
 
-                // InOrderPoses
-                foreach (var inOrderPos in subItem.InOrderPoses)
-                    if (!groupMixPoint.InOrderPoses.Select(c => c.InOrderPosID).Contains(inOrderPos.InOrderPosID))
-                        groupMixPoint.InOrderPoses.Add(inOrderPos);
+                // InOrderPositions
+                foreach (var inOrderPos in subItem.InOrderPositions)
+                    if (!groupMixPoint.InOrderPositions.Select(c => c.InOrderPosID).Contains(inOrderPos.InOrderPosID))
+                        groupMixPoint.InOrderPositions.Add(inOrderPos);
 
                 // InwardBookings
                 foreach (var inwardBookingPreview in subItem.InwardBookings)
@@ -863,7 +863,7 @@ namespace gip.mes.facility.TandTv3
                 if (mixPoint.IsInputPoint)
                 {
                     dbMixPoint.IsInputPoint = true;
-                    foreach (var item in mixPoint.InOrderPoses)
+                    foreach (var item in mixPoint.InOrderPositions)
                     {
                         TandTv3MixPointInOrderPos dbMixPointInOrderPos = new TandTv3MixPointInOrderPos()
                         {
@@ -956,7 +956,7 @@ namespace gip.mes.facility.TandTv3
 
 
                 //// TandTv3_MixPointDeliveryNotePos
-                foreach (var dns in mixPoint.DeliveryNotePoses)
+                foreach (var dns in mixPoint.DeliveryNotePositions)
                 {
                     TandTv3MixPointDeliveryNotePos dbMixPointDeliveryNotePos = new TandTv3MixPointDeliveryNotePos()
                     {
@@ -1091,16 +1091,16 @@ namespace gip.mes.facility.TandTv3
 
             }
 
-            // DeliveryNotePoses
+            // DeliveryNotePositions
             // => TandTv3_MixPointDeliveryNotePos
-            mixPoint.DeliveryNotePoses.AddRange(dbMixPoint.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint.Select(c => c.DeliveryNotePos));
-            foreach (var item in mixPoint.DeliveryNotePoses)
+            mixPoint.DeliveryNotePositions.AddRange(dbMixPoint.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint.Select(c => c.DeliveryNotePos));
+            foreach (var item in mixPoint.DeliveryNotePositions)
                 if (!result.Ids.ContainsKey(item.DeliveryNotePosID))
                     result.Ids.Add(item.DeliveryNotePosID, MDTrackingStartItemTypeEnum.DeliveryNotePos.ToString());
-            if (mixPoint.DeliveryNotePoses != null && mixPoint.DeliveryNotePoses.Any() && mixPoint is TandTv3PointDN)
+            if (mixPoint.DeliveryNotePositions != null && mixPoint.DeliveryNotePositions.Any() && mixPoint is TandTv3PointDN)
             {
                 TandTv3PointDN tandTv3PointDN = mixPoint as TandTv3PointDN;
-                tandTv3PointDN.OtherDeliveryPreviews = mixPoint.DeliveryNotePoses.Select(c => FactoryDeliveryPreviewModel(c)).ToList();
+                tandTv3PointDN.OtherDeliveryPreviews = mixPoint.DeliveryNotePositions.Select(c => FactoryDeliveryPreviewModel(c)).ToList();
                 tandTv3PointDN.DeliveryPreview = tandTv3PointDN.OtherDeliveryPreviews.FirstOrDefault();
                 tandTv3PointDN.DeliveryNo = tandTv3PointDN.DeliveryPreview.DeliveryNoteNo;
             }
@@ -1121,9 +1121,9 @@ namespace gip.mes.facility.TandTv3
             {
                 // mixPoint.Pos = dbMixPoint.ProdOrderPartslistPos;
                 mixPoint.ProductionPositions = dbMixPoint.TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint.Select(c => c.ProdOrderPartslistPos).ToList();
-                foreach (var poses in mixPoint.ProductionPositions)
-                    if (!result.Ids.ContainsKey(poses.ProdOrderPartslistPosID))
-                        result.Ids.Add(poses.ProdOrderPartslistPosID, MDTrackingStartItemTypeEnum.ProdOrderPartslistPos.ToString());
+                foreach (var positions in mixPoint.ProductionPositions)
+                    if (!result.Ids.ContainsKey(positions.ProdOrderPartslistPosID))
+                        result.Ids.Add(positions.ProdOrderPartslistPosID, MDTrackingStartItemTypeEnum.ProdOrderPartslistPos.ToString());
                 var firstPos = dbMixPoint.TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint.FirstOrDefault();
                 if (firstPos != null)
                 {
@@ -1147,13 +1147,13 @@ namespace gip.mes.facility.TandTv3
                 mixPoint.InwardMaterialName = dbMixPoint.InwardMaterial.MaterialName1;
             }
 
-            // InOrderPoses
+            // InOrderPositions
             // InOrderPosID
             mixPoint.IsInputPoint = dbMixPoint.IsInputPoint;
             if (dbMixPoint.IsInputPoint)
             {
-                mixPoint.InOrderPoses = dbMixPoint.TandTv3MixPointInOrderPos_TandTv3MixPoint.Select(c => c.InOrderPos).ToList();
-                foreach (var inOrderPos in mixPoint.InOrderPoses)
+                mixPoint.InOrderPositions = dbMixPoint.TandTv3MixPointInOrderPos_TandTv3MixPoint.Select(c => c.InOrderPos).ToList();
+                foreach (var inOrderPos in mixPoint.InOrderPositions)
                 {
                     if (inOrderPos.LabOrder_InOrderPos.Any())
                         mixPoint.ItemsWithLabOrder.Add(MixPointLabOrder.Factory(databaseApp, inOrderPos));
@@ -1244,7 +1244,7 @@ namespace gip.mes.facility.TandTv3
                     }
                 }
 
-                if (mixPoint.InOrderPoses != null && mixPoint.InOrderPoses.Any())
+                if (mixPoint.InOrderPositions != null && mixPoint.InOrderPositions.Any())
                 {
                     foreach (var secondMixPoint in result.MixPoints)
                     {

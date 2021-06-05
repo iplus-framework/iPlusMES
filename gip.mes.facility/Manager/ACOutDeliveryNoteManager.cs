@@ -1052,7 +1052,7 @@ namespace gip.mes.facility
             return invoicePos;
         }
 
-        private List<MDCountrySalesTax> GetTaxOverviewList(string langCode, IOutOrder outOrder, List<IOutOrderPos> poses)
+        private List<MDCountrySalesTax> GetTaxOverviewList(string langCode, IOutOrder outOrder, List<IOutOrderPos> positions)
         {
             List<MDCountrySalesTax> mDCountrySalesTaxes = new List<MDCountrySalesTax>();
             string vatFormat = Root.Environment.TranslateMessageLC(this, "Info50066", langCode);
@@ -1064,7 +1064,7 @@ namespace gip.mes.facility
             {
                 var percent = (decimal)((Math.Abs(outOrder.PosPriceNetDiscount) / outOrder.PosPriceNetSum) * 100);
 
-                mDCountrySalesTaxes = poses
+                mDCountrySalesTaxes = positions
                                         .Where(c => c.PriceNet > 0)
                                         .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (decimal)x.TargetQuantity * (x.SalesTax / 100)))
                                         .GroupBy(t => t.Item1)
@@ -1077,7 +1077,7 @@ namespace gip.mes.facility
             }
             else
             {
-                mDCountrySalesTaxes = poses
+                mDCountrySalesTaxes = positions
                                         .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
                                         .GroupBy(g => g.SalesTax)
                                         .Select(o => new MDCountrySalesTax()

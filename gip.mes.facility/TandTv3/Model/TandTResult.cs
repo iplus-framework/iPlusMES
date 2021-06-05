@@ -18,7 +18,7 @@ namespace gip.mes.facility.TandTv3
             Steps = new List<TandTStep>();
             Lots = new List<string>();
             MixPoints = new List<TandTv3Point>();
-            DeliveryNotePoses = new List<DeliveryNotePos>();
+            DeliveryNotePositions = new List<DeliveryNotePos>();
             FacilityChargeIDs = new List<FacilityChargeIDModel>();
             ProgramNos = new List<string>();
             MixPointRelations = new List<MixPointRelation>();
@@ -48,7 +48,7 @@ namespace gip.mes.facility.TandTv3
         public List<TandTStep> Steps { get; set; }
         public List<TandTv3Point> MixPoints { get; set; }
 
-        public List<DeliveryNotePos> DeliveryNotePoses { get; set; }
+        public List<DeliveryNotePos> DeliveryNotePositions { get; set; }
         public List<FacilityChargeIDModel> FacilityChargeIDs { get; set; }
 
         public List<DeliveryNotePosPreview> DeliveryNotes { get; set; }
@@ -186,7 +186,7 @@ namespace gip.mes.facility.TandTv3
             }
             else
             {
-                mixPoint = MixPoints.FirstOrDefault(c => c.IsInputPoint && c.InOrderPoses.Select(x => x.InOrderPosID).Contains(inOrderPos.InOrderPosID));
+                mixPoint = MixPoints.FirstOrDefault(c => c.IsInputPoint && c.InOrderPositions.Select(x => x.InOrderPosID).Contains(inOrderPos.InOrderPosID));
             }
             if (mixPoint == null)
             {
@@ -205,7 +205,7 @@ namespace gip.mes.facility.TandTv3
                 {
                     mixPoint.AddInwardLot(facilityLot);
                 }
-                mixPoint.InOrderPoses.Add(inOrderPos);
+                mixPoint.InOrderPositions.Add(inOrderPos);
                 MixPoints.Add(mixPoint);
                 CurrentStep.MixingPoints.Add(mixPoint);
                 mixPoint.IsInputPoint = true;
@@ -221,7 +221,7 @@ namespace gip.mes.facility.TandTv3
                 MixPoints
                 .Where(c =>
                     c is TandTv3PointDN &&
-                    c.OutOrderPoses.Select(x => x.OutOrderID).Contains(outOrderPos.OutOrderID) &&
+                    c.OutOrderPositions.Select(x => x.OutOrderID).Contains(outOrderPos.OutOrderID) &&
                     c.InwardLot != null &&
                     c.InwardLot.LotNo == facilityLot.LotNo
                 )
@@ -240,7 +240,7 @@ namespace gip.mes.facility.TandTv3
                 {
                     mixPoint.AddInwardLot(facilityLot);
                 }
-                mixPoint.OutOrderPoses.Add(outOrderPos);
+                mixPoint.OutOrderPositions.Add(outOrderPos);
                 MixPoints.Add(mixPoint);
                 CurrentStep.MixingPoints.Add(mixPoint);
                 mixPoint.IsInputPoint = true;

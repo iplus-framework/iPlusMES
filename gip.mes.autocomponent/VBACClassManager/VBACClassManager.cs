@@ -447,8 +447,8 @@ namespace gip.mes.autocomponent
         {
             MsgWithDetails msgWithDetails = null;
             //  DemandOrderPos/VBiProgramACClassMethodID  |NotNull 
-            List<DemandOrderPos> demandOrderPoses = databaseApp.DemandOrderPos.Where(c => c.VBiProgramACClassMethodID == aCClassMethod.ACClassMethodID).ToList();
-            foreach (DemandOrderPos demandOrderPos in demandOrderPoses)
+            List<DemandOrderPos> demandOrderPositions = databaseApp.DemandOrderPos.Where(c => c.VBiProgramACClassMethodID == aCClassMethod.ACClassMethodID).ToList();
+            foreach (DemandOrderPos demandOrderPos in demandOrderPositions)
                 demandOrderPos.DeleteACObject(databaseApp, withCheck);
 
             //  Material/VBiProgramACClassMethodID  |Null 

@@ -2442,12 +2442,12 @@ namespace gip.bso.manufacturing
             List<SearchBatchMaterialModel> searchResult = new List<SearchBatchMaterialModel>();
             foreach (var batchPlan in batchPlans)
             {
-                GetPosesForBatchMaterialModel(searchResult, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
+                GetPositionsForBatchMaterialModel(searchResult, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
             }
             return searchResult;
         }
 
-        private void GetPosesForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
+        private void GetPositionsForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
         {
             foreach (ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
             {
@@ -2459,7 +2459,7 @@ namespace gip.bso.manufacturing
                 {
                     double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
                     double subPosTargetQuantity = posTargetQuantityUOM * factor;
-                    GetPosesForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
+                    GetPositionsForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
                 }
             }
         }
