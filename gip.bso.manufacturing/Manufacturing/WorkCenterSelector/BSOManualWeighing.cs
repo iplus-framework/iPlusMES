@@ -2456,8 +2456,10 @@ namespace gip.bso.manufacturing
             gip.core.datamodel.ACClassMethod acClassMethod = null;
             bool wfRunsBatches = false;
             ACComponent appManager = null;
+            Route validRoute = null;
+            ACClassWF workflow = null;
 
-            if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches, out appManager))
+            if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches, out appManager, out validRoute, out workflow))
             {
                 ClearBookingData();
                 return;
@@ -2485,6 +2487,9 @@ namespace gip.bso.manufacturing
                 return;
             }
             ACSaveChanges();
+
+            SetPickingRoutingRules(validRoute, workflow, picking);
+
             msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
@@ -2538,24 +2543,36 @@ namespace gip.bso.manufacturing
         }
 
         //#region Workflow-Starting
-        protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, out gip.core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager)
+        protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, out gip.core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager,
+                                                    out Route validRoute, out ACClassWF workflow)
         {
             string pwClassNameOfRoot = GetPWClassNameOfRoot(forBooking);
             acClassMethod = null;
             wfRunsBatches = false;
             appManager = null;
-            //SelectedSourceModule = null;
+            validRoute = null;
+            workflow = null;
+
             Msg msg = null;
 
             if (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
                 || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                 return false;
-            msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
+
+            
+
+            msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
             if (msg != null)
             {
                 Messages.Msg(msg);
                 return false;
             }
+
+            if (validRoute == null)
+            {
+                //TODO:Error
+                return false;
+            }    
 
             vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
             if (material == null)
@@ -2584,17 +2601,17 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            gip.core.datamodel.ACClassWF wfNode = wfConfig.VBiACClassWF.FromIPlusContext<ACClassWF>(DatabaseApp.ContextIPlus);
-            acClassMethod = wfNode.ACClassMethod;
+            workflow = wfConfig.VBiACClassWF.FromIPlusContext<ACClassWF>(DatabaseApp.ContextIPlus);
+            acClassMethod = workflow.ACClassMethod;
 
-            if (wfNode == null || wfNode.ACClassMethod == null)
+            if (workflow == null || workflow.ACClassMethod == null)
                 return false;
 
             if (acClassMethod == null)
                 return false;
 
             Type typePWWF = typeof(PWNodeProcessWorkflow);
-            wfRunsBatches = acClassMethod.ACClassWF_ACClassMethod.ToArray().Where(c => c.RefPAACClassMethodID.HasValue && c.PWACClass != null && c.PWACClass.ObjectType != null && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)).Any();
+            //wfRunsBatches = acClassMethod.ACClassWF_ACClassMethod.ToArray().Where(c => c.RefPAACClassMethodID.HasValue && c.PWACClass != null && c.PWACClass.ObjectType != null && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)).Any();
             gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
 
             var AppManagersList = this.Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).ToList();
@@ -2660,9 +2677,10 @@ namespace gip.bso.manufacturing
             return false;
         }
 
-        protected virtual Msg OnValidateRoutesForWF(ACMethodBooking forBooking, gip.core.datamodel.ACClass fromClass, gip.core.datamodel.ACClass toClass)
+        protected virtual Msg OnValidateRoutesForWF(ACMethodBooking forBooking, gip.core.datamodel.ACClass fromClass, gip.core.datamodel.ACClass toClass, out Route validRoute)
         {
             Msg msg = null;
+            validRoute = null;
             string siloClass = this.ACFacilityManager.C_SiloClass;
             gip.core.datamodel.ACClass siloACClass = this.ACFacilityManager.GetACClassForIdentifier(siloClass, this.Database.ContextIPlus);
             if (siloACClass == null)
@@ -2693,7 +2711,7 @@ namespace gip.bso.manufacturing
                                     fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
                                     (c, p, r) => c.ACClassID == toClass.ACClassID,
                                     (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (fromClass.ACClassID == c.ACClassID || typeSilo.IsAssignableFrom(c.ObjectType)),
-                                    0, true, true, false, false, 10);
+                                    10, true, true, false, false, 10);
             if (result.Routes == null || !result.Routes.Any())
             {
                 //Error50122: No route found for this transport.
@@ -2707,7 +2725,107 @@ namespace gip.bso.manufacturing
                 return msg;
             }
 
+            Guid currentModule = CurrentProcessModule.ComponentClass.ACClassID;
+
+            validRoute = result.Routes.FirstOrDefault(c => c.Items.Any(x => x.SourceGuid == currentModule || x.TargetGuid == currentModule));
+
             return msg;
+        }
+
+        protected virtual void SetPickingRoutingRules(Route validRoute, ACClassWF rootWF, vd.Picking picking)
+        {
+            List<Tuple<ACClassWF,string>> subWFs = new List<Tuple<ACClassWF, string>>();
+            GetSubWorkflows(new Tuple<ACClassWF, string>(rootWF, ""), subWFs, 0);
+
+            List<SingleDosingConfigItem> configItems = new List<SingleDosingConfigItem>();
+
+            foreach (var subWF in subWFs)
+            {
+                configItems.AddRange(subWF.Item1.RefPAACClassMethod.ACClassWF_ACClassMethod.Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWGroup)
+                                                                                     .Select(p => new SingleDosingConfigItem() { PreConfigACUrl = subWF.Item2, PWGroup = p }));
+            }
+
+
+            string ruleSuffix = @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString();
+
+            RouteItem target = validRoute.GetRouteTarget();
+
+            foreach(RouteItem rItem in validRoute)
+            {
+                if (rItem.Source.ACKindIndex != (short)Global.ACKinds.TPAProcessModule)
+                    continue;
+
+                var configPWGroups = configItems.Where(c => c.PossibleMachines.Any(x => x.ACClassID == rItem.SourceGuid));
+            
+                if(configPWGroups != null && configPWGroups.Any())
+                {
+                    if(configPWGroups.Count() > 1)
+                    {
+                        //TODO: user must manually set routing rules
+                        continue;
+                    }
+
+                    SingleDosingConfigItem configItem = configPWGroups.FirstOrDefault();
+
+                    string preACUrl = configItem.PreConfigACUrl + "\\";
+                    string configACUrl = configItem.PWGroup.ConfigACUrl + ruleSuffix;
+
+                    vd.PickingConfig pickingConfig = picking.PickingConfig_Picking.FirstOrDefault(c => c.PreConfigACUrl == preACUrl && c.LocalConfigACUrl == configACUrl);
+                    if (pickingConfig == null)
+                    {
+                        pickingConfig = vd.PickingConfig.NewACObject(DatabaseApp, picking);
+                        pickingConfig.PreConfigACUrl = preACUrl;
+                        pickingConfig.LocalConfigACUrl = configACUrl;
+                        pickingConfig.VBiACClassWFID = configItem.PWGroup.ACClassWFID;
+
+                        ACClass machine = configItem.PossibleMachines.FirstOrDefault(c => c.ACClassID == rItem.SourceGuid);
+
+                        List<RuleValue> ruleValues = new List<RuleValue>();
+                        ruleValues.Add(new RuleValue() { RuleType = ACClassWFRuleTypes.Allowed_instances, ACClassACUrl = new List<string>() { machine.ACUrl } });
+
+                        RulesCommand.WriteIACConfig(DatabaseApp, pickingConfig, ruleValues);
+
+                        var msg = DatabaseApp.ACSaveChanges();
+                    }
+                }
+            }
+
+            OnSetPickingRoutingRules(picking, rootWF, configItems);
+        }
+
+        public virtual void OnSetPickingRoutingRules(vd.Picking picking, ACClassWF rootWF, List<SingleDosingConfigItem> configItems)
+        {
+
+        }
+
+        private void GetSubWorkflows(Tuple<ACClassWF, string> acClassWF, List<Tuple<ACClassWF, string>> subworkflows, int depth, int maxDepth = 4)
+        {
+            string preConfigACUrl = "";
+            var items = acClassWF.Item1.ACClassWF_ParentACClassWF.Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeWorkflow);
+            if (items == null || !items.Any())
+            {
+                if (acClassWF.Item1.RefPAACClassMethod != null)
+                {
+                    preConfigACUrl = acClassWF.Item2 + "\\";
+                    items = acClassWF.Item1.RefPAACClassMethod.ACClassWF_ACClassMethod.Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeWorkflow);
+                }
+            }
+
+            if (items == null || !items.Any())
+                return;
+
+            if (depth >= maxDepth)
+                return;
+            depth++;
+
+            var wfItems = items.Select(c => new Tuple<ACClassWF, string>(c, preConfigACUrl + c.ConfigACUrl));
+
+            subworkflows.AddRange(wfItems);
+
+            foreach (var subworkflow in wfItems)
+            {
+                GetSubWorkflows(subworkflow, subworkflows, depth, maxDepth);
+            }
         }
 
         #endregion
@@ -3334,6 +3452,26 @@ namespace gip.bso.manufacturing
         Weighing = 0,
         InTolerance = 10,
         OutTolerance = 20
+    }
+
+    public class SingleDosingConfigItem
+    {
+        public string PreConfigACUrl
+        {
+            get;
+            set;
+        }
+
+        public ACClassWF PWGroup
+        {
+            get;
+            set;
+        }
+
+        public IEnumerable<ACClass> PossibleMachines
+        {
+            get => PWGroup.RefPAACClass.DerivedClassesInProjects;
+        }
     }
 
     #endregion

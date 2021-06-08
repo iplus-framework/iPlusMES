@@ -1462,12 +1462,9 @@ namespace gip.bso.masterdata
                 if (SelectedWorkflowRoot == null)
                     return null;
 
-                var subWorkflows = SelectedWorkflowRoot.ACClassWF_ParentACClassWF.Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeWorkflow);
+                var pwGroups = SelectedWorkflowRoot.GetPWGroups();
 
-                var pwGroups = subWorkflows.SelectMany(x => x.RefPAACClassMethod.ACClassWF_ACClassMethod).Where(c => c.PWACClass != null && c.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWGroup);
-
-                var possibleMachines = pwGroups.SelectMany(c => c.RefPAACClass.ACClass_BasedOnACClass).Where(c => c.ACStartTypeIndex != (short)Global.ACStartTypes.Disabled &&
-                                                                                                                  c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application);
+                var possibleMachines = pwGroups.SelectMany(c => c.RefPAACClass.DerivedClassesInProjects);
 
                 return possibleMachines;
             }

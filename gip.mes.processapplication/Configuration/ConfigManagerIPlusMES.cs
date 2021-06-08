@@ -213,6 +213,42 @@ namespace gip.mes.processapplication
             return mandatoryConfigStores;
         }
 
+        public List<IACConfigStore> GetPickingConfigStoreOfflineList(Guid acClassTaskID, Guid pickingID, out int expectedConfigStoresCount, out string message)
+        {
+            expectedConfigStoresCount = 1;
+            message = "";
+            Picking configStagePicking = null;
+
+            List<IACConfigStore> mandatoryConfigStores = new List<IACConfigStore>();
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                gip.mes.datamodel.ACClassTask task = dbApp.ACClassTask.FirstOrDefault(x => x.ACClassTaskID == acClassTaskID);
+                if (task == null)
+                {
+                    message = String.Format("ACClassTask-Object doesn't exist in Database with ACClassTaskID {0}", acClassTaskID);
+                    Messages.LogError(this.GetACUrl(), "GetPickingConfigStoreOfflineList()", message);
+                    return null;
+                }
+
+                configStagePicking = dbApp.Picking.Include("PickingConfig_Picking").FirstOrDefault(c => c.PickingID == pickingID);
+
+                IEnumerable<IACConfig> cfSource = null;
+                if (configStagePicking != null)
+                    cfSource = configStagePicking.ConfigurationEntries;
+
+                dbApp.DetachAllEntitiesAndDispose(true, false);
+            }
+
+            if (configStagePicking != null)
+            {
+                configStagePicking.OverridingOrder = 1;
+                mandatoryConfigStores.Add(configStagePicking);
+            }
+
+            return mandatoryConfigStores;
+        }
+
         public override List<IACConfigStore> AttachConfigStoresToDatabase(IACEntityObjectContext db, List<ACConfigStoreInfo> rmiResult)
         {
             ObjectContext obContext = db as ObjectContext;
