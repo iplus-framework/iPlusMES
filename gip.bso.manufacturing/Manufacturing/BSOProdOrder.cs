@@ -432,6 +432,8 @@ namespace gip.bso.manufacturing
             if (result < Global.ControlModes.Enabled)
                 return result;
 
+
+
             if (!String.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith("SelectedOutwardACMethodBooking"))
             {
                 if (SelectedOutwardACMethodBooking == null)
@@ -1401,14 +1403,23 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction(ProdOrder.ClassName, "en{'Ok'}de{'Ok'}", (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void PartslistChangeTargetQuantityDlgOk()
         {
-            Msg msg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, SelectedProdOrderPartslist, PartslistChangeTargetQuantityInput.Value);
-            if (msg != null)
+            if (RecalculateQuantities)
             {
-                Messages.Msg(msg);
-                return;
+                Msg msg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, SelectedProdOrderPartslist, PartslistChangeTargetQuantityInput.Value);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    return;
+                }
+                PreselectedProdorderPartslistID = SelectedProdOrderPartslist?.ProdOrderPartslistID;
+                SearchProdOrderPartslist();
             }
-            PreselectedProdorderPartslistID = SelectedProdOrderPartslist?.ProdOrderPartslistID;
-            SearchProdOrderPartslist();
+            else
+            {
+                SelectedProdOrderPartslist.TargetQuantity = PartslistChangeTargetQuantityInput.Value;
+                OnPropertyChanged("SelectedProdOrderPartslist");
+                OnPropertyChanged("ProdOrderPartslistList");
+            }
             CloseTopDialog();
         }
 
@@ -1449,6 +1460,28 @@ namespace gip.bso.manufacturing
                 {
                     _PartslistChangeTargetQuantityInput = value;
                     OnPropertyChanged("PartslistChangeTargetQuantityInput");
+                }
+            }
+        }
+
+        private bool _RecalculateQuantities = true;
+        /// <summary>
+        /// Doc  MakeQuantityRecalculation
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "RecalculateQuantities", "en{'Recalc all quantities'}de{'Alle Mengen neu berechnen'}")]
+        public bool RecalculateQuantities
+        {
+            get
+            {
+                return _RecalculateQuantities;
+            }
+            set
+            {
+                if (_RecalculateQuantities != value)
+                {
+                    _RecalculateQuantities = value;
+                    OnPropertyChanged("RecalculateQuantities");
                 }
             }
         }
@@ -1593,6 +1626,15 @@ namespace gip.bso.manufacturing
                     SearchAlternative();
                     OnPropertyChanged("SelectedProdOrderPartslistPos");
                     OnPropertyChanged("SelectedInputMaterial");
+
+                    _ComponentBasedOnPlPosList = null;
+                    _SelectedComponentBasedOnPlPos = null;
+                    if (value != null)
+                        _SelectedComponentBasedOnPlPos = ComponentBasedOnPlPosList.Where(c => c.PartslistPosID == value.BasedOnPartslistPosID).FirstOrDefault();
+                    
+                    OnPropertyChanged("SelectedComponentBasedOnPlPos");
+                    OnPropertyChanged("ComponentBasedOnPlPosList");
+
                 }
             }
         }
@@ -1620,6 +1662,75 @@ namespace gip.bso.manufacturing
                 return _ProdOrderPartslistPosList;
             }
         }
+
+        #endregion
+
+        #region ProdOrderPartslistPos -> ComponentBasedOnPlPos
+
+
+        #region ComponentBasedOnPlPos
+        private PartslistPos _SelectedComponentBasedOnPlPos;
+        /// <summary>
+        /// Selected property for PartslistPos
+        /// </summary>
+        /// <value>The selected ComponentBasedOnPlPos</value>
+        [ACPropertySelected(9999, "ComponentBasedOnPlPos", "en{'Based on BM. line'}de{'Basiert auf Stückl. Linie'}")]
+        public PartslistPos SelectedComponentBasedOnPlPos
+        {
+            get
+            {
+                return _SelectedComponentBasedOnPlPos;
+            }
+            set
+            {
+                if (_SelectedComponentBasedOnPlPos != value)
+                {
+                    _SelectedComponentBasedOnPlPos = value;
+                    if (SelectedProdOrderPartslistPos != null)
+                    {
+                        if (value != null)
+                            SelectedProdOrderPartslistPos.BasedOnPartslistPos = value;
+                        else
+                            SelectedProdOrderPartslistPos.BasedOnPartslistPos = null;
+                    }
+
+                    OnPropertyChanged("SelectedComponentBasedOnPlPos");
+                }
+            }
+        }
+
+
+        private List<PartslistPos> _ComponentBasedOnPlPosList;
+        /// <summary>
+        /// List property for PartslistPos
+        /// </summary>
+        /// <value>The ComponentBasedOnPlPos list</value>
+        [ACPropertyList(9999, "ComponentBasedOnPlPos")]
+        public List<PartslistPos> ComponentBasedOnPlPosList
+        {
+            get
+            {
+                if (_ComponentBasedOnPlPosList == null)
+                    _ComponentBasedOnPlPosList = LoadComponentBasedOnPlPosList();
+                return _ComponentBasedOnPlPosList;
+            }
+        }
+
+        private List<PartslistPos> LoadComponentBasedOnPlPosList()
+        {
+            if (SelectedProdOrderPartslist == null)
+                return new List<PartslistPos>();
+            List<Guid> allocatedPlPosIDs = new List<Guid>();
+            if (ProdOrderPartslistPosList != null && ProdOrderPartslistPosList.Any())
+            {
+                allocatedPlPosIDs = ProdOrderPartslistPosList.Where(c => c.BasedOnPartslistPos != null).Select(c => c.BasedOnPartslistPosID ?? Guid.Empty).ToList();
+                if (SelectedProdOrderPartslistPos != null && SelectedProdOrderPartslistPos.BasedOnPartslistPos != null)
+                    allocatedPlPosIDs.Remove(SelectedProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty);
+            }
+            return SelectedProdOrderPartslist.Partslist.PartslistPos_Partslist.Where(c => !allocatedPlPosIDs.Contains(c.PartslistPosID)).ToList();
+        }
+        #endregion
+
 
         #endregion
 
