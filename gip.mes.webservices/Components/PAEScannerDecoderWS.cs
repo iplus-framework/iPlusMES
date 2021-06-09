@@ -19,7 +19,7 @@ namespace gip.mes.webservices
             RegisterExecuteHandler(typeof(PAEScannerDecoderWS), HandleExecuteACMethod_PAEScannerDecoderWS);
         }
 
-        public PAEScannerDecoderWS(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public PAEScannerDecoderWS(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
@@ -47,6 +47,32 @@ namespace gip.mes.webservices
         #region Methods
 
         public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequence(BarcodeSequence sequence)
+        {
+            WSResponse<BarcodeSequence> response = null;
+            switch (sequence.BarcodeIssuer)
+            {
+                case BarcodeSequenceBase.BarcodeIssuerEnum.Picking:
+                    response = OnHandleNextBarcodeSequencePicking(sequence);
+                    break;
+                case BarcodeSequenceBase.BarcodeIssuerEnum.Production:
+                    response = OnHandleNextBarcodeSequenceProduction(sequence);
+                    break;
+                case BarcodeSequenceBase.BarcodeIssuerEnum.Inventory:
+                    response = OnHandleNextBarcodeSequenceInventory(sequence);
+                    break;
+                default:
+                    response = OnHandleNextBarcodeSequenceProduction(sequence);
+                    break;
+            }
+            return response;
+        }
+
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequencePicking(BarcodeSequence sequence)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequenceProduction(BarcodeSequence sequence)
         {
             if (sequence.Sequence.Count >= 3 && sequence.State != BarcodeSequence.ActionState.Question)
             {
@@ -91,6 +117,37 @@ namespace gip.mes.webservices
             OnHandleResolvedComponent(resolvedComponent, controller, sequence);
 
             return new WSResponse<BarcodeSequence>(sequence);
+        }
+
+        /// <summary>
+        /// Barcode sequence is complete when valid FacilityCharge is obtained
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequenceInventory(BarcodeSequence sequence)
+        {
+            // Can be scanned
+            // Material
+            // Facility Lot
+            // Facility
+
+            // Result: FacilityCharge (unique)
+            // Is enough when unique charge is obtained
+
+            if(sequence.Sequence.Any(c=>c.GetType() ==  typeof(FacilityCharge)))
+            {
+                sequence.State = BarcodeSequenceBase.ActionState.Completed;
+            }
+            else
+            {
+                BarcodeEntity material = sequence.Sequence.Where(c=>c.GetType() == typeof(Material)).FirstOrDefault();
+                BarcodeEntity facility = sequence.Sequence.Where(c=>c.GetType() == typeof(Facility)).FirstOrDefault();
+                BarcodeEntity facilityLot = sequence.Sequence.Where(c=>c.GetType() == typeof(FacilityLot)).FirstOrDefault();
+
+
+            }
+
+            throw new NotImplementedException();
         }
 
         protected virtual bool ResolveACComponentAndValidateState(BarcodeSequence sequence, BarcodeEntity entityClass, out ACComponent resolvedComponent, out PAScannedCompContrBase controller)
