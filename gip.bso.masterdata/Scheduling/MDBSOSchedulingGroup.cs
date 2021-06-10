@@ -40,7 +40,6 @@ namespace gip.bso.masterdata.Scheduling
                 return false;
 
             Search();
-            AccessAvailableACClassWF.NavSearch();
             return true;
         }
 
@@ -113,9 +112,10 @@ namespace gip.bso.masterdata.Scheduling
             }
             set
             {
-                if (AccessPrimary == null) return; 
+                if (AccessPrimary == null) return;
                 AccessPrimary.Current = value;
                 LoadMDSchedulingGroupWFList();
+                LoadAvailableACClassWFList();
                 OnPropertyChanged("CurrentMDSchedulingGroup");
             }
         }
@@ -162,7 +162,6 @@ namespace gip.bso.masterdata.Scheduling
             }
         }
 
-
         private List<MDSchedulingGroupWF> _MDSchedulingGroupWFList;
         /// <summary>
         /// List property for MDSchedulingGroupWF
@@ -179,7 +178,6 @@ namespace gip.bso.masterdata.Scheduling
 
         private void LoadMDSchedulingGroupWFList()
         {
-            Guid? acclasWFID = null;
             if (SelectedMDSchedulingGroup == null)
             {
                 _MDSchedulingGroupWFList = null;
@@ -191,16 +189,8 @@ namespace gip.bso.masterdata.Scheduling
                 _SelectedMDSchedulingGroupWF = _MDSchedulingGroupWFList.FirstOrDefault();
             }
 
-            if (_SelectedMDSchedulingGroupWF != null)
-                acclasWFID = _SelectedMDSchedulingGroupWF.VBiACClassWFID;
-
-            SelectedAvailableACClassWF = null;
-            if (AvailableACClassWFList != null)
-                SelectedAvailableACClassWF = AvailableACClassWFList.FirstOrDefault(c => acclasWFID == null || c.ACClassWFID == acclasWFID);
-
             OnPropertyChanged("MDSchedulingGroupWFList");
             OnPropertyChanged("SelectedMDSchedulingGroupWF");
-            OnPropertyChanged("SelectedAvailableACClassWF");
         }
         #endregion
 
@@ -227,6 +217,9 @@ namespace gip.bso.masterdata.Scheduling
         {
             if (result != null)
             {
+                List<Guid> assignedWorkflowNodeIds = new List<Guid>();
+                if (_MDSchedulingGroupWFList != null)
+                    assignedWorkflowNodeIds = _MDSchedulingGroupWFList.Select(c => c.VBiACClassWFID).ToList();
                 result = result
                     .Where(c =>
                  c.RefPAACClassMethodID.HasValue
@@ -235,7 +228,8 @@ namespace gip.bso.masterdata.Scheduling
                  && c.RefPAACClassMethod.PWACClass != null
                  && (c.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
                      || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
-                 && !string.IsNullOrEmpty(c.Comment));
+                 && !string.IsNullOrEmpty(c.Comment)
+                 && !assignedWorkflowNodeIds.Contains(c.ACClassWFID));
             }
             return result;
         }
@@ -277,6 +271,11 @@ namespace gip.bso.masterdata.Scheduling
             }
         }
 
+        public void LoadAvailableACClassWFList()
+        {
+            AccessAvailableACClassWF.NavSearch();
+            OnPropertyChanged("AvailableACClassWFList");
+        }
 
         #endregion
 
@@ -413,7 +412,7 @@ namespace gip.bso.masterdata.Scheduling
 
         #region 2. MDSchedulingGroupWF
 
-        [ACMethodInfo("AddMDSchedulingGroupWF", "en{'Add'}de{'Neu'}", 9999, false)]
+        [ACMethodInfo("AddMDSchedulingGroupWF", "en{'>'}de{'>'}", 9999, false)]
         public void AddMDSchedulingGroupWF()
         {
             if (!IsEnabledAddMDSchedulingGroupWF())
@@ -424,7 +423,9 @@ namespace gip.bso.masterdata.Scheduling
             newWf.ACClassWF = SelectedAvailableACClassWF;
             MDSchedulingGroupWFList.Add(newWf);
             SelectedMDSchedulingGroupWF = newWf;
+
             OnPropertyChanged("MDSchedulingGroupWFList");
+            LoadAvailableACClassWFList();
         }
 
         public bool IsEnabledAddMDSchedulingGroupWF()
@@ -440,7 +441,7 @@ namespace gip.bso.masterdata.Scheduling
                     );
         }
 
-        [ACMethodInfo("DeleteMDSchedulingGroupWF", "en{'Delete'}de{'Löschen'}", 9999, false)]
+        [ACMethodInfo("DeleteMDSchedulingGroupWF", "en{'<'}de{'<'}", 9999, false)]
         public void DeleteMDSchedulingGroupWF()
         {
             if (!IsEnabledDeleteMDSchedulingGroupWF())
@@ -452,6 +453,9 @@ namespace gip.bso.masterdata.Scheduling
                 SelectedMDSchedulingGroupWF = MDSchedulingGroupWFList.FirstOrDefault();
             else
                 MDSchedulingGroupWFList.Add(item);
+
+            OnPropertyChanged("MDSchedulingGroupWFList");
+            LoadAvailableACClassWFList();
         }
 
 

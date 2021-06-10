@@ -106,7 +106,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return Partslist.ACCaption + " " + Sequence;
+                return Partslist.PartslistNo + " " + Sequence + " | " + Material.MaterialNo;
             }
         }
 
