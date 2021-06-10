@@ -160,20 +160,7 @@ namespace gip.mes.webservices
                         MDNameTrans = c.MDFacilityType.MDNameTrans,
                         MDFacilityTypeIndex = c.MDFacilityType.MDFacilityTypeIndex
                     },
-
-                    ParentFacilityID = c.ParentFacilityID,
-                    ParentFacility = c.ParentFacilityID == null ? null : new gip.mes.webservices.Facility()
-                                    {
-                                        FacilityID = c.Facility1_ParentFacility.FacilityID,
-                                        FacilityNo = c.Facility1_ParentFacility.FacilityNo,
-                                        FacilityName = c.Facility1_ParentFacility.FacilityName,
-                                        MDFacilityType = new MDFacilityType()
-                                        {
-                                            MDFacilityTypeID = c.Facility1_ParentFacility.MDFacilityTypeID,
-                                            MDNameTrans = c.Facility1_ParentFacility.MDFacilityType.MDNameTrans,
-                                            MDFacilityTypeIndex = c.Facility1_ParentFacility.MDFacilityType.MDFacilityTypeIndex
-                                        }
-                                    }
+                    ParentFacilityID = c.ParentFacilityID
                 }
              )
         );
@@ -210,7 +197,10 @@ namespace gip.mes.webservices
             {
                 try
                 {
-                    return new WSResponse<Facility>(s_cQry_GetFacility(dbApp, guid, null, null, null).FirstOrDefault());
+                    Facility facility = s_cQry_GetFacility(dbApp, guid, null, null, null).FirstOrDefault();
+                    if (facility.ParentFacilityID != null)
+                        facility.ParentFacility = s_cQry_GetFacility(dbApp, facility.ParentFacilityID, null, null, null).FirstOrDefault();
+                    return new WSResponse<Facility>(facility);
                 }
                 catch (Exception e)
                 {
@@ -283,7 +273,10 @@ namespace gip.mes.webservices
                     Guid guid = facManager.ResolveFacilityIdFromBarcode(dbApp, barcodeID);
                     if (guid == Guid.Empty)
                         return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
-                    return new WSResponse<Facility>(s_cQry_GetFacility(dbApp, guid, null, null, null).FirstOrDefault());
+                    Facility facility = s_cQry_GetFacility(dbApp, guid, null, null, null).FirstOrDefault();
+                    if (facility.ParentFacilityID != null)
+                        facility.ParentFacility = s_cQry_GetFacility(dbApp, facility.ParentFacilityID, null, null, null).FirstOrDefault();
+                    return new WSResponse<Facility>(facility);
                 }
                 catch (Exception e)
                 {

@@ -41,7 +41,7 @@ namespace gip.mes.webservices
             get; set;
         }
 
-        [DataMember(Name = "PFID")]
+        [DataMember(Name = "PF")]
         public Facility ParentFacility
         {
             get; set;
