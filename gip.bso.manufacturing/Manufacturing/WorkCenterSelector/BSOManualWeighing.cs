@@ -2488,7 +2488,7 @@ namespace gip.bso.manufacturing
             }
             ACSaveChanges();
 
-            SetPickingRoutingRules(validRoute, workflow, picking);
+            //SetPickingRoutingRules(validRoute, workflow, picking);
 
             msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)

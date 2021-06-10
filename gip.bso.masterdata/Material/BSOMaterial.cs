@@ -1443,7 +1443,9 @@ namespace gip.bso.masterdata
                                                                     || (c.PWACClass.BasedOnACClassID.HasValue
                                                                         && (c.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodRelocation.PWClassName
                                                                             || (c.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodRelocation.PWClassName))))
-                                                                && !c.ACClassMethod.IsSubMethod);
+                                                                && !c.ACClassMethod.IsSubMethod).SelectMany(x => x.ACClassWF_ParentACClassWF)
+                                                                .Where(c => c.PWACClass.ACIdentifier == mes.processapplication.PWNodeProcessWorkflowVB.PWClassName).ToArray()
+                                                                ;
             }
         }
 
