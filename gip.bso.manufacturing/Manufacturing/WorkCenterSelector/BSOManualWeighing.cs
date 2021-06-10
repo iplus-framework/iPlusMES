@@ -2752,9 +2752,6 @@ namespace gip.bso.manufacturing
 
             foreach(RouteItem rItem in validRoute)
             {
-                if (rItem.Source.ACKindIndex != (short)Global.ACKinds.TPAProcessModule)
-                    continue;
-
                 var configPWGroups = configItems.Where(c => c.PossibleMachines.Any(x => x.ACClassID == rItem.SourceGuid));
             
                 if(configPWGroups != null && configPWGroups.Any())
