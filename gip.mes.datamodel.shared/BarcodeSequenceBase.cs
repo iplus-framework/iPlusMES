@@ -97,7 +97,8 @@ namespace gip.mes.datamodel
         {
             Production = 0,
             Picking = 1,
-            Inventory = 2
+            Inventory = 2,
+            General = 3
         }
     }
 }
