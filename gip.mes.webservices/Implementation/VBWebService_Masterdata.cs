@@ -145,7 +145,7 @@ namespace gip.mes.webservices
         CompiledQuery.Compile<DatabaseApp, Guid?, string, Guid?, short?, IQueryable<Facility>>(
             (dbApp, facilityID, term, parentFacilityID, facilityTypeIndex) =>
                 dbApp.Facility
-                .Where(c =>    (!facilityID.HasValue || c.FacilityID == facilityID)
+                .Where(c => (!facilityID.HasValue || c.FacilityID == facilityID)
                             && (term == null || c.FacilityNo.Contains(term) || c.FacilityName.Contains(term))
                             && (!parentFacilityID.HasValue || c.ParentFacilityID == parentFacilityID)
                             && (!facilityTypeIndex.HasValue || c.MDFacilityType.MDFacilityTypeIndex == facilityTypeIndex))
@@ -154,13 +154,26 @@ namespace gip.mes.webservices
                     FacilityID = c.FacilityID,
                     FacilityNo = c.FacilityNo,
                     FacilityName = c.FacilityName,
-                    ParentFacilityID = c.ParentFacilityID,
                     MDFacilityType = new MDFacilityType()
                     {
                         MDFacilityTypeID = c.MDFacilityTypeID,
                         MDNameTrans = c.MDFacilityType.MDNameTrans,
                         MDFacilityTypeIndex = c.MDFacilityType.MDFacilityTypeIndex
-                    }
+                    },
+
+                    ParentFacilityID = c.ParentFacilityID,
+                    ParentFacility = c.ParentFacilityID == null ? null : new gip.mes.webservices.Facility()
+                                    {
+                                        FacilityID = c.Facility1_ParentFacility.FacilityID,
+                                        FacilityNo = c.Facility1_ParentFacility.FacilityNo,
+                                        FacilityName = c.Facility1_ParentFacility.FacilityName,
+                                        MDFacilityType = new MDFacilityType()
+                                        {
+                                            MDFacilityTypeID = c.Facility1_ParentFacility.MDFacilityTypeID,
+                                            MDNameTrans = c.Facility1_ParentFacility.MDFacilityType.MDNameTrans,
+                                            MDFacilityTypeIndex = c.Facility1_ParentFacility.MDFacilityType.MDFacilityTypeIndex
+                                        }
+                                    }
                 }
              )
         );
