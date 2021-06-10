@@ -262,11 +262,13 @@ namespace gip.mes.processapplication
         {
             var pwGroup = ParentPWGroup;
             if (pwGroup == null) // Is null when Service-Application is shutting down
+            {
                 if (this.InitState == ACInitState.Initialized)
                 {
                     Messages.LogError(this.GetACUrl(), "SMStarting()", "ParentPWGroup is null");
                     return;
                 }
+            }
 
             bool isCompleted = IsCompleted(pwGroup);
             if (isCompleted)

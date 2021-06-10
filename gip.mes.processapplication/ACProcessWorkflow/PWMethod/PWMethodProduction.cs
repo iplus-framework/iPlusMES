@@ -70,7 +70,7 @@ namespace gip.mes.processapplication
             _LabOrderManager = null;
             UnregisterFromCachedDestinations();
 
-
+            IsStartingMethodProduction = false;
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 //_ACProgramVB = null;
@@ -88,7 +88,7 @@ namespace gip.mes.processapplication
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
         {
-
+            IsStartingMethodProduction = false;
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 //_ACProgramVB = null;
@@ -191,6 +191,25 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected bool _IsStartingMethodProduction = false;
+        protected bool IsStartingMethodProduction
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _IsStartingMethodProduction;
+                }
+            }
+            private set
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _IsStartingMethodProduction = value;
+                }
+            }
+        }
+
         //private MaterialWFACClassMethod _ConfigStageMatWF = null;
         //private Partslist _ConfigStagePartslist = null;
         //private MaterialWF _ConfigMaterialWF = null;
@@ -250,7 +269,7 @@ namespace gip.mes.processapplication
                         errorMessage = "";
                     errorMessage = errorMessage + " Configuration could not be loaded. Workflownodes will run with wrong parameters. If you acknowledge the alarm, the workflow will continue otherwise reset the Workflow manually!";
                     OnNewAlarmOccurred(ProcessAlarm, new Msg(errorMessage, this, eMsgLevel.Error, PWClassName, "MandatoryConfigStores", 1000), true);
-                    Messages.LogError(this.GetACUrl(), "Start(0)", errorMessage);
+                    Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(10)", errorMessage);
                 }
                 if (recalcExpectedConfigStoresCount)
                 {
@@ -258,6 +277,15 @@ namespace gip.mes.processapplication
                     {
                         _ExpectedConfigStoresCount += expectedConfigStoresCount;
                     }
+                }
+            }
+            else if (recalcExpectedConfigStoresCount)
+            {
+                Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(20)", "CurrentProdOrderPartslistPos is null => ConfigStore-Validation will fail!");
+                using (ACMonitor.Lock(_20015_LockStoreList))
+                {
+                    // Minimum is ProdOrderPartslistConfig and PartslistConfig:
+                    _ExpectedConfigStoresCount += 2;
                 }
             }
         }
@@ -407,62 +435,70 @@ namespace gip.mes.processapplication
 #region ACState-Methods
         public override ACMethodEventArgs Start(ACMethod acMethod)
         {
-            ACMethodEventArgs result = null;
-            using (DatabaseApp dbApp = new DatabaseApp())
+            try
             {
-                ProdOrderBatch currentProdOrderBatch = null;
-                ProdOrderPartslistPos currentProdOrderPartslistPos = null;
-                Guid prodOrderPartslistPosID = (Guid)acMethod[ProdOrderPartslistPos.ClassName];
-                if (prodOrderPartslistPosID != Guid.Empty)
-                    currentProdOrderPartslistPos = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == prodOrderPartslistPosID).FirstOrDefault();
-                if (currentProdOrderPartslistPos != null)
+                IsStartingMethodProduction = true;
+                ACMethodEventArgs result = null;
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    currentProdOrderPartslistPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
-                    if (currentProdOrderPartslistPos.ProdOrderBatch != null)
-                        currentProdOrderPartslistPos.ProdOrderBatch.MDProdOrderState = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
-                }
-                var msg = dbApp.ACSaveChanges();
-                if (msg != null)
-                {
-                    ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.InnerMessage, this, eMsgLevel.Error, PWClassName, "Start", 1000), true);
-                    Messages.LogError(this.GetACUrl(), "Start(0)", msg.InnerMessage);
-                }
-
-                if (currentProdOrderPartslistPos != null)
-                    currentProdOrderBatch = currentProdOrderPartslistPos.ProdOrderBatch;
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _CurrentProdOrderBatch = currentProdOrderBatch;
-                    _CurrentProdOrderPartslistPos = currentProdOrderPartslistPos;
-                }
-
-                result = base.Start(acMethod);
-
-                if (result.ResultState == Global.ACMethodResultState.InProcess)
-                {
-                    ACUrlCommand("!OnProdOrderStarted", currentProdOrderPartslistPos);
-                }
-                else
-                {
+                    ProdOrderBatch currentProdOrderBatch = null;
+                    ProdOrderPartslistPos currentProdOrderPartslistPos = null;
+                    Guid prodOrderPartslistPosID = (Guid)acMethod[ProdOrderPartslistPos.ClassName];
+                    if (prodOrderPartslistPosID != Guid.Empty)
+                        currentProdOrderPartslistPos = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == prodOrderPartslistPosID).FirstOrDefault();
                     if (currentProdOrderPartslistPos != null)
                     {
-                        currentProdOrderPartslistPos.ACClassTaskID = null;
-                        msg = dbApp.ACSaveChanges();
-                        if (msg != null)
+                        currentProdOrderPartslistPos.ACClassTaskID = this.ContentTask.ACClassTaskID;
+                        if (currentProdOrderPartslistPos.ProdOrderBatch != null)
+                            currentProdOrderPartslistPos.ProdOrderBatch.MDProdOrderState = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
+                    }
+                    var msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.InnerMessage, this, eMsgLevel.Error, PWClassName, "Start", 1000), true);
+                        Messages.LogError(this.GetACUrl(), "Start(0)", msg.InnerMessage);
+                    }
+
+                    if (currentProdOrderPartslistPos != null)
+                        currentProdOrderBatch = currentProdOrderPartslistPos.ProdOrderBatch;
+                    using (ACMonitor.Lock(_20015_LockValue))
+                    {
+                        _CurrentProdOrderBatch = currentProdOrderBatch;
+                        _CurrentProdOrderPartslistPos = currentProdOrderPartslistPos;
+                    }
+
+                    result = base.Start(acMethod);
+
+                    if (result.ResultState == Global.ACMethodResultState.InProcess)
+                    {
+                        ACUrlCommand("!OnProdOrderStarted", currentProdOrderPartslistPos);
+                    }
+                    else
+                    {
+                        if (currentProdOrderPartslistPos != null)
                         {
-                            ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                            OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.InnerMessage, this, eMsgLevel.Error, PWClassName, "Start", 1010), true);
-                            Messages.LogError(this.GetACUrl(), "Start(1)", msg.InnerMessage);
+                            currentProdOrderPartslistPos.ACClassTaskID = null;
+                            msg = dbApp.ACSaveChanges();
+                            if (msg != null)
+                            {
+                                ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.InnerMessage, this, eMsgLevel.Error, PWClassName, "Start", 1010), true);
+                                Messages.LogError(this.GetACUrl(), "Start(1)", msg.InnerMessage);
+                            }
                         }
                     }
+                    if (currentProdOrderBatch != null)
+                        dbApp.Detach(currentProdOrderBatch);
+                    if (currentProdOrderPartslistPos != null)
+                        dbApp.Detach(currentProdOrderPartslistPos);
                 }
-                if (currentProdOrderBatch != null)
-                    dbApp.Detach(currentProdOrderBatch);
-                if (currentProdOrderPartslistPos != null)
-                    dbApp.Detach(currentProdOrderPartslistPos);
+                return result;
             }
-            return result;
+            finally
+            {
+                IsStartingMethodProduction = false;
+            }
         }
 
         protected override bool CanRunWorkflow()
@@ -518,6 +554,18 @@ namespace gip.mes.processapplication
             var rootPW = RootPW;
             if (rootPW == null)
                 return;
+            if (this.ContentTask.EntityState == System.Data.EntityState.Added)
+            {
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(10)", "EntityState of ContentTask is Added and not saved to the database. The call of LoadVBEntities is too early!");
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(11)", System.Environment.StackTrace);
+                return;
+            }
+            if (IsStartingMethodProduction)
+            {
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(20)", "IsStartingMethodProduction is true. The call of LoadVBEntities is too early!");
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(21)", System.Environment.StackTrace);
+                return;
+            }
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 var contentTaskVB = this.ContentTask.FromAppContext<gip.mes.datamodel.ACClassTask>(dbApp);
