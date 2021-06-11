@@ -277,35 +277,35 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(32, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
-        public double SalesTaxAmount
+        [ACPropertyInfo(32, "", ConstApp.VATPerUnit)]
+        public decimal SalesTaxAmount
         {
             get
             {
-                return (double)PriceNet * (double)(SalesTax / 100);
+                return PriceNet * (SalesTax / 100);
             }
         }
 
-        [ACPropertyInfo(33, "", "en{'Neto total'}de{'Neto total'}")]
-        public double TotalPrice
+        [ACPropertyInfo(33, "", ConstApp.PriceNetTotal)]
+        public decimal TotalPrice
         {
             get
             {
-                return TargetQuantity * (double)PriceNet;
+                return Convert.ToDecimal(TargetQuantity) * PriceNet;
             }
         }
 
-        [ACPropertyInfo(34, "", "en{'VAT total'}de{'MwSt. total'}")]
-        public double TotalSalesTax
+        [ACPropertyInfo(34, "", ConstApp.VATTotal)]
+        public decimal TotalSalesTax
         {
             get
             {
-                return TargetQuantity * (double)SalesTaxAmount;
+                return Convert.ToDecimal(TargetQuantity) * SalesTaxAmount;
             }
         }
 
-        [ACPropertyInfo(35, "", "en{'Bruto total'}de{'Bruto total'}")]
-        public double TotalPriceWithTax
+        [ACPropertyInfo(35, "", ConstApp.PriceGrossTotal)]
+        public decimal TotalPriceWithTax
         {
             get
             {
@@ -314,13 +314,26 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(36)]
-        public string QuantityUnit
+        public string QuantityWithUnitPrinted
         {
             get
             {
-                if (TargetQuantity > 0)
-                    return TargetQuantity + " " + MDUnit?.Symbol;
-                return "";
+                //if (TargetQuantity > 0)
+                return TargetQuantity + " " + DerivedMDUnit?.Symbol;
+                //return "";
+            }
+        }
+
+        [ACPropertyInfo(37)]
+        public MDUnit DerivedMDUnit
+        {
+            get
+            {
+                if (MDUnit != null)
+                    return MDUnit;
+                if (this.Material != null)
+                    return Material.BaseMDUnit;
+                return null;
             }
         }
 

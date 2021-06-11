@@ -219,6 +219,10 @@
         public const string CostGeneral = "en{'Total Cost'}de{'Gesamtkosten'}";
         public const string PriceNet = "en{'Net Price'}de{'Nettopreis'}";
         public const string PriceGross = "en{'Gross Price'}de{'Bruttopreis'}";
+        public const string PriceNetTotal = "en{'Net Total'}de{'Netto Gesamt'}";
+        public const string PriceGrossTotal = "en{'Gross total'}de{'Brutto Gesamt'}";
+        public const string VATPerUnit = "en{'VAT per unit'}de{'MwSt. pro Einheit'}";
+        public const string VATTotal = "en{'VAT total'}de{'MwSt. gesamt'}";
 
         // Addition
         public const string Addition1Percent = "en{'Percent 1'}de{'Prozent 1'}";

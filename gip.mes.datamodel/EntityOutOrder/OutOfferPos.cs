@@ -251,52 +251,52 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(32, "", "en{'Neto total'}de{'Neto total'}")]
-        public double TotalPrice
+        [ACPropertyInfo(32, "", ConstApp.PriceNetTotal)]
+        public decimal TotalPrice
         {
             get
             {
-                return TargetQuantity * (double)PriceNet;
+                return Convert.ToDecimal(TargetQuantity) * PriceNet;
             }
         }
 
         [ACPropertyInfo(33)]
-        public string QuantityUnit
+        public string QuantityWithUnitPrinted
         {
             get
             {
-                if (TargetQuantity > 0)
-                    return TargetQuantity + " " + MDUnit?.Symbol;
+                if (!GroupSum)
+                    return TargetQuantity + " " + DerivedMDUnit?.Symbol;
                 return "";
             }
         }
 
         [ACPropertyInfo(34)]
-        public string Price
+        public string PriceNetPrinted
         {
             get
             {
-                if (PriceNet > 0)
+                if (!GroupSum)
                     return PriceNet.ToString("N");
                 return "";
             }
         }
 
-        public string _Total;
+        public string _TotalPricePrinted;
         [ACPropertyInfo(35)]
-        public string Total
+        public string TotalPricePrinted
         {
             get
             {
-                if (_Total != null)
-                    return _Total;
-                if (TotalPrice > 0)
+                if (_TotalPricePrinted != null)
+                    return _TotalPricePrinted;
+                if (!GroupSum)
                     return TotalPrice.ToString("N");
                 return "";
             }
             set
             {
-                _Total = value;
+                _TotalPricePrinted = value;
             }
         }
 
@@ -319,32 +319,57 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        [ACPropertyInfo(31, "", "en{'VAT amount'}de{'Mehrwertsteuerbetrag'}")]
-        public double SalesTaxAmount
+        [ACPropertyInfo(38)]
+        public string SalesTaxPrinted
         {
             get
             {
-                return (double)PriceNet * (double)(SalesTax / 100);
+                if (!GroupSum)
+                    return SalesTax.ToString("N");
+                return "";
             }
         }
 
-        [ACPropertyInfo(32, "", "en{'VAT total'}de{'MwSt. total'}")]
-        public double TotalSalesTax
+        [ACPropertyInfo(31, "", ConstApp.VATPerUnit)]
+        public decimal SalesTaxAmount
         {
             get
             {
-                return SalesTaxAmount * this.TargetQuantity;
+                return PriceNet * (SalesTax / 100);            
             }
         }
 
-        [ACPropertyInfo(33, "", "en{'Bruto total'}de{'Bruto total'}")]
-        public double TotalPriceWithTax
+        [ACPropertyInfo(32, "", ConstApp.VATTotal)]
+        public decimal TotalSalesTax
+        {
+            get
+            {
+                return SalesTaxAmount * Convert.ToDecimal(this.TargetQuantity);
+            }
+        }
+
+        [ACPropertyInfo(33, "", ConstApp.PriceGrossTotal)]
+        public decimal TotalPriceWithTax
         {
             get
             {
                 return TotalPrice + TotalSalesTax;
             }
         }
+
+        [ACPropertyInfo(37)]
+        public MDUnit DerivedMDUnit
+        {
+            get
+            {
+                if (MDUnit != null)
+                    return MDUnit;
+                if (this.Material != null)
+                    return Material.BaseMDUnit;
+                return null;
+            }
+        }
+
 
         public bool InRecalculation { get; set; }
 
