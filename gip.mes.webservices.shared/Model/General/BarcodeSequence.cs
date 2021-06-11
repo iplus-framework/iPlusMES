@@ -41,6 +41,18 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember]
+        public BarcodeEntity LastAddedSequence
+        {
+            get; set;
+        }
+
+        public void AddSequence(BarcodeEntity barcodeEntity)
+        {
+            LastAddedSequence = barcodeEntity;
+            Sequence.Add(barcodeEntity);
+        }
+
         public void AddQuestion(core.datamodel.Msg question)
         {
             if (question.MessageLevel != core.datamodel.eMsgLevel.Question && question.MessageLevel != core.datamodel.eMsgLevel.QuestionPrompt)

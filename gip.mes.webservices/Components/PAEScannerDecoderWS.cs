@@ -152,6 +152,17 @@ namespace gip.mes.webservices
             }
             else
             {
+
+                // Remove old version item with new one
+                List<BarcodeEntity> sameOlderItems =
+                    sequence
+                    .Sequence
+                    .Where(c => c.GetType() == sequence.LastAddedSequence.GetType() && c.Barcode != sequence.LastAddedSequence.Barcode)
+                    .ToList();
+
+                foreach (BarcodeEntity sameOlderItem in sameOlderItems)
+                    sequence.Sequence.Remove(sameOlderItem);
+
                 sequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
                 BarcodeEntity material = sequence.Sequence.Where(c => c.Material != null).FirstOrDefault();
                 BarcodeEntity facility = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
