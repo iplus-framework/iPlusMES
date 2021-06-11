@@ -142,7 +142,7 @@ namespace gip.mes.webservices
             // Result: FacilityCharge (unique)
             // Is enough when unique charge is obtained
 
-            if (sequence.Sequence.Any(c => c.GetType() == typeof(FacilityCharge)))
+            if (sequence.Sequence.Any(c => c.FacilityCharge != null))
             {
                 sequence.State = BarcodeSequenceBase.ActionState.Completed;
             }
@@ -153,9 +153,9 @@ namespace gip.mes.webservices
             else
             {
                 sequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
-                BarcodeEntity material = sequence.Sequence.Where(c => c.GetType() == typeof(Material)).FirstOrDefault();
-                BarcodeEntity facility = sequence.Sequence.Where(c => c.GetType() == typeof(Facility)).FirstOrDefault();
-                BarcodeEntity facilityLot = sequence.Sequence.Where(c => c.GetType() == typeof(FacilityLot)).FirstOrDefault();
+                BarcodeEntity material = sequence.Sequence.Where(c => c.Material != null).FirstOrDefault();
+                BarcodeEntity facility = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
+                BarcodeEntity facilityLot = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
 
                 BarcodeEntity foundedFacilityCharge = null;
                 using (var dbApp = new gip.mes.datamodel.DatabaseApp())
