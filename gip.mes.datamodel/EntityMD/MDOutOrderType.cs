@@ -45,13 +45,13 @@ namespace gip.mes.datamodel
             (database, index) => from c in database.MDOutOrderType where c.OrderTypeIndex == index select c
         );
 
-        public static MDOutOrderType DefaultMDOutOrderType(DatabaseApp dbApp)
+        public static MDOutOrderType DefaultMDOutOrderType(DatabaseApp dbApp, GlobalApp.OrderTypes orderType)
         {
             try
             {
                 MDOutOrderType defaultObj = s_cQry_Default(dbApp).FirstOrDefault();
                 if (defaultObj == null)
-                    defaultObj = s_cQry_Index(dbApp, (short)GlobalApp.OrderTypes.Order).FirstOrDefault();
+                    defaultObj = s_cQry_Index(dbApp, (short)orderType).FirstOrDefault();
                 return defaultObj;
             }
             catch (Exception ec)
