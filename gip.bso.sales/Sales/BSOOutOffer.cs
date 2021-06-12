@@ -23,8 +23,6 @@ namespace gip.bso.sales
     [ACClassInfo(Const.PackName_VarioSales, "en{'Offering'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
     public class BSOOutOffer : ACBSOvbNav, IOutOrderPosBSO
     {
-
-
         #region private
         private UserSettings CurrentUserSettings { get; set; }
 
@@ -495,10 +493,6 @@ namespace gip.bso.sales
 
         #endregion
 
-        #endregion
-
-        #region Properties
-
         #region Issuer
 
         #region Issuer -> IssuerCompanyAddress
@@ -786,7 +780,6 @@ namespace gip.bso.sales
 
         #endregion
 
-
         #endregion
 
         #region BSO->ACMethod
@@ -842,10 +835,14 @@ namespace gip.bso.sales
                 outOffer.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
                 outOffer.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
             }
+            SelectedOutOffer = outOffer;
             CurrentOutOffer = outOffer;
+
+            if (AccessPrimary != null)
+                AccessPrimary.NavList.Add(CurrentOutOffer);
+
             ACState = Const.SMNew;
             PostExecute("New");
-
         }
 
         public bool IsEnabledNew()
@@ -875,6 +872,7 @@ namespace gip.bso.sales
             newOfferVersion.TargetDeliveryMaxDate = CurrentOutOffer.TargetDeliveryMaxDate;
             newOfferVersion.XMLConfig = CurrentOutOffer.XMLConfig;
             newOfferVersion.XMLDesignStart = CurrentOutOffer.XMLDesignStart;
+            newOfferVersion.XMLDesignEnd = CurrentOutOffer.XMLDesignEnd;
 
             DatabaseApp.OutOffer.AddObject(newOfferVersion);
 
