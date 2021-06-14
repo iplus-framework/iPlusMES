@@ -23,8 +23,6 @@ namespace gip.bso.sales
     [ACClassInfo(Const.PackName_VarioSales, "en{'Offering'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
     public class BSOOutOffer : ACBSOvbNav, IOutOrderPosBSO
     {
-
-
         #region private
         private UserSettings CurrentUserSettings { get; set; }
 
@@ -271,8 +269,11 @@ namespace gip.bso.sales
 
         void CurrentOutOfferPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName,
-                CurrentOutOffer, CurrentOutOfferPos, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList(), CurrentOutOffer?.BillingCompanyAddress);
+            if (OutDeliveryNoteManager != null)
+            {
+                OutDeliveryNoteManager.HandleIOrderPosPropertyChange(DatabaseApp, this, e.PropertyName,
+                    CurrentOutOffer, CurrentOutOfferPos, CurrentOutOffer.OutOfferPos_OutOffer.Select(c => (IOutOrderPos)c).ToList(), CurrentOutOffer?.BillingCompanyAddress);
+            }
         }
 
         /// <summary>
@@ -491,10 +492,6 @@ namespace gip.bso.sales
         }
 
         #endregion
-
-        #endregion
-
-        #region Properties
 
         #region Issuer
 
@@ -783,7 +780,6 @@ namespace gip.bso.sales
 
         #endregion
 
-
         #endregion
 
         #region BSO->ACMethod
@@ -839,10 +835,14 @@ namespace gip.bso.sales
                 outOffer.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
                 outOffer.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
             }
+            SelectedOutOffer = outOffer;
             CurrentOutOffer = outOffer;
+
+            if (AccessPrimary != null)
+                AccessPrimary.NavList.Add(CurrentOutOffer);
+
             ACState = Const.SMNew;
             PostExecute("New");
-
         }
 
         public bool IsEnabledNew()
@@ -872,6 +872,7 @@ namespace gip.bso.sales
             newOfferVersion.TargetDeliveryMaxDate = CurrentOutOffer.TargetDeliveryMaxDate;
             newOfferVersion.XMLConfig = CurrentOutOffer.XMLConfig;
             newOfferVersion.XMLDesignStart = CurrentOutOffer.XMLDesignStart;
+            newOfferVersion.XMLDesignEnd = CurrentOutOffer.XMLDesignEnd;
 
             DatabaseApp.OutOffer.AddObject(newOfferVersion);
 
@@ -1131,7 +1132,7 @@ namespace gip.bso.sales
                 if (outOfferPos.GroupSum)
                 {
                     OutOfferPos sumPos = new OutOfferPos();
-                    sumPos.Total = outOfferPos.Items.Sum(c => c.TotalPrice).ToString("N");
+                    sumPos.TotalPricePrinted = outOfferPos.Items.Sum(c => c.TotalPrice).ToString("N");
                     sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50063", langCode) + outOfferPos.Material.MaterialNo; // Info50063.
                     sumPos.Sequence = outOfferPos.Sequence;
                     sumPos.GroupSum = outOfferPos.GroupSum;
@@ -1216,11 +1217,12 @@ namespace gip.bso.sales
                             tableCell.ColumnSpan = 2;
                         }
 
-                        else if (inlineCell.VBContent == "Total")
+                        else if (inlineCell.VBContent == "TotalPricePrinted")
                         {
                             tableCell.ColumnSpan = 4;
                             tableCell.BorderBrush = Brushes.Black;
                             tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
+                            tableCell.TextAlignment = System.Windows.TextAlignment.Right;
                         }
                         tableCell.FontWeight = System.Windows.FontWeights.Bold;
                     }

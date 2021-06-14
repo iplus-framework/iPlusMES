@@ -1947,11 +1947,12 @@ namespace gip.bso.sales
                             tableCell.ColumnSpan = 2;
                         }
 
-                        else if (inlineCell.VBContent == "Total")
+                        else if (inlineCell.VBContent == "TotalPricePrinted")
                         {
                             tableCell.ColumnSpan = 4;
                             tableCell.BorderBrush = Brushes.Black;
                             tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
+                            tableCell.TextAlignment = System.Windows.TextAlignment.Right;
                         }
                         tableCell.FontWeight = System.Windows.FontWeights.Bold;
                     }

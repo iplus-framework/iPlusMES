@@ -52,12 +52,13 @@ namespace gip.mes.datamodel
             entity.OutOfferID = Guid.NewGuid();
             entity.DefaultValuesACObject();
 
-            entity.MDOutOrderType = MDOutOrderType.DefaultMDOutOrderType(dbApp);
+            entity.MDOutOrderType = MDOutOrderType.DefaultMDOutOrderType(dbApp, GlobalApp.OrderTypes.Order);
             entity.MDOutOfferState = MDOutOfferState.DefaultMDOutOfferState(dbApp);
 
             entity.MDDelivType = MDDelivType.DefaultMDDelivType(dbApp);
             entity.OutOfferNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.OutOfferDate = DateTime.Now;
 
             entity.XMLDesignStart = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
             entity.XMLDesignEnd = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";

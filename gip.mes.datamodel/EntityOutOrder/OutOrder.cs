@@ -56,7 +56,7 @@ namespace gip.mes.datamodel
             entity.OutOrderID = Guid.NewGuid();
             entity.DefaultValuesACObject();
 
-            entity.MDOutOrderType = MDOutOrderType.DefaultMDOutOrderType(dbApp);
+            entity.MDOutOrderType = MDOutOrderType.DefaultMDOutOrderType(dbApp, GlobalApp.OrderTypes.Order);
             entity.MDOutOrderState = MDOutOrderState.DefaultMDOutOrderState(dbApp);
 
             entity.MDDelivType = MDDelivType.DefaultMDDelivType(dbApp);
