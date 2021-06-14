@@ -19,7 +19,7 @@ namespace gip.mes.webservices
             RegisterExecuteHandler(typeof(PAEScannerDecoderWS), HandleExecuteACMethod_PAEScannerDecoderWS);
         }
 
-        public PAEScannerDecoderWS(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public PAEScannerDecoderWS(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
@@ -47,6 +47,40 @@ namespace gip.mes.webservices
         #region Methods
 
         public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequence(BarcodeSequence sequence)
+        {
+            WSResponse<BarcodeSequence> response = null;
+            switch (sequence.BarcodeIssuer)
+            {
+                case BarcodeSequenceBase.BarcodeIssuerEnum.General:
+                    response = OnHandleNextBarcodeSequenceGeneral(sequence);
+                    break;
+                case BarcodeSequenceBase.BarcodeIssuerEnum.Picking:
+                    response = OnHandleNextBarcodeSequencePicking(sequence);
+                    break;
+                case BarcodeSequenceBase.BarcodeIssuerEnum.Production:
+                    response = OnHandleNextBarcodeSequenceProduction(sequence);
+                    break;
+                case BarcodeSequenceBase.BarcodeIssuerEnum.Inventory:
+                    response = OnHandleNextBarcodeSequenceInventory(sequence);
+                    break;
+                default:
+                    response = OnHandleNextBarcodeSequenceProduction(sequence);
+                    break;
+            }
+            return response;
+        }
+
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequenceGeneral(BarcodeSequence sequence)
+        {
+            return new WSResponse<BarcodeSequence>(sequence);
+        }
+
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequencePicking(BarcodeSequence sequence)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequenceProduction(BarcodeSequence sequence)
         {
             if (sequence.Sequence.Count >= 3 && sequence.State != BarcodeSequence.ActionState.Question)
             {
@@ -90,6 +124,173 @@ namespace gip.mes.webservices
 
             OnHandleResolvedComponent(resolvedComponent, controller, sequence);
 
+            return new WSResponse<BarcodeSequence>(sequence);
+        }
+
+        /// <summary>
+        /// Barcode sequence is complete when valid FacilityCharge is obtained
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequenceInventory(BarcodeSequence sequence)
+        {
+            // Can be scanned
+            // Material
+            // Facility Lot
+            // Facility
+
+            // Result: FacilityCharge (unique)
+            // Is enough when unique charge is obtained
+
+            if (sequence.Sequence.Any(c => c.FacilityCharge != null))
+            {
+                sequence.State = BarcodeSequenceBase.ActionState.Completed;
+            }
+            else if (sequence.Sequence == null || !sequence.Sequence.Any())
+            {
+                sequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
+            }
+            else
+            {
+
+                // Remove old version item with new one
+                List<BarcodeEntity> sameOlderItems =
+                    sequence
+                    .Sequence
+                    .Where(c =>
+                                sequence.LastAddedSequence != null
+                                && c.ValidEntity.GetType() == sequence.LastAddedSequence.ValidEntity.GetType()
+                                && c.Barcode != sequence.LastAddedSequence.Barcode
+                            )
+                    .ToList();
+
+                foreach (BarcodeEntity sameOlderItem in sameOlderItems)
+                    sequence.Sequence.Remove(sameOlderItem);
+
+                sequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
+                BarcodeEntity material = sequence.Sequence.Where(c => c.Material != null).FirstOrDefault();
+                BarcodeEntity facility = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
+                BarcodeEntity facilityLot = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
+
+                BarcodeEntity foundedFacilityCharge = null;
+                using (var dbApp = new gip.mes.datamodel.DatabaseApp())
+                {
+                    if (material != null && facility == null && facilityLot == null)
+                    {
+                        // Info50067
+                        // Material scanned, please scan facility or lot
+                        sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 161, "Info50067");
+                    }
+                    else if (material == null && facility != null && facilityLot == null)
+                    {
+                        // Info50068
+                        // Facility scanned, please scan material or facilityLot
+                        sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 165, "Info50068");
+                    }
+                    else if (material == null && facility == null && facilityLot != null)
+                    {
+                        // Info50069
+                        // Lot scanned, please scan material or facilty
+                        sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 171, "Info50069");
+                    }
+                    // Search lot
+                    else if (material != null && facility != null && facilityLot == null)
+                    {
+                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                            dbApp
+                            .FacilityCharge
+                            .Where(c =>
+                                        !c.NotAvailable
+                                        && c.Material.MaterialNo == material.Material.MaterialNo
+                                        && c.Facility.FacilityNo == facility.Facility.FacilityNo
+                                    );
+                        if (query.Count() == 1)
+                        {
+                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
+                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
+                        }
+                        else
+                        {
+                            // Info50070
+                            // For selected material and facility founded one or more quants, please scan lot to
+                            sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 192, "Info50070");
+                        }
+                    }
+                    else if (material != null && facility == null && facilityLot != null)
+                    {
+                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                            dbApp
+                            .FacilityCharge
+                            .Where(c =>
+                                        !c.NotAvailable
+                                        && c.Material.MaterialNo == material.Material.MaterialNo
+                                        && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
+                                    );
+                        if (query.Count() == 1)
+                        {
+                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
+                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
+                        }
+                        else
+                        {
+                            // Info50071
+                            // For selected material and lot founded one or more quants, please scan faciltiy to!
+                            sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 213, "Info50071");
+                        }
+                    }
+                    else if (material == null && facility != null && facilityLot != null)
+                    {
+                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                            dbApp
+                            .FacilityCharge
+                            .Where(c =>
+                                        !c.NotAvailable
+                                        && c.Facility.FacilityNo == facility.Facility.FacilityNo
+                                        && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
+                                    );
+                        if (query.Count() == 1)
+                        {
+                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
+                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
+                        }
+                        else
+                        {
+                            // Info50072
+                            // For selected facility and lot founded one or more charges, please scan material to
+                            sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 213, "Info50072");
+                        }
+                    }
+                    else
+                    {
+                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                            dbApp
+                            .FacilityCharge
+                            .Where(c =>
+                                        !c.NotAvailable
+                                        && c.Material.MaterialNo == material.Material.MaterialNo
+                                        && c.Facility.FacilityNo == facility.Facility.FacilityNo
+                                        && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
+                                    );
+                        if (query.Count() == 1)
+                        {
+                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
+                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
+                        }
+                        else
+                        {
+                            // Info50073
+                            // For selected facility, lot and material founded one or more charges, please scan exat faciltiy charge
+                            sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequenceInventory", 256, "Info50073");
+                        }
+                    }
+
+                    if (foundedFacilityCharge != null)
+                    {
+                        sequence.Sequence.Add(foundedFacilityCharge);
+                        sequence.State = BarcodeSequenceBase.ActionState.Completed;
+                    }
+                }
+            }
             return new WSResponse<BarcodeSequence>(sequence);
         }
 
