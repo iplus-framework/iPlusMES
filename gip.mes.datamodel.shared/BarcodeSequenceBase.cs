@@ -25,6 +25,9 @@ namespace gip.mes.datamodel
     [DataContract]
     public class BarcodeSequenceBase
     {
+
+        #region State
+
         [DataMember]
         public short StateIndex
         {
@@ -43,6 +46,31 @@ namespace gip.mes.datamodel
                 StateIndex = (short) value;
             }
         }
+
+        #endregion
+
+        #region BarcodeIssuer
+
+        [DataMember]
+        public short BarcodeIssuerIndex
+        {
+            get; set;
+        }
+
+        [IgnoreDataMember]
+        public BarcodeIssuerEnum BarcodeIssuer
+        {
+            get
+            {
+                return (BarcodeIssuerEnum) BarcodeIssuerIndex;
+            }
+            set
+            {
+                BarcodeIssuerIndex = (short) value;
+            }
+        }
+
+        #endregion
 
         [DataMember]
         public core.datamodel.Msg Message
@@ -63,6 +91,14 @@ namespace gip.mes.datamodel
             Completed = 2,
             Question = 10,
             Selection = 11
+        }
+
+        public enum BarcodeIssuerEnum : short
+        {
+            Production = 0,
+            Picking = 1,
+            Inventory = 2,
+            General = 3
         }
     }
 }

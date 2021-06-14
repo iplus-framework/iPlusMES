@@ -61,6 +61,7 @@ namespace gip.mes.webservices
                     sequence.Message = nextEntity.Message;
                     return new WSResponse<BarcodeSequence>(sequence, nextEntity.Message);
                 }
+                sequence.LastAddedSequence = nextEntity.Data;
                 sequence.Sequence.Add(nextEntity.Data);
             }
             else if (sequence.State == datamodel.BarcodeSequenceBase.ActionState.Selection)

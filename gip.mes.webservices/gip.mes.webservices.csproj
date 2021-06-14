@@ -96,8 +96,11 @@
   <ItemGroup>
     <Content Include="TestUrls.txt" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="VBControlScripts\" />
+    <None Include="VBControlScripts\2021-06-14 10-39_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\gip.mes.webservices.shared\gip.mes.webservices.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
