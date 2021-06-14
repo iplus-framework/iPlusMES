@@ -50,6 +50,8 @@ namespace gip.mes.webservices
         public void AddSequence(BarcodeEntity barcodeEntity)
         {
             LastAddedSequence = barcodeEntity;
+            if(Sequence == null)
+                Sequence = new List<BarcodeEntity>();
             Sequence.Add(barcodeEntity);
         }
 

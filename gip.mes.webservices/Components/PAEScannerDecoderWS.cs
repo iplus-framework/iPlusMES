@@ -157,7 +157,11 @@ namespace gip.mes.webservices
                 List<BarcodeEntity> sameOlderItems =
                     sequence
                     .Sequence
-                    .Where(c => c.GetType() == sequence.LastAddedSequence.GetType() && c.Barcode != sequence.LastAddedSequence.Barcode)
+                    .Where(c =>
+                                sequence.LastAddedSequence != null
+                                && c.ValidEntity.GetType() == sequence.LastAddedSequence.ValidEntity.GetType()
+                                && c.Barcode != sequence.LastAddedSequence.Barcode
+                            )
                     .ToList();
 
                 foreach (BarcodeEntity sameOlderItem in sameOlderItems)
@@ -196,7 +200,8 @@ namespace gip.mes.webservices
                             dbApp
                             .FacilityCharge
                             .Where(c =>
-                                        c.Material.MaterialNo == material.Material.MaterialNo
+                                        !c.NotAvailable
+                                        && c.Material.MaterialNo == material.Material.MaterialNo
                                         && c.Facility.FacilityNo == facility.Facility.FacilityNo
                                     );
                         if (query.Count() == 1)
@@ -217,7 +222,8 @@ namespace gip.mes.webservices
                             dbApp
                             .FacilityCharge
                             .Where(c =>
-                                        c.Material.MaterialNo == material.Material.MaterialNo
+                                        !c.NotAvailable
+                                        && c.Material.MaterialNo == material.Material.MaterialNo
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
                                     );
                         if (query.Count() == 1)
@@ -238,7 +244,8 @@ namespace gip.mes.webservices
                             dbApp
                             .FacilityCharge
                             .Where(c =>
-                                        c.Facility.FacilityNo == facility.Facility.FacilityNo
+                                        !c.NotAvailable
+                                        && c.Facility.FacilityNo == facility.Facility.FacilityNo
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
                                     );
                         if (query.Count() == 1)
@@ -259,7 +266,8 @@ namespace gip.mes.webservices
                             dbApp
                             .FacilityCharge
                             .Where(c =>
-                                        c.Material.MaterialNo == material.Material.MaterialNo
+                                        !c.NotAvailable
+                                        && c.Material.MaterialNo == material.Material.MaterialNo
                                         && c.Facility.FacilityNo == facility.Facility.FacilityNo
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
                                     );
