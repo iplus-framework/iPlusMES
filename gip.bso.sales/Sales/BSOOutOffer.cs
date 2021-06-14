@@ -1107,10 +1107,20 @@ namespace gip.bso.sales
 
         public bool IsEnabledOutOrderPosDown()
         {
-            return CurrentOutOfferPos != null
-                && CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos == null
-                   ? CurrentOutOfferPos.Sequence < OutOfferPosList.Where(x => x.OutOfferPos1_GroupOutOfferPos == null).Max(c => c.Sequence)
-                   : CurrentOutOfferPos.Sequence < CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Max(x => x.Sequence);
+            if (CurrentOutOfferPos != null)
+            {
+                if (CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos == null)
+                {
+                    return CurrentOutOfferPos.Sequence < OutOfferPosList.Where(x => x.OutOfferPos1_GroupOutOfferPos == null).Max(c => c.Sequence);
+                }
+                else if (CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos != null)
+                {
+                    return CurrentOutOfferPos.Sequence < CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Max(x => x.Sequence);
+                }
+
+            }
+
+            return false;
         }
 
         #region Methods => Report

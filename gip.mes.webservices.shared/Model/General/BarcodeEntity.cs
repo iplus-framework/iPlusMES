@@ -108,5 +108,27 @@ namespace gip.mes.webservices
                 return null;
             }
         }
+
+        public string Barcode
+        {
+            get
+            {
+                if (ACClass != null)
+                    return ACClass.ACClassID.ToString();
+                else if (Material != null)
+                    return Material.MaterialID.ToString();
+                else if (FacilityLot != null)
+                    return FacilityLot.FacilityLotID.ToString();
+                else if (Facility != null)
+                    return Facility.FacilityID.ToString();
+                else if (FacilityCharge != null)
+                    return FacilityCharge.FacilityChargeID.ToString();
+                else if (Picking != null)
+                    return Picking.PickingID.ToString();
+                else if (PickingPos != null)
+                    return PickingPos.PickingPosID.ToString();
+                return null;
+            }
+        }
     }
 }
