@@ -1351,8 +1351,21 @@ namespace gip.mes.webservices
                         }
                     }
 
-                    List<FacilityInventoryPos> items = s_cQry_GetFacilityInventoryLines(databaseApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo,
-                       lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal).OrderBy(c => c.Sequence).ToList();
+                    List<FacilityInventoryPos> items = 
+                        s_cQry_GetFacilityInventoryLines(
+                                databaseApp, 
+                                facilityInventoryNo, 
+                                inputCodeVal, 
+                                storageLocationNo, 
+                                facilityNo,
+                                lotNo, 
+                                materialNo, 
+                                inventoryPosStateVal, 
+                                notAvailableVal, 
+                                zeroStockVal, 
+                                notProcessedVal
+                        )
+                        .OrderBy(c => c.LotNo).ToList();
                     response.Data = items;
                 }
             }
@@ -1390,6 +1403,7 @@ namespace gip.mes.webservices
                     }
                     else
                     {
+                        // Check is inventory document active for inventory - InArbeit
                         bool newInventory = dbFacilityInventoryPos.FacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.New;
                         bool finishedInventory = dbFacilityInventoryPos.FacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.Finished;
                         if (newInventory)
