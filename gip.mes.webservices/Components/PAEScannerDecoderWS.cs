@@ -172,7 +172,8 @@ namespace gip.mes.webservices
                 BarcodeEntity facility = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
                 BarcodeEntity facilityLot = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
 
-                BarcodeEntity foundedFacilityCharge = null;
+                List<gip.mes.datamodel.FacilityCharge> foundedFacilityCharges = new List<gip.mes.datamodel.FacilityCharge>();
+                List<gip.mes.datamodel.FacilityCharge> tmpChargeList = new List<gip.mes.datamodel.FacilityCharge>();
                 using (var dbApp = new gip.mes.datamodel.DatabaseApp())
                 {
                     if (material != null && facility == null && facilityLot == null)
@@ -196,20 +197,18 @@ namespace gip.mes.webservices
                     // Search lot
                     else if (material != null && facility != null && facilityLot == null)
                     {
-                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                        tmpChargeList =
                             dbApp
                             .FacilityCharge
                             .Where(c =>
                                         !c.NotAvailable
                                         && c.Material.MaterialNo == material.Material.MaterialNo
                                         && c.Facility.FacilityNo == facility.Facility.FacilityNo
-                                    );
-                        if (query.Count() == 1)
-                        {
-                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
-                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
-                        }
-                        else
+                                    )
+                           .ToList();
+
+                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        if (tmpChargeList.Count > 1)
                         {
                             // Info50070
                             // For selected material and facility founded one or more quants, please scan lot to
@@ -218,20 +217,17 @@ namespace gip.mes.webservices
                     }
                     else if (material != null && facility == null && facilityLot != null)
                     {
-                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                        tmpChargeList =
                             dbApp
                             .FacilityCharge
                             .Where(c =>
                                         !c.NotAvailable
                                         && c.Material.MaterialNo == material.Material.MaterialNo
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
-                                    );
-                        if (query.Count() == 1)
-                        {
-                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
-                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
-                        }
-                        else
+                                    )
+                             .ToList();
+                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        if (tmpChargeList.Count > 1)
                         {
                             // Info50071
                             // For selected material and lot founded one or more quants, please scan faciltiy to!
@@ -240,20 +236,17 @@ namespace gip.mes.webservices
                     }
                     else if (material == null && facility != null && facilityLot != null)
                     {
-                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                        tmpChargeList =
                             dbApp
                             .FacilityCharge
                             .Where(c =>
                                         !c.NotAvailable
                                         && c.Facility.FacilityNo == facility.Facility.FacilityNo
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
-                                    );
-                        if (query.Count() == 1)
-                        {
-                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
-                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
-                        }
-                        else
+                                    )
+                             .ToList();
+                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        if (tmpChargeList.Count > 1)
                         {
                             // Info50072
                             // For selected facility and lot founded one or more charges, please scan material to
@@ -262,7 +255,7 @@ namespace gip.mes.webservices
                     }
                     else
                     {
-                        IQueryable<gip.mes.datamodel.FacilityCharge> query =
+                        tmpChargeList =
                             dbApp
                             .FacilityCharge
                             .Where(c =>
@@ -270,13 +263,10 @@ namespace gip.mes.webservices
                                         && c.Material.MaterialNo == material.Material.MaterialNo
                                         && c.Facility.FacilityNo == facility.Facility.FacilityNo
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
-                                    );
-                        if (query.Count() == 1)
-                        {
-                            FacilityCharge facilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, query.Select(c => c.FacilityChargeID).FirstOrDefault()).FirstOrDefault();
-                            foundedFacilityCharge = new BarcodeEntity() { FacilityCharge = facilityCharge };
-                        }
-                        else
+                                    )
+                             .ToList();
+                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        if (tmpChargeList.Count > 1)
                         {
                             // Info50073
                             // For selected facility, lot and material founded one or more charges, please scan exat faciltiy charge
@@ -284,9 +274,16 @@ namespace gip.mes.webservices
                         }
                     }
 
-                    if (foundedFacilityCharge != null)
+                    if (foundedFacilityCharges.Any())
                     {
-                        sequence.Sequence.Add(foundedFacilityCharge);
+                        sequence.Sequence.AddRange(
+                            foundedFacilityCharges
+                            .Select(c=> new BarcodeEntity()
+                                {
+                                    FacilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, c.FacilityChargeID).FirstOrDefault()
+                                }
+                            ));
+                        sequence.LastAddedSequence = sequence.Sequence.LastOrDefault();
                         sequence.State = BarcodeSequenceBase.ActionState.Completed;
                     }
                 }

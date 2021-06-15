@@ -16,7 +16,7 @@ namespace gip.bso.facility
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Warehouse Inventory'}de{'Lager Inventur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityInventory.ClassName)]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "FacilityInventory", "en{'FacilityInventory'}de{'FacilityInventory'}", typeof(FacilityInventory), FacilityInventory.ClassName, "FacilityInventoryNo", "FacilityInventoryNo")]
 
-    public class BSOFacilityInventory : ACBSOvbNav
+    public class BSOFacilityInventory : ACBSOvbNav, IOnTrackingCall
     {
         #region contants
         public const string BGWorkerMehtod_DoNewInventory = @"DoNewInventory";
@@ -1205,7 +1205,6 @@ namespace gip.bso.facility
 
         #endregion
 
-
         #endregion
 
         #region Property -> FilterInventoryFaciltiyBookingCharge
@@ -1557,6 +1556,7 @@ namespace gip.bso.facility
                 .AsEnumerable()
                 .Where(c =>
                     !usedFacilityChargeIDs.Contains(c.FacilityChargeID)
+                    && c.NotAvailable
                     &&
                         (
                             FilterNotUsedChargeMaterial == null
@@ -2124,6 +2124,43 @@ namespace gip.bso.facility
             BSOFacilityInventory cloned = clonedObject as BSOFacilityInventory;
             cloned.SelectedFacilityInventoryPos = SelectedFacilityInventoryPos;
             return cloned;
+        }
+
+        #endregion
+
+
+        #region Tracking
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vbContent"></param>
+        /// <param name="vbControl"></param>
+        /// <returns></returns>
+        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
+        {
+            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
+            if (vbContent == "SelectedInventoryPosFacilityBooking" && SelectedInventoryPosFacilityBooking != null)
+            {
+                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedInventoryPosFacilityBooking);
+                aCMenuItems.AddRange(trackingAndTracingMenuItems);
+            }
+            else if (vbContent == "SelectedInventoryFacilityBookingCharge" && SelectedInventoryFacilityBookingCharge != null)
+            {
+                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedInventoryFacilityBookingCharge.FacilityBooking);
+                aCMenuItems.AddRange(trackingAndTracingMenuItems);
+            }
+            return aCMenuItems;
+        }
+
+
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
+        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
+        {
+            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
         }
 
         #endregion
