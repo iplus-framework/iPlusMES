@@ -232,13 +232,19 @@ namespace gip.mes.datamodel
             get
             {
                 if (OutOfferPos1_GroupOutOfferPos == null)
-                    return Sequence.ToString();
+                    return Sequence.ToString("00");
                 else
                 {
-                    return OutOfferPos1_GroupOutOfferPos.Position + "." + Sequence.ToString();
+                    return OutOfferPos1_GroupOutOfferPos.Position + "." + Sequence.ToString("00");
                 }
             }
         }
+
+        partial void OnSequenceChanged()
+        {
+            OnPropertyChanged("Position");
+        }
+
 
         #region Report helper
 

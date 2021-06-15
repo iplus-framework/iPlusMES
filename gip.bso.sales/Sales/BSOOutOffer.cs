@@ -156,13 +156,12 @@ namespace gip.bso.sales
             set
             {
                 if (CurrentOutOffer != null)
-                {
                     CurrentOutOffer.PropertyChanged -= CurrentOutOffer_PropertyChanged;
-                }
-                if (AccessPrimary == null) return;
+                if (AccessPrimary == null) 
+                    return;
 
-                if (AccessPrimary.Current != value)
-                {
+                //if (AccessPrimary.Current != value)
+                //{
                     AccessPrimary.Current = value;
 
                     if (CurrentOutOffer != null)
@@ -170,7 +169,6 @@ namespace gip.bso.sales
                         CurrentOutOffer.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentOutOffer_PropertyChanged);
                     }
                     CurrentOutOfferPos = null;
-
                     CurrentOutOfferPos = OutOfferPosList?.FirstOrDefault();
                     OnPropertyChanged("CurrentOutOffer");
                     OnPropertyChanged("OutOfferPosList");
@@ -181,8 +179,7 @@ namespace gip.bso.sales
                     OnPropertyChanged("CurrentDeliveryCompanyAddress");
 
                     ResetAccessTenantCompanyFilter(value);
-                }
-
+                //}
             }
         }
 

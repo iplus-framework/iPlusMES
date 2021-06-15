@@ -1299,7 +1299,7 @@ namespace gip.bso.masterdata
         #region Translation
 
         private List<gip.core.datamodel.VBLanguage> _TranslationLanguages;
-        [ACPropertyInfo(9999, "Translation")]
+        [ACPropertyInfo(9999, "TranslationLang")]
         public IEnumerable<gip.core.datamodel.VBLanguage> TranslationLanguages
         {
             get
