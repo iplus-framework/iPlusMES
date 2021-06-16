@@ -67,6 +67,13 @@ namespace gip.mes.facility.TandTv3
 
                 nextStepItems.AddRange(nextFbcs);
             }
+            if (Item.FacilityInventoryPos != null)
+            {
+                var inwardCharges = Item.InwardFacilityCharge.FacilityBookingCharge_InwardFacilityCharge.Where(c => c.FacilityBookingChargeNo != Item.FacilityBookingChargeNo);
+                var outwardCharges = Item.InwardFacilityCharge.FacilityBookingCharge_OutwardFacilityCharge.Where(c => c.FacilityBookingChargeNo != Item.FacilityBookingChargeNo);
+                var nextFbcs = inwardCharges.Union(outwardCharges);
+                nextStepItems.AddRange(nextFbcs);
+            }
 
             return nextStepItems;
         }
