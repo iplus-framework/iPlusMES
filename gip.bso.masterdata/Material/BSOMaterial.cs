@@ -1477,6 +1477,17 @@ namespace gip.bso.masterdata
         #region Methods
 
         [ACMethodInfo("", "en{'Add single dosing rule'}de{'Regel für Einzeldosierung hinzufügen'}", 800)]
+        public void ShowDialogAddSingleDosingConfig()
+        {
+            ShowDialog(this, "SingleDosingDialog");
+        }
+
+        public bool IsEnabledShowDialogAddSingleDosingConfig()
+        {
+            return true;
+        }
+
+        [ACMethodInfo("", "en{'Add single dosing rule'}de{'Regel für Einzeldosierung hinzufügen'}", 800)]
         public void AddSingleDosingConfig()
         {
             gip.mes.datamodel.MaterialConfig singleDosConfig = gip.mes.datamodel.MaterialConfig.NewACObject(DatabaseApp, CurrentMaterial);
@@ -1489,11 +1500,15 @@ namespace gip.bso.masterdata
             DatabaseApp.MaterialConfig.AddObject(singleDosConfig);
 
             OnPropertyChanged("SingleDosingConfigList");
+            CloseTopDialog();
+
+            SelectedWorkflowRoot = null;
+            SelectedSingleDosingMachine = null;
         }
 
         public bool IsEnabledAddSingleDosingConfig()
         {
-            return SelectedWorkflowRoot != null;
+            return SelectedWorkflowRoot != null && SelectedSingleDosingMachine != null;
         }
 
         [ACMethodInfo("", "en{'Delete single dosing rule'}de{'Einzeldosierungsregel löschen'}", 800)]

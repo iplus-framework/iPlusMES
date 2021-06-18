@@ -323,14 +323,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private string _PAProcessModuleACCaption;
+
         [ACPropertyInfo(603, "", "en{'Module'}de{'Modul'}")]
         public string PAProcessModuleACCaption
         {
-            get;
-            set;
+            get => _PAProcessModuleACCaption;
+            set
+            {
+                _PAProcessModuleACCaption = value;
+                OnPropertyChanged("PAProcessModuleACCaption");
+            }
         }
-
-
 
         #endregion
 
@@ -1010,9 +1014,18 @@ namespace gip.bso.manufacturing
                 {
                     if (func.ACStateProperty != null && ((ACStateEnum)func.ACStateProperty.Value == ACStateEnum.SMRunning
                                                          || (ACStateEnum)func.ACStateProperty.Value == ACStateEnum.SMStarting))
+                    {
                         func.IsFunctionActive = true;
+                    }
                     else
+                    {
+                        if (func.RelatedBSOs.Any(x => ParentBSO.BSOManualWeighingType.IsAssignableFrom((x.ValueT as core.datamodel.ACClass)?.ObjectType))
+                            && ( userPWNodeAckInfo != null && userPWNodeAckInfo.Any()))
+                        {
+                            continue;
+                        }
                         func.IsFunctionActive = false;
+                    }
                 }
                 ActiveFunctionsCount = ItemFunctions.Count(c => c.IsFunctionActive);
             }
@@ -1110,7 +1123,6 @@ namespace gip.bso.manufacturing
 
                 _CurrentWFNodesList = temp;
             }
-
 
             if (BSOManualWeighing.PWUserAckClasses == null || !BSOManualWeighing.PWUserAckClasses.Any())
                 return;

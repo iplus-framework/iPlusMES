@@ -2121,7 +2121,6 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-
             var pwInstanceInfos = connectionList.Where(c => PWUserAckClasses.Contains(c.ACType.ValueT));
 
             var userAckItemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
@@ -2498,7 +2497,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            StartWorkflow(acClassMethod, picking, appManager);
+            StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID);
 
             SingleDosTargetQuantity = 0;
 
@@ -2559,8 +2558,6 @@ namespace gip.bso.manufacturing
                 || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                 return false;
 
-            
-
             msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
             if (msg != null)
             {
@@ -2568,11 +2565,11 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            if (validRoute == null)
-            {
-                //TODO:Error
-                return false;
-            }    
+            //if (validRoute == null)
+            //{
+            //    //TODO:Error
+            //    return false;
+            //}    
 
             vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
             if (material == null)
@@ -2637,12 +2634,12 @@ namespace gip.bso.manufacturing
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
-            if (this.ACFacilityManager != null)
-                return this.ACFacilityManager.C_PWMethodRelocClass;
-            return "PWMethodRelocation";
+            //if (this.ACFacilityManager != null)
+            //    return this.ACFacilityManager.C_PWMethodRelocClass; //TODO: single dosing info
+            return "PWMethodSingleDosing";
         }
 
-        protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, vd.Picking picking, ACComponent selectedAppManager)
+        protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, vd.Picking picking, ACComponent selectedAppManager, Guid allowedWFNode)
         {
             using (Database db = new core.datamodel.Database())
             {
@@ -2669,6 +2666,12 @@ namespace gip.bso.manufacturing
                         acMethod.ParameterValueList.Add(new ACValue(vd.Picking.ClassName, typeof(Guid), picking.PickingID));
                     else
                         acValue.Value = picking.PickingID;
+
+                    ACValue paramACClassWF = acMethod.ParameterValueList.GetACValue(ACClassWF.ClassName);
+                    if (paramACClassWF == null)
+                        acMethod.ParameterValueList.Add(new ACValue(ACClassWF.ClassName, typeof(Guid), allowedWFNode));
+                    else
+                        paramACClassWF.Value = allowedWFNode;
 
                     selectedAppManager.ExecuteMethod(acClassMethod.ACIdentifier, acMethod);
                     return true;

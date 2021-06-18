@@ -151,6 +151,13 @@ namespace gip.mes.processapplication
                     return StartNextBatchResult.Done;
                 }
 
+                PWMethodSingleDosing singleDosing = ParentPWMethod<PWMethodSingleDosing>();
+                if (   singleDosing != null && singleDosing.SelectedSingleDosingACClassWFID.HasValue
+                    && ContentACClassWF != null && ContentACClassWF.ACClassWFID != singleDosing.SelectedSingleDosingACClassWFID)
+                {
+                    return StartNextBatchResult.Done;
+                }
+
             }
             return StartNextBatchResult.StartNextBatch;
         }
