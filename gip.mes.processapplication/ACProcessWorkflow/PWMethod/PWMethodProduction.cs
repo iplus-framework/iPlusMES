@@ -70,7 +70,6 @@ namespace gip.mes.processapplication
             _LabOrderManager = null;
             UnregisterFromCachedDestinations();
 
-            IsStartingMethodProduction = false;
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 //_ACProgramVB = null;
@@ -88,7 +87,6 @@ namespace gip.mes.processapplication
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
         {
-            IsStartingMethodProduction = false;
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 //_ACProgramVB = null;
@@ -435,12 +433,14 @@ namespace gip.mes.processapplication
 #region ACState-Methods
         public override ACMethodEventArgs Start(ACMethod acMethod)
         {
+            if (!IsEnabledStart(acMethod))
+                return CreateNewMethodEventArgs(acMethod, Global.ACMethodResultState.Failed);
+
             try
             {
-                IsStartingMethodProduction = true;
-                ACMethodEventArgs result = null;
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
+                    EnteringStartMethod();
                     ProdOrderBatch currentProdOrderBatch = null;
                     ProdOrderPartslistPos currentProdOrderPartslistPos = null;
                     Guid prodOrderPartslistPosID = (Guid)acMethod[ProdOrderPartslistPos.ClassName];
@@ -452,12 +452,13 @@ namespace gip.mes.processapplication
                         if (currentProdOrderPartslistPos.ProdOrderBatch != null)
                             currentProdOrderPartslistPos.ProdOrderBatch.MDProdOrderState = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
                     }
-                    var msg = dbApp.ACSaveChanges();
+                    var msg = dbApp.ACSaveChangesWithRetry();
                     if (msg != null)
                     {
                         ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
                         OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.InnerMessage, this, eMsgLevel.Error, PWClassName, "Start", 1000), true);
                         Messages.LogError(this.GetACUrl(), "Start(0)", msg.InnerMessage);
+                        return CreateNewMethodEventArgs(acMethod, Global.ACMethodResultState.Failed);
                     }
 
                     if (currentProdOrderPartslistPos != null)
@@ -468,37 +469,31 @@ namespace gip.mes.processapplication
                         _CurrentProdOrderPartslistPos = currentProdOrderPartslistPos;
                     }
 
-                    result = base.Start(acMethod);
+                    OnEnterStart(acMethod);
+                    ACUrlCommand("!OnProdOrderStarted", currentProdOrderPartslistPos);
 
-                    if (result.ResultState == Global.ACMethodResultState.InProcess)
-                    {
-                        ACUrlCommand("!OnProdOrderStarted", currentProdOrderPartslistPos);
-                    }
-                    else
-                    {
-                        if (currentProdOrderPartslistPos != null)
-                        {
-                            currentProdOrderPartslistPos.ACClassTaskID = null;
-                            msg = dbApp.ACSaveChanges();
-                            if (msg != null)
-                            {
-                                ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.InnerMessage, this, eMsgLevel.Error, PWClassName, "Start", 1010), true);
-                                Messages.LogError(this.GetACUrl(), "Start(1)", msg.InnerMessage);
-                            }
-                        }
-                    }
                     if (currentProdOrderBatch != null)
                         dbApp.Detach(currentProdOrderBatch);
                     if (currentProdOrderPartslistPos != null)
                         dbApp.Detach(currentProdOrderPartslistPos);
+                    LeavingStartMethod();
+                    OnLeaveStart(acMethod);
                 }
-                return result;
+            }
+            catch (Exception e)
+            {
+                //Exception50000: {0}\n{1}\n{2}
+                Msg msg = new Msg(this, eMsgLevel.Exception, PWClassName, "Start", 1000, "Exception50000",
+                                    e.Message, e.InnerException != null ? e.InnerException.Message : "", e.StackTrace);
+                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                Messages.LogException(this.GetACUrl(), "Start(0)", msg.Message);
+                throw e;
             }
             finally
             {
-                IsStartingMethodProduction = false;
+                ResetStartingProcessFunction();
             }
+            return CreateNewMethodEventArgs(acMethod, Global.ACMethodResultState.InProcess);
         }
 
         protected override bool CanRunWorkflow()
@@ -560,9 +555,9 @@ namespace gip.mes.processapplication
                 Messages.LogError(this.GetACUrl(), "LoadVBEntities(11)", System.Environment.StackTrace);
                 return;
             }
-            if (IsStartingMethodProduction)
+            if (IsStartingProcessFunction)
             {
-                Messages.LogError(this.GetACUrl(), "LoadVBEntities(20)", "IsStartingMethodProduction is true. The call of LoadVBEntities is too early!");
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(20)", "IsStartingProcessFunction is true. The call of LoadVBEntities is too early!");
                 Messages.LogError(this.GetACUrl(), "LoadVBEntities(21)", System.Environment.StackTrace);
                 return;
             }

@@ -125,6 +125,19 @@ namespace gip.mes.processapplication
             if (rootPW == null)
                 return;
 
+            if (this.ContentTask.EntityState == System.Data.EntityState.Added)
+            {
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(10)", "EntityState of ContentTask is Added and not saved to the database. The call of LoadVBEntities is too early!");
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(11)", System.Environment.StackTrace);
+                return;
+            }
+            if (IsStartingProcessFunction)
+            {
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(20)", "IsStartingProcessFunction is true. The call of LoadVBEntities is too early!");
+                Messages.LogError(this.GetACUrl(), "LoadVBEntities(21)", System.Environment.StackTrace);
+                return;
+            }
+
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 if (_CurrentPicking != null || _CurrentFacilityBooking != null)
@@ -242,6 +255,15 @@ namespace gip.mes.processapplication
                     {
                         _ExpectedConfigStoresCount += expectedConfigStoresCount;
                     }
+                }
+            }
+            else if (recalcExpectedConfigStoresCount)
+            {
+                Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(20)", "CurrentPicking is null => ConfigStore-Validation will fail!");
+                using (ACMonitor.Lock(_20015_LockStoreList))
+                {
+                    // Minimum is PickingConfig:
+                    _ExpectedConfigStoresCount += 1;
                 }
             }
         }

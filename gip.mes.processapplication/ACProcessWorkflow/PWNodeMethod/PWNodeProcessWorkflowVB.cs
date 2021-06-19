@@ -1091,7 +1091,6 @@ namespace gip.mes.processapplication
             if (CurrentACState == ACStateEnum.SMPaused)
                 return;
 
-
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _NewChildPosForBatch_ProdOrderPartslistPosID = null;
@@ -1101,7 +1100,8 @@ namespace gip.mes.processapplication
                 _StartNextBatchAtProjectID2 = null;
             }
 
-            if (!Root.Initialized)
+            if (   !Root.Initialized
+                || (RootPW != null && RootPW.IsStartingProcessFunction))
             {
                 SubscribeToProjectWorkCycle();
                 return;
