@@ -830,7 +830,7 @@ namespace gip.mes.processapplication
                 return;
             }
 
-            if (!Root.Initialized)
+            if (Root == null || !Root.Initialized)
             {
                 SubscribeToProjectWorkCycle();
                 return;
@@ -943,6 +943,8 @@ namespace gip.mes.processapplication
             if (dosing != null)
             {
                 SubscribeToProjectWorkCycle();
+                if (!Root.Initialized)
+                    return;
                 if (dosing.CurrentACState != ACStateEnum.SMIdle)
                 {
                     OnHandleStateCheckEmptySilo(dosing);

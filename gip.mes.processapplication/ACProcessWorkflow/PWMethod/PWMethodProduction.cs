@@ -280,6 +280,7 @@ namespace gip.mes.processapplication
             else if (recalcExpectedConfigStoresCount)
             {
                 Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(20)", "CurrentProdOrderPartslistPos is null => ConfigStore-Validation will fail!");
+                Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(10)", System.Environment.StackTrace);
                 using (ACMonitor.Lock(_20015_LockStoreList))
                 {
                     // Minimum is ProdOrderPartslistConfig and PartslistConfig:
