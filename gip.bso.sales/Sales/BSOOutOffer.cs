@@ -850,29 +850,14 @@ namespace gip.bso.sales
         [ACMethodInteraction(OutOffer.ClassName, "en{'New version'}de{'Neue Version'}", (short)MISort.New + 1, true, "", Global.ACKinds.MSMethodPrePost)]
         public void NewVersion()
         {
-            OutOffer newOfferVersion = OutOffer.NewACObject(DatabaseApp, null, CurrentOutOffer.OutOfferNo);
-            newOfferVersion.OutOfferDate = DateTime.Now;
+            OutOffer newOfferVersion = CurrentOutOffer.Clone() as OutOffer;
+            if (newOfferVersion == null)
+                return;
+
+            newOfferVersion.OutOfferID = Guid.NewGuid();
             newOfferVersion.OutOfferVersion = DatabaseApp.OutOffer.Where(c => c.OutOfferNo == CurrentOutOffer.OutOfferNo).Max(v => v.OutOfferVersion) + 1;
-            newOfferVersion.BillingCompanyAddress = CurrentOutOffer.BillingCompanyAddress;
-            newOfferVersion.Comment = CurrentOutOffer.Comment;
-            newOfferVersion.CustomerCompany = CurrentOutOffer.CustomerCompany;
-            newOfferVersion.CustRequestNo = CurrentOutOffer.CustRequestNo;
-            newOfferVersion.DeliveryCompanyAddress = CurrentOutOffer.DeliveryCompanyAddress;
-            newOfferVersion.MDDelivType = CurrentOutOffer.MDDelivType;
-            //newVersion.MDOutOfferState = CurrentOutOffer.MDOutOfferState;
-            newOfferVersion.MDOutOrderType = CurrentOutOffer.MDOutOrderType;
-            newOfferVersion.MDTermOfPayment = CurrentOutOffer.MDTermOfPayment;
-            newOfferVersion.MDTimeRange = CurrentOutOffer.MDTimeRange;
-            newOfferVersion.PriceGross = CurrentOutOffer.PriceGross;
-            newOfferVersion.PriceNet = CurrentOutOffer.PriceNet;
-            newOfferVersion.TargetDeliveryDate = CurrentOutOffer.TargetDeliveryDate;
-            newOfferVersion.TargetDeliveryMaxDate = CurrentOutOffer.TargetDeliveryMaxDate;
-            newOfferVersion.XMLConfig = CurrentOutOffer.XMLConfig;
-            newOfferVersion.XMLDesignStart = CurrentOutOffer.XMLDesignStart;
-            newOfferVersion.XMLDesignEnd = CurrentOutOffer.XMLDesignEnd;
 
             DatabaseApp.OutOffer.AddObject(newOfferVersion);
-
 
             foreach (OutOfferPos pos in CurrentOutOffer.OutOfferPos_OutOffer.Where(c => !c.GroupOutOfferPosID.HasValue))
             {
@@ -891,27 +876,13 @@ namespace gip.bso.sales
 
         private void NewVersionPos(OutOffer outOffer, OutOfferPos pos, OutOfferPos groupPos)
         {
-            OutOfferPos newPos = OutOfferPos.NewACObject(DatabaseApp, null, groupPos);
-            newPos.OutOfferPos1_GroupOutOfferPos = groupPos;
-            newPos.Comment = pos.Comment;
-            newPos.Comment2 = pos.Comment2;
-            newPos.GroupSum = pos.GroupSum;
-            newPos.Material = pos.Material;
-            newPos.MDCountrySalesTax = pos.MDCountrySalesTax;
-            newPos.MDTimeRange = pos.MDTimeRange;
-            newPos.MDUnit = pos.MDUnit;
-            newPos.OutOffer = outOffer;
-            newPos.PriceGross = pos.PriceGross;
-            newPos.PriceNet = pos.PriceNet;
-            newPos.Sequence = pos.Sequence;
-            newPos.TargetDeliveryDate = pos.TargetDeliveryDate;
-            newPos.TargetDeliveryMaxDate = pos.TargetDeliveryMaxDate;
-            newPos.TargetDeliveryPriority = pos.TargetDeliveryPriority;
-            newPos.TargetQuantity = pos.TargetQuantity;
-            newPos.TargetQuantityUOM = pos.TargetQuantityUOM;
-            newPos.TargetWeight = pos.TargetWeight;
-            newPos.XMLConfig = pos.XMLConfig;
-            newPos.XMLDesign = pos.XMLDesign;
+            OutOfferPos newPos = pos.Clone() as OutOfferPos;
+            if (newPos == null)
+                return;
+
+            newPos.OutOfferPosID = Guid.NewGuid();
+            newPos.OutOfferID = outOffer.OutOfferID;
+            newPos.GroupOutOfferPosID = groupPos?.OutOfferPosID;
 
             outOffer.OutOfferPos_OutOffer.Add(newPos);
             DatabaseApp.OutOfferPos.AddObject(newPos);
@@ -990,7 +961,7 @@ namespace gip.bso.sales
         [ACMethodInteraction("OutOfferPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
         public void NewSubOutOfferPos()
         {
-            if (!PreExecute("NewOutOfferPos")) return;
+            if (!PreExecute("NewSubOutOfferPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             OutOfferPos subOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, CurrentOutOfferPos);
             subOutOfferPos.OutOfferPos1_GroupOutOfferPos = CurrentOutOfferPos;
@@ -998,7 +969,7 @@ namespace gip.bso.sales
             CurrentOutOffer.OutOfferPos_OutOffer.Add(subOutOfferPos);
             OnPropertyChanged("OutOfferPosList");
             CurrentOutOfferPos = subOutOfferPos;
-            PostExecute("NewOutOfferPos");
+            PostExecute("NewSubOutOfferPos");
         }
 
         public bool IsEnabledSubOutOfferPos()

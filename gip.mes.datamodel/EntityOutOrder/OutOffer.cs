@@ -37,7 +37,7 @@ namespace gip.mes.datamodel
         })
     ]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOffer>) })]
-    public partial class OutOffer : IACConfigStore, IOutOrder
+    public partial class OutOffer : IACConfigStore, IOutOrder, ICloneable
     {
         public const string ClassName = "OutOffer";
         public const string NoColumnName = "OutOfferNo";
@@ -364,5 +364,35 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        public object Clone()
+        {
+            OutOffer clonedObject = new OutOffer();
+            clonedObject.OutOfferID = this.OutOfferID;
+            clonedObject.OutOfferNo = this.OutOfferNo;
+            clonedObject.OutOfferVersion = this.OutOfferVersion;
+            clonedObject.OutOfferDate = this.OutOfferDate;
+            clonedObject.MDOutOrderTypeID = this.MDOutOrderTypeID;
+            clonedObject.MDOutOfferStateID = this.MDOutOfferStateID;
+            clonedObject.CustomerCompanyID = this.CustomerCompanyID;
+            clonedObject.CustRequestNo = this.CustRequestNo;
+            clonedObject.DeliveryCompanyAddressID = this.DeliveryCompanyAddressID;
+            clonedObject.BillingCompanyAddressID = this.BillingCompanyAddressID;
+            clonedObject.IssuerCompanyAddressID = this.IssuerCompanyAddressID;
+            clonedObject.IssuerCompanyPersonID = this.IssuerCompanyPersonID;
+            clonedObject.TargetDeliveryDate = this.TargetDeliveryDate;
+            clonedObject.TargetDeliveryMaxDate = this.TargetDeliveryMaxDate;
+            clonedObject.MDTimeRangeID = this.MDTimeRangeID;
+            clonedObject.MDDelivTypeID = this.MDDelivTypeID;
+            clonedObject.PriceNet = this.PriceNet;
+            clonedObject.PriceGross = this.PriceGross;
+            clonedObject.SalesTax = this.SalesTax;
+            clonedObject.MDTermOfPaymentID = this.MDTermOfPaymentID;
+            clonedObject.Comment = this.Comment;
+            clonedObject.XMLDesignStart = this.XMLDesignStart;
+            clonedObject.XMLDesignEnd = this.XMLDesignEnd;
+            clonedObject.XMLConfig = this.XMLConfig;
+
+            return clonedObject;
+        }
     }
 }

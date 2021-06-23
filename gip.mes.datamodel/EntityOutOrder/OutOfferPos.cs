@@ -32,7 +32,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOfferPos.ClassName, "en{'Offer Position'}de{'Angebotsposition'}", typeof(OutOfferPos), OutOfferPos.ClassName, "Sequence", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<OutOfferPos>) })]
-    public partial class OutOfferPos : IOutOrderPos
+    public partial class OutOfferPos : IOutOrderPos, ICloneable
     {
         public const string ClassName = "OutOfferPos";
 
@@ -106,8 +106,9 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             OutOffer outOffer = OutOffer;
+            OutOfferPos groupPos = OutOfferPos1_GroupOutOfferPos;
             database.DeleteObject(this);
-            OutOfferPos.RenumberSequence(outOffer, sequence, OutOfferPos1_GroupOutOfferPos);
+            OutOfferPos.RenumberSequence(outOffer, sequence, groupPos);
             return null;
         }
 
@@ -120,7 +121,7 @@ namespace gip.mes.datamodel
 
             if (groupPos != null)
             {
-                elements = groupPos.OutOfferPos1_GroupOutOfferPos.OutOfferPos_GroupOutOfferPos.Where(c => c.Sequence > sequence).ToList();
+                elements = groupPos.OutOfferPos_GroupOutOfferPos.Where(c => c.Sequence > sequence).ToList();
             }
             else
             {
@@ -380,5 +381,38 @@ namespace gip.mes.datamodel
         public bool InRecalculation { get; set; }
 
         #endregion
+
+        public object Clone()
+        {
+            OutOfferPos clonedObject = new OutOfferPos();
+            clonedObject.OutOfferPosID = this.OutOfferPosID;
+            clonedObject.OutOfferID = this.OutOfferID;
+            clonedObject.ParentOutOfferPosID = this.ParentOutOfferPosID;
+            clonedObject.GroupOutOfferPosID = this.GroupOutOfferPosID;
+            clonedObject.MDTimeRangeID = this.MDTimeRangeID;
+            clonedObject.MaterialPosTypeIndex = this.MaterialPosTypeIndex;
+            clonedObject.MDCountrySalesTaxID = this.MDCountrySalesTaxID;
+            clonedObject.MDCountrySalesTaxMDMaterialGroupID = this.MDCountrySalesTaxMDMaterialGroupID;
+            clonedObject.MDCountrySalesTaxMaterialID = this.MDCountrySalesTaxMaterialID;
+            clonedObject.Sequence = this.Sequence;
+            clonedObject.MaterialID = this.MaterialID;
+            clonedObject.MDUnitID = this.MDUnitID;
+            clonedObject.TargetQuantityUOM = this.TargetQuantityUOM;
+            clonedObject.TargetQuantity = this.TargetQuantity;
+            clonedObject.PriceNet = this.PriceNet;
+            clonedObject.PriceGross = this.PriceGross;
+            clonedObject.SalesTax = this.SalesTax;
+            clonedObject.TargetWeight = this.TargetWeight;
+            clonedObject.TargetDeliveryDate = this.TargetDeliveryDate;
+            clonedObject.TargetDeliveryMaxDate = this.TargetDeliveryMaxDate;
+            clonedObject.TargetDeliveryPriority = this.TargetDeliveryPriority;
+            clonedObject.GroupSum = this.GroupSum;
+            clonedObject.Comment = this.Comment;
+            clonedObject.Comment2 = this.Comment2;
+            clonedObject.XMLDesign = this.XMLDesign;
+            clonedObject.XMLConfig = this.XMLConfig;
+
+            return clonedObject;
+        }
     }
 }
