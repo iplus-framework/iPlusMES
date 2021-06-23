@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using gip.mes.datamodel;
+using System.Threading;
 
 namespace gip.bso.manufacturing
 {
@@ -611,6 +612,11 @@ namespace gip.bso.manufacturing
 
                 string pwGroupACUrl = accessArr[0];
                 PAOrderInfo currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!GetPAOrderInfo") as PAOrderInfo;
+                if (currentOrderInfo == null)
+                {
+                    Thread.Sleep(500);
+                    currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!GetPAOrderInfo") as PAOrderInfo;
+                }
                 if (currentOrderInfo != null)
                 {
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
@@ -719,7 +725,7 @@ namespace gip.bso.manufacturing
                 return;
 
             var childBSO = this.ACComponentChilds.FirstOrDefault(c => c.ACIdentifier == actionArgs.DropObject.VBContent) as BSOWorkCenterChild;
-            if (childBSO == null)
+            if (childBSO == null && (actionArgs.DropObject.VBContent != "Workflow" || actionArgs.DropObject.VBContent != "BOM"))
                 return;
 
             if (CurrentChildBSO == childBSO && CurrentProcessModule == CurrentWorkCenterItem.ProcessModule)
@@ -727,10 +733,22 @@ namespace gip.bso.manufacturing
 
             if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
             {
-                (CurrentChildBSO as BSOWorkCenterChild)?.DeActivate();
+                if (CurrentChildBSO != null)
+                    (CurrentChildBSO as BSOWorkCenterChild)?.DeActivate();
+
                 CurrentChildBSO = childBSO;
                 CurrentProcessModule = CurrentWorkCenterItem.ProcessModule;
-                childBSO.Activate(CurrentProcessModule);
+
+                if (childBSO != null)
+                    childBSO.Activate(CurrentProcessModule);
+                else if (actionArgs.DropObject.VBContent == "Workflow")
+                {
+                    ShowWorkflow();
+                }
+                else if (actionArgs.DropObject.VBContent == "BOM")
+                {
+                    LoadPartslist();
+                }
             }
         }
 

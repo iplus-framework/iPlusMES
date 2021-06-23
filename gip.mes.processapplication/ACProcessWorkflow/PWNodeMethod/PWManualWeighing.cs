@@ -101,6 +101,13 @@ namespace gip.mes.processapplication
 
         #endregion
 
+        #region Const
+
+        public const string MNCompleteWeighing = "CompleteWeighing";
+        public const string MaterialConfigLastUsedLotKeyACUrl = "ManWeighLastUsedLot";
+
+        #endregion
+
         #region Properties
 
         #region Propeties => Private members
@@ -1074,7 +1081,10 @@ namespace gip.mes.processapplication
             }
 
             if (msgSet == null)
+            {
+                SaveLastUsedLot(newFacilityCharge, CurrentOpenMaterial);
                 SetInfo(null, WeighingComponentInfoType.SelectFC_F, newFacilityCharge, null, true, true);
+            }
 
             return msgSet;
         }
@@ -1672,7 +1682,7 @@ namespace gip.mes.processapplication
                                         availableFC = availableFC.OrderBy(c => c.ExpirationDate.HasValue).ThenBy(c => c.ExpirationDate).ToArray();
                                         break;
                                 case LotUsageEnum.LastUsed:
-                                        //TODO:
+                                        availableFC = TryGetLastUsedLot(availableFC, mat.MaterialID, dbApp);
                                         break;
                                 case LotUsageEnum.LIFO:
                                         availableFC = availableFC.OrderByDescending(c => c.FillingDate.HasValue).ThenByDescending(c => c.FillingDate).ToArray();
@@ -1703,9 +1713,73 @@ namespace gip.mes.processapplication
             }
         }
 
-        private void DetermineFacilityChargePrio()
+        private IEnumerable<FacilityCharge> TryGetLastUsedLot(IEnumerable<FacilityCharge> facilityCharges, Guid materialID, DatabaseApp dbApp)
         {
+            Guid? moduleID = ParentPWGroup?.AccessedProcessModule?.ComponentClass?.ACClassID;
 
+            if (!moduleID.HasValue)
+                return new List<FacilityCharge>();
+
+            MaterialConfig lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == materialID
+                                                                                                            && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+
+            if (lastUsedFC == null || lastUsedFC.Value == null)
+                return new List<FacilityCharge>();
+
+            Guid? fcID = lastUsedFC.Value as Guid?;
+            if (fcID.HasValue)
+            {
+                FacilityCharge fc = facilityCharges.FirstOrDefault(c => c.FacilityChargeID == fcID);
+                if (fc != null)
+                    return new List<FacilityCharge>() { fc };
+            }
+
+            return new List<FacilityCharge>();
+        }
+
+        private void SaveLastUsedLot(Guid? facilityCharge, Guid? materialID)
+        {
+            if (!facilityCharge.HasValue || !materialID.HasValue)
+                return;
+
+            if (AutoSelectLotPriority == LotUsageEnum.LastUsed || LotValidation == LotUsageEnum.LastUsed)
+            {
+                Guid? moduleID = ParentPWGroup?.AccessedProcessModule?.ComponentClass?.ACClassID;
+                if (!moduleID.HasValue)
+                    return;
+
+                ApplicationManager?.ApplicationQueue.Add(() =>
+                {
+                    using (Database db = new core.datamodel.Database())
+                   using (DatabaseApp dbApp = new DatabaseApp(db))
+                   {
+                       ProdOrderPartslistPosRelation posRel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == materialID);
+                       if (posRel == null)
+                           return;
+
+                       MaterialConfig lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == posRel.SourceProdOrderPartslistPos.MaterialID
+                                                                                                                       && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+
+                       if (lastUsedFC == null)
+                       {
+                           lastUsedFC = MaterialConfig.NewACObject(dbApp, null);
+                           lastUsedFC.MaterialID = posRel.SourceProdOrderPartslistPos.MaterialID;
+                           lastUsedFC.VBiACClassID = moduleID;
+                           lastUsedFC.KeyACUrl = MaterialConfigLastUsedLotKeyACUrl;
+                            dbApp.MaterialConfig.AddObject(lastUsedFC);
+                            lastUsedFC.SetValueTypeACClass(db.GetACType(typeof(Guid)));
+                       }
+
+                       Guid? lastFCID = lastUsedFC.Value as Guid?;
+                       if (!lastFCID.HasValue || lastFCID.Value != facilityCharge.Value)
+                       {
+                           lastUsedFC.Value = facilityCharge;
+                       }
+
+                       Msg msg = dbApp.ACSaveChanges();
+                   }
+                });
+            }    
         }
 
         private void SelectFacilityChargeOrFacility(Guid? componentID, WeighingComponentInfoType infoType)
@@ -1816,7 +1890,7 @@ namespace gip.mes.processapplication
             if (module == null)
                 return StartNextCompResult.CycleWait;
 
-            if (!OnStartManualWeighingNextComp())
+            if (!OnStartManualWeighingNextComp(weighingComponent))
                 return StartNextCompResult.CycleWait;
 
             gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
@@ -1909,7 +1983,7 @@ namespace gip.mes.processapplication
             return StartNextCompResult.NextCompStarted;
         }
 
-        public virtual bool OnStartManualWeighingNextComp()
+        public virtual bool OnStartManualWeighingNextComp(WeighingComponent component)
         {
             return true;
         }
@@ -2047,6 +2121,7 @@ namespace gip.mes.processapplication
                                     if (!FreeSelectionMode && !AutoSelectLot)
                                         infoType = WeighingComponentInfoType.StateSelectFC_F;
                                     SetInfo(comp, infoType, CurrentFacilityCharge.Value, CurrentFacility);
+                                    SaveLastUsedLot(CurrentFacilityCharge, CurrentOpenMaterial);
                                 }
                             }
                         }

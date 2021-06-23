@@ -32,25 +32,20 @@ namespace gip.mes.processapplication
 
         public override ACMethodEventArgs Start(ACMethod acMethod)
         {
-            ACValue acclassWF = acMethod?.ParameterValueList.GetACValue(core.datamodel.ACClassWF.ClassName);
-            if (acclassWF != null && acclassWF.Value != null)
-            {
-                SelectedSingleDosingACClassWFID = acclassWF.ParamAsGuid;
-            }
-
             return base.Start(acMethod);
         }
 
         public Guid? SelectedSingleDosingACClassWFID
         {
-            get;
-            private set;
-        }
-
-        public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
-        {
-            SelectedSingleDosingACClassWFID = null;            
-            base.Recycle(content, parentACObject, parameter, acIdentifier);
+            get
+            {
+                ACValue acclassWF = CurrentACMethod?.ValueT?.ParameterValueList.GetACValue(core.datamodel.ACClassWF.ClassName);
+                if (acclassWF != null && acclassWF.Value != null && ContentACClassWF != null)
+                {
+                    return acclassWF.ParamAsGuid;
+                }
+                return null;
+            }
         }
     }
 }

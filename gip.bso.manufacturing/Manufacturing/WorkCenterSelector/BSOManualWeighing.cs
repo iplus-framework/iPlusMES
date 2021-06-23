@@ -381,6 +381,31 @@ namespace gip.bso.manufacturing
             set;
         }
 
+        private List<MessageItem> _AckMessageList;
+        [ACPropertyList(612, "MessagesAck")]
+        public List<MessageItem> AckMessageList
+        {
+            get => _AckMessageList;
+            set
+            {
+                _AckMessageList = value;
+                OnPropertyChanged("AckMessageList");
+            }
+        }
+
+        private MessageItem _SelectedAckMessage;
+        [ACPropertySelected(613, "MessagesAck")]
+        public MessageItem SelectedAckMessage
+        {
+            get => _SelectedAckMessage;
+            set
+            {
+                _SelectedAckMessage = value;
+                OnPropertyChanged("SelectedAckMessage");
+            }
+        }
+
+
         #endregion
 
         #region Properties => PW&PAFConfiguration
@@ -1045,18 +1070,51 @@ namespace gip.bso.manufacturing
             if (!IsEnabledAcknowledge())
                 return;
 
-            var messageToAck = MessagesList.FirstOrDefault(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton);
+            var messagesToAck = MessagesList.Where(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton).ToList();
 
-            if (messageToAck != null)
-                messageToAck.Acknowledge();
-            else if (ComponentPWNode != null && ComponentPWNode.ValueT != null)
-                ComponentPWNode.ValueT.ACUrlCommand("!CompleteWeighing", ScaleActualWeight);
+            if (messagesToAck.Count > 1 || (messagesToAck.Any() && ScaleBckgrState == ScaleBackgroundState.InTolerance))
+            {
+                if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
+                {
+                    MessageItem msgItem = new MessageItem(ComponentPWNode?.ValueT, this);
+                    msgItem.Message = string.Format("Acknowledge weighing component: {0} {1} ", SelectedWeighingMaterial.MaterialNo, SelectedWeighingMaterial.MaterialName);
+                    messagesToAck.Add(msgItem);
+                }
+
+                AckMessageList = messagesToAck;
+                ShowDialog(this, "MsgAckDialog");
+            }
+            else
+            {
+                var messageToAck = messagesToAck.FirstOrDefault();
+
+                if (messageToAck != null)
+                    messageToAck.AcknowledgeMsg();
+                else if (ComponentPWNode != null && ComponentPWNode.ValueT != null)
+                    ComponentPWNode.ValueT.ACUrlCommand("!"+PWManualWeighing.MNCompleteWeighing, ScaleActualWeight);
+            }
         }
 
         public virtual bool IsEnabledAcknowledge()
         {
             return (MessagesList.Any(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton) ||
                                                        ScaleBckgrState == ScaleBackgroundState.InTolerance);
+        }
+
+        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602)]
+        public void AcknowledgeMsg(MessageItem item)
+        {
+            if (item != null)
+            {
+                item.AcknowledgeMsg();
+                AckMessageList.Remove(item);
+                AckMessageList = AckMessageList.ToList();
+
+                if (!AckMessageList.Any())
+                {
+                    CloseTopDialog();
+                }
+            }
         }
 
         [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603)]
@@ -2487,7 +2545,7 @@ namespace gip.bso.manufacturing
             }
             ACSaveChanges();
 
-            //SetPickingRoutingRules(validRoute, workflow, picking);
+            PreStartWorkflow(validRoute, workflow, picking);
 
             msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
@@ -2735,9 +2793,16 @@ namespace gip.bso.manufacturing
             return msg;
         }
 
-        protected virtual void SetPickingRoutingRules(Route validRoute, ACClassWF rootWF, vd.Picking picking)
+        protected virtual void PreStartWorkflow(Route validRoute, ACClassWF rootWF, vd.Picking picking)
         {
-            List<Tuple<ACClassWF,string>> subWFs = new List<Tuple<ACClassWF, string>>();
+            List<Tuple<ACClassWF, string>> subWFs = new List<Tuple<ACClassWF, string>>();
+
+            if (rootWF.PWACClass != null && rootWF.PWACClass.ACKindIndex == (short)Global.ACKinds.TPWNodeWorkflow)
+            {
+                Tuple<ACClassWF, string> subItem = new Tuple<ACClassWF, string>(rootWF, rootWF.ConfigACUrl);
+                subWFs.Add(subItem);
+            }
+
             GetSubWorkflows(new Tuple<ACClassWF, string>(rootWF, ""), subWFs, 0);
 
             List<SingleDosingConfigItem> configItems = new List<SingleDosingConfigItem>();
@@ -2748,52 +2813,10 @@ namespace gip.bso.manufacturing
                                                                                      .Select(p => new SingleDosingConfigItem() { PreConfigACUrl = subWF.Item2, PWGroup = p }));
             }
 
-
-            string ruleSuffix = @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString();
-
-            RouteItem target = validRoute.GetRouteTarget();
-
-            foreach(RouteItem rItem in validRoute)
-            {
-                var configPWGroups = configItems.Where(c => c.PossibleMachines.Any(x => x.ACClassID == rItem.SourceGuid));
-            
-                if(configPWGroups != null && configPWGroups.Any())
-                {
-                    if(configPWGroups.Count() > 1)
-                    {
-                        //TODO: user must manually set routing rules
-                        continue;
-                    }
-
-                    SingleDosingConfigItem configItem = configPWGroups.FirstOrDefault();
-
-                    string preACUrl = configItem.PreConfigACUrl + "\\";
-                    string configACUrl = configItem.PWGroup.ConfigACUrl + ruleSuffix;
-
-                    vd.PickingConfig pickingConfig = picking.PickingConfig_Picking.FirstOrDefault(c => c.PreConfigACUrl == preACUrl && c.LocalConfigACUrl == configACUrl);
-                    if (pickingConfig == null)
-                    {
-                        pickingConfig = vd.PickingConfig.NewACObject(DatabaseApp, picking);
-                        pickingConfig.PreConfigACUrl = preACUrl;
-                        pickingConfig.LocalConfigACUrl = configACUrl;
-                        pickingConfig.VBiACClassWFID = configItem.PWGroup.ACClassWFID;
-
-                        ACClass machine = configItem.PossibleMachines.FirstOrDefault(c => c.ACClassID == rItem.SourceGuid);
-
-                        List<RuleValue> ruleValues = new List<RuleValue>();
-                        ruleValues.Add(new RuleValue() { RuleType = ACClassWFRuleTypes.Allowed_instances, ACClassACUrl = new List<string>() { machine.ACUrl } });
-
-                        RulesCommand.WriteIACConfig(DatabaseApp, pickingConfig, ruleValues);
-
-                        var msg = DatabaseApp.ACSaveChanges();
-                    }
-                }
-            }
-
-            OnSetPickingRoutingRules(picking, rootWF, configItems);
+            OnPreStartWorkflow(picking, configItems, validRoute, rootWF);
         }
 
-        public virtual void OnSetPickingRoutingRules(vd.Picking picking, ACClassWF rootWF, List<SingleDosingConfigItem> configItems)
+        public virtual void OnPreStartWorkflow(vd.Picking picking, List<SingleDosingConfigItem> configItems, Route validRoute, ACClassWF rootWF)
         {
 
         }
@@ -3322,10 +3345,10 @@ namespace gip.bso.manufacturing
 
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'UserAckNode'}de{'UserAckNode'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, true)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + "UserAckNode", "", typeof(MessageItem), "UserAckNode", "", "")]
-    public class MessageItem : INotifyPropertyChanged
+    public class MessageItem : IACObject, INotifyPropertyChanged
     {
 
-        public MessageItem(IACComponent pwNode, IACComponent bso)
+        public MessageItem(IACComponent pwNode, BSOManualWeighing bso)
         {
             if (pwNode != null)
             {
@@ -3336,10 +3359,13 @@ namespace gip.bso.manufacturing
                     _AlarmsAsText.PropertyChanged += AlarmsAsText_PropertyChanged;
                     Message = _AlarmsAsText.Value as string;
                 }
+                _BSOManualWeighing = bso;
             }
         }
 
         private IACPropertyNetBase _AlarmsAsText;
+
+        private BSOManualWeighing _BSOManualWeighing;
 
         private string _Message;
         [ACPropertyInfo(100)]
@@ -3375,19 +3401,35 @@ namespace gip.bso.manufacturing
             set;
         }
 
+        public IACObject ParentACObject => null;
+
+        public IACType ACType => this.ReflectACType();
+
+        public IEnumerable<IACObject> ACContentList => this.ReflectGetACContentList();
+
+        public string ACIdentifier => this.ReflectGetACIdentifier();
+
+        public string ACCaption => this.ACIdentifier;
+
         private void AlarmsAsText_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
                 Task.Run(() => Message = _AlarmsAsText.Value as string);
         }
 
-        public virtual void Acknowledge()
+        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 100)]
+        public virtual void AcknowledgeMsg()
         {
             if (UserAckPWNode != null && UserAckPWNode.ValueT != null)
             {
-                UserAckPWNode.ValueT.ACUrlCommand("!" + PWNodeUserAck.MN_AckStartClient);
-                //MN_AckStartClient
-                //PWNodeUserAck.AckStartClient(UserAckPWNode.ValueT);
+                if (_BSOManualWeighing != null && _BSOManualWeighing.CurrentComponentPWNode == UserAckPWNode.ValueT)
+                {
+                    UserAckPWNode.ValueT.ACUrlCommand("!" + PWManualWeighing.MNCompleteWeighing, _BSOManualWeighing.ScaleActualWeight);
+                }
+                else
+                {
+                    UserAckPWNode.ValueT.ACUrlCommand("!" + PWNodeUserAck.MN_AckStartClient);
+                }
             }
         }
 
@@ -3401,6 +3443,7 @@ namespace gip.bso.manufacturing
             _AlarmsAsText = null;
             UserAckPWNode.Detach();
             UserAckPWNode = null;
+            _BSOManualWeighing = null;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -3409,6 +3452,25 @@ namespace gip.bso.manufacturing
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public object ACUrlCommand(string acUrl, params object[] acParameter)
+        {
+            return this.ReflectACUrlCommand(acUrl, acParameter);
+        }
+
+        public bool IsEnabledACUrlCommand(string acUrl, params object[] acParameter)
+        {
+            return this.ReflectIsEnabledACUrlCommand(acUrl, acParameter);
+        }
+
+        public string GetACUrl(IACObject rootACObject = null)
+        {
+            return this.ReflectGetACUrl(rootACObject);
+        }
+
+        public bool ACUrlBinding(string acUrl, ref IACType acTypeInfo, ref object source, ref string path, ref Global.ControlModes rightControlMode)
+        {
+            return this.ReflectACUrlBinding(acUrl, ref acTypeInfo, ref source, ref path, ref rightControlMode);
+        }
     }
 
     public class ManualWeighingPWNode
