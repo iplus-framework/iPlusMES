@@ -1,4 +1,29 @@
-﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpTranslation')
+IF EXISTS (SELECT * FROM sysobjects WHERE type = 'V' AND name = 'VBTranslationView')
+	BEGIN
+		DROP  View dbo.[VBTranslationView]
+	END
+GO
+CREATE VIEW [dbo].[VBTranslationView]
+	AS 
+select
+pr.ACProjectName as							ACProjectName,
+'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+' as								
+											TableName,
+cl.ACClassID as								MandatoryID,
+cl.ACIdentifier as							MandatoryACIdentifier,
+cl.ACURLCached as							MandatoryACURLCached,
+cl.ACClassID as								ID,
+cl.ACIdentifier as							ACIdentifier,
+cl.ACCaptionTranslation as					TranslationValue,
+isnull(cl.UpdateName, '') as				UpdateName,
+isnull(cl.UpdateDate, getdate()) as			UpdateDate
+from ACClass cl
+inner join ACProject pr on pr.ACProjectID = cl.ACProjectID
+
+GO
+IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpTranslation')
 	BEGIN
 		DROP  procedure  dbo.[udpTranslation]
 	END
@@ -27,6 +52,7 @@ begin
 						TableName				varchar(150),
 						MandatoryID				uniqueidentifier,
 						MandatoryACIdentifier	varchar(200),
+						MandatoryACURLCached    varchar(max),
 						ID						uniqueidentifier,
 						ACIdentifier			varchar(200),
 						TranslationValue		varchar(max),
@@ -40,13 +66,14 @@ begin
 				set @jobID = NEWID();
 
 				-- ACClass
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
 					Pr.ACProjectName as			ACProjectName,
 					N'ACClass' as				TableName,
 					cl.ACClassID as				MandatoryID,
 					cl.ACIdentifier as			MandatoryACIdentifier,
+					cl.ACURLCached	as			MandatoryACURLCached,
 					cl.ACClassID as				ID,
 					cl.ACIdentifier as			ACIdentifier,
 					cl.ACCaptionTranslation as	TranslationValue,
@@ -61,13 +88,14 @@ begin
 					order by cl.ACIdentifier
 
 				--ACClassMessage
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
 					cl.ACIdentifier as			ACProjectName,
 					'ACClassMessage' as			TableName,
 					cl.ACClassID as				MandatoryID,
 					cl.ACIdentifier as			MandatoryACIdentifier,
+					cl.ACURLCached	as			MandatoryACURLCached,
 					msg.ACClassMessageID as		ID,
 					msg.ACIdentifier as			ACIdentifier,
 					msg.ACCaptionTranslation as TranslationValue,
@@ -82,13 +110,14 @@ begin
 					order by msg.ACIdentifier
 
 				--ACClassMethod
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
 					cl.ACIdentifier as			ACProjectName,
 					N'ACClassMethod' as			TableName,
 					cl.ACClassID as				MandatoryID,
 					cl.ACIdentifier as			MandatoryACIdentifier,
+					cl.ACURLCached	as			MandatoryACURLCached,
 					mth.ACClassMethodID as		ID,
 					mth.ACIdentifier as			ACIdentifier,
 					mth.ACCaptionTranslation as TranslationValue,
@@ -103,13 +132,14 @@ begin
 					order by mth.ACIdentifier
 			
 				--ACClassProperty
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
 					cl.ACIdentifier as			ACProjectName,
 					N'ACClassProperty' as		TableName,
 					cl.ACClassID as				MandatoryID,
 					cl.ACIdentifier as			MandatoryACIdentifier,
+					cl.ACURLCached	as			MandatoryACURLCached,
 					prop.ACClassPropertyID as	ID,
 					prop.ACIdentifier as		ACIdentifier,
 					prop.ACCaptionTranslation as TranslationValue,
@@ -124,13 +154,14 @@ begin
 					order by prop.ACIdentifier
 
 				--ACClassText
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
 					cl.ACIdentifier as			ACProjectName,
 					N'ACClassText' as			TableName,
 					cl.ACClassID as				MandatoryID,
 					cl.ACIdentifier as			MandatoryACIdentifier,
+					cl.ACURLCached	as			MandatoryACURLCached,
 					txt.ACClassTextID as		ID,
 					txt.ACIdentifier as			ACIdentifier,
 					txt.ACCaptionTranslation as TranslationValue,
@@ -145,16 +176,17 @@ begin
 					order by txt.ACIdentifier
 			
 				--ACClassDesign
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
 					cl.ACIdentifier as			ACProjectName,
 					N'ACClassDesign' as			TableName,
 					cl.ACClassID as				MandatoryID,
 					cl.ACIdentifier as			MandatoryACIdentifier,
+					cl.ACURLCached	as			MandatoryACURLCached,
 					de.ACClassDesignID as		ID,
 					de.ACIdentifier as			ACIdentifier,
-					de.ACCaptionTranslation as TranslationValue,
+					de.ACCaptionTranslation as	TranslationValue,
 					de.UpdateName as			UpdateName,
 					de.UpdateDate as			UpdateDate
 				from ACClassDesign de
@@ -170,22 +202,19 @@ begin
 		if  @onlyMDTables is null or @onlyMDTables = 1
 		begin
 
-			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'tableName')
-			begin
-				select 1;
-			end
-				-- MDBalancingMode
+			-- MDBalancingMode
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDBalancingMode')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDBalancingMode' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDBalancingModeID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDBalancingModeID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -200,15 +229,16 @@ begin
 			-- MDBookingNotAvailableMode
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDBookingNotAvailableMode')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as							JobID,
-					null as							ACProjectName,
+					null as								ACProjectName,
 					'MDBookingNotAvailableMode' as		TableName,
-					null as							MandatoryID,
-					null as							MandatoryACIdentifier,
+					null as								MandatoryID,
+					null as								MandatoryACIdentifier,
+					null as								MandatoryACURLCached,
 					md.MDBookingNotAvailableModeID as	ID,
-					md.MDKey as						ACIdentifier,
+					md.MDKey as							ACIdentifier,
 					md.MDNameTrans as					TranslationValue,
 					md.UpdateName as					UpdateName,
 					md.UpdateDate as					UpdateDate
@@ -223,15 +253,16 @@ begin
 			-- MDCostCenter
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDCostCenter')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
+					null as					ACProjectName,
 					'MDCostCenter' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
 					md.MDCostCenterID as	ID,
-					md.MDKey as			ACIdentifier,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -246,15 +277,16 @@ begin
 			-- MDCountry
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDCountry')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as			JobID,
-					null as			ACProjectName,
+					null as				ACProjectName,
 					'MDCountry' as		TableName,
-					null as			MandatoryID,
-					null as			MandatoryACIdentifier,
+					null as				MandatoryID,
+					null as				MandatoryACIdentifier,
+					null as				MandatoryACURLCached,
 					md.MDCountryID as	ID,
-					md.MDKey as		ACIdentifier,
+					md.MDKey as			ACIdentifier,
 					md.MDNameTrans as	TranslationValue,
 					md.UpdateName as	UpdateName,
 					md.UpdateDate as	UpdateDate
@@ -269,15 +301,16 @@ begin
 			-- MDCountryLand
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDCountryLand')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
+					null as					ACProjectName,
 					'MDCountryLand' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
 					md.MDCountryLandID as	ID,
-					md.MDKey as			ACIdentifier,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -291,15 +324,16 @@ begin
 			-- MDCountrySalesTax
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDCountrySalesTax')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDCountrySalesTax' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDCountrySalesTaxID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -313,15 +347,16 @@ begin
 			-- MDCurrency
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDCurrency')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
-					'MDCurrency' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
+					null as					ACProjectName,
+					'MDCurrency' as			TableName,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
 					md.MDCurrencyID as		ID,
-					md.MDKey as			ACIdentifier,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -335,15 +370,16 @@ begin
 			-- MDDelivNoteState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDDelivNoteState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDDelivNoteState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDDelivNoteStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -357,15 +393,16 @@ begin
 			-- MDDelivPosLoadState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDDelivPosLoadState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
+					null as							ACProjectName,
 					'MDDelivPosLoadState' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
-					md.MDDelivPosLoadStateID as	ID,
-					md.MDKey as					ACIdentifier,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
+					md.MDDelivPosLoadStateID as		ID,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -379,15 +416,16 @@ begin
 			-- MDDelivPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDDelivPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDDelivPosState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDDelivPosStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDDelivPosStateID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -401,15 +439,16 @@ begin
 			-- MDDelivType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDDelivType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
+					null as					ACProjectName,
 					'MDDelivType' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
-					md.MDDelivTypeID as	ID,
-					md.MDKey as			ACIdentifier,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
+					md.MDDelivTypeID as		ID,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -423,15 +462,16 @@ begin
 			-- MDDemandOrderState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDDemandOrderState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
-					'MDDemandOrderState' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
+					null as							ACProjectName,
+					'MDDemandOrderState' as			TableName,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
 					md.MDDemandOrderStateID as		ID,
-					md.MDKey as					ACIdentifier,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -445,15 +485,16 @@ begin
 			-- MDFacilityInventoryPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDFacilityInventoryPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as JobID,
-					null as								ACProjectName,
+					null as									ACProjectName,
 					'MDFacilityInventoryPosState' as		TableName,
-					null as								MandatoryID,
-					null as								MandatoryACIdentifier,
-					md.MDFacilityInventoryPosStateID as	ID,
-					md.MDKey as							ACIdentifier,
+					null as									MandatoryID,
+					null as									MandatoryACIdentifier,
+					null as									MandatoryACURLCached,
+					md.MDFacilityInventoryPosStateID as		ID,
+					md.MDKey as								ACIdentifier,
 					md.MDNameTrans as						TranslationValue,
 					md.UpdateName as						UpdateName,
 					md.UpdateDate as						UpdateDate
@@ -467,15 +508,16 @@ begin
 			-- MDFacilityInventoryState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDFacilityInventoryState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as							JobID,
-					null as							ACProjectName,
+					null as								ACProjectName,
 					'MDFacilityInventoryState' as		TableName,
-					null as							MandatoryID,
-					null as							MandatoryACIdentifier,
+					null as								MandatoryID,
+					null as								MandatoryACIdentifier,
+					null as								MandatoryACURLCached,
 					md.MDFacilityInventoryStateID as	ID,
-					md.MDKey as						ACIdentifier,
+					md.MDKey as							ACIdentifier,
 					md.MDNameTrans as					TranslationValue,
 					md.UpdateName as					UpdateName,
 					md.UpdateDate as					UpdateDate
@@ -489,15 +531,16 @@ begin
 			-- MDFacilityManagementType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDFacilityManagementType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as							JobID,
-					null as							ACProjectName,
+					null as								ACProjectName,
 					'MDFacilityManagementType' as		TableName,
-					null as							MandatoryID,
-					null as							MandatoryACIdentifier,
+					null as								MandatoryID,
+					null as								MandatoryACIdentifier,
+					null as								MandatoryACURLCached,
 					md.MDFacilityManagementTypeID as	ID,
-					md.MDKey as						ACIdentifier,
+					md.MDKey as							ACIdentifier,
 					md.MDNameTrans as					TranslationValue,
 					md.UpdateName as					UpdateName,
 					md.UpdateDate as					UpdateDate
@@ -511,15 +554,16 @@ begin
 			-- MDFacilityType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDFacilityType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
-					'MDFacilityType' as	TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
-					md.MDFacilityTypeID as ID,
-					md.MDKey as			ACIdentifier,
+					null as					ACProjectName,
+					'MDFacilityType' as		TableName,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
+					md.MDFacilityTypeID as	ID,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -533,15 +577,16 @@ begin
 			-- MDFacilityVehicleType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDFacilityVehicleType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
+					null as							ACProjectName,
 					'MDFacilityVehicleType' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
 					md.MDFacilityVehicleTypeID as	ID,
-					md.MDKey as					ACIdentifier,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -556,18 +601,19 @@ begin
 			-- MDGMPAdditive
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDGMPAdditive')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 			select
-				@jobID as				JobID,
-				null as				ACProjectName,
-				'MDGMPAdditive' as		TableName,
-				null as				MandatoryID,
-				null as				MandatoryACIdentifier,
-				md.MDGMPAdditiveID as	ID,
-				md.MDKey as			ACIdentifier,
-				md.MDNameTrans as		TranslationValue,
-				md.UpdateName as		UpdateName,
-				md.UpdateDate as		UpdateDate
+				@jobID as					JobID,
+				null as						ACProjectName,
+				'MDGMPAdditive' as			TableName,
+				null as						MandatoryID,
+				null as						MandatoryACIdentifier,
+				null as						MandatoryACURLCached,
+				md.MDGMPAdditiveID as		ID,
+				md.MDKey as					ACIdentifier,
+				md.MDNameTrans as			TranslationValue,
+				md.UpdateName as			UpdateName,
+				md.UpdateDate as			UpdateDate
 			from MDGMPAdditive md
 				where 
 				(@searchACIdentifier is null or lower(md.MDKey) like '%' + @searchACIdentifier + '%') and
@@ -578,15 +624,16 @@ begin
 			-- MDGMPMaterialGroup
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDGMPMaterialGroup')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDGMPMaterialGroup' as	TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDGMPMaterialGroupID as ID,
-					md.MDKey as				ACIdentifier,
+					null as						ACProjectName,
+					'MDGMPMaterialGroup' as		TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDGMPMaterialGroupID as	ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -601,18 +648,19 @@ begin
 			-- MDInOrderPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDInOrderPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
-					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDInOrderPosState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDInOrderPosStateID as	ID,
-					md.MDKey as				ACIdentifier,
-					md.MDNameTrans as			TranslationValue,
-					md.UpdateName as			UpdateName,
-					md.UpdateDate as			UpdateDate
+					@jobID as						JobID,
+					null as							ACProjectName,
+					'MDInOrderPosState' as			TableName,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
+					md.MDInOrderPosStateID as		ID,
+					md.MDKey as						ACIdentifier,
+					md.MDNameTrans as				TranslationValue,
+					md.UpdateName as				UpdateName,
+					md.UpdateDate as				UpdateDate
 				from MDInOrderPosState md
 					where 
 					(@searchACIdentifier is null or lower(md.MDKey) like '%' + @searchACIdentifier + '%') and
@@ -624,15 +672,16 @@ begin
 			-- MDInOrderState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDInOrderState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDInOrderState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						ACProjectName,
+					'MDInOrderState' as			TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDInOrderStateID as		ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -647,15 +696,16 @@ begin
 			-- MDInOrderType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDInOrderType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
+					null as					ACProjectName,
 					'MDInOrderType' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
 					md.MDInOrderTypeID as	ID,
-					md.MDKey as			ACIdentifier,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -670,15 +720,16 @@ begin
 			-- MDInRequestState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDInRequestState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDInRequestState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDInRequestStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -692,15 +743,16 @@ begin
 			-- MDInventoryManagementType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDInventoryManagementType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as							JobID,
-					null as							ACProjectName,
+					null as								ACProjectName,
 					'MDInventoryManagementType' as		TableName,
-					null as							MandatoryID,
-					null as							MandatoryACIdentifier,
+					null as								MandatoryID,
+					null as								MandatoryACIdentifier,
+					null as								MandatoryACURLCached,
 					md.MDInventoryManagementTypeID as	ID,
-					md.MDKey as						ACIdentifier,
+					md.MDKey as							ACIdentifier,
 					md.MDNameTrans as					TranslationValue,
 					md.UpdateName as					UpdateName,
 					md.UpdateDate as					UpdateDate
@@ -714,15 +766,16 @@ begin
 			-- MDLabOrderPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDLabOrderPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDLabOrderPosState' as	TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDLabOrderPosStateID as ID,
-					md.MDKey as				ACIdentifier,
+					null as						ACProjectName,
+					'MDLabOrderPosState' as		TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDLabOrderPosStateID as	ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -736,15 +789,16 @@ begin
 			-- MDLabOrderState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDLabOrderState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDLabOrderState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDLabOrderStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDLabOrderStateID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -759,15 +813,16 @@ begin
 			-- MDLabTag
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDLabTag')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as			JobID,
-					null as			ACProjectName,
+					null as				ACProjectName,
 					'MDLabTag' as		TableName,
-					null as			MandatoryID,
-					null as			MandatoryACIdentifier,
+					null as				MandatoryID,
+					null as				MandatoryACIdentifier,
+					null as				MandatoryACURLCached,
 					md.MDLabTagID as	ID,
-					md.MDKey as		ACIdentifier,
+					md.MDKey as			ACIdentifier,
 					md.MDNameTrans as	TranslationValue,
 					md.UpdateName as	UpdateName,
 					md.UpdateDate as	UpdateDate
@@ -781,15 +836,16 @@ begin
 			-- MDMaintMode
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDMaintMode')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
+					null as					ACProjectName,
 					'MDMaintMode' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
-					md.MDMaintModeID as	ID,
-					md.MDKey as			ACIdentifier,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
+					md.MDMaintModeID as		ID,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -803,15 +859,16 @@ begin
 			-- MDMaintOrderPropertyState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDMaintOrderPropertyState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as							JobID,
-					null as							ACProjectName,
+					null as								ACProjectName,
 					'MDMaintOrderPropertyState' as		TableName,
-					null as							MandatoryID,
-					null as							MandatoryACIdentifier,
+					null as								MandatoryID,
+					null as								MandatoryACIdentifier,
+					null as								MandatoryACURLCached,
 					md.MDMaintOrderPropertyStateID as	ID,
-					md.MDKey as						ACIdentifier,
+					md.MDKey as							ACIdentifier,
 					md.MDNameTrans as					TranslationValue,
 					md.UpdateName as					UpdateName,
 					md.UpdateDate as					UpdateDate
@@ -826,15 +883,16 @@ begin
 			-- MDMaintOrderState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDMaintOrderState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDMaintOrderState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDMaintOrderStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -848,15 +906,16 @@ begin
 			-- MDMaterialGroup
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDMaterialGroup')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDMaterialGroup' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDMaterialGroupID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDMaterialGroupID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -871,15 +930,16 @@ begin
 			-- MDMaterialType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDMaterialType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDMaterialType' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						ACProjectName,
+					'MDMaterialType' as			TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDMaterialTypeID as		ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -893,15 +953,16 @@ begin
 			-- MDMovementReason
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDMovementReason')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDMovementReason' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDMovementReasonID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -915,15 +976,16 @@ begin
 			-- MDOutOfferState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDOutOfferState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDOutOfferState' as	TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDOutOfferStateID as ID,
-					md.MDKey as				ACIdentifier,
+					null as						ACProjectName,
+					'MDOutOfferState' as		TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDOutOfferStateID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -937,15 +999,16 @@ begin
 			-- MDOutOrderPlanState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDOutOrderPlanState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
+					null as							ACProjectName,
 					'MDOutOrderPlanState' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
-					md.MDOutOrderPlanStateID as	ID,
-					md.MDKey as					ACIdentifier,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
+					md.MDOutOrderPlanStateID as		ID,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -959,15 +1022,16 @@ begin
 			-- MDOutOrderPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDOutOrderPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDOutOrderPosState' as	TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDOutOrderPosStateID as ID,
-					md.MDKey as				ACIdentifier,
+					null as						ACProjectName,
+					'MDOutOrderPosState' as		TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDOutOrderPosStateID as	ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -981,15 +1045,16 @@ begin
 			-- MDOutOrderState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDOutOrderState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDOutOrderState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDOutOrderStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDOutOrderStateID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1003,18 +1068,19 @@ begin
 			-- MDOutOrderType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDOutOrderType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
-					@jobID as					JobID,
+					@jobID as				JobID,
 					null as					ACProjectName,
 					'MDOutOrderType' as		TableName,
 					null as					MandatoryID,
 					null as					MandatoryACIdentifier,
-					md.MDOutOrderTypeID as		ID,
+					null as					MandatoryACURLCached,
+					md.MDOutOrderTypeID as	ID,
 					md.MDKey as				ACIdentifier,
-					md.MDNameTrans as			TranslationValue,
-					md.UpdateName as			UpdateName,
-					md.UpdateDate as			UpdateDate
+					md.MDNameTrans as		TranslationValue,
+					md.UpdateName as		UpdateName,
+					md.UpdateDate as		UpdateDate
 				from MDOutOrderType md
 					where 
 					(@searchACIdentifier is null or lower(md.MDKey) like '%' + @searchACIdentifier + '%') and
@@ -1025,15 +1091,16 @@ begin
 			-- MDProcessErrorAction
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDProcessErrorAction')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
+					null as							ACProjectName,
 					'MDProcessErrorAction' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
 					md.MDProcessErrorActionID as	ID,
-					md.MDKey as					ACIdentifier,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -1047,15 +1114,16 @@ begin
 			-- MDProdOrderPartslistPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDProdOrderPartslistPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 			select
 				@jobID as								JobID,
-				null as								ACProjectName,
+				null as									ACProjectName,
 				'MDProdOrderPartslistPosState' as		TableName,
-				null as								MandatoryID,
-				null as								MandatoryACIdentifier,
+				null as									MandatoryID,
+				null as									MandatoryACIdentifier,
+				null as									MandatoryACURLCached,
 				md.MDProdOrderPartslistPosStateID as	ID,
-				md.MDKey as							ACIdentifier,
+				md.MDKey as								ACIdentifier,
 				md.MDNameTrans as						TranslationValue,
 				md.UpdateName as						UpdateName,
 				md.UpdateDate as						UpdateDate
@@ -1069,15 +1137,16 @@ begin
 			-- MDProdOrderState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDProdOrderState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDProdOrderState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDProdOrderStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1092,15 +1161,16 @@ begin
 			-- MDRatingComplaintType
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDRatingComplaintType')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
+					null as							ACProjectName,
 					'MDRatingComplaintType' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
 					md.MDRatingComplaintTypeID as	ID,
-					md.MDKey as					ACIdentifier,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -1115,15 +1185,16 @@ begin
 			-- MDReleaseState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDReleaseState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
-					'MDReleaseState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						ACProjectName,
+					'MDReleaseState' as			TableName,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDReleaseStateID as		ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1137,15 +1208,16 @@ begin
 			-- MDReservationMode
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDReservationMode')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDReservationMode' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDReservationModeID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1159,15 +1231,16 @@ begin
 			-- MDTermOfPayment
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDTermOfPayment')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDTermOfPayment' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDTermOfPaymentID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDTermOfPaymentID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1181,15 +1254,16 @@ begin
 			-- MDTimeRange
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDTimeRange')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as				JobID,
-					null as				ACProjectName,
+					null as					ACProjectName,
 					'MDTimeRange' as		TableName,
-					null as				MandatoryID,
-					null as				MandatoryACIdentifier,
-					md.MDTimeRangeID as	ID,
-					md.MDKey as			ACIdentifier,
+					null as					MandatoryID,
+					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
+					md.MDTimeRangeID as		ID,
+					md.MDKey as				ACIdentifier,
 					md.MDNameTrans as		TranslationValue,
 					md.UpdateName as		UpdateName,
 					md.UpdateDate as		UpdateDate
@@ -1203,15 +1277,16 @@ begin
 			-- MDToleranceState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDToleranceState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDToleranceState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDToleranceStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1225,15 +1300,16 @@ begin
 			-- MDTour
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDTour')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as			JobID,
-					null as			ACProjectName,
-					'MDTour' as		TableName,
-					null as			MandatoryID,
-					null as			MandatoryACIdentifier,
-					md.MDTourID as		ID,
-					md.MDKey as		ACIdentifier,
+					null as				ACProjectName,
+					'MDTour' as			TableName,
+					null as				MandatoryID,
+					null as				MandatoryACIdentifier,
+					null as				MandatoryACURLCached,
+					md.MDTourID			ID,
+					md.MDKey as			ACIdentifier,
 					md.MDNameTrans as	TranslationValue,
 					md.UpdateName as	UpdateName,
 					md.UpdateDate as	UpdateDate
@@ -1247,15 +1323,16 @@ begin
 			-- MDTourplanPosState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDTourplanPosState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
-					'MDTourplanPosState' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
+					null as							ACProjectName,
+					'MDTourplanPosState' as			TableName,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
 					md.MDTourplanPosStateID as		ID,
-					md.MDKey as					ACIdentifier,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -1270,15 +1347,16 @@ begin
 			-- MDTourplanState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDTourplanState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDTourplanState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
-					md.MDTourplanStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
+					md.MDTourplanStateID as		ID,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1292,18 +1370,19 @@ begin
 			-- MDTransportMode
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDTransportMode')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
-					@jobID as					JobID,
+					@jobID as				JobID,
 					null as					ACProjectName,
-					'MDTransportMode' as		TableName,
+					'MDTransportMode' as	TableName,
 					null as					MandatoryID,
 					null as					MandatoryACIdentifier,
+					null as					MandatoryACURLCached,
 					md.MDTransportModeID as	ID,
 					md.MDKey as				ACIdentifier,
-					md.MDNameTrans as			TranslationValue,
-					md.UpdateName as			UpdateName,
-					md.UpdateDate as			UpdateDate
+					md.MDNameTrans as		TranslationValue,
+					md.UpdateName as		UpdateName,
+					md.UpdateDate as		UpdateDate
 				from MDTransportMode md
 					where 
 					(@searchACIdentifier is null or lower(md.MDKey) like '%' + @searchACIdentifier + '%') and
@@ -1314,18 +1393,19 @@ begin
 			-- MDVisitorCardState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDVisitorCardState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
-					@jobID as						JobID,
+					@jobID as					JobID,
 					null as						ACProjectName,
 					'MDVisitorCardState' as		TableName,
 					null as						MandatoryID,
 					null as						MandatoryACIdentifier,
-					md.MDVisitorCardStateID as		ID,
+					null as						MandatoryACURLCached,
+					md.MDVisitorCardStateID as	ID,
 					md.MDKey as					ACIdentifier,
-					md.MDNameTrans as				TranslationValue,
-					md.UpdateName as				UpdateName,
-					md.UpdateDate as				UpdateDate
+					md.MDNameTrans as			TranslationValue,
+					md.UpdateName as			UpdateName,
+					md.UpdateDate as			UpdateDate
 				from MDVisitorCardState md
 					where 
 					(@searchACIdentifier is null or lower(md.MDKey) like '%' + @searchACIdentifier + '%') and
@@ -1337,15 +1417,16 @@ begin
 			-- MDVisitorVoucherState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDVisitorVoucherState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as						JobID,
-					null as						ACProjectName,
+					null as							ACProjectName,
 					'MDVisitorVoucherState' as		TableName,
-					null as						MandatoryID,
-					null as						MandatoryACIdentifier,
+					null as							MandatoryID,
+					null as							MandatoryACIdentifier,
+					null as							MandatoryACURLCached,
 					md.MDVisitorVoucherStateID as	ID,
-					md.MDKey as					ACIdentifier,
+					md.MDKey as						ACIdentifier,
 					md.MDNameTrans as				TranslationValue,
 					md.UpdateName as				UpdateName,
 					md.UpdateDate as				UpdateDate
@@ -1360,15 +1441,16 @@ begin
 			-- MDZeroStockState
 			if(@searchClassACIdentifier is null or @searchClassACIdentifier = 'MDZeroStockState')
 			begin
-				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
+				insert into #translationViewResults(JobID, ACProjectName, TableName, MandatoryID, MandatoryACIdentifier, MandatoryACURLCached, ID, ACIdentifier, TranslationValue, UpdateName, UpdateDate)
 				select
 					@jobID as					JobID,
-					null as					ACProjectName,
+					null as						ACProjectName,
 					'MDZeroStockState' as		TableName,
-					null as					MandatoryID,
-					null as					MandatoryACIdentifier,
+					null as						MandatoryID,
+					null as						MandatoryACIdentifier,
+					null as						MandatoryACURLCached,
 					md.MDZeroStockStateID as	ID,
-					md.MDKey as				ACIdentifier,
+					md.MDKey as					ACIdentifier,
 					md.MDNameTrans as			TranslationValue,
 					md.UpdateName as			UpdateName,
 					md.UpdateDate as			UpdateDate
@@ -1387,6 +1469,7 @@ begin
 				TableName,
 				MandatoryID,
 				MandatoryACIdentifier,
+				MandatoryACURLCached,
 				ID, 
 				ACIdentifier, 
 				TranslationValue,
