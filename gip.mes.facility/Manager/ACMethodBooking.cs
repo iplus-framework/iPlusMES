@@ -1792,6 +1792,9 @@ namespace gip.mes.facility
             }
         }
 
+        /// <summary>
+        /// Machine/Workplace where the posting takes place
+        /// </summary>
         [ACPropertyInfo(9999, "", "en{'Process Module'}de{'Prozessmodul'}")]
         public string PropertyACUrl
         {
@@ -4739,6 +4742,7 @@ namespace gip.mes.facility
             Suceeded = 0,
 
             // Warning  (10000 - 19999)
+            NoFacilityFoundForRetrotragePosting = 10000,
 
             // Failure  (20000 - 29999)
 

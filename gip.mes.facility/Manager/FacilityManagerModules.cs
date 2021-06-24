@@ -64,14 +64,25 @@ namespace gip.mes.facility
             return s_cQry_ACClassIdentifier(db, acIdentifier);
         }
 
-        protected ACRef<ACComponent> _RoutingService = null;
+
+        protected ACRef<ACPartslistManager> _PartslistManager = null;
+        public ACPartslistManager PartslistManager
+        {
+            get
+            {
+                if (_PartslistManager == null)
+                    return null;
+                return _PartslistManager.ValueT;
+            }
+        }
+
         public override ACComponent RoutingService
         {
             get
             {
-                if (_RoutingService == null)
+                if (PartslistManager == null)
                     return null;
-                return _RoutingService.ValueT;
+                return PartslistManager.RoutingService;
             }
         }
 

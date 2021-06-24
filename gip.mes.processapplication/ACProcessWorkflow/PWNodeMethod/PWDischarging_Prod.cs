@@ -1347,6 +1347,45 @@ namespace gip.mes.processapplication
             return connectionToDischarging != null;
         }
 
+        public virtual bool GetMaterialWFConnection(DatabaseApp dbApp, ProdOrderBatchPlan batchPlan, string materialNo, out MaterialWFConnection connectionToDischarging)
+        {
+            if (batchPlan == null || dbApp == null || String.IsNullOrEmpty(materialNo))
+            {
+                connectionToDischarging = null;
+                return false;
+            }
+            if (batchPlan.MaterialWFACClassMethodID.HasValue)
+            {
+                connectionToDischarging = dbApp.MaterialWFConnection
+                                        .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
+                                                && c.Material.MaterialNo == materialNo
+                                                && c.ACClassWFID == ContentACClassWF.ACClassWFID)
+                                        .FirstOrDefault();
+            }
+            else
+            {
+                PartslistACClassMethod plMethod = batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                if (plMethod != null)
+                {
+                    connectionToDischarging = dbApp.MaterialWFConnection
+                                            .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
+                                                    && c.Material.MaterialNo == materialNo
+                                                    && c.ACClassWFID == ContentACClassWF.ACClassWFID)
+                                            .FirstOrDefault();
+                }
+                else
+                {
+                    connectionToDischarging = dbApp.MaterialWFConnection
+                                            .Where(c => c.MaterialWFACClassMethod.MaterialWFID == batchPlan.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.MaterialWFID
+                                                    && c.Material.MaterialNo == materialNo
+                                                    && c.ACClassWFID == ContentACClassWF.ACClassWFID)
+                                            .FirstOrDefault();
+                }
+            }
+            return connectionToDischarging != null;
+        }
+
+
         protected virtual void OnSetLastBatchParam(ACValue lastBatchParam, ACMethod acMethod, PAProcessModule targetModule, DatabaseApp dbApp, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos currentBatchPos)
         {
         }

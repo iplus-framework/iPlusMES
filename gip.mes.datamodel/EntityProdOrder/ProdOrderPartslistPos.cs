@@ -333,6 +333,23 @@ namespace gip.mes.datamodel
             }
         }
 
+        /// <summary>
+        /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables ProdOrderPartslistPos->BasedOnPartslistPos->Material
+        /// </summary>
+        public bool Backflushing
+        {
+            get
+            {
+                if (this.RetrogradeFIFO.HasValue)
+                    return this.RetrogradeFIFO.Value;
+                else if (BasedOnPartslistPosID.HasValue && BasedOnPartslistPos != null)
+                    return BasedOnPartslistPos.Backflushing;
+                else if (MaterialID.HasValue && Material != null && Material.RetrogradeFIFO.HasValue)
+                    return Material.RetrogradeFIFO.Value;
+                return false;
+            }
+        }
+
         #endregion
 
         #region Partial methods

@@ -30,7 +30,15 @@ namespace gip.mes.facility
             }
         }
 
-        public override Global.ACMethodResultState CalculateInOut(bool isInwardBooking, bool shiftBookingReverse, bool negativeStockAllowed, double quantityUOM, MDUnit mdUnitUOM, IEnumerable<FacilityCharge> facilityCharges, ACMethodBooking BP, out StackItemList stackItemListInOut, out MsgBooking msgBookingResult)
+        public override Global.ACMethodResultState CalculateInOut(bool isInwardBooking, // false: Outward, true: Inward
+                                 bool shiftBookingReverse, // false: normal, true: reverse booking
+                                 bool negativeStockAllowed,
+                                 Double quantityUOM, MDUnit mdUnitUOM,
+                                 IEnumerable<FacilityCharge> facilityCharges,
+                                 ACMethodBooking BP,
+                                 out StackItemList stackItemListInOut,
+                                 out MsgBooking msgBookingResult,
+                                 bool isRetrogradePosting = false)
         {
             stackItemListInOut = new StackItemList();
             msgBookingResult = new MsgBooking();

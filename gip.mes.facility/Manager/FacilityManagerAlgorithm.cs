@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 
@@ -629,7 +630,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                             && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -640,7 +641,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                             && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -664,7 +665,7 @@ namespace gip.mes.facility
                         // Gibt es eine anonyme Charge auf dieser Facility?
                         if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                             && (c.FacilityLot == null)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -674,7 +675,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                             && (c.FacilityLot == null)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -750,7 +751,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
                                                                                                && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
                                                                                                && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -761,7 +762,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
                                                                                                 && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
                                                                                                 && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -786,7 +787,7 @@ namespace gip.mes.facility
                         // Suche im Einlagerplatz, ob es dort eine anonyme Charge gibt
                         if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.Facility1_IncomingFacility.FacilityID)
                                                                             && (c.FacilityLot == null)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -796,7 +797,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.Facility1_IncomingFacility.FacilityID)
                                                                             && (c.FacilityLot == null)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
@@ -1395,8 +1396,8 @@ namespace gip.mes.facility
                     }
 
                     // Ermittle Schichten im Silo
-                    cellInwardChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                            where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
+                    cellInwardChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                 && (c.NotAvailable == false)
                                             select c);
                 }
@@ -1475,7 +1476,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.InwardPartslist != null)
                         {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                                      && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
                                                                                         || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
@@ -1485,7 +1486,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                                      && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
                                                                                         || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
@@ -1498,7 +1499,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.InwardPartslist != null)
                         {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                                      && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
                                                                                      && (c.NotAvailable == false)
@@ -1506,7 +1507,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                                      && (c.NotAvailable == false)
                                                                                  select c);
@@ -1551,8 +1552,8 @@ namespace gip.mes.facility
                     }
 
                     // Ermittle Schichten im Silo
-                    cellOutwardChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                             where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
+                    cellOutwardChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                  && (c.NotAvailable == false)
                                              select c);
                 }
@@ -1564,7 +1565,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardPartslist != null)
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
                                                                                        || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
@@ -1575,7 +1576,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
                                                                                         || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
@@ -1588,7 +1589,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardPartslist != null)
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
                                                                                       && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
@@ -1597,7 +1598,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
                                                                                       && (c.NotAvailable == false)
@@ -1609,7 +1610,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardPartslist != null)
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
                                                                                       && (c.NotAvailable == false)
@@ -1617,7 +1618,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && (c.NotAvailable == false)
                                                                                   select c);
@@ -1631,7 +1632,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardPartslist != null)
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
                                                                                          || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
@@ -1641,7 +1642,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
                                                                                         || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
@@ -1654,7 +1655,7 @@ namespace gip.mes.facility
                     {
                         if (BP.ParamsAdjusted.OutwardPartslist != null)
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
                                                                                       && (c.NotAvailable == false)
@@ -1662,7 +1663,7 @@ namespace gip.mes.facility
                         }
                         else
                         {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
+                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
                                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
                                                                                       && (c.NotAvailable == false)
                                                                                   select c);
@@ -2388,6 +2389,153 @@ namespace gip.mes.facility
         {
             return BookingOn_Facility_Common(BP);
         }
+        #endregion
+
+        #region Retrograde Posting
+        private Global.ACMethodResultState PerformRetrogradePosting(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges)
+        {
+            if (BP.BookingType != GlobalApp.FacilityBookingType.ProdOrderPosInward
+                || BP.PartslistPos == null
+                || !BP.PartslistPos.Backflushing
+                || !BP.PartslistPos.ProdOrderBatchID.HasValue
+                || Math.Abs(FBC.InwardQuantityUOM - 0) <= Double.Epsilon
+                || PartslistManager == null)
+                return Global.ACMethodResultState.Succeeded;
+
+            var queryRelationsForRetrogPosting = BP.DatabaseApp.ProdOrderPartslistPosRelation
+                .Include(c => c.SourceProdOrderPartslistPos)
+                .Include(c => c.SourceProdOrderPartslistPos.Material)
+                .Where(c => c.ProdOrderBatchID == BP.PartslistPos.ProdOrderBatchID.Value
+                            && ((c.SourceProdOrderPartslistPos.Material.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.Material.RetrogradeFIFO.Value)
+                                || (c.SourceProdOrderPartslistPos.BasedOnPartslistPosID.HasValue && c.SourceProdOrderPartslistPos.BasedOnPartslistPos.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.BasedOnPartslistPos.RetrogradeFIFO.Value)
+                                || (c.SourceProdOrderPartslistPos.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.RetrogradeFIFO.Value))
+                            );
+            if (queryRelationsForRetrogPosting == null || !queryRelationsForRetrogPosting.Any())
+                return Global.ACMethodResultState.Succeeded;
+            
+            ACComponent workplace = null;
+            core.datamodel.ACClass workplaceClass = null;
+            if (!String.IsNullOrEmpty(BP.PropertyACUrl))
+            {
+                workplace = this.ACUrlCommand(BP.PropertyACUrl) as ACComponent;
+                if (workplace != null)
+                    workplaceClass = workplace.ComponentClass;
+                else
+                    workplaceClass = core.datamodel.Database.GlobalDatabase.GetACTypeByACUrlComp(BP.PropertyACUrl);
+            }
+            if (workplaceClass == null && BP.InwardFacility != null)
+                workplaceClass = BP.InwardFacility.FacilityACClass;
+
+
+            if (workplaceClass != null)
+            {
+                using (core.datamodel.Database usingPlusDB = new Database())
+                {
+                    core.datamodel.Database iPlusDB = usingPlusDB;
+                    if (BP.DatabaseApp.IsSeparateIPlusContext)
+                        iPlusDB = BP.DatabaseApp.ContextIPlus;
+                    if (workplaceClass.Database != iPlusDB)
+                        workplaceClass = workplaceClass.FromIPlusContext<core.datamodel.ACClass>(iPlusDB);
+
+                    double factor = FBC.InwardQuantityUOM / BP.PartslistPos.TargetQuantityUOM;
+                    foreach (var relationForRPost in queryRelationsForRetrogPosting)
+                    {
+                        if (!relationForRPost.SourceProdOrderPartslistPos.Backflushing)
+                            continue;
+                        double postingQuantity = relationForRPost.TargetQuantityUOM * factor;
+                        IList<Facility> possibleSourceFacilities;
+                        IEnumerable<Route> routes = PartslistManager.GetRoutes(relationForRPost, BP.DatabaseApp, iPlusDB, workplaceClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSourceFacilities, null, null, null, false);
+                        if (routes != null && routes.Any())
+                        {
+                            Route dosingRoute = null;
+                            Facility storeForRetrogradePosting = null;
+                            foreach (var prioSilo in possibleSourceFacilities)
+                            {
+                                if (!prioSilo.VBiFacilityACClassID.HasValue)
+                                    continue;
+                                dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
+                                if (dosingRoute != null)
+                                {
+                                    storeForRetrogradePosting = prioSilo;
+                                    break;
+                                }
+                            }
+
+                            if (storeForRetrogradePosting == null)
+                            {
+                                // Warning50040: Backflushing for Material {0} / {1} is not possible, because no route from {2} (Target) to a storage container (Source) could be found.
+                                BP.AddBookingMessage(ACMethodBooking.eResultCodes.NoFacilityFoundForRetrotragePosting, Root.Environment.TranslateMessage(this, "Warning50040", relationForRPost.SourceProdOrderPartslistPos.MaterialNo, relationForRPost.SourceProdOrderPartslistPos.MaterialName, workplaceClass.ACURLComponentCached));
+                                continue;
+                            }
+
+                            Global.ACMethodResultState bookingSubResult = Global.ACMethodResultState.Succeeded;
+                            FacilityChargeList facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                                                     where (c.Facility.FacilityID == storeForRetrogradePosting.FacilityID)
+                                                                                                            && ((c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID)
+                                                                                                            || (relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID))
+                                                                                                            && (c.NotAvailable == false)
+                                                                                                        select c);
+
+                            StackItemList stackItemListInOut;
+                            MsgBooking msgBookingInOut;
+                            bookingSubResult = BP.StackCalculatorOutward(this).CalculateInOut(false,
+                                                false,
+                                                BP.ParamsAdjusted.DontAllowNegativeStock == true ? false : true,
+                                                postingQuantity, relationForRPost.SourceProdOrderPartslistPos.Material.BaseMDUnit,
+                                                facilityOutwardChargeSubList, BP, out stackItemListInOut, out msgBookingInOut, true);
+                            BP.Merge(msgBookingInOut);
+                            if (bookingSubResult == Global.ACMethodResultState.Succeeded)
+                            {
+                                ACMethodBooking outwardMethod = NewBookParamOutwardMovement(BP, relationForRPost, postingQuantity);
+                                FacilityBooking fbOutward = NewFacilityBooking(outwardMethod);
+
+                                // Mache Stackbuchung
+                                bookingSubResult = DoOutwardStackBooking(outwardMethod, stackItemListInOut, facilityOutwardChargeSubList);
+                                if ((bookingSubResult == Global.ACMethodResultState.Failed) || (bookingSubResult == Global.ACMethodResultState.Notpossible))
+                                {
+                                    BP.Merge(outwardMethod.ValidMessage);
+                                    return bookingSubResult;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Global.ACMethodResultState.Succeeded;
+        }
+
+        public ACMethodBooking NewBookParamOutwardMovement(ACMethodBooking BP, ProdOrderPartslistPosRelation partsListPosRelation, double postingQuantity)
+        {
+            ACMethodBooking outwardMethod = GetBookParamOutwardMovementClone();
+            outwardMethod.OutwardMaterial = partsListPosRelation.SourceProdOrderPartslistPos.Material;
+            outwardMethod.PartslistPosRelation = partsListPosRelation;
+            //acMethodBooking.InwardQuantity = deliveryNotePos.InOrderPos.TargetQuantityUOM;
+            if (partsListPosRelation.SourceProdOrderPartslistPos.MDUnit != null)
+            {
+                outwardMethod.OutwardQuantity = partsListPosRelation.SourceProdOrderPartslistPos.Material.ConvertQuantity(postingQuantity, partsListPosRelation.SourceProdOrderPartslistPos.Material.BaseMDUnit, partsListPosRelation.SourceProdOrderPartslistPos.MDUnit);
+                outwardMethod.MDUnit = partsListPosRelation.SourceProdOrderPartslistPos.MDUnit;
+            }
+            else
+            {
+                outwardMethod.OutwardQuantity = postingQuantity;
+            }
+            if (partsListPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.CPartnerCompany != null)
+                outwardMethod.CPartnerCompany = partsListPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.CPartnerCompany;
+            outwardMethod.Database = BP.DatabaseApp;
+            outwardMethod.CheckAndAdjustPropertiesForBooking(BP.DatabaseApp);
+            return outwardMethod;
+        }
+
+        ACMethodBooking _BookParamOutwardMovementClone;
+        public ACMethodBooking GetBookParamOutwardMovementClone()
+        {
+            if (_BookParamOutwardMovementClone != null)
+                return _BookParamOutwardMovementClone;
+            _BookParamOutwardMovementClone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            return _BookParamOutwardMovementClone;
+        }
+
         #endregion
     }
 }

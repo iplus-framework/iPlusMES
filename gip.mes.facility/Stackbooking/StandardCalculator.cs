@@ -15,6 +15,39 @@ namespace gip.mes.facility
         public StandardCalculator(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _SortOrderForRetroFIFO = new ACPropertyConfigValue<short>(this, "SortOrderForRetroFIFO", 0);
+        }
+        #endregion
+
+        #region Configuration
+        private ACPropertyConfigValue<short> _SortOrderForRetroFIFO;
+        [ACPropertyConfig("en{'Sort order for retrograde posting'}de{'Sortierreihenfolge für Retrograde Buchung'}", DefaultValue = (int)0)]
+        public short SortOrderForRetroFIFO
+        {
+            get
+            {
+                return _SortOrderForRetroFIFO.ValueT;
+            }
+            set
+            {
+                _SortOrderForRetroFIFO.ValueT = value;
+            }
+        }
+
+        public SortOrderFIFOEnum SortOrder
+        {
+            get
+            {
+                switch (SortOrderForRetroFIFO)
+                {
+                    case 1:
+                        return SortOrderFIFOEnum.ByFirstFillingDate;
+                    case 2:
+                        return SortOrderFIFOEnum.ByExpirationDate;
+                    default:
+                        return SortOrderFIFOEnum.ByFacilityChargeSortNo;
+                }
+            }
         }
         #endregion
 
@@ -37,7 +70,8 @@ namespace gip.mes.facility
                                  IEnumerable<FacilityCharge> facilityCharges,
                                  ACMethodBooking BP,
                                  out StackItemList stackItemListInOut,
-                                 out MsgBooking msgBookingResult)
+                                 out MsgBooking msgBookingResult,
+                                 bool isRetrogradePosting = false)
         {
             stackItemListInOut = new StackItemList();
             msgBookingResult = new MsgBooking();
@@ -67,7 +101,7 @@ namespace gip.mes.facility
             // Sonst normale Buchung
             else
             {
-                return InternCalculateInOut(isInwardBooking, shiftBookingReverse, negativeStockAllowed, quantityUOM, mdUnitUOM, facilityCharges, BP, stackItemListInOut, msgBookingResult);
+                return InternCalculateInOut(isInwardBooking, shiftBookingReverse, negativeStockAllowed, quantityUOM, mdUnitUOM, facilityCharges, BP, stackItemListInOut, msgBookingResult, isRetrogradePosting);
             }
 
 
@@ -137,7 +171,8 @@ namespace gip.mes.facility
                                 IEnumerable<FacilityCharge> facilityCharges,
                                 ACMethodBooking BP,
                                 StackItemList stackItemListInOut,
-                                MsgBooking msgBookingResult)
+                                MsgBooking msgBookingResult,
+                                bool isRetrogradePosting)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             StackItemList localStackItemListRelocation = new StackItemList();
@@ -154,7 +189,7 @@ namespace gip.mes.facility
                 return bookingResult;
             }
 
-            IOrderedEnumerable<FacilityCharge> sortedFacilityCharges = null;
+            IEnumerable<FacilityCharge> sortedFacilityCharges = null;
             // Umsortieren der Liste
             if (shiftBookingReverse)
             {
@@ -168,7 +203,22 @@ namespace gip.mes.facility
                 if (isInwardBooking)
                     sortedFacilityCharges = facilityCharges.OrderByDescending(c => c.FacilityChargeSortNo);
                 else
-                    sortedFacilityCharges = facilityCharges.OrderBy(c => c.FacilityChargeSortNo);
+                {
+                    if (!isRetrogradePosting || SortOrder == SortOrderFIFOEnum.ByFacilityChargeSortNo)
+                        sortedFacilityCharges = facilityCharges.OrderBy(c => c.FacilityChargeSortNo);
+                    else if (SortOrder == SortOrderFIFOEnum.ByExpirationDate)
+                    {
+                        List<FacilityCharge> sortWithExpirationDate = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.ExpirationDate.HasValue).OrderBy(c => c.FacilityLot.ExpirationDate).ToList();
+                        sortWithExpirationDate.AddRange(facilityCharges.Where(c => c.FacilityLot == null || !c.FacilityLot.ExpirationDate.HasValue).OrderBy(c => c.FacilityChargeSortNo));
+                        sortedFacilityCharges = sortWithExpirationDate;
+                    }
+                    else // if (SortOrder == SortOrderFIFOEnum.ByFirstFillingDate)
+                    {
+                        List<FacilityCharge> sortWithExpirationDate = facilityCharges.Where(c => c.FacilityLot != null && c.FacilityLot.FillingDate.HasValue).OrderBy(c => c.FacilityLot.FillingDate).ToList();
+                        sortWithExpirationDate.AddRange(facilityCharges.Where(c => c.FacilityLot == null || !c.FacilityLot.FillingDate.HasValue).OrderBy(c => c.FacilityChargeSortNo));
+                        sortedFacilityCharges = sortWithExpirationDate;
+                    }
+                }
             }
 
             // StockIncrease: Inward and positive, Outward and negative

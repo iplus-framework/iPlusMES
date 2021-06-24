@@ -19,6 +19,16 @@ namespace gip.mes.facility
         }
         #endregion
 
+        #region Enum
+        public enum SortOrderFIFOEnum : short
+        {
+            ByFacilityChargeSortNo = 0,
+            ByFirstFillingDate = 1,
+            ByExpirationDate = 2
+        }
+        #endregion
+
+
         #region CalculateInOut
         /// <summary>
         /// If isOutwardBooking (isInwardBooking is false) and passed booking-values are negative: Stock should be increased
@@ -38,7 +48,8 @@ namespace gip.mes.facility
                                  IEnumerable<FacilityCharge> facilityCharges,
                                  ACMethodBooking BP,
                                  out StackItemList stackItemListInOut,
-                                 out MsgBooking msgBookingResult);
+                                 out MsgBooking msgBookingResult,
+                                 bool isRetrogradePosting = false);
         #endregion
 
 
