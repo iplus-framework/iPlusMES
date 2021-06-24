@@ -13,6 +13,7 @@ namespace gip.mes.facility
             Suceeded = 0,
 
             // Warning  (10000 - 19999)
+            NoFacilityFoundForRetrotragePosting = 10000,
 
             // Failure  (20000 - 29999)
 

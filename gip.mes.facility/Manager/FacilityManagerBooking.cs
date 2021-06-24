@@ -19,7 +19,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Abgangsbuchung auf  FacilityBookingCharge
         /// </summary>
-        Global.ACMethodResultState BookFacilityBookingChargeOut(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges)
+        private Global.ACMethodResultState BookFacilityBookingChargeOut(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             bookingResult = BookFacilityChargeOut(BP, FBC, facilityCharges);
@@ -52,7 +52,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Zugangsbuchung auf  FacilityBookingCharge
         /// </summary>
-        Global.ACMethodResultState BookFacilityBookingChargeIn(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges)
+        private Global.ACMethodResultState BookFacilityBookingChargeIn(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             bookingResult = BookFacilityChargeIn(BP, FBC, facilityCharges);
@@ -76,6 +76,10 @@ namespace gip.mes.facility
                 return bookingResult;
 
             bookingResult = BookCPartnerCompMatIn(BP, FBC, facilityCharges);
+            if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                return bookingResult;
+
+            bookingResult = PerformRetrogradePosting(BP, FBC, facilityCharges);
             if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                 return bookingResult;
 

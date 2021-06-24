@@ -226,9 +226,8 @@ namespace gip.mes.facility
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
-            _RoutingService = null;
-
+            ACPartslistManager.DetachACRefFromServiceInstance<ACPartslistManager>(this, _PartslistManager);
+            _PartslistManager = null;
             bool result = base.ACDeInit(deleteACClassTask);
             return result;
         }
@@ -236,7 +235,7 @@ namespace gip.mes.facility
         public override bool ACPostInit()
         {
             bool init = base.ACPostInit();
-            _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
+            _PartslistManager = ACPartslistManager.ACRefToServiceInstance(this);
             return init;
         }
 
