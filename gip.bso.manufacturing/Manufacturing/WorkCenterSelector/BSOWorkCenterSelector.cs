@@ -300,9 +300,9 @@ namespace gip.bso.manufacturing
 
         #region Properties => Partslist
 
-        private ProdOrderPartslistPosRelation _SelectedInputComponent;
+        private InputComponentItem _SelectedInputComponent;
         [ACPropertySelected(620, "InputComponent")]
-        public ProdOrderPartslistPosRelation SelectedInputComponent
+        public InputComponentItem SelectedInputComponent
         {
             get => _SelectedInputComponent;
             set
@@ -312,9 +312,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistPosRelation> _InputComponentList;
+        private List<InputComponentItem> _InputComponentList;
         [ACPropertyList(621, "InputComponent")]
-        public List<ProdOrderPartslistPosRelation> InputComponentList
+        public List<InputComponentItem> InputComponentList
         {
             get => _InputComponentList;
             set
@@ -725,7 +725,7 @@ namespace gip.bso.manufacturing
                 return;
 
             var childBSO = this.ACComponentChilds.FirstOrDefault(c => c.ACIdentifier == actionArgs.DropObject.VBContent) as BSOWorkCenterChild;
-            if (childBSO == null && (actionArgs.DropObject.VBContent != "Workflow" || actionArgs.DropObject.VBContent != "BOM"))
+            if (childBSO == null && (actionArgs.DropObject.VBContent != "Workflow" && actionArgs.DropObject.VBContent != "BOM"))
                 return;
 
             if (CurrentChildBSO == childBSO && CurrentProcessModule == CurrentWorkCenterItem.ProcessModule)
@@ -791,13 +791,28 @@ namespace gip.bso.manufacturing
             else
             {
                 _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
-                InputComponentList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                                                  .Where(c => c.SourceProdOrderPartslistPos != null 
-                                                           && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
-                                                           && c.TargetQuantityUOM > 0.00001)
-                                                  .OrderBy(p => p.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex)
-                                                  .ToList();
+                var inputList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
+                                                    .Where(c => c.SourceProdOrderPartslistPos != null
+                                                            && c.MDProdOrderPartslistPosState != null
+                                                            && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                                            && c.TargetQuantityUOM > 0.00001)
+                                                    .OrderBy(p => p.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex);
+
+                List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
+                foreach(var relation in inputList)
+                {
+                    InputComponentItem compItem = new InputComponentItem(relation);
+                    OnInputComponentCreated(compItem, relation);
+                    inputComponentsList.Add(compItem);
+                }
+
+                InputComponentList = inputComponentsList;
             }
+        }
+
+        protected virtual void OnInputComponentCreated(InputComponentItem item, ProdOrderPartslistPosRelation relation)
+        {
+
         }
 
         /// <summary>
