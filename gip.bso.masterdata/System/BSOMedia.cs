@@ -538,6 +538,7 @@ namespace gip.bso.masterdata
                     e.Cancel = true;
                     return false;
                 }
+
                 bool isDeleted = false;
                 int cntTry = 0;
                 while (!isDeleted && cntTry < 3)
@@ -605,7 +606,7 @@ namespace gip.bso.masterdata
                 dialog.IsFolderPicker = false;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    if (File.Exists(dialog.FileName))
+                    if (!string.IsNullOrEmpty(dialog.FileName) && File.Exists(dialog.FileName))
                     {
                         FilePath = dialog.FileName;
                     }
@@ -727,23 +728,26 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledDeleteDefaultImage()) return;
             DeleteFilesNames = new List<string>();
-            MediaItemPresentation image = ImageList.FirstOrDefault(c => c.FilePath == DefaultImage);
+            DeleteFilesNames.Add(DefaultImage);
+            if (!string.IsNullOrEmpty(DefaultThumbImage))
+                DeleteFilesNames.Add(DefaultThumbImage);
+
             DefaultImage = null;
             DefaultThumbImage = null;
             if (OnDefaultImageDelete != null)
                 OnDefaultImageDelete(this, new EventArgs());
 
-            ImageList.Remove(image);
-            _ImageList = ImageList.ToList();
-            OnPropertyChanged("ImageList");
+            MediaItemPresentation image = ImageList.FirstOrDefault(c => c.FilePath == DefaultImage);
+            if (image != null)
+            {
+                ImageList.Remove(image);
+                _ImageList = ImageList.ToList();
+                OnPropertyChanged("ImageList");
+            }
 
             IImageInfo imageInfo = currentACObject as IImageInfo;
             imageInfo.DefaultImage = null;
             imageInfo.DefaultThumbImage = null;
-
-
-            DeleteFilesNames.Add(image.FilePath);
-            DeleteFilesNames.Add(image.ThumbPath);
 
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
             ShowDialog(this, DesignNameProgressBar);
