@@ -3348,7 +3348,7 @@ namespace gip.bso.manufacturing
     public class MessageItem : IACObject, INotifyPropertyChanged
     {
 
-        public MessageItem(IACComponent pwNode, BSOManualWeighing bso)
+        public MessageItem(IACComponent pwNode, IACBSO bso)
         {
             if (pwNode != null)
             {
@@ -3359,7 +3359,7 @@ namespace gip.bso.manufacturing
                     _AlarmsAsText.PropertyChanged += AlarmsAsText_PropertyChanged;
                     Message = _AlarmsAsText.Value as string;
                 }
-                _BSOManualWeighing = bso;
+                _BSOManualWeighing = bso as BSOManualWeighing;
             }
         }
 

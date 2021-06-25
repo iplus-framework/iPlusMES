@@ -119,7 +119,10 @@ namespace gip.mes.processapplication
                 }
 
                 var myNewConfig = NewACMethodWithConfiguration();
-                _MyConfiguration = myNewConfig;
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _MyConfiguration = myNewConfig;
+                }
                 return myNewConfig;
             }
         }

@@ -208,7 +208,10 @@ namespace gip.mes.processapplication
                 }
 
                 var myNewConfig = NewACMethodWithConfiguration();
-                _MyConfiguration = myNewConfig;
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _MyConfiguration = myNewConfig;
+                }
                 return myNewConfig;
             }
         }
@@ -1147,6 +1150,7 @@ namespace gip.mes.processapplication
                 var query = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
                 if (query != null && query.Any())
                 {
+                    query = query.Where(c => c.InitState == ACInitState.Initialized);
                     Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) => {
                         using (ACMonitor.Lock(ContextLockForACClassWF))
                         {
