@@ -332,7 +332,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>iPlusMESV4.edmx</DependentUpon>
     </Compile>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config">

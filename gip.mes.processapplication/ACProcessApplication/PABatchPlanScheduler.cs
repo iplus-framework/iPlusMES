@@ -207,6 +207,8 @@ namespace gip.mes.processapplication
                 using (DatabaseApp dbApp = new DatabaseApp(db))
                 {
                     var queryLoadedInstances = this.ApplicationManager.ACCompTypeDict.GetComponentsOfType<PWNodeProcessWorkflowVB>(true);
+                    if (queryLoadedInstances != null && queryLoadedInstances.Any())
+                        queryLoadedInstances = queryLoadedInstances.Where(c => c.InitState == ACInitState.Initialized);
                     foreach (PAScheduleForPWNode scheduleForPWNode in activatedSchedules)
                     {
                         GlobalApp.BatchPlanStartModeEnum startMode;
