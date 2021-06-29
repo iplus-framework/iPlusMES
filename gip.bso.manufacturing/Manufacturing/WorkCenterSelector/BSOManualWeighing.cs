@@ -588,6 +588,30 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private vd.FacilityCharge _SelectedLastUsedLot;
+        [ACPropertySelected(690, "LastUsedLot")]
+        public vd.FacilityCharge SelectedLastUsedLot
+        {
+            get => _SelectedLastUsedLot;
+            set
+            {
+                _SelectedLastUsedLot = value;
+                OnPropertyChanged("SelectedLastUsedLot");
+            }
+        }
+
+        private List<vd.FacilityCharge> _LastUsedLotList;
+        [ACPropertyList(690, "LastUsedLot")]
+        public List<vd.FacilityCharge> LastUsedLotList
+        {
+            get => _LastUsedLotList;
+            set
+            {
+                _LastUsedLotList = value;
+                OnPropertyChanged("LastUsedLotList");
+            }
+        }
+
         #endregion
 
         #region Properties => Components and Facility/FacilityCharge selection
@@ -2414,6 +2438,70 @@ namespace gip.bso.manufacturing
             }
         }
 
+        [ACMethodInteraction("", "en{'Settings'}de{'Einstellungen'}", 690, true)]
+        public void OpenSettings()
+        {
+            using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+            {
+                var lastUsedLotConfigs = dbApp.MaterialConfig.Where(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl 
+                                                                      && c.VBiACClassID == CurrentProcessModule.ComponentClass.ACClassID);
+
+                List<vd.FacilityCharge> lastUsedLots = new List<vd.FacilityCharge>();
+
+                foreach (vd.MaterialConfig lotConfig in lastUsedLotConfigs)
+                {
+                    Guid? fcID = lotConfig.Value as Guid?;
+                    if (fcID.HasValue)
+                    {
+                        vd.FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fcID);
+                        if (fc != null)
+                        {
+                            lastUsedLots.Add(fc);
+                        }
+                    }
+                }
+
+                LastUsedLotList = lastUsedLots;
+
+                ShowDialog(this, "SettingsDialog");
+            }
+        }
+
+        public bool IsEnabledOpenSettings()
+        {
+            return CurrentProcessModule != null;
+        }
+
+        [ACMethodInfo("", "en{'Remove last used lot suggestion'}de{'Zuletzt verwendeten Chargenvorschlag entfernen'}", 691)]
+        public void RemoveLastUsedLot()
+        {
+            var lastUsedLotConfig = SelectedLastUsedLot.Material.MaterialConfig_Material.FirstOrDefault(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl
+                                                                                                 && c.VBiACClassID == CurrentProcessModule.ComponentClass.ACClassID);
+
+            if (lastUsedLotConfig == null)
+                return;
+
+            vd.DatabaseApp dbApp = lastUsedLotConfig.GetObjectContext<vd.DatabaseApp>();
+            if (dbApp != null)
+                dbApp.DeleteObject(lastUsedLotConfig);
+
+            Msg msg = dbApp.ACSaveChanges();
+            if (msg != null)
+            {
+                Root.Messages.Msg(msg);
+                return;
+            }
+
+            LastUsedLotList.Remove(SelectedLastUsedLot);
+            OnPropertyChanged("LastUsedLotList");
+            //LastUsedLotList = LastUsedLotList.ToList();
+        }
+
+        public bool IsEnabledRemoveLastUsedLot()
+        {
+            return SelectedLastUsedLot != null;
+        }
+
         #endregion
 
         #region Methods => SingleDosing
@@ -3414,7 +3502,37 @@ namespace gip.bso.manufacturing
         private void AlarmsAsText_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
-                Task.Run(() => Message = _AlarmsAsText.Value as string);
+            {
+                string alarmMessage = _AlarmsAsText.Value as string;
+                Task.Run(() => HandleAlarm(alarmMessage));
+            }
+        }
+
+        private string _LastAlarmMessage;
+
+        private void HandleAlarm(string alarmMessage)
+        {
+            if (string.IsNullOrEmpty(alarmMessage))
+            {
+                if (_LastAlarmMessage != null && Message.Contains(_LastAlarmMessage))
+                {
+                    Message = Message.Replace(_LastAlarmMessage, "");
+                    _LastAlarmMessage = alarmMessage;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(Message))
+                {
+                    Message = alarmMessage;
+                    _LastAlarmMessage = alarmMessage;
+                }
+                else
+                {
+                    Message = Message + alarmMessage;
+                    _LastAlarmMessage = alarmMessage;
+                }
+            }
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 100)]
