@@ -28,11 +28,6 @@ IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpTranslation'
 		DROP  procedure  dbo.[udpTranslation]
 	END
 GO
-IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpTranslation')
-	BEGIN
-		DROP  procedure  dbo.[udpTranslation]
-	END
-GO
 CREATE PROCEDURE [dbo].[udpTranslation]
 	@acProjectID uniqueidentifier,
 	@mandatoryID uniqueidentifier,
@@ -52,15 +47,15 @@ begin
 			CREATE TABLE #translationViewResults
 			(
 				JobID					uniqueidentifier,
-				ACProjectName			varchar(200),
-				TableName				varchar(150),
+				ACProjectName			varchar(200) COLLATE DATABASE_DEFAULT,
+				TableName				varchar(150) COLLATE DATABASE_DEFAULT,
 				MandatoryID				uniqueidentifier,
-				MandatoryACIdentifier	varchar(200),
+				MandatoryACIdentifier	varchar(200) COLLATE DATABASE_DEFAULT,
 				MandatoryACURLCached    varchar(max),
 				ID						uniqueidentifier,
-				ACIdentifier			varchar(200),
-				TranslationValue		varchar(max),
-				UpdateName				varchar(20),
+				ACIdentifier			varchar(200) COLLATE DATABASE_DEFAULT,
+				TranslationValue		varchar(max) COLLATE DATABASE_DEFAULT,
+				UpdateName				varchar(20) COLLATE DATABASE_DEFAULT,
 				UpdateDate				datetime
 			);
 		end
@@ -122,7 +117,7 @@ begin
 						(@searchClassACIdentifier is null or lower(cl.ACIdentifier) like '%' + @searchClassACIdentifier + '%') and
 						(@searchACIdentifier is null or lower(msg.ACIdentifier) like '%' + @searchACIdentifier + '%') and
 						(@searchTranslation is null or LOWER(msg.ACCaptionTranslation) like '%' + @searchTranslation + '%') and 
-						(@notHaveInTranslation is null or LOWER(cl.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
+						(@notHaveInTranslation is null or LOWER(msg.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
 					order by msg.ACIdentifier
 
 				--ACClassMethod
@@ -147,7 +142,7 @@ begin
 						(@searchClassACIdentifier is null or lower(cl.ACIdentifier) like '%' + @searchClassACIdentifier + '%') and
 						(@searchACIdentifier is null or lower(mth.ACIdentifier) like '%' + @searchACIdentifier + '%') and
 						(@searchTranslation is null or LOWER(mth.ACCaptionTranslation) like '%' + @searchTranslation + '%') and 
-						(@notHaveInTranslation is null or LOWER(cl.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
+						(@notHaveInTranslation is null or LOWER(mth.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
 					order by mth.ACIdentifier
 			
 				--ACClassProperty
@@ -172,7 +167,7 @@ begin
 						(@searchClassACIdentifier is null or lower(cl.ACIdentifier) like '%' + @searchClassACIdentifier + '%') and
 						(@searchACIdentifier is null or lower(prop.ACIdentifier) like '%' + @searchACIdentifier + '%') and
 						(@searchTranslation is null or LOWER(prop.ACCaptionTranslation) like '%' + @searchTranslation + '%') and 
-						(@notHaveInTranslation is null or LOWER(cl.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
+						(@notHaveInTranslation is null or LOWER(prop.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
 					order by prop.ACIdentifier
 
 				--ACClassText
@@ -197,7 +192,7 @@ begin
 						(@searchClassACIdentifier is null or lower(cl.ACIdentifier) like '%' + @searchClassACIdentifier + '%') and
 						(@searchACIdentifier is null or lower(txt.ACIdentifier) like '%' + @searchACIdentifier + '%') and
 						(@searchTranslation is null or LOWER(txt.ACCaptionTranslation) like '%' + @searchTranslation + '%') and 
-						(@notHaveInTranslation is null or LOWER(cl.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
+						(@notHaveInTranslation is null or LOWER(txt.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
 					order by txt.ACIdentifier
 			
 				--ACClassDesign
@@ -222,7 +217,7 @@ begin
 						(@searchClassACIdentifier is null or lower(cl.ACIdentifier) like '%' + @searchClassACIdentifier + '%') and
 						(@searchACIdentifier is null or lower(de.ACIdentifier) like '%' + @searchACIdentifier + '%') and
 						(@searchTranslation is null or LOWER(de.ACCaptionTranslation) like '%' + @searchTranslation + '%') and 
-						(@notHaveInTranslation is null or LOWER(cl.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
+						(@notHaveInTranslation is null or LOWER(de.ACCaptionTranslation) not like '%' + @notHaveInTranslation + '%')
 					order by de.ACIdentifier
 			end -- end cause only class tables
 			
