@@ -94,13 +94,7 @@ namespace gip.bso.masterdata
             Global.ControlModes result = base.OnGetControlModes(vbControl);
             if (result < Global.ControlModes.Enabled)
                 return result;
-            switch (vbControl.VBContent)
-            {
-                case "IsGenerateThumb":
-                    return IsExistingImageSelected ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
-                case "ISSetAsDefaultImage":
-                    return IsExistingImageSelected ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
-            }
+
 
             return result;
         }
@@ -110,178 +104,11 @@ namespace gip.bso.masterdata
         #region Properties
 
         #region Properties -> MediaSets
+
         public MediaSet ImageMediaSet { get; private set; }
         public MediaSet DocumentMediaSet { get; private set; }
         public MediaSet AudioMediaSet { get; private set; }
         public MediaSet VideoMediaSet { get; private set; }
-
-        #endregion
-
-        #region Properties -> ACProperties
-
-        private string _DefaultImage;
-
-        [ACPropertyInfo(999, "DefaultImage", "en{'Default image'}de{'Standardbild'}")]
-        public string DefaultImage
-        {
-            get
-            {
-                return _DefaultImage;
-            }
-            set
-            {
-                if (_DefaultImage != value)
-                {
-                    _DefaultImage = value;
-                    OnPropertyChanged("DefaultImage");
-                }
-            }
-        }
-
-        private string _DefaultThumbImage;
-
-        [ACPropertyInfo(999, "DefaultThumbImage", "en{'Default thumb image'}de{'Standard-Bildzeichen'}")]
-        public string DefaultThumbImage
-        {
-            get
-            {
-                return _DefaultThumbImage;
-            }
-            set
-            {
-                if (_DefaultThumbImage != value)
-                {
-                    _DefaultThumbImage = value;
-                    OnPropertyChanged("DefaultThumbImage");
-                }
-            }
-        }
-
-        private bool _IsExistingImageSelected;
-        public bool IsExistingImageSelected
-        {
-            get
-            {
-                return _IsExistingImageSelected;
-            }
-            set
-            {
-                if (_IsExistingImageSelected != value)
-                {
-                    _IsExistingImageSelected = value;
-                    if (!value)
-                    {
-                        _IsGenerateThumb = false;
-                        _ISSetAsDefaultImage = false;
-                    }
-                    OnPropertyChanged("IsGenerateThumb");
-                    OnPropertyChanged("ISSetAsDefaultImage");
-                }
-            }
-        }
-
-        private string _FilePath;
-        /// <summary>
-        /// Selected property for 
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilePath", "en{'Path'}de{'Dateipfad'}")]
-        public string FilePath
-        {
-            get
-            {
-                return _FilePath;
-            }
-            set
-            {
-                if (_FilePath != value)
-                {
-                    IsExistingImageSelected = false;
-                    _FilePath = value;
-                    if (value != null && File.Exists(value))
-                    {
-                        MediaTypeSettingsItem mediaTypeSettingsItem = MediaSettings.MediaItemTypes.Where(c => c.MediaType == MediaItemTypeEnum.Image).FirstOrDefault();
-                        if (mediaTypeSettingsItem.Extensions.Contains(Path.GetExtension(value)))
-                            IsExistingImageSelected = true;
-                    }
-                    OnPropertyChanged("FilePath");
-                }
-            }
-        }
-
-        private string _FileThumbPath;
-        /// <summary>
-        /// Selected property for 
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, "FileThumbPath", "en{'Thumb file path'}de{'(Bildzeichen) Dateipfad'}")]
-        public string FileThumbPath
-        {
-            get
-            {
-                return _FileThumbPath;
-            }
-            set
-            {
-                if (_FileThumbPath != value)
-                {
-                    _FileThumbPath = value;
-                    if (value != null && File.Exists(value))
-                    {
-                        MediaTypeSettingsItem mediaTypeSettingsItem = MediaSettings.MediaItemTypes.Where(c => c.MediaType == MediaItemTypeEnum.Image).FirstOrDefault();
-                        if (!mediaTypeSettingsItem.Extensions.Contains(Path.GetExtension(value)))
-                            _FileThumbPath = null;
-                    }
-                    OnPropertyChanged("FileThumbPath");
-                }
-            }
-        }
-
-        private bool _IsGenerateThumb;
-        /// <summary>
-        /// Selected property for 
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, "IsGenerateThumb", "en{'Generate thumb'}de{'Generiere Bildzeichen'}")]
-        public bool IsGenerateThumb
-        {
-            get
-            {
-                return _IsGenerateThumb;
-            }
-            set
-            {
-                if (_IsGenerateThumb != value)
-                {
-                    _IsGenerateThumb = value;
-                    if (_IsGenerateThumb)
-                        FileThumbPath = null;
-                    OnPropertyChanged("IsGenerateThumb");
-                }
-            }
-        }
-
-        private bool _ISSetAsDefaultImage;
-        /// <summary>
-        /// Selected property for 
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, "ISSetAsDefaultImage", "en{'Set as default image'}de{'Stelle as Standardbild'}")]
-        public bool ISSetAsDefaultImage
-        {
-            get
-            {
-                return _ISSetAsDefaultImage;
-            }
-            set
-            {
-                if (_ISSetAsDefaultImage != value)
-                {
-                    _ISSetAsDefaultImage = value;
-                    OnPropertyChanged("IsSetAsDefaultImage");
-                }
-            }
-        }
 
         #endregion
 
@@ -326,6 +153,7 @@ namespace gip.bso.masterdata
             set
             {
                 _ImageList = value;
+                OnPropertyChanged("ImageList");
             }
         }
 
@@ -372,6 +200,7 @@ namespace gip.bso.masterdata
             set
             {
                 _DocumentList = value;
+                OnPropertyChanged("DocumentList");
             }
         }
 
@@ -416,14 +245,17 @@ namespace gip.bso.masterdata
                     _AudioList = new List<MediaItemPresentation>();
                 return _AudioList;
             }
+            set
+            {
+                _AudioList = value;
+                OnPropertyChanged("AudioList");
+            }
         }
 
         #endregion
 
         #region Properties -> Video
 
-
-        #region Video
         private MediaItemPresentation _SelectedVideo;
         /// <summary>
         /// Selected property for string
@@ -461,18 +293,151 @@ namespace gip.bso.masterdata
                     _VideoList = new List<MediaItemPresentation>();
                 return _VideoList;
             }
+            set
+            {
+                _VideoList = value;
+                OnPropertyChanged("VideoList");
+            }
         }
 
         #endregion
 
+        #region Properties -> SelectedTab
+        private MediaItemTypeEnum _ActiveTab = MediaItemTypeEnum.Image;
+        [ACPropertyInfo(80, "ActiveTab", "en{'ActiveTab'}de{'ActiveTab'}")]
+        public MediaItemTypeEnum ActiveTab
+        {
+            get
+            {
+                return _ActiveTab;
+            }
+            set
+            {
+                if (_ActiveTab != value)
+                {
+                    _ActiveTab = value;
+                    OnPropertyChanged("ActiveTab");
+                    OnPropertyChanged("SelectedMediaItemPresentation");
+                }
+            }
+        }
+
+        [ACPropertyInfo(81, "SelectedMediaItemPresentation", "en{'SelectedMediaItemPresentation'}de{'SelectedMediaItemPresentation'}")]
+        public MediaItemPresentation SelectedMediaItemPresentation
+        {
+            get
+            {
+                MediaItemPresentation item = null;
+                switch (ActiveTab)
+                {
+                    case MediaItemTypeEnum.Image:
+                        item = SelectedImage;
+                        break;
+                    case MediaItemTypeEnum.Document:
+                        item = SelectedDocument;
+                        break;
+                    case MediaItemTypeEnum.Audio:
+                        item = SelectedAudio;
+                        break;
+                    case MediaItemTypeEnum.Video:
+                        item = SelectedVideo;
+                        break;
+                }
+                return item;
+            }
+            set
+            {
+                switch (ActiveTab)
+                {
+                    case MediaItemTypeEnum.Image:
+                        SelectedImage = value;
+                        break;
+                    case MediaItemTypeEnum.Document:
+                        SelectedDocument = value;
+                        break;
+                    case MediaItemTypeEnum.Audio:
+                        SelectedAudio = value;
+                        break;
+                    case MediaItemTypeEnum.Video:
+                        SelectedVideo = value;
+                        break;
+                }
+                OnPropertyChanged("SelectedMediaItemPresentation");
+            }
+        }
+
+        [ACPropertyInfo(82, "MediaItemPresentationList", "en{'MediaItemPresentationList'}de{'MediaItemPresentationList'}")]
+        public List<MediaItemPresentation> MediaItemPresentationList
+        {
+            get
+            {
+                List<MediaItemPresentation> list = null;
+                switch (ActiveTab)
+                {
+                    case MediaItemTypeEnum.Image:
+                        list = ImageList;
+                        break;
+                    case MediaItemTypeEnum.Document:
+                        list = DocumentList;
+                        break;
+                    case MediaItemTypeEnum.Audio:
+                        list = AudioList;
+                        break;
+                    case MediaItemTypeEnum.Video:
+                        list = VideoList;
+                        break;
+                }
+                return list;
+            }
+            set
+            {
+                switch (ActiveTab)
+                {
+                    case MediaItemTypeEnum.Image:
+                        _ImageList = value;
+                        break;
+                    case MediaItemTypeEnum.Document:
+                        _DocumentList = value;
+                        break;
+                    case MediaItemTypeEnum.Audio:
+                        _AudioList = value;
+                        break;
+                    case MediaItemTypeEnum.Video:
+                        _VideoList = value;
+                        break;
+                }
+                MediaItemPresentationList_OnPropertyChanged();
+            }
+        }
+
+        public void MediaItemPresentationList_OnPropertyChanged()
+        {
+            switch (ActiveTab)
+            {
+                case MediaItemTypeEnum.Image:
+                    OnPropertyChanged("ImageList");
+                    break;
+                case MediaItemTypeEnum.Document:
+                    OnPropertyChanged("DocumentList");
+                    break;
+                case MediaItemTypeEnum.Audio:
+                    OnPropertyChanged("AudioList");
+                    break;
+                case MediaItemTypeEnum.Video:
+                    OnPropertyChanged("VideoList");
+                    break;
+            }
+            OnPropertyChanged("MediaItemPresentationList");
+        }
 
         #endregion
 
         #endregion
+
 
         #region BackgroundWorker
 
-        #region BackgroundWorker 
+        #region BackgroundWorker -> BGMethod
         public List<string> DeleteFilesNames { get; set; }
 
         /// <summary>
@@ -563,7 +528,6 @@ namespace gip.bso.masterdata
 
         #endregion
 
-
         #endregion
 
         #region Methods
@@ -575,8 +539,6 @@ namespace gip.bso.masterdata
             if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder)) return;
             currentACObject = aCObject;
             MediaController = new MediaController(MediaSettings, aCObject);
-            DefaultImage = MediaController.DefaultImage;
-            DefaultThumbImage = MediaController.DefaultThumbImage;
             ImageMediaSet = MediaController.Items[MediaItemTypeEnum.Image];
             DocumentMediaSet = MediaController.Items[MediaItemTypeEnum.Document];
             AudioMediaSet = MediaController.Items[MediaItemTypeEnum.Audio];
@@ -601,6 +563,8 @@ namespace gip.bso.masterdata
         [ACMethodInfo("SetFilePath", "en{'...'}de{'...'}", 9999, false, false, true)]
         public void SetFilePath()
         {
+            if (!IsEnabledSetFilePath())
+                return;
             using (var dialog = new CommonOpenFileDialog())
             {
                 dialog.IsFolderPicker = false;
@@ -608,11 +572,17 @@ namespace gip.bso.masterdata
                 {
                     if (!string.IsNullOrEmpty(dialog.FileName) && File.Exists(dialog.FileName))
                     {
-                        FilePath = dialog.FileName;
+                        SelectedMediaItemPresentation.FilePath = dialog.FileName;
                     }
                 }
             }
         }
+
+        public bool IsEnabledSetFilePath()
+        {
+            return SelectedMediaItemPresentation != null;
+        }
+
 
         /// <summary>
         /// Exports the folder.
@@ -620,17 +590,21 @@ namespace gip.bso.masterdata
         [ACMethodInfo("SetFileThumbPath", "en{'...'}de{'...'}", 9999, false, false, true)]
         public void SetFileThumbPath()
         {
+            if (!IsEnabledSetFileThumbPath())
+                return;
             using (var dialog = new CommonOpenFileDialog())
             {
                 dialog.IsFolderPicker = false;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    if (File.Exists(dialog.FileName))
-                    {
-                        FileThumbPath = dialog.FileName;
-                    }
+                    SelectedMediaItemPresentation.ThumbPath = dialog.FileName;
                 }
             }
+        }
+
+        public bool IsEnabledSetFileThumbPath()
+        {
+            return IsEnabledSetFilePath();
         }
 
         /// <summary>
@@ -639,24 +613,25 @@ namespace gip.bso.masterdata
         [ACMethodInfo("UploadFile", "en{'Upload file'}de{'Datei hochladen'}", 9999, false, false, true)]
         public void UploadFile()
         {
-            if (!IsEnabledUploadFile()) return;
-            string extension = Path.GetExtension(FilePath);
+            if (!IsEnabledUploadFile())
+                return;
+            string extension = Path.GetExtension(SelectedMediaItemPresentation.FilePath);
             MediaItemTypeEnum? mediaType = GetUpladedFileType(extension);
             if (mediaType != null)
             {
-                if (mediaType != MediaItemTypeEnum.Image && (IsGenerateThumb || ISSetAsDefaultImage)) return;
+                if (mediaType != MediaItemTypeEnum.Image && (SelectedMediaItemPresentation.IsGenerateThumb || SelectedMediaItemPresentation.IsDefault)) return;
 
                 if (mediaType != MediaItemTypeEnum.Image)
                 {
-                    MediaController.UploadFile(FilePath);
-                    if (!string.IsNullOrEmpty(FileThumbPath) && File.Exists(FileThumbPath))
+                    MediaController.UploadFile(SelectedMediaItemPresentation.FilePath);
+                    if (!string.IsNullOrEmpty(SelectedMediaItemPresentation.ThumbPath) && File.Exists(SelectedMediaItemPresentation.ThumbPath))
                     {
                         string recomendedFileName =
-                            Path.GetFileNameWithoutExtension(FilePath) +
+                            Path.GetFileNameWithoutExtension(SelectedMediaItemPresentation.FilePath) +
                             MediaController.MediaSettings.DefaultThumbSuffix +
-                            Path.GetExtension(FileThumbPath);
+                            Path.GetExtension(SelectedMediaItemPresentation.ThumbPath);
                         MediaSet mediaSet = MediaController.Items.Where(c => c.Value.MediaTypeSettings.Extensions.Contains(extension)).Select(c => c.Value).FirstOrDefault();
-                        MediaController.UploadFile(FileThumbPath, Path.Combine(mediaSet.ItemRootFolder, recomendedFileName));
+                        MediaController.UploadFile(SelectedMediaItemPresentation.ThumbPath, Path.Combine(mediaSet.ItemRootFolder, recomendedFileName));
                     }
                     switch (mediaType)
                     {
@@ -676,227 +651,113 @@ namespace gip.bso.masterdata
                 }
                 else
                 {
-                    MediaController.UploadImage(FilePath, FileThumbPath, IsGenerateThumb, ISSetAsDefaultImage);
-                    _ImageList = ImageMediaSet.GetFiles(1);
+                    MediaController.UploadImage(SelectedMediaItemPresentation.FilePath, SelectedMediaItemPresentation.ThumbPath, SelectedMediaItemPresentation.IsGenerateThumb, SelectedMediaItemPresentation.IsDefault);
                     OnPropertyChanged("ImageList");
-                    if (ISSetAsDefaultImage)
-                    {
-                        MediaController.LoadDefaultImage();
-                        DefaultImage = MediaController.DefaultImage;
-                        DefaultThumbImage = MediaController.DefaultThumbImage;
-                        OnPropertyChanged("DefaultImage");
-                        OnPropertyChanged("DefaultThumbImage");
-                    }
                 }
             }
-            ClearInput();
         }
         public bool IsEnabledUploadFile()
         {
-            return !string.IsNullOrEmpty(FilePath) &&
-                File.Exists(FilePath) &&
-                (!ISSetAsDefaultImage ||
+            return SelectedMediaItemPresentation != null
+                && !string.IsNullOrEmpty(SelectedMediaItemPresentation.FilePath)
+                && File.Exists(SelectedMediaItemPresentation.FilePath)
+                && (!SelectedMediaItemPresentation.IsDefault ||
                     (
 
-                        IsGenerateThumb ||
-                        (!string.IsNullOrEmpty(FileThumbPath) && File.Exists(FilePath))
+                        SelectedMediaItemPresentation.IsGenerateThumb ||
+                        (!string.IsNullOrEmpty(SelectedMediaItemPresentation.ThumbPath) && File.Exists(SelectedMediaItemPresentation.FilePath))
                      )
                  );
         }
-        public void ClearInput()
-        {
-            _FilePath = null;
-            _FileThumbPath = null;
-            _IsGenerateThumb = false;
-            _ISSetAsDefaultImage = false;
 
-            OnPropertyChanged("FilePath");
-            OnPropertyChanged("FileThumbPath");
-            OnPropertyChanged("IsGenerateThumb");
-            OnPropertyChanged("ISSetAsDefaultImage");
-        }
 
         #endregion
 
-        #region Methods -> ACMethods -> Delete
+        #region Methods -> ACMethods -> Common
 
         /// <summary>
-        /// Method DeleteDefaultImage
+        /// Method DownloadImage
         /// </summary>
-        [ACMethodInfo("DeleteDefaultImage", "en{'Delete default image'}de{'Lösche Standardbild'}", 9999, false, false, true)]
-        public void DeleteDefaultImage()
+        [ACMethodInfo("DownloadImage", "en{'Download'}de{'Herunterladen'}", 9999, false, false, true)]
+        public void DownloadItem()
         {
-            if (!IsEnabledDeleteDefaultImage()) return;
-            DeleteFilesNames = new List<string>();
-            DeleteFilesNames.Add(DefaultImage);
-            if (!string.IsNullOrEmpty(DefaultThumbImage))
-                DeleteFilesNames.Add(DefaultThumbImage);
-
-            DefaultImage = null;
-            DefaultThumbImage = null;
-            if (OnDefaultImageDelete != null)
-                OnDefaultImageDelete(this, new EventArgs());
-
-            MediaItemPresentation image = ImageList.FirstOrDefault(c => c.FilePath == DefaultImage);
-            if (image != null)
-            {
-                ImageList.Remove(image);
-                _ImageList = ImageList.ToList();
-                OnPropertyChanged("ImageList");
-            }
-
-            IImageInfo imageInfo = currentACObject as IImageInfo;
-            imageInfo.DefaultImage = null;
-            imageInfo.DefaultThumbImage = null;
-
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
-            ShowDialog(this, DesignNameProgressBar);
+            if (!IsEnabledDownloadItem())
+                return;
+            DownloadFile(SelectedMediaItemPresentation.FilePath);
         }
-        public bool IsEnabledDeleteDefaultImage()
+
+        public bool IsEnabledDownloadItem()
         {
-            return !string.IsNullOrEmpty(DefaultImage);
+            return IsEnabledOpenItem();
+        }
+
+        /// <summary>
+        /// Method DownloadDocument
+        /// </summary>
+        [ACMethodInfo("OpenItem", "en{'Open'}de{'Öffnen'}", 9999, false, false, true)]
+        public void OpenItem()
+        {
+            if (!IsEnabledOpenItem())
+                return;
+            System.Diagnostics.Process.Start("CMD.exe", SelectedMediaItemPresentation.FilePath);
+        }
+
+        public bool IsEnabledOpenItem()
+        {
+            return
+               SelectedMediaItemPresentation != null
+               && string.IsNullOrEmpty(SelectedMediaItemPresentation.FilePath);
+        }
+
+        /// <summary>
+        /// Method DownloadDocument
+        /// </summary>
+        [ACMethodInfo("ShowInFolder", "en{'Show in folder'}de{'Im Ordner anzeigen'}", 9999, false, false, true)]
+        public void ShowInFolder()
+        {
+            if (!IsEnabledOpenItem())
+                return;
+            System.Diagnostics.Process.Start("CMD.exe", "open " + Path.GetDirectoryName(SelectedMediaItemPresentation.FilePath));
+        }
+
+        public bool IsEnabledShowInFolder()
+        {
+            return IsEnabledOpenItem();
+        }
+
+        [ACMethodInfo("Add", "en{'Add'}de{'Neu'}", 9999, false, false, true)]
+        public void Add()
+        {
+            MediaItemPresentation item = new MediaItemPresentation();
+            MediaItemPresentationList.Add(item);
+            MediaItemPresentationList_OnPropertyChanged();
         }
 
         /// <summary>
         /// Method DeleteImage
         /// </summary>
         [ACMethodInfo("DeleteImage", "en{'Delete'}de{'Lösche'}", 9999, false, false, true)]
-        public void DeleteImage()
+        public void Delete()
         {
-            if (!IsEnabledDeleteImage()) return;
-            DeleteFilesNames = new List<string>();
-            MediaItemPresentation image = SelectedImage;
-            SelectedImage = null;
-            ImageList.Remove(image);
-            _ImageList = ImageList.ToList();
-            OnPropertyChanged("ImageList");
+            if (!IsEnabledDelete())
+                return;
+            MediaItemPresentation item = SelectedMediaItemPresentation;
+            SelectedMediaItemPresentation = null;
 
-            DeleteFilesNames.Add(image.FilePath);
-            if (image.HaveOwnThumb)
-                DeleteFilesNames.Add(image.ThumbPath);
+            MediaItemPresentationList.Remove(item);
+            MediaItemPresentationList = MediaItemPresentationList.ToList();
+
+            DeleteFilesNames.Add(item.FilePath);
+            if (!string.IsNullOrEmpty(item.ThumbPath))
+                DeleteFilesNames.Add(item.ThumbPath);
 
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
             ShowDialog(this, DesignNameProgressBar);
         }
 
-
-
-        public bool IsEnabledDeleteImage()
+        public bool IsEnabledDelete()
         {
-            return SelectedImage != null && (DefaultImage == null || SelectedImage.FilePath != DefaultImage);
-        }
-
-        /// <summary>
-        /// Method DeleteDocument
-        /// </summary>
-        [ACMethodInfo("DeleteDocument", "en{'Delete'}de{'Lösche'}", 9999, false, false, true)]
-        public void DeleteDocument()
-        {
-            if (!IsEnabledDeleteDocument()) return;
-            DeleteFilesNames = new List<string>();
-            MediaItemPresentation selectedDocument = SelectedDocument;
-            DocumentList.Remove(selectedDocument);
-            SelectedDocument = DocumentList.FirstOrDefault();
-            DocumentList = DocumentList.ToList();
-            OnPropertyChanged("DocumentList");
-
-            DeleteFilesNames.Add(selectedDocument.FilePath);
-            if (selectedDocument.HaveOwnThumb)
-                DeleteFilesNames.Add(selectedDocument.ThumbPath);
-
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
-            ShowDialog(this, DesignNameProgressBar);
-
-        }
-        public bool IsEnabledDeleteDocument()
-        {
-            return SelectedDocument != null;
-        }
-
-        /// <summary>
-        /// Method DeleteAudio
-        /// </summary>
-        [ACMethodInfo("DeleteAudio", "en{'Delete'}de{'Lösche'}", 9999, false, false, true)]
-        public void DeleteAudio()
-        {
-            if (!IsEnabledDeleteAudio()) return;
-            DeleteFilesNames = new List<string>();
-            MediaItemPresentation selectedAudio = SelectedAudio;
-            AudioList.Remove(selectedAudio);
-            SelectedAudio = AudioList.FirstOrDefault();
-            _AudioList = AudioList.ToList();
-            OnPropertyChanged("AudioList");
-
-            DeleteFilesNames.Add(selectedAudio.FilePath);
-            if (selectedAudio.HaveOwnThumb)
-                DeleteFilesNames.Add(selectedAudio.ThumbPath);
-
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
-            ShowDialog(this, DesignNameProgressBar);
-        }
-        public bool IsEnabledDeleteAudio()
-        {
-            return SelectedAudio != null;
-        }
-        /// <summary>
-        /// Method DeleteVideo
-        /// </summary>
-        [ACMethodInfo("DeleteVideo", "en{'Delete'}de{'Lösche'}", 9999, false, false, true)]
-        public void DeleteVideo()
-        {
-            if (!IsEnabledDeleteAudio()) return;
-            DeleteFilesNames = new List<string>();
-            MediaItemPresentation selectedVideo = SelectedVideo;
-            VideoList.Remove(selectedVideo);
-            SelectedVideo = AudioList.FirstOrDefault();
-            _VideoList = VideoList.ToList();
-            OnPropertyChanged("VideoList");
-
-            DeleteFilesNames.Add(selectedVideo.FilePath);
-            if (selectedVideo.HaveOwnThumb)
-                DeleteFilesNames.Add(selectedVideo.ThumbPath);
-
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
-            ShowDialog(this, DesignNameProgressBar);
-        }
-        public bool IsEnabledDeleteVideo()
-        {
-            return SelectedVideo != null;
-        }
-
-        #endregion
-
-        #region Methods -> ACMethods -> Download
-
-        /// <summary>
-        /// Method DownloadImage
-        /// </summary>
-        [ACMethodInfo("DownloadImage", "en{'DownloadImage'}de{'DownloadImage'}", 9999, false, false, true)]
-        public void DownloadImage()
-        {
-            if (!IsEnabledDownloadImage()) return;
-            DownloadFile(SelectedImage.FilePath);
-        }
-
-        public bool IsEnabledDownloadImage()
-        {
-            return SelectedImage != null;
-        }
-
-
-        /// <summary>
-        /// Method DownloadDocument
-        /// </summary>
-        [ACMethodInfo("DownloadDocument", "en{'DownloadDocument'}de{'DownloadDocument'}", 9999, false, false, true)]
-        public void DownloadDocument()
-        {
-            if (!IsEnabledDownloadDocument()) return;
-            DownloadFile(SelectedDocument.FilePath);
-        }
-
-        public bool IsEnabledDownloadDocument()
-        {
-            return SelectedDocument != null;
+            return IsEnabledOpenItem();
         }
 
         #endregion
