@@ -2461,7 +2461,7 @@ namespace gip.bso.manufacturing
                     }
                 }
 
-                LastUsedLotList = lastUsedLots;
+                LastUsedLotList = lastUsedLots.OrderBy(c => c.Material.MaterialNo).ToList();
 
                 ShowDialog(this, "SettingsDialog");
             }
