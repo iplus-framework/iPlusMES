@@ -1,5 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.mes.autocomponent;
+using gip.mes.datamodel;
 using gip.mes.facility;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
@@ -13,11 +15,16 @@ using System.Threading;
 namespace gip.bso.masterdata
 {
     [ACClassInfo(Const.PackName_VarioDevelopment, "en{'Update info'}de{'Update Info'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Msg")]
-    public class BSOMedia : ACBSO
+    public class BSOMedia : ACBSOvb
     {
         #region Events
 
         public event EventHandler OnDefaultImageDelete;
+
+        #endregion
+
+        #region const
+
 
         #endregion
 
@@ -75,6 +82,11 @@ namespace gip.bso.masterdata
                 return false;
 
             MediaSettings = new MediaSettings();
+
+            #region TestLoad
+            Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == "102");
+            LoadMedia(material);
+            #endregion
 
             return true;
         }
@@ -615,57 +627,18 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledUploadFile())
                 return;
-            string extension = Path.GetExtension(SelectedMediaItemPresentation.FilePath);
-            MediaItemTypeEnum? mediaType = GetUpladedFileType(extension);
-            if (mediaType != null)
-            {
-                if (mediaType != MediaItemTypeEnum.Image && (SelectedMediaItemPresentation.IsGenerateThumb || SelectedMediaItemPresentation.IsDefault)) return;
-
-                if (mediaType != MediaItemTypeEnum.Image)
-                {
-                    MediaController.UploadFile(SelectedMediaItemPresentation.FilePath);
-                    if (!string.IsNullOrEmpty(SelectedMediaItemPresentation.ThumbPath) && File.Exists(SelectedMediaItemPresentation.ThumbPath))
-                    {
-                        string recomendedFileName =
-                            Path.GetFileNameWithoutExtension(SelectedMediaItemPresentation.FilePath) +
-                            MediaController.MediaSettings.DefaultThumbSuffix +
-                            Path.GetExtension(SelectedMediaItemPresentation.ThumbPath);
-                        MediaSet mediaSet = MediaController.Items.Where(c => c.Value.MediaTypeSettings.Extensions.Contains(extension)).Select(c => c.Value).FirstOrDefault();
-                        MediaController.UploadFile(SelectedMediaItemPresentation.ThumbPath, Path.Combine(mediaSet.ItemRootFolder, recomendedFileName));
-                    }
-                    switch (mediaType)
-                    {
-                        case MediaItemTypeEnum.Document:
-                            _DocumentList = DocumentMediaSet.GetFiles(1);
-                            OnPropertyChanged("DocumentList");
-                            break;
-                        case MediaItemTypeEnum.Audio:
-                            _AudioList = AudioMediaSet.GetFiles(1);
-                            OnPropertyChanged("AudioList");
-                            break;
-                        case MediaItemTypeEnum.Video:
-                            _VideoList = VideoMediaSet.GetFiles(1);
-                            OnPropertyChanged("VideoList");
-                            break;
-                    }
-                }
-                else
-                {
-                    MediaController.UploadImage(SelectedMediaItemPresentation.FilePath, SelectedMediaItemPresentation.ThumbPath, SelectedMediaItemPresentation.IsGenerateThumb, SelectedMediaItemPresentation.IsDefault);
-                    OnPropertyChanged("ImageList");
-                }
-            }
+            MediaController.Upload(SelectedMediaItemPresentation);
         }
         public bool IsEnabledUploadFile()
         {
             return SelectedMediaItemPresentation != null
-                && !string.IsNullOrEmpty(SelectedMediaItemPresentation.FilePath)
-                && File.Exists(SelectedMediaItemPresentation.FilePath)
+                && !string.IsNullOrEmpty(SelectedMediaItemPresentation.EditFilePath)
+                && File.Exists(SelectedMediaItemPresentation.EditFilePath)
                 && (!SelectedMediaItemPresentation.IsDefault ||
                     (
 
                         SelectedMediaItemPresentation.IsGenerateThumb ||
-                        (!string.IsNullOrEmpty(SelectedMediaItemPresentation.ThumbPath) && File.Exists(SelectedMediaItemPresentation.FilePath))
+                        (!string.IsNullOrEmpty(SelectedMediaItemPresentation.EditThumbPath) && File.Exists(SelectedMediaItemPresentation.EditFilePath))
                      )
                  );
         }
@@ -706,7 +679,7 @@ namespace gip.bso.masterdata
         {
             return
                SelectedMediaItemPresentation != null
-               && string.IsNullOrEmpty(SelectedMediaItemPresentation.FilePath);
+               && !string.IsNullOrEmpty(SelectedMediaItemPresentation.FilePath);
         }
 
         /// <summary>
@@ -729,9 +702,11 @@ namespace gip.bso.masterdata
         public void Add()
         {
             MediaItemPresentation item = new MediaItemPresentation();
+            LoadMediaPresentationDefaults(item, ActiveTab == MediaItemTypeEnum.Image);
             MediaItemPresentationList.Add(item);
             MediaItemPresentationList_OnPropertyChanged();
         }
+
 
         /// <summary>
         /// Method DeleteImage
@@ -741,18 +716,22 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledDelete())
                 return;
+            DeleteFilesNames = new List<string>();
             MediaItemPresentation item = SelectedMediaItemPresentation;
             SelectedMediaItemPresentation = null;
 
             MediaItemPresentationList.Remove(item);
             MediaItemPresentationList = MediaItemPresentationList.ToList();
 
-            DeleteFilesNames.Add(item.FilePath);
-            if (!string.IsNullOrEmpty(item.ThumbPath))
-                DeleteFilesNames.Add(item.ThumbPath);
+            if (!string.IsNullOrEmpty(item.EditFilePath))
+            {
+                DeleteFilesNames.Add(item.FilePath);
+                if (!string.IsNullOrEmpty(item.ThumbPath))
+                    DeleteFilesNames.Add(item.ThumbPath);
 
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
-            ShowDialog(this, DesignNameProgressBar);
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
+                ShowDialog(this, DesignNameProgressBar);
+            }
         }
 
         public bool IsEnabledDelete()
@@ -763,7 +742,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Helper methods
-        public MediaItemTypeEnum? GetUpladedFileType(string extension)
+        private MediaItemTypeEnum? GetUpladedFileType(string extension)
         {
             KeyValuePair<MediaItemTypeEnum, MediaSet>? searchItem = null;
             foreach (var tmp in MediaController.Items)
@@ -775,7 +754,7 @@ namespace gip.bso.masterdata
                 return searchItem.Value.Key;
             return null;
         }
-        public void DownloadFile(string filePath)
+        private void DownloadFile(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -788,6 +767,15 @@ namespace gip.bso.masterdata
                         File.Copy(filePath, dialog.FileName);
                     }
                 }
+            }
+        }
+
+        private void LoadMediaPresentationDefaults(MediaItemPresentation item, bool isImage)
+        {
+            item.ThumbPath = MediaController.GetEmptyThumbImagePath();
+            if (isImage)
+            {
+                item.FilePath = MediaController.GetEmptyImagePath();
             }
         }
 
@@ -842,4 +830,5 @@ namespace gip.bso.masterdata
 
         #endregion
     }
+
 }
