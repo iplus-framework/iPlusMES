@@ -181,6 +181,29 @@ namespace gip.mes.processapplication
                 if (responsibleFunc == null)
                     return StartNextCompResult.CycleWait;
 
+                var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
+                
+                var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
+                var sourceClass = parentModule?.FirstOrDefault()?.Source;
+                if (sourcePoint == null || sourceClass == null)
+                {
+                    if (ComponentsSkippable)
+                        return StartNextCompResult.Done;
+                    else
+                        return StartNextCompResult.CycleWait;
+                }
+
+                RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(RoutingService, Database.ContextIPlus, false, sourceClass, sourcePoint, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards,
+                                                                                     null, null, null, 0, true, true);
+
+                if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
+                {
+                    if (ComponentsSkippable)
+                        return StartNextCompResult.Done;
+                    else
+                        return StartNextCompResult.CycleWait;
+                }
+
                 if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, pickingPos, sourceSilo))
                     return StartNextCompResult.CycleWait;
 
