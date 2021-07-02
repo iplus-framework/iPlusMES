@@ -2513,7 +2513,10 @@ namespace gip.bso.manufacturing
             {
                 _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
                 if (_RoutingService == null)
-                    return; //TODO error
+                {
+                    //The routing service is unavailable.
+                    return; 
+                }
             }
 
             RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, CurrentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
@@ -2521,6 +2524,7 @@ namespace gip.bso.manufacturing
 
             if (rResult == null)
             {
+                // Can not find any target storage for this station.
                 return;
             }
 
@@ -2531,7 +2535,11 @@ namespace gip.bso.manufacturing
             {
                 _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
                 if (_ACFacilityManager == null)
-                    return; //TODO error
+                {
+                    //The facility manager is null.
+                    return;
+
+                }
             }
 
             _ACPickingManager = ACRefToPickingManager();
@@ -2539,7 +2547,7 @@ namespace gip.bso.manufacturing
             var result = CurrentProcessModule.ACUrlCommand("!GetDosableComponents") as SingleDosingItems;
             if (result == null)
             {
-                //TODO message
+                //Can not get dosable components for single dosing.
                 return;
             }
 
@@ -2565,12 +2573,13 @@ namespace gip.bso.manufacturing
         {
             if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
             {
-                //error
+                // Can not find any target storage for this station. 
+                return;
             }
 
             if (SingleDosTargetStorageList.Count() > 1)
             {
-                //Show selection dialog
+                //todo Show selection dialog
             }
             else
             {
@@ -2581,7 +2590,7 @@ namespace gip.bso.manufacturing
             
             if (inwardFacility == null)
             {
-                //Error
+                //Can not find any facility according target storage ID: {0}
                 return;
             }
 
@@ -2589,7 +2598,7 @@ namespace gip.bso.manufacturing
 
             if (outwardFacility == null)
             {
-                //Error
+                //Can not find any outward facility with FacilityNo: {0}
                 return;
             }
 
@@ -2646,6 +2655,7 @@ namespace gip.bso.manufacturing
             StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID);
 
             SingleDosTargetQuantity = 0;
+            SelectedSingleDosTargetStorage = null;
 
             CloseTopDialog();
         }
@@ -2687,7 +2697,7 @@ namespace gip.bso.manufacturing
             return null;
         }
 
-        //#region Workflow-Starting
+        
         protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, out gip.core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager,
                                                     out Route validRoute, out ACClassWF workflow)
         {
@@ -2711,16 +2721,11 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            //if (validRoute == null)
-            //{
-            //    //TODO:Error
-            //    return false;
-            //}    
-
             vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
             if (material == null)
             {
-                //TODO Error
+                //The material with MaterialNo: {0} can not be found in database.
+
                 return false;
             }
 
@@ -2728,7 +2733,8 @@ namespace gip.bso.manufacturing
 
             if (wfConfigs == null || !wfConfigs.Any())
             {
-                //TODO error
+                //The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Bill of material. 
+
                 return false;
             }
 
@@ -2740,7 +2746,8 @@ namespace gip.bso.manufacturing
 
             if (wfConfig == null)
             {
-                //error
+                //The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station.
+
                 return false;
             }
 
@@ -2754,13 +2761,12 @@ namespace gip.bso.manufacturing
                 return false;
 
             Type typePWWF = typeof(PWNodeProcessWorkflow);
-            //wfRunsBatches = acClassMethod.ACClassWF_ACClassMethod.ToArray().Where(c => c.RefPAACClassMethodID.HasValue && c.PWACClass != null && c.PWACClass.ObjectType != null && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)).Any();
             gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
 
             var AppManagersList = this.Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).ToList();
             if (AppManagersList.Count > 1)
             {
-                ShowDialog(this, "SelectAppManager");
+                ShowDialog(this, "SelectAppManager"); //TODO
                 if (appManager == null)
                     return false;
             }
@@ -2772,7 +2778,7 @@ namespace gip.bso.manufacturing
                 return false;
             if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
             {
-                // TODO: Message
+                // The connection to the server is unreachable, please try again when connection to server established.
                 return false;
             }
             return true;
@@ -3051,6 +3057,38 @@ namespace gip.bso.manufacturing
                     return true;
                 case "IsEnabledRefreshMaterialOrFC_F":
                     result = IsEnabledRefreshMaterialOrFC_F();
+                    return true;
+
+                case "OpenSettings":
+                    OpenSettings();
+                    return true;
+
+                case "IsEnabledOpenSettings":
+                    result = IsEnabledOpenSettings();
+                    return true;
+
+                case "RemoveLastUsedLot":
+                    RemoveLastUsedLot();
+                    return true;
+
+                case "IsEnabledRemoveLastUsedLot":
+                    result = IsEnabledRemoveLastUsedLot();
+                    return true;
+
+                case "ShowSingleDosingDialog":
+                    ShowSingleDosingDialog();
+                    return true;
+
+                case "IsEnabledShowSingleDosingDialog":
+                    result = IsEnabledShowSingleDosingDialog();
+                    return true;
+
+                case "SingleDosingStart":
+                    SingleDosingStart();
+                    return true;
+
+                case "IsEnabledSingleDosingStart":
+                    result = IsEnabledSingleDosingStart();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
