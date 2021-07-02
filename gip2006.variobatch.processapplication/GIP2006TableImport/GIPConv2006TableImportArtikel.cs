@@ -326,7 +326,10 @@ namespace gip2006.variobatch.processapplication
                         break;
                     case Const.EntityInsertName:
                         material.InsertName = value.Length <= 5 ? value : value.Substring(0, 5);
-                        break; 
+                        break;
+                    case "SpezWaerme":
+                        material.SpecHeatCapacity = System.Convert.ToDouble(value);
+                        break;
                     default:
                         break;
                 }
