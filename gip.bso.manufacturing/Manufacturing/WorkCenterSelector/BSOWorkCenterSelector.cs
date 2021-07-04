@@ -611,10 +611,12 @@ namespace gip.bso.manufacturing
                 }
 
                 string pwGroupACUrl = accessArr[0];
-                PAOrderInfo currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!GetPAOrderInfo") as PAOrderInfo;
+                ACComponent pwGroup = Root.ACUrlCommand(pwGroupACUrl) as ACComponent;
+
+                PAOrderInfo currentOrderInfo = pwGroup?.ExecuteMethod("GetPAOrderInfo") as PAOrderInfo;
                 if (currentOrderInfo == null)
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(300);
                     currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!GetPAOrderInfo") as PAOrderInfo;
                 }
                 if (currentOrderInfo != null)
