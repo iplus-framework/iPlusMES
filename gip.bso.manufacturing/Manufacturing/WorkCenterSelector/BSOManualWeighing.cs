@@ -2514,7 +2514,8 @@ namespace gip.bso.manufacturing
                 _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
                 if (_RoutingService == null)
                 {
-                    //The routing service is unavailable.
+                    //Error50430: The routing service is unavailable.
+                    Messages.Error(this, "Error50430");
                     return; 
                 }
             }
@@ -2522,9 +2523,10 @@ namespace gip.bso.manufacturing
             RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, CurrentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
                                                                     RouteDirections.Forwards, null, null, null, 0, true, true);
 
-            if (rResult == null)
+            if (rResult == null || rResult.Routes == null)
             {
-                // Can not find any target storage for this station.
+                //Error50431: Can not find any target storage for this station.
+                Messages.Error(this, "Error50431");
                 return;
             }
 
@@ -2536,9 +2538,9 @@ namespace gip.bso.manufacturing
                 _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
                 if (_ACFacilityManager == null)
                 {
-                    //The facility manager is null.
+                    //Error50432: The facility manager is null.
+                    Messages.Error(this, "Error50432");
                     return;
-
                 }
             }
 
@@ -2547,7 +2549,8 @@ namespace gip.bso.manufacturing
             var result = CurrentProcessModule.ACUrlCommand("!GetDosableComponents") as SingleDosingItems;
             if (result == null)
             {
-                //Can not get dosable components for single dosing.
+                //Error50433: Can not get dosable components for single dosing.
+                Messages.Error(this, "Error50433");
                 return;
             }
 
@@ -2573,7 +2576,8 @@ namespace gip.bso.manufacturing
         {
             if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
             {
-                // Can not find any target storage for this station. 
+                //Error50431: Can not find any target storage for this station.
+                Messages.Error(this, "Error50431");
                 return;
             }
 
@@ -2590,7 +2594,8 @@ namespace gip.bso.manufacturing
             
             if (inwardFacility == null)
             {
-                //Can not find any facility according target storage ID: {0}
+                //Error50434: Can not find any facility according target storage ID: {0}
+                Messages.Error(this, "Error50434", false, SelectedSingleDosTargetStorage.ACClassID);
                 return;
             }
 
@@ -2598,7 +2603,8 @@ namespace gip.bso.manufacturing
 
             if (outwardFacility == null)
             {
-                //Can not find any outward facility with FacilityNo: {0}
+                //Error50435: Can not find any outward facility with FacilityNo: {0}
+                Messages.Error(this, "Error50435",false, SelectedSingleDosingItem.FacilityNo);
                 return;
             }
 
@@ -2724,8 +2730,8 @@ namespace gip.bso.manufacturing
             vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
             if (material == null)
             {
-                //The material with MaterialNo: {0} can not be found in database.
-
+                //Error50436: The material with MaterialNo: {0} can not be found in database.
+                Messages.Error(this, "Error50436", false, SelectedSingleDosingItem.MaterialNo);
                 return false;
             }
 
@@ -2733,8 +2739,8 @@ namespace gip.bso.manufacturing
 
             if (wfConfigs == null || !wfConfigs.Any())
             {
-                //The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Bill of material. 
-
+                //Error50437: The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Material. 
+                Messages.Error(this, "Error50437");
                 return false;
             }
 
@@ -2746,8 +2752,8 @@ namespace gip.bso.manufacturing
 
             if (wfConfig == null)
             {
-                //The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station.
-
+                //Error50438: The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station. 
+                Messages.Error(this, "Error50438");
                 return false;
             }
 
@@ -2778,7 +2784,9 @@ namespace gip.bso.manufacturing
                 return false;
             if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
             {
-                // The connection to the server is unreachable, please try again when connection to server established.
+                // 
+                //Error50439: The connection to the server is unreachable, please try again when connection to server established.
+                Messages.Error(this, "Error50439");
                 return false;
             }
             return true;
