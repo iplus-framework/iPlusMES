@@ -800,8 +800,7 @@ namespace gip.bso.masterdata
                 item.Image = null;
                 item.ImageThumb = null;
                 DeleteFilesNames.Add(item.FilePath);
-                string fileName = Path.GetFileNameWithoutExtension(item.FilePath);
-                if (!string.IsNullOrEmpty(item.ThumbPath) && item.ThumbPath.Contains(fileName))
+                if (item.ThumbExistAndIsNotGeneric())
                     DeleteFilesNames.Add(item.ThumbPath);
 
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
