@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace gip.bso.masterdata
 {
@@ -84,7 +85,8 @@ namespace gip.bso.masterdata
             MediaSettings = new MediaSettings();
 
             #region TestLoad
-            Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == "102");
+            string testMaterialNo = @"001";
+            Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == testMaterialNo);
             LoadMedia(material);
             #endregion
 
@@ -315,6 +317,32 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Properties -> SelectedTab
+
+
+        private int _ActiveTabIndex;
+        /// <summary>
+        /// Doc  ActiveTabIndex
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(79, "ActiveTabIndex", "en{'ActiveTabIndex'}de{'ActiveTabIndex'}")]
+        public int ActiveTabIndex
+        {
+            get
+            {
+                return _ActiveTabIndex;
+            }
+            set
+            {
+                if (_ActiveTabIndex != value)
+                {
+                    _ActiveTabIndex = value;
+                    ActiveTab = (MediaItemTypeEnum)_ActiveTabIndex;
+                    OnPropertyChanged("ActiveTabIndex");
+                }
+            }
+        }
+
+
         private MediaItemTypeEnum _ActiveTab = MediaItemTypeEnum.Image;
         [ACPropertyInfo(80, "ActiveTab", "en{'ActiveTab'}de{'ActiveTab'}")]
         public MediaItemTypeEnum ActiveTab
@@ -375,6 +403,26 @@ namespace gip.bso.masterdata
                         break;
                 }
                 OnPropertyChanged("SelectedMediaItemPresentation");
+                SelectedMediaItemPresentation_OnPropertyChanged();
+            }
+        }
+
+        public void SelectedMediaItemPresentation_OnPropertyChanged()
+        {
+            switch (ActiveTab)
+            {
+                case MediaItemTypeEnum.Image:
+                    OnPropertyChanged("SelectedImage");
+                    break;
+                case MediaItemTypeEnum.Document:
+                    OnPropertyChanged("SelectedDocument");
+                    break;
+                case MediaItemTypeEnum.Audio:
+                    OnPropertyChanged("SelectedAudio");
+                    break;
+                case MediaItemTypeEnum.Video:
+                    OnPropertyChanged("SelectedVideo");
+                    break;
             }
         }
 
@@ -445,7 +493,6 @@ namespace gip.bso.masterdata
         #endregion
 
         #endregion
-
 
         #region BackgroundWorker
 
@@ -557,9 +604,20 @@ namespace gip.bso.masterdata
             VideoMediaSet = MediaController.Items[MediaItemTypeEnum.Video];
 
             _ImageList = ImageMediaSet.GetFiles(1);
+            if (_ImageList != null && _ImageList.Any())
+                SelectedImage = _ImageList.FirstOrDefault();
+
             _DocumentList = DocumentMediaSet.GetFiles(1);
+            if (_DocumentList != null && _DocumentList.Any())
+                SelectedDocument = _DocumentList.FirstOrDefault();
+
             _AudioList = AudioMediaSet.GetFiles(1);
+            if (_AudioList != null && _AudioList.Any())
+                SelectedAudio = _AudioList.FirstOrDefault();
+
             _VideoList = VideoMediaSet.GetFiles(1);
+            if (_VideoList != null && _VideoList.Any())
+                SelectedVideo = _VideoList.FirstOrDefault();
 
             OnPropertyChanged("ImageList");
             OnPropertyChanged("DocumentList");
@@ -584,7 +642,8 @@ namespace gip.bso.masterdata
                 {
                     if (!string.IsNullOrEmpty(dialog.FileName) && File.Exists(dialog.FileName))
                     {
-                        SelectedMediaItemPresentation.FilePath = dialog.FileName;
+                        SelectedMediaItemPresentation.EditFilePath = dialog.FileName;
+                        SelectedMediaItemPresentation_OnPropertyChanged();
                     }
                 }
             }
@@ -609,7 +668,8 @@ namespace gip.bso.masterdata
                 dialog.IsFolderPicker = false;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    SelectedMediaItemPresentation.ThumbPath = dialog.FileName;
+                    SelectedMediaItemPresentation.EditThumbPath = dialog.FileName;
+                    SelectedMediaItemPresentation_OnPropertyChanged();
                 }
             }
         }
@@ -627,7 +687,17 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledUploadFile())
                 return;
-            MediaController.Upload(SelectedMediaItemPresentation);
+            try
+            {
+                SelectedMediaItemPresentation = MediaController.Upload(SelectedMediaItemPresentation);
+                SelectedMediaItemPresentation_OnPropertyChanged();
+            }
+            catch (Exception ec)
+            {
+                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+                SendMessage(msg);
+            }
+
         }
         public bool IsEnabledUploadFile()
         {
@@ -672,7 +742,7 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledOpenItem())
                 return;
-            System.Diagnostics.Process.Start("CMD.exe", SelectedMediaItemPresentation.FilePath);
+            System.Diagnostics.Process.Start(SelectedMediaItemPresentation.FilePath);
         }
 
         public bool IsEnabledOpenItem()
@@ -690,7 +760,7 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledOpenItem())
                 return;
-            System.Diagnostics.Process.Start("CMD.exe", "open " + Path.GetDirectoryName(SelectedMediaItemPresentation.FilePath));
+            System.Diagnostics.Process.Start(Path.GetDirectoryName(SelectedMediaItemPresentation.FilePath));
         }
 
         public bool IsEnabledShowInFolder()
@@ -703,8 +773,10 @@ namespace gip.bso.masterdata
         {
             MediaItemPresentation item = new MediaItemPresentation();
             LoadMediaPresentationDefaults(item, ActiveTab == MediaItemTypeEnum.Image);
+            item.LoadImage(ActiveTab == MediaItemTypeEnum.Image);
             MediaItemPresentationList.Add(item);
             MediaItemPresentationList_OnPropertyChanged();
+            SelectedMediaItemPresentation = item;
         }
 
 
@@ -723,10 +795,13 @@ namespace gip.bso.masterdata
             MediaItemPresentationList.Remove(item);
             MediaItemPresentationList = MediaItemPresentationList.ToList();
 
-            if (!string.IsNullOrEmpty(item.EditFilePath))
+            if (!string.IsNullOrEmpty(item.FilePath))
             {
+                item.Image = null;
+                item.ImageThumb = null;
                 DeleteFilesNames.Add(item.FilePath);
-                if (!string.IsNullOrEmpty(item.ThumbPath))
+                string fileName = Path.GetFileNameWithoutExtension(item.FilePath);
+                if (!string.IsNullOrEmpty(item.ThumbPath) && item.ThumbPath.Contains(fileName))
                     DeleteFilesNames.Add(item.ThumbPath);
 
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
@@ -774,9 +849,7 @@ namespace gip.bso.masterdata
         {
             item.ThumbPath = MediaController.GetEmptyThumbImagePath();
             if (isImage)
-            {
                 item.FilePath = MediaController.GetEmptyImagePath();
-            }
         }
 
         #endregion
