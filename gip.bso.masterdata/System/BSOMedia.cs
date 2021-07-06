@@ -85,9 +85,9 @@ namespace gip.bso.masterdata
             MediaSettings = new MediaSettings();
 
             #region TestLoad
-            string testMaterialNo = @"001";
-            Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == testMaterialNo);
-            LoadMedia(material);
+            //string testMaterialNo = @"001";
+            //Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == testMaterialNo);
+            //LoadMedia(material);
             #endregion
 
             return true;
