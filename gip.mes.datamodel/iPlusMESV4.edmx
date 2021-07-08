@@ -3601,8 +3601,9 @@
           <Property Name="PreviousPartslistID" Type="uniqueidentifier" />
           <Property Name="DeleteDate" Type="datetime" />
           <Property Name="DeleteName" Type="varchar" MaxLength="5" />
-          <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="MaterialWFID" Type="uniqueidentifier" />
+          <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
+          <Property Name="ProductionUnits" Type="float" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -4171,7 +4172,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4695,7 +4696,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.TandTv2TempPos' does not ha
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4728,7 +4729,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.ACProgramLogView' does not 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4752,7 +4753,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialPosView' doe
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4776,7 +4777,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialRelView' doe
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4801,7 +4802,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.MachineMaterialView' does n
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4830,7 +4831,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogPosMachines' does n
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4860,7 +4861,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogPosView' does not h
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -16606,7 +16607,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <EntitySet Name="OutOrderConfig" EntityType="iPlusMESV4_Model.OutOrderConfig" />
           <EntitySet Name="OutOrderPosSplit" EntityType="iPlusMESV4_Model.OutOrderPosSplit" />
           <EntitySet Name="OutOrderPosUtilization" EntityType="iPlusMESV4_Model.OutOrderPosUtilization" />
-          <EntitySet Name="Partslist" EntityType="iPlusMESV4_Model.Partslist" />
           <EntitySet Name="PartslistACClassMethod" EntityType="iPlusMESV4_Model.PartslistACClassMethod" />
           <EntitySet Name="PartslistConfig" EntityType="iPlusMESV4_Model.PartslistConfig" />
           <EntitySet Name="PartslistPosRelation" EntityType="iPlusMESV4_Model.PartslistPosRelation" />
@@ -17406,20 +17406,12 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="DemandOrder" EntitySet="DemandOrder" />
             <End Role="DemandProdOrder" EntitySet="DemandProdOrder" />
           </AssociationSet>
-          <AssociationSet Name="FK_DemandOrderPos_PartsListID" Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="DemandOrderPos" EntitySet="DemandOrderPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_FacilityCharge_MDReleaseStateID" Association="iPlusMESV4_Model.FK_FacilityCharge_MDReleaseStateID">
             <End Role="MDReleaseState" EntitySet="MDReleaseState" />
             <End Role="FacilityCharge" EntitySet="FacilityCharge" />
           </AssociationSet>
           <AssociationSet Name="FK_FacilityCharge_MDUnitID" Association="iPlusMESV4_Model.FK_FacilityCharge_MDUnitID">
             <End Role="MDUnit" EntitySet="MDUnit" />
-            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityCharge_PartsListID" Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
             <End Role="FacilityCharge" EntitySet="FacilityCharge" />
           </AssociationSet>
           <AssociationSet Name="FK_FacilityReservation_FacilityChargeID" Association="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID">
@@ -17658,10 +17650,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="MaterialWF" EntitySet="MaterialWF" />
             <End Role="MaterialWFRelation" EntitySet="MaterialWFRelation" />
           </AssociationSet>
-          <AssociationSet Name="FK_Partslist_MaterialWF" Association="iPlusMESV4_Model.FK_Partslist_MaterialWF">
-            <End Role="MaterialWF" EntitySet="MaterialWF" />
-            <End Role="Partslist" EntitySet="Partslist" />
-          </AssociationSet>
           <AssociationSet Name="FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID" Association="iPlusMESV4_Model.FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID">
             <End Role="MaterialWFACClassMethodConfig" EntitySet="MaterialWFACClassMethodConfig" />
             <End Role="MaterialWFACClassMethodConfig1" EntitySet="MaterialWFACClassMethodConfig" />
@@ -17762,10 +17750,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="MDUnit" EntitySet="MDUnit" />
             <End Role="MDUnitConversion" EntitySet="MDUnitConversion" />
           </AssociationSet>
-          <AssociationSet Name="FK_Partslist_MDUnitID" Association="iPlusMESV4_Model.FK_Partslist_MDUnitID">
-            <End Role="MDUnit" EntitySet="MDUnit" />
-            <End Role="Partslist" EntitySet="Partslist" />
-          </AssociationSet>
           <AssociationSet Name="FK_MDVisitorCard_MDVisitorCardStateID" Association="iPlusMESV4_Model.FK_MDVisitorCard_MDVisitorCardStateID">
             <End Role="MDVisitorCardState" EntitySet="MDVisitorCardState" />
             <End Role="MDVisitorCard" EntitySet="MDVisitorCard" />
@@ -17797,26 +17781,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <AssociationSet Name="FK_OutOrderConfig_ParentOutOrderConfigID" Association="iPlusMESV4_Model.FK_OutOrderConfig_ParentOutOrderConfigID">
             <End Role="OutOrderConfig" EntitySet="OutOrderConfig" />
             <End Role="OutOrderConfig1" EntitySet="OutOrderConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistACClassMethod_Partslist" Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistACClassMethod" EntitySet="PartslistACClassMethod" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistConfig_PartslistID" Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistConfig" EntitySet="PartslistConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistStock_PartslistID" Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistStock" EntitySet="PartslistStock" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslist_PartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-          </AssociationSet>
-          <AssociationSet Name="PreviousPartslistID_PartslistID" Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="Partslist1" EntitySet="Partslist" />
           </AssociationSet>
           <AssociationSet Name="FK_PartslistConfig_ParentPartslistConfigID" Association="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID">
             <End Role="PartslistConfig" EntitySet="PartslistConfig" />
@@ -18219,14 +18183,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="MDUnit" EntitySet="MDUnit" />
             <End Role="PartslistPos" EntitySet="PartslistPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_Partslist" Association="iPlusMESV4_Model.FK_PartslistPos_Partslist">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_PartsListID" Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_PartslistPos_AlternativePartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID">
             <End Role="PartslistPos" EntitySet="PartslistPos" />
             <End Role="PartslistPos1" EntitySet="PartslistPos" />
@@ -18342,10 +18298,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="FacilityLot" EntitySet="FacilityLot" />
             <End Role="FacilityBooking" EntitySet="FacilityBooking" />
           </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_InwardPartslistID" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
           <AssociationSet Name="FK_FacilityBooking_MDBalancingModeID" Association="iPlusMESV4_Model.FK_FacilityBooking_MDBalancingModeID">
             <End Role="MDBalancingMode" EntitySet="MDBalancingMode" />
             <End Role="FacilityBooking" EntitySet="FacilityBooking" />
@@ -18380,10 +18332,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           </AssociationSet>
           <AssociationSet Name="FK_FacilityBooking_OutwardFacilityLotID" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLotID">
             <End Role="FacilityLot" EntitySet="FacilityLot" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
             <End Role="FacilityBooking" EntitySet="FacilityBooking" />
           </AssociationSet>
           <AssociationSet Name="FK_FacilityBooking_PickingPosID" Association="iPlusMESV4_Model.FK_FacilityBooking_PickingPosID">
@@ -18426,10 +18374,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="FacilityLot" EntitySet="FacilityLot" />
             <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
           </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_InwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
           <AssociationSet Name="FK_FacilityBookingCharge_MDBalancingModeID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_MDBalancingModeID">
             <End Role="MDBalancingMode" EntitySet="MDBalancingMode" />
             <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
@@ -18464,10 +18408,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           </AssociationSet>
           <AssociationSet Name="FK_FacilityBookingCharge_OutwardFacilityLotID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLotID">
             <End Role="FacilityLot" EntitySet="FacilityLot" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
             <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
           </AssociationSet>
           <AssociationSet Name="FK_FacilityBookingCharge_PickingPosID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_PickingPosID">
@@ -18920,10 +18860,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="Facility" EntitySet="Facility" />
             <End Role="Facility1" EntitySet="Facility" />
           </AssociationSet>
-          <AssociationSet Name="FK_Facility_PartsListID" Association="iPlusMESV4_Model.FK_Facility_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="Facility" EntitySet="Facility" />
-          </AssociationSet>
           <AssociationSet Name="FK_FacilityBooking_InwardFacilityID" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID">
             <End Role="Facility" EntitySet="Facility" />
             <End Role="FacilityBooking" EntitySet="FacilityBooking" />
@@ -19214,10 +19150,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             <End Role="Material" EntitySet="Material" />
             <End Role="OutOrderPosUtilization" EntitySet="OutOrderPosUtilization" />
           </AssociationSet>
-          <AssociationSet Name="FK_Partslist_MaterialID" Association="iPlusMESV4_Model.FK_Partslist_MaterialID">
-            <End Role="Material" EntitySet="Material" />
-            <End Role="Partslist" EntitySet="Partslist" />
-          </AssociationSet>
           <AssociationSet Name="FK_PartslistConfig_MaterialID" Association="iPlusMESV4_Model.FK_PartslistConfig_MaterialID">
             <End Role="Material" EntitySet="Material" />
             <End Role="PartslistConfig" EntitySet="PartslistConfig" />
@@ -19424,6 +19356,75 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <AssociationSet Name="FK_UserSettings_VBUser" Association="iPlusMESV4_Model.FK_UserSettings_VBUser">
             <End Role="VBUser" EntitySet="VBUser" />
             <End Role="UserSettings" EntitySet="UserSettings" />
+          </AssociationSet>
+          <EntitySet Name="Partslist" EntityType="iPlusMESV4_Model.Partslist" />
+          <AssociationSet Name="FK_DemandOrderPos_PartsListID" Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="DemandOrderPos" EntitySet="DemandOrderPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Facility_PartsListID" Association="iPlusMESV4_Model.FK_Facility_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="Facility" EntitySet="Facility" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBooking_InwardPartslistID" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBooking_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBookingCharge_InwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBookingCharge_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityCharge_PartsListID" Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Partslist_MaterialID" Association="iPlusMESV4_Model.FK_Partslist_MaterialID">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="Partslist" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Partslist_MaterialWF" Association="iPlusMESV4_Model.FK_Partslist_MaterialWF">
+            <End Role="MaterialWF" EntitySet="MaterialWF" />
+            <End Role="Partslist" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Partslist_MDUnitID" Association="iPlusMESV4_Model.FK_Partslist_MDUnitID">
+            <End Role="MDUnit" EntitySet="MDUnit" />
+            <End Role="Partslist" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistACClassMethod_Partslist" Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistACClassMethod" EntitySet="PartslistACClassMethod" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistConfig_PartslistID" Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistConfig" EntitySet="PartslistConfig" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_Partslist" Association="iPlusMESV4_Model.FK_PartslistPos_Partslist">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_PartsListID" Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistStock_PartslistID" Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistStock" EntitySet="PartslistStock" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslist_PartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+          </AssociationSet>
+          <AssociationSet Name="PreviousPartslistID_PartslistID" Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="Partslist1" EntitySet="Partslist" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -20631,8 +20632,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="VBiProgramACClassMethod" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_ProgramACClassMethodID" FromRole="DemandOrderPos" ToRole="ACClassMethod" />
           <NavigationProperty Name="ACProgram" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_ACProgramID" FromRole="DemandOrderPos" ToRole="ACProgram" />
           <NavigationProperty Name="DemandOrder" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_DemandOrderID" FromRole="DemandOrderPos" ToRole="DemandOrder" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="DemandOrderPos" ToRole="Partslist" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_MaterialID" FromRole="DemandOrderPos" ToRole="Material" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="DemandOrderPos" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="DemandPrimary">
           <Key>
@@ -20714,7 +20715,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="CPartnerCompanyMaterial" Relationship="iPlusMESV4_Model.FK_FacilityCharge_CPartnerCompMatID" FromRole="FacilityCharge" ToRole="CompanyMaterial" />
           <NavigationProperty Name="MDReleaseState" Relationship="iPlusMESV4_Model.FK_FacilityCharge_MDReleaseStateID" FromRole="FacilityCharge" ToRole="MDReleaseState" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_FacilityCharge_MDUnitID" FromRole="FacilityCharge" ToRole="MDUnit" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="FacilityCharge" ToRole="Partslist" />
           <NavigationProperty Name="FacilityReservation_FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityReservation" />
           <NavigationProperty Name="TandTv2StepItem_FacilityCharge" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_FacilityChargeID" FromRole="FacilityCharge" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="FacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityLotID" FromRole="FacilityCharge" ToRole="FacilityLot" />
@@ -20725,6 +20725,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="FacilityInventoryPos_FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityInventoryPos" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityID" FromRole="FacilityCharge" ToRole="Facility" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_FacilityCharge_MaterialID" FromRole="FacilityCharge" ToRole="Material" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="FacilityCharge" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="FacilityHistory">
           <Key>
@@ -21652,8 +21653,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MaterialWFRelation_MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_MaterialWF" FromRole="MaterialWF" ToRole="MaterialWFRelation" />
-          <NavigationProperty Name="Partslist_MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="MaterialWF" ToRole="Partslist" />
           <NavigationProperty Name="MaterialWFACClassMethod_MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFACClassMethod_MaterialWF" FromRole="MaterialWF" ToRole="MaterialWFACClassMethod" />
+          <NavigationProperty Name="Partslist_MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="MaterialWF" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="MaterialWFACClassMethodConfig">
           <Key>
@@ -22710,7 +22711,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="MDGMPAdditive_MDQuantityUnit" Relationship="iPlusMESV4_Model.FK_MDGMPAdditive_MDQuantityUnitID" FromRole="MDUnit" ToRole="MDGMPAdditive" />
           <NavigationProperty Name="MDUnitConversion_MDUnit" Relationship="iPlusMESV4_Model.FK_MDUnitConversion_MDUnitID" FromRole="MDUnit" ToRole="MDUnitConversion" />
           <NavigationProperty Name="MDUnitConversion_ToMDUnit" Relationship="iPlusMESV4_Model.FK_MDUnitConversion_ToMDUnitID" FromRole="MDUnit" ToRole="MDUnitConversion" />
-          <NavigationProperty Name="Partslist_MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
           <NavigationProperty Name="ProdOrderPartslistPos_MDUnit" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDUnitID" FromRole="MDUnit" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="PartslistPos_MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="MDUnit" ToRole="PartslistPos" />
           <NavigationProperty Name="FacilityBooking_MDUnit" Relationship="iPlusMESV4_Model.FK_FacilityBooking_MDUnitID" FromRole="MDUnit" ToRole="FacilityBooking" />
@@ -22721,6 +22721,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="InvoicePos_MDUnit" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDUnitID" FromRole="MDUnit" ToRole="InvoicePos" />
           <NavigationProperty Name="Facility_MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID" FromRole="MDUnit" ToRole="Facility" />
           <NavigationProperty Name="Material_BaseMDUnit" Relationship="iPlusMESV4_Model.FK_Material_BaseMDUnitID" FromRole="MDUnit" ToRole="Material" />
+          <NavigationProperty Name="Partslist_MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -22947,57 +22948,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_OutOrderPosUtilization_OutOrderPosID" FromRole="OutOrderPosUtilization" ToRole="OutOrderPos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" FromRole="OutOrderPosUtilization" ToRole="Material" />
         </EntityType>
-        <EntityType Name="Partslist">
-          <Key>
-            <PropertyRef Name="PartslistID" />
-          </Key>
-          <Property Name="PartslistID" Type="Guid" Nullable="false" />
-          <Property Name="PartslistNo" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="PartslistName" Type="String" MaxLength="350" FixedLength="false" Unicode="true" />
-          <Property Name="PartslistVersion" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialID" Type="Guid" Nullable="false" />
-          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="MDUnitID" Type="Guid" />
-          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
-          <Property Name="GrossWeight" Type="Double" Nullable="false" />
-          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="EnabledFrom" Type="DateTime" Precision="3" />
-          <Property Name="EnabledTo" Type="DateTime" Precision="3" />
-          <Property Name="ProductionWeight" Type="Single" Nullable="false" />
-          <Property Name="IsStandard" Type="Boolean" Nullable="false" />
-          <Property Name="IsProductionUnit" Type="Boolean" Nullable="false" />
-          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesign" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="PreviousPartslistID" Type="Guid" />
-          <Property Name="DeleteDate" Type="DateTime" Precision="3" />
-          <Property Name="DeleteName" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
-          <Property Name="IsInEnabledPeriod" Type="Boolean" annotation:StoreGeneratedPattern="Computed" />
-          <Property Name="MaterialWFID" Type="Guid" />
-          <NavigationProperty Name="DemandOrderPos_Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
-          <NavigationProperty Name="FacilityCharge_Partslist" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="Partslist" ToRole="FacilityCharge" />
-          <NavigationProperty Name="MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="Partslist" ToRole="MaterialWF" />
-          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="Partslist" ToRole="MDUnit" />
-          <NavigationProperty Name="PartslistACClassMethod_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
-          <NavigationProperty Name="PartslistConfig_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
-          <NavigationProperty Name="PartslistStock_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
-          <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="Partslist_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
-          <NavigationProperty Name="Partslist1_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
-          <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="FacilityBooking_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBooking_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBookingCharge_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityBookingCharge_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="Facility_Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
-          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Partslist" ToRole="Material" />
-        </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
             <PropertyRef Name="PartslistACClassMethodID" />
@@ -23008,8 +22958,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="UsedInPhaseIndex" Type="Int16" Nullable="false" />
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="PartslistACClassMethod" ToRole="Partslist" />
           <NavigationProperty Name="MaterialWFACClassMethod" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_MaterialWFACClassMethod" FromRole="PartslistACClassMethod" ToRole="MaterialWFACClassMethod" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="PartslistACClassMethod" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="PartslistConfig">
           <Key>
@@ -23037,10 +22987,10 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="VBiValueTypeACClass" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ValueTypeACClassID" FromRole="PartslistConfig" ToRole="ACClass" />
           <NavigationProperty Name="VBiACClassPropertyRelation" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ACClassPropertyRelationID" FromRole="PartslistConfig" ToRole="ACClassPropertyRelation" />
           <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ACClassWFID" FromRole="PartslistConfig" ToRole="ACClassWF" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="PartslistConfig" ToRole="Partslist" />
           <NavigationProperty Name="PartslistConfig_ParentPartslistConfig" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID" FromRole="PartslistConfig" ToRole="PartslistConfig1" />
           <NavigationProperty Name="PartslistConfig1_ParentPartslistConfig" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID" FromRole="PartslistConfig1" ToRole="PartslistConfig" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistConfig_MaterialID" FromRole="PartslistConfig" ToRole="Material" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="PartslistConfig" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="PartslistPosRelation">
           <Key>
@@ -23291,7 +23241,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="ExternProdOrderNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="ProdOrderPartslist" ToRole="MDProdOrderState" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderBatch_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
           <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
@@ -23299,6 +23248,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -26680,18 +26630,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_DemandOrderPos_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.DemandOrderPos" Role="DemandOrderPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="DemandOrderPos">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_FacilityCharge_MDReleaseStateID">
           <End Type="iPlusMESV4_Model.MDReleaseState" Role="MDReleaseState" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="*" />
@@ -26713,18 +26651,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="FacilityCharge">
               <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityCharge_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityCharge">
-              <PropertyRef Name="PartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -27454,18 +27380,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Partslist_MaterialWF">
-          <End Type="iPlusMESV4_Model.MaterialWF" Role="MaterialWF" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaterialWF">
-              <PropertyRef Name="MaterialWFID" />
-            </Principal>
-            <Dependent Role="Partslist">
-              <PropertyRef Name="MaterialWFID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID">
           <End Type="iPlusMESV4_Model.MaterialWFACClassMethodConfig" Role="MaterialWFACClassMethodConfig" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.MaterialWFACClassMethodConfig" Role="MaterialWFACClassMethodConfig1" Multiplicity="*" />
@@ -27776,18 +27690,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Partslist_MDUnitID">
-          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDUnit">
-              <PropertyRef Name="MDUnitID" />
-            </Principal>
-            <Dependent Role="Partslist">
-              <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_MDVisitorCard_MDVisitorCardStateID">
           <End Type="iPlusMESV4_Model.MDVisitorCardState" Role="MDVisitorCardState" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.MDVisitorCard" Role="MDVisitorCard" Multiplicity="*" />
@@ -27881,70 +27783,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="OutOrderConfig1">
               <PropertyRef Name="ParentOutOrderConfigID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistACClassMethod_Partslist">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistACClassMethod" Role="PartslistACClassMethod" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistACClassMethod">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistConfig_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PartslistConfig" Role="PartslistConfig" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistConfig">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistStock_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PartslistStock" Role="PartslistStock" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistStock">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderPartslist_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslist">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="PreviousPartslistID_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="Partslist1">
-              <PropertyRef Name="PreviousPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -29339,8 +29177,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <Property Name="RetrogradeFIFO" Type="Boolean" />
           <Property Name="ExplosionOff" Type="Boolean" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="PartslistPos" ToRole="MDUnit" />
-          <NavigationProperty Name="ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
           <NavigationProperty Name="PartslistPos_AlternativePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
           <NavigationProperty Name="PartslistPos1_AlternativePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistPos_ParentPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
@@ -29350,6 +29186,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="PartslistPosSplit_PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
           <NavigationProperty Name="ProdOrderPartslistPos_BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="PartslistPos" ToRole="Material" />
+          <NavigationProperty Name="ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
         </EntityType>
         <Association Name="FK_PartslistPos_MDUnitID">
           <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
@@ -29360,30 +29198,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="PartslistPos">
               <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_Partslist">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="ParentPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="PartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -29701,7 +29515,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="History" Relationship="iPlusMESV4_Model.FK_FacilityBooking_HistoryID" FromRole="FacilityBooking" ToRole="History" />
           <NavigationProperty Name="InwardFacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityChargeID" FromRole="FacilityBooking" ToRole="FacilityCharge" />
           <NavigationProperty Name="InwardFacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLotID" FromRole="FacilityBooking" ToRole="FacilityLot" />
-          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="FacilityBooking" ToRole="Partslist" />
           <NavigationProperty Name="MDBalancingMode" Relationship="iPlusMESV4_Model.FK_FacilityBooking_MDBalancingModeID" FromRole="FacilityBooking" ToRole="MDBalancingMode" />
           <NavigationProperty Name="MDBookingNotAvailableMode" Relationship="iPlusMESV4_Model.FK_FacilityBooking_MDBookingNotAvailableModeID" FromRole="FacilityBooking" ToRole="MDBookingNotAvailableMode" />
           <NavigationProperty Name="MDMovementReason" Relationship="iPlusMESV4_Model.FK_FacilityBooking_MDMovementReasonID" FromRole="FacilityBooking" ToRole="MDMovementReason" />
@@ -29711,7 +29524,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="MDZeroStockState" Relationship="iPlusMESV4_Model.FK_FacilityBooking_MDZeroStockStateID" FromRole="FacilityBooking" ToRole="MDZeroStockState" />
           <NavigationProperty Name="OutwardFacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityChargeID" FromRole="FacilityBooking" ToRole="FacilityCharge" />
           <NavigationProperty Name="OutwardFacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLotID" FromRole="FacilityBooking" ToRole="FacilityLot" />
-          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="FacilityBooking" ToRole="Partslist" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_PickingPosID" FromRole="FacilityBooking" ToRole="PickingPos" />
           <NavigationProperty Name="ProdOrderPartslistPosFacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosFacilityLot" FromRole="FacilityBooking" ToRole="ProdOrderPartslistPosFacilityLot" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosID" FromRole="FacilityBooking" ToRole="ProdOrderPartslistPos" />
@@ -29727,6 +29539,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID" FromRole="FacilityBooking" ToRole="Facility" />
           <NavigationProperty Name="InwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardMaterialID" FromRole="FacilityBooking" ToRole="Material" />
           <NavigationProperty Name="OutwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardMaterialID" FromRole="FacilityBooking" ToRole="Material" />
+          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="FacilityBooking" ToRole="Partslist" />
+          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="FacilityBooking" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="FacilityBookingCharge">
           <Key>
@@ -29806,7 +29620,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="FacilityInventoryPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID" FromRole="FacilityBookingCharge" ToRole="FacilityInventoryPos" />
           <NavigationProperty Name="InwardFacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityChargeID" FromRole="FacilityBookingCharge" ToRole="FacilityCharge" />
           <NavigationProperty Name="InwardFacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityLotID" FromRole="FacilityBookingCharge" ToRole="FacilityLot" />
-          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
           <NavigationProperty Name="MDBalancingMode" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_MDBalancingModeID" FromRole="FacilityBookingCharge" ToRole="MDBalancingMode" />
           <NavigationProperty Name="MDBookingNotAvailableMode" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_MDBookingNotAvailableModeID" FromRole="FacilityBookingCharge" ToRole="MDBookingNotAvailableMode" />
           <NavigationProperty Name="MDMovementReason" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_MDMovementReasonID" FromRole="FacilityBookingCharge" ToRole="MDMovementReason" />
@@ -29816,7 +29629,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="MDZeroStockState" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_MDZeroStockStateID" FromRole="FacilityBookingCharge" ToRole="MDZeroStockState" />
           <NavigationProperty Name="OutwardFacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityChargeID" FromRole="FacilityBookingCharge" ToRole="FacilityCharge" />
           <NavigationProperty Name="OutwardFacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLotID" FromRole="FacilityBookingCharge" ToRole="FacilityLot" />
-          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_PickingPosID" FromRole="FacilityBookingCharge" ToRole="PickingPos" />
           <NavigationProperty Name="ProdOrderPartslistPosFacilityLot" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosFacilityLot" FromRole="FacilityBookingCharge" ToRole="ProdOrderPartslistPosFacilityLot" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosID" FromRole="FacilityBookingCharge" ToRole="ProdOrderPartslistPos" />
@@ -29831,6 +29643,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID" FromRole="FacilityBookingCharge" ToRole="Facility" />
           <NavigationProperty Name="InwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardMaterialID" FromRole="FacilityBookingCharge" ToRole="Material" />
           <NavigationProperty Name="OutwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardMaterialID" FromRole="FacilityBookingCharge" ToRole="Material" />
+          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
+          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="FacilityInventory">
           <Key>
@@ -30028,18 +29842,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_FacilityBooking_InwardPartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="InwardPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_FacilityBooking_MDBalancingModeID">
           <End Type="iPlusMESV4_Model.MDBalancingMode" Role="MDBalancingMode" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
@@ -30145,18 +29947,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="FacilityBooking">
               <PropertyRef Name="OutwardFacilityLotID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_OutwardPartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="OutwardPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -30282,18 +30072,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_FacilityBookingCharge_InwardPartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="InwardPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_FacilityBookingCharge_MDBalancingModeID">
           <End Type="iPlusMESV4_Model.MDBalancingMode" Role="MDBalancingMode" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
@@ -30399,18 +30177,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="FacilityBookingCharge">
               <PropertyRef Name="OutwardFacilityLotID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_OutwardPartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="OutwardPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -32118,7 +31884,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="Facility1_OutgoingFacility" Relationship="iPlusMESV4_Model.FK_Facility_OutgoingFacilityID" FromRole="Facility1" ToRole="Facility" />
           <NavigationProperty Name="Facility_ParentFacility" Relationship="iPlusMESV4_Model.FK_Facility_ParentFacilityID" FromRole="Facility" ToRole="Facility1" />
           <NavigationProperty Name="Facility1_ParentFacility" Relationship="iPlusMESV4_Model.FK_Facility_ParentFacilityID" FromRole="Facility1" ToRole="Facility" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Facility" ToRole="Partslist" />
           <NavigationProperty Name="FacilityBooking_InwardFacility" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID" FromRole="Facility" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBooking_InwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLocationID" FromRole="Facility" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBooking_OutwardFacility" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityID" FromRole="Facility" ToRole="FacilityBooking" />
@@ -32145,6 +31910,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="Material_InFacility" Relationship="iPlusMESV4_Model.FK_Material_InFacilityID" FromRole="Facility" ToRole="Material" />
           <NavigationProperty Name="Material_OutFacility" Relationship="iPlusMESV4_Model.FK_Material_OutFacilityID" FromRole="Facility" ToRole="Material" />
           <NavigationProperty Name="CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="Facility" ToRole="CompanyPerson" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Facility" ToRole="Partslist" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -32263,18 +32029,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="Facility1">
               <PropertyRef Name="ParentFacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="Facility">
-              <PropertyRef Name="PartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -32750,7 +32504,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="OutOrderConfig_Material" Relationship="iPlusMESV4_Model.FK_OutOrderConfig_MaterialID" FromRole="Material" ToRole="OutOrderConfig" />
           <NavigationProperty Name="OutOrderPos_Material" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" FromRole="Material" ToRole="OutOrderPos" />
           <NavigationProperty Name="OutOrderPosUtilization_Material" Relationship="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" FromRole="Material" ToRole="OutOrderPosUtilization" />
-          <NavigationProperty Name="Partslist_Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
           <NavigationProperty Name="PartslistConfig_Material" Relationship="iPlusMESV4_Model.FK_PartslistConfig_MaterialID" FromRole="Material" ToRole="PartslistConfig" />
           <NavigationProperty Name="PartslistPos_Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="Material" ToRole="PartslistPos" />
           <NavigationProperty Name="PickingConfig_Material" Relationship="iPlusMESV4_Model.FK_PickingConfig_MaterialID" FromRole="Material" ToRole="PickingConfig" />
@@ -32763,6 +32516,7 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="TourplanConfig_Material" Relationship="iPlusMESV4_Model.FK_TourplanConfig_MaterialID" FromRole="Material" ToRole="TourplanConfig" />
           <NavigationProperty Name="Visitor_Material" Relationship="iPlusMESV4_Model.FK_Visitor_MaterialID" FromRole="Material" ToRole="Visitor" />
+          <NavigationProperty Name="Partslist_Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
         </EntityType>
         <Association Name="FK_Material_StackCalculatorACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -33302,18 +33056,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
               <PropertyRef Name="MaterialID" />
             </Principal>
             <Dependent Role="OutOrderPosUtilization">
-              <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Partslist_MaterialID">
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Material">
-              <PropertyRef Name="MaterialID" />
-            </Principal>
-            <Dependent Role="Partslist">
               <PropertyRef Name="MaterialID" />
             </Dependent>
           </ReferentialConstraint>
@@ -34051,6 +33793,266 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
             </Principal>
             <Dependent Role="UserSettings">
               <PropertyRef Name="VBUserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Partslist">
+          <Key>
+            <PropertyRef Name="PartslistID" />
+          </Key>
+          <Property Name="PartslistID" Type="Guid" Nullable="false" />
+          <Property Name="PartslistNo" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="PartslistName" Type="String" MaxLength="350" FixedLength="false" Unicode="true" />
+          <Property Name="PartslistVersion" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialID" Type="Guid" Nullable="false" />
+          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="MDUnitID" Type="Guid" />
+          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
+          <Property Name="GrossWeight" Type="Double" Nullable="false" />
+          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="EnabledFrom" Type="DateTime" Precision="3" />
+          <Property Name="EnabledTo" Type="DateTime" Precision="3" />
+          <Property Name="ProductionWeight" Type="Single" Nullable="false" />
+          <Property Name="IsStandard" Type="Boolean" Nullable="false" />
+          <Property Name="IsProductionUnit" Type="Boolean" Nullable="false" />
+          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesign" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PreviousPartslistID" Type="Guid" />
+          <Property Name="DeleteDate" Type="DateTime" Precision="3" />
+          <Property Name="DeleteName" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialWFID" Type="Guid" />
+          <Property Name="IsInEnabledPeriod" Type="Boolean" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ProductionUnits" Type="Double" />
+          <NavigationProperty Name="DemandOrderPos_Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
+          <NavigationProperty Name="Facility_Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
+          <NavigationProperty Name="FacilityBooking_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
+          <NavigationProperty Name="FacilityBooking_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
+          <NavigationProperty Name="FacilityBookingCharge_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
+          <NavigationProperty Name="FacilityBookingCharge_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
+          <NavigationProperty Name="FacilityCharge_Partslist" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="Partslist" ToRole="FacilityCharge" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Partslist" ToRole="Material" />
+          <NavigationProperty Name="MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="Partslist" ToRole="MaterialWF" />
+          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="Partslist" ToRole="MDUnit" />
+          <NavigationProperty Name="PartslistACClassMethod_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
+          <NavigationProperty Name="PartslistConfig_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
+          <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistStock_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
+          <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="Partslist_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
+          <NavigationProperty Name="Partslist1_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
+        </EntityType>
+        <Association Name="FK_DemandOrderPos_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.DemandOrderPos" Role="DemandOrderPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="DemandOrderPos">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Facility_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="Facility">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBooking_InwardPartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBooking">
+              <PropertyRef Name="InwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBooking_OutwardPartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBooking">
+              <PropertyRef Name="OutwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBookingCharge_InwardPartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBookingCharge">
+              <PropertyRef Name="InwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBookingCharge_OutwardPartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBookingCharge">
+              <PropertyRef Name="OutwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityCharge_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityCharge">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Partslist_MaterialID">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="Partslist">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Partslist_MaterialWF">
+          <End Type="iPlusMESV4_Model.MaterialWF" Role="MaterialWF" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaterialWF">
+              <PropertyRef Name="MaterialWFID" />
+            </Principal>
+            <Dependent Role="Partslist">
+              <PropertyRef Name="MaterialWFID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Partslist_MDUnitID">
+          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDUnit">
+              <PropertyRef Name="MDUnitID" />
+            </Principal>
+            <Dependent Role="Partslist">
+              <PropertyRef Name="MDUnitID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistACClassMethod_Partslist">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistACClassMethod" Role="PartslistACClassMethod" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistACClassMethod">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistConfig_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PartslistConfig" Role="PartslistConfig" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistConfig">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_Partslist">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="ParentPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistStock_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PartslistStock" Role="PartslistStock" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistStock">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslist_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslist">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PreviousPartslistID_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="Partslist1">
+              <PropertyRef Name="PreviousPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -37073,40 +37075,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Partslist">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.Partslist">
-              <MappingFragment StoreEntitySet="Partslist">
-                <ScalarProperty Name="MaterialWFID" ColumnName="MaterialWFID" />
-                <ScalarProperty Name="IsInEnabledPeriod" ColumnName="IsInEnabledPeriod" />
-                <ScalarProperty Name="DeleteName" ColumnName="DeleteName" />
-                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
-                <ScalarProperty Name="PreviousPartslistID" ColumnName="PreviousPartslistID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="IsDefault" ColumnName="IsDefault" />
-                <ScalarProperty Name="IsProductionUnit" ColumnName="IsProductionUnit" />
-                <ScalarProperty Name="IsStandard" ColumnName="IsStandard" />
-                <ScalarProperty Name="ProductionWeight" ColumnName="ProductionWeight" />
-                <ScalarProperty Name="EnabledTo" ColumnName="EnabledTo" />
-                <ScalarProperty Name="EnabledFrom" ColumnName="EnabledFrom" />
-                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
-                <ScalarProperty Name="GrossWeight" ColumnName="GrossWeight" />
-                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
-                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
-                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="PartslistVersion" ColumnName="PartslistVersion" />
-                <ScalarProperty Name="PartslistName" ColumnName="PartslistName" />
-                <ScalarProperty Name="PartslistNo" ColumnName="PartslistNo" />
-                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="PartslistACClassMethod">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistACClassMethod">
               <MappingFragment StoreEntitySet="PartslistACClassMethod">
@@ -39136,6 +39104,41 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Partslist">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.Partslist">
+              <MappingFragment StoreEntitySet="Partslist">
+                <ScalarProperty Name="ProductionUnits" ColumnName="ProductionUnits" />
+                <ScalarProperty Name="IsInEnabledPeriod" ColumnName="IsInEnabledPeriod" />
+                <ScalarProperty Name="MaterialWFID" ColumnName="MaterialWFID" />
+                <ScalarProperty Name="DeleteName" ColumnName="DeleteName" />
+                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
+                <ScalarProperty Name="PreviousPartslistID" ColumnName="PreviousPartslistID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="IsDefault" ColumnName="IsDefault" />
+                <ScalarProperty Name="IsProductionUnit" ColumnName="IsProductionUnit" />
+                <ScalarProperty Name="IsStandard" ColumnName="IsStandard" />
+                <ScalarProperty Name="ProductionWeight" ColumnName="ProductionWeight" />
+                <ScalarProperty Name="EnabledTo" ColumnName="EnabledTo" />
+                <ScalarProperty Name="EnabledFrom" ColumnName="EnabledFrom" />
+                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
+                <ScalarProperty Name="GrossWeight" ColumnName="GrossWeight" />
+                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
+                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="PartslistVersion" ColumnName="PartslistVersion" />
+                <ScalarProperty Name="PartslistName" ColumnName="PartslistName" />
+                <ScalarProperty Name="PartslistNo" ColumnName="PartslistNo" />
+                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -39301,7 +39304,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOrderConfig" Width="1.5" PointX="29.75" PointY="296.25" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOrderPosSplit" Width="1.5" PointX="46.25" PointY="301" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOrderPosUtilization" Width="1.5" PointX="49.25" PointY="293.875" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.Partslist" Width="1.5" PointX="29.75" PointY="276.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistACClassMethod" Width="1.5" PointX="35" PointY="296.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistConfig" Width="1.5" PointX="35" PointY="283.25" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPosRelation" Width="1.5" PointX="46.25" PointY="294.25" />
@@ -39555,10 +39557,8 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrder_MDDemandOrderStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrderPos_DemandOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_DemandProdOrder_DemandOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_MDReleaseStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_MDUnitID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_FacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityHistory_HistoryID" />
@@ -39618,7 +39618,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialStock_MDReleaseStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialUnit_ToMDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialWFRelation_MaterialWF" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialWF" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountry_MDCurrencyID" />
@@ -39644,7 +39643,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_Tourplan_MDCommissionPlanStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDUnitConversion_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDUnitConversion_ToMDUnitID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDVisitorCard_MDVisitorCardStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_MDVisitorCardID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_MDVisitorCardID" />
@@ -39653,11 +39651,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_OrderLog_ProdOrderPartslistPosRelationID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferConfig_ParentOutOfferConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderConfig_ParentOutOrderConfigID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_TourplanID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_VisitorVoucherID" />
@@ -39762,8 +39755,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointFacilityLot_FacilityLotID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPos" Width="1.5" PointX="55.25" PointY="268.5" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_Partslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" />
@@ -39798,7 +39789,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_HistoryID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLotID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_MDBalancingModeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_MDBookingNotAvailableModeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_MDMovementReasonID" />
@@ -39808,7 +39798,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_MDZeroStockStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLotID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_PickingPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosFacilityLot" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosID" />
@@ -39819,7 +39808,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardFacilityLotID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_MDBalancingModeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_MDBookingNotAvailableModeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_MDMovementReasonID" />
@@ -39829,7 +39817,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_MDZeroStockStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLotID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_PickingPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosFacilityLot" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosID" />
@@ -39953,7 +39940,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_OutgoingFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_ParentFacilityID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_PartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardFacilityLocationID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityID" />
@@ -40028,7 +40014,6 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderConfig_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingConfig_MaterialID" />
@@ -40083,6 +40068,24 @@ warning 6002: The table/view 'OutOrderPosModelV4.dbo.OrderLogRelView' does not h
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_UserSettings_VBUser" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.Partslist" Width="1.5" PointX="79.75" PointY="274.75" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialWF" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MDUnitID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_Partslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID" />
       </Diagram>
     </Diagrams>
   </Designer>
