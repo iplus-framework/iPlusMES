@@ -1440,10 +1440,10 @@ namespace gip.mes.processapplication
                     if (!actualQuantity.HasValue)
                         actualQuantity = (double)e["ActualQuantity"];
                     if (!tolerancePlus.HasValue)
-                        tolerancePlus = (double)e.ParentACMethod["TolerancePlus"];
+                        tolerancePlus = (double)acMethod["TolerancePlus"];
                     if (!toleranceMinus.HasValue)
-                        toleranceMinus = (double)e.ParentACMethod["ToleranceMinus"];
-                    targetQuantity = (double)e.ParentACMethod["TargetQuantity"];
+                        toleranceMinus = (double)acMethod["ToleranceMinus"];
+                    targetQuantity = (double)acMethod["TargetQuantity"];
                     //var acValue = acMethod.ParameterValueList.GetACValue("EndlessDosing");
                     //if (acValue != null)
                     //    isEndlessDosing = acValue.ParamAsBoolean;

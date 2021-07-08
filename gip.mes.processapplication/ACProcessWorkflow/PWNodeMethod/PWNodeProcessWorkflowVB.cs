@@ -1055,7 +1055,9 @@ namespace gip.mes.processapplication
                 return true;
             countParallelNodes = parallelNodes.Count;
 
-            var completedNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMStarting || (c.CurrentACState == ACStateEnum.SMStopping && !c.HasActiveSubworkflows) || c.CurrentACState == ACStateEnum.SMIdle);
+            var completedNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMStarting 
+                                        || (c.CurrentACState == ACStateEnum.SMStopping && !c.HasActiveSubworkflows) 
+                                        || c.CurrentACState == ACStateEnum.SMIdle);
 
             // Are all completed?
             if (completedNodes != null && completedNodes.Count() == countParallelNodes)

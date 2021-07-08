@@ -1573,6 +1573,10 @@ namespace gip.mes.processapplication
 
                 if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                     bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                OnProcessBookingPre(facilityPreBooking, collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
+                                       dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
+                                       isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState, onEmptyingFacility);
+
                 msg = dbApp.ACSaveChangesWithRetry();
 
                 // 2. Führe Buchung durch
@@ -1697,6 +1701,16 @@ namespace gip.mes.processapplication
                     }
                 }
             }
+        }
+
+        protected virtual void OnProcessBookingPre(FacilityPreBooking facilityPreBooking, MsgWithDetails collectedMessages, bool reEvaluatePosState,
+                                    IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
+                                    DatabaseApp dbApp, ProdOrderPartslistPosRelation dosingPosRelation, Facility outwardFacility,
+                                    PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
+                                    string dis2SpecialDest, double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
+                                    bool isEndlessDosing, bool thisDosingIsInTol, Msg msg, ref MDProdOrderPartslistPosState posState, ref bool changePosState,
+                                    bool onEmptyingFacility)
+        {
         }
 
 
