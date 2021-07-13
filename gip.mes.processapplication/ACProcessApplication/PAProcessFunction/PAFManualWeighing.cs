@@ -1060,7 +1060,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("ToleranceMinus", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("ToleranceMinus", "en{'Tolerance - [+=kg/-=%]'}de{'Toleranz - [+=kg/-=%]'}");
             method.ParameterValueList.Add(new ACValue("TargetScaleACIdentifier", typeof(string), null, Global.ParamOption.Optional));
-            paramTranslation.Add("TargetScaleACIdentifier", "en{'Target Scale ACIdentifier'}de{'Target Scale ACIdentifier'}");
+            paramTranslation.Add("TargetScaleACIdentifier", "en{'Weighing only on Scale (ACIdentifier)'}de{'Verwiegung nur auf Waage (ACIdentifier)'}");
             method.ParameterValueList.Add(new ACValue("IsLastWeighingMaterial", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("IsLastWeighingMaterial", "en{'Is last weighing material'}de{'Ist das letzte Wiegegut'}");
 

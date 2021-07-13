@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 
 
@@ -185,7 +186,11 @@ namespace gip.bso.masterdata.Scheduling
             }
             else
             {
-                _MDSchedulingGroupWFList = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.AsEnumerable().OrderBy(c => c.ACClassWF.ACCaption).ToList();
+                _MDSchedulingGroupWFList = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.CreateSourceQuery()
+                                                    .Include(c => c.VBiACClassWF)
+                                                    .Include(c => c.VBiACClassWF.ACClassMethod)
+                                                    .AsEnumerable().OrderBy(c => c.ACClassWF.ACCaption).ToList();
+                //_MDSchedulingGroupWFList = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.AsEnumerable().OrderBy(c => c.ACClassWF.ACCaption).ToList();
                 _SelectedMDSchedulingGroupWF = _MDSchedulingGroupWFList.FirstOrDefault();
             }
 
@@ -220,16 +225,20 @@ namespace gip.bso.masterdata.Scheduling
                 List<Guid> assignedWorkflowNodeIds = new List<Guid>();
                 if (_MDSchedulingGroupWFList != null)
                     assignedWorkflowNodeIds = _MDSchedulingGroupWFList.Select(c => c.VBiACClassWFID).ToList();
-                result = result
-                    .Where(c =>
-                 c.RefPAACClassMethodID.HasValue
-                 && c.RefPAACClassID.HasValue
-                 && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                 && c.RefPAACClassMethod.PWACClass != null
-                 && (c.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
-                     || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
-                 && !string.IsNullOrEmpty(c.Comment)
-                 && !assignedWorkflowNodeIds.Contains(c.ACClassWFID));
+                ObjectQuery<core.datamodel.ACClassWF> query = result as ObjectQuery<core.datamodel.ACClassWF>;
+                if (query != null)
+                {
+                    result = query.Include(c => c.ACClassMethod)
+                        .Where(c =>
+                     c.RefPAACClassMethodID.HasValue
+                     && c.RefPAACClassID.HasValue
+                     && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                     && c.RefPAACClassMethod.PWACClass != null
+                     && (c.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
+                         || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
+                     && !string.IsNullOrEmpty(c.Comment)
+                     && !assignedWorkflowNodeIds.Contains(c.ACClassWFID));
+                }
             }
             return result;
         }

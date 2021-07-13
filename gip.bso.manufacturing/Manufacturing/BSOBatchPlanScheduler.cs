@@ -719,6 +719,10 @@ namespace gip.bso.manufacturing
         {
             get
             {
+                if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
+                {
+                    return _ScheduleForPWNodeList.OrderBy(c => c.MDSchedulingGroup.SortIndex).ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
+                }
                 return _ScheduleForPWNodeList;
             }
         }
