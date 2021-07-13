@@ -6,7 +6,7 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Manual Addition'}de{'Manuelle Zugabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, true, PWInfoACClass = PWManualAddition.PWClassName, BSOConfig = "BSOManualAddition", SortIndex = 200)]
     public class PAFManualAddition : PAFManualWeighing
     {
-        //#region Constructors
+        #region c'tors
 
         public new const string ClassName = "PAFManualAddition";
 
@@ -22,6 +22,41 @@ namespace gip.mes.processapplication
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
+
+        #endregion
+
+        #region Properties
+
+        [ACPropertyInfo(400)]
+        public PWManualAddition ManualAdditionPW
+        {
+            get
+            {
+                if (CurrentTask != null && CurrentTask.ValueT != null)
+                    return CurrentTask.ValueT as PWManualAddition;
+                return null;
+            }
+        }
+
+        protected override bool CheckIsScaleInTol()
+        {
+            if (ManualAdditionPW != null && ManualAdditionPW.OnlyAcknowledge)
+            {
+                var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
+                double? targetQuantity = null;
+                if (targetQ != null)
+                    targetQuantity = targetQ.ParamAsDouble;
+
+                if (targetQuantity.HasValue)
+                {
+                    ManuallyAddedQuantity.ValueT = targetQuantity.Value;
+                }
+            }
+
+            return base.CheckIsScaleInTol();
+        }
+
+        #endregion
 
         #region Methods
         public static bool HandleExecuteACMethod_PAFManualAddition(out object result, IACComponent acComponent, string acMethodName, ACClassMethod acClassMethod, object[] acParameter)

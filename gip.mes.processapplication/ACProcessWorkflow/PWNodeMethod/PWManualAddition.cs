@@ -29,12 +29,28 @@ namespace gip.mes.processapplication
             ACMethod method;
             method = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+
             method.ParameterValueList.Add(new ACValue("FreeSelectionMode", typeof(bool), false, Global.ParamOption.Required));
             paramTranslation.Add("FreeSelectionMode", "en{'Free selection mode for material order'}de{'Freier Auswahlmodus für Materialbestellung'}");
+
             method.ParameterValueList.Add(new ACValue("AutoSelectLot", typeof(bool), false, Global.ParamOption.Required));
             paramTranslation.Add("AutoSelectLot", "en{'Automatically select lot'}de{'Los automatisch auswählen'}");
+
+            method.ParameterValueList.Add(new ACValue("AutoSelectLotPrio", typeof(LotUsageEnum), LotUsageEnum.ExpirationFirst, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoSelectLotPrio", "en{'Priority of auto lot selection'}de{'Priorität der automatischen Losauswahl'}");
+
             method.ParameterValueList.Add(new ACValue("EnterLotManually", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("EnterLotManually", "en{'Enter lot manually'}de{'Los manuell eingeben'}");
+
+            method.ParameterValueList.Add(new ACValue("OnlyAcknowledge", typeof(bool), false, Global.ParamOption.Optional)); // Acknowledge without entering added quantity
+            paramTranslation.Add("OnlyAcknowledge", "en{'Only acknowledge'}de{'Nur quittieren'}");
+
+            method.ParameterValueList.Add(new ACValue("ComponentsSeqFrom", typeof(Int32), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("ComponentsSeqFrom", "en{'Components from Seq.-No.'}de{'Komponenten VON Seq.-Nr.'}");
+
+            method.ParameterValueList.Add(new ACValue("ComponentsSeqTo", typeof(Int32), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("ComponentsSeqTo", "en{'Components to Seq.-No.'}de{'Komponenten BIS Seq.-Nr.'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualAddition), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualAddition), ACStateConst.SMStarting, wrapper);
         }
@@ -54,6 +70,23 @@ namespace gip.mes.processapplication
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             return base.ACDeInit(deleteACClassTask);
+        }
+
+        public bool OnlyAcknowledge
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("OnlyAcknowledge");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
         }
 
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
