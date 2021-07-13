@@ -113,6 +113,21 @@ namespace gip.bso.masterdata
             return result;
         }
 
+        public override void ACAction(ACActionArgs actionArgs)
+        {
+            if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
+            {
+                string tablItem = actionArgs.DropObject.VBContent;
+                if (tablItem.StartsWith("*"))
+                    tablItem = tablItem.TrimStart('*');
+                MediaItemTypeEnum activeTab = ActiveTab;
+                if (Enum.TryParse<MediaItemTypeEnum>(tablItem, out activeTab))
+                    ActiveTab = activeTab;
+            }
+            else
+                base.ACAction(actionArgs);
+        }
+
         #endregion
 
         #region Properties
@@ -317,30 +332,6 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Properties -> SelectedTab
-
-
-        private int _ActiveTabIndex;
-        /// <summary>
-        /// Doc  ActiveTabIndex
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(79, "ActiveTabIndex", "en{'ActiveTabIndex'}de{'ActiveTabIndex'}")]
-        public int ActiveTabIndex
-        {
-            get
-            {
-                return _ActiveTabIndex;
-            }
-            set
-            {
-                if (_ActiveTabIndex != value)
-                {
-                    _ActiveTabIndex = value;
-                    ActiveTab = (MediaItemTypeEnum)_ActiveTabIndex;
-                    OnPropertyChanged("ActiveTabIndex");
-                }
-            }
-        }
 
 
         private MediaItemTypeEnum _ActiveTab = MediaItemTypeEnum.Image;
