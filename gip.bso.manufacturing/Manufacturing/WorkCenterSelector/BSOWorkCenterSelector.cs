@@ -1027,10 +1027,9 @@ namespace gip.bso.manufacturing
             if (function == null)
                 return;
 
-            ItemFunctions.Add(function);
-
             if (function.ACStateProperty != null)
             {
+                ItemFunctions.Add(function);
                 function.ACStateProperty.PropertyChanged += ACStateProperty_PropertyChanged;
                 ActiveFunctionsCount = ItemFunctions.Count(c => (ACStateEnum)c.ACStateProperty.Value == ACStateEnum.SMRunning || (ACStateEnum)c.ACStateProperty.Value == ACStateEnum.SMStarting);
 
@@ -1038,6 +1037,16 @@ namespace gip.bso.manufacturing
                     function.IsFunctionActive = true;
                 else
                     function.IsFunctionActive = false;
+            }
+            else
+            {
+                if (ParentBSO != null)
+                {
+                    string compositionText = "";
+                    if (function.RelatedBSOs != null && function.RelatedBSOs.Any())
+                        compositionText = function.RelatedBSOs.FirstOrDefault().ACUrlComposition;
+                    ParentBSO.Messages.LogWarning(ParentBSO.GetACUrl(), "AddItemFunction()", String.Format("ACStateProperty is null of function {0}", compositionText));
+                }
             }
         }
 
