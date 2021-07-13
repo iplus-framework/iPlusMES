@@ -1030,7 +1030,7 @@ namespace gip.mes.processapplication
             if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
                 return false;
             // Are there any parallel nodes which starts the same Sub-Method for parallel Production
-            var parallelNodes = ParallelNodes;
+            var parallelNodes = AllParallelNodes; // ParallelNodes;
             if (parallelNodes == null || !parallelNodes.Any())
                 return false;
             countParallelNodes = parallelNodes.Count;
@@ -1050,7 +1050,7 @@ namespace gip.mes.processapplication
             if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
                 return true;
             // Are there any parallel nodes which starts the same Sub-Method for parallel Production
-            var parallelNodes = ParallelNodes;
+            var parallelNodes = AllParallelNodes; //ParallelNodes;
             if (parallelNodes == null || !parallelNodes.Any())
                 return true;
             countParallelNodes = parallelNodes.Count;
@@ -1087,6 +1087,18 @@ namespace gip.mes.processapplication
                             && (c as PWNodeProcessWorkflowVB).ContentACClassWF != null
                             && (c as PWNodeProcessWorkflowVB).ContentACClassWF.RefPAACClassMethodID.HasValue
                             && (c as PWNodeProcessWorkflowVB).ContentACClassWF.RefPAACClassMethodID.Value == this.ContentACClassWF.RefPAACClassMethodID.Value);
+
+            }
+        }
+
+        public List<PWNodeProcessWorkflowVB> AllParallelNodes
+        {
+            get
+            {
+                return ParentRootWFNode.FindChildComponents<PWNodeProcessWorkflowVB>
+                            (c => c != this
+                            && c is PWNodeProcessWorkflowVB
+                            && (c as PWNodeProcessWorkflowVB).ContentACClassWF != null);
 
             }
         }

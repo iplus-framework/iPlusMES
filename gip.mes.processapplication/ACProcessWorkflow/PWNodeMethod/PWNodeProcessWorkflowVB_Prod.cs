@@ -244,8 +244,9 @@ namespace gip.mes.processapplication
                     {
                         bool parallelNodesHasStartedBatch = false;
                         bool parallelNodesAreWaiting = false;
-                        var parallelNodes = ParallelNodes;
-                        if (parallelNodes != null && parallelNodes.Any())
+                        var parallelNodes = AllParallelNodes; //ParallelNodes;
+                        bool hasParallelNodes = parallelNodes != null && parallelNodes.Any();
+                        if (hasParallelNodes)
                         {
                             parallelNodesHasStartedBatch = parallelNodes.Where(c => c.CurrentACState != ACStateEnum.SMStarting).Any();
                             if (!parallelNodesHasStartedBatch)
@@ -256,9 +257,17 @@ namespace gip.mes.processapplication
                         {
                             if (!parallelNodesAreWaiting)
                             {
-                                // Error00123: No batchplan found for this intermediate material
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1030, "Error00123");
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                if (!hasParallelNodes)
+                                {
+                                    _NoBatchPlanFoundCounter = 0;
+                                    return StartNextBatchResult.Done;
+                                }
+                                else
+                                {
+                                    // Error00123: No batchplan found for this intermediate material
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1030, "Error00123");
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                }
                             }
                         }
                         _NoBatchPlanFoundCounter++;

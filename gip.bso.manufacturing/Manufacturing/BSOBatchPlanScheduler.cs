@@ -719,6 +719,10 @@ namespace gip.bso.manufacturing
         {
             get
             {
+                if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
+                {
+                    return _ScheduleForPWNodeList.OrderBy(c => c.MDSchedulingGroup.SortIndex).ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
+                }
                 return _ScheduleForPWNodeList;
             }
         }
@@ -1783,7 +1787,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSetBatchStateReadyToStart()
         {
-            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.PlanState == vd.GlobalApp.BatchPlanState.Created);
+            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.Created);
         }
 
         [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508)]
@@ -1802,7 +1806,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSetBatchStateCreated()
         {
-            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.PlanState == vd.GlobalApp.BatchPlanState.ReadyToStart);
+            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.ReadyToStart);
         }
 
 
