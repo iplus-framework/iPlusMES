@@ -833,7 +833,7 @@ namespace gip.mes.processapplication
             scale.TareScale(false, IsSimulationOn);
         }
 
-        private bool CheckIsScaleInTol()
+        protected virtual bool CheckIsScaleInTol()
         {
             bool result = false;
 
@@ -867,7 +867,7 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        private bool WaitForAcknowledge()
+        protected virtual bool WaitForAcknowledge()
         {
             bool result = false;
             if (ManualWeighingPW != null && ManualWeighingPW.AutoAcknowledge)
