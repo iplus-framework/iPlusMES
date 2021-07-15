@@ -436,6 +436,25 @@ namespace gip.bso.manufacturing
 
         public Type BSOManualWeighingType = typeof(BSOManualWeighing);
 
+        private static core.datamodel.ACClass[] _PWUserAckClasses;
+        public static core.datamodel.ACClass[] PWUserAckClasses
+        {
+            get
+            {
+                if (_PWUserAckClasses == null)
+                {
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PWNodeUserAck));
+                    if (acClass != null)
+                    {
+                        var derivedClasses = acClass.DerivedClasses;
+                        derivedClasses.Add(acClass);
+                        _PWUserAckClasses = derivedClasses.ToArray();
+                    }
+                }
+                return _PWUserAckClasses;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -1168,7 +1187,7 @@ namespace gip.bso.manufacturing
                 _CurrentWFNodesList = temp;
             }
 
-            if (BSOManualWeighing.PWUserAckClasses == null || !BSOManualWeighing.PWUserAckClasses.Any())
+            if (BSOWorkCenterSelector.PWUserAckClasses == null || !BSOWorkCenterSelector.PWUserAckClasses.Any())
                 return;
 
             if (_CurrentWFNodesList == null)
@@ -1190,7 +1209,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var pwInstanceInfos = _CurrentWFNodesList.Where(c => BSOManualWeighing.PWUserAckClasses.Contains(c.ACType.ValueT));
+            var pwInstanceInfos = _CurrentWFNodesList.Where(c => BSOWorkCenterSelector.PWUserAckClasses.Contains(c.ACType.ValueT));
 
             using (ACMonitor.Lock(_60200_WFNodesListLock))
             {
