@@ -61,13 +61,13 @@ namespace gip.bso.masterdata
             _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
             Search();
 
-            if(BSOMedia_Child != null && BSOMedia_Child.Value != null)
+            if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
                 BSOMedia_Child.Value.OnDefaultImageDelete += Value_OnDefaultImageDelete;
 
             return true;
         }
 
-       
+
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
@@ -1395,6 +1395,81 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #endregion
+
+
+        #endregion
+
+        #region AssociatedPartslist
+
+
+        #region AssociatedPartslist
+        private Partslist _SelectedAssociatedPartslist;
+        /// <summary>
+        /// Selected property for Partslist
+        /// </summary>
+        /// <value>The selected AssociatedPartslist</value>
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: AssociatedPartslist'}de{'TODO: AssociatedPartslist'}")]
+        public Partslist SelectedAssociatedPartslist
+        {
+            get
+            {
+                return _SelectedAssociatedPartslist;
+            }
+            set
+            {
+                if (_SelectedAssociatedPartslist != value)
+                {
+                    _SelectedAssociatedPartslist = value;
+                    OnPropertyChanged("SelectedAssociatedPartslist");
+                }
+            }
+        }
+
+
+        private List<Partslist> _AssociatedPartslistList;
+        /// <summary>
+        /// List property for Partslist
+        /// </summary>
+        /// <value>The AssociatedPartslist list</value>
+        [ACPropertyList(9999, "PropertyGroupName")]
+        public List<Partslist> AssociatedPartslistList
+        {
+            get
+            {
+                return _AssociatedPartslistList;
+            }
+        }
+
+        private List<Partslist> LoadAssociatedPartslistList()
+        {
+            if (SelectedMaterial == null)
+                return null;
+            else
+                return SelectedMaterial
+                .PartslistPos_Material
+                .Select(C => C.Partslist)
+                .Distinct()
+                .ToList();
+
+        }
+
+        private void SetAssociatedPartslist()
+        {
+            _AssociatedPartslistList = LoadAssociatedPartslistList();
+            OnPropertyChanged("AssociatedPartslistList");
+            if (_AssociatedPartslistList != null)
+                SelectedAssociatedPartslist = _AssociatedPartslistList.FirstOrDefault();
+            else
+                SelectedAssociatedPartslist = null;
+        }
+
+
+        public override void ChangedSelectedMaterial()
+        {
+            base.ChangedSelectedMaterial();
+            SetAssociatedPartslist();
+        }
         #endregion
 
 
