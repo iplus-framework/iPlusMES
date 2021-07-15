@@ -2496,6 +2496,10 @@ namespace gip.mes.facility
                                     BP.Merge(outwardMethod.ValidMessage);
                                     return bookingSubResult;
                                 }
+                                else
+                                {
+                                    BP.FacilityBookings.Add(outwardMethod);
+                                }
                             }
                         }
                     }
