@@ -17,7 +17,7 @@ using gip.mes.facility;
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Manual weighing'}de{'Handverwiegung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 100)]
-    public class BSOManualWeighing : BSOWorkCenterChild
+    public class BSOManualWeighing : BSOWorkCenterMessages
     {
         #region c'tors
 
@@ -57,7 +57,7 @@ namespace gip.bso.manufacturing
             DeactivateManualWeighingModel();
 
             _DefaultMaterialIcon = null;
-            _MScaleWFNodes = null;
+            //_MScaleWFNodes = null;
 
             MainSyncContext = null;
             this._BookParamRelocation = null;
@@ -133,7 +133,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private string _AlarmsAsTextCache = null;
+        //private string _AlarmsAsTextCache = null;
 
 
         #region Private fields
@@ -142,29 +142,12 @@ namespace gip.bso.manufacturing
 
         private object _UserAckNodeLock = new object(), _PWNodeACStateLock = new object(), _LoadWFNodeLock = new object();
 
-        private static ACClass[] _PWUserAckClasses;
-        public static ACClass[] PWUserAckClasses
-        {
-            get
-            {
-                if (_PWUserAckClasses == null)
-                {
-                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PWNodeUserAck));
-                    if (acClass != null)
-                    {
-                        var derivedClasses = acClass.DerivedClasses;
-                        derivedClasses.Add(acClass);
-                        _PWUserAckClasses = derivedClasses.ToArray();
-                    }
-                }
-                return _PWUserAckClasses;
-            }
-        }
+        
 
         private IACContainerT<string> _OrderInfo;
-        private IACContainerT<List<ACChildInstanceInfo>> _WFNodes;
-        private IACContainerT<bool> _ScaleHasAlarms;
-        private IACContainerTNet<string> _AlarmsAsText;
+        //private IACContainerT<List<ACChildInstanceInfo>> _WFNodes;
+        //private IACContainerT<bool> _ScaleHasAlarms;
+        //private IACContainerTNet<string> _AlarmsAsText;
         private IACContainerT<WeighingComponentInfo> _WeighingComponentInfo;
         //private List<IACContainerT<ACStateEnum>> _PWNodeACState;
         private IACContainerT<double> _ScaleActualWeight;
@@ -338,72 +321,72 @@ namespace gip.bso.manufacturing
 
         #region Properties => Messages
 
-        private List<ACChildInstanceInfo> _MScaleWFNodes;
-        public List<ACChildInstanceInfo> MScaleWFNodes
-        {
-            get => _MScaleWFNodes;
-            set
-            {
-                if (_UserAckNodeLock == null)
-                    return;
+        //private List<ACChildInstanceInfo> _MScaleWFNodes;
+        //public List<ACChildInstanceInfo> MScaleWFNodes
+        //{
+        //    get => _MScaleWFNodes;
+        //    set
+        //    {
+        //        if (_UserAckNodeLock == null)
+        //            return;
 
-                lock (_UserAckNodeLock)
-                {
-                    if (_MScaleWFNodes != value)
-                    {
-                        _MScaleWFNodes = value;
-                        HandleWFNodes(_MScaleWFNodes);
-                    }
-                }
-            }
-        }
+        //        lock (_UserAckNodeLock)
+        //        {
+        //            if (_MScaleWFNodes != value)
+        //            {
+        //                _MScaleWFNodes = value;
+        //                HandleWFNodes(_MScaleWFNodes);
+        //            }
+        //        }
+        //    }
+        //}
 
-        private List<MessageItem> _MessagesList = new List<MessageItem>();
-        [ACPropertyList(610, "Messages")]
-        public List<MessageItem> MessagesList
-        {
-            get
-            {
-                return _MessagesList;
-            }
-            set
-            {
-                _MessagesList = value;
-                OnPropertyChanged("MessagesList");
-            }
-        }
+        //private List<MessageItem> _MessagesList = new List<MessageItem>();
+        //[ACPropertyList(610, "Messages")]
+        //public List<MessageItem> MessagesList
+        //{
+        //    get
+        //    {
+        //        return _MessagesList;
+        //    }
+        //    set
+        //    {
+        //        _MessagesList = value;
+        //        OnPropertyChanged("MessagesList");
+        //    }
+        //}
 
-        //private MessageItem _SelectedMessage;
-        [ACPropertySelected(611, "Messages")]
-        public MessageItem SelectedMessage
-        {
-            get;
-            set;
-        }
+        ////private MessageItem _SelectedMessage;
+        //[ACPropertySelected(611, "Messages")]
+        //public MessageItem SelectedMessage
+        //{
+        //    get;
+        //    set;
+        //}
 
-        private List<MessageItem> _AckMessageList;
-        [ACPropertyList(612, "MessagesAck")]
-        public List<MessageItem> AckMessageList
-        {
-            get => _AckMessageList;
-            set
-            {
-                _AckMessageList = value;
-                OnPropertyChanged("AckMessageList");
-            }
-        }
+        //private List<MessageItem> _AckMessageList;
+        //[ACPropertyList(612, "MessagesAck")]
+        //public List<MessageItem> AckMessageList
+        //{
+        //    get => _AckMessageList;
+        //    set
+        //    {
+        //        _AckMessageList = value;
+        //        OnPropertyChanged("AckMessageList");
+        //    }
+        //}
 
-        private MessageItem _SelectedAckMessage;
-        [ACPropertySelected(613, "MessagesAck")]
-        public MessageItem SelectedAckMessage
-        {
-            get => _SelectedAckMessage;
-            set
-            {
-                _SelectedAckMessage = value;
-                OnPropertyChanged("SelectedAckMessage");
-            }
-        }
+        //private MessageItem _SelectedAckMessage;
+        //[ACPropertySelected(613, "MessagesAck")]
+        //public MessageItem SelectedAckMessage
+        //{
+        //    get => _SelectedAckMessage;
+        //    set
+        //    {
+        //        _SelectedAckMessage = value;
+        //        OnPropertyChanged("SelectedAckMessage");
+        //    }
+        //}
 
 
         #endregion
@@ -1035,11 +1018,13 @@ namespace gip.bso.manufacturing
 
         public override void Activate(ACComponent selectedProcessModule)
         {
+            base.Activate(selectedProcessModule);
             CurrentProcessModule = selectedProcessModule;
         }
 
         public override void DeActivate()
         {
+            base.DeActivate();
             CurrentProcessModule = null;
         }
 
@@ -1238,6 +1223,7 @@ namespace gip.bso.manufacturing
                     return;
                 }
                 ComponentPWNode.ValueT.ACUrlCommand("!Abort", false);
+                ShowSelectFacilityLotInfo = false;
             }
         }
 
@@ -1366,32 +1352,32 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            var wfNodes = CurrentProcessModule.GetPropertyNet("WFNodes");
-            if (wfNodes == null)
-            {
-                //Error50285: Initialization error: The process module doesn't have the property {0}.
-                // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "WFNodes");
-                return false;
-            }
+            //var wfNodes = CurrentProcessModule.GetPropertyNet("WFNodes");
+            //if (wfNodes == null)
+            //{
+            //    //Error50285: Initialization error: The process module doesn't have the property {0}.
+            //    // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
+            //    Messages.Error(this, "Error50285", false, "WFNodes");
+            //    return false;
+            //}
 
-            var hasAlarms = CurrentProcessModule.GetPropertyNet("HasAlarms");
-            if (hasAlarms == null)
-            {
-                //Error50285: Initialization error: The process module doesn't have the property {0}.
-                // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "HasAlarms");
-                return false;
-            }
+            //var hasAlarms = CurrentProcessModule.GetPropertyNet("HasAlarms");
+            //if (hasAlarms == null)
+            //{
+            //    //Error50285: Initialization error: The process module doesn't have the property {0}.
+            //    // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
+            //    Messages.Error(this, "Error50285", false, "HasAlarms");
+            //    return false;
+            //}
 
-            var alarmsAsText = CurrentProcessModule.GetPropertyNet("AlarmsAsText");
-            if (alarmsAsText == null)
-            {
-                //Error50285: Initialization error: The process module doesn't have the property {0}.
-                // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "AlarmsAsText");
-                return false;
-            }
+            //var alarmsAsText = CurrentProcessModule.GetPropertyNet("AlarmsAsText");
+            //if (alarmsAsText == null)
+            //{
+            //    //Error50285: Initialization error: The process module doesn't have the property {0}.
+            //    // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
+            //    Messages.Error(this, "Error50285", false, "AlarmsAsText");
+            //    return false;
+            //}
 
             LoadPAFManualWeighing(pafManWeighingRef);
 
@@ -1409,17 +1395,17 @@ namespace gip.bso.manufacturing
                 _PWNodeACStateLock = new object();
             LoadWFNode();
 
-            _WFNodes = wfNodes as IACContainerTNet<List<ACChildInstanceInfo>>;
-            (_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
-            if (_WFNodes.ValueT != null)
-                ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
+            //_WFNodes = wfNodes as IACContainerTNet<List<ACChildInstanceInfo>>;
+            //(_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
+            //if (_WFNodes.ValueT != null)
+            //    ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
 
-            _AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
+            //_AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
 
-            _ScaleHasAlarms = hasAlarms as IACContainerTNet<bool>;
-            (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
-            bool hasAlarmsTemp = _ScaleHasAlarms.ValueT;
-            ApplicationQueue.Add(() => HandleAlarms(hasAlarmsTemp));
+            //_ScaleHasAlarms = hasAlarms as IACContainerTNet<bool>;
+            //(_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
+            //bool hasAlarmsTemp = _ScaleHasAlarms.ValueT;
+            //ApplicationQueue.Add(() => HandleAlarms(hasAlarmsTemp));
 
             return true;
         }
@@ -1696,6 +1682,9 @@ namespace gip.bso.manufacturing
 
             ACValue acValue = ComponentPWNode.ValueT.ACUrlCommand("WeighingComponentsInfo\\ValueT") as ACValue;
             Dictionary<string, string> valueList = acValue?.Value as Dictionary<string, string>;
+
+
+
             if (valueList != null && valueList.Any())
             {
                 List<WeighingMaterial> weihgingMaterials = new List<WeighingMaterial>();
@@ -1787,17 +1776,17 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if (_ScaleHasAlarms != null)
-            {
-                (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged -= ScaleHasAlarms_PropertyChanged;
-                _ScaleHasAlarms = null;
-            }
+            //if (_ScaleHasAlarms != null)
+            //{
+            //    (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged -= ScaleHasAlarms_PropertyChanged;
+            //    _ScaleHasAlarms = null;
+            //}
 
-            if (_WFNodes != null)
-            {
-                (_WFNodes as IACPropertyNetBase).PropertyChanged -= WFNodes_PropertyChanged;
-                _WFNodes = null;
-            }
+            //if (_WFNodes != null)
+            //{
+            //    (_WFNodes as IACPropertyNetBase).PropertyChanged -= WFNodes_PropertyChanged;
+            //    _WFNodes = null;
+            //}
 
 
             if (_ProcessModuleScales != null && _ProcessModuleScales.Any())
@@ -1813,15 +1802,15 @@ namespace gip.bso.manufacturing
             BtnWeighBlink = false;
             NextTaskInfo = ManualWeighingTaskInfo.None;
 
-            _LoadWFNodeLock = null;
+            //_LoadWFNodeLock = null;
             _PAFManuallyAddedQuantity = null;
             _TareScaleState = null;
             _CallPWLotChange = false;
             _CurrentOrderInfoValueLock = null;
             _PWNodeACStateLock = null;
-            _MScaleWFNodes = null;
+            //_MScaleWFNodes = null;
             _ScaleObjectsList = null;
-            _AlarmsAsTextCache = null;
+            //_AlarmsAsTextCache = null;
         }
 
         private void DeactivateWFNode(bool reset = false)
@@ -1943,20 +1932,20 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void WFNodes_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == Const.ValueT)
-                ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
-        }
+        //private void WFNodes_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (e.PropertyName == Const.ValueT)
+        //        ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
+        //}
 
-        private void ScaleHasAlarms_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == Const.ValueT)
-            {
-                bool hasAlarms = _ScaleHasAlarms.ValueT;
-                ApplicationQueue.Add(() => HandleAlarms(hasAlarms));
-            }
-        }
+        //private void ScaleHasAlarms_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (e.PropertyName == Const.ValueT)
+        //    {
+        //        bool hasAlarms = _ScaleHasAlarms.ValueT;
+        //        ApplicationQueue.Add(() => HandleAlarms(hasAlarms));
+        //    }
+        //}
 
         private void ActWeightProp_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -2185,92 +2174,92 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        private void HandleWFNodes(List<ACChildInstanceInfo> connectionList)
-        {
-            if (PWUserAckClasses == null || !PWUserAckClasses.Any())
-                return;
+        //private void HandleWFNodes(List<ACChildInstanceInfo> connectionList)
+        //{
+        //    if (PWUserAckClasses == null || !PWUserAckClasses.Any())
+        //        return;
 
-            if (connectionList == null)
-            {
-                BtnAckBlink = false;
-                var itemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null).ToArray();
-                foreach (var itemToRemove in itemsToRemove)
-                {
-                    RemoveFromMessageList(itemToRemove);
-                    itemToRemove.DeInit();
-                }
+        //    if (connectionList == null)
+        //    {
+        //        BtnAckBlink = false;
+        //        var itemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null).ToArray();
+        //        foreach (var itemToRemove in itemsToRemove)
+        //        {
+        //            RemoveFromMessageList(itemToRemove);
+        //            itemToRemove.DeInit();
+        //        }
 
-                return;
-            }
+        //        return;
+        //    }
 
-            var pwInstanceInfos = connectionList.Where(c => PWUserAckClasses.Contains(c.ACType.ValueT));
+        //    var pwInstanceInfos = connectionList.Where(c => PWUserAckClasses.Contains(c.ACType.ValueT));
 
-            var userAckItemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
-            foreach (var itemToRemove in userAckItemsToRemove)
-            {
-                RemoveFromMessageList(itemToRemove);
-                itemToRemove.DeInit();
-                if (BtnAckBlink && !MessagesList.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage))
-                    BtnAckBlink = false;
-            }
+        //    var userAckItemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
+        //    foreach (var itemToRemove in userAckItemsToRemove)
+        //    {
+        //        RemoveFromMessageList(itemToRemove);
+        //        itemToRemove.DeInit();
+        //        if (BtnAckBlink && !MessagesList.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage))
+        //            BtnAckBlink = false;
+        //    }
 
-            foreach (var instanceInfo in pwInstanceInfos)
-            {
-                string instanceInfoACUrl = instanceInfo.ACUrlParent + "\\" + instanceInfo.ACIdentifier;
-                if (MessagesList.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
-                    continue;
+        //    foreach (var instanceInfo in pwInstanceInfos)
+        //    {
+        //        string instanceInfoACUrl = instanceInfo.ACUrlParent + "\\" + instanceInfo.ACIdentifier;
+        //        if (MessagesList.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
+        //            continue;
 
-                var pwNode = Root.ACUrlCommand(instanceInfoACUrl) as IACComponent;
-                if (pwNode == null)
-                    continue;
+        //        var pwNode = Root.ACUrlCommand(instanceInfoACUrl) as IACComponent;
+        //        if (pwNode == null)
+        //            continue;
 
-                var userAckItem = new MessageItem(pwNode, this);
-                AddToMessageList(userAckItem);
-                if (!BtnAckBlink)
-                    BtnAckBlink = true;
+        //        var userAckItem = new MessageItem(pwNode, this);
+        //        AddToMessageList(userAckItem);
+        //        if (!BtnAckBlink)
+        //            BtnAckBlink = true;
 
-                //if (TaskPresenter != null && TaskPresenter.PresenterACWorkflowNode == null)
-                //    TaskPresenter.LoadWFInstance((userAckItem?.UserAckPWNode.ValueT as IACComponentPWNode).ParentRootWFNode);
-            }
-        }
+        //        //if (TaskPresenter != null && TaskPresenter.PresenterACWorkflowNode == null)
+        //        //    TaskPresenter.LoadWFInstance((userAckItem?.UserAckPWNode.ValueT as IACComponentPWNode).ParentRootWFNode);
+        //    }
+        //}
 
-        private void HandleAlarms(bool hasAlarms)
-        {
-            string alarmsAsText = _AlarmsAsText.ValueT;
-            if (alarmsAsText == _AlarmsAsTextCache)
-                return;
+        //private void HandleAlarms(bool hasAlarms)
+        //{
+        //    string alarmsAsText = _AlarmsAsText.ValueT;
+        //    if (alarmsAsText == _AlarmsAsTextCache)
+        //        return;
 
-            if (hasAlarms)
-            {
-                var alarms = CurrentProcessModule?.ExecuteMethod("GetAlarms", true, true, true) as List<Msg>;
-                if (alarms == null)
-                    return;
+        //    if (hasAlarms)
+        //    {
+        //        var alarms = CurrentProcessModule?.ExecuteMethod("GetAlarms", true, true, true) as List<Msg>;
+        //        if (alarms == null)
+        //            return;
 
-                var messagesToRemove = MessagesList.Where(c => c.GetType() == typeof(MessageItem) && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
-                foreach (var messageToRemove in messagesToRemove)
-                    RemoveFromMessageList(messageToRemove);
+        //        var messagesToRemove = MessagesList.Where(c => c.GetType() == typeof(MessageItem) && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
+        //        foreach (var messageToRemove in messagesToRemove)
+        //            RemoveFromMessageList(messageToRemove);
 
-                foreach (var alarm in alarms)
-                {
-                    MessageItem msgItem = new MessageItem(null, null);
-                    msgItem.Message = BuildAlarmMessage(alarm);
-                    AddToMessageList(msgItem);
-                }
-            }
-            else if (MessagesList != null)
-            {
-                var messageList = MessagesList.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton).ToArray();
-                foreach (var messageItem in messageList)
-                    RemoveFromMessageList(messageItem);
-            }
+        //        foreach (var alarm in alarms)
+        //        {
+        //            MessageItem msgItem = new MessageItem(null, null);
+        //            msgItem.Message = BuildAlarmMessage(alarm);
+        //            AddToMessageList(msgItem);
+        //        }
+        //    }
+        //    else if (MessagesList != null)
+        //    {
+        //        var messageList = MessagesList.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton).ToArray();
+        //        foreach (var messageItem in messageList)
+        //            RemoveFromMessageList(messageItem);
+        //    }
 
-            _AlarmsAsTextCache = _AlarmsAsText.ValueT;
-        }
+        //    _AlarmsAsTextCache = _AlarmsAsText.ValueT;
+        //}
 
-        private string BuildAlarmMessage(Msg msg)
-        {
-            return string.Format("{0}: {1} {2}", msg.Source, msg.ACCaption, msg.Message);
-        }
+        //private string BuildAlarmMessage(Msg msg)
+        //{
+        //    return string.Format("{0}: {1} {2}", msg.Source, msg.ACCaption, msg.Message);
+        //}
 
         #endregion
 
