@@ -1179,7 +1179,7 @@ namespace gip.bso.manufacturing
         {
             using (ACMonitor.Lock(_60200_WFNodesListLock))
             {
-                var temp = _WFNodes.ValueT;
+                var temp = _WFNodes != null ? _WFNodes.ValueT : null;
 
                 if (_CurrentWFNodesList == temp)
                     return;

@@ -675,6 +675,8 @@ namespace gip.mes.processapplication
                 if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                     bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
 
+                OnInwardBookingPre(facilityPreBooking, collectedMessages, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd);
+
                 msg = dbApp.ACSaveChangesWithRetry();
 
                 // 2. Führe Buchung durch
@@ -718,7 +720,7 @@ namespace gip.mes.processapplication
                         if (msg != null)
                         {
                             collectedMessages.AddDetailMessage(msg);
-                            Messages.LogError(this.GetACUrl(), "DoDosingBookingPicking(8)", msg.InnerMessage);
+                            Messages.LogError(this.GetACUrl(), "DoInwardBooking(8)", msg.InnerMessage);
                             OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1360), true);
                         }
                         else
@@ -736,8 +738,11 @@ namespace gip.mes.processapplication
 
         public virtual Msg DoOutwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
         {
-            // TODO: Implement Standard-Behaviour for Picking
             return null;
+        }
+
+        protected virtual void OnInwardBookingPre(FacilityPreBooking facilityPreBooking, MsgWithDetails collectedMessages, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
+        {
         }
 
         #endregion
