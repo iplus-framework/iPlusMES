@@ -218,7 +218,7 @@ namespace gip.bso.facility
         }
 
         protected List<gip.core.datamodel.ACClassMethod> _WorkflowList;
-        [ACPropertyList(603, "Workflow")]
+        [ACPropertyList(603, "Workflow", "en{'Select Workflow'}de{'Workflow auswählen'}")]
         public IEnumerable<gip.core.datamodel.ACClassMethod> WorkflowList
         {
             get
@@ -228,7 +228,7 @@ namespace gip.bso.facility
         }
 
         protected gip.core.datamodel.ACClassMethod _SelectedWorkflow;
-        [ACPropertySelected(604, "Workflow")]
+        [ACPropertySelected(604, "Workflow", "en{'Select Workflow'}de{'Workflow auswählen'}")]
         public gip.core.datamodel.ACClassMethod SelectedWorkflow
         {
             get
