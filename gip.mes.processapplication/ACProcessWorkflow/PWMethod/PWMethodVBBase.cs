@@ -198,7 +198,8 @@ namespace gip.mes.processapplication
                     // Sons synchron aufgerufen
                     else
                         acValue = CurrentACMethod.ValueT.ParameterValueList.GetACValue(PWMethodVBBase.IsLastBatchParamName);
-                    acValue.Value = (Int16)value;
+                    if (acValue != null)
+                        acValue.Value = (Int16)value;
                     if (CurrentTask != null)
                         OnPropertyChanged("CurrentTask");
                 }

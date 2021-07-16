@@ -32,6 +32,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(22, "IsProductionUnit", "en{'Production Unit'}de{'Produktionseinheit'}", "", "", true)]
     [ACPropertyEntity(23, "IsStandard", "en{'Standard'}de{'Standard'}", "", "", true)]
     [ACPropertyEntity(24, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}", "", "", true)]
+    [ACPropertyEntity(25, "XMLComment", ConstApp.XMLComment, "", "", true)]
     [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]
     [ACPropertyEntity(495, Const.EntityDeleteName, Const.EntityTransDeleteName)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]

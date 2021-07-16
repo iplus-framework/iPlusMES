@@ -243,9 +243,19 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) return; AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedMaterial");
+                if (AccessPrimary == null) return; 
+                if(AccessPrimary.Selected != value)
+                {
+                    AccessPrimary.Selected = value;
+                    ChangedSelectedMaterial();
+                    OnPropertyChanged("SelectedMaterial");
+                }
             }
+        }
+
+        public virtual void ChangedSelectedMaterial()
+        {
+
         }
 
         #endregion

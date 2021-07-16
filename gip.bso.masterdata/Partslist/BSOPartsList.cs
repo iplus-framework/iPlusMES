@@ -75,7 +75,7 @@ namespace gip.bso.masterdata
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             if (!base.ACInit(startChildMode)) return false;
-
+            TempReportData = new ReportData();
             _PartslistManager = ACPartslistManager.ACRefToServiceInstance(this);
             if (_PartslistManager == null)
                 throw new Exception("PartslistManager not configured");
@@ -128,6 +128,21 @@ namespace gip.bso.masterdata
         }
 
         protected ACRef<ACComponent> _FacilityManager = null;
+
+        private ReportData _TempReportData;
+        [ACPropertyInfo(9999)]
+        public ReportData TempReportData
+        {
+            get
+            {
+                return _TempReportData;
+            }
+            set
+            {
+                _TempReportData = value;
+                OnPropertyChanged("TempReportData");
+            }
+        }
 
         #endregion
 
