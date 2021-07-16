@@ -32,7 +32,7 @@ namespace gip.bso.masterdata
     /// 1. Artikelstamm
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
-    [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + "AssociatedPartslistPos", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(PartslistPos), PartslistPos.ClassName, PartslistPos.ClassName + "\\Material\\MaterialNo", "Sequence")]
+    [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + "AssociatedPartslistPos", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(PartslistPos), PartslistPos.ClassName, "Sequence", "Sequence")]
     public partial class BSOMaterial : BSOMaterialExplorer
     {
         #region c´tors
@@ -66,9 +66,11 @@ namespace gip.bso.masterdata
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
                 BSOMedia_Child.Value.OnDefaultImageDelete += Value_OnDefaultImageDelete;
 
+            if (CurrentMaterial != null)
+                FilterAssociatedPosMaterialNo = CurrentMaterial.MaterialNo;
+
             return true;
         }
-
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
@@ -1401,11 +1403,9 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region AssociatedPartslist
-
-
-
         #region AssociatedPartslistPos
+
+        #region AssociatedPartslistPos -> ACAccessNav
 
         ACAccessNav<PartslistPos> _AccessAssociatedPartslistPos;
         [ACPropertyAccess(100, "AssociatedPartslistPos")]
@@ -1418,9 +1418,26 @@ namespace gip.bso.masterdata
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(this, Const.QueryPrefix + "AssociatedPartslistPos", "PartslistPos");
                     _AccessAssociatedPartslistPos = navACQueryDefinition.NewAccessNav<PartslistPos>("AssociatedPartslistPos", this);
                     _AccessAssociatedPartslistPos.AutoSaveOnNavigation = false;
+                    _AccessAssociatedPartslistPos.NavSearchExecuting += _AccessAssociatedPartslistPos_NavSearchExecuting; ;
+
                 }
                 return _AccessAssociatedPartslistPos;
             }
+        }
+
+        private IQueryable<PartslistPos> _AccessAssociatedPartslistPos_NavSearchExecuting(IQueryable<PartslistPos> result)
+        {
+            if (result != null)
+            {
+                result =
+                    result.Where(c =>
+                                    FilterAssociatedPosIntermMatNo == null
+                                    ||
+                                    c.PartslistPosRelation_SourcePartslistPos
+                                    .Any(x => x.TargetPartslistPos.Material.MaterialNo == FilterAssociatedPosIntermMatNo)
+                                );
+            }
+            return result;
         }
 
         /// <summary>
@@ -1460,74 +1477,166 @@ namespace gip.bso.masterdata
             }
         }
 
-        public ACFilterItem FilterMaterialAssociatedPos
+        #endregion
+
+        #region AssociatedPartslistPos -> Filter fields
+
+        private ACFilterItem FilterAssociatedPosMaterial
         {
             get
             {
-                string propertyName = @"Material\\MaterialNo";
-                if (_AccessAssociatedPartslistPos == null)
-                    return null;
-                ACFilterItem acFilterItem =  _AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c=>c.PropertyName == propertyName);
-                if(acFilterItem == null)
+                ACFilterItem filterItem = AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == FilterMaterialNoAssociatedPos_PropertyName);
+                if (filterItem == null)
                 {
-                    acFilterItem = new ACFilterItem(Global.FilterTypes.filter, propertyName, Global.LogicalOperators.equal, Global.Operators.and, "", false);
-                    _AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Add(acFilterItem);
+                    filterItem = new ACFilterItem(Global.FilterTypes.filter, FilterMaterialNoAssociatedPos_PropertyName, Global.LogicalOperators.equal, Global.Operators.and, "", false);
+                    AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Add(filterItem);
                 }
-                return acFilterItem;
+                return filterItem;
             }
         }
 
-        public override void ChangedSelectedMaterial()
-        {
-            base.ChangedSelectedMaterial();
-            AccessAssociatedPartslistPos.NavList.Clear();
-            if (FilterMaterialAssociatedPos != null)
-                FilterMaterialAssociatedPos.SearchWord = CurrentMaterial.MaterialNo;
 
-        }
+        private string FilterMaterialNoAssociatedPos_PropertyName = @"Material\MaterialNo";
 
-
-        /// <summary>
-        /// Doc  FilterSearchWordAssociatedPos
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterSearchWordAssociatedPos", "en{'Filter'}de{'Filter'}")]
-        public string FilterSearchWordAssociatedPos
+        [ACPropertyInfo(999, "FilterAssociatedPosMaterialNo", "en{'Material No.'}de{'Material Nr.'}")]
+        public string FilterAssociatedPosMaterialNo
         {
             get
             {
-                if(_AccessAssociatedPartslistPos == null)
-                    return null;
-                return _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord;
+                return FilterAssociatedPosMaterial.SearchWord;
             }
             set
             {
-                if (_AccessAssociatedPartslistPos != null && _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord != value)
+                if (FilterAssociatedPosMaterial.SearchWord != value)
                 {
-                    _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord = value;
-                    OnPropertyChanged("FilterSearchWordAssociatedPos");
+                    FilterAssociatedPosMaterial.SearchWord = value;
+                    OnPropertyChanged("FilterAssociatedPosMaterialNo");
                 }
             }
         }
+
+        private double? _FilterAssociatedPosTargetQFrom;
+        /// <summary>
+        /// Doc  FilterAssociatedPosTargetQFrom
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterAssociatedPosTargetQFrom", "en{'Quantity from'}de{'Menge von'}")]
+        public double? FilterAssociatedPosTargetQFrom
+        {
+            get
+            {
+                return _FilterAssociatedPosTargetQFrom;
+            }
+            set
+            {
+                if (_FilterAssociatedPosTargetQFrom != value)
+                {
+                    _FilterAssociatedPosTargetQFrom = value;
+                    SetQuantitySearchFilter();
+                    OnPropertyChanged("FilterAssociatedPosTargetQFrom");
+                }
+            }
+        }
+
+        private double? _FilterAssociatedPosTargetQTo;
+        /// <summary>
+        /// Doc  FilterAssociatedPosTargetQTo
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterAssociatedPosTargetQTo", "en{'To'}de{'Bis'}")]
+        public double? FilterAssociatedPosTargetQTo
+        {
+            get
+            {
+                return _FilterAssociatedPosTargetQTo;
+            }
+            set
+            {
+                if (_FilterAssociatedPosTargetQTo != value)
+                {
+                    _FilterAssociatedPosTargetQTo = value;
+                    SetQuantitySearchFilter();
+                    OnPropertyChanged("FilterAssociatedPosTargetQTo");
+                }
+            }
+        }
+
+        // FilterAssociatedPosIntermMatNo
+
+        private string _FilterAssociatedPosIntermMatNo;
+        /// <summary>
+        /// Doc  FilterAssociatedPosIntermMatNo
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterAssociatedPosIntermMatNo", "en{'Mix product N'}de{'Zwischenprodukt Nr.'}")]
+        public string FilterAssociatedPosIntermMatNo
+        {
+            get
+            {
+                return _FilterAssociatedPosIntermMatNo;
+            }
+            set
+            {
+                if (_FilterAssociatedPosIntermMatNo != value)
+                {
+                    _FilterAssociatedPosIntermMatNo = value;
+                    OnPropertyChanged("FilterAssociatedPosIntermMatNo");
+                }
+            }
+        }
+
+
+        #endregion
+
+        #region AssociatedPartslistPos -> Helper methods 
+
+        public override void ChangedSelectedMaterial(Material material)
+        {
+            base.ChangedSelectedMaterial(material);
+            AccessAssociatedPartslistPos.NavList.Clear();
+            if (material != null)
+                FilterAssociatedPosMaterialNo = material.MaterialNo;
+            else
+                FilterAssociatedPosMaterialNo = null;
+        }
+
+        private List<ACFilterItem> GetQuantitySearchFilter()
+        {
+            List<ACFilterItem> list = new List<ACFilterItem>();
+            list.Add(new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
+            list.Add(new ACFilterItem(Global.FilterTypes.filter, "TargetQuantityUOM", Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, FilterAssociatedPosTargetQFrom?.ToString(), true, true));
+            list.Add(new ACFilterItem(Global.FilterTypes.filter, "TargetQuantityUOM", Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, FilterAssociatedPosTargetQTo?.ToString(), true, true));
+            list.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true));
+            return list;
+        }
+
+        private void SetQuantitySearchFilter()
+        {
+            List<ACFilterItem> oldQuantityFilters = AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName != FilterMaterialNoAssociatedPos_PropertyName).ToList();
+            foreach (var item in oldQuantityFilters)
+                AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Remove(item);
+
+            var newQuantityFilters = GetQuantitySearchFilter();
+            foreach (var item in newQuantityFilters)
+                AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Add(item);
+        }
+
+        #endregion
+
+        #region AssociatedPartslistPos -> Methods
 
         /// <summary>
         /// Method SearchAssociatedPos
         /// </summary>
-        [ACMethodInfo("SearchAssociatedPos", "en{'SearchAssociatedPos'}de{'SearchAssociatedPos'}", 502, false)]
-        public void SearchAssociatedPos(KeyEventArgs e)
+        [ACMethodInfo("SearchAssociatedPos", "en{'Search'}de{'Suchen'}", 9999, false, false, true)]
+        public void SearchAssociatedPos()
         {
-            IVBContent control = e.Source as IVBContent;
-            if (control != null && control.VBContent == "FilterSearchWordAssociatedPos")
-            {
-                if (e.Key == Key.Enter)
-                {
-                    if (!IsEnabledSearchAssociatedPos())
-                        return;
-                    if (_AccessAssociatedPartslistPos != null)
-                        _AccessAssociatedPartslistPos.NavSearch();
-                    OnPropertyChanged("AssociatedPartslistPosList");
-                }
-            }
+            if (!IsEnabledSearchAssociatedPos())
+                return;
+            if (_AccessAssociatedPartslistPos != null)
+                _AccessAssociatedPartslistPos.NavSearch();
+
+            OnPropertyChanged("AssociatedPartslistPosList");
         }
 
         public bool IsEnabledSearchAssociatedPos()
@@ -1536,14 +1645,18 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInfo("OpenQueryDialog", "en{'Query dialog'}de{'Abfragedialog'}", 503, false)]
-        public void OpenQueryDialog()
+        public bool OpenQueryDialog()
         {
             if (!IsEnabledSearchAssociatedPos())
-                return;
-            if (_AccessAssociatedPartslistPos != null)
-                _AccessAssociatedPartslistPos.ShowACQueryDialog();
-        }
+                return false;
 
+            bool result = false;
+            if (_AccessAssociatedPartslistPos != null)
+                result = _AccessAssociatedPartslistPos.ShowACQueryDialog();
+            if (result)
+                SearchAssociatedPos();
+            return result;
+        }
 
         #endregion
 

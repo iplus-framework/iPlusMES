@@ -59,13 +59,13 @@ namespace gip.bso.masterdata
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             var b = base.ACDeInit(deleteACClassTask);
-            if (_AccessPrimary != null)
+            if (_AccessAssociatedPartslistPos != null)
             {
-                _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
-                if (_AccessPrimary.NavACQueryDefinition != null)
-                    _AccessPrimary.NavACQueryDefinition.PropertyChanged -= NavACQueryDefinition_PropertyChanged;
-                _AccessPrimary.ACDeInit(false);
-                _AccessPrimary = null;
+                _AccessAssociatedPartslistPos.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
+                if (_AccessAssociatedPartslistPos.NavACQueryDefinition != null)
+                    _AccessAssociatedPartslistPos.NavACQueryDefinition.PropertyChanged -= NavACQueryDefinition_PropertyChanged;
+                _AccessAssociatedPartslistPos.ACDeInit(false);
+                _AccessAssociatedPartslistPos = null;
             }
             return b;
         }
@@ -78,7 +78,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// The _ access primary
         /// </summary>
-        ACAccessNav<Material> _AccessPrimary;
+        ACAccessNav<Material> _AccessAssociatedPartslistPos;
         /// <summary>
         /// Gets the access primary.
         /// </summary>
@@ -88,20 +88,20 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (_AccessPrimary == null && ACType != null)
+                if (_AccessAssociatedPartslistPos == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
-                        _AccessPrimary = navACQueryDefinition.NewAccessNav<Material>(Material.ClassName, this);
-                        _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
+                        _AccessAssociatedPartslistPos = navACQueryDefinition.NewAccessNav<Material>(Material.ClassName, this);
+                        _AccessAssociatedPartslistPos.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                         navACQueryDefinition.PropertyChanged += NavACQueryDefinition_PropertyChanged;
                     }
                 }
-                return _AccessPrimary;
+                return _AccessAssociatedPartslistPos;
             }
         }
 
@@ -197,8 +197,14 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) return; AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentMaterial");
+                if (AccessPrimary == null) 
+                    return; 
+                if(AccessPrimary.Current != value)
+                {
+                    AccessPrimary.Current = value;
+                    ChangedSelectedMaterial(value);
+                    OnPropertyChanged("CurrentMaterial");
+                }
             }
         }
 
@@ -247,13 +253,13 @@ namespace gip.bso.masterdata
                 if(AccessPrimary.Selected != value)
                 {
                     AccessPrimary.Selected = value;
-                    ChangedSelectedMaterial();
+                    ChangedSelectedMaterial(value);
                     OnPropertyChanged("SelectedMaterial");
                 }
             }
         }
 
-        public virtual void ChangedSelectedMaterial()
+        public virtual void ChangedSelectedMaterial(Material material)
         {
 
         }
@@ -271,16 +277,16 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (_AccessPrimary == null || _AccessPrimary.NavACQueryDefinition == null) return null;
-                return _AccessPrimary.NavACQueryDefinition.SearchWord;
+                if (_AccessAssociatedPartslistPos == null || _AccessAssociatedPartslistPos.NavACQueryDefinition == null) return null;
+                return _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord;
             }
             set
             {
-                if (_AccessPrimary != null && _AccessPrimary.NavACQueryDefinition != null)
+                if (_AccessAssociatedPartslistPos != null && _AccessAssociatedPartslistPos.NavACQueryDefinition != null)
                 {
-                    if (_AccessPrimary.NavACQueryDefinition.SearchWord != value)
+                    if (_AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord != value)
                     {
-                        _AccessPrimary.NavACQueryDefinition.SearchWord = value;
+                        _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord = value;
                         OnPropertyChanged("SearchWord");
                         if (string.IsNullOrEmpty(value))
                             ClearSearch();
