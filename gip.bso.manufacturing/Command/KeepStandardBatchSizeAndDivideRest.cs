@@ -19,14 +19,20 @@ namespace gip.bso.manufacturing
 
             if (totalSize > 0)
             {
-                if((standardBatchSize == 0 && maxBatchSize == 0 && minBatchSize == 0) || totalSize < minBatchSize)
+                if ( (   Math.Abs(standardBatchSize) <= Double.Epsilon 
+                      && Math.Abs(maxBatchSize) <= Double.Epsilon 
+                      && Math.Abs(minBatchSize) <= Double.Epsilon)
+                   || totalSize < minBatchSize)
                 {
-                    // error
-                    
+                    calcBatchCount = 1;
+                    calcBatchSize = totalSize;
+                    rest = 0;
                 }
-                else if(standardBatchSize > 0 && maxBatchSize == 0 && minBatchSize == 0)
+                else if (   standardBatchSize > Double.Epsilon 
+                         && Math.Abs(maxBatchSize) <= Double.Epsilon 
+                         && Math.Abs(minBatchSize) <= Double.Epsilon)
                 {
-                    if(totalSize <= standardBatchSize)
+                    if (totalSize <= standardBatchSize)
                     {
                         calcBatchCount = 1;
                         calcBatchSize = totalSize;
@@ -40,9 +46,11 @@ namespace gip.bso.manufacturing
                     }
                    
                 }
-                else if(standardBatchSize > 0 && minBatchSize > 0 && maxBatchSize > 0)
+                else if (   standardBatchSize > Double.Epsilon 
+                         && minBatchSize > Double.Epsilon 
+                         && maxBatchSize > Double.Epsilon)
                 {
-                    if(totalSize <= standardBatchSize)
+                    if (totalSize <= standardBatchSize)
                     {
                         calcBatchCount = 1;
                         calcBatchSize = totalSize;
@@ -53,14 +61,14 @@ namespace gip.bso.manufacturing
                         calcBatchSize = standardBatchSize;
                         calcBatchCount = (int)(totalSize / calcBatchSize);
                         rest = totalSize - calcBatchSize * calcBatchCount;
-                        if(rest < minBatchSize || rest > maxBatchSize)
+                        if (rest < minBatchSize || rest > maxBatchSize)
                         {
                             calcBatchSize += rest / calcBatchCount;
                             rest = totalSize - calcBatchSize * calcBatchCount;
                         }
-                        if(calcBatchSize < minBatchSize || calcBatchSize > maxBatchSize)
+                        if (calcBatchSize < minBatchSize || calcBatchSize > maxBatchSize)
                         {
-                            if(calcBatchCount > 1)
+                            if (calcBatchCount > 1)
                             {
                                 calcBatchCount--;
                                 calcBatchSize = standardBatchSize;
@@ -78,7 +86,7 @@ namespace gip.bso.manufacturing
             }
 
 
-            if (calcBatchCount > 0 && calcBatchSize > 0)
+            if (calcBatchCount > 0 && calcBatchSize > Double.Epsilon)
                 Suggestion = new BatchPlanSuggestionItem() { BatchSize = calcBatchSize, BatchTargetCount = calcBatchCount, Nr = nr, TotalBatchSize = calcBatchSize * calcBatchCount };
             Rest = rest;
         }

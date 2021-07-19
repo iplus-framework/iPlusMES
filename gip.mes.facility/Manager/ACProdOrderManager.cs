@@ -225,7 +225,7 @@ namespace gip.mes.facility
             }
 
 
-            if (partsList.TargetQuantity <= 0)
+            if (partsList.TargetQuantityUOM <= Double.Epsilon)
             {
                 //"Error: Partslist quantity shuld be greather than zero!"
                 return new Msg

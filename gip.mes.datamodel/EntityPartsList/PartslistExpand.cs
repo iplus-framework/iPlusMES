@@ -245,7 +245,8 @@ namespace gip.mes.datamodel
             PartslistName = partslist.PartslistName;
             MDUnit = partslist.MDUnit;
             TargetQuantityUOM = partslist.TargetQuantityUOM * treeQuantityRatio;
-            TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
+            if (partslist.MDUnitID.HasValue)
+                TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
         }
         #endregion
 

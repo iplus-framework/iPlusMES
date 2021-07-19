@@ -1533,7 +1533,7 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("ProdOrderPartListExpand", "en{'BOM-Expand'}de{'Auflösen'}", 605, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost)]
         public void BOMExplosion()
         {
-            double treeQuantityRatio = SelectedProdOrderPartslist.TargetQuantity / SelectedProdOrderPartslist.Partslist.TargetQuantity;
+            double treeQuantityRatio = SelectedProdOrderPartslist.TargetQuantity / SelectedProdOrderPartslist.Partslist.TargetQuantityUOM;
             rootProdOrderPartListExpand = new PartslistExpand(SelectedProdOrderPartslist.Partslist, treeQuantityRatio);
             rootProdOrderPartListExpand.IsChecked = true;
             rootProdOrderPartListExpand.LoadTree();

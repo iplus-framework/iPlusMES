@@ -2206,7 +2206,8 @@ namespace gip.bso.manufacturing
             if (targetQuantityUOM > 0)
             {
                 item.TargetQuantityUOM = targetQuantityUOM;
-                item.TargetQuantity = partslist.Material.ConvertQuantity(item.TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
+                if (partslist.MDUnitID.HasValue)
+                    item.TargetQuantity = partslist.Material.ConvertQuantity(item.TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
             }
             item.MDSchedulingGroupList = schedulingGroups;
             item.SelectedMDSchedulingGroup = item.MDSchedulingGroupList.FirstOrDefault();
@@ -2255,7 +2256,8 @@ namespace gip.bso.manufacturing
 
                         Partslist selectedPartslist = DatabaseApp.Partslist.FirstOrDefault(c => c.PartslistID == DefaultWizardSchedulerPartslist.PartslistID);
                         DefaultWizardSchedulerPartslist.TargetQuantityUOM = TargetQuantityUOM;
-                        DefaultWizardSchedulerPartslist.TargetQuantity = selectedPartslist.Material.ConvertQuantity(TargetQuantityUOM, selectedPartslist.Material.BaseMDUnit, selectedPartslist.MDUnit);
+                        if (selectedPartslist.MDUnitID.HasValue)
+                            DefaultWizardSchedulerPartslist.TargetQuantity = selectedPartslist.Material.ConvertQuantity(TargetQuantityUOM, selectedPartslist.Material.BaseMDUnit, selectedPartslist.MDUnit);
                         SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
                         OnSelectedWizardSchedulerPartslistChanged();
 
@@ -2535,7 +2537,7 @@ namespace gip.bso.manufacturing
                         batchPlan.ProdOrderPartslist.ProdOrder.ProgramNo,
                         batchPlan.ProdOrderPartslist.Partslist.Material.MaterialName1,
                         batchPlan.TotalSize,
-                        batchPlan.ProdOrderPartslist.Partslist.MDUnit.MDUnitName);
+                        batchPlan.ProdOrderPartslist.Partslist.MDUnitID.HasValue ? batchPlan.ProdOrderPartslist.Partslist.MDUnit.MDUnitName : batchPlan.ProdOrderPartslist.Partslist.Material.BaseMDUnit.MDUnitName);
                     if (batchPlan.CalculatedStartDate != null)
                         item.StartDate = batchPlan.CalculatedStartDate;
                     else
