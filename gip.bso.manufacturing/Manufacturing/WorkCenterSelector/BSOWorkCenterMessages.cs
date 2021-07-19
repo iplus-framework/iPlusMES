@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
@@ -18,17 +19,22 @@ namespace gip.bso.manufacturing
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
+            MainSyncContext = SynchronizationContext.Current;
             return base.ACInit(startChildMode);
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _MScaleWFNodes = null;
+            MainSyncContext = null;
+            UnSubscribeFromWFNodes();
 
             return base.ACDeInit(deleteACClassTask);
         }
 
         #region Properties 
+
+        internal SynchronizationContext MainSyncContext;
 
         private ACMonitorObject _WFNodesLock_40000 = new ACMonitorObject(40000);
 
@@ -158,14 +164,14 @@ namespace gip.bso.manufacturing
             _WFNodes = wfNodes as IACContainerTNet<List<ACChildInstanceInfo>>;
             (_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
             if (_WFNodes.ValueT != null)
-                Task.Run(() => MScaleWFNodes = _WFNodes.ValueT);
+                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
 
             _AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
 
             _ScaleHasAlarms = hasAlarms as IACContainerTNet<bool>;
             (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
             bool hasAlarmsTemp = _ScaleHasAlarms.ValueT;
-            Task.Run(() => HandleAlarms(hasAlarmsTemp));
+                HandleAlarms(hasAlarmsTemp);
         }
 
         private void UnSubscribeFromWFNodes()
@@ -190,7 +196,7 @@ namespace gip.bso.manufacturing
         private void WFNodes_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
-                Task.Run(() => MScaleWFNodes = _WFNodes.ValueT);
+                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
         }
 
         private void ScaleHasAlarms_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -198,20 +204,18 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT)
             {
                 bool hasAlarms = _ScaleHasAlarms.ValueT;
-                Task.Run(() => HandleAlarms(hasAlarms));
+                ParentBSOWCS?.ApplicationQueue.Add(() => HandleAlarms(hasAlarms));
             }
         }
 
 
         private void HandleWFNodes(List<ACChildInstanceInfo> connectionList)
         {
-            if (BSOWorkCenterSelector.PWUserAckClasses == null || !BSOWorkCenterSelector.PWUserAckClasses.Any())
+            if (ParentBSOWCS == null || ParentBSOWCS.PWUserAckClasses == null || !ParentBSOWCS.PWUserAckClasses.Any())
                 return;
 
             if (connectionList == null)
             {
-                //BtnAckBlink = false;
-
                 OnHandleWFNodes(connectionList);
 
                 var itemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null).ToArray();
@@ -224,7 +228,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var pwInstanceInfos = connectionList.Where(c => BSOWorkCenterSelector.PWUserAckClasses.Contains(c.ACType.ValueT));
+            var pwInstanceInfos = connectionList.Where(c => ParentBSOWCS.PWUserAckClasses.Contains(c.ACType.ValueT));
 
             var userAckItemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
             foreach (var itemToRemove in userAckItemsToRemove)
@@ -320,6 +324,7 @@ namespace gip.bso.manufacturing
                 msgList.Insert(0, messageItem);
 
             MessagesList = msgList;
+            
             return true;
         }
 
@@ -332,6 +337,7 @@ namespace gip.bso.manufacturing
             msgList.Remove(messageItem);
 
             MessagesList = msgList;
+
             return true;
         }
 

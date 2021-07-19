@@ -37,6 +37,12 @@ namespace gip.bso.manufacturing
 
             _BSOWorkCenterSelectorRules = new ACPropertyConfigValue<string>(this, "BSOWorkCenterSelectorRules", "");
 
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _ApplicationQueue = new ACDelegateQueue(this.GetACUrl() + ";AppQueue");
+                _ApplicationQueue.StartWorkerThread();
+            }
+
             return result;
         }
 
@@ -72,6 +78,15 @@ namespace gip.bso.manufacturing
 
             BSOManualWeighingType = null;
 
+            if (_ApplicationQueue != null)
+            {
+                _ApplicationQueue.StopWorkerThread();
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _ApplicationQueue = null;
+                }
+            }
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -80,6 +95,19 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties
+
+        private ACDelegateQueue _ApplicationQueue;
+
+        public ACDelegateQueue ApplicationQueue
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _ApplicationQueue;
+                }
+            }
+        }
 
         #region Properties => AccessNav
 
@@ -178,7 +206,6 @@ namespace gip.bso.manufacturing
                     if (_CurrentProcessModule != null)
                     {
                         PAProcessModuleACCaption = _CurrentProcessModule.ACCaption;
-                        RegisterOnOrderInfoPropChanged(value);
                     }
                     else
                         PAProcessModuleACCaption = null;
@@ -416,7 +443,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        IACComponent CurrentChildBSO
+        BSOWorkCenterChild CurrentChildBSO
         {
             get;
             set;
@@ -436,8 +463,8 @@ namespace gip.bso.manufacturing
 
         public Type BSOManualWeighingType = typeof(BSOManualWeighing);
 
-        private static core.datamodel.ACClass[] _PWUserAckClasses;
-        public static core.datamodel.ACClass[] PWUserAckClasses
+        protected core.datamodel.ACClass[] _PWUserAckClasses;
+        public virtual core.datamodel.ACClass[] PWUserAckClasses
         {
             get
             {
@@ -608,7 +635,7 @@ namespace gip.bso.manufacturing
             if(e.PropertyName == Const.ValueT)
             {
                 string orderInfo = ProcessModuleOrderInfo.ValueT;
-                Task.Run(() => HandleOrderInfoPropChanged(orderInfo));
+                ApplicationQueue?.Add(() => HandleOrderInfoPropChanged(orderInfo));
             }
         }
 
@@ -666,6 +693,9 @@ namespace gip.bso.manufacturing
                         }
                     }
                 }
+
+                //if (CurrentChildBSO != null)
+                //    CurrentChildBSO.OnHandleOrderInfoChanged(orderInfo, pwGroupACUrl, pwGroup);
             }
         }
 
@@ -675,7 +705,8 @@ namespace gip.bso.manufacturing
             var relevantPAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray().OrderBy(c => c.ACCaption);
 
             if (configuredRules != null && configuredRules.Any() && !Root.Environment.User.IsSuperuser)
-                relevantPAFs = relevantPAFs.Where(c => configuredRules.Any(x => x.ProcessModuleACUrl == c.ACClass1_ParentACClass.ACUrlComponent)).ToArray().OrderBy(c => c.ACCaption);
+                relevantPAFs = relevantPAFs.Where(c => configuredRules.Any(x => x.ProcessModuleACUrl == c.ACClass1_ParentACClass.ACUrlComponent)).ToArray()
+                                           .OrderBy(x => x.SortIndex);
 
             if (!relevantPAFs.Any())
                 return;
@@ -755,13 +786,20 @@ namespace gip.bso.manufacturing
             if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
             {
                 if (CurrentChildBSO != null)
-                    (CurrentChildBSO as BSOWorkCenterChild)?.DeActivate();
+                    CurrentChildBSO.DeActivate();
 
                 CurrentChildBSO = childBSO;
-                CurrentProcessModule = CurrentWorkCenterItem.ProcessModule;
+
+                bool processModuleChanged = false;
+                if (CurrentProcessModule != CurrentWorkCenterItem.ProcessModule)
+                {
+                    CurrentProcessModule = CurrentWorkCenterItem.ProcessModule;
+                    processModuleChanged = true;
+                }
 
                 if (childBSO != null)
                     childBSO.Activate(CurrentProcessModule);
+
                 else if (actionArgs.DropObject.VBContent == "Workflow")
                 {
                     ShowWorkflow();
@@ -770,6 +808,9 @@ namespace gip.bso.manufacturing
                 {
                     LoadPartslist();
                 }
+
+                if (processModuleChanged)
+                    RegisterOnOrderInfoPropChanged(CurrentProcessModule);
             }
         }
 
@@ -1171,7 +1212,7 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == Const.ValueT)
             {
-                Task.Run(() => CheckActivePWNodeUserAck());
+                ParentBSO?.ApplicationQueue?.Add(() => CheckActivePWNodeUserAck());
             }
         }
 
@@ -1187,7 +1228,7 @@ namespace gip.bso.manufacturing
                 _CurrentWFNodesList = temp;
             }
 
-            if (BSOWorkCenterSelector.PWUserAckClasses == null || !BSOWorkCenterSelector.PWUserAckClasses.Any())
+            if (ParentBSO.PWUserAckClasses == null || !ParentBSO.PWUserAckClasses.Any())
                 return;
 
             if (_CurrentWFNodesList == null)
@@ -1209,7 +1250,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var pwInstanceInfos = _CurrentWFNodesList.Where(c => BSOWorkCenterSelector.PWUserAckClasses.Contains(c.ACType.ValueT));
+            var pwInstanceInfos = _CurrentWFNodesList.Where(c => ParentBSO.PWUserAckClasses.Contains(c.ACType.ValueT));
 
             using (ACMonitor.Lock(_60200_WFNodesListLock))
             {

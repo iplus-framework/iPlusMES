@@ -37,7 +37,7 @@ namespace gip.mes.processapplication
 
         public override bool ACPostInit()
         {
-            if(ScaleMappingHelper.AssignedScales.Any())
+            if (ScaleMappingHelper.AssignedScales.Any())
             {
                 _HasParentPMMultipleScaleObjects = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().Count() > 1;
             }
@@ -69,7 +69,7 @@ namespace gip.mes.processapplication
         }
 
         #endregion
-		
+
         #region Config
         protected ACPropertyConfigValue<string> _FuncScaleConfig;
         [ACPropertyConfig("en{'Assigned Scales'}de{'Zugeordnete Waagen'}")]
@@ -192,7 +192,7 @@ namespace gip.mes.processapplication
             return ActiveScaleObject?.ACUrl;
         }
 
-        [ACMethodInfo("","",400)]
+        [ACMethodInfo("", "", 400)]
         public ACValueList GetAvailableScaleObjects()
         {
             var assignedScaleObjects = ScaleMappingHelper.AssignedScales;
@@ -232,12 +232,12 @@ namespace gip.mes.processapplication
             CurrentACMethod.ValueT.ResultValueList["IsComponentConsumed"] = isComponentConsumed;
         }
 
-        [ACMethodInfo("Function", "en{'Default dosing paramters'}de{'Standard Dosierparameter'}", 9999)]
+        [ACMethodInfo("Function", "en{'Default dosing parameters'}de{'Standard Dosierparameter'}", 9999)]
         public virtual void SetDefaultACMethodValues(ACMethod newACMethod)
         {
             newACMethod["TargetQuantity"] = (Double)0;
-            newACMethod["TolerancePlus"] = (Double)0.5;
-            newACMethod["ToleranceMinus"] = (Double)0.5;
+            newACMethod["TolerancePlus"] = (Double)0.0;
+            newACMethod["ToleranceMinus"] = (Double)0.0;
             newACMethod["IsLastWeighingMaterial"] = false;
         }
 
@@ -282,10 +282,10 @@ namespace gip.mes.processapplication
                 }
                 else if (Math.Abs(tolPlus) <= Double.Epsilon)
                 {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolPlus = targetQ * 0.05;
-                    else
-                        tolPlus = 0.001;
+                    //if (Math.Abs(targetQ) > Double.Epsilon)
+                    //    tolPlus = targetQ * 0.05;
+                    //else
+                    //    tolPlus = 0.001;
                 }
                 newACMethod["TolerancePlus"] = tolPlus;
 
@@ -302,10 +302,10 @@ namespace gip.mes.processapplication
                 }
                 else if (Math.Abs(tolMinus) <= Double.Epsilon)
                 {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolMinus = targetQ * 0.05;
-                    else
-                        tolMinus = 0.001;
+                    //if (Math.Abs(targetQ) > Double.Epsilon)
+                    //    tolMinus = targetQ * 0.05;
+                    //else
+                    //    tolMinus = 0.001;
                 }
                 newACMethod["ToleranceMinus"] = tolMinus;
             }
@@ -390,7 +390,7 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-				string tmp = FuncScaleConfig; // Init Config-Param
+                string tmp = FuncScaleConfig; // Init Config-Param
                 var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
                 var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                 if (sourcePoint == null)
@@ -639,7 +639,7 @@ namespace gip.mes.processapplication
             if (!_HasParentPMMultipleScaleObjects)
             {
                 var scalesGravimetric = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>();
-                if(scalesGravimetric.Any())
+                if (scalesGravimetric.Any())
                 {
                     ActiveScaleObject = scalesGravimetric.FirstOrDefault();
                 }
@@ -651,76 +651,77 @@ namespace gip.mes.processapplication
                 return;
             }
 
-            if (ActiveScaleObject == null)
+
+            var targetScale = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetScaleACIdentifier");
+            string targetScaleACIdentifier = null;
+            if (targetScale != null)
+                targetScaleACIdentifier = targetScale.ParamAsString;
+
+            if (!string.IsNullOrEmpty(targetScaleACIdentifier))
             {
-                var targetScale = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetScaleACIdentifier");
-                string targetScaleACIdentifier = null;
-                if (targetScale != null)
-                    targetScaleACIdentifier = targetScale.ParamAsString;
+                PAEScaleGravimetric scale = null;
 
-                if (!string.IsNullOrEmpty(targetScaleACIdentifier))
-                {
-                    PAEScaleGravimetric scale = null;
-
-                    if(ScaleMappingHelper.AssignedScales != null && ScaleMappingHelper.AssignedScales.Any())
-                    {
-                        scale = ScaleMappingHelper.AssignedScales.FirstOrDefault(c => c.ACIdentifier == targetScaleACIdentifier) as PAEScaleGravimetric;
-                    }
-                    else
-                    {
-                        scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric && c.ACIdentifier == targetScaleACIdentifier)
-                                                                     .FirstOrDefault();
-                    }
-                    if (scale == null)
-                    {
-                        //Error50362: The scale object with ACIdentifier: {0} can not be found! Please check your scale configuration!
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50362", targetScaleACIdentifier);
-                        OnNewAlarmOccurred(FunctionError, msg, true);
-                        if (IsAlarmActive(FunctionError, msg.Message) == null)
-                            Messages.LogMessageMsg(msg);
-                    }
-                    ActiveScaleObject = scale;
+                if (ActiveScaleObject != null && ActiveScaleObject.ACIdentifier == targetScaleACIdentifier)
                     return;
-                }
 
-                var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
-                double targetQuantity = 0;
-                if (targetQ != null)
-                    targetQuantity = targetQ.ParamAsDouble;
-
-                if (targetQuantity > 0)
+                if (ScaleMappingHelper.AssignedScales != null && ScaleMappingHelper.AssignedScales.Any())
                 {
-                    PAEScaleGravimetric scale = null;
-
-                    if (ScaleMappingHelper.AssignedScales.Any())
-                    {
-                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>()
-                                                                 .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight?.ValueT)
-                                                                 .FirstOrDefault();
-
-                        if (scale == null)
-                            scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().FirstOrDefault(c => c.MinDosingWeight.ValueT == 0 && c.MaxScaleWeight.ValueT == 0);
-                    }
-                    else
-                    {
-                        scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                                  .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight?.ValueT)
-                                                  .FirstOrDefault();
-                            if (scale == null)
-                                scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                                          .Where(c => c.MinDosingWeight.ValueT == 0 && c.MaxScaleWeight.ValueT == 0)
-                                                          .FirstOrDefault();
-                    }
-                    if (scale == null)
-                    {
-                        //Error50363: Can not determine appropriate scale object. Please check your scale configuration (MinDosingWeight, MaxScaleWeight or FunctionScaleConfiguration).
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(20)", 737, "Error50363");
-                        OnNewAlarmOccurred(FunctionError, msg, true);
-                        if (IsAlarmActive(FunctionError, msg.Message) == null)
-                            Messages.LogMessageMsg(msg);
-                    }
-                    ActiveScaleObject = scale;
+                    scale = ScaleMappingHelper.AssignedScales.FirstOrDefault(c => c.ACIdentifier == targetScaleACIdentifier) as PAEScaleGravimetric;
                 }
+                else
+                {
+                    scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric && c.ACIdentifier == targetScaleACIdentifier)
+                                                                 .FirstOrDefault();
+                }
+                if (scale == null)
+                {
+                    //Error50362: The scale object with ACIdentifier: {0} can not be found! Please check your scale configuration!
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50362", targetScaleACIdentifier);
+                    OnNewAlarmOccurred(FunctionError, msg, true);
+                    if (IsAlarmActive(FunctionError, msg.Message) == null)
+                        Messages.LogMessageMsg(msg);
+                }
+                ActiveScaleObject = scale;
+                return;
+            }
+
+            var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
+            double targetQuantity = 0;
+            if (targetQ != null)
+                targetQuantity = targetQ.ParamAsDouble;
+
+            if (targetQuantity > 0)
+            {
+                PAEScaleGravimetric scale = null;
+
+                if (ScaleMappingHelper.AssignedScales.Any())
+                {
+                    scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>()
+                                                             .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight?.ValueT)
+                                                             .FirstOrDefault();
+
+                    if (scale == null)
+                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().FirstOrDefault(c => c.MinDosingWeight.ValueT == 0 && c.MaxScaleWeight.ValueT == 0);
+                }
+                else
+                {
+                    scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
+                                              .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight?.ValueT)
+                                              .FirstOrDefault();
+                    if (scale == null)
+                        scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
+                                                  .Where(c => c.MinDosingWeight.ValueT == 0 && c.MaxScaleWeight.ValueT == 0)
+                                                  .FirstOrDefault();
+                }
+                if (scale == null)
+                {
+                    //Error50363: Can not determine appropriate scale object. Please check your scale configuration (MinDosingWeight, MaxScaleWeight or FunctionScaleConfiguration).
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(20)", 737, "Error50363");
+                    OnNewAlarmOccurred(FunctionError, msg, true);
+                    if (IsAlarmActive(FunctionError, msg.Message) == null)
+                        Messages.LogMessageMsg(msg);
+                }
+                ActiveScaleObject = scale;
             }
         }
 
@@ -826,9 +827,9 @@ namespace gip.mes.processapplication
                 return;
 
             scale.TareScale(true, IsSimulationOn);
-            if(ManualWeighingPW != null)
+            if (ManualWeighingPW != null)
                 TareScaleState.ValueT = (short)TareScaleStateEnum.TareReq;
-            else if(TareScaleState.ValueT != (short)TareScaleStateEnum.None)
+            else if (TareScaleState.ValueT != (short)TareScaleStateEnum.None)
                 TareScaleState.ValueT = (short)TareScaleStateEnum.None;
             scale.TareScale(false, IsSimulationOn);
         }
@@ -856,6 +857,48 @@ namespace gip.mes.processapplication
                 tolPlus = 0;
             if (!tolMinus.HasValue)
                 tolMinus = 0;
+
+            if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
+            {
+                tolPlus = scale.TolerancePlus;
+                if (tolPlus < -0.0000001)
+                {
+                    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                        tolPlus = targetQuantity * tolPlus * -0.01;
+                    else
+                        tolPlus = 0.001;
+                }
+                else if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
+                {
+                    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                        tolPlus = targetQuantity * 0.05;
+                    else
+                        tolPlus = 0.001;
+                }
+
+                CurrentACMethod.ValueT["TolerancePlus"] = tolPlus;
+            }
+
+            if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
+            {
+                tolMinus = scale.ToleranceMinus;
+                if (tolMinus < -0.0000001)
+                {
+                    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                        tolMinus = targetQuantity * tolMinus * -0.01;
+                    else
+                        tolMinus = 0.001;
+                }
+                else if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
+                {
+                    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                        tolMinus = targetQuantity * 0.05;
+                    else
+                        tolMinus = 0.001;
+                }
+
+                CurrentACMethod.ValueT["ToleranceMinus"] = tolMinus;
+            }
 
             double actWeight = Math.Round(checkQuantity, 3);
 
@@ -984,7 +1027,7 @@ namespace gip.mes.processapplication
             if (scanSequence == 1)
             {
                 // Info50050: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
-                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(10)", 10, "Info50050"); 
+                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(10)", 10, "Info50050");
                 resultSequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
             }
             else

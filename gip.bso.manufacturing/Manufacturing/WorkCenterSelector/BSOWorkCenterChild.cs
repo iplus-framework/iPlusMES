@@ -32,6 +32,11 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public virtual void OnHandleOrderInfoChanged(string orderInfo, string pwGroupACUrl, ACComponent pwGroup)
+        {
+
+        }
+
         public abstract void Activate(ACComponent selectedProcessModule);
 
         public abstract void DeActivate();

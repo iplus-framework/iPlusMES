@@ -32,27 +32,27 @@ namespace gip.bso.manufacturing
             if (!result)
                 return result;
 
-            MainSyncContext = SynchronizationContext.Current;
+            
 
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _ApplicationQueue = new ACDelegateQueue(this.GetACUrl() + ";AppQueue");
-                _ApplicationQueue.StartWorkerThread();
-            }
+            //using (ACMonitor.Lock(_20015_LockValue))
+            //{
+            //    _ApplicationQueue = new ACDelegateQueue(this.GetACUrl() + ";AppQueue");
+            //    _ApplicationQueue.StartWorkerThread();
+            //}
 
             return result;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            if (_ApplicationQueue != null)
-            {
-                _ApplicationQueue.StopWorkerThread();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _ApplicationQueue = null;
-                }
-            }
+            //if (_ApplicationQueue != null)
+            //{
+            //    _ApplicationQueue.StopWorkerThread();
+            //    using (ACMonitor.Lock(_20015_LockValue))
+            //    {
+            //        _ApplicationQueue = null;
+            //    }
+            //}
 
             DeactivateManualWeighingModel();
 
@@ -86,20 +86,18 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        internal SynchronizationContext MainSyncContext;
+        //private ACDelegateQueue _ApplicationQueue;
 
-        private ACDelegateQueue _ApplicationQueue;
-
-        public ACDelegateQueue ApplicationQueue
-        {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    return _ApplicationQueue;
-                }
-            }
-        }
+        //public ACDelegateQueue ApplicationQueue
+        //{
+        //    get
+        //    {
+        //        using (ACMonitor.Lock(_20015_LockValue))
+        //        {
+        //            return _ApplicationQueue;
+        //        }
+        //    }
+        //}
 
         private ACComponent _CurrentProcessModule;
         [ACPropertyInfo(601)]
@@ -133,14 +131,11 @@ namespace gip.bso.manufacturing
             }
         }
 
-        //private string _AlarmsAsTextCache = null;
-
-
         #region Private fields
 
         private bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
 
-        private object _UserAckNodeLock = new object(), _PWNodeACStateLock = new object(), _LoadWFNodeLock = new object();
+        private object _PWNodeACStateLock = new object();
 
         
 
@@ -316,78 +311,6 @@ namespace gip.bso.manufacturing
             get;
             set;
         }
-
-        #endregion
-
-        #region Properties => Messages
-
-        //private List<ACChildInstanceInfo> _MScaleWFNodes;
-        //public List<ACChildInstanceInfo> MScaleWFNodes
-        //{
-        //    get => _MScaleWFNodes;
-        //    set
-        //    {
-        //        if (_UserAckNodeLock == null)
-        //            return;
-
-        //        lock (_UserAckNodeLock)
-        //        {
-        //            if (_MScaleWFNodes != value)
-        //            {
-        //                _MScaleWFNodes = value;
-        //                HandleWFNodes(_MScaleWFNodes);
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private List<MessageItem> _MessagesList = new List<MessageItem>();
-        //[ACPropertyList(610, "Messages")]
-        //public List<MessageItem> MessagesList
-        //{
-        //    get
-        //    {
-        //        return _MessagesList;
-        //    }
-        //    set
-        //    {
-        //        _MessagesList = value;
-        //        OnPropertyChanged("MessagesList");
-        //    }
-        //}
-
-        ////private MessageItem _SelectedMessage;
-        //[ACPropertySelected(611, "Messages")]
-        //public MessageItem SelectedMessage
-        //{
-        //    get;
-        //    set;
-        //}
-
-        //private List<MessageItem> _AckMessageList;
-        //[ACPropertyList(612, "MessagesAck")]
-        //public List<MessageItem> AckMessageList
-        //{
-        //    get => _AckMessageList;
-        //    set
-        //    {
-        //        _AckMessageList = value;
-        //        OnPropertyChanged("AckMessageList");
-        //    }
-        //}
-
-        //private MessageItem _SelectedAckMessage;
-        //[ACPropertySelected(613, "MessagesAck")]
-        //public MessageItem SelectedAckMessage
-        //{
-        //    get => _SelectedAckMessage;
-        //    set
-        //    {
-        //        _SelectedAckMessage = value;
-        //        OnPropertyChanged("SelectedAckMessage");
-        //    }
-        //}
-
 
         #endregion
 
@@ -1395,18 +1318,6 @@ namespace gip.bso.manufacturing
                 _PWNodeACStateLock = new object();
             LoadWFNode();
 
-            //_WFNodes = wfNodes as IACContainerTNet<List<ACChildInstanceInfo>>;
-            //(_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
-            //if (_WFNodes.ValueT != null)
-            //    ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
-
-            //_AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
-
-            //_ScaleHasAlarms = hasAlarms as IACContainerTNet<bool>;
-            //(_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
-            //bool hasAlarmsTemp = _ScaleHasAlarms.ValueT;
-            //ApplicationQueue.Add(() => HandleAlarms(hasAlarmsTemp));
-
             return true;
         }
 
@@ -1460,7 +1371,7 @@ namespace gip.bso.manufacturing
             _PAFCurrentACMethod = currentACMethod as IACContainerTNet<ACMethod>;
             (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged += PAFCurrentACMethodPropChanged;
             ACMethod temp = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
-            ApplicationQueue.Add(() => HandlePAFCurrentACMethod(temp));
+            ParentBSOWCS.ApplicationQueue.Add(() => HandlePAFCurrentACMethod(temp));
 
             _PAFManuallyAddedQuantity = manuallyAddedQuantity as IACContainerTNet<double>;
             (_PAFManuallyAddedQuantity as IACPropertyNetBase).PropertyChanged += PAFManuallyAddedQuantityPropChanged;
@@ -1632,7 +1543,7 @@ namespace gip.bso.manufacturing
             _NextTaskInfoProperty = ComponentPWNode.ValueT.GetPropertyNet("ManualWeihgingNextTask") as IACContainerTNet<ManualWeighingTaskInfo>;
             if (_NextTaskInfoProperty != null)
             {
-                _NextTaskInfoProperty.PropertyChanged += _NextTaskInfoProperty_PropertyChanged;
+                _NextTaskInfoProperty.PropertyChanged += NextTaskInfoProperty_PropertyChanged;
                 NextTaskInfo = _NextTaskInfoProperty.ValueT;
             }
 
@@ -1640,12 +1551,12 @@ namespace gip.bso.manufacturing
             if (_WeighingComponentInfo != null)
             {
                 WeighingComponentInfo tempCompInfo = _WeighingComponentInfo.ValueT;
-                ApplicationQueue.Add(() => HandleWeighingComponentInfo(tempCompInfo));
+                ParentBSOWCS?.ApplicationQueue.Add(() => HandleWeighingComponentInfo(tempCompInfo));
                 (_WeighingComponentInfo as IACPropertyNetBase).PropertyChanged += WeighingComponentInfoPropChanged;
             }
         }
 
-        private void _NextTaskInfoProperty_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void NextTaskInfoProperty_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT && _NextTaskInfoProperty != null && NextTaskInfo != _NextTaskInfoProperty.ValueT)
             {
@@ -1822,7 +1733,7 @@ namespace gip.bso.manufacturing
 
             if (_NextTaskInfoProperty != null)
             {
-                _NextTaskInfoProperty.PropertyChanged -= _NextTaskInfoProperty_PropertyChanged;
+                _NextTaskInfoProperty.PropertyChanged -= NextTaskInfoProperty_PropertyChanged;
                 NextTaskInfo = ManualWeighingTaskInfo.None;
                 _NextTaskInfoProperty = null;
             }
@@ -1907,7 +1818,7 @@ namespace gip.bso.manufacturing
         private void OrderInfoPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
-                ApplicationQueue.Add(() => LoadWFNode());
+                ParentBSOWCS?.ApplicationQueue.Add(() => LoadWFNode());
         }
 
         private void PAFCurrentACMethodPropChanged(object sender, PropertyChangedEventArgs e)
@@ -1915,7 +1826,7 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT)
             {
                 ACMethod temp = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
-                ApplicationQueue.Add(() => HandlePAFCurrentACMethod(temp));
+                ParentBSOWCS?.ApplicationQueue.Add(() => HandlePAFCurrentACMethod(temp));
             }
         }
 
@@ -1927,7 +1838,7 @@ namespace gip.bso.manufacturing
                 if (targetNode != null && (CurrentComponentPWNode == null || targetNode.ComponentPWNode.ValueT.ACUrl == CurrentComponentPWNode.ACUrl))
                 {
                     ACStateEnum tempACState = targetNode.ComponentPWNodeACState.ValueT;
-                    ApplicationQueue.Add(() => HandlePWNodeACState(targetNode, tempACState));
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandlePWNodeACState(targetNode, tempACState));
                 }
             }
         }
@@ -1952,7 +1863,7 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT && _ScaleActualWeight != null)
             {
                 double tempValue = _ScaleActualWeight.ValueT;
-                ApplicationQueue.Add(() => ScaleRealWeight = tempValue);
+                ParentBSOWCS?.ApplicationQueue.Add(() => ScaleRealWeight = tempValue);
             }
         }
 
@@ -1963,7 +1874,7 @@ namespace gip.bso.manufacturing
                 if (_WeighingComponentInfo != null && _WeighingComponentInfo.ValueT != null)
                 {
                     var temp = _WeighingComponentInfo.ValueT.Clone() as WeighingComponentInfo;
-                    ApplicationQueue.Add(() => HandleWeighingComponentInfo(temp));
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandleWeighingComponentInfo(temp));
                 }
             }
         }
@@ -1973,7 +1884,7 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT && _PAFManuallyAddedQuantity != null)
             {
                 double tempValue = _PAFManuallyAddedQuantity.ValueT;
-                ApplicationQueue.Add(() => ScaleAddAcutalWeight = tempValue);
+                ParentBSOWCS?.ApplicationQueue.Add(() => ScaleAddAcutalWeight = tempValue);
             }
         }
 
@@ -2003,7 +1914,7 @@ namespace gip.bso.manufacturing
             }
             catch (Exception e)
             {
-                string message = null;
+                string message;
                 if (e.InnerException != null)
                     message = string.Format("ManualWeighingModel(HandlePWNodeACState): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
                 else
@@ -2174,93 +2085,20 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        //private void HandleWFNodes(List<ACChildInstanceInfo> connectionList)
-        //{
-        //    if (PWUserAckClasses == null || !PWUserAckClasses.Any())
-        //        return;
+        public override void OnHandleWFNodes(List<ACChildInstanceInfo> connectionList)
+        {
+            if (connectionList == null)
+            {
+                BtnAckBlink = false;
+            }
+            else
+            {
+                bool blink = MessagesList.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage);
+                if (BtnAckBlink != blink)
+                    BtnAckBlink = blink;
+            }
 
-        //    if (connectionList == null)
-        //    {
-        //        BtnAckBlink = false;
-        //        var itemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null).ToArray();
-        //        foreach (var itemToRemove in itemsToRemove)
-        //        {
-        //            RemoveFromMessageList(itemToRemove);
-        //            itemToRemove.DeInit();
-        //        }
-
-        //        return;
-        //    }
-
-        //    var pwInstanceInfos = connectionList.Where(c => PWUserAckClasses.Contains(c.ACType.ValueT));
-
-        //    var userAckItemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
-        //    foreach (var itemToRemove in userAckItemsToRemove)
-        //    {
-        //        RemoveFromMessageList(itemToRemove);
-        //        itemToRemove.DeInit();
-        //        if (BtnAckBlink && !MessagesList.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage))
-        //            BtnAckBlink = false;
-        //    }
-
-        //    foreach (var instanceInfo in pwInstanceInfos)
-        //    {
-        //        string instanceInfoACUrl = instanceInfo.ACUrlParent + "\\" + instanceInfo.ACIdentifier;
-        //        if (MessagesList.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
-        //            continue;
-
-        //        var pwNode = Root.ACUrlCommand(instanceInfoACUrl) as IACComponent;
-        //        if (pwNode == null)
-        //            continue;
-
-        //        var userAckItem = new MessageItem(pwNode, this);
-        //        AddToMessageList(userAckItem);
-        //        if (!BtnAckBlink)
-        //            BtnAckBlink = true;
-
-        //        //if (TaskPresenter != null && TaskPresenter.PresenterACWorkflowNode == null)
-        //        //    TaskPresenter.LoadWFInstance((userAckItem?.UserAckPWNode.ValueT as IACComponentPWNode).ParentRootWFNode);
-        //    }
-        //}
-
-        //private void HandleAlarms(bool hasAlarms)
-        //{
-        //    string alarmsAsText = _AlarmsAsText.ValueT;
-        //    if (alarmsAsText == _AlarmsAsTextCache)
-        //        return;
-
-        //    if (hasAlarms)
-        //    {
-        //        var alarms = CurrentProcessModule?.ExecuteMethod("GetAlarms", true, true, true) as List<Msg>;
-        //        if (alarms == null)
-        //            return;
-
-        //        var messagesToRemove = MessagesList.Where(c => c.GetType() == typeof(MessageItem) && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
-        //        foreach (var messageToRemove in messagesToRemove)
-        //            RemoveFromMessageList(messageToRemove);
-
-        //        foreach (var alarm in alarms)
-        //        {
-        //            MessageItem msgItem = new MessageItem(null, null);
-        //            msgItem.Message = BuildAlarmMessage(alarm);
-        //            AddToMessageList(msgItem);
-        //        }
-        //    }
-        //    else if (MessagesList != null)
-        //    {
-        //        var messageList = MessagesList.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton).ToArray();
-        //        foreach (var messageItem in messageList)
-        //            RemoveFromMessageList(messageItem);
-        //    }
-
-        //    _AlarmsAsTextCache = _AlarmsAsText.ValueT;
-        //}
-
-        //private string BuildAlarmMessage(Msg msg)
-        //{
-        //    return string.Format("{0}: {1} {2}", msg.Source, msg.ACCaption, msg.Message);
-        //}
-
+        }
         #endregion
 
         #region Methods => Misc.
@@ -2280,36 +2118,6 @@ namespace gip.bso.manufacturing
         public bool IsEnabledRefreshMaterialOrFC_F()
         {
             return SelectedMaterialF_FC == null || _CallPWLotChange;
-        }
-
-        public bool AddToMessageList(MessageItem messageItem)
-        {
-            if (MessagesList == null)
-                return false;
-
-            if (MessagesList.Any(c => c.IsAlarmMessage && c.Message == messageItem.Message))
-                return true;
-
-            List<MessageItem> msgList = new List<MessageItem>(MessagesList);
-            if (messageItem.IsAlarmMessage)
-                msgList.Add(messageItem);
-            else
-                msgList.Insert(0, messageItem);
-
-            MessagesList = msgList;
-            return true;
-        }
-
-        public bool RemoveFromMessageList(MessageItem messageItem)
-        {
-            if (MessagesList == null)
-                return false;
-
-            List<MessageItem> msgList = new List<MessageItem>(MessagesList);
-            msgList.Remove(messageItem);
-
-            MessagesList = msgList;
-            return true;
         }
 
         protected ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
@@ -3551,8 +3359,11 @@ namespace gip.bso.manufacturing
             {
                 if (_LastAlarmMessage != null && Message.Contains(_LastAlarmMessage))
                 {
-                    Message = Message.Replace(_LastAlarmMessage, "");
-                    _LastAlarmMessage = alarmMessage;
+                    if (!string.IsNullOrEmpty(_LastAlarmMessage))
+                    {
+                        Message = Message.Replace(_LastAlarmMessage, "");
+                        _LastAlarmMessage = alarmMessage;
+                    }
                 }
             }
             else
