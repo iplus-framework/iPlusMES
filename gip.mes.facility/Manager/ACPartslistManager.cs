@@ -330,7 +330,7 @@ namespace gip.mes.facility
 
         public Msg UpdatePartslistFromMaterialWF(DatabaseApp dbApp, Partslist partsList)
         {
-            if(partsList == null)
+            if (partsList == null)
             {
                 return new Msg
                 {
@@ -361,7 +361,7 @@ namespace gip.mes.facility
 
             IEnumerable<Material> newMaterials = materials.Except(partsList.PartslistPos_Partslist.Select(x => x.Material));
 
-            foreach(Material newMaterial in newMaterials)
+            foreach (Material newMaterial in newMaterials)
             {
                 PartslistPos posItem = PartslistPos.NewACObject(dbApp, null);
                 posItem.Partslist = partsList;
@@ -385,7 +385,7 @@ namespace gip.mes.facility
 
             var newRelations = relations.Except(existingRelations);
 
-            foreach(MaterialWFRelation newRelation in newRelations)
+            foreach (MaterialWFRelation newRelation in newRelations)
             {
                 if (newRelation.SourceMaterialID == newRelation.TargetMaterialID)
                     continue;
@@ -525,7 +525,8 @@ namespace gip.mes.facility
                     .Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern
                             && !x.PartslistPosRelation_SourcePartslistPos.Any())
                     .FirstOrDefault();
-            RecalcIntermediateItem(lastIntermediate, setDefaultValueAtIncompatibleUnits);
+            if (lastIntermediate != null)
+                RecalcIntermediateItem(lastIntermediate, setDefaultValueAtIncompatibleUnits);
             return msg;
         }
 
@@ -624,7 +625,7 @@ namespace gip.mes.facility
             var sources = relations.Where(c => c.TargetMaterialID == material.MaterialID);
 
             foreach (var source in sources)
-            { 
+            {
                 FindRootSeqNoRecursive(source.SourceMaterial, relations, myLevel, ref resultLevel);
             }
         }
@@ -649,24 +650,24 @@ namespace gip.mes.facility
         {
             var depths = positions.Select(c => c.Sequence).Distinct().OrderByDescending(x => x);
 
-            foreach(var depth in depths)
+            foreach (var depth in depths)
             {
                 int withSources = 50, withoutSources = 0;
                 var targetPositons = positions.Where(c => c.Sequence == depth).OrderBy(c => c.Material.MaterialName1);
 
-                foreach(var targetPos in targetPositons)
+                foreach (var targetPos in targetPositons)
                 {
                     var sources = relations.Where(c => c.SourceMaterialID != c.TargetMaterialID && c.TargetMaterialID == targetPos.MaterialID);
                     if (sources != null && sources.Any())
                     {
                         targetPos.Sequence = depth + withSources;
-                        if(withSources < 99)
+                        if (withSources < 99)
                             withSources++;
                     }
                     else
                     {
                         targetPos.Sequence = depth + withoutSources;
-                        if(withoutSources < 49)
+                        if (withoutSources < 49)
                             withoutSources++;
                     }
                 }
