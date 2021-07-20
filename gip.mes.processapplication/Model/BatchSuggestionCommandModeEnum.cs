@@ -6,9 +6,9 @@ namespace gip.mes.processapplication
     //[DataContract]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Batch suggestion mode'}de{'Batch-Vorschlagsmodus'}", Global.ACKinds.TACEnum)]
-    public enum BatchSuggestionCommandModeEnum
+    public enum BatchSuggestionCommandModeEnum : short
     {
-        KeepEqualBatchSizes,
-        KeepStandardBatchSizeAndDivideRest
+        KeepEqualBatchSizes = 0,
+        KeepStandardBatchSizeAndDivideRest = 1
     }
 }

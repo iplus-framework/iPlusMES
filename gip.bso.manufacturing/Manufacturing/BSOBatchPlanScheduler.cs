@@ -1360,8 +1360,7 @@ namespace gip.bso.manufacturing
             if (BatchPlanSuggestion.ItemsList.Any())
                 nr = BatchPlanSuggestion.ItemsList.Max(c => c.Nr);
             nr++;
-            BatchPlanSuggestionItem newItem = new BatchPlanSuggestionItem();
-            newItem.Nr = nr;
+            BatchPlanSuggestionItem newItem = new BatchPlanSuggestionItem(nr, 0, 0, SelectedWizardSchedulerPartslist.TargetQuantityUOM);
             BatchPlanSuggestion.ItemsList.Add(newItem);
             BatchPlanSuggestion.SelectedItems = newItem;
             OnPropertyChanged("BatchPlanSuggestion\\ItemsList");
@@ -2019,12 +2018,7 @@ namespace gip.bso.manufacturing
                    RestNotUsedQuantity = 0,
                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
                    {
-                        new BatchPlanSuggestionItem()
-                        {
-                            BatchSize = prodOrderBatchPlan.BatchSize,
-                            BatchTargetCount = moveBatchCount,
-                            TotalBatchSize = totalSize
-                        }
+                        new BatchPlanSuggestionItem(1, prodOrderBatchPlan.BatchSize, moveBatchCount, totalSize)
                    }
                };
             string programNo = "";
@@ -2044,12 +2038,7 @@ namespace gip.bso.manufacturing
                     RestNotUsedQuantity = 0,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                     {
-                        new BatchPlanSuggestionItem()
-                        {
-                            BatchSize = moveQuantity,
-                            BatchTargetCount = 1,
-                            TotalBatchSize = moveQuantity
-                        }
+                        new BatchPlanSuggestionItem(1, moveQuantity, 1, moveQuantity)
                     }
                 };
             string programNo = "";
@@ -2081,7 +2070,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledWizardForward()) return;
             if (WizardPhase == NewScheduledBatchWizardPhaseEnum.DefineSuggestion
                 && BatchPlanSuggestion != null && BatchPlanSuggestion.ItemsList.Any()
-                && BatchPlanSuggestion.TotalSize != BatchPlanSuggestion.ItemsList.Sum(c => c.BatchSize * c.BatchTargetCount))
+                && Math.Abs(BatchPlanSuggestion.TotalSize - BatchPlanSuggestion.ItemsList.Sum(c => c.BatchSize * c.BatchTargetCount)) > 0.1)
             {
                 Msg batchBatchCount = new Msg(this, eMsgLevel.Error, GetACUrl(), "WizardForward", 0, "Error50391", BatchPlanSuggestion.TotalSize, BatchPlanSuggestion.ItemsList.Sum(c => c.BatchSize * c.BatchTargetCount));
                 SendMessage(batchBatchCount);
@@ -2296,12 +2285,7 @@ namespace gip.bso.manufacturing
                                 TotalSize = SelectedWizardSchedulerPartslist.TargetQuantity,
                                 ItemsList = new BindingList<BatchPlanSuggestionItem>()
                             };
-                            BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem()
-                            {
-                                BatchTargetCount = 1,
-                                Nr = 1,
-                                BatchSize = SelectedWizardSchedulerPartslist.TargetQuantity
-                            });
+                            BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem(1, SelectedWizardSchedulerPartslist.TargetQuantity, 1, SelectedWizardSchedulerPartslist.TargetQuantity));
                             WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineSuggestion);
                         }
                         else

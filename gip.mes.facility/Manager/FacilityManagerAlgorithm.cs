@@ -2534,10 +2534,17 @@ namespace gip.mes.facility
         ACMethodBooking _BookParamOutwardMovementClone;
         public ACMethodBooking GetBookParamOutwardMovementClone()
         {
-            if (_BookParamOutwardMovementClone != null)
-                return _BookParamOutwardMovementClone;
-            _BookParamOutwardMovementClone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-            return _BookParamOutwardMovementClone;
+            using (ACMonitor.Lock(_40010_ValueLock))
+            {
+                if (_BookParamOutwardMovementClone != null)
+                    return _BookParamOutwardMovementClone.Clone() as ACMethodBooking;
+            }
+            var clone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            using (ACMonitor.Lock(_40010_ValueLock))
+            {
+                _BookParamOutwardMovementClone = clone;
+                return _BookParamOutwardMovementClone.Clone() as ACMethodBooking;
+            }
         }
 
         #endregion

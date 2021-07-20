@@ -87,7 +87,7 @@ namespace gip.bso.manufacturing
 
 
             if (calcBatchCount > 0 && calcBatchSize > Double.Epsilon)
-                Suggestion = new BatchPlanSuggestionItem() { BatchSize = calcBatchSize, BatchTargetCount = calcBatchCount, Nr = nr, TotalBatchSize = calcBatchSize * calcBatchCount };
+                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount);
             Rest = rest;
         }
 
