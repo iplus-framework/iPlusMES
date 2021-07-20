@@ -1367,7 +1367,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledRecalculateBatchSuggestion()
         {
-            return FilterBatchplanSuggestionMode != null && BatchPlanSuggestion != null && TargetQuantityUOM > 0;
+            return FilterBatchplanSuggestionMode != null && BatchPlanSuggestion != null && TargetQuantityUOM > Double.Epsilon;
         }
 
         [ACMethodInfo("AddSuggestion", "en{'Add'}de{'Neu'}", 999)]
@@ -1760,7 +1760,7 @@ namespace gip.bso.manufacturing
             return
                 LocalBSOBatchPlan != null
                 && DefaultWizardSchedulerPartslist != null
-                && TargetQuantityUOM > 0;
+                && TargetQuantityUOM > Double.Epsilon;
         }
 
 
@@ -1870,7 +1870,7 @@ namespace gip.bso.manufacturing
                 if (string.IsNullOrEmpty(enteredValue))
                 {
                     double moveQuantity = BatchSizeValidate(enteredValue, SelectedProdOrderBatchPlan.BatchSize, SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist);
-                    isMovingValueValid = moveQuantity > 0;
+                    isMovingValueValid = moveQuantity > Double.Epsilon;
                     if (isMovingValueValid)
                     {
                         if (moveQuantity == SelectedProdOrderBatchPlan.BatchSize)
@@ -1940,16 +1940,13 @@ namespace gip.bso.manufacturing
                 Root.Messages.Msg(msg);
                 SendMessage(msg);
             }
-            if (moveBatchCount > 0)
+            if (moveBatchCount <= 0 || moveBatchCount > batchTargetCount)
             {
-                if (moveBatchCount <= 0 || moveBatchCount > batchTargetCount)
-                {
-                    //Error50394.
-                    Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1847, "Error50394", batchTargetCount);
-                    Root.Messages.Msg(msg);
-                    SendMessage(msg);
-                    moveBatchCount = 0;
-                }
+                //Error50394.
+                Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1847, "Error50394", batchTargetCount);
+                Root.Messages.Msg(msg);
+                SendMessage(msg);
+                moveBatchCount = 0;
             }
             return moveBatchCount;
         }
@@ -1964,31 +1961,28 @@ namespace gip.bso.manufacturing
                 Root.Messages.Msg(msg);
                 SendMessage(msg);
             }
-            if (moveQuantity > 0)
+            if (moveQuantity <= Double.Epsilon || moveQuantity > targetQuantity)
             {
-                if (moveQuantity <= 0 || moveQuantity > targetQuantity)
+                //Error50396
+                Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1894, "Error50396", targetQuantity);
+                Root.Messages.Msg(msg);
+                SendMessage(msg);
+                moveQuantity = 0;
+            }
+            else
+            {
+                WizardSchedulerPartslist tmpWizardPl = GetWizardSchedulerPartslist(partslist, moveQuantity, 1, new List<MDSchedulingGroup>() { SelectedTargetScheduleForPWNode.MDSchedulingGroup });
+                if (tmpWizardPl.SelectedMDSchedulingGroup != null)
+                    LoadConfiguration(tmpWizardPl);
+                if (tmpWizardPl.BatchSizeMin > 0)
                 {
-                    //Error50396
-                    Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1894, "Error50396", targetQuantity);
-                    Root.Messages.Msg(msg);
-                    SendMessage(msg);
-                    moveQuantity = 0;
-                }
-                else
-                {
-                    WizardSchedulerPartslist tmpWizardPl = GetWizardSchedulerPartslist(partslist, moveQuantity, 1, new List<MDSchedulingGroup>() { SelectedTargetScheduleForPWNode.MDSchedulingGroup });
-                    if (tmpWizardPl.SelectedMDSchedulingGroup != null)
-                        LoadConfiguration(tmpWizardPl);
-                    if (tmpWizardPl.BatchSizeMin > 0)
+                    if (moveQuantity < tmpWizardPl.BatchSizeMin)
                     {
-                        if (moveQuantity < tmpWizardPl.BatchSizeMin)
-                        {
-                            //Error50397
-                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1908, "Error50397", tmpWizardPl.BatchSizeMin, moveQuantity);
-                            Root.Messages.Msg(msg);
-                            SendMessage(msg);
-                            moveQuantity = 0;
-                        }
+                        //Error50397
+                        Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1908, "Error50397", tmpWizardPl.BatchSizeMin, moveQuantity);
+                        Root.Messages.Msg(msg);
+                        SendMessage(msg);
+                        moveQuantity = 0;
                     }
                 }
             }
@@ -2174,7 +2168,7 @@ namespace gip.bso.manufacturing
                         BSOBatchPlanChild != null &&
                         BSOBatchPlanChild.Value != null;
                     if (isEnabled)
-                        isEnabled = BSOBatchPlanChild.Value.SelectedBatchPlanForIntermediate != null && SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.TargetQuantityUOM > 0;
+                        isEnabled = BSOBatchPlanChild.Value.SelectedBatchPlanForIntermediate != null && SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.TargetQuantityUOM > Double.Epsilon;
                     break;
             }
             return isEnabled;
@@ -2214,7 +2208,7 @@ namespace gip.bso.manufacturing
             item.MDUnit = partslist.MDUnit;
             item.BaseMDUnit = partslist.Material.BaseMDUnit;
             item.Sn = sn;
-            if (targetQuantityUOM > 0)
+            if (targetQuantityUOM > Double.Epsilon)
             {
                 item.TargetQuantityUOM = targetQuantityUOM;
                 if (partslist.MDUnitID.HasValue)
@@ -2335,7 +2329,7 @@ namespace gip.bso.manufacturing
                         success = true;
                         break;
                     case NewScheduledBatchWizardPhaseEnum.DefineQuantites:
-                        success = SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.TargetQuantityUOM > 0 && BatchPlanSuggestion != null;
+                        success = SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.TargetQuantityUOM > Double.Epsilon && BatchPlanSuggestion != null;
                         if (success)
                         {
                             string programNo = SelectedWizardSchedulerPartslist.ProgramNo;
@@ -2491,7 +2485,7 @@ namespace gip.bso.manufacturing
             searchFacilityModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
             searchResult.Add(searchFacilityModel);
 
-            //if (posTargetQuantityUOM > 0)
+            //if (posTargetQuantityUOM  > Double.Epsilon)
             //{
             //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
             //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
