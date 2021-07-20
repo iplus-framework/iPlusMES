@@ -106,6 +106,8 @@
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
+    <Compile Include="EntityPlanningMR\PlanningMR.cs" />
+    <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
@@ -436,6 +438,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DbScripts\iPlusMES\dbsync_2021-07-20_10-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DbScripts\iPlusMES\dbsync_2021-07-16_09-31_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
