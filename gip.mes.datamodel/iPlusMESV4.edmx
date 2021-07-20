@@ -3814,6 +3814,37 @@
           <Property Name="PickingPosID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ProdorderPartslistPosID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
+        <EntityType Name="PlanningMR">
+          <Key>
+            <PropertyRef Name="PlanningMRID" />
+          </Key>
+          <Property Name="PlanningMRID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="PlanningMRNo" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="PlanningName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="RangeFrom" Type="datetime" />
+          <Property Name="RangeTo" Type="datetime" />
+          <Property Name="Template" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="varchar(max)" />
+          <Property Name="XMLConfig" Type="text" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PlanningMRProposal">
+          <Key>
+            <PropertyRef Name="PlanningMRProposalID" />
+          </Key>
+          <Property Name="PlanningMRProposalID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="PlanningMRID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="InOrderID" Type="uniqueidentifier" />
+          <Property Name="ProdOrderID" Type="uniqueidentifier" />
+          <Property Name="ProdOrderPartslistID" Type="uniqueidentifier" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="PriceList">
           <Key>
             <PropertyRef Name="PriceListID" />
@@ -11221,6 +11252,54 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_PlanningMRProposal_InOrderID">
+          <End Role="InOrder" Type="Self.InOrder" Multiplicity="0..1" />
+          <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InOrder">
+              <PropertyRef Name="InOrderID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="InOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_PlanningMR">
+          <End Role="PlanningMR" Type="Self.PlanningMR" Multiplicity="1" />
+          <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_ProdOrderID">
+          <End Role="ProdOrder" Type="Self.ProdOrder" Multiplicity="0..1" />
+          <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrder">
+              <PropertyRef Name="ProdOrderID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="ProdOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_ProdOrderPartslistID">
+          <End Role="ProdOrderPartslist" Type="Self.ProdOrderPartslist" Multiplicity="0..1" />
+          <End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_PriceList_MDCurrency">
           <End Role="MDCurrency" Type="Self.MDCurrency" Multiplicity="1" />
           <End Role="PriceList" Type="Self.PriceList" Multiplicity="*" />
@@ -13506,6 +13585,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySet Name="PickingConfig" EntityType="Self.PickingConfig" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PickingPos" EntityType="Self.PickingPos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PickingPosProdOrderPartslistPos" EntityType="Self.PickingPosProdOrderPartslistPos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PlanningMR" EntityType="Self.PlanningMR" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PlanningMRProposal" EntityType="Self.PlanningMRProposal" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PriceList" EntityType="Self.PriceList" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PriceListMaterial" EntityType="Self.PriceListMaterial" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProdOrder" EntityType="Self.ProdOrder" Schema="dbo" store:Type="Tables" />
@@ -15750,6 +15831,22 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <AssociationSet Name="FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" Association="Self.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos">
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
             <End Role="PickingPosProdOrderPartslistPos" EntitySet="PickingPosProdOrderPartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_InOrderID" Association="Self.FK_PlanningMRProposal_InOrderID">
+            <End Role="InOrder" EntitySet="InOrder" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_PlanningMR" Association="Self.FK_PlanningMRProposal_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_ProdOrderID" Association="Self.FK_PlanningMRProposal_ProdOrderID">
+            <End Role="ProdOrder" EntitySet="ProdOrder" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_ProdOrderPartslistID" Association="Self.FK_PlanningMRProposal_ProdOrderPartslistID">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
           </AssociationSet>
           <AssociationSet Name="FK_PriceList_MDCurrency" Association="Self.FK_PriceList_MDCurrency">
             <End Role="MDCurrency" EntitySet="MDCurrency" />
@@ -19427,6 +19524,24 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="Partslist" EntitySet="Partslist" />
             <End Role="Partslist1" EntitySet="Partslist" />
           </AssociationSet>
+          <EntitySet Name="PlanningMR" EntityType="iPlusMESV4_Model.PlanningMR" />
+          <EntitySet Name="PlanningMRProposal" EntityType="iPlusMESV4_Model.PlanningMRProposal" />
+          <AssociationSet Name="FK_PlanningMRProposal_InOrderID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID">
+            <End Role="InOrder" EntitySet="InOrder" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_ProdOrderID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID">
+            <End Role="ProdOrder" EntitySet="ProdOrder" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -21066,6 +21181,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="InOrderPos_InOrder" Relationship="iPlusMESV4_Model.FK_InOrderPos_InOrderID" FromRole="InOrder" ToRole="InOrderPos" />
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_BillingCompanyAddressID" FromRole="InOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" FromRole="InOrder" ToRole="CompanyAddress" />
+          <NavigationProperty Name="PlanningMRProposal_InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="InOrder" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="InOrderConfig">
           <Key>
@@ -23192,6 +23308,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="ProdOrder" ToRole="MDProdOrderState" />
           <NavigationProperty Name="ProdOrderPartslist_ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="TandTv2StepItem_ProdOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID" FromRole="ProdOrder" ToRole="TandTv2StepItem" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="ProdOrderBatch">
           <Key>
@@ -23250,6 +23367,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -34058,6 +34176,90 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="PlanningMR">
+          <Key>
+            <PropertyRef Name="PlanningMRID" />
+          </Key>
+          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="PlanningName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="RangeFrom" Type="DateTime" Precision="3" />
+          <Property Name="RangeTo" Type="DateTime" Precision="3" />
+          <Property Name="Template" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="PlanningMRProposal_PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
+        </EntityType>
+        <EntityType Name="PlanningMRProposal">
+          <Key>
+            <PropertyRef Name="PlanningMRProposalID" />
+          </Key>
+          <Property Name="PlanningMRProposalID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
+          <Property Name="InOrderID" Type="Guid" />
+          <Property Name="ProdOrderID" Type="Guid" />
+          <Property Name="ProdOrderPartslistID" Type="Guid" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="PlanningMRProposal" ToRole="InOrder" />
+          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMRProposal" ToRole="PlanningMR" />
+          <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="PlanningMRProposal" ToRole="ProdOrder" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="PlanningMRProposal" ToRole="ProdOrderPartslist" />
+        </EntityType>
+        <Association Name="FK_PlanningMRProposal_InOrderID">
+          <End Type="iPlusMESV4_Model.InOrder" Role="InOrder" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InOrder">
+              <PropertyRef Name="InOrderID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="InOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_PlanningMR">
+          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_ProdOrderID">
+          <End Type="iPlusMESV4_Model.ProdOrder" Role="ProdOrder" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrder">
+              <PropertyRef Name="ProdOrderID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="ProdOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_ProdOrderPartslistID">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -39142,6 +39344,39 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMR">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMR">
+              <MappingFragment StoreEntitySet="PlanningMR">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="Template" ColumnName="Template" />
+                <ScalarProperty Name="RangeTo" ColumnName="RangeTo" />
+                <ScalarProperty Name="RangeFrom" ColumnName="RangeFrom" />
+                <ScalarProperty Name="PlanningName" ColumnName="PlanningName" />
+                <ScalarProperty Name="PlanningMRNo" ColumnName="PlanningMRNo" />
+                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMRProposal">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRProposal">
+              <MappingFragment StoreEntitySet="PlanningMRProposal">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
+                <ScalarProperty Name="ProdOrderID" ColumnName="ProdOrderID" />
+                <ScalarProperty Name="InOrderID" ColumnName="InOrderID" />
+                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
+                <ScalarProperty Name="PlanningMRProposalID" ColumnName="PlanningMRProposalID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -40089,6 +40324,12 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMR" Width="1.5" PointX="38" PointY="316.875" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRProposal" Width="1.5" PointX="40.25" PointY="307.875" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
       </Diagram>
     </Diagrams>
   </Designer>

@@ -261,6 +261,7 @@
         public const string TermsOfPayment = "en{'Terms of Payment'}de{'Zahlungsbedingungen'}";
         public const string BillingCompanyAddress = "en{'Billing Address'}de{'Rechnungsadresse'}";
         public const string DeliveryCompanyAddress = "en{'Delivery Address'}de{'Lieferadresse'}";
+        public const string PlanningMR = "en{'Planning'}de{'Planung'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
 
