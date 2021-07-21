@@ -2192,9 +2192,40 @@ namespace gip.bso.manufacturing
             foreach (ExpandResult expand in treeResult)
             {
                 sn++;
-                List<MDSchedulingGroup> schedulingGroups = PartslistMDSchedulerGroupConnections.FirstOrDefault(c => c.PartslistID == expand.Item.PartslistForPosition.PartslistID).SchedulingGroups.ToList();
-                WizardSchedulerPartslist item = GetWizardSchedulerPartslist(expand.Item.PartslistForPosition, expand.Item.TargetQuantityUOM, sn, schedulingGroups);
-                wizardSchedulerPartslists.Add(item);
+                List<MDSchedulingGroup> schedulingGroups =
+                    PartslistMDSchedulerGroupConnections
+                    .FirstOrDefault(c =>
+                    c.PartslistID == expand.Item.PartslistForPosition.PartslistID)
+                    .SchedulingGroups
+                    .OrderBy(c => c.SortIndex)
+                    .ToList();
+                Dictionary<int,Guid> items =
+                    expand
+                    .Item
+                    .PartslistForPosition
+                    .PartslistConfig_Partslist
+                    .Where(c => c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
+                    .ToList()
+                    .ToDictionary(key => (int)key.Value, val => val.VBiACClassWFID.Value);
+                if (items != null && items.Any())
+                {
+                    List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
+                    foreach(var item in items.OrderBy(c=>c.Key))
+                    {
+                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c=>c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x=>x.VBiACClassWFID == item.Value)).FirstOrDefault();
+                        if(mDSchedulingGroup != null)
+                            tmpSchedulingGroups.Add(mDSchedulingGroup);
+                    }
+
+                    tmpSchedulingGroups.AddRange(
+                        schedulingGroups
+                        .Where(c=> !tmpSchedulingGroups.Select(x=>x.MDSchedulingGroupID).Contains(c.MDSchedulingGroupID))
+                        .OrderBy(c=>c.SortIndex)
+                    );
+                    schedulingGroups = tmpSchedulingGroups;
+                }
+                WizardSchedulerPartslist wizardSchedulerPartslist = GetWizardSchedulerPartslist(expand.Item.PartslistForPosition, expand.Item.TargetQuantityUOM, sn, schedulingGroups);
+                wizardSchedulerPartslists.Add(wizardSchedulerPartslist);
             }
             return wizardSchedulerPartslists;
         }
