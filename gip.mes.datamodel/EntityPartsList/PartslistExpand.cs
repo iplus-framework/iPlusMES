@@ -179,7 +179,14 @@ namespace gip.mes.datamodel
         public virtual void LoadTree()
         {
             int i = 1;
-            var posItems = PartslistForPosition.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot && x.AlternativePartslistPosID == null).ToList();
+            var posItems = 
+                PartslistForPosition
+                .PartslistPos_Partslist
+                .Where(x => 
+                        x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot 
+                        && x.AlternativePartslistPosID == null
+                        && !(x.ExplosionOff ?? false))
+                .ToList();
             foreach (var position in posItems)
             {
                 PartslistExpand childExpand = null;
