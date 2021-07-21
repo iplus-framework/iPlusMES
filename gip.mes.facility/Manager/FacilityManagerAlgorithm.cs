@@ -2469,7 +2469,7 @@ namespace gip.mes.facility
                             }
 
                             Global.ACMethodResultState bookingSubResult = Global.ACMethodResultState.Succeeded;
-                            FacilityChargeList facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                            FacilityChargeList facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot).Include(d => d.Facility)
                                                                                                      where (c.Facility.FacilityID == storeForRetrogradePosting.FacilityID)
                                                                                                             && ((c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID)
                                                                                                             || (relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID))
@@ -2487,6 +2487,7 @@ namespace gip.mes.facility
                             if (bookingSubResult == Global.ACMethodResultState.Succeeded)
                             {
                                 ACMethodBooking outwardMethod = NewBookParamOutwardMovement(BP, relationForRPost, postingQuantity);
+                                outwardMethod.OutwardFacility = facilityOutwardChargeSubList.Select(c => c.Facility).FirstOrDefault();
                                 FacilityBooking fbOutward = NewFacilityBooking(outwardMethod);
 
                                 // Mache Stackbuchung

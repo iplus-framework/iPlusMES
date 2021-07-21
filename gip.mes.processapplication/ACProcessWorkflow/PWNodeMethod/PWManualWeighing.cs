@@ -35,7 +35,7 @@ namespace gip.mes.processapplication
             method = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
             method.ParameterValueList.Add(new ACValue("FreeSelectionMode", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("FreeSelectionMode", "en{'Free selection mode for material order'}de{'Freier Auswahlmodus für Materialbestellung'}");
+            paramTranslation.Add("FreeSelectionMode", "en{'Material to be weighed can be freely selected'}de{'Zu verwiegendes Material kann frei ausgewählt werden'}");
 
             method.ParameterValueList.Add(new ACValue("AutoSelectLot", typeof(bool), false, Global.ParamOption.Required));
             paramTranslation.Add("AutoSelectLot", "en{'Automatically select lot'}de{'Los automatisch auswählen'}");
@@ -60,6 +60,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("ComponentsSeqTo", typeof(Int32), 0, Global.ParamOption.Optional));
             paramTranslation.Add("ComponentsSeqTo", "en{'Components to Seq.-No.'}de{'Komponenten BIS Seq.-Nr.'}");
+
+            method.ParameterValueList.Add(new ACValue("AutoInsertQuantToStore", typeof(string), "", Global.ParamOption.Optional));
+            paramTranslation.Add("AutoInsertQuantToStore", "en{'Store for automatic quant creation'}de{'Lagerplatz für automatische Quantanlage'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
@@ -163,12 +166,50 @@ namespace gip.mes.processapplication
         {
             get
             {
-                if(_ZeroBookingFacilityCharge == null)
+                using (ACMonitor.Lock(_20015_LockValue))
                 {
-                    var fbt_ZeroStock = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-                    _ZeroBookingFacilityCharge = fbt_ZeroStock.Clone() as ACMethodBooking;
+                    if (_ZeroBookingFacilityCharge != null)
+                        return _ZeroBookingFacilityCharge.Clone() as ACMethodBooking;
                 }
-                return _ZeroBookingFacilityCharge;
+
+                if (ACFacilityManager == null)
+                    return null;
+
+                ACMethodBooking acBook = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _ZeroBookingFacilityCharge = acBook;
+                    if (_ZeroBookingFacilityCharge != null)
+                        return _ZeroBookingFacilityCharge.Clone() as ACMethodBooking;
+                }
+                return null;
+            }
+        }
+
+        private ACMethodBooking _InventoryNewQuant;
+        public ACMethodBooking InventoryNewQuant
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    if (_InventoryNewQuant != null)
+                        return _InventoryNewQuant.Clone() as ACMethodBooking;
+                }
+
+                if (ACFacilityManager == null)
+                    return null;
+
+                ACMethodBooking acBook = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InventoryNewQuant, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _InventoryNewQuant = acBook;
+                    if (_InventoryNewQuant != null)
+                        return _InventoryNewQuant.Clone() as ACMethodBooking;
+                }
+                return null;
             }
         }
 
@@ -386,11 +427,26 @@ namespace gip.mes.processapplication
             }
         }
 
-        #endregion
+        public string AutoInsertQuantToStore
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("AutoInsertQuantToStore");
+                    if (acValue != null)
+                        return acValue.ParamAsString;
+                }
+                return null;
+            }
+        }
 
-        #region Properties => Materials, Relations and FacilityCharge
+#endregion
 
-        [ACPropertyInfo(999)]
+#region Properties => Materials, Relations and FacilityCharge
+
+[ACPropertyInfo(999)]
         public EntityKey CurrentEndBatchPosKey
         {
             get;
@@ -448,11 +504,11 @@ namespace gip.mes.processapplication
             set;
         }
 
-        public virtual Func<IEnumerable<FacilityCharge>, Guid[], IEnumerable<FacilityCharge>> FacilityChargeListQuery
+        public virtual Func<IQueryable<FacilityCharge>, Guid[], IEnumerable<FacilityCharge>> FacilityChargeListQuery
         {
             get
             {
-                return (fc, a) => fc.Where(c => !c.NotAvailable && a != null && c.Facility != null && c.Facility.VBiFacilityACClassID.HasValue &&
+                return (fc, a) => fc.AsEnumerable().Where(c => a != null && c.Facility != null && c.Facility.VBiFacilityACClassID.HasValue &&
                                                  a.Any(x => x == c.Facility.VBiFacilityACClassID)).ToArray();
             }
         }
@@ -806,8 +862,8 @@ namespace gip.mes.processapplication
                         }
 
                         CurrentOpenMaterial = nextComp.PLPosRelation;
-                        TryAutoSelectFacilityLotOrFacility(CurrentOpenMaterial);
-                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp); //Auto Comp && Auto Lot
+                        bool hasQuants = TryAutoSelectFacilityLotOrFacility(CurrentOpenMaterial);
+                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, hasQuants); //Auto Comp && Auto Lot
                         if (!CurrentFacilityCharge.HasValue && !CurrentFacility.HasValue)
                         {
                             //_ExitFromWaitForFC = false;
@@ -830,21 +886,21 @@ namespace gip.mes.processapplication
 
                     if (CurrentFacility != null || CurrentFacilityCharge != null)
                     {
-                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp); //Man Comp && Auto Lot || ManLot
+                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, null); //Man Comp && Auto Lot || ManLot
                         UnSubscribeToProjectWorkCycle();
                     }
                     else if (AutoSelectLot)
                     {
-                        TryAutoSelectFacilityLotOrFacility(CurrentOpenMaterial);
+                        bool hasQuants = TryAutoSelectFacilityLotOrFacility(CurrentOpenMaterial);
                         if (CurrentFacility != null || CurrentFacilityCharge != null)
                         {
-                            StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp); //Man Comp && Auto Lot || ManLot
+                            StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, hasQuants); //Man Comp && Auto Lot || ManLot
                             UnSubscribeToProjectWorkCycle();
                         }
                     }
                     else
                     {
-                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp);
+                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, null);
                         UnSubscribeToProjectWorkCycle();
                         SetCanStartFromBSO(true);
                     }
@@ -1025,7 +1081,7 @@ namespace gip.mes.processapplication
                         return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(20)", 921, "Error50374", CurrentOpenMaterial.Value);
                     }
 
-                    var fc = GetFacilityChargesForMaterial(rel);
+                    var fc = GetFacilityChargesForMaterial(dbApp, rel.SourceProdOrderPartslistPos.Material);
                     if (fc.Any(c => c.FacilityChargeID == newFacilityCharge.Value))
                     {
                         Msg msg = SetFacilityCharge(newFacilityCharge.Value, CurrentOpenMaterial, forceSetFC_F);
@@ -1150,7 +1206,7 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    FacilityCharge fc = GetFacilityChargesForMaterial(posRel).FirstOrDefault(c => c.FacilityLot != null && c.FacilityLot.LotNo == enteredLotNo);
+                    FacilityCharge fc = GetFacilityChargesForMaterial(dbApp, posRel.SourceProdOrderPartslistPos.Material).FirstOrDefault(c => c.FacilityLot != null && c.FacilityLot.LotNo == enteredLotNo);
                     if (fc == null)
                     {
                         //Error50268: An available quant with Lotnumber {0} doesn't exist in the warehouse!
@@ -1402,7 +1458,12 @@ namespace gip.mes.processapplication
         //TODO:Get component only for pwnode, in bso get from database directy in one query
         protected virtual ProdOrderPartslistPosRelation[] OnGetAllMaterials(Database dbIPlus, DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos)
         {
-            ProdOrderPartslistPosRelation[] queryOpenDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
+            ProdOrderPartslistPosRelation[] queryOpenDosings = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                .Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
+                                                .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID)
+                                                .ToArray()
+            //ProdOrderPartslistPosRelation[] queryOpenDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
                                 .Where(c => c.RemainingDosingQuantityUOM < (MinWeightQuantity * -1) && c.MDProdOrderPartslistPosState != null
                                         && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
                                          && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
@@ -1475,9 +1536,9 @@ namespace gip.mes.processapplication
         //TODO Ivan: Last used and Expiration first
         public virtual Msg ValidateFacilityCharge(Guid? facilityChargeID, Guid? plPosRelationID)
         {
-            if(LotValidation != null && LotValidation != LotUsageEnum.None)
+            if (LotValidation != null && LotValidation != LotUsageEnum.None)
             {
-                if(LotValidation == LotUsageEnum.FIFO || LotValidation == LotUsageEnum.LIFO)
+                if (LotValidation == LotUsageEnum.FIFO || LotValidation == LotUsageEnum.LIFO)
                 {
                     return ValidateFacilityChargeFIFOorLIFO(facilityChargeID, plPosRelationID);
                 }
@@ -1510,7 +1571,7 @@ namespace gip.mes.processapplication
                     return new Msg(this, eMsgLevel.Error, PWClassName, "ValidateFacilityChargeFIFOorLIFO(40)", 40, "Error50374", plPosRelationID);
                 }
 
-                IEnumerable<FacilityCharge> relevantFacilityCharges = GetFacilityChargesForMaterial(rel);
+                IEnumerable<FacilityCharge> relevantFacilityCharges = GetFacilityChargesForMaterial(dbApp, rel.SourceProdOrderPartslistPos.Material);
 
                 if (relevantFacilityCharges != null && relevantFacilityCharges.Any())
                 {
@@ -1567,33 +1628,44 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 999)]
         public ACValueList GetAvailableFacilityCharges(Guid PLPosRelation)
         {
-            using (DatabaseApp db = new DatabaseApp())
+            using (Database db = new Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
             {
-                ProdOrderPartslistPosRelation rel = db.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRelation);
+                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation
+                                                    .Include(c => c.SourceProdOrderPartslistPos)
+                                                    .Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                    .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
+                                                    .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRelation);
                 if (rel != null)
                 {
-                    var facilityChargeList = GetFacilityChargesForMaterial(rel);
+                    var facilityChargeList = GetFacilityChargesForMaterial(dbApp, rel.SourceProdOrderPartslistPos.Material);
                     return new ACValueList(facilityChargeList.Select(c => new ACValue("ID", c.FacilityChargeID)).ToArray());
                 }
                 return null;
             }
         }
 
-        private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(ProdOrderPartslistPosRelation relation)
+        private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, Material material)
         {
-            IEnumerable<FacilityCharge> fc = relation.SourceProdOrderPartslistPos.Material.FacilityCharge_Material;
-            if (fc == null)
+            IQueryable<FacilityCharge> facilityChargesQuery =  dbApp.FacilityCharge
+                .Include(c => c.Material)
+                .Include(c => c.Facility)
+                .Include(c => c.FacilityLot)
+                .Where(c => c.MaterialID == material.MaterialID
+                            && (   !material.IsLotManaged
+                                || !c.NotAvailable));
+            if (facilityChargesQuery == null)
                 return null;
 
-            return FacilityChargeListQuery(fc, AvailableStorages);
+            return FacilityChargeListQuery(facilityChargesQuery, AvailableStorages);
         }
 
         [ACMethodInfo("", "", 999)]
         public ACValueList GetAvailableFacilities(Guid PLPosRelation)
         {
-            using (DatabaseApp db = new DatabaseApp())
+            using (DatabaseApp dbApp = new DatabaseApp())
             {
-                ProdOrderPartslistPosRelation rel = db.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRelation);
+                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRelation);
                 if (rel != null)
                 {
                     var facilitiesList = GetFacilitiesForMaterial(rel);
@@ -1645,7 +1717,9 @@ namespace gip.mes.processapplication
             {
                 RoutingResult routeResult = ACRoutingService.FindSuccessors(RoutingService, db, false, toComponent,
                                         PAMParkingspace.SelRuleID_ParkingSpace, RouteDirections.Backwards, new object[] { },
-                                        (c, p, r) => c.ObjectFullType == typeof(PAMParkingspace), null, 0, true, true);
+                                        (c, p, r) => c.ObjectFullType == typeof(PAMParkingspace),
+                                        (c, p, r) => c.ObjectFullType == typeof(PAProcessModule), 
+                                        0, true, true);
 
                 if (routeResult != null)
                 {
@@ -1663,11 +1737,13 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        private void TryAutoSelectFacilityLotOrFacility(Guid? materialID)
+        /// <summary>
+        /// return true if there are any quants in the store
+        /// </summary>
+        /// <param name="materialID"></param>
+        /// <returns></returns>
+        private bool TryAutoSelectFacilityLotOrFacility(Guid? materialID)
         {
-            if (!AutoSelectLot)
-                return;
-
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
@@ -1677,49 +1753,53 @@ namespace gip.mes.processapplication
                     Material mat = rel.SourceProdOrderPartslistPos.Material;
                     if (mat != null)
                     {
+                        Msg msg = null;
+                        var availableFC = GetFacilityChargesForMaterial(dbApp, mat);
+                        if (!AutoSelectLot)
+                            return availableFC.Any();
+
                         if (mat.IsLotManaged)
                         {
-                            Msg msg = null;
-                            var availableFC = GetFacilityChargesForMaterial(rel);
-
                             switch (AutoSelectLotPriority)
                             {
                                 case LotUsageEnum.FIFO:
-                                        availableFC = availableFC.OrderBy(c =>  c.FillingDate.HasValue).ThenBy(c => c.FillingDate).ToArray();
-                                        break;
+                                    availableFC = availableFC.OrderBy(c => c.FillingDate.HasValue).ThenBy(c => c.FillingDate).ToArray();
+                                    break;
                                 case LotUsageEnum.ExpirationFirst:
-                                        availableFC = availableFC.OrderBy(c => c.ExpirationDate.HasValue).ThenBy(c => c.ExpirationDate).ToArray();
-                                        break;
+                                    availableFC = availableFC.OrderBy(c => c.ExpirationDate.HasValue).ThenBy(c => c.ExpirationDate).ToArray();
+                                    break;
                                 case LotUsageEnum.LastUsed:
-                                        availableFC = TryGetLastUsedLot(availableFC, mat.MaterialID, dbApp);
-                                        break;
+                                    availableFC = TryGetLastUsedLot(availableFC, mat.MaterialID, dbApp);
+                                    break;
                                 case LotUsageEnum.LIFO:
-                                        availableFC = availableFC.OrderByDescending(c => c.FillingDate.HasValue).ThenByDescending(c => c.FillingDate).ToArray();
-                                        break;
-                            }
-
-                            foreach (var fc in availableFC)
-                            {
-                                msg = SetFacilityCharge(fc.FacilityChargeID, materialID);
-                                if (msg == null)
-                                    return;
+                                    availableFC = availableFC.OrderByDescending(c => c.FillingDate.HasValue).ThenByDescending(c => c.FillingDate).ToArray();
+                                    break;
                             }
                         }
-                        else
+
+                        foreach (var fc in availableFC)
                         {
-                            Msg msg = null;
-                            var availableFacilities = GetFacilitiesForMaterial(rel);
-
-                            foreach(var f in availableFacilities)
-                            {
-                                msg = SetFacility(f.FacilityID, materialID);
-                                if (msg == null)
-                                    return;
-                            }
+                            msg = SetFacilityCharge(fc.FacilityChargeID, materialID);
+                            if (msg == null)
+                                return true;
                         }
+                        //}
+                        //else
+                        //{
+                        //    Msg msg = null;
+                        //    var availableFacilities = GetFacilitiesForMaterial(rel);
+
+                        //    foreach(var f in availableFacilities)
+                        //    {
+                        //        msg = SetFacility(f.FacilityID, materialID);
+                        //        if (msg == null)
+                        //            return;
+                        //    }
+                        //}
                     }
                 }
             }
+            return false;
         }
 
         private IEnumerable<FacilityCharge> TryGetLastUsedLot(IEnumerable<FacilityCharge> facilityCharges, Guid materialID, DatabaseApp dbApp)
@@ -1825,6 +1905,86 @@ namespace gip.mes.processapplication
             }
         }
 
+        private MsgWithDetails DoAutoInsertQuantToStore(WeighingComponent weighingComponent)
+        {
+            MsgWithDetails msg = null;
+            if (weighingComponent == null)
+                return null;
+            try
+            {
+                using (Database db = new Database())
+                using (DatabaseApp dbApp = new DatabaseApp(db))
+                {
+                    Material material = dbApp.Material.Where(c => c.MaterialID == weighingComponent.Material).FirstOrDefault();
+                    if (material == null)
+                        return null;
+                    var facilityChargeList = GetFacilityChargesForMaterial(dbApp, material);
+                    if (!facilityChargeList.Any() && !String.IsNullOrEmpty(AutoInsertQuantToStore))
+                    {
+                        ACComponent storeComponent = ACUrlCommand(AutoInsertQuantToStore) as ACComponent;
+                        if (storeComponent != null)
+                        {
+                            Facility store = dbApp.Facility.Where(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID.Value == storeComponent.ComponentClass.ACClassID).FirstOrDefault();
+                            if (store != null)
+                            {
+                                ACMethodBooking bookingParam = InventoryNewQuant;
+                                if (bookingParam != null)
+                                {
+                                    bookingParam.InwardMaterial = material;
+                                    bookingParam.InwardFacility = store;
+                                    bookingParam.InwardQuantity = 1000000;
+                                    if (material.IsLotManaged)
+                                    {
+                                        string secondaryKey = Root.NoManager.GetNewNo(db, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
+                                        FacilityLot fl = FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                                        fl.Material = material;
+                                        bookingParam.InwardFacilityLot = fl;
+                                    }
+
+                                    msg = dbApp.ACSaveChangesWithRetry();
+                                    // 2. Führe Buchung durch
+                                    if (msg != null)
+                                    {
+                                        Messages.LogError(this.GetACUrl(), "DoAutoInsertQuantToStore(1100)", msg.InnerMessage);
+                                        OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoAutoInsertQuantToStore", 1100), true);
+                                    }
+                                    else
+                                    {
+                                        ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
+                                        if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                        {
+                                            Messages.LogError(this.GetACUrl(), "DoAutoInsertQuantToStore(1110)", bookingParam.ValidMessage.InnerMessage);
+                                            OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoAutoInsertQuantToStore", 1110), true);
+                                        }
+                                        else
+                                        {
+                                            if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
+                                            {
+                                                Messages.LogError(this.GetACUrl(), "DoAutoInsertQuantToStore(1120)", bookingParam.ValidMessage.InnerMessage);
+                                                OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoAutoInsertQuantToStore", 1120), true);
+                                            }
+                                            msg = dbApp.ACSaveChangesWithRetry();
+                                            if (msg != null)
+                                            {
+                                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1130), true);
+                                                Messages.LogError(this.GetACUrl(), "DoAutoInsertQuantToStore(1130)", msg.Message);
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Messages.LogException(this.GetACUrl(), "GetAvailableFacilityCharges(0)", ex);
+            }
+            return msg;
+        }
+
         private void UpdatePAFACMethod(WeighingComponent weighingComponent, ACMethod acMethod)
         {
             if (weighingComponent != null)
@@ -1892,12 +2052,18 @@ namespace gip.mes.processapplication
 
         #region Methods => StartWeighingComponent
 
-        private StartNextCompResult StartManualWeighingNextComp(PAProcessModule module, WeighingComponent weighingComponent)
+        private StartNextCompResult StartManualWeighingNextComp(PAProcessModule module, WeighingComponent weighingComponent, bool? hasQuantsChecked)
         {
             Msg msg = null;
 
             if (module == null)
                 return StartNextCompResult.CycleWait;
+
+            if (   (!hasQuantsChecked.HasValue || !hasQuantsChecked.Value)
+                && !String.IsNullOrEmpty(AutoInsertQuantToStore))
+            {
+                DoAutoInsertQuantToStore(weighingComponent);
+            }
 
             if (!OnStartManualWeighingNextComp(weighingComponent))
                 return StartNextCompResult.CycleWait;
@@ -2377,13 +2543,13 @@ namespace gip.mes.processapplication
 
         public Msg DoFacilityChargeZeroBooking(Guid facilityCharge)
         {
-            if (ZeroBookingFacilityCharge == null)
+            ACMethodBooking fbtZeroBooking = ZeroBookingFacilityCharge as ACMethodBooking;
+
+            if (fbtZeroBooking == null)
             {
                 //Error50364: Can not find the zero booking ACMethod!
                 return new Msg(this, eMsgLevel.Error, PWClassName, "DoFacilityChargeZeroBooking(10)", 2133, "Error50364");
             }
-
-            ACMethodBooking fbtZeroBooking = ZeroBookingFacilityCharge.Clone() as ACMethodBooking;
 
             using (DatabaseApp dbApp = new DatabaseApp())
             {
@@ -2626,6 +2792,7 @@ namespace gip.mes.processapplication
         public WeighingComponent(ProdOrderPartslistPosRelation posRelation, short weighState)
         {
             PLPosRelation = posRelation.ProdOrderPartslistPosRelationID;
+            Material = posRelation.SourceProdOrderPartslistPos.MaterialID.Value;
             Sequence = posRelation.Sequence;
             WeighState = weighState;
             TargetQuantity = Math.Abs(posRelation.RemainingDosingQuantityUOM);
@@ -2637,6 +2804,12 @@ namespace gip.mes.processapplication
         }
 
         public Guid PLPosRelation
+        {
+            get;
+            set;
+        }
+
+        public Guid Material
         {
             get;
             set;

@@ -31,7 +31,7 @@ namespace gip.mes.processapplication
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
 
             method.ParameterValueList.Add(new ACValue("FreeSelectionMode", typeof(bool), false, Global.ParamOption.Required));
-            paramTranslation.Add("FreeSelectionMode", "en{'Free selection mode for material order'}de{'Freier Auswahlmodus für Materialbestellung'}");
+            paramTranslation.Add("FreeSelectionMode", "en{'Material to be weighed can be freely selected'}de{'Zu verwiegendes Material kann frei ausgewählt werden'}");
 
             method.ParameterValueList.Add(new ACValue("AutoSelectLot", typeof(bool), false, Global.ParamOption.Required));
             paramTranslation.Add("AutoSelectLot", "en{'Automatically select lot'}de{'Los automatisch auswählen'}");
@@ -42,6 +42,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("EnterLotManually", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("EnterLotManually", "en{'Enter lot manually'}de{'Los manuell eingeben'}");
 
+            method.ParameterValueList.Add(new ACValue("LotValidation", typeof(LotUsageEnum?), null, Global.ParamOption.Optional));
+            paramTranslation.Add("LotValidation", "en{'Lot validation'}de{'Chargenvalidierung'}");
+
             method.ParameterValueList.Add(new ACValue("OnlyAcknowledge", typeof(bool), false, Global.ParamOption.Optional)); // Acknowledge without entering added quantity
             paramTranslation.Add("OnlyAcknowledge", "en{'Only acknowledge'}de{'Nur quittieren'}");
 
@@ -50,6 +53,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("ComponentsSeqTo", typeof(Int32), 0, Global.ParamOption.Optional));
             paramTranslation.Add("ComponentsSeqTo", "en{'Components to Seq.-No.'}de{'Komponenten BIS Seq.-Nr.'}");
+
+            method.ParameterValueList.Add(new ACValue("AutoInsertQuantToStore", typeof(string), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoInsertQuantToStore", "en{'Store for automatic quant creation'}de{'Lagerplatz für automatische Quantanlage'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualAddition), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualAddition), ACStateConst.SMStarting, wrapper);
