@@ -82,7 +82,15 @@ namespace gip.mes.facility
             try
             {
                 ACProdOrderManager aCProdOrderManager = ACProdOrderManager.GetServiceInstance(this);
-                List<ProdOrderBatchPlan> batchPlans = aCProdOrderManager.GetProductionLinieBatchPlans(databaseApp, mdSchedulingGroupID, GlobalApp.BatchPlanState.Created, GlobalApp.BatchPlanState.Paused, null, null, null).ToList();
+                List<ProdOrderBatchPlan> batchPlans = aCProdOrderManager.GetProductionLinieBatchPlans(
+                    databaseApp, 
+                    mdSchedulingGroupID, 
+                    GlobalApp.BatchPlanState.Created, 
+                    GlobalApp.BatchPlanState.Paused, 
+                    null, 
+                    null, 
+                    null,
+                    null).ToList();
                 if (isBackward)
                     batchPlans = batchPlans.OrderByDescending(c => c.ScheduledOrder).ToList();
 

@@ -39,7 +39,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region New/Delete
-        public static PlanningMRProposal NewACObject(DatabaseApp dbApp, IACObject parentACObject, string secondaryKey)
+        public static PlanningMRProposal NewACObject(DatabaseApp dbApp, IACObject parentACObject)
         {
             PlanningMRProposal entity = new PlanningMRProposal();
             entity.PlanningMRProposalID = Guid.NewGuid();

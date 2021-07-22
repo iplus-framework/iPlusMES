@@ -134,7 +134,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         #endregion
 
         #region c´tors
@@ -191,7 +190,6 @@ namespace gip.bso.manufacturing
                 BSOMaterialPreparationChild.Value.OnSearchStockMaterial += Value_OnSearchStockMaterial;
 
             _CreatedBatchState = new ACPropertyConfigValue<vd.GlobalApp.BatchPlanState>(this, "CreatedBatchState", vd.GlobalApp.BatchPlanState.Created);
-
 
             return true;
         }
@@ -395,7 +393,6 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
 
         private void ChildBSO_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -630,6 +627,23 @@ namespace gip.bso.manufacturing
         #endregion
 
 
+        private PlanningMR _FilterPlanningMR;
+        public PlanningMR FilterPlanningMR
+        {
+            get
+            {
+                return _FilterPlanningMR;
+            }
+            set
+            {
+                if (_FilterPlanningMR != value)
+                {
+                    _FilterPlanningMR = value;
+                    LoadProdOrderBatchPlanList();
+                    OnPropertyChanged("FilterPlanningMR");
+                }
+            }
+        }
         #endregion
 
         #region Facility
@@ -853,8 +867,10 @@ namespace gip.bso.manufacturing
                         mdSchedulingGroupID,
                         startState,
                         endState,
-                        FilterStartTime, FilterEndTime,
-                        prodOrderState);
+                        FilterStartTime,
+                        FilterEndTime,
+                        prodOrderState,
+                        FilterPlanningMR?.PlanningMRID);
             }
             finally
             {
@@ -909,12 +925,19 @@ namespace gip.bso.manufacturing
             if (SelectedScheduleForPWNode == null)
                 return new List<ProdOrderPartslistPlanWrapper>();
 
-            return GetProdOrderPartslistsPlan(DatabaseApp, SelectedScheduleForPWNode.MDSchedulingGroupID, MDProdOrderState.ProdOrderStates.InProduction);
+            ObjectQuery<ProdOrderPartslistPlanWrapper> batchQuery = 
+                s_cQry_ProdOrderPartslistForPWNode(
+                    DatabaseApp,
+                    SelectedScheduleForPWNode.MDSchedulingGroupID,
+                    (short)MDProdOrderState.ProdOrderStates.InProduction,
+                    FilterPlanningMR?.PlanningMRID) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+            batchQuery.MergeOption = MergeOption.OverwriteChanges;
+            return batchQuery.ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, short, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, short, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, toOrderState) => ctx.ProdOrderPartslist
+        protected static readonly Func<DatabaseApp, Guid, short, Guid?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, short, Guid?, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, toOrderState, planningMRID) => ctx.ProdOrderPartslist
                                                         .Include("MDProdOrderState")
                                                         .Include("ProdOrder")
                                                         .Include("Partslist")
@@ -924,6 +947,10 @@ namespace gip.bso.manufacturing
                                                         .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
                                                         .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
                                                              && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
+                                                             && (
+                                                                    (planningMRID == null &&    !c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                                    || (planningMRID != null &&  c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                                )
                                                              && c
                                                                  .Partslist
                                                                  .PartslistACClassMethod_Partslist
@@ -941,13 +968,6 @@ namespace gip.bso.manufacturing
                                                             PlannedQuantityUOM = c.ProdOrderBatchPlan_ProdOrderPartslist.Any() ? c.ProdOrderBatchPlan_ProdOrderPartslist.Sum(d => d.TotalSize) : 0.0
                                                         })
         );
-
-        public IEnumerable<ProdOrderPartslistPlanWrapper> GetProdOrderPartslistsPlan(DatabaseApp databaseApp, Guid mdSchedulingGroupID, MDProdOrderState.ProdOrderStates toOrderState)
-        {
-            ObjectQuery<ProdOrderPartslistPlanWrapper> batchQuery = s_cQry_ProdOrderPartslistForPWNode(databaseApp, mdSchedulingGroupID, (short)toOrderState) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
-            batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            return batchQuery.ToList();
-        }
 
         #endregion
 
@@ -2224,7 +2244,7 @@ namespace gip.bso.manufacturing
                     .SchedulingGroups
                     .OrderBy(c => c.SortIndex)
                     .ToList();
-                Dictionary<int,Guid> items =
+                Dictionary<int, Guid> items =
                     expand
                     .Item
                     .PartslistForPosition
@@ -2235,17 +2255,17 @@ namespace gip.bso.manufacturing
                 if (items != null && items.Any())
                 {
                     List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
-                    foreach(var item in items.OrderBy(c=>c.Key))
+                    foreach (var item in items.OrderBy(c => c.Key))
                     {
-                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c=>c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x=>x.VBiACClassWFID == item.Value)).FirstOrDefault();
-                        if(mDSchedulingGroup != null)
+                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == item.Value)).FirstOrDefault();
+                        if (mDSchedulingGroup != null)
                             tmpSchedulingGroups.Add(mDSchedulingGroup);
                     }
 
                     tmpSchedulingGroups.AddRange(
                         schedulingGroups
-                        .Where(c=> !tmpSchedulingGroups.Select(x=>x.MDSchedulingGroupID).Contains(c.MDSchedulingGroupID))
-                        .OrderBy(c=>c.SortIndex)
+                        .Where(c => !tmpSchedulingGroups.Select(x => x.MDSchedulingGroupID).Contains(c.MDSchedulingGroupID))
+                        .OrderBy(c => c.SortIndex)
                     );
                     schedulingGroups = tmpSchedulingGroups;
                 }
@@ -2567,8 +2587,17 @@ namespace gip.bso.manufacturing
                 prodOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = ProdOrderManager.GetProductionLinieBatchPlans(DatabaseApp, null, startState, endState,
-                                                                                                                            FilterStartTime, FilterEndTime, prodOrderState);
+            ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = 
+                ProdOrderManager
+                .GetProductionLinieBatchPlans(
+                    DatabaseApp, 
+                    null, 
+                    startState, 
+                    endState,
+                    FilterStartTime, 
+                    FilterEndTime, 
+                    prodOrderState,
+                    FilterPlanningMR?.PlanningMRID);
 
             int displayOrder = 0;
 
@@ -2836,6 +2865,12 @@ namespace gip.bso.manufacturing
             {
                 Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.TargetQuantityUOM, out prodOrderPartslist);
                 success = msg == null || msg.IsSucceded();
+
+                if (FilterPlanningMR != null)
+                {
+                    PlanningMRProposal proposal = PlanningMRProposal.NewACObject(DatabaseApp, FilterPlanningMR);
+                    FilterPlanningMR.PlanningMRProposal_PlanningMR.Add(proposal);
+                }
             }
 
             if (success)
