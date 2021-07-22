@@ -954,9 +954,9 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, toOrderState) => ctx.ProdOrderBatchPlan
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, toOrderState, planningMRID) => ctx.ProdOrderBatchPlan
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
@@ -968,15 +968,26 @@ namespace gip.mes.facility
                                             && (filterEndTime == null
                                                  || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
                                                  || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime))
+                                             && (
+                                                    (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                    || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                )
                                           )
                                     .OrderBy(c => c.ScheduledOrder ?? 0)
         );
 
 
-        public ObservableCollection<ProdOrderBatchPlan> GetProductionLinieBatchPlans(DatabaseApp databaseApp, Guid? mdSchedulingGroupID, GlobalApp.BatchPlanState fromPlanState, GlobalApp.BatchPlanState toPlanState, DateTime? filterStartTime, DateTime? filterEndTime,
-            MDProdOrderState.ProdOrderStates? toOrderState)
+        public ObservableCollection<ProdOrderBatchPlan> GetProductionLinieBatchPlans(
+            DatabaseApp databaseApp, 
+            Guid? mdSchedulingGroupID, 
+            GlobalApp.BatchPlanState fromPlanState, 
+            GlobalApp.BatchPlanState toPlanState, 
+            DateTime? filterStartTime, 
+            DateTime? filterEndTime,
+            MDProdOrderState.ProdOrderStates? toOrderState,
+            Guid? planningMRID)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, toOrderState.HasValue ? (short?)toOrderState.Value : null) as ObjectQuery<ProdOrderBatchPlan>;
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, toOrderState.HasValue ? (short?)toOrderState.Value : null, planningMRID) as ObjectQuery<ProdOrderBatchPlan>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
