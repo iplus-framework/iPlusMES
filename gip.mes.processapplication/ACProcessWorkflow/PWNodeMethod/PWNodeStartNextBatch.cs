@@ -10,7 +10,7 @@ namespace gip.mes.processapplication
 {
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Start next batch'}de{'Nächsten Batch starten'}", Global.ACKinds.TPWNodeStatic, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWNodeStartNextBatch : PWBaseNodeProcess
+    public class PWNodeStartNextBatch : PWBaseNodeProcess, IACMyConfigCache
     {
         public const string PWClassName = "PWNodeStartNextBatch";
 
