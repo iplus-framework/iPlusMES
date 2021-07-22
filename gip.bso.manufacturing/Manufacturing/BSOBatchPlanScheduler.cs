@@ -2587,8 +2587,17 @@ namespace gip.bso.manufacturing
                 prodOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = ProdOrderManager.GetProductionLinieBatchPlans(DatabaseApp, null, startState, endState,
-                                                                                                                            FilterStartTime, FilterEndTime, prodOrderState);
+            ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = 
+                ProdOrderManager
+                .GetProductionLinieBatchPlans(
+                    DatabaseApp, 
+                    null, 
+                    startState, 
+                    endState,
+                    FilterStartTime, 
+                    FilterEndTime, 
+                    prodOrderState,
+                    FilterPlanningMR?.PlanningMRID);
 
             int displayOrder = 0;
 

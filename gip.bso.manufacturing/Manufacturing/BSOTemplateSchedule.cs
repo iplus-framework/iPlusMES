@@ -9,6 +9,10 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName)]
     public class BSOTemplateSchedule : ACBSOvbNav
     {
+        #region const
+        public const string Const_BSOBatchPlanScheduler_Child = @"BSOBatchPlanScheduler_Child";
+        #endregion
+
         #region c´tors
 
         public BSOTemplateSchedule(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -31,6 +35,24 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #region Child (Local BSOs)
+
+        ACChildItem<BSOBatchPlanScheduler> _BSOBatchPlanScheduler_Child;
+        [ACPropertyInfo(590)]
+        [ACChildInfo(Const_BSOBatchPlanScheduler_Child, typeof(BSOBatchPlanScheduler))]
+        public ACChildItem<BSOBatchPlanScheduler> BSOBatchPlanScheduler_Child
+        {
+            get
+            {
+                if (_BSOBatchPlanScheduler_Child == null)
+                    _BSOBatchPlanScheduler_Child = new ACChildItem<BSOBatchPlanScheduler>(this, Const_BSOBatchPlanScheduler_Child);
+                return _BSOBatchPlanScheduler_Child;
+            }
+        }
+
+        #endregion
+
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         /// <summary>
@@ -72,8 +94,12 @@ namespace gip.bso.manufacturing
             {
                 if (AccessPrimary == null)
                     return;
-                AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedPlanningMR");
+                if(AccessPrimary.Selected != value)
+                {
+                    AccessPrimary.Selected = value;
+                    NotifiyChangedCurrentPlanningMR(AccessPrimary.Selected);
+                    OnPropertyChanged("SelectedPlanningMR");
+                }
             }
         }
 
@@ -94,8 +120,12 @@ namespace gip.bso.manufacturing
             {
                 if (AccessPrimary == null)
                     return;
-                AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentPlanningMR");
+                if(AccessPrimary.Current != value)
+                {
+                    AccessPrimary.Current = value;
+                    NotifiyChangedCurrentPlanningMR(AccessPrimary.Current);
+                    OnPropertyChanged("CurrentPlanningMR");
+                }
             }
         }
 
@@ -239,6 +269,12 @@ namespace gip.bso.manufacturing
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("PlanningMRList");
+        }
+
+        public void NotifiyChangedCurrentPlanningMR(PlanningMR planningMR)
+        {
+            if(BSOBatchPlanScheduler_Child != null && BSOBatchPlanScheduler_Child.Value != null)
+                BSOBatchPlanScheduler_Child.Value.FilterPlanningMR = planningMR ?? new PlanningMR();
         }
         #endregion
 
