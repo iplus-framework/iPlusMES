@@ -15,7 +15,7 @@ using vd = gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.ProdOrderBatchPlan.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.ProdOrderBatchPlan.ClassName)]
     public class BSOBatchPlanScheduler : ACBSOvb
     {
         #region const
@@ -1208,7 +1208,7 @@ namespace gip.bso.manufacturing
             get
             {
                 string designName = "Batch";
-                if (ParentACObject != null && ParentACObject.ACIdentifier == BSOTemplateSchedule.ClassName)
+                if (ParentACObject != null && ParentACObject.ACType.ACIdentifier == BSOTemplateSchedule.ClassName)
                     designName = "BatchMin";
                 if (IsWizard)
                     designName = "Wizard";
