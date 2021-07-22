@@ -925,7 +925,7 @@ namespace gip.bso.manufacturing
             if (SelectedScheduleForPWNode == null)
                 return new List<ProdOrderPartslistPlanWrapper>();
 
-            ObjectQuery<ProdOrderPartslistPlanWrapper> batchQuery = 
+            ObjectQuery<ProdOrderPartslistPlanWrapper> batchQuery =
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
@@ -948,8 +948,8 @@ namespace gip.bso.manufacturing
                                                         .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
                                                              && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
                                                              && (
-                                                                    (planningMRID == null &&    !c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
-                                                                    || (planningMRID != null &&  c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                                    (planningMRID == null && !c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                                    || (planningMRID != null && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                                                                 )
                                                              && c
                                                                  .Partslist
@@ -1208,6 +1208,8 @@ namespace gip.bso.manufacturing
             get
             {
                 string designName = "Batch";
+                if (ParentACObject != null && ParentACObject.ACIdentifier == BSOTemplateSchedule.ClassName)
+                    designName = "BatchMin";
                 if (IsWizard)
                     designName = "Wizard";
                 gip.core.datamodel.ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
@@ -2587,15 +2589,15 @@ namespace gip.bso.manufacturing
                 prodOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = 
+            ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans =
                 ProdOrderManager
                 .GetProductionLinieBatchPlans(
-                    DatabaseApp, 
-                    null, 
-                    startState, 
+                    DatabaseApp,
+                    null,
+                    startState,
                     endState,
-                    FilterStartTime, 
-                    FilterEndTime, 
+                    FilterStartTime,
+                    FilterEndTime,
                     prodOrderState,
                     FilterPlanningMR?.PlanningMRID);
 
@@ -2866,10 +2868,13 @@ namespace gip.bso.manufacturing
                 Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.TargetQuantityUOM, out prodOrderPartslist);
                 success = msg == null || msg.IsSucceded();
 
-                if (FilterPlanningMR != null)
+                if (FilterPlanningMR != null && success)
                 {
-                    PlanningMRProposal proposal = PlanningMRProposal.NewACObject(DatabaseApp, FilterPlanningMR);
-                    FilterPlanningMR.PlanningMRProposal_PlanningMR.Add(proposal);
+                    PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == FilterPlanningMR.PlanningMRID);
+                    PlanningMRProposal proposal = PlanningMRProposal.NewACObject(DatabaseApp, planningMR);
+                    proposal.ProdOrder = prodOrderPartslist.ProdOrder;
+                    proposal.ProdOrderPartslist = prodOrderPartslist;
+                    planningMR.PlanningMRProposal_PlanningMR.Add(proposal);
                 }
             }
 

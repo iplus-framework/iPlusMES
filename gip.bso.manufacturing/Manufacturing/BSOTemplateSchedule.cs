@@ -10,6 +10,7 @@ namespace gip.bso.manufacturing
     public class BSOTemplateSchedule : ACBSOvbNav
     {
         #region const
+        public const string ClassName = @"BSOTemplateSchedule";
         public const string Const_BSOBatchPlanScheduler_Child = @"BSOBatchPlanScheduler_Child";
         #endregion
 
@@ -26,6 +27,8 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            var test = BSOBatchPlanScheduler_Child;
+            Search();
             return true;
         }
 
@@ -214,10 +217,12 @@ namespace gip.bso.manufacturing
         public void New()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
-            CurrentPlanningMR = PlanningMR.NewACObject(DatabaseApp, null, secondaryKey);
-            DatabaseApp.PlanningMR.AddObject(CurrentPlanningMR);
-            ACState = Const.SMNew;
-
+            PlanningMR planningMR = PlanningMR.NewACObject(DatabaseApp, null, secondaryKey);
+            planningMR.Template = true;
+            AccessPrimary.NavList.Add(planningMR);
+            DatabaseApp.PlanningMR.AddObject(planningMR);
+            CurrentPlanningMR = planningMR;
+            OnPropertyChanged("PlanningMRList");
         }
 
         /// <summary>

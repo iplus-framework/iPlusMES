@@ -969,7 +969,7 @@ namespace gip.mes.facility
                                                  || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
                                                  || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime))
                                              && (
-                                                    (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                                    (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
                                                     || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                                                 )
                                           )
