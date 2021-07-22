@@ -2380,10 +2380,10 @@ namespace gip.bso.manufacturing
                         {
                             BatchPlanSuggestion = new BatchPlanSuggestion()
                             {
-                                TotalSize = SelectedWizardSchedulerPartslist.TargetQuantity,
+                                TotalSize = SelectedWizardSchedulerPartslist.MDUnit != null ? SelectedWizardSchedulerPartslist.TargetQuantity : SelectedWizardSchedulerPartslist.TargetQuantityUOM,
                                 ItemsList = new BindingList<BatchPlanSuggestionItem>()
                             };
-                            BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem(1, SelectedWizardSchedulerPartslist.TargetQuantity, 1, SelectedWizardSchedulerPartslist.TargetQuantity));
+                            BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem(1, SelectedWizardSchedulerPartslist.MDUnit != null ? SelectedWizardSchedulerPartslist.TargetQuantity : SelectedWizardSchedulerPartslist.TargetQuantityUOM, 1, SelectedWizardSchedulerPartslist.MDUnit != null ? SelectedWizardSchedulerPartslist.TargetQuantity : SelectedWizardSchedulerPartslist.TargetQuantityUOM));
                             WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineSuggestion);
                         }
                         else
@@ -2391,7 +2391,7 @@ namespace gip.bso.manufacturing
                             BatchSuggestionCommandModeEnum defMode = BatchSuggestionCommandModeEnum.KeepStandardBatchSizeAndDivideRest;
                             if (SelectedWizardSchedulerPartslist.BatchSuggestionMode != null)
                                 defMode = SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value;
-                            _SelectedFilterBatchplanSuggestionMode = FilterBatchplanSuggestionModeList.FirstOrDefault(c => (BatchSuggestionCommandModeEnum)c.Value == defMode);
+                            SelectedFilterBatchplanSuggestionMode = FilterBatchplanSuggestionModeList.FirstOrDefault(c => (BatchSuggestionCommandModeEnum)c.Value == defMode);
                             BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, defMode);
                             BatchPlanSuggestion = cmd.BatchPlanSuggestion;
                             WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineSuggestion);
