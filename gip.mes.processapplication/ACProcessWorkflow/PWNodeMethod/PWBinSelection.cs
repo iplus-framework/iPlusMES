@@ -11,7 +11,7 @@ using System.Threading;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWBinSelection'}de{'PWBinSelection'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWBinSelection : PWNodeProcessMethod
+    public class PWBinSelection : PWNodeProcessMethod, IACMyConfigCache
     {
         #region config
         public const string Config_LPHF = @"LPHF";

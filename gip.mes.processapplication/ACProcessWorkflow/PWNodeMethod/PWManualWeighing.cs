@@ -23,7 +23,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterial" />
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWManualWeighing'}de{'PWManualWeighing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial
+    public class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial, IACMyConfigCache
     {
         public const string PWClassName = "PWManualWeighing";
 
@@ -2687,6 +2687,7 @@ namespace gip.mes.processapplication
             {
                 _MyConfiguration = null;
             }
+            this.HasRules.ValueT = 0;
         }
 
         protected override void OnNewProgramLogAddedToQueue(ACMethod acMethod, gip.core.datamodel.ACProgramLog currentProgramLog)

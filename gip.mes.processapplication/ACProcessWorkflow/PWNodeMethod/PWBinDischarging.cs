@@ -12,7 +12,7 @@ using System.Threading;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Bin Discharging'}de{'Gebinde entleeren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWBinDischarging : PWNodeProcessMethod
+    public class PWBinDischarging : PWNodeProcessMethod, IACMyConfigCache
     {
         #region c'tors
 
@@ -761,12 +761,13 @@ namespace gip.mes.processapplication
                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
         }
 
-        private void ClearMyConfiguration()
+        public void ClearMyConfiguration()
         {
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _MyConfiguration = null;
             }
+            this.HasRules.ValueT = 0;
         }
 
 
