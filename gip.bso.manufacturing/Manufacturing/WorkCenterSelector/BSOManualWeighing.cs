@@ -1569,10 +1569,10 @@ namespace gip.bso.manufacturing
             try
             {
                 Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel after GetEndBatchPos.");
-                MainSyncContext.Send((object state) =>
-                {
+                //MainSyncContext.Send((object state) =>
+                //{
                     WeighingMaterialList = GetWeighingMaterials(dbApp, iconDesign);
-                }, new object());
+                //}, new object());
                 Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel after GetWeighingMaterials. Count " + WeighingMaterialList?.Count());
             }
             catch (Exception e)
