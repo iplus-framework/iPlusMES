@@ -409,6 +409,19 @@ namespace gip.mes.processapplication
                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                         Messages.LogDebug(this.GetACUrl(), "MN_ReadAndStartNextBatch", msg.InnerMessage);
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    if (StartNextStage == StartNextStageMode.CompleteOnLastBatch)
+                    {
+                        List<ProdOrderBatchPlan> batchPlans = ProdOrderManager.GetBatchplansOfNextStages(dbApp, intermediatePosition.ProdOrderPartslist);
+                        bool canCompletePOLists = !batchPlans.Any(c => c.PlanState > GlobalApp.BatchPlanState.Created && c.PlanState < GlobalApp.BatchPlanState.Completed);
+                        batchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created).ToList().ForEach(c => c.PlanState = GlobalApp.BatchPlanState.Cancelled);
+                        if (canCompletePOLists)
+                        {
+                            var finishedState = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
+                            if (finishedState != null)
+                                ProdOrderManager.GetNextStages(dbApp, intermediatePosition.ProdOrderPartslist).ForEach(c => c.MDProdOrderState = finishedState);
+                        }
+                        dbApp.ACSaveChanges();
+                    }
                 }
                 else if (nbResult == NextBatchState.NoPlanEntryFound && startableBatchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created).Any())
                 {

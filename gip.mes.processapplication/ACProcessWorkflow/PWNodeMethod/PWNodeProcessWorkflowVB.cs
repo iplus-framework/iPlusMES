@@ -80,6 +80,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("SkipWaitingNodes", typeof(bool), false, Global.ParamOption.Required));
             paramTranslation.Add("SkipWaitingNodes", "en{'Skip waiting nodes'}de{'Ignoriere wartende Knoten'}");
 
+            method.ParameterValueList.Add(new ACValue("StartNextStage", typeof(StartNextStageMode), (short)StartNextStageMode.DoNothing, Global.ParamOption.Required));
+            paramTranslation.Add("StartNextStage", "en{'Start next production stage'}de{'Nächste Fertigungsstufe starten'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeProcessWorkflowVB), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeProcessWorkflowVB), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWNodeProcessWorkflowVB), HandleExecuteACMethod_PWNodeProcessWorkflowVB);
@@ -373,6 +376,24 @@ namespace gip.mes.processapplication
                 }
             }
         }
+
+        public StartNextStageMode StartNextStage
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("StartNextStage");
+                    if (acValue != null)
+                    {
+                        return (StartNextStageMode) acValue.ParamAsInt16;
+                    }
+                }
+                return StartNextStageMode.DoNothing;
+            }
+        }
+
 
         #endregion  
 
@@ -1662,6 +1683,15 @@ namespace gip.mes.processapplication
                 xmlChild = doc.CreateElement("IgnoreFIFO");
                 if (xmlChild != null)
                     xmlChild.InnerText = IgnoreFIFO.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList["StartNextStage"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("StartNextStage");
+                if (xmlChild != null)
+                    xmlChild.InnerText = StartNextStage.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 

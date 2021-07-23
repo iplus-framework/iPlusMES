@@ -495,6 +495,28 @@ namespace gip.mes.facility
             return msg;
         }
 
+
+        public List<ProdOrderPartslist> GetNextStages(DatabaseApp dbApp, ProdOrderPartslist fromPOPartslist)
+        {
+            if (fromPOPartslist == null || dbApp == null)
+                return new List<ProdOrderPartslist>();
+            List<ProdOrderPartslist> nextStages = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslist.ProdOrderID == fromPOPartslist.ProdOrderID
+                                                                                    && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                                                                    && c.MaterialID == fromPOPartslist.Partslist.MaterialID)
+                                                    .Select(c => c.ProdOrderPartslist).ToList();
+            return nextStages;
+        }
+
+        public List<ProdOrderBatchPlan> GetBatchplansOfNextStages(DatabaseApp dbApp, ProdOrderPartslist fromPOPartslist)
+        {
+            if (fromPOPartslist == null || dbApp == null)
+                return new List<ProdOrderBatchPlan>();
+            List<ProdOrderBatchPlan> nextStages = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslist.ProdOrderID == fromPOPartslist.ProdOrderID
+                                                                                    && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                                                                    && c.MaterialID == fromPOPartslist.Partslist.MaterialID)
+                                                    .SelectMany(c => c.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist).ToList();
+            return nextStages;
+        }
         #endregion
 
         #region Batch-Creation
