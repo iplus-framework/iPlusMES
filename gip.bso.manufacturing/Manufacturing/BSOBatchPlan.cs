@@ -799,35 +799,51 @@ namespace gip.bso.manufacturing
                     reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, SelectedBatchPlanForIntermediate, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
                 }
             }
-            InheritBefereSelectedFacilities(reservationCollection, TargetsList);
+
+            // select first if only one is present
+            bool isForFirstSelect =
+                reservationCollection != null
+                &&
+                (
+                    selectedFacilityPosReservationCache == null
+                    || !selectedFacilityPosReservationCache.Any(c => c.ParentBatchPlan.ProdOrderBatchPlanID == SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID)
+                );
+            if (isForFirstSelect)
+            {
+                POPartslistPosReservation firstItem = reservationCollection.FirstOrDefault();
+                firstItem.IsChecked = true;
+                if(selectedFacilityPosReservationCache == null)
+                    selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
+                selectedFacilityPosReservationCache = new List<POPartslistPosReservation>() { firstItem };
+            }
+            SelectReservationsFromCache(reservationCollection, TargetsList);
             TargetsList = reservationCollection;
             SelectedTarget = TargetsList.FirstOrDefault();
         }
 
 
-        private List<POPartslistPosReservation> dumpFacilitySelection { get; set; }
-        private void InheritBefereSelectedFacilities(BindingList<POPartslistPosReservation> newItems, BindingList<POPartslistPosReservation> oldItems)
+        private List<POPartslistPosReservation> selectedFacilityPosReservationCache { get; set; }
+        private void SelectReservationsFromCache(BindingList<POPartslistPosReservation> newItems, BindingList<POPartslistPosReservation> oldItems)
         {
 
-            if (dumpFacilitySelection == null)
-                dumpFacilitySelection = new List<POPartslistPosReservation>();
+            if (selectedFacilityPosReservationCache == null)
+                selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
 
             if (oldItems != null)
             {
                 var forRemove =
-                    dumpFacilitySelection
+                    selectedFacilityPosReservationCache
                     .Where(c => ReservationBelongToList(oldItems.ToList(), c))
                     .ToList();
                 foreach (var item in forRemove)
-                    dumpFacilitySelection.Remove(item);
+                    selectedFacilityPosReservationCache.Remove(item);
 
                 foreach (var item in oldItems.Where(c => c.IsChecked))
-                    dumpFacilitySelection.Add(item);
+                    selectedFacilityPosReservationCache.Add(item);
             }
 
             foreach (var item in newItems)
-                if (ReservationBelongToList(dumpFacilitySelection, item))
-                    item.IsChecked = true;
+                item.IsChecked = ReservationBelongToList(selectedFacilityPosReservationCache, item);
         }
 
         private static bool ReservationBelongToList(List<POPartslistPosReservation> items, POPartslistPosReservation item)
