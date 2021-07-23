@@ -15,7 +15,7 @@ using vd = gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.ProdOrderBatchPlan.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + vd.ProdOrderBatchPlan.ClassName)]
     public class BSOBatchPlanScheduler : ACBSOvb
     {
         #region const
@@ -255,12 +255,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void LocalBSOBatchPlan_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "SelectedTarget" && LocalBSOBatchPlan.SelectedTarget != null)
-                LocalBSOBatchPlan.SelectedTarget.IsChecked = !LocalBSOBatchPlan.SelectedTarget.IsChecked;
-        }
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
@@ -365,6 +359,9 @@ namespace gip.bso.manufacturing
                 case "IsEnabledMoveToOtherLine":
                     result = IsEnabledMoveToOtherLine();
                     return true;
+                case "IsEnabledLoad":
+                    IsEnabledLoad();
+                    break;
                 default:
                     break;
             }
@@ -410,11 +407,11 @@ namespace gip.bso.manufacturing
                 else
                     SelectedUnitConvert = null;
             }
-            else if (e.PropertyName == "SelectedTarget")
-            {
-                if (LocalBSOBatchPlan.SelectedTarget != null)
-                    LocalBSOBatchPlan.SelectedTarget.IsChecked = !LocalBSOBatchPlan.SelectedTarget.IsChecked;
-            }
+            //else if (e.PropertyName == "SelectedTarget")
+            //{
+            //    if (LocalBSOBatchPlan.SelectedTarget != null)
+            //        LocalBSOBatchPlan.SelectedTarget.IsChecked = !LocalBSOBatchPlan.SelectedTarget.IsChecked;
+            //}
         }
 
         #endregion
@@ -2229,7 +2226,7 @@ namespace gip.bso.manufacturing
                 .Where(x =>
                     x.Item.IsChecked
                     && x.Item.IsEnabled)
-                .OrderBy(x => x.TreeVersion)
+                .OrderByDescending(x => x.TreeVersion)
                 .ToList();
 
             int sn = 0;
@@ -2405,6 +2402,7 @@ namespace gip.bso.manufacturing
                             Msg noBachSuggestionsErr = new Msg(this, eMsgLevel.Error, GetACUrl(), "WizardForward", 0, "Error50392");
                             SendMessage(noBachSuggestionsErr);
                         }
+                        TargetQuantityUOM = SelectedWizardSchedulerPartslist.TargetQuantityUOM;
                         success = true;
                         break;
                     case NewScheduledBatchWizardPhaseEnum.DefineQuantites:

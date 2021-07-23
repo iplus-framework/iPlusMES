@@ -204,7 +204,7 @@ namespace gip.bso.manufacturing
 
         public void SetSchedulingGroup(MDSchedulingGroup group, core.datamodel.ACClassWF aclassWF)
         {
-            if(IsWFProdNode(aclassWF))
+            if (IsWFProdNode(aclassWF))
             {
                 bool isThere = DatabaseApp.MDSchedulingGroupWF.Where(c => c.MDSchedulingGroupID == group.MDSchedulingGroupID && c.VBiACClassWFID == aclassWF.ACClassWFID).Any();
                 if (!isThere)
@@ -215,7 +215,7 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-        
+
         public MDSchedulingGroup GetSchedulingGroup(core.datamodel.ACClassWF aclassWF)
         {
             if (aclassWF == null || !IsWFProdNode(aclassWF))
@@ -350,7 +350,7 @@ namespace gip.bso.manufacturing
                 {
                     if (_SelectedBatchPlanForIntermediate != null)
                         _SelectedBatchPlanForIntermediate.PropertyChanged += _SelectedBatchPlanForIntermediate_PropertyChanged;
-                    this.RefreshTargets();
+                    RefreshTargets();
                     OnPropertyChanged("SumTotalSize");
                     OnPropertyChanged("SumDiffSize");
                     OnPropertyChanged("SumDiffBatchCount");
@@ -799,8 +799,46 @@ namespace gip.bso.manufacturing
                     reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, SelectedBatchPlanForIntermediate, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
                 }
             }
+            InheritBefereSelectedFacilities(reservationCollection, TargetsList);
             TargetsList = reservationCollection;
             SelectedTarget = TargetsList.FirstOrDefault();
+        }
+
+
+        private List<POPartslistPosReservation> dumpFacilitySelection { get; set; }
+        private void InheritBefereSelectedFacilities(BindingList<POPartslistPosReservation> newItems, BindingList<POPartslistPosReservation> oldItems)
+        {
+
+            if (dumpFacilitySelection == null)
+                dumpFacilitySelection = new List<POPartslistPosReservation>();
+
+            if (oldItems != null)
+            {
+                var forRemove =
+                    dumpFacilitySelection
+                    .Where(c => ReservationBelongToList(oldItems.ToList(), c))
+                    .ToList();
+                foreach (var item in forRemove)
+                    dumpFacilitySelection.Remove(item);
+
+                foreach (var item in oldItems.Where(c => c.IsChecked))
+                    dumpFacilitySelection.Add(item);
+            }
+
+            foreach (var item in newItems)
+                if (ReservationBelongToList(dumpFacilitySelection, item))
+                    item.IsChecked = true;
+        }
+
+        private static bool ReservationBelongToList(List<POPartslistPosReservation> items, POPartslistPosReservation item)
+        {
+            return
+                items
+                .Where(x =>
+                            x.Module.ACClassID == item.Module.ACClassID
+                            && x.ParentBatchPlan.ProdOrderBatchPlanID == item.ParentBatchPlan.ProdOrderBatchPlanID
+                        )
+                        .Any();
         }
 
         protected virtual bool OnFilterTarget(RouteItem routeItem)
@@ -1061,7 +1099,7 @@ namespace gip.bso.manufacturing
         }
 
 
-       
+
 
 
         #region Dialog select App-Manager

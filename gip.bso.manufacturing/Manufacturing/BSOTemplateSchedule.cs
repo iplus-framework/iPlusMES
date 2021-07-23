@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName)]
     public class BSOTemplateSchedule : ACBSOvbNav
     {
         #region const
@@ -19,7 +19,7 @@ namespace gip.bso.manufacturing
         public BSOTemplateSchedule(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            
+
         }
 
 
@@ -97,7 +97,7 @@ namespace gip.bso.manufacturing
             {
                 if (AccessPrimary == null)
                     return;
-                if(AccessPrimary.Selected != value)
+                if (AccessPrimary.Selected != value)
                 {
                     AccessPrimary.Selected = value;
                     NotifiyChangedCurrentPlanningMR(AccessPrimary.Selected);
@@ -123,7 +123,7 @@ namespace gip.bso.manufacturing
             {
                 if (AccessPrimary == null)
                     return;
-                if(AccessPrimary.Current != value)
+                if (AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
                     NotifiyChangedCurrentPlanningMR(AccessPrimary.Current);
@@ -278,7 +278,7 @@ namespace gip.bso.manufacturing
 
         public void NotifiyChangedCurrentPlanningMR(PlanningMR planningMR)
         {
-            if(BSOBatchPlanScheduler_Child != null && BSOBatchPlanScheduler_Child.Value != null)
+            if (BSOBatchPlanScheduler_Child != null && BSOBatchPlanScheduler_Child.Value != null)
                 BSOBatchPlanScheduler_Child.Value.FilterPlanningMR = planningMR ?? new PlanningMR();
         }
         #endregion
