@@ -2241,9 +2241,9 @@ namespace gip.bso.manufacturing
                 sn++;
                 List<MDSchedulingGroup> schedulingGroups =
                     PartslistMDSchedulerGroupConnections
-                    .FirstOrDefault(c =>
+                    .Where(c =>
                     c.PartslistID == expand.Item.PartslistForPosition.PartslistID)
-                    .SchedulingGroups
+                    .SelectMany(c => c.SchedulingGroups)
                     .OrderBy(c => c.SortIndex)
                     .ToList();
                 Dictionary<int, Guid> items =
@@ -2257,12 +2257,13 @@ namespace gip.bso.manufacturing
                 if (items != null && items.Any())
                 {
                     List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
-                    foreach (var item in items.OrderBy(c => c.Key))
-                    {
-                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == item.Value)).FirstOrDefault();
-                        if (mDSchedulingGroup != null)
-                            tmpSchedulingGroups.Add(mDSchedulingGroup);
-                    }
+                    if (schedulingGroups != null && schedulingGroups.Any())
+                        foreach (var item in items.OrderBy(c => c.Key))
+                        {
+                            MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == item.Value)).FirstOrDefault();
+                            if (mDSchedulingGroup != null)
+                                tmpSchedulingGroups.Add(mDSchedulingGroup);
+                        }
 
                     tmpSchedulingGroups.AddRange(
                         schedulingGroups
