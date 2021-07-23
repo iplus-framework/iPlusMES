@@ -293,6 +293,7 @@ namespace gip.mes.facility
                 ProdOrderPartslistPosRelation prodRelationItem = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
                 prodRelationItem.Sequence = posRelation.Sequence;
                 prodRelationItem.TargetQuantityUOM = posRelation.TargetQuantityUOM;
+                prodRelationItem.RetrogradeFIFO = posRelation.RetrogradeFIFO;
                 // build relation same to PartslistPosRelation
                 prodRelationItem.TargetProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);
                 prodRelationItem.SourceProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);// ToSetup
@@ -584,6 +585,7 @@ namespace gip.mes.facility
                         childRelation.TargetProdOrderPartslistPos = childPosition;
                         childRelation.SourceProdOrderPartslistPos = rel.SourceProdOrderPartslistPos;
                         childRelation.TargetQuantityUOM = rel.TargetQuantityUOM * quantityFactor;
+                        childRelation.RetrogradeFIFO = rel.RetrogradeFIFO;
                         childRelation.ProdOrderBatch = batch;
                         model.BatchRelations.Add(childRelation);
                         resultNewEntities.Add(childRelation);
@@ -661,6 +663,7 @@ namespace gip.mes.facility
                         childRelation.TargetQuantityUOM = rel.TargetQuantityUOM * batchFraction;
                     else
                         childRelation.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * batchFraction;
+                    childRelation.RetrogradeFIFO = rel.RetrogradeFIFO;
                     childRelation.ProdOrderBatch = batch;
                     batchRelations.Add(childRelation);
                     resultNewEntities.Add(childRelation);
@@ -794,6 +797,7 @@ namespace gip.mes.facility
             childRelation.TargetProdOrderPartslistPos = childPosition;
             childRelation.SourceProdOrderPartslistPos = parentRelation.SourceProdOrderPartslistPos;
             childRelation.TargetQuantityUOM = parentRelation.TargetQuantityUOM * quantityFactor;
+            childRelation.RetrogradeFIFO = parentRelation.RetrogradeFIFO;
             childRelation.ProdOrderBatch = batch;
         }
 

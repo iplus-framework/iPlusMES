@@ -242,9 +242,35 @@ namespace gip.mes.processapplication
                                 continue;
                             ProdOrderBatchPlan nextBatchPlan = null;
                             if (startMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic)
+                            {
                                 nextBatchPlan = readyBatchPlans.Where(c => c.PartialTargetCount.HasValue
                                                                             && c.PartialTargetCount > 0
                                                                             && (!c.PartialActualCount.HasValue || c.PartialActualCount == 0)).FirstOrDefault();
+                                if (nextBatchPlan == null)
+                                {
+                                    nextBatchPlan = readyBatchPlans.Where(c => c.PartialTargetCount.HasValue
+                                                                            && c.PartialTargetCount > 0
+                                                                            && (c.PartialActualCount.HasValue || c.PartialTargetCount == c.PartialTargetCount)).FirstOrDefault();
+                                    if (nextBatchPlan != null)
+                                    {
+                                        PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist.ProdOrderPartslistID == nextBatchPlan.ProdOrderPartslistID).FirstOrDefault();
+                                        if (activeInstanceForBatchplan == null)
+                                        {
+                                            if (nextBatchPlan.BatchActualCount >= nextBatchPlan.BatchTargetCount)
+                                                nextBatchPlan.PlanState = GlobalApp.BatchPlanState.Completed;
+                                            else
+                                                nextBatchPlan.PlanState = GlobalApp.BatchPlanState.Paused;
+                                            nextBatchPlan.PartialTargetCount = null;
+                                            nextBatchPlan.PartialActualCount = null;
+                                        }
+                                        nextBatchPlan = null;
+                                        dbApp.ACSaveChanges();
+                                        scheduleForPWNode.IncrementRefreshCounter();
+                                        // Force Broadcast
+                                        (SchedulesForPWNodes as IACPropertyNetServer).ChangeValueServer(SchedulesForPWNodes.ValueT, true);
+                                    }
+                                }
+                            }
                             else // if (startMode == AutoSequential || startMode == AutoTimeAndSequential)
                             {
                                 nextBatchPlan = readyBatchPlans.FirstOrDefault();
