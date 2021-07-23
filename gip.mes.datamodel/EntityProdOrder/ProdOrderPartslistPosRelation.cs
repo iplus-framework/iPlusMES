@@ -17,6 +17,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9, "SourceProdOrderPartslistPos", "en{'Subitem from'}de{'Unterposition von'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     [ACPropertyEntity(10, "TargetProdOrderPartslistPos", "en{'Intermediate Product'}de{'Zwischenprodukt'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     [ACPropertyEntity(11, "ParentProdOrderPartslistPosRelation", "en{'Partial Quantity from'}de{'Teilmenge von'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName, "", true)]
+    [ACPropertyEntity(13, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPosRelation.ClassName, "en{'Component Part'}de{'Teilmenge'}", typeof(ProdOrderPartslistPosRelation), ProdOrderPartslistPosRelation.ClassName, "", "ProdOrderPartslistPosRelationID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderPartslistPosRelation>) })]
     public partial class ProdOrderPartslistPosRelation : IACObjectEntity, IACObject, IPartslistPosRelation
@@ -388,6 +389,24 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        #region Additional Properties
+        /// <summary>
+        /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables PartslistPos->Material
+        /// </summary>
+        public bool Backflushing
+        {
+            get
+            {
+                if (this.RetrogradeFIFO.HasValue)
+                    return this.RetrogradeFIFO.Value;
+                if (ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation != null)
+                    return ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.Backflushing;
+                if (SourceProdOrderPartslistPos != null)
+                    return SourceProdOrderPartslistPos.Backflushing;
+                return false;
+            }
+        }
+
         public double PreBookingOutwardQuantityUOM(Nullable<MergeOption> mergeOption = null)
         {
             if (mergeOption.HasValue)
@@ -424,6 +443,7 @@ namespace gip.mes.datamodel
             }
             return sumUOM;
         }
+        #endregion
 
         #region IPartslistPosRelation implementation
         public IPartslistPos I_SourcePartslistPos

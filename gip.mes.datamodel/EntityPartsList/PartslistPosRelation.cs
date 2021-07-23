@@ -15,6 +15,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(5, "TargetPartslistPos", "en{'Intermediate Product'}de{'Zwischenprodukt'}", Const.ContextDatabase + "\\PartslistPos", "", true)]
     [ACPropertyEntity(6, "MaterialWFRelation", "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", Const.ContextDatabase + "\\MaterialWFRelation", "", true)]
     [ACPropertyEntity(7, "BaseMDUnit", "en{'Base Unit of Measure UOM'}de{'Basismengeneinheit'}", Const.ContextDatabase + "\\SourcePartslistPos\\Material\\MDUnitList", "", true)]
+    [ACPropertyEntity(8, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistPosRelation.ClassName, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", typeof(PartslistPosRelation), PartslistPosRelation.ClassName, "", PartslistPosRelation.ClassName + "ID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistPosRelation>) })]
     public partial class PartslistPosRelation : IPartslistPosRelation
@@ -132,6 +133,23 @@ namespace gip.mes.datamodel
             }
         }
 
+        #endregion
+
+        #region Additional Properties
+        /// <summary>
+        /// Property that evaluates the override of the RetrogradeFIFO-Fields in Tables PartslistPos->Material
+        /// </summary>
+        public bool Backflushing
+        {
+            get
+            {
+                if (this.RetrogradeFIFO.HasValue)
+                    return this.RetrogradeFIFO.Value;
+                if (SourcePartslistPos != null)
+                    return SourcePartslistPos.Backflushing;
+                return false;
+            }
+        }
         #endregion
 
         #region convention implementation

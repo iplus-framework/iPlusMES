@@ -11,6 +11,8 @@ namespace gip.mes.facility
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Defaultcalculator'}de{'Standardcalculator'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, false, false)]
     public class StandardCalculator : ACStackCalculatorBase
     {
+        public new const string ClassName = "StandardCalculator";
+
         #region c´tors
         public StandardCalculator(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)

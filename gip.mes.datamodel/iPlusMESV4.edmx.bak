@@ -3601,8 +3601,8 @@
           <Property Name="PreviousPartslistID" Type="uniqueidentifier" />
           <Property Name="DeleteDate" Type="datetime" />
           <Property Name="DeleteName" Type="varchar" MaxLength="5" />
-          <Property Name="MaterialWFID" Type="uniqueidentifier" />
           <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
+          <Property Name="MaterialWFID" Type="uniqueidentifier" />
           <Property Name="ProductionUnits" Type="float" />
           <Property Name="XMLComment" Type="text" />
         </EntityType>
@@ -3677,6 +3677,7 @@
           <Property Name="TargetQuantity" Type="float" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="MaterialWFRelationID" Type="uniqueidentifier" />
+          <Property Name="RetrogradeFIFO" Type="bit" />
         </EntityType>
         <EntityType Name="PartslistPosSplit">
           <Key>
@@ -4051,6 +4052,7 @@
           <Property Name="MDToleranceStateID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MDProdOrderPartslistPosStateID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="XMLConfig" Type="text" />
+          <Property Name="RetrogradeFIFO" Type="bit" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosSplit">
           <Key>
@@ -4204,7 +4206,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4728,7 +4730,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a pri
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4749,7 +4751,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a p
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4761,7 +4763,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4776,7 +4778,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4785,7 +4787,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4800,7 +4802,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4809,7 +4811,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4823,7 +4825,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have 
           <Property Name="Nr" Type="bigint" />
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4834,7 +4836,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4863,7 +4865,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4886,14 +4888,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PartslistSequence" Type="int" Nullable="false" />
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4928,14 +4930,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="BasedOnMachine" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="RelSequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosSequence" Type="int" Nullable="false" />
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
@@ -21180,7 +21182,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="InOrderPos_InOrder" Relationship="iPlusMESV4_Model.FK_InOrderPos_InOrderID" FromRole="InOrder" ToRole="InOrderPos" />
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_BillingCompanyAddressID" FromRole="InOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" FromRole="InOrder" ToRole="CompanyAddress" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="InOrder" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="InOrder" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="InOrderConfig">
           <Key>
@@ -23122,6 +23124,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="MaterialWFRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" FromRole="PartslistPosRelation" ToRole="MaterialWFRelation" />
           <NavigationProperty Name="TargetPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
           <NavigationProperty Name="SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
+          <Property Name="RetrogradeFIFO" Type="Boolean" />
         </EntityType>
         <EntityType Name="PartslistPosSplit">
           <Key>
@@ -23307,7 +23310,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="ProdOrder" ToRole="MDProdOrderState" />
           <NavigationProperty Name="ProdOrderPartslist_ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="TandTv2StepItem_ProdOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID" FromRole="ProdOrder" ToRole="TandTv2StepItem" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="ProdOrderBatch">
           <Key>
@@ -23366,7 +23369,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -23447,6 +23450,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="SourceProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPos1" FromRole="ProdOrderPartslistPosRelation" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="FacilityBooking_ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosRelation" FromRole="ProdOrderPartslistPosRelation" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBookingCharge_ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosRelation" FromRole="ProdOrderPartslistPosRelation" ToRole="FacilityBookingCharge" />
+          <Property Name="RetrogradeFIFO" Type="Boolean" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosSplit">
           <Key>
@@ -24281,7 +24285,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -24306,7 +24310,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24328,7 +24332,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24349,7 +24353,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="Nr" Type="Int64" />
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24408,7 +24412,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PartslistSequence" Type="Int32" Nullable="false" />
@@ -24448,14 +24452,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="BasedOnMachine" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="RelSequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosSequence" Type="Int32" Nullable="false" />
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -34191,7 +34195,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="PlanningMRProposal">
           <Key>
@@ -37317,6 +37321,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="PartslistPosRelation">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPosRelation">
               <MappingFragment StoreEntitySet="PartslistPosRelation">
+                <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
                 <ScalarProperty Name="MaterialWFRelationID" ColumnName="MaterialWFRelationID" />
                 <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
                 <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
@@ -37570,6 +37575,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="ProdOrderPartslistPosRelation">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslistPosRelation">
               <MappingFragment StoreEntitySet="ProdOrderPartslistPosRelation">
+                <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
                 <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
                 <ScalarProperty Name="MDProdOrderPartslistPosStateID" ColumnName="MDProdOrderPartslistPosStateID" />
                 <ScalarProperty Name="MDToleranceStateID" ColumnName="MDToleranceStateID" />

@@ -12,6 +12,8 @@ namespace gip.mes.facility
     [ACClassInfo(Const.PackName_VarioFacility, "en{'LiquidsCalculator'}de{'LiquidsCalculator'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, false, false)]
     public class LiquidsCalculator : StandardCalculator
     {
+        public new const string ClassName = "LiquidsCalculator";
+
         public LiquidsCalculator(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {

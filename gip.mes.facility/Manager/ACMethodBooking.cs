@@ -1952,17 +1952,21 @@ namespace gip.mes.facility
         }
 
 
+        gip.core.datamodel.ACClass _InwardStackCalculatorType = null;
         public gip.core.datamodel.ACClass InwardStackCalculatorType
         {
             get
             {
                 if (InwardStackBookingModel != null)
                     return InwardStackBookingModel;
+                if (_InwardStackCalculatorType != null)
+                    return _InwardStackCalculatorType;
                 if (InwardFacility != null)
                 {
                     if (InwardFacility.StackCalculatorACClass != null)
                     {
-                        return InwardFacility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        _InwardStackCalculatorType = InwardFacility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        return _InwardStackCalculatorType;
                     }
                 }
                 if (InwardFacilityCharge != null)
@@ -1970,49 +1974,83 @@ namespace gip.mes.facility
                     if (InwardFacilityCharge.Facility != null)
                     {
                         if (InwardFacilityCharge.Facility.StackCalculatorACClass != null)
-                            return InwardFacilityCharge.Facility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        {
+                            _InwardStackCalculatorType = InwardFacilityCharge.Facility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                            return _InwardStackCalculatorType;
+                        }
                     }
                 }
                 if (InwardMaterial != null)
                 {
                     if (InwardMaterial.StackCalculatorACClass != null)
-                        return InwardMaterial.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                    {
+                        _InwardStackCalculatorType = InwardMaterial.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        return _InwardStackCalculatorType;
+                    }
                 }
 
                 if (DatabaseApp != null)
-                    return StackCalculatorACClassList.FirstOrDefault();
+                {
+                    if (StackCalculatorACClassList != null)
+                    {
+                        _InwardStackCalculatorType = StackCalculatorACClassList.ToArray().FirstOrDefault(c => c.ACIdentifier == StandardCalculator.ClassName);
+                        if (_InwardStackCalculatorType == null)
+                            _InwardStackCalculatorType = StackCalculatorACClassList.FirstOrDefault();
+                        return _InwardStackCalculatorType;
+                    }
+                }
 
                 return null;
             }
         }
 
+        gip.core.datamodel.ACClass _OutwardStackCalculatorType = null;
         public gip.core.datamodel.ACClass OutwardStackCalculatorType
         {
             get
             {
                 if (OutwardStackBookingModel != null)
                     return OutwardStackBookingModel;
+                if (_OutwardStackCalculatorType != null)
+                    return _OutwardStackCalculatorType;
                 if (OutwardFacility != null)
                 {
                     if (OutwardFacility.StackCalculatorACClass != null)
-                        return OutwardFacility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                    {
+                        _OutwardStackCalculatorType = OutwardFacility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        return _OutwardStackCalculatorType;
+                    }
                 }
                 if (OutwardFacilityCharge != null)
                 {
                     if (OutwardFacilityCharge.Facility != null)
                     {
                         if (OutwardFacilityCharge.Facility.StackCalculatorACClass != null)
-                            return OutwardFacilityCharge.Facility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        {
+                            _OutwardStackCalculatorType = OutwardFacilityCharge.Facility.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                            return _OutwardStackCalculatorType;
+                        }
                     }
                 }
                 if (OutwardMaterial != null)
                 {
                     if (OutwardMaterial.StackCalculatorACClass != null)
-                        return OutwardMaterial.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                    {
+                        _OutwardStackCalculatorType = OutwardMaterial.StackCalculatorACClass.FromIPlusContext<gip.core.datamodel.ACClass>();
+                        return _OutwardStackCalculatorType;
+                    }
                 }
 
                 if (DatabaseApp != null)
-                    return StackCalculatorACClassList.FirstOrDefault();
+                {
+                    if (StackCalculatorACClassList != null)
+                    {
+                        _OutwardStackCalculatorType = StackCalculatorACClassList.ToArray().FirstOrDefault(c => c.ACIdentifier == StandardCalculator.ClassName);
+                        if (_OutwardStackCalculatorType == null)
+                            _OutwardStackCalculatorType = StackCalculatorACClassList.FirstOrDefault();
+                        return _OutwardStackCalculatorType;
+                    }
+                }
 
                 return null;
             }
@@ -2942,33 +2980,37 @@ namespace gip.mes.facility
             // Überprüfe Unterschiede zwischen Material, Rezept und Materialindentifikation auf Quelle und Ziel
             if ((ParamsAdjusted.OutwardFacility != null) && (ParamsAdjusted.InwardFacility != null))
             {
-                if ((ParamsAdjusted.OutwardFacility.MDFacilityType != null) &&
-                    (ParamsAdjusted.InwardFacility.MDFacilityType != null))
+                if (   (ParamsAdjusted.OutwardFacility.MDFacilityType != null) 
+                    && (ParamsAdjusted.InwardFacility.MDFacilityType != null))
                 {
                     // Lagerplatztypen müssen auf beiden Seiten gleich sein
-                    if (ParamsAdjusted.OutwardFacility.MDFacilityType != ParamsAdjusted.InwardFacility.MDFacilityType
-                        && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin))
+                    if (    ParamsAdjusted.OutwardFacility.MDFacilityType != ParamsAdjusted.InwardFacility.MDFacilityType
+                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin 
+                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
                     {
                         AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00060"));
                         return false;
                     }
 
-                    if (ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
-                        && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin))
+                    if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
                     {
+                        Material checkMaterial = ParamsAdjusted.OutwardMaterial;
+                        if (ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                            checkMaterial = ParamsAdjusted.OutwardFacility.Material;
+
                         // Überprüfe ob Material auf Quelle und Ziel gleich sind
-                        if ((ParamsAdjusted.OutwardFacility.Material != null) && (ParamsAdjusted.InwardFacility.Material != null)
-                            && !Material.IsMaterialEqual(ParamsAdjusted.OutwardFacility.Material, ParamsAdjusted.InwardFacility.Material))
+                        if ((checkMaterial != null) && (ParamsAdjusted.InwardFacility.Material != null)
+                            && !Material.IsMaterialEqual(checkMaterial, ParamsAdjusted.InwardFacility.Material))
                         {
                             AddBookingMessage(eResultCodes.ProhibitedBooking,
                                     Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00068",
-                                                ParamsAdjusted.OutwardFacility.FacilityNo, ParamsAdjusted.OutwardFacility.FacilityName, ParamsAdjusted.OutwardFacility.Material.MaterialNo, ParamsAdjusted.OutwardFacility.Material.MaterialName1,
+                                                ParamsAdjusted.OutwardFacility.FacilityNo, ParamsAdjusted.OutwardFacility.FacilityName, checkMaterial.MaterialNo, checkMaterial.MaterialName1,
                                                 ParamsAdjusted.InwardFacility.FacilityNo, ParamsAdjusted.InwardFacility.FacilityName, ParamsAdjusted.InwardFacility.Material.MaterialNo, ParamsAdjusted.InwardFacility.Material.MaterialName1));
                             AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00062"));
                             return false;
                         }
                         // Materialbelegung muss auf Quelle vorhanden sein, wenn auf Ziel vorhanden
-                        else if ((ParamsAdjusted.OutwardFacility.Material == null) && (ParamsAdjusted.InwardFacility.Material != null))
+                        else if ((checkMaterial == null) && (ParamsAdjusted.InwardFacility.Material != null))
                         {
                             AddBookingMessage(eResultCodes.ProhibitedBooking,
                                     Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00066",
@@ -3004,72 +3046,68 @@ namespace gip.mes.facility
             }
 
             // Überprüfe Material, Rezept und Materialindentifikation auf Quelle
-            if (ParamsAdjusted.OutwardFacility != null)
-            {
-                if (ParamsAdjusted.OutwardFacility.MDFacilityType != null)
+            if (   ParamsAdjusted.OutwardFacility != null
+                && ParamsAdjusted.OutwardFacility.MDFacilityType != null)
+            { 
+                if (    ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
+                    && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin))
                 {
-                    if (ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
-                        && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin))
+                    // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
+                    if (ParamsAdjusted.IsPhysicalBooking
+                        && (ParamsAdjusted.OutwardFacility.Material != null)
+                        && !Material.IsMaterialEqual(ParamsAdjusted.OutwardFacility.Material, ParamsAdjusted.OutwardMaterial))
                     {
-                        // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
-                        if (ParamsAdjusted.IsPhysicalBooking
-                            && (ParamsAdjusted.OutwardFacility.Material != null)
-                            && !Material.IsMaterialEqual(ParamsAdjusted.OutwardFacility.Material, ParamsAdjusted.OutwardMaterial))
-                        {
-                            AddBookingMessage(eResultCodes.ProhibitedBooking,
-                                    Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00031",
-                                                ParamsAdjusted.OutwardFacility.FacilityNo, ParamsAdjusted.OutwardFacility.FacilityName, ParamsAdjusted.OutwardFacility.Material.MaterialNo, ParamsAdjusted.OutwardFacility.Material.MaterialName1,
-                                                ParamsAdjusted.OutwardMaterial.MaterialNo, ParamsAdjusted.OutwardMaterial.MaterialName1));
-                            return false;
-                        }
+                        AddBookingMessage(eResultCodes.ProhibitedBooking,
+                                Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00031",
+                                            ParamsAdjusted.OutwardFacility.FacilityNo, ParamsAdjusted.OutwardFacility.FacilityName, ParamsAdjusted.OutwardFacility.Material.MaterialNo, ParamsAdjusted.OutwardFacility.Material.MaterialName1,
+                                            ParamsAdjusted.OutwardMaterial.MaterialNo, ParamsAdjusted.OutwardMaterial.MaterialName1));
+                        return false;
+                    }
 
-                        // Check ob Zellenbelegung mit übergebenen Partslist übereinstimmt
-                        if (ParamsAdjusted.IsPhysicalBooking
-                            && (ParamsAdjusted.OutwardFacility.Partslist != null)
-                            && (ParamsAdjusted.OutwardPartslist != null)
-                            && (ParamsAdjusted.OutwardFacility.Partslist != ParamsAdjusted.OutwardPartslist))
-                        {
-                            AddBookingMessage(eResultCodes.ProhibitedBooking,
-                                    Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00033",
-                                                ParamsAdjusted.OutwardFacility.FacilityNo, ParamsAdjusted.OutwardFacility.FacilityName, ParamsAdjusted.OutwardFacility.Partslist.PartslistNo, ParamsAdjusted.OutwardFacility.Partslist.PartslistName,
-                                                ParamsAdjusted.OutwardPartslist.PartslistNo, ParamsAdjusted.OutwardPartslist.PartslistName));
-                            return false;
-                        }
+                    // Check ob Zellenbelegung mit übergebenen Partslist übereinstimmt
+                    if (ParamsAdjusted.IsPhysicalBooking
+                        && (ParamsAdjusted.OutwardFacility.Partslist != null)
+                        && (ParamsAdjusted.OutwardPartslist != null)
+                        && (ParamsAdjusted.OutwardFacility.Partslist != ParamsAdjusted.OutwardPartslist))
+                    {
+                        AddBookingMessage(eResultCodes.ProhibitedBooking,
+                                Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00033",
+                                            ParamsAdjusted.OutwardFacility.FacilityNo, ParamsAdjusted.OutwardFacility.FacilityName, ParamsAdjusted.OutwardFacility.Partslist.PartslistNo, ParamsAdjusted.OutwardFacility.Partslist.PartslistName,
+                                            ParamsAdjusted.OutwardPartslist.PartslistNo, ParamsAdjusted.OutwardPartslist.PartslistName));
+                        return false;
                     }
                 }
             }
 
             // Überprüfe Material, Rezept und Materialindentifikation auf Ziel
-            if (ParamsAdjusted.InwardFacility != null)
+           if (    ParamsAdjusted.InwardFacility != null
+                && ParamsAdjusted.InwardFacility.MDFacilityType != null)
             {
-                if (ParamsAdjusted.InwardFacility.MDFacilityType != null)
+                if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
                 {
-                    if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
+                    if (ParamsAdjusted.IsPhysicalBooking
+                        && (ParamsAdjusted.InwardFacility.Material != null)
+                        && !Material.IsMaterialEqual(ParamsAdjusted.InwardFacility.Material, ParamsAdjusted.InwardMaterial))
                     {
-                        // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
-                        if (ParamsAdjusted.IsPhysicalBooking
-                            && (ParamsAdjusted.InwardFacility.Material != null)
-                            && !Material.IsMaterialEqual(ParamsAdjusted.InwardFacility.Material, ParamsAdjusted.InwardMaterial))
-                        {
-                            AddBookingMessage(eResultCodes.ProhibitedBooking,
-                                    Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00031",
-                                                ParamsAdjusted.InwardFacility.FacilityNo, ParamsAdjusted.InwardFacility.FacilityName, ParamsAdjusted.InwardFacility.Material.MaterialNo, ParamsAdjusted.InwardFacility.Material.MaterialName1,
-                                                ParamsAdjusted.InwardMaterial.MaterialNo, ParamsAdjusted.InwardMaterial.MaterialName1));
-                            return false;
-                        }
+                        AddBookingMessage(eResultCodes.ProhibitedBooking,
+                                Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00031",
+                                            ParamsAdjusted.InwardFacility.FacilityNo, ParamsAdjusted.InwardFacility.FacilityName, ParamsAdjusted.InwardFacility.Material.MaterialNo, ParamsAdjusted.InwardFacility.Material.MaterialName1,
+                                            ParamsAdjusted.InwardMaterial.MaterialNo, ParamsAdjusted.InwardMaterial.MaterialName1));
+                        return false;
+                    }
 
-                        // Check ob Zellenbelegung mit übergebenen Partslist übereinstimmt
-                        if (ParamsAdjusted.IsPhysicalBooking
-                            && (ParamsAdjusted.InwardFacility.Partslist != null)
-                            && (ParamsAdjusted.InwardPartslist != null)
-                            && (ParamsAdjusted.InwardFacility.Partslist != ParamsAdjusted.InwardPartslist))
-                        {
-                            AddBookingMessage(eResultCodes.ProhibitedBooking,
-                                    Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00033",
-                                                ParamsAdjusted.InwardFacility.FacilityNo, ParamsAdjusted.InwardFacility.FacilityName, ParamsAdjusted.InwardFacility.Partslist.PartslistNo, ParamsAdjusted.InwardFacility.Partslist.PartslistName,
-                                                ParamsAdjusted.InwardPartslist.PartslistNo, ParamsAdjusted.InwardPartslist.PartslistName));
-                            return false;
-                        }
+                    // Check ob Zellenbelegung mit übergebenen Partslist übereinstimmt
+                    if (ParamsAdjusted.IsPhysicalBooking
+                        && (ParamsAdjusted.InwardFacility.Partslist != null)
+                        && (ParamsAdjusted.InwardPartslist != null)
+                        && (ParamsAdjusted.InwardFacility.Partslist != ParamsAdjusted.InwardPartslist))
+                    {
+                        AddBookingMessage(eResultCodes.ProhibitedBooking,
+                                Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00033",
+                                            ParamsAdjusted.InwardFacility.FacilityNo, ParamsAdjusted.InwardFacility.FacilityName, ParamsAdjusted.InwardFacility.Partslist.PartslistNo, ParamsAdjusted.InwardFacility.Partslist.PartslistName,
+                                            ParamsAdjusted.InwardPartslist.PartslistNo, ParamsAdjusted.InwardPartslist.PartslistName));
+                        return false;
                     }
                 }
             }

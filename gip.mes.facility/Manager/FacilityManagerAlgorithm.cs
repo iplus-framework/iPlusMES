@@ -2405,11 +2405,16 @@ namespace gip.mes.facility
             var queryRelationsForRetrogPosting = BP.DatabaseApp.ProdOrderPartslistPosRelation
                 .Include(c => c.SourceProdOrderPartslistPos)
                 .Include(c => c.SourceProdOrderPartslistPos.Material)
+                .Include(c => c.SourceProdOrderPartslistPos.BasedOnPartslistPos)
+                .Include(c => c.SourceProdOrderPartslistPos.BasedOnPartslistPos.Material)
                 .Where(c => c.ProdOrderBatchID == BP.PartslistPos.ProdOrderBatchID.Value
                             && ((c.SourceProdOrderPartslistPos.Material.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.Material.RetrogradeFIFO.Value)
                                 || (c.SourceProdOrderPartslistPos.BasedOnPartslistPosID.HasValue && c.SourceProdOrderPartslistPos.BasedOnPartslistPos.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.BasedOnPartslistPos.RetrogradeFIFO.Value)
-                                || (c.SourceProdOrderPartslistPos.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.RetrogradeFIFO.Value))
+                                || (c.SourceProdOrderPartslistPos.RetrogradeFIFO.HasValue && c.SourceProdOrderPartslistPos.RetrogradeFIFO.Value)
+                                || (c.RetrogradeFIFO.HasValue && c.RetrogradeFIFO.Value)
+                                || (c.ParentProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.RetrogradeFIFO.HasValue && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.RetrogradeFIFO.Value))
                             );
+
             if (queryRelationsForRetrogPosting == null || !queryRelationsForRetrogPosting.Any())
                 return Global.ACMethodResultState.Succeeded;
             
@@ -2440,7 +2445,7 @@ namespace gip.mes.facility
                     double factor = FBC.InwardQuantityUOM / BP.PartslistPos.TargetQuantityUOM;
                     foreach (var relationForRPost in queryRelationsForRetrogPosting)
                     {
-                        if (!relationForRPost.SourceProdOrderPartslistPos.Backflushing)
+                        if (!relationForRPost.Backflushing)
                             continue;
                         double postingQuantity = relationForRPost.TargetQuantityUOM * factor;
                         IList<Facility> possibleSourceFacilities;
@@ -2449,7 +2454,7 @@ namespace gip.mes.facility
                         {
                             Route dosingRoute = null;
                             Facility storeForRetrogradePosting = null;
-                            foreach (var prioSilo in possibleSourceFacilities)
+                            foreach (var prioSilo in possibleSourceFacilities.OrderBy(c => c.MDFacilityType.MDFacilityTypeIndex)) // First storage place then silo!
                             {
                                 if (!prioSilo.VBiFacilityACClassID.HasValue)
                                     continue;

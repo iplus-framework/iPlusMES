@@ -147,13 +147,35 @@ namespace gip.mes.datamodel
         [ACClassInfo(Const.PackName_VarioSystem, "en{'FacilityTypes'}de{'FacilityTypes'}", Global.ACKinds.TACEnum)]
         public enum FacilityTypes : short
         {
-            StorageLocation = 1000, // Lagerort
-            StorageBin = 1100, // Lagerplatz
-            StorageBinContainer = 1110, // Behältnis: Tank/Silo/Zelle/Waagenbehältnis
+            /// <summary>
+            /// Location, store, hall
+            /// </summary>
+            StorageLocation = 1000,
+
+            /// <summary>
+            /// Storage place, bin (Lagerplatz)
+            /// </summary>
+            StorageBin = 1100,
+            
+            /// <summary>
+            /// Silo or Tank
+            /// </summary>
+            StorageBinContainer = 1110, 
+
+            /// <summary>
+            /// Bin for prepration of imermediate material
+            /// </summary>
             PreparationBin = 1120,
 
-            Vehicle = 2000, // Fahrzeug
-            VehicleContainer = 2100, // Fahrzeug: Stellplatz/Kammer/Öffnung
+            /// <summary>
+            /// Vehilce
+            /// </summary>
+            Vehicle = 2000,
+
+            /// <summary>
+            /// Silo, Chamber of a Vehicle
+            /// </summary>
+            VehicleContainer = 2100,
         }
 
         public FacilityTypes FacilityType
