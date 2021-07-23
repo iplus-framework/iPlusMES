@@ -814,7 +814,7 @@ namespace gip.bso.manufacturing
                 firstItem.IsChecked = true;
                 if(selectedFacilityPosReservationCache == null)
                     selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
-                selectedFacilityPosReservationCache = new List<POPartslistPosReservation>() { firstItem };
+                selectedFacilityPosReservationCache.Add(firstItem);
             }
             SelectReservationsFromCache(reservationCollection, TargetsList);
             TargetsList = reservationCollection;

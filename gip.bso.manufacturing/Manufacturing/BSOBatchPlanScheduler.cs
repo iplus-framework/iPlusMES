@@ -2365,9 +2365,9 @@ namespace gip.bso.manufacturing
                             foreach (WizardSchedulerPartslist item in expandedItems)
                             {
                                 AddWizardSchedulerPartslistList(item, nr);
-                                nr++;
+                                ++nr;
                             }
-                            DefaultWizardSchedulerPartslist.Sn = nr;
+                            DefaultWizardSchedulerPartslist.Sn = expandedItems.Count() + 1;
                         }
                         foreach (var item in AllWizardSchedulerPartslistList)
                             if (item.SelectedMDSchedulingGroup != null)
@@ -2409,8 +2409,14 @@ namespace gip.bso.manufacturing
                         success = SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.TargetQuantityUOM > Double.Epsilon && BatchPlanSuggestion != null;
                         if (success)
                         {
+                            bool loadGeneratedBatchesInCurrentLinie =
+                                SelectedScheduleForPWNode != null
+                                && SelectedWizardSchedulerPartslist != null
+                                && SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup != null
+                                && SelectedScheduleForPWNode.MDSchedulingGroupID == SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID;
                             string programNo = SelectedWizardSchedulerPartslist.ProgramNo;
-                            success = FactoryBatches(BatchPlanSuggestion, SelectedWizardSchedulerPartslist, ref programNo, true);
+                            success = FactoryBatches(BatchPlanSuggestion, SelectedWizardSchedulerPartslist, ref programNo,
+                                loadGeneratedBatchesInCurrentLinie);
                             MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
                             if (success && !string.IsNullOrEmpty(programNo) && (saveMsg == null || saveMsg.IsSucceded()))
                             {
