@@ -12,6 +12,8 @@ using gip.mes.processapplication;
 
 namespace gip.bso.manufacturing
 {
+    public delegate void PreselectReservationTarget(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> targetList, ProdOrderBatchPlan selectedBatchPlanForIntermediate);
+
     /// <summary>
     /// Unter-BSO für VBBSOControlDialog
     /// Wird verwendet für PWBase (Workflowwelt) und Ableitungen
@@ -20,6 +22,11 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch planning'}de{'Batchplanung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
     public class BSOBatchPlan : VBBSOModulesSelector
     {
+
+        #region event
+        public event PreselectReservationTarget OnPreselectReservationTarget;
+        #endregion
+
         #region c´tors
 
         public BSOBatchPlan(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -645,22 +652,7 @@ namespace gip.bso.manufacturing
                 }
 
                 if (ExternProdOrderPartslist == null)
-                {
-                    SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.AutoLoad(DatabaseApp);
-                    BatchPlanForIntermediateList = new ObservableCollection<ProdOrderBatchPlan>(SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos
-                        .Where(c => c.VBiACClassWFID.HasValue && c.VBiACClassWFID == VBCurrentACClassWF.ACClassWFID)
-                        .OrderBy(c => c.Sequence)
-                        .ThenBy(c => c.InsertDate)
-                        .ToArray());
-                    if (!BatchPlanForIntermediateList.Any())
-                    {
-                        SelectedBatchPlanForIntermediate = null;
-                        // TODO: Show MEssage Error00123: No batchplan found for this intermediate material
-                        return;
-                    }
-
-                    SelectedBatchPlanForIntermediate = _BatchPlanForIntermediateList.FirstOrDefault();
-                }
+                    LoadBatchPlanForIntermediateList(true);
 
             }
             catch (Exception e)
@@ -670,6 +662,25 @@ namespace gip.bso.manufacturing
                     message += e.InnerException.Message;
                 Messages.Exception(this, message, true);
             }
+        }
+
+        public void LoadBatchPlanForIntermediateList(bool autoLoad)
+        {
+            if (autoLoad)
+                SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.AutoLoad(DatabaseApp);
+            BatchPlanForIntermediateList = new ObservableCollection<ProdOrderBatchPlan>(SelectedIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos
+                .Where(c => c.VBiACClassWFID.HasValue && c.VBiACClassWFID == VBCurrentACClassWF.ACClassWFID)
+                .OrderBy(c => c.Sequence)
+                .ThenBy(c => c.InsertDate)
+                .ToArray());
+            if (!BatchPlanForIntermediateList.Any())
+            {
+                SelectedBatchPlanForIntermediate = null;
+                // TODO: Show MEssage Error00123: No batchplan found for this intermediate material
+                return;
+            }
+
+            SelectedBatchPlanForIntermediate = _BatchPlanForIntermediateList.FirstOrDefault();
         }
 
         public virtual bool CorrectInputData(MsgWithDetails msg)
@@ -801,60 +812,10 @@ namespace gip.bso.manufacturing
             }
 
             // select first if only one is present
-            bool isForFirstSelect =
-                reservationCollection != null
-                &&
-                (
-                    selectedFacilityPosReservationCache == null
-                    || !selectedFacilityPosReservationCache.Any(c => c.ParentBatchPlan.ProdOrderBatchPlanID == SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID)
-                );
-            if (isForFirstSelect)
-            {
-                POPartslistPosReservation firstItem = reservationCollection.FirstOrDefault();
-                firstItem.IsChecked = true;
-                if(selectedFacilityPosReservationCache == null)
-                    selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
-                selectedFacilityPosReservationCache.Add(firstItem);
-            }
-            SelectReservationsFromCache(reservationCollection, TargetsList);
+            if (OnPreselectReservationTarget != null)
+                OnPreselectReservationTarget(reservationCollection, TargetsList, SelectedBatchPlanForIntermediate);
             TargetsList = reservationCollection;
             SelectedTarget = TargetsList.FirstOrDefault();
-        }
-
-
-        private List<POPartslistPosReservation> selectedFacilityPosReservationCache { get; set; }
-        private void SelectReservationsFromCache(BindingList<POPartslistPosReservation> newItems, BindingList<POPartslistPosReservation> oldItems)
-        {
-
-            if (selectedFacilityPosReservationCache == null)
-                selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
-
-            if (oldItems != null)
-            {
-                var forRemove =
-                    selectedFacilityPosReservationCache
-                    .Where(c => ReservationBelongToList(oldItems.ToList(), c))
-                    .ToList();
-                foreach (var item in forRemove)
-                    selectedFacilityPosReservationCache.Remove(item);
-
-                foreach (var item in oldItems.Where(c => c.IsChecked))
-                    selectedFacilityPosReservationCache.Add(item);
-            }
-
-            foreach (var item in newItems)
-                item.IsChecked = ReservationBelongToList(selectedFacilityPosReservationCache, item);
-        }
-
-        private static bool ReservationBelongToList(List<POPartslistPosReservation> items, POPartslistPosReservation item)
-        {
-            return
-                items
-                .Where(x =>
-                            x.Module.ACClassID == item.Module.ACClassID
-                            && x.ParentBatchPlan.ProdOrderBatchPlanID == item.ParentBatchPlan.ProdOrderBatchPlanID
-                        )
-                        .Any();
         }
 
         protected virtual bool OnFilterTarget(RouteItem routeItem)
@@ -1113,10 +1074,6 @@ namespace gip.bso.manufacturing
 
             return msg;
         }
-
-
-
-
 
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }

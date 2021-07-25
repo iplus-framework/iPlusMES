@@ -184,7 +184,11 @@ namespace gip.bso.manufacturing
 
 
             if (LocalBSOBatchPlan != null)
+            {
                 LocalBSOBatchPlan.PropertyChanged += ChildBSO_PropertyChanged;
+                LocalBSOBatchPlan.OnPreselectReservationTarget += SetReservationFromCache;
+            }
+
 
             if (BSOMaterialPreparationChild != null && BSOMaterialPreparationChild.Value != null)
                 BSOMaterialPreparationChild.Value.OnSearchStockMaterial += Value_OnSearchStockMaterial;
@@ -2081,7 +2085,7 @@ namespace gip.bso.manufacturing
                    }
                };
             string programNo = "";
-            FactoryBatches(batchPlanSuggestion, wizardSchedulerPartslist, ref programNo, false);
+            FactoryBatches(batchPlanSuggestion, wizardSchedulerPartslist, ref programNo);
         }
 
         private void CreateNewBatchWithSize(ProdOrderBatchPlan prodOrderBatchPlan, double moveQuantity, PAScheduleForPWNode selectedTargetScheduleForPWNode)
@@ -2102,7 +2106,7 @@ namespace gip.bso.manufacturing
                     }
                 };
             string programNo = "";
-            FactoryBatches(batchPlanSuggestion, wizardSchedulerPartslist, ref programNo, false);
+            FactoryBatches(batchPlanSuggestion, wizardSchedulerPartslist, ref programNo);
         }
 
 
@@ -2409,14 +2413,8 @@ namespace gip.bso.manufacturing
                         success = SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.TargetQuantityUOM > Double.Epsilon && BatchPlanSuggestion != null;
                         if (success)
                         {
-                            bool loadGeneratedBatchesInCurrentLinie =
-                                SelectedScheduleForPWNode != null
-                                && SelectedWizardSchedulerPartslist != null
-                                && SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup != null
-                                && SelectedScheduleForPWNode.MDSchedulingGroupID == SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID;
                             string programNo = SelectedWizardSchedulerPartslist.ProgramNo;
-                            success = FactoryBatches(BatchPlanSuggestion, SelectedWizardSchedulerPartslist, ref programNo,
-                                loadGeneratedBatchesInCurrentLinie);
+                            success = FactoryBatches(BatchPlanSuggestion, SelectedWizardSchedulerPartslist, ref programNo);
                             MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
                             if (success && !string.IsNullOrEmpty(programNo) && (saveMsg == null || saveMsg.IsSucceded()))
                             {
@@ -2844,7 +2842,7 @@ namespace gip.bso.manufacturing
             return prodOrderBatchPlan;
         }
 
-        private bool FactoryBatches(BatchPlanSuggestion suggestion, WizardSchedulerPartslist wizardSchedulerPartslist, ref string programNo, bool loadGeneratedBatchesInCurrentLinie)
+        private bool FactoryBatches(BatchPlanSuggestion suggestion, WizardSchedulerPartslist wizardSchedulerPartslist, ref string programNo)
         {
             bool success = false;
             vd.ProdOrderPartslist prodOrderPartslist = null;
@@ -2908,27 +2906,12 @@ namespace gip.bso.manufacturing
                 }
                 wizardSchedulerPartslist.IsSolved = true;
                 wizardSchedulerPartslist.ProgramNo = prodOrder.ProgramNo;
-                if (loadGeneratedBatchesInCurrentLinie)
-                {
-                    SetBSOBatchPlan_BatchParents(aCClassWF, prodOrderPartslist);
-                    LoadGeneratedBatchesInCurrentLine(generatedBatchPlans, firstBatchPlan, prodOrderPartslist);
-                }
+
+                SetBSOBatchPlan_BatchParents(aCClassWF, prodOrderPartslist);
+                LoadGeneratedBatchesInCurrentLine(firstBatchPlan);
                 IsNewBatchPrepared = true;
             }
             return success;
-        }
-
-        private void LoadGeneratedBatchesInCurrentLine(List<vd.ProdOrderBatchPlan> generatedBatchPlans, vd.ProdOrderBatchPlan firstBatchPlan, vd.ProdOrderPartslist prodOrderPartslist)
-        {
-            foreach (var item in LocalBSOBatchPlan.BatchPlanForIntermediateList)
-                item.DeleteACObject(DatabaseApp, false);
-            LocalBSOBatchPlan.BatchPlanForIntermediateList.Clear();
-            foreach (vd.ProdOrderBatchPlan batchPlan in generatedBatchPlans)
-                LocalBSOBatchPlan.BatchPlanForIntermediateList.Add(batchPlan);
-
-            SetBSOBatchPlan_Batch(firstBatchPlan);
-            LocalBSOBatchPlan.OnPropertyChanged("IsVisibleInCurrentContext");
-
         }
 
         private void SetBSOBatchPlan_BatchParents(core.datamodel.ACClassWF aCClassWF, vd.ProdOrderPartslist prodOrderPartslist)
@@ -2948,14 +2931,24 @@ namespace gip.bso.manufacturing
                     LocalBSOBatchPlan.CurrentProdOrderPartslist
                     );
             }
+          
         }
 
-        private void SetBSOBatchPlan_Batch(vd.ProdOrderBatchPlan batchPlan)
+        private void LoadGeneratedBatchesInCurrentLine(vd.ProdOrderBatchPlan batchPlan)
         {
+
             LocalBSOBatchPlan.SelectedIntermediate = batchPlan.ProdOrderPartslistPos;
+            LocalBSOBatchPlan.LoadBatchPlanForIntermediateList(false);
+
+            if (!LocalBSOBatchPlan.BatchPlanForIntermediateList.Any(c => c.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID))
+                LocalBSOBatchPlan.BatchPlanForIntermediateList.Add(batchPlan);
+
             LocalBSOBatchPlan.SelectedBatchPlanForIntermediate = batchPlan;
             LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = SelectedWizardSchedulerPartslist.TargetQuantityUOM;
+
+            LocalBSOBatchPlan.OnPropertyChanged("IsVisibleInCurrentContext");
         }
+
 
         #endregion
 
@@ -3100,6 +3093,64 @@ namespace gip.bso.manufacturing
             return _IsEnabledInitialBuildLines ?? false;
         }
 
+        #endregion
+
+        #region Methods -> Preselecting Targets
+
+        public virtual void SetReservationFromCache(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> targetList, ProdOrderBatchPlan selectedBatchPlanForIntermediate)
+        {
+            bool isForFirstSelect =
+                            reservationCollection != null
+                            &&
+                            (
+                                selectedFacilityPosReservationCache == null
+                                || !selectedFacilityPosReservationCache.Any(c => c.ParentBatchPlan.ProdOrderBatchPlanID == selectedBatchPlanForIntermediate.ProdOrderBatchPlanID)
+                            );
+            if (isForFirstSelect)
+            {
+                POPartslistPosReservation firstItem = reservationCollection.FirstOrDefault();
+                firstItem.IsChecked = true;
+                if (selectedFacilityPosReservationCache == null)
+                    selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
+                selectedFacilityPosReservationCache.Add(firstItem);
+            }
+            SelectReservationsFromCache(reservationCollection, targetList);
+        }
+
+        private List<POPartslistPosReservation> selectedFacilityPosReservationCache { get; set; }
+        private void SelectReservationsFromCache(BindingList<POPartslistPosReservation> newItems, BindingList<POPartslistPosReservation> oldItems)
+        {
+
+            if (selectedFacilityPosReservationCache == null)
+                selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
+
+            if (oldItems != null)
+            {
+                var forRemove =
+                    selectedFacilityPosReservationCache
+                    .Where(c => ReservationBelongToList(oldItems.ToList(), c))
+                    .ToList();
+                foreach (var item in forRemove)
+                    selectedFacilityPosReservationCache.Remove(item);
+
+                foreach (var item in oldItems.Where(c => c.IsChecked))
+                    selectedFacilityPosReservationCache.Add(item);
+            }
+
+            foreach (var item in newItems)
+                item.IsChecked = ReservationBelongToList(selectedFacilityPosReservationCache, item);
+        }
+
+        private static bool ReservationBelongToList(List<POPartslistPosReservation> items, POPartslistPosReservation item)
+        {
+            return
+                items
+                .Where(x =>
+                            x.Module.ACClassID == item.Module.ACClassID
+                            && x.ParentBatchPlan.ProdOrderBatchPlanID == item.ParentBatchPlan.ProdOrderBatchPlanID
+                        )
+                        .Any();
+        }
         #endregion
 
         #endregion
