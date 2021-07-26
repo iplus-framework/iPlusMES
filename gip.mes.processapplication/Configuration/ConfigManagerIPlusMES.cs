@@ -55,17 +55,16 @@ namespace gip.mes.processapplication
             if (dbApp != null)
             {
                 List<PickingConfig> picikingConfigs = dbApp.PickingConfig.Where(c => c.VBiACClassWFID == acClassWFID).ToList();
-                picikingConfigs.ForEach(x => x.DeleteACObject(db.ContextIPlus, false));
+                picikingConfigs.ForEach(x => x.DeleteACObject(dbApp, false));
 
                 List<MaterialWFACClassMethodConfig> materialWFACClassMethodConfigs = dbApp.MaterialWFACClassMethodConfig.Where(c => c.VBiACClassWFID == acClassWFID).ToList();
-                materialWFACClassMethodConfigs.ForEach(x => x.DeleteACObject(db.ContextIPlus, false));
-
+                materialWFACClassMethodConfigs.ForEach(x => x.DeleteACObject(dbApp, false));
 
                 List<PartslistConfig> partslistConfigs = dbApp.PartslistConfig.Where(c => c.VBiACClassWFID == acClassWFID).ToList();
-                partslistConfigs.ForEach(x => x.DeleteACObject(db.ContextIPlus, false));
+                partslistConfigs.ForEach(x => x.DeleteACObject(dbApp, false));
 
                 List<ProdOrderPartslistConfig> prodOrderPartslistConfig = dbApp.ProdOrderPartslistConfig.Where(c => c.VBiACClassWFID == acClassWFID).ToList();
-                prodOrderPartslistConfig.ForEach(x => x.DeleteACObject(db.ContextIPlus, false));
+                prodOrderPartslistConfig.ForEach(x => x.DeleteACObject(dbApp, false));
 
             }
             base.DeleteConfigNode(db, acClassWFID);
