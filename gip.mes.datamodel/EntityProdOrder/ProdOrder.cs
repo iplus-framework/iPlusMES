@@ -74,7 +74,7 @@ namespace gip.mes.datamodel
         /// <returns>A Entity-Object as IACObject</returns>
         public override IACObject GetChildEntityObject(string className, params string[] filterValues)
         {
-            if (filterValues.Any())
+            if (filterValues.Any() && filterValues[0] != null)
             {
                 string[] filterParams = filterValues[0].Split(',');
                 switch (className)

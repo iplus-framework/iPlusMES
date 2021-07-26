@@ -408,6 +408,32 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties -> FilterShowPlanningProdOrder
+
+
+        private bool? _FilterShowPlanningProdOrder = false;
+        /// <summary>
+        /// Doc  FilterShowPlanningProdOrder
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterShowPlanningProdOrder", "en{'Show planning orders'}de{'Planungsaufträge anzeigen'}")]
+        public bool? FilterShowPlanningProdOrder
+        {
+            get
+            {
+                return _FilterShowPlanningProdOrder;
+            }
+            set
+            {
+                if (_FilterShowPlanningProdOrder != value)
+                {
+                    _FilterShowPlanningProdOrder = value;
+                    OnPropertyChanged("FilterShowPlanningProdOrder");
+                }
+            }
+        }
+
+        #endregion
         #endregion
 
         #region BSO handlers
@@ -595,23 +621,24 @@ namespace gip.bso.manufacturing
                 query.Include(c => c.MDProdOrderState);
                 query.Include("ProdOrderPartslist_ProdOrder");
                 query.Include("ProdOrderPartslist_ProdOrder.Partslist");
-                query.Include("ProdOrderPartslist_ProdOrder.Partslist.Material");
+                query.Include("ProdOrderPartslist_ProdOrder.Partslist.Material")
+                .Where(c => c.PlanningMRProposal_ProdOrder.Any());
             }
+
+            if(FilterShowPlanningProdOrder != null)
+                result = result.Where(c=> c.PlanningMRProposal_ProdOrder.Any() == (FilterShowPlanningProdOrder ?? false));
+
             if (FilterProdOrderState != null)
-            {
                 result = result.Where(x => x.MDProdOrderState.MDProdOrderStateIndex == (short)FilterProdOrderState);
-            }
+
             if (SelectedFilterOutputMaterial != null)
-            {
                 result = result.Where(c => c.ProdOrderPartslist_ProdOrder.Any(p => p.Partslist.Material.MaterialID == SelectedFilterOutputMaterial.MaterialID));
-            }
             else if (!string.IsNullOrEmpty(FilterMaterialNoName))
-            {
                 result = result.Where(c => c.ProdOrderPartslist_ProdOrder.Any(p =>
                     p.Partslist.Material.MaterialNo.Contains(FilterMaterialNoName) ||
                     p.Partslist.Material.MaterialName1.Contains(FilterMaterialNoName)
                 ));
-            }
+
             return result;
         }
 
@@ -792,7 +819,12 @@ namespace gip.bso.manufacturing
                 }
 
                 var selectedItem = SelectedProdOrder;
-                if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(selectedItem);
+                if (AccessPrimary == null) 
+                    return; 
+                AccessPrimary.NavList.Remove(selectedItem);
+                List<PlanningMRProposal> planningMRProposals = selectedItem.PlanningMRProposal_ProdOrder.ToList();
+                foreach(var planningMRProposal in planningMRProposals)
+                    planningMRProposal.DeleteACObject(DatabaseApp, false);
                 selectedItem.DeleteACObject(DatabaseApp, false);
                 SelectedProdOrder = AccessPrimary.NavList.FirstOrDefault();
             }
@@ -1631,7 +1663,7 @@ namespace gip.bso.manufacturing
                     _SelectedComponentBasedOnPlPos = null;
                     if (value != null)
                         _SelectedComponentBasedOnPlPos = ComponentBasedOnPlPosList.Where(c => c.PartslistPosID == value.BasedOnPartslistPosID).FirstOrDefault();
-                    
+
                     OnPropertyChanged("SelectedComponentBasedOnPlPos");
                     OnPropertyChanged("ComponentBasedOnPlPosList");
 
