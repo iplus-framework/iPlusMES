@@ -38,6 +38,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public override double ScaleRealWeight 
+        { 
+            get => base.ScaleRealWeight; 
+            set
+            {
+                _ScaleRealWeight = value;
+                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, ScaleAddAcutalWeight);
+                OnPropertyChanged("ScaleActualWeight");
+                OnPropertyChanged("ScaleDifferenceWeight");
+            }
+        }
+
         public override IACComponent GetTargetFunction(IEnumerable<IACComponent> processModuleChildrenComponents)
         {
             using (ACMonitor.Lock(Database.QueryLock_1X000))

@@ -75,6 +75,7 @@ namespace gip.mes.processapplication
         public override bool CheckInToleranceOnlyManuallyAddedQuantity => true;
 
         public override bool SimulateWeightIfSimulationOn => false;
+
         #endregion
 
     }

@@ -67,20 +67,6 @@ namespace gip.bso.manufacturing
 
         #region Managers
 
-        /// <summary>
-        /// The _ facility manager
-        /// </summary>
-        protected ACRef<ACComponent> _ACFacilityManager = null;
-        public FacilityManager ACFacilityManager
-        {
-            get
-            {
-                if (_ACFacilityManager == null)
-                    return null;
-                return _ACFacilityManager.ValueT as FacilityManager;
-            }
-        }
-
         protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
         public ACProdOrderManager ProdOrderManager
         {

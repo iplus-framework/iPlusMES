@@ -196,7 +196,7 @@ namespace gip.bso.manufacturing
         private void WFNodes_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
-                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
+                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes?.ValueT);
         }
 
         private void ScaleHasAlarms_PropertyChanged(object sender, PropertyChangedEventArgs e)

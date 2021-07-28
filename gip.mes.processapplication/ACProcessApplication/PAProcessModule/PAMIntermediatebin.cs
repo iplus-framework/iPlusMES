@@ -12,9 +12,12 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Intermediatebin'}de{'Zwischenbehälter'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
     public class PAMIntermediatebin : PAProcessModuleVB
     {
+        public const string SelRuleID_Intermediatebin = "PAMIntermediatebin";
+
         static PAMIntermediatebin()
         {
             RegisterExecuteHandler(typeof(PAMIntermediatebin), HandleExecuteACMethod_PAMIntermediatebin);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Intermediatebin, (c, p) => c.Component.ValueT is PAMIntermediatebin, null);
         }
 
         public PAMIntermediatebin(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
