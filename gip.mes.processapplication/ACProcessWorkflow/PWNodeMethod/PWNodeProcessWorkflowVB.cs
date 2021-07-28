@@ -1291,7 +1291,7 @@ namespace gip.mes.processapplication
 
                             // Option "canStartIfPredecessorIsStopping": If other node is in Stopping-State, than this node can start.
                             if (   canStartIfPredecessorIsStopping 
-                                && (   (otherPriorPlanningNode.CurrentACState >= ACStateEnum.SMStopping && otherPriorPlanningNode.CurrentACState <= ACStateEnum.SMCompleted) // Node has already started it's batches an waits till last subworkflow has completed
+                                && (   (otherPriorPlanningNode.CurrentACState >= ACStateEnum.SMCompleted && otherPriorPlanningNode.CurrentACState <= ACStateEnum.SMResetting) // Node has already started it's batches an waits till last subworkflow has completed
                                     || (otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IterationCount.ValueT > 0)) // Node has already started it's batches an waits for a new batchplan
                                )
                                continue;
