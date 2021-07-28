@@ -1503,7 +1503,15 @@ namespace gip.mes.facility
 
             List<ProdOrderPartslistPos> components = sourcePartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToList();
             foreach (ProdOrderPartslistPos sourcePos in components)
-                CloneProdPos(databaseApp, sourcePos, targetPartslist, ref connectionOldNewItems);
+                CloneProdPos(databaseApp, sourcePos, targetPartslist, false, ref connectionOldNewItems);
+
+            List<ProdOrderPartslistPos> mixures = sourcePartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern).ToList();
+            foreach (ProdOrderPartslistPos sourcePos in mixures)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.ProdOrderPartslistPosID);
+                if (pair.Key == Guid.Empty)
+                    CloneProdPos(databaseApp, sourcePos, targetPartslist, true, ref connectionOldNewItems);
+            }
 
             return targetPartslist;
         }
@@ -1562,7 +1570,7 @@ namespace gip.mes.facility
             return targetBatch;
         }
 
-        public ProdOrderPartslistPos CloneProdPos(DatabaseApp databaseApp, ProdOrderPartslistPos sourcePos, ProdOrderPartslist targetPartslist, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderPartslistPos CloneProdPos(DatabaseApp databaseApp, ProdOrderPartslistPos sourcePos, ProdOrderPartslist targetPartslist, bool searchRelated, ref Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderPartslistPos targetPos = ProdOrderPartslistPos.NewACObject(databaseApp, targetPartslist);
             targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Add(targetPos);
@@ -1616,35 +1624,49 @@ namespace gip.mes.facility
             targetPos.TakeMatFromOtherOrder = sourcePos.TakeMatFromOtherOrder;
             targetPos.RetrogradeFIFO = sourcePos.RetrogradeFIFO;
 
-
-            List<ProdOrderPartslistPosRelation> sourceRelations = sourcePos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.OrderBy(c => c.Sequence).ToList();
-            foreach (ProdOrderPartslistPosRelation sourceRelation in sourceRelations)
+            if (searchRelated)
             {
-                ProdOrderPartslistPos nextTargetPos = null;
-                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRelation.TargetProdOrderPartslistPosID);
-                if (pair.Key != Guid.Empty)
+                if (sourcePos.ProdOrderPartslistPos_ParentProdOrderPartslistPos.Any())
                 {
-                    nextTargetPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistPosID == pair.Value);
-                    if (nextTargetPos == null)
-                        throw new Exception("Problem finding existing pos!");
+                    List<ProdOrderPartslistPos> childPositions = sourcePos.ProdOrderPartslistPos_ParentProdOrderPartslistPos.OrderBy(c => c.Sequence).ToList();
+                    foreach (ProdOrderPartslistPos childPos in childPositions)
+                    {
+                        KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == childPos.ProdOrderPartslistPosID);
+                        if (pair.Key == Guid.Empty)
+                            CloneProdPos(databaseApp, childPos, targetPartslist, true, ref connectionOldNewItems);
+                    }
                 }
-                else
-                    nextTargetPos = CloneProdPos(databaseApp, sourceRelation.TargetProdOrderPartslistPos, targetPartslist, ref connectionOldNewItems);
-                CloneProdRelation(databaseApp, sourceRelation, targetPos, nextTargetPos, ref connectionOldNewItems);
+
+                List<ProdOrderPartslistPosRelation> targetRelations = sourcePos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.OrderBy(c => c.Sequence).ToList();
+                foreach (ProdOrderPartslistPosRelation targetRelation in targetRelations)
+                {
+                    ProdOrderPartslistPos nextSourcePos = null;
+                    KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == targetRelation.SourceProdOrderPartslistPosID);
+                    if (pair.Key != Guid.Empty)
+                    {
+                        nextSourcePos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistPosID == pair.Value);
+                        if (nextSourcePos == null)
+                            throw new Exception("Problem finding existing pos!");
+                    }
+                    else
+                        nextSourcePos = CloneProdPos(databaseApp, targetRelation.SourceProdOrderPartslistPos, targetPartslist, true, ref connectionOldNewItems);
+                    CloneProdRelation(databaseApp, targetRelation, targetPos, nextSourcePos, ref connectionOldNewItems);
+                }
             }
+
 
             return targetPos;
         }
 
-        public ProdOrderPartslistPosRelation CloneProdRelation(DatabaseApp databaseApp, ProdOrderPartslistPosRelation sourceRel, ProdOrderPartslistPos sourcePos, ProdOrderPartslistPos targetPos, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderPartslistPosRelation CloneProdRelation(DatabaseApp databaseApp, ProdOrderPartslistPosRelation sourceRel, ProdOrderPartslistPos targetPos, ProdOrderPartslistPos nextSourcePos, ref Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderPartslistPosRelation targetRel = ProdOrderPartslistPosRelation.NewACObject(databaseApp, null);
-            sourcePos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Add(targetRel);
+            targetPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(targetRel);
             connectionOldNewItems.Add(sourceRel.ProdOrderPartslistPosRelationID, targetRel.ProdOrderPartslistPosRelationID);
 
             targetRel.Sequence = sourceRel.Sequence;
 
-            targetRel.TargetProdOrderPartslistPos = targetPos;
+            targetRel.SourceProdOrderPartslistPos = nextSourcePos;
 
             targetRel.TargetQuantity = sourceRel.TargetQuantity;
             targetRel.ActualQuantity = sourceRel.ActualQuantity;
@@ -1665,7 +1687,7 @@ namespace gip.mes.facility
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRel.ProdOrderBatchID.Value);
                 if (pair.Key == Guid.Empty)
                     throw new Exception("Missing source-target key pair!");
-                targetRel.ProdOrderBatch = sourcePos.ProdOrderPartslist.ProdOrderBatch_ProdOrderPartslist.Where(c => c.ProdOrderBatchID == pair.Value).FirstOrDefault();
+                targetRel.ProdOrderBatch = targetPos.ProdOrderPartslist.ProdOrderBatch_ProdOrderPartslist.Where(c => c.ProdOrderBatchID == pair.Value).FirstOrDefault();
             }
 
             targetRel.MDToleranceState = sourceRel.MDToleranceState;
