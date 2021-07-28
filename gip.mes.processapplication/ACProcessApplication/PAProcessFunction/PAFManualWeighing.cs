@@ -182,7 +182,7 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 999)]
-        public string GetActiveScaleObjectACUrl()
+        public virtual string GetActiveScaleObjectACUrl()
         {
             if (ActiveScaleObject == null)
             {
