@@ -1,6 +1,8 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.facility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,16 +30,41 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
             var test = BSOBatchPlanScheduler_Child;
+
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
             Search();
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_ProdOrderManager != null)
+                ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
+
+        #region Managers
+
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        public ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
+            }
+        }
+
+        #endregion
+
 
         #region Child (Local BSOs)
 
@@ -281,8 +308,60 @@ namespace gip.bso.manufacturing
             if (BSOBatchPlanScheduler_Child != null && BSOBatchPlanScheduler_Child.Value != null)
                 BSOBatchPlanScheduler_Child.Value.FilterPlanningMR = planningMR ?? new PlanningMR();
         }
-        #endregion
 
+
+        /// <summary>
+        /// Method GeneratePlan
+        /// </summary>
+        [ACMethodInfo("GeneratePlan", "en{'Generate scheduler'}de{'Zeitplaner generieren'}", 100)]
+        public void GeneratePlan()
+        {
+            if (!IsEnabledGeneratePlan())
+                return;
+            // Info50075.
+            if(Root.Root.Messages.Question(this, "Info50075", Global.MsgResult.No, false, SelectedPlanningMR.PlanningMRNo) == Global.MsgResult.Yes)
+            {
+                List<ProdOrder> prodOrders = SelectedPlanningMR.PlanningMRProposal_PlanningMR.Where(c => c.ProdOrder != null).Select(c => c.ProdOrder).Distinct().ToList();
+                if (prodOrders != null && prodOrders.Any())
+                    GenerateProdOrders(prodOrders);
+            }
+        }
+
+        public bool IsEnabledGeneratePlan()
+        {
+            return SelectedPlanningMR != null
+                && SelectedPlanningMR.PlanningMRProposal_PlanningMR.Any();
+        }
+
+
+        private void GenerateProdOrders(List<ProdOrder> prodOrders)
+        {
+            List<ProdOrder> generated = new List<ProdOrder>();
+            try
+            {
+                foreach (var sourceProdOrder in prodOrders)
+                {
+                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder);
+                    generated.Add(targetProdOrder);
+                }
+
+                MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+                if (msgWithDetails == null)
+                {
+                    string[] generatedNos = generated.Select(c => c.ProgramNo).OrderBy(c => c).ToArray();
+                    Root.Root.Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
+                }
+                else
+                    Root.Root.Messages.Msg(msgWithDetails);
+            }
+            catch (Exception ec)
+            {
+                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+                Root.Root.Messages.Msg(msg);
+            }
+        }
+
+        #endregion
 
     }
 }

@@ -1004,11 +1004,11 @@ namespace gip.mes.facility
 
 
         public ObservableCollection<ProdOrderBatchPlan> GetProductionLinieBatchPlans(
-            DatabaseApp databaseApp, 
-            Guid? mdSchedulingGroupID, 
-            GlobalApp.BatchPlanState fromPlanState, 
-            GlobalApp.BatchPlanState toPlanState, 
-            DateTime? filterStartTime, 
+            DatabaseApp databaseApp,
+            Guid? mdSchedulingGroupID,
+            GlobalApp.BatchPlanState fromPlanState,
+            GlobalApp.BatchPlanState toPlanState,
+            DateTime? filterStartTime,
             DateTime? filterEndTime,
             MDProdOrderState.ProdOrderStates? toOrderState,
             Guid? planningMRID)
@@ -1405,7 +1405,7 @@ namespace gip.mes.facility
 
         #endregion
 
-        #region 
+        #region CalcProducedBatchWeight
         public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, out double sumWeight)
         {
             sumWeight = 0;
@@ -1447,6 +1447,231 @@ namespace gip.mes.facility
                     }
                 }
             }
+        }
+
+        #endregion
+
+        #region ProdOrder -> Clone ProdOrder
+
+        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder)
+        {
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
+            ProdOrder targetProdOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
+
+            targetProdOrder.MDProdOrderState = sourceProdOrder.MDProdOrderState;
+            targetProdOrder.CPartnerCompany = sourceProdOrder.CPartnerCompany;
+
+            Dictionary<Guid, Guid> connectionOldNewItems = new Dictionary<Guid, Guid>();
+
+            List<ProdOrderPartslist> originalPartslists = sourceProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
+            foreach (ProdOrderPartslist originalPartslist in originalPartslists)
+                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, ref connectionOldNewItems);
+
+            return targetProdOrder;
+        }
+
+        public ProdOrderPartslist ClonePartslist(DatabaseApp databaseApp, ProdOrderPartslist sourcePartslist, ProdOrder targetProdOrder, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        {
+            ProdOrderPartslist targetPartslist = ProdOrderPartslist.NewACObject(databaseApp, targetProdOrder);
+            connectionOldNewItems.Add(sourcePartslist.ProdOrderPartslistID, targetPartslist.ProdOrderPartslistID);
+            targetProdOrder.ProdOrderPartslist_ProdOrder.Add(targetPartslist);
+
+            targetPartslist.TargetQuantity = sourcePartslist.TargetQuantity;
+            targetPartslist.IsEnabled = sourcePartslist.IsEnabled;
+            targetPartslist.LossComment = sourcePartslist.LossComment;
+            targetPartslist.ProdUserEndDate = sourcePartslist.ProdUserEndDate;
+            targetPartslist.ProdUserEndName = sourcePartslist.ProdUserEndName;
+            targetPartslist.DepartmentUserDate = sourcePartslist.DepartmentUserDate;
+            targetPartslist.DepartmentUserName = sourcePartslist.DepartmentUserName;
+            targetPartslist.StartDate = sourcePartslist.StartDate;
+            targetPartslist.EndDate = sourcePartslist.EndDate;
+            targetPartslist.Partslist = sourcePartslist.Partslist;
+            targetPartslist.Sequence = sourcePartslist.Sequence;
+            targetPartslist.MDProdOrderState = sourcePartslist.MDProdOrderState;
+            targetPartslist.VBiACProgram = sourcePartslist.VBiACProgram;
+            targetPartslist.ExternProdOrderNo = sourcePartslist.ExternProdOrderNo;
+
+
+
+            List<ProdOrderBatchPlan> sourcebatchPlans = sourcePartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+            foreach (ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
+                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, ref connectionOldNewItems);
+
+            List<ProdOrderBatch> sourceBatches = sourcePartslist.ProdOrderBatch_ProdOrderPartslist.ToList();
+            foreach (ProdOrderBatch sourceBatch in sourceBatches)
+                CloneBatch(databaseApp, sourceBatch, targetPartslist, ref connectionOldNewItems);
+
+            List<ProdOrderPartslistPos> components = sourcePartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToList();
+            foreach (ProdOrderPartslistPos sourcePos in components)
+                CloneProdPos(databaseApp, sourcePos, targetPartslist, ref connectionOldNewItems);
+
+            return targetPartslist;
+        }
+
+        public ProdOrderBatchPlan CloneBatchPlan(DatabaseApp databaseApp, ProdOrderBatchPlan sourceBatchPlan, ProdOrderPartslist targetPartslist, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        {
+            ProdOrderBatchPlan targetBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, targetPartslist);
+            targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(targetBatchPlan);
+            connectionOldNewItems.Add(sourceBatchPlan.ProdOrderBatchPlanID, targetBatchPlan.ProdOrderBatchPlanID);
+
+            targetBatchPlan.VBiACClassWF = sourceBatchPlan.VBiACClassWF;
+            targetBatchPlan.Sequence = sourceBatchPlan.Sequence;
+            targetBatchPlan.BatchNoFrom = sourceBatchPlan.BatchNoFrom;
+            targetBatchPlan.BatchNoTo = sourceBatchPlan.BatchNoTo;
+            targetBatchPlan.BatchTargetCount = sourceBatchPlan.BatchTargetCount;
+            targetBatchPlan.BatchActualCount = sourceBatchPlan.BatchActualCount;
+            targetBatchPlan.BatchSize = sourceBatchPlan.BatchSize;
+            targetBatchPlan.TotalSize = sourceBatchPlan.TotalSize;
+            targetBatchPlan.PlanModeIndex = sourceBatchPlan.PlanModeIndex;
+            targetBatchPlan.PlanStateIndex = sourceBatchPlan.PlanStateIndex;
+            targetBatchPlan.MaterialWFACClassMethod = sourceBatchPlan.MaterialWFACClassMethod;
+            targetBatchPlan.IsValidated = sourceBatchPlan.IsValidated;
+            targetBatchPlan.PlannedStartDate = sourceBatchPlan.PlannedStartDate;
+            targetBatchPlan.ScheduledOrder = sourceBatchPlan.ScheduledOrder;
+            targetBatchPlan.ScheduledStartDate = sourceBatchPlan.ScheduledStartDate;
+            targetBatchPlan.ScheduledEndDate = sourceBatchPlan.ScheduledEndDate;
+            targetBatchPlan.CalculatedStartDate = sourceBatchPlan.CalculatedStartDate;
+            targetBatchPlan.CalculatedEndDate = sourceBatchPlan.CalculatedEndDate;
+            targetBatchPlan.PartialTargetCount = sourceBatchPlan.PartialTargetCount;
+            targetBatchPlan.PartialActualCount = sourceBatchPlan.PartialActualCount;
+            targetBatchPlan.StartOffsetSecAVG = sourceBatchPlan.StartOffsetSecAVG;
+            targetBatchPlan.DurationSecAVG = sourceBatchPlan.DurationSecAVG;
+
+            return targetBatchPlan;
+        }
+
+        public ProdOrderBatch CloneBatch(DatabaseApp databaseApp, ProdOrderBatch sourceBatch, ProdOrderPartslist targetPartslist, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        {
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrderBatch), ProdOrderBatch.NoColumnName, ProdOrderBatch.FormatNewNo, this);
+            ProdOrderBatch targetBatch = ProdOrderBatch.NewACObject(databaseApp, targetPartslist, secondaryKey);
+            targetPartslist.ProdOrderBatch_ProdOrderPartslist.Add(targetBatch);
+            connectionOldNewItems.Add(sourceBatch.ProdOrderBatchID, targetBatch.ProdOrderBatchID);
+
+            targetBatch.BatchSeqNo = sourceBatch.BatchSeqNo;
+            targetBatch.MDProdOrderState = sourceBatch.MDProdOrderState;
+
+            // ProdOrderBatchPlanID
+            if (sourceBatch.ProdOrderBatchPlanID != null)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatch.ProdOrderBatchPlanID.Value);
+                if (pair.Key == Guid.Empty)
+                    throw new Exception("Missing source-target key pair!");
+                targetBatch.ProdOrderBatchPlanID = targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.ProdOrderBatchPlanID == pair.Value).Select(C => C.ProdOrderBatchPlanID).FirstOrDefault();
+            }
+
+            return targetBatch;
+        }
+
+        public ProdOrderPartslistPos CloneProdPos(DatabaseApp databaseApp, ProdOrderPartslistPos sourcePos, ProdOrderPartslist targetPartslist, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        {
+            ProdOrderPartslistPos targetPos = ProdOrderPartslistPos.NewACObject(databaseApp, targetPartslist);
+            targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Add(targetPos);
+            connectionOldNewItems.Add(sourcePos.ProdOrderPartslistPosID, targetPos.ProdOrderPartslistPosID);
+
+            targetPos.Sequence = sourcePos.Sequence;
+            targetPos.SequenceProduction = sourcePos.SequenceProduction;
+            targetPos.MaterialPosTypeIndex = sourcePos.MaterialPosTypeIndex;
+            targetPos.Material = sourcePos.Material;
+            targetPos.MDUnit = sourcePos.MDUnit;
+            targetPos.TargetQuantity = sourcePos.TargetQuantity;
+            targetPos.ActualQuantity = sourcePos.ActualQuantity;
+            targetPos.TargetQuantityUOM = sourcePos.TargetQuantityUOM;
+            targetPos.ActualQuantityUOM = sourcePos.ActualQuantityUOM;
+            targetPos.MDToleranceStateID = sourcePos.MDToleranceStateID;
+            targetPos.IsBaseQuantityExcluded = sourcePos.IsBaseQuantityExcluded;
+            targetPos.BasedOnPartslistPos = sourcePos.BasedOnPartslistPos;
+
+            // SourceProdOrderPartslist
+            if (sourcePos.SourceProdOrderPartslist != null)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.SourceProdOrderPartslistID.Value);
+                if (pair.Key == Guid.Empty)
+                    throw new Exception("Missing source-target key pair!");
+                targetPos.SourceProdOrderPartslist = targetPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.Where(c => c.ProdOrderPartslistID == pair.Value).FirstOrDefault();
+            }
+
+            // ParentProdOrderPartslistPosID
+            if (sourcePos.ParentProdOrderPartslistPosID != null)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.ParentProdOrderPartslistPosID.Value);
+                if (pair.Key == Guid.Empty)
+                    throw new Exception("Missing source-target key pair!");
+                targetPos.ParentProdOrderPartslistPosID = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == pair.Value).Select(C => C.ProdOrderPartslistPosID).FirstOrDefault();
+            }
+
+            // AlternativeProdOrderPartslistPosID
+            if (sourcePos.AlternativeProdOrderPartslistPosID != null)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.AlternativeProdOrderPartslistPosID.Value);
+                if (pair.Key == Guid.Empty)
+                    throw new Exception("Missing source-target key pair!");
+                targetPos.AlternativeProdOrderPartslistPosID = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == pair.Value).Select(C => C.ProdOrderPartslistPosID).FirstOrDefault();
+            }
+
+            targetPos.FacilityLot = sourcePos.FacilityLot;
+            targetPos.LineNumber = sourcePos.LineNumber;
+            targetPos.MDProdOrderPartslistPosState = sourcePos.MDProdOrderPartslistPosState;
+            targetPos.CalledUpQuantityUOM = sourcePos.CalledUpQuantityUOM;
+            targetPos.CalledUpQuantity = sourcePos.CalledUpQuantity;
+            targetPos.TakeMatFromOtherOrder = sourcePos.TakeMatFromOtherOrder;
+            targetPos.RetrogradeFIFO = sourcePos.RetrogradeFIFO;
+
+
+            List<ProdOrderPartslistPosRelation> sourceRelations = sourcePos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.OrderBy(c => c.Sequence).ToList();
+            foreach (ProdOrderPartslistPosRelation sourceRelation in sourceRelations)
+            {
+                ProdOrderPartslistPos nextTargetPos = null;
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRelation.TargetProdOrderPartslistPosID);
+                if (pair.Key != Guid.Empty)
+                {
+                    nextTargetPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistPosID == pair.Value);
+                    if (nextTargetPos == null)
+                        throw new Exception("Problem finding existing pos!");
+                }
+                else
+                    nextTargetPos = CloneProdPos(databaseApp, sourceRelation.TargetProdOrderPartslistPos, targetPartslist, ref connectionOldNewItems);
+                CloneProdRelation(databaseApp, sourceRelation, targetPos, nextTargetPos, ref connectionOldNewItems);
+            }
+
+            return targetPos;
+        }
+
+        public ProdOrderPartslistPosRelation CloneProdRelation(DatabaseApp databaseApp, ProdOrderPartslistPosRelation sourceRel, ProdOrderPartslistPos sourcePos, ProdOrderPartslistPos targetPos, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        {
+            ProdOrderPartslistPosRelation targetRel = ProdOrderPartslistPosRelation.NewACObject(databaseApp, null);
+            sourcePos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Add(targetRel);
+            connectionOldNewItems.Add(sourceRel.ProdOrderPartslistPosRelationID, targetRel.ProdOrderPartslistPosRelationID);
+
+            targetRel.Sequence = sourceRel.Sequence;
+
+            targetRel.TargetProdOrderPartslistPos = targetPos;
+
+            targetRel.TargetQuantity = sourceRel.TargetQuantity;
+            targetRel.ActualQuantity = sourceRel.ActualQuantity;
+            targetRel.TargetQuantityUOM = sourceRel.TargetQuantityUOM;
+            targetRel.ActualQuantityUOM = sourceRel.ActualQuantityUOM;
+
+            // ParentProdOrderPartslistPosRelationID
+            if (sourceRel.ParentProdOrderPartslistPosRelationID != null)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRel.ParentProdOrderPartslistPosRelationID.Value);
+                if (pair.Key == Guid.Empty)
+                    throw new Exception("Missing source-target key pair!");
+                targetRel.ParentProdOrderPartslistPosRelationID = targetPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosRelationID == pair.Value).Select(C => C.ProdOrderPartslistPosRelationID).FirstOrDefault();
+            }
+            // ProdOrderBatchID
+            if (sourceRel.ProdOrderBatchID != null)
+            {
+                KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRel.ProdOrderBatchID.Value);
+                if (pair.Key == Guid.Empty)
+                    throw new Exception("Missing source-target key pair!");
+                targetRel.ProdOrderBatch = sourcePos.ProdOrderPartslist.ProdOrderBatch_ProdOrderPartslist.Where(c => c.ProdOrderBatchID == pair.Value).FirstOrDefault();
+            }
+
+            targetRel.MDToleranceState = sourceRel.MDToleranceState;
+            targetRel.MDProdOrderPartslistPosState = sourceRel.MDProdOrderPartslistPosState;
+
+            return targetRel;
         }
 
         #endregion
