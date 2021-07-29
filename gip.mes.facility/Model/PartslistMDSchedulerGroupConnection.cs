@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     public class PartslistMDSchedulerGroupConnection
     {
         public Guid PartslistID { get; set; }
 
         public List<MDSchedulingGroup> SchedulingGroups { get; set; }
+
     }
 }

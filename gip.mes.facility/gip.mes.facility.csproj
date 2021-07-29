@@ -121,6 +121,8 @@
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
     <Compile Include="Model\ActualSalesTax.cs" />
     <Compile Include="Model\IssuerResult.cs" />
+    <Compile Include="Model\SchedulingMaxBPOrder.cs" />
+    <Compile Include="Model\PartslistMDSchedulerGroupConnection.cs" />
     <Compile Include="Model\SchedulingBatchPlanDuration.cs" />
     <Compile Include="Model\BatchSizeCalculation\BatchPercentageModel.cs" />
     <Compile Include="Model\BatchSizeCalculation\BatchQuantityModel.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="Model\ITandTDriver.cs" />
     <Compile Include="Model\MaterialUsageCheck.cs" />
     <Compile Include="Model\SchedulingDurationAVG.cs" />
+    <Compile Include="Model\SchedulingMaxBPOrderWF.cs" />
     <Compile Include="Model\TandTFilter.cs" />
     <Compile Include="Model\TandTLotPreviewEnum.cs" />
     <Compile Include="Model\TandTPoint.cs" />

@@ -1451,9 +1451,100 @@ namespace gip.mes.facility
 
         #endregion
 
+        #region Methods -> Connect 
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="pwClassName">PWNodeProcessWorkflowVB.PWClassName</param>
+        /// <returns></returns>
+        public List<PartslistMDSchedulerGroupConnection> GetPartslistMDSchedulerGroupConnections(DatabaseApp databaseApp, string pwClassName, string partslistNoListComaSep = null)
+        {
+            return
+            databaseApp
+                   .Partslist
+                   .Where(c => c.MaterialWFID != null && (partslistNoListComaSep == null || partslistNoListComaSep.Contains(c.PartslistNo)))
+                   .Select(c => new { c.PartslistID, pl = c })
+                   .AsEnumerable()
+                   .Select(c =>
+                                new
+                                {
+                                    PartslistID = c.PartslistID,
+                                    SchedulingGroups =
+                                            c
+                                            .pl
+                                            .MaterialWF
+                                            .MaterialWFACClassMethod_MaterialWF
+                                            .Select(x => x.ACClassMethod)
+                                            .SelectMany(x => x.ACClassWF_ACClassMethod)
+                                            .Where(x =>
+                                                     x.RefPAACClassMethodID.HasValue
+                                                       && x.RefPAACClassID.HasValue
+                                                       && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                                                       && x.RefPAACClassMethod.PWACClass != null
+                                                       && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
+                                                           || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
+                                                       && !string.IsNullOrEmpty(x.Comment))
+                                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                                            .Select(x => x.MDSchedulingGroup)
+                                            .ToList()
+                                }
+                    )
+                   .ToList()
+                   .Select(c => new PartslistMDSchedulerGroupConnection()
+                   {
+                       PartslistID = c.PartslistID,
+                       SchedulingGroups = c.SchedulingGroups
+                   })
+                   .ToList();
+        }
+
+
+        public List<SchedulingMaxBPOrder> GetMaxScheduledOrder(DatabaseApp databaseApp, string pwClassName)
+        {
+            return
+            databaseApp
+                   .MDSchedulingGroup
+                   .Select(c => new
+                   {
+                       mdGroup = c,
+                       wfs =
+                             c.MDSchedulingGroupWF_MDSchedulingGroup
+                             .Select(x =>
+                            new
+                            {
+                                acClWf = x.VBiACClassWF,
+                                maxOrder =
+                                           x.VBiACClassWF
+                                           .ProdOrderBatchPlan_VBiACClassWF
+                                           .Select(y => y.ScheduledOrder)
+                                           .DefaultIfEmpty()
+                                           .Max()
+                            })
+
+                   })
+                   .ToList()
+                   .Select(c => new SchedulingMaxBPOrder()
+                   {
+                       MDSchedulingGroup = c.mdGroup,
+                       WFs = c.wfs.Select(x => new SchedulingMaxBPOrderWF()
+                       {
+                           ACClassWF = x.acClWf,
+                           MaxScheduledOrder = x.maxOrder ?? 0
+                       })
+                       .ToList()
+                   })
+                   .ToList();
+        }
+
+
+        #endregion
+
         #region ProdOrder -> Clone ProdOrder
 
-        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder)
+        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string pwClassName)
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
             ProdOrder targetProdOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
@@ -1461,16 +1552,20 @@ namespace gip.mes.facility
             targetProdOrder.MDProdOrderState = sourceProdOrder.MDProdOrderState;
             targetProdOrder.CPartnerCompany = sourceProdOrder.CPartnerCompany;
 
+            List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, pwClassName);
+
             Dictionary<Guid, Guid> connectionOldNewItems = new Dictionary<Guid, Guid>();
 
             List<ProdOrderPartslist> originalPartslists = sourceProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
             foreach (ProdOrderPartslist originalPartslist in originalPartslists)
-                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, ref connectionOldNewItems);
+                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, ref maxSchedulerOrders, ref connectionOldNewItems);
 
             return targetProdOrder;
         }
 
-        public ProdOrderPartslist ClonePartslist(DatabaseApp databaseApp, ProdOrderPartslist sourcePartslist, ProdOrder targetProdOrder, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderPartslist ClonePartslist(DatabaseApp databaseApp, ProdOrderPartslist sourcePartslist, ProdOrder targetProdOrder,
+            ref List<SchedulingMaxBPOrder> maxSchedulerOrders,
+            ref Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderPartslist targetPartslist = ProdOrderPartslist.NewACObject(databaseApp, targetProdOrder);
             connectionOldNewItems.Add(sourcePartslist.ProdOrderPartslistID, targetPartslist.ProdOrderPartslistID);
@@ -1495,7 +1590,7 @@ namespace gip.mes.facility
 
             List<ProdOrderBatchPlan> sourcebatchPlans = sourcePartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
             foreach (ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
-                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, ref connectionOldNewItems);
+                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, ref maxSchedulerOrders, ref connectionOldNewItems);
 
             List<ProdOrderBatch> sourceBatches = sourcePartslist.ProdOrderBatch_ProdOrderPartslist.ToList();
             foreach (ProdOrderBatch sourceBatch in sourceBatches)
@@ -1513,10 +1608,23 @@ namespace gip.mes.facility
                     CloneProdPos(databaseApp, sourcePos, targetPartslist, true, ref connectionOldNewItems);
             }
 
+            // fix batchplans 
+            foreach(ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
+            {
+                KeyValuePair<Guid, Guid> pairBatch = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatchPlan.ProdOrderBatchPlanID);
+                ProdOrderBatchPlan targetBatchPlan = targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderBatchPlanID == pairBatch.Value);
+
+                KeyValuePair<Guid, Guid> pairPos = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatchPlan.ProdOrderPartslistPosID);
+                ProdOrderPartslistPos batchPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistPosID == pairPos.Value);
+                targetBatchPlan.ProdOrderPartslistPos = batchPos;
+            }
+
             return targetPartslist;
         }
 
-        public ProdOrderBatchPlan CloneBatchPlan(DatabaseApp databaseApp, ProdOrderBatchPlan sourceBatchPlan, ProdOrderPartslist targetPartslist, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderBatchPlan CloneBatchPlan(DatabaseApp databaseApp, ProdOrderBatchPlan sourceBatchPlan, ProdOrderPartslist targetPartslist,
+            ref List<SchedulingMaxBPOrder> maxSchedulerOrders,
+            ref Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderBatchPlan targetBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, targetPartslist);
             targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(targetBatchPlan);
@@ -1535,7 +1643,16 @@ namespace gip.mes.facility
             targetBatchPlan.MaterialWFACClassMethod = sourceBatchPlan.MaterialWFACClassMethod;
             targetBatchPlan.IsValidated = sourceBatchPlan.IsValidated;
             targetBatchPlan.PlannedStartDate = sourceBatchPlan.PlannedStartDate;
-            targetBatchPlan.ScheduledOrder = sourceBatchPlan.ScheduledOrder;
+
+            // TODO: Recalc max ScheduledOrder
+            SchedulingMaxBPOrderWF schedulingMaxOrder = 
+                maxSchedulerOrders
+                .SelectMany(c=>c.WFs)
+                .Where(c=>c.ACClassWF.ACClassWFID == targetBatchPlan.VBiACClassWF.ACClassWFID)
+                .FirstOrDefault();
+            ++schedulingMaxOrder.MaxScheduledOrder;
+            targetBatchPlan.ScheduledOrder = schedulingMaxOrder.MaxScheduledOrder;
+
             targetBatchPlan.ScheduledStartDate = sourceBatchPlan.ScheduledStartDate;
             targetBatchPlan.ScheduledEndDate = sourceBatchPlan.ScheduledEndDate;
             targetBatchPlan.CalculatedStartDate = sourceBatchPlan.CalculatedStartDate;

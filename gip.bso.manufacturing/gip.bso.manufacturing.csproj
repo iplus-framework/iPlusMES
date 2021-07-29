@@ -81,7 +81,6 @@
     <Compile Include="Model\BatchPlanSuggestion.cs" />
     <Compile Include="Model\BatchPlanSuggestionItem.cs" />
     <Compile Include="Model\BatchPlanTimelineItem.cs" />
-    <Compile Include="Model\PartslistMDSchedulerGroupConnection.cs" />
     <Compile Include="Model\PickingRelationTypeEnum.cs" />
     <Compile Include="Model\PreparedMaterial.cs" />
     <Compile Include="Model\ProdOrderPartslistPlanWrapper.cs" />
@@ -179,13 +178,13 @@
     <None Include="VBControlScripts\2021-07-23 08-45_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-07-26 11-19_aaginic.zip">
+    <None Include="VBControlScripts\2021-07-29 14-39_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-07-28 13-43_aaginic.zip">
+    <None Include="VBControlScripts\2021-07-29 14-42_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-07-29 10-21_aaginic.zip">
+    <None Include="VBControlScripts\2021-07-29 15-33_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

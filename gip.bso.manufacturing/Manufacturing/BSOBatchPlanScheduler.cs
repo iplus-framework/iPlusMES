@@ -245,7 +245,7 @@ namespace gip.bso.manufacturing
             {
                 if (_DatabaseApp != null)
                     return _DatabaseApp;
-                if (    ParentACComponent is Businessobjects
+                if (ParentACComponent is Businessobjects
                     || !(ParentACComponent is ACBSOvb || ParentACComponent is ACBSOvbNav))
                 {
                     _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
@@ -895,51 +895,12 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_PartslistMDSchedulerGroupConnections == null)
-                    _PartslistMDSchedulerGroupConnections = GetPartslistMDSchedulerGroupConnections();
+                    _PartslistMDSchedulerGroupConnections = ProdOrderManager.GetPartslistMDSchedulerGroupConnections(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName);
                 return _PartslistMDSchedulerGroupConnections;
             }
         }
 
-        private List<PartslistMDSchedulerGroupConnection> GetPartslistMDSchedulerGroupConnections()
-        {
-            return
-            DatabaseApp
-                   .Partslist
-                   .Where(c => c.MaterialWFID != null)
-                   .Select(c => new { c.PartslistID, pl = c })
-                   .AsEnumerable()
-                   .Select(c =>
-                                new
-                                {
-                                    PartslistID = c.PartslistID,
-                                    SchedulingGroups =
-                                            c
-                                            .pl
-                                            .MaterialWF
-                                            .MaterialWFACClassMethod_MaterialWF
-                                            .Select(x => x.ACClassMethod)
-                                            .SelectMany(x => x.ACClassWF_ACClassMethod)
-                                            .Where(x =>
-                                                     x.RefPAACClassMethodID.HasValue
-                                                       && x.RefPAACClassID.HasValue
-                                                       && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                                                       && x.RefPAACClassMethod.PWACClass != null
-                                                       && (x.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
-                                                           || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
-                                                       && !string.IsNullOrEmpty(x.Comment))
-                                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
-                                            .Select(x => x.MDSchedulingGroup)
-                                            .ToList()
-                                }
-                    )
-                   .ToList()
-                   .Select(c => new PartslistMDSchedulerGroupConnection()
-                   {
-                       PartslistID = c.PartslistID,
-                       SchedulingGroups = c.SchedulingGroups
-                   })
-                   .ToList();
-        }
+
 
         public MediaSettings MediaSettings { get; private set; }
 
@@ -1369,6 +1330,12 @@ namespace gip.bso.manufacturing
 
                         // setup value to null
                         item._NewSyncTargetQuantityUOM = null;
+                        foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
+                            if (wizardItem.ProdOrderPartslistID != null)
+                            {
+                                ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistID == wizardItem.ProdOrderPartslistID);
+                                ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
+                            }
                         OnPropertyChanged("WizardSchedulerPartslistList");
                     }
                 }
@@ -2660,8 +2627,8 @@ namespace gip.bso.manufacturing
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
                 BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem(
-                    1, 
-                    SelectedWizardSchedulerPartslist.NewTargetQuantityUOM, 
+                    1,
+                    SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     1,
                     SelectedWizardSchedulerPartslist.NewTargetQuantityUOM
                     ));
