@@ -1608,6 +1608,17 @@ namespace gip.mes.facility
                     CloneProdPos(databaseApp, sourcePos, targetPartslist, true, ref connectionOldNewItems);
             }
 
+            // fix batchplans 
+            foreach(ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
+            {
+                KeyValuePair<Guid, Guid> pairBatch = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatchPlan.ProdOrderBatchPlanID);
+                ProdOrderBatchPlan targetBatchPlan = targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderBatchPlanID == pairBatch.Value);
+
+                KeyValuePair<Guid, Guid> pairPos = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatchPlan.ProdOrderPartslistPosID);
+                ProdOrderPartslistPos batchPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistPosID == pairPos.Value);
+                targetBatchPlan.ProdOrderPartslistPos = batchPos;
+            }
+
             return targetPartslist;
         }
 

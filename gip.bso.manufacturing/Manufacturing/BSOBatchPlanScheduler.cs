@@ -245,7 +245,7 @@ namespace gip.bso.manufacturing
             {
                 if (_DatabaseApp != null)
                     return _DatabaseApp;
-                if (    ParentACComponent is Businessobjects
+                if (ParentACComponent is Businessobjects
                     || !(ParentACComponent is ACBSOvb || ParentACComponent is ACBSOvbNav))
                 {
                     _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
@@ -882,7 +882,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        
+
 
         public MediaSettings MediaSettings { get; private set; }
 
@@ -1312,6 +1312,12 @@ namespace gip.bso.manufacturing
 
                         // setup value to null
                         item._NewSyncTargetQuantityUOM = null;
+                        foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
+                            if (wizardItem.ProdOrderPartslistID != null)
+                            {
+                                ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistID == wizardItem.ProdOrderPartslistID);
+                                ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
+                            }
                         OnPropertyChanged("WizardSchedulerPartslistList");
                     }
                 }
@@ -2603,8 +2609,8 @@ namespace gip.bso.manufacturing
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
                 BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem(
-                    1, 
-                    SelectedWizardSchedulerPartslist.NewTargetQuantityUOM, 
+                    1,
+                    SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     1,
                     SelectedWizardSchedulerPartslist.NewTargetQuantityUOM
                     ));
