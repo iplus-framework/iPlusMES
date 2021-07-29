@@ -243,9 +243,25 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (_DatabaseApp == null)
+                if (_DatabaseApp != null)
+                    return _DatabaseApp;
+                if (    ParentACComponent is Businessobjects
+                    || !(ParentACComponent is ACBSOvb || ParentACComponent is ACBSOvbNav))
+                {
                     _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
-                return _DatabaseApp;
+                    return _DatabaseApp;
+                }
+                else
+                {
+                    ACBSOvbNav parentNav = ParentACComponent as ACBSOvbNav;
+                    if (parentNav != null)
+                        return parentNav.DatabaseApp;
+                    ACBSOvb parent = ParentACComponent as ACBSOvb;
+                    if (parent != null)
+                        return parent.DatabaseApp;
+                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<vd.DatabaseApp>(this.GetACUrl());
+                    return _DatabaseApp;
+                }
             }
         }
 

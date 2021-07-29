@@ -1227,7 +1227,7 @@ namespace gip.mes.processapplication
                         {
                             // Warning50005: No Silo/Tank/Container found for component {0}
                             Msg msg = new Msg(this, eMsgLevel.Warning, PWClassName, "OnHandleStateCheckEmptySilo(100)", 100, "Warning50005",
-                                            silo.MaterialName);
+                                            silo.MaterialName != null ? silo.MaterialName.ValueT : "");
 
                             if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                 Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);

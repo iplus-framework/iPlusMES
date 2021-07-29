@@ -305,6 +305,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        /// <summary>
+        /// Returns ActualQuantity - TargetQuantity (A negative value)
+        /// </summary>
         public double RemainingDosingQuantityUOM
         {
             get
