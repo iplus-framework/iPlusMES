@@ -400,15 +400,19 @@ namespace gip.mes.processapplication
 
                 if (nbResult == NextBatchState.CompletedNoNewEntry)
                 {
-                    //Error50203: Subtasks Order {0}, Recipe {1}, Position {2} are completed.
-                    string message = Root.Environment.TranslateMessage(this, "Error50203",
-                                                    intermediatePosition.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                    intermediatePosition.ProdOrderPartslist.Partslist.PartslistNo,
-                                                    intermediatePosition.BookingMaterial.MaterialName1);
-                    msg = new Msg(message, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1080);
-                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                        Messages.LogDebug(this.GetACUrl(), "MN_ReadAndStartNextBatch", msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    if (AlarmOnCompleted)
+                    {
+                        //Error50203: Subtasks Order {0}, Recipe {1}, Position {2} are completed.
+                        string message = Root.Environment.TranslateMessage(this, "Error50203",
+                                                        intermediatePosition.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                        intermediatePosition.ProdOrderPartslist.Partslist.PartslistNo,
+                                                        intermediatePosition.BookingMaterial.MaterialName1);
+                        msg = new Msg(message, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1080);
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogDebug(this.GetACUrl(), "MN_ReadAndStartNextBatch", msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    }
+
                     if (StartNextStage == StartNextStageMode.CompleteOnLastBatch)
                     {
                         List<ProdOrderBatchPlan> batchPlans = ProdOrderManager.GetBatchplansOfNextStages(dbApp, intermediatePosition.ProdOrderPartslist);
@@ -422,6 +426,8 @@ namespace gip.mes.processapplication
                         }
                         dbApp.ACSaveChanges();
                     }
+
+                    OnBatchplanCompleted(dbApp, intermediatePosition, batchPlanEntry);
                 }
                 else if (nbResult == NextBatchState.NoPlanEntryFound && startableBatchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created).Any())
                 {
@@ -601,6 +607,9 @@ namespace gip.mes.processapplication
             //queryBatchPlans.Where();
         }
 
+        protected virtual void OnBatchplanCompleted(DatabaseApp dbApp, ProdOrderPartslistPos intermediatePosition, ProdOrderBatchPlan lastBatchPlanEntry)
+        {
+        }
 
         public Guid? CurrentProdOrderBatchPlanID { get; set; }
 
