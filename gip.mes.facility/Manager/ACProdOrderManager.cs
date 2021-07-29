@@ -1504,6 +1504,8 @@ namespace gip.mes.facility
 
         public List<SchedulingMaxBPOrder> GetMaxScheduledOrder(DatabaseApp databaseApp, string pwClassName)
         {
+            GlobalApp.BatchPlanState startState = GlobalApp.BatchPlanState.Created;
+            GlobalApp.BatchPlanState endState = GlobalApp.BatchPlanState.Paused;
             return
             databaseApp
                    .MDSchedulingGroup
@@ -1519,6 +1521,8 @@ namespace gip.mes.facility
                                 maxOrder =
                                            x.VBiACClassWF
                                            .ProdOrderBatchPlan_VBiACClassWF
+                                           .Where(a => a.PlanStateIndex >= (short)startState
+                                                        && a.PlanStateIndex <= (short)endState)
                                            .Select(y => y.ScheduledOrder)
                                            .DefaultIfEmpty()
                                            .Max()
@@ -1609,13 +1613,13 @@ namespace gip.mes.facility
             }
 
             // fix batchplans 
-            foreach(ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
+            foreach (ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
             {
                 KeyValuePair<Guid, Guid> pairBatch = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatchPlan.ProdOrderBatchPlanID);
-                ProdOrderBatchPlan targetBatchPlan = targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderBatchPlanID == pairBatch.Value);
+                ProdOrderBatchPlan targetBatchPlan = targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderBatchPlanID == pairBatch.Value);
 
                 KeyValuePair<Guid, Guid> pairPos = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatchPlan.ProdOrderPartslistPosID);
-                ProdOrderPartslistPos batchPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistPosID == pairPos.Value);
+                ProdOrderPartslistPos batchPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistPosID == pairPos.Value);
                 targetBatchPlan.ProdOrderPartslistPos = batchPos;
             }
 
@@ -1645,10 +1649,10 @@ namespace gip.mes.facility
             targetBatchPlan.PlannedStartDate = sourceBatchPlan.PlannedStartDate;
 
             // TODO: Recalc max ScheduledOrder
-            SchedulingMaxBPOrderWF schedulingMaxOrder = 
+            SchedulingMaxBPOrderWF schedulingMaxOrder =
                 maxSchedulerOrders
-                .SelectMany(c=>c.WFs)
-                .Where(c=>c.ACClassWF.ACClassWFID == targetBatchPlan.VBiACClassWF.ACClassWFID)
+                .SelectMany(c => c.WFs)
+                .Where(c => c.ACClassWF.ACClassWFID == targetBatchPlan.VBiACClassWF.ACClassWFID)
                 .FirstOrDefault();
             ++schedulingMaxOrder.MaxScheduledOrder;
             targetBatchPlan.ScheduledOrder = schedulingMaxOrder.MaxScheduledOrder;
