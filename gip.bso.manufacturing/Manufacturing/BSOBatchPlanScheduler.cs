@@ -345,6 +345,9 @@ namespace gip.bso.manufacturing
                 case "IsEnabledChangeMode":
                     result = IsEnabledChangeMode();
                     return true;
+                case "IsEnabledSave":
+                    result = IsEnabledSave();
+                    return true;
                 case "New":
                     New();
                     return true;
@@ -390,6 +393,12 @@ namespace gip.bso.manufacturing
                 case "IsEnabledSetBatchStateCreated":
                     result = IsEnabledSetBatchStateCreated();
                     return true;
+                case "SetBatchStateCancelled":
+                    SetBatchStateCancelled();
+                    return true;
+                case "IsEnabledSetBatchStateCancelled":
+                    result = IsEnabledSetBatchStateCancelled();
+                    return true;
                 case "WizardForward":
                     WizardForward();
                     return true;
@@ -423,9 +432,18 @@ namespace gip.bso.manufacturing
                 case "IsEnabledMoveToOtherLine":
                     result = IsEnabledMoveToOtherLine();
                     return true;
+                case "Load":
+                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    return true;
                 case "IsEnabledLoad":
-                    IsEnabledLoad();
-                    break;
+                    result = IsEnabledLoad();
+                    return true;
+                case "IsEnabledToChangeBatchPlan":
+                    result = IsEnabledToChangeBatchPlan();
+                    return true;
+                case "ChangeBatchPlan":
+                    ChangeBatchPlan((ProdOrderBatchPlan)acParameter[0]);
+                    return true;
                 default:
                     break;
             }
@@ -764,6 +782,12 @@ namespace gip.bso.manufacturing
                     if (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
                         || SelectedProdOrderBatchPlan.PlanState >= GlobalApp.BatchPlanState.Paused)
                         SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.ReadyToStart;
+                }
+                else if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount <= 0)
+                {
+                    SelectedProdOrderBatchPlan.PartialTargetCount = null;
+                    if (SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.ReadyToStart)
+                        SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.Paused;
                 }
                 Save();
             }
@@ -2160,6 +2184,41 @@ namespace gip.bso.manufacturing
         }
 
 
+
+        [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
+        public void SetBatchStateCancelled()
+        {
+            if (!IsEnabledSetBatchStateCancelled())
+                return;
+            List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
+            {
+                if (   batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
+                    || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
+                    batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
+                else if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
+                {
+                    foreach (var reservation in batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray())
+                    {
+                        reservation.DeleteACObject(this.DatabaseApp, true);
+                    }
+                    batchPlan.DeleteACObject(this.DatabaseApp, true);
+                }
+            }
+            Save();
+            LoadProdOrderBatchPlanList();
+        }
+
+        public bool IsEnabledSetBatchStateCancelled()
+        {
+            return ProdOrderBatchPlanList != null 
+                && ProdOrderBatchPlanList.Any(c =>     c.IsSelected 
+                                                    && (   c.PlanState <= vd.GlobalApp.BatchPlanState.Created 
+                                                        || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused));
+        }
+
+
+
         #endregion
 
         #endregion
@@ -2865,7 +2924,22 @@ namespace gip.bso.manufacturing
                             result = Global.ControlModes.Hidden;
                         break;
                     case "SelectedProdOrderBatchPlan\\PartialTargetCount":
-                        if (SelectedScheduleForPWNode != null && SelectedScheduleForPWNode.StartMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic)
+                        //SelectedProdOrderBatchPlan.PlannedStartDate && SelectedProdOrderBatchPlan.end
+                        if (SelectedScheduleForPWNode != null
+                            && SelectedScheduleForPWNode.StartMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic
+                            && SelectedProdOrderBatchPlan != null
+                            && SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount
+                            && SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount)
+                            result = Global.ControlModes.Enabled;
+                        else
+                            result = Global.ControlModes.Disabled;
+                        break;
+                    case "SelectedProdOrderBatchPlan\\ScheduledStartDate":
+                    case "SelectedProdOrderBatchPlan\\ScheduledEndDate":
+                        if (SelectedProdOrderBatchPlan != null
+                            && (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.ReadyToStart || SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.Paused)
+                            && (  SelectedProdOrderBatchPlan.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
+                               || SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount))
                             result = Global.ControlModes.Enabled;
                         else
                             result = Global.ControlModes.Disabled;

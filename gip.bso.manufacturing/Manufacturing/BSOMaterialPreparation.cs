@@ -115,6 +115,9 @@ namespace gip.bso.manufacturing
                 case "IsEnabledSearchStockMaterial":
                     result = IsEnabledSearchStockMaterial();
                     return true;
+                case "IsEnabledNewPickingPos":
+                    result = IsEnabledNewPickingPos();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }

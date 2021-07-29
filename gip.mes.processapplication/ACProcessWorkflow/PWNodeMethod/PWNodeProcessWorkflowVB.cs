@@ -866,6 +866,11 @@ namespace gip.mes.processapplication
             ACPropertyValueEvent<ACStateEnum> valueEventT = e.ValueEvent as ACPropertyValueEvent<ACStateEnum>;
             if (valueEventT.Sender == EventRaiser.Target)
                 return;
+            InformSchedulerOnStateChange();
+        }
+
+        protected void InformSchedulerOnStateChange()
+        {
             var appManager = this.ApplicationManager;
             if (appManager != null)
             {
@@ -927,7 +932,6 @@ namespace gip.mes.processapplication
         {
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _PreventHandleStartNextBatchAgain;
@@ -935,7 +939,6 @@ namespace gip.mes.processapplication
             }
             set
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     _PreventHandleStartNextBatchAgain = value;
@@ -948,7 +951,6 @@ namespace gip.mes.processapplication
         {
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _PlanningWait.HasValue && _PlanningWait.Value > DateTime.Now;
@@ -960,11 +962,18 @@ namespace gip.mes.processapplication
         { 
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _PlanningWait.HasValue;
                 }
+            }
+        }
+
+        public void ResetPlanningWait()
+        {
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _PlanningWait = null;
             }
         }
 
@@ -1028,10 +1037,7 @@ namespace gip.mes.processapplication
                 HandleStartNextBatch();
             else if (!HasActiveSubworkflows)
             {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _PlanningWait = null;
-                }
+                ResetPlanningWait();
                 UnSubscribeToProjectWorkCycle();
 
                 int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
@@ -1065,7 +1071,7 @@ namespace gip.mes.processapplication
                 {
                     if (_PlanningWait.HasValue)
                     {
-                        _PlanningWait = null;
+                        ResetPlanningWait();
                         UnSubscribeToProjectWorkCycle();
                     }
                     else
@@ -1074,11 +1080,7 @@ namespace gip.mes.processapplication
             }
             else
             {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _PlanningWait = null;
-                }
+                ResetPlanningWait();
             }
         }
 
@@ -1192,10 +1194,7 @@ namespace gip.mes.processapplication
             if (IsInPlanningWaitNotElapsed)
                 return;
 
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _PlanningWait = null;
-            }
+            ResetPlanningWait();
 
             if (!IgnoreFIFO)
             {
@@ -1374,6 +1373,8 @@ namespace gip.mes.processapplication
                     PreventHandleStartNextBatchAgain = true;
                     if (CurrentACState == ACStateEnum.SMStarting)
                         CurrentACState = ACStateEnum.SMRunning;
+                    else
+                        InformSchedulerOnStateChange();
                     return;
                 }
                 else
@@ -1400,6 +1401,7 @@ namespace gip.mes.processapplication
                         _PlanningWait = DateTime.Now.AddSeconds(10);
                     }
                     SubscribeToProjectWorkCycle();
+                    InformSchedulerOnStateChange();
                     return;
                 }
             }
@@ -1457,10 +1459,7 @@ namespace gip.mes.processapplication
 
         public override void UnSubscribeToProjectWorkCycle()
         {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _PlanningWait = null;
-            }
+            ResetPlanningWait();
             base.UnSubscribeToProjectWorkCycle();
         }
 

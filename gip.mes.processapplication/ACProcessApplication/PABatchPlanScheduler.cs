@@ -303,6 +303,18 @@ namespace gip.mes.processapplication
                             {
                                 startableBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
                                 saveMessage = dbApp.ACSaveChanges();
+                                if (saveMessage == null)
+                                {
+                                    if (activeInstanceForBatchplan.CurrentACState == ACStateEnum.SMStopping)
+                                    {
+                                        activeInstanceForBatchplan.Resume();
+                                    }
+                                    else if (  activeInstanceForBatchplan.CurrentACState == ACStateEnum.SMStarting
+                                            && activeInstanceForBatchplan.IsInPlanningWaitNotElapsed)
+                                    {
+                                        activeInstanceForBatchplan.ResetPlanningWait();
+                                    }
+                                }
                             }
                             // New workflow must be instantiated
                             else
