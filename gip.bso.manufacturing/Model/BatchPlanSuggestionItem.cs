@@ -146,6 +146,30 @@ namespace gip.bso.manufacturing
             }
         }
 
+
+        private bool _IsEditable;
+        /// <summary>
+        /// Doc  IsEditable
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(401, "IsEditable", "en{'IsEditable'}de{'IsEditable'}")]
+        public bool IsEditable
+        {
+            get
+            {
+                return _IsEditable;
+            }
+            set
+            {
+                if (_IsEditable != value)
+                {
+                    _IsEditable = value;
+                    OnPropertyChanged("IsEditable");
+                }
+            }
+        }
+
+
         public override string ToString()
         {
             return string.Format(@"[BatchPlanSuggestion] #{0} {1} x {2} = {3}", Nr, BatchTargetCount, BatchSize, TotalBatchSize);
