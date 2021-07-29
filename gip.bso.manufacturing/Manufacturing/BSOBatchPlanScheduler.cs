@@ -393,6 +393,12 @@ namespace gip.bso.manufacturing
                 case "IsEnabledSetBatchStateCreated":
                     result = IsEnabledSetBatchStateCreated();
                     return true;
+                case "SetBatchStateCancelled":
+                    SetBatchStateCancelled();
+                    return true;
+                case "IsEnabledSetBatchStateCancelled":
+                    result = IsEnabledSetBatchStateCancelled();
+                    return true;
                 case "WizardForward":
                     WizardForward();
                     return true;
@@ -2176,6 +2182,41 @@ namespace gip.bso.manufacturing
         {
             return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.ReadyToStart);
         }
+
+
+
+        [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
+        public void SetBatchStateCancelled()
+        {
+            if (!IsEnabledSetBatchStateCancelled())
+                return;
+            List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
+            {
+                if (   batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
+                    || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
+                    batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
+                else if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
+                {
+                    foreach (var reservation in batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray())
+                    {
+                        reservation.DeleteACObject(this.DatabaseApp, true);
+                    }
+                    batchPlan.DeleteACObject(this.DatabaseApp, true);
+                }
+            }
+            Save();
+            LoadProdOrderBatchPlanList();
+        }
+
+        public bool IsEnabledSetBatchStateCancelled()
+        {
+            return ProdOrderBatchPlanList != null 
+                && ProdOrderBatchPlanList.Any(c =>     c.IsSelected 
+                                                    && (   c.PlanState <= vd.GlobalApp.BatchPlanState.Created 
+                                                        || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused));
+        }
+
 
 
         #endregion
