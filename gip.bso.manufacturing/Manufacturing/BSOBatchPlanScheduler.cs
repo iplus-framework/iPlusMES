@@ -345,6 +345,9 @@ namespace gip.bso.manufacturing
                 case "IsEnabledChangeMode":
                     result = IsEnabledChangeMode();
                     return true;
+                case "IsEnabledSave":
+                    result = IsEnabledSave();
+                    return true;
                 case "New":
                     New();
                     return true;
@@ -423,9 +426,18 @@ namespace gip.bso.manufacturing
                 case "IsEnabledMoveToOtherLine":
                     result = IsEnabledMoveToOtherLine();
                     return true;
+                case "Load":
+                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    return true;
                 case "IsEnabledLoad":
-                    IsEnabledLoad();
-                    break;
+                    result = IsEnabledLoad();
+                    return true;
+                case "IsEnabledToChangeBatchPlan":
+                    result = IsEnabledToChangeBatchPlan();
+                    return true;
+                case "ChangeBatchPlan":
+                    ChangeBatchPlan((ProdOrderBatchPlan)acParameter[0]);
+                    return true;
                 default:
                     break;
             }
@@ -764,6 +776,12 @@ namespace gip.bso.manufacturing
                     if (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
                         || SelectedProdOrderBatchPlan.PlanState >= GlobalApp.BatchPlanState.Paused)
                         SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.ReadyToStart;
+                }
+                else if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount <= 0)
+                {
+                    SelectedProdOrderBatchPlan.PartialTargetCount = null;
+                    if (SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.ReadyToStart)
+                        SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.Paused;
                 }
                 Save();
             }
@@ -2898,7 +2916,22 @@ namespace gip.bso.manufacturing
                             result = Global.ControlModes.Hidden;
                         break;
                     case "SelectedProdOrderBatchPlan\\PartialTargetCount":
-                        if (SelectedScheduleForPWNode != null && SelectedScheduleForPWNode.StartMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic)
+                        //SelectedProdOrderBatchPlan.PlannedStartDate && SelectedProdOrderBatchPlan.end
+                        if (SelectedScheduleForPWNode != null
+                            && SelectedScheduleForPWNode.StartMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic
+                            && SelectedProdOrderBatchPlan != null
+                            && SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount
+                            && SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount)
+                            result = Global.ControlModes.Enabled;
+                        else
+                            result = Global.ControlModes.Disabled;
+                        break;
+                    case "SelectedProdOrderBatchPlan\\ScheduledStartDate":
+                    case "SelectedProdOrderBatchPlan\\ScheduledEndDate":
+                        if (SelectedProdOrderBatchPlan != null
+                            && (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.ReadyToStart || SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.Paused)
+                            && (  SelectedProdOrderBatchPlan.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
+                               || SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount))
                             result = Global.ControlModes.Enabled;
                         else
                             result = Global.ControlModes.Disabled;

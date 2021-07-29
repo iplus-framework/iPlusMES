@@ -144,7 +144,7 @@ namespace gip.mes.processapplication
             if (startableBatchPlans != null && startableBatchPlans.Any())
             {
                 var batchPlanningTimes = startableBatchPlans
-                                        .Where(c => c.PlanState > GlobalApp.BatchPlanState.Created && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
+                                        .Where(c => c.PlanState >= GlobalApp.BatchPlanState.AutoStart && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
                                         .Select(c => new BatchPlanningTime()
                                         {
                                             ProdOrderBatchPlanID = c.ProdOrderBatchPlanID,
@@ -665,9 +665,15 @@ namespace gip.mes.processapplication
                 {
                     if (batchPlanEntry.BatchActualCount < batchPlanEntry.BatchTargetCount)
                     {
-                        if (   !batchPlanEntry.DiffPartialCount.HasValue
+                        if (!batchPlanEntry.DiffPartialCount.HasValue
                             || batchPlanEntry.DiffPartialCount > 0)
-                            createOneBatchMore = true;
+                        {
+                            // Somebody has reset the PartialTargetCount-Property during the partial production => don't create a batch
+                            if (batchPlanEntry.PartialActualCount.HasValue && !batchPlanEntry.DiffPartialCount.HasValue)
+                                createOneBatchMore = false;
+                            else
+                                createOneBatchMore = true;
+                        }
                         if (batchPlanEntry.BatchActualCount + 1 >= batchPlanEntry.BatchTargetCount)
                             isLastBatch = true;
                     }
@@ -699,16 +705,17 @@ namespace gip.mes.processapplication
                 {
                     NextBatchState nextBatchState = NextBatchState.CompletedNoNewEntry;
                     if (batchPlanEntry.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
-                        || (   isLastBatch 
-                            && (   !batchPlanEntry.DiffPartialCount.HasValue 
-                                || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
+                        || isLastBatch 
+                            //&& (   !batchPlanEntry.DiffPartialCount.HasValue 
+                            //    || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
                         || totalSizeReached)
                     {
                         batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Completed;
                         batchPlanEntry.PartialTargetCount = null;
                         batchPlanEntry.PartialActualCount = null;
                     }
-                    else if (batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
+                    else if (  (batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
+                            || (!batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.PartialActualCount.HasValue))
                     {
                         nextBatchState = NextBatchState.UncompletedButPartialQuantityReached;
                         batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Paused;
