@@ -119,6 +119,14 @@ namespace gip.mes.processapplication
                     ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
                     _LastSubStateResetCounter = IterationCount.ValueT + 1;
                 }
+
+                if (loop && previousDosings != null)
+                {
+                    foreach (var pwDosing in previousDosings)
+                    {
+                        pwDosing.OnDosingLoopDecision(this, loop);
+                    }
+                }
             }
 
             if (loop && _PreviousLoopTime.HasValue)

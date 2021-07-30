@@ -126,6 +126,9 @@
     <None Include="Service References\BingServices\service1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="VBControlScripts\2021-07-30 09-39_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\BingServices\" />
@@ -188,9 +191,7 @@
       <Name>gip.mes.facility</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="VBControlScripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

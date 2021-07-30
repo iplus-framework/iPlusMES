@@ -586,7 +586,8 @@ namespace gip.bso.masterdata
 
         public void LoadMedia(IACObject aCObject)
         {
-            if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder)) return;
+            if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder)) 
+                return;
             currentACObject = aCObject;
             MediaController = new MediaController(MediaSettings, aCObject);
             ImageMediaSet = MediaController.Items[MediaItemTypeEnum.Image];
