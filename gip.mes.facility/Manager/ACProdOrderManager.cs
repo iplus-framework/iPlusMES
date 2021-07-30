@@ -1666,6 +1666,15 @@ namespace gip.mes.facility
             targetBatchPlan.StartOffsetSecAVG = sourceBatchPlan.StartOffsetSecAVG;
             targetBatchPlan.DurationSecAVG = sourceBatchPlan.DurationSecAVG;
 
+            List<FacilityReservation> sourceFacilityReservations = sourceBatchPlan.FacilityReservation_ProdOrderBatchPlan.ToList();
+            foreach (FacilityReservation sourceFacilityReservation in sourceFacilityReservations)
+            {
+                KeyValuePair<Guid, Guid> facilityReservationPair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceFacilityReservation.FacilityReservationID);
+                if (facilityReservationPair.Key == Guid.Empty)
+                    CloneFacilityReservation(databaseApp, sourceFacilityReservation, targetBatchPlan, ref connectionOldNewItems);
+
+            }
+
             return targetBatchPlan;
         }
 
@@ -1758,11 +1767,11 @@ namespace gip.mes.facility
                     }
                 }
 
-                List<ProdOrderPartslistPosRelation> targetRelations = sourcePos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.OrderBy(c => c.Sequence).ToList();
-                foreach (ProdOrderPartslistPosRelation targetRelation in targetRelations)
+                List<ProdOrderPartslistPosRelation> sourceRelations = sourcePos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.OrderBy(c => c.Sequence).ToList();
+                foreach (ProdOrderPartslistPosRelation sourceRelation in sourceRelations)
                 {
                     ProdOrderPartslistPos nextSourcePos = null;
-                    KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == targetRelation.SourceProdOrderPartslistPosID);
+                    KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRelation.SourceProdOrderPartslistPosID);
                     if (pair.Key != Guid.Empty)
                     {
                         nextSourcePos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistPosID == pair.Value);
@@ -1770,13 +1779,37 @@ namespace gip.mes.facility
                             throw new Exception("Problem finding existing pos!");
                     }
                     else
-                        nextSourcePos = CloneProdPos(databaseApp, targetRelation.SourceProdOrderPartslistPos, targetPartslist, true, ref connectionOldNewItems);
-                    CloneProdRelation(databaseApp, targetRelation, targetPos, nextSourcePos, ref connectionOldNewItems);
+                    {
+                        nextSourcePos = CloneProdPos(databaseApp, sourceRelation.SourceProdOrderPartslistPos, targetPartslist, true, ref connectionOldNewItems);
+                    }
+                    KeyValuePair<Guid, Guid> pairRelation = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRelation.ProdOrderPartslistPosRelationID);
+                    if (pairRelation.Key == Guid.Empty)
+                        CloneProdRelation(databaseApp, sourceRelation, targetPos, nextSourcePos, ref connectionOldNewItems);
                 }
             }
 
 
             return targetPos;
+        }
+
+        private FacilityReservation CloneFacilityReservation(DatabaseApp databaseApp, FacilityReservation sourceReservation, ProdOrderBatchPlan targetBatchPlan, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        {
+            string secondaryKey = ACRoot.SRoot.NoManager.GetNewNo(databaseApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
+            FacilityReservation targetReservation = FacilityReservation.NewACObject(databaseApp, targetBatchPlan, secondaryKey);
+            connectionOldNewItems.Add(sourceReservation.FacilityReservationID, targetReservation.FacilityReservationID);
+            targetBatchPlan.FacilityReservation_ProdOrderBatchPlan.Add(targetReservation);
+
+            sourceReservation.Material = targetReservation.Material;
+            sourceReservation.FacilityLot = targetReservation.FacilityLot;
+            sourceReservation.FacilityCharge = targetReservation.FacilityCharge;
+            sourceReservation.Facility = targetReservation.Facility;
+
+            sourceReservation.ParentFacilityReservationID = targetReservation.ParentFacilityReservationID;
+            sourceReservation.VBiACClass = targetReservation.VBiACClass;
+            sourceReservation.Sequence = targetReservation.Sequence;
+            sourceReservation.ReservationStateIndex = targetReservation.ReservationStateIndex;
+
+            return targetReservation;
         }
 
         public ProdOrderPartslistPosRelation CloneProdRelation(DatabaseApp databaseApp, ProdOrderPartslistPosRelation sourceRel, ProdOrderPartslistPos targetPos, ProdOrderPartslistPos nextSourcePos, ref Dictionary<Guid, Guid> connectionOldNewItems)
