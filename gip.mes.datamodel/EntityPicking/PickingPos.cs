@@ -379,6 +379,10 @@ namespace gip.mes.datamodel
                 this.PickingActualUOM = sumActualQuantityUOM;
         }
 
+        partial void OnPickingMaterialIDChanged()
+        {
+            OnPropertyChanged("Material");
+        }
 
         #endregion
 

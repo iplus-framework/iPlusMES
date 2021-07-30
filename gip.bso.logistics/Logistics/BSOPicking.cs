@@ -1039,6 +1039,14 @@ namespace gip.bso.logistics
                         }
                         break;
                     }
+                case "CurrentPickingPos\\PickingQuantityUOM":
+                case "CurrentPickingPos\\PickingMaterial":
+                    if (    CurrentPickingPos == null 
+                        || CurrentPickingPos.InOrderPosID.HasValue 
+                        || CurrentPickingPos.OutOrderPosID.HasValue
+                        || CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                        return Global.ControlModes.Disabled;
+                    break;
             }
 
             if (!String.IsNullOrEmpty(vbControl.VBContent) && vbControl.VBContent.StartsWith("CurrentACMethodBooking"))
@@ -1541,6 +1549,34 @@ namespace gip.bso.logistics
                 return false;
             return true;
         }
+
+        /// <summary>
+        /// Adds a new pos witout a reference to other entities
+        /// </summary>
+        [ACMethodCommand("PickingPos", "en{'Add'}de{'Hinzufügen'}", 602, true)]
+        public virtual void AddPickingPos()
+        {
+            if (!IsEnabledAddPickingPos())
+                return;
+            PickingPos pickingPos = PickingPos.NewACObject(DatabaseApp, CurrentPicking);
+            if (pickingPos != null)
+                CurrentPicking.PickingPos_Picking.Add(pickingPos);
+            OnPropertyChanged("PickingPosList");
+            CurrentPickingPos = pickingPos;
+            SelectedPickingPos = pickingPos;
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled AddPickingPos in order pos].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled AddPickingPos in order pos]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledAddPickingPos()
+        {
+            if (CurrentPicking == null)
+                return false;
+            return true;
+        }
+
         #endregion
 
         #region FacilityPreBooking
@@ -2325,6 +2361,12 @@ namespace gip.bso.logistics
                     return true;
                 case "IsEnabledUnassignPickingPos":
                     result = IsEnabledUnassignPickingPos();
+                    return true;
+                case "AddPickingPos":
+                    AddPickingPos();
+                    return true;
+                case "IsEnabledAddPickingPos":
+                    result = IsEnabledAddPickingPos();
                     return true;
                 case "NewFacilityPreBooking":
                     NewFacilityPreBooking();
