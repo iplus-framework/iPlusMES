@@ -87,7 +87,7 @@ namespace gip.bso.manufacturing
             else
                 ConfigPreselectedLine = null;
             ACSaveChanges();
-            
+
         }
 
         public string ConfigPreselectedLineCurrentUser
@@ -1811,6 +1811,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledMoveToOtherLine())
                 return;
+            ClearMessages();
             bool isMovingValueValid = false;
             bool isMove = false;
             if (SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
@@ -2287,9 +2288,11 @@ namespace gip.bso.manufacturing
         [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
         public void SetBatchStateCancelled()
         {
+            ClearMessages();
             if (!IsEnabledSetBatchStateCancelled())
                 return;
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            List<ProdOrderPartslist> partslists = selectedBatches.Select(c => c.ProdOrderPartslist).ToList();
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
                 if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
@@ -2304,7 +2307,34 @@ namespace gip.bso.manufacturing
                     batchPlan.DeleteACObject(this.DatabaseApp, true);
                 }
             }
-            Save();
+
+            foreach (ProdOrderPartslist partslist in partslists)
+            {
+                ProdOrder prodOrder = partslist.ProdOrder;
+                if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+                {
+                    Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, prodOrder, partslist);
+                    if (msg != null)
+                    {
+                        SendMessage(msg);
+                    }
+                    if (prodOrder.ProdOrderPartslist_ProdOrder.Any())
+                    {
+                        var tempPlList = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
+                        SequenceManager<ProdOrderPartslist>.Order(ref tempPlList);
+                    }
+                    if (!prodOrder.ProdOrderPartslist_ProdOrder.Any())
+                    {
+                        List<PlanningMRProposal> planningMRProposals = prodOrder.PlanningMRProposal_ProdOrder.ToList();
+                        foreach (var planningMRProposal in planningMRProposals)
+                            planningMRProposal.DeleteACObject(DatabaseApp, false);
+                        prodOrder.DeleteACObject(DatabaseApp, false);
+                    }
+                }
+            }
+            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+            if (saveMsg != null)
+                SendMessage(saveMsg);
             LoadProdOrderBatchPlanList();
         }
 
@@ -2399,6 +2429,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
+                MsgWithDetails saveFinishOnePl = DatabaseApp.ACSaveChanges();
                 if (WizardSchedulerPartslistList.Any())
                 {
                     WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
@@ -2766,7 +2797,7 @@ namespace gip.bso.manufacturing
                     TotalSize = SelectedWizardSchedulerPartslist.MDUnit != null ? SelectedWizardSchedulerPartslist.TargetQuantity : SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
-                BatchPlanSuggestion.ItemsList.Add(new BatchPlanSuggestionItem(
+                suggestion.ItemsList.Add(new BatchPlanSuggestionItem(
                     1,
                     SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     1,
@@ -2850,6 +2881,7 @@ namespace gip.bso.manufacturing
             TargetQuantity = 0;
             WizardSolvedTasks.Clear();
             IsWizardExistingBatch = false;
+            ClearMessages();
         }
 
         #endregion

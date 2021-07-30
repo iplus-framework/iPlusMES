@@ -1799,15 +1799,15 @@ namespace gip.mes.facility
             connectionOldNewItems.Add(sourceReservation.FacilityReservationID, targetReservation.FacilityReservationID);
             targetBatchPlan.FacilityReservation_ProdOrderBatchPlan.Add(targetReservation);
 
-            sourceReservation.Material = targetReservation.Material;
-            sourceReservation.FacilityLot = targetReservation.FacilityLot;
-            sourceReservation.FacilityCharge = targetReservation.FacilityCharge;
-            sourceReservation.Facility = targetReservation.Facility;
+            targetReservation.Material = sourceReservation.Material;
+            targetReservation.FacilityLot = sourceReservation.FacilityLot;
+            targetReservation.FacilityCharge = sourceReservation.FacilityCharge;
+            targetReservation.Facility = sourceReservation.Facility;
 
-            sourceReservation.ParentFacilityReservationID = targetReservation.ParentFacilityReservationID;
-            sourceReservation.VBiACClass = targetReservation.VBiACClass;
-            sourceReservation.Sequence = targetReservation.Sequence;
-            sourceReservation.ReservationStateIndex = targetReservation.ReservationStateIndex;
+            targetReservation.ParentFacilityReservationID = sourceReservation.ParentFacilityReservationID;
+            targetReservation.VBiACClass = sourceReservation.VBiACClass;
+            targetReservation.Sequence = sourceReservation.Sequence;
+            targetReservation.ReservationStateIndex = sourceReservation.ReservationStateIndex;
 
             return targetReservation;
         }

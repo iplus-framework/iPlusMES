@@ -317,7 +317,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method GeneratePlan
         /// </summary>
-        [ACMethodInfo("GeneratePlan", "en{'Generate scheduler'}de{'Zeitplaner generieren'}", 100)]
+        [ACMethodInfo("GeneratePlan", "en{'Add to schedule'}de{'Übernehme in Terminplan'}", 100)]
         public void GeneratePlan()
         {
             if (!IsEnabledGeneratePlan())
