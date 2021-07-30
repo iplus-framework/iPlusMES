@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
+using System.Text;
 using vd = gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
@@ -25,6 +26,94 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Configuration
+
+        #region Configuration -> ConfigPreselectedLine
+
+        private ACPropertyConfigValue<string> _ConfigPreselectedLine;
+        [ACPropertyConfig("ConfigPreselectedLine")]
+        public string ConfigPreselectedLine
+        {
+            get
+            {
+                if (_ConfigPreselectedLine.ValueT == null)
+                    return null;
+                return _ConfigPreselectedLine.ValueT;
+            }
+            set
+            {
+                _ConfigPreselectedLine.ValueT = value;
+            }
+        }
+
+        private Dictionary<string, string> _ConfigPreselectedLineDict;
+        public Dictionary<string, string> ConfigPreselectedLineDict
+        {
+            get
+            {
+                if (_ConfigPreselectedLineDict == null)
+                    _ConfigPreselectedLineDict = GetConfigPreselectedLineDict();
+                return _ConfigPreselectedLineDict;
+            }
+        }
+
+        private Dictionary<string, string> GetConfigPreselectedLineDict()
+        {
+            Dictionary<string, string> preselectedLines = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(ConfigPreselectedLine))
+            {
+                string[] preselectedLinesRows = ConfigPreselectedLine.Split(';');
+                foreach (string row in preselectedLinesRows)
+                {
+                    string[] preselectDef = row.Split(':');
+                    if (preselectDef.Length == 2)
+                        if (!preselectedLines.Keys.Contains(preselectDef[0]))
+                            preselectedLines.Add(preselectDef[0], preselectDef[1]);
+                }
+            }
+            return preselectedLines;
+        }
+
+        private void SetConfigPreselectedLineDict(Dictionary<string, string> preselectedLines)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (preselectedLines != null && preselectedLines.Any())
+            {
+                foreach (var item in preselectedLines)
+                {
+                    sb.Append(item.Key + ":" + item.Value);
+                }
+                ConfigPreselectedLine = sb.ToString();
+            }
+            else
+                ConfigPreselectedLine = null;
+            ACSaveChanges();
+            
+        }
+
+        public string ConfigPreselectedLineCurrentUser
+        {
+            get
+            {
+                if (!ConfigPreselectedLineDict.Keys.Contains(Root.CurrentInvokingUser.Initials))
+                    return null;
+                return ConfigPreselectedLineDict[Root.CurrentInvokingUser.Initials];
+            }
+            set
+            {
+                if (value == null)
+                {
+                    if (ConfigPreselectedLineDict.Keys.Contains(Root.CurrentInvokingUser.Initials))
+                        ConfigPreselectedLineDict.Remove(Root.CurrentInvokingUser.Initials);
+                }
+                else
+                if (!ConfigPreselectedLineDict.Keys.Contains(Root.CurrentInvokingUser.Initials))
+                    ConfigPreselectedLineDict.Add(Root.CurrentInvokingUser.Initials, value);
+                else
+                    ConfigPreselectedLineDict[Root.CurrentInvokingUser.Initials] = value;
+            }
+        }
+
+        #endregion
 
         private ACPropertyConfigValue<string> _PABatchPlanSchedulerURL;
         [ACPropertyConfig("PABatchPlanSchedulerURL")]
@@ -142,6 +231,7 @@ namespace gip.bso.manufacturing
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, "PABatchPlanSchedulerURL", "");
+            _ConfigPreselectedLine = new ACPropertyConfigValue<string>(this, "ConfigPreselectedLine", "");
         }
 
         #region c´tors -> ACInit
@@ -150,6 +240,8 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
+
+            _ConfigPreselectedLineDict = GetConfigPreselectedLineDict();
 
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
@@ -174,7 +266,7 @@ namespace gip.bso.manufacturing
             MediaSettings.LoadTypeFolder(dummyMaterial);
 
             InitBatchPlanSchedulerComponent();
-            LoadScheduleListForPWNodes();
+            LoadScheduleListForPWNodes(ConfigPreselectedLineCurrentUser);
 
             if (BSOPartslistExplorer_Child != null && BSOPartslistExplorer_Child.Value != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value != null)
                 BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.PropertyChanged += ChildBSO_PropertyChanged;
@@ -235,6 +327,13 @@ namespace gip.bso.manufacturing
             MediaSettings = null;
             SelectedProdOrderBatchPlan = null;
             IsWizard = false;
+
+            if (SelectedScheduleForPWNode != null)
+                ConfigPreselectedLineCurrentUser = SelectedScheduleForPWNode.MDSchedulingGroup.MDKey;
+            else
+                ConfigPreselectedLineCurrentUser = null;
+            SetConfigPreselectedLineDict(ConfigPreselectedLineDict);
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -468,7 +567,7 @@ namespace gip.bso.manufacturing
 
         private void SchedulesForPWNodesProp_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            LoadScheduleListForPWNodes();
+            LoadScheduleListForPWNodes(ConfigPreselectedLineCurrentUser);
         }
 
         #endregion
@@ -1339,7 +1438,7 @@ namespace gip.bso.manufacturing
                         foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
                             if (wizardItem.ProdOrderPartslistID != null)
                             {
-                                ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c=>c.ProdOrderPartslistID == wizardItem.ProdOrderPartslistID);
+                                ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistID == wizardItem.ProdOrderPartslistID);
                                 ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
                             }
                         OnPropertyChanged("WizardSchedulerPartslistList");
@@ -2193,7 +2292,7 @@ namespace gip.bso.manufacturing
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
-                if (   batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
+                if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
                     || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
                     batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
                 else if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
@@ -2211,9 +2310,9 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSetBatchStateCancelled()
         {
-            return ProdOrderBatchPlanList != null 
-                && ProdOrderBatchPlanList.Any(c =>     c.IsSelected 
-                                                    && (   c.PlanState <= vd.GlobalApp.BatchPlanState.Created 
+            return ProdOrderBatchPlanList != null
+                && ProdOrderBatchPlanList.Any(c => c.IsSelected
+                                                    && (c.PlanState <= vd.GlobalApp.BatchPlanState.Created
                                                         || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused));
         }
 
@@ -2938,7 +3037,7 @@ namespace gip.bso.manufacturing
                     case "SelectedProdOrderBatchPlan\\ScheduledEndDate":
                         if (SelectedProdOrderBatchPlan != null
                             && (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.ReadyToStart || SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.Paused)
-                            && (  SelectedProdOrderBatchPlan.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
+                            && (SelectedProdOrderBatchPlan.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
                                || SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount))
                             result = Global.ControlModes.Enabled;
                         else
@@ -2962,7 +3061,7 @@ namespace gip.bso.manufacturing
             ProdOrderPartslistList = GetProdOrderPartslistList();
         }
 
-        private void LoadScheduleListForPWNodes()
+        private void LoadScheduleListForPWNodes(string schedulingGroupMDKey)
         {
             PAScheduleForPWNodeList newScheduleForWFNodeList = null;
             if (_SchedulesForPWNodesProp != null && _SchedulesForPWNodesProp.ValueT != null)
@@ -2971,6 +3070,8 @@ namespace gip.bso.manufacturing
                 newScheduleForWFNodeList = PABatchPlanScheduler.CreateScheduleListForPWNodes(this, DatabaseApp, null);
             //int removedCount = newScheduleForWFNodeList.RemoveAll(x => x.MDSchedulingGroupID == Guid.Empty);
             UpdateScheduleForPWNodeList(newScheduleForWFNodeList);
+            if (!string.IsNullOrEmpty(schedulingGroupMDKey))
+                SelectedScheduleForPWNode = ScheduleForPWNodeList.FirstOrDefault(c => c.MDSchedulingGroup.MDKey == schedulingGroupMDKey);
         }
 
         private void UpdateScheduleForPWNodeList(PAScheduleForPWNodeList newScheduleForWFNodeList)
