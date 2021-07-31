@@ -2828,6 +2828,7 @@ namespace gip.bso.manufacturing
             {
                 nr++;
                 BatchPlanSuggestionItem item = new BatchPlanSuggestionItem(nr, batchPlan.BatchSize, batchPlan.BatchTargetCount, batchPlan.TotalSize);
+                item.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
                 suggestion.ItemsList.Add(item);
             }
             return suggestion;
@@ -3240,9 +3241,7 @@ namespace gip.bso.manufacturing
                     nr++;
                     vd.ProdOrderBatchPlan batchPlan = FactoryBatchPlan(aCClassWF, partslist, prodOrderPartslist, CreatedBatchState);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
-                    batchPlan.BatchSize = item.BatchSize;
-                    batchPlan.BatchTargetCount = item.BatchTargetCount;
-                    batchPlan.TotalSize = item.TotalBatchSize;
+                    WriteBatchPlanQuantities(item, batchPlan);
                     batchPlan.Sequence = nr;
                     if (firstBatchPlan == null)
                         firstBatchPlan = batchPlan;
@@ -3257,9 +3256,30 @@ namespace gip.bso.manufacturing
             return success;
         }
 
+        private void WriteBatchPlanQuantities(BatchPlanSuggestionItem suggestionItem, ProdOrderBatchPlan batchPlan)
+        {
+            batchPlan.BatchSize = suggestionItem.BatchSize;
+            batchPlan.BatchTargetCount = suggestionItem.BatchTargetCount;
+            batchPlan.TotalSize = suggestionItem.TotalBatchSize;
+        }
+
         private bool UpdateBatchPlans(BatchPlanSuggestion suggestion, WizardSchedulerPartslist wizardSchedulerPartslist)
         {
-            bool success = false;
+            bool success = true;
+            ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistID == wizardSchedulerPartslist.ProdOrderPartslistID);
+            List<ProdOrderBatchPlan> existingBatchPlans = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+            vd.ACClassWF tempACClassWFItem = wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
+            core.datamodel.ACClassWF aCClassWF = tempACClassWFItem.FromIPlusContext<core.datamodel.ACClassWF>(DatabaseApp.ContextIPlus);
+            foreach (BatchPlanSuggestionItem suggestionItem in suggestion.ItemsList)
+            {
+                ProdOrderBatchPlan batchPlan = null;
+                if (suggestionItem.ProdOrderBatchPlanID != null)
+                    batchPlan = existingBatchPlans.FirstOrDefault(c => c.ProdOrderBatchPlanID == suggestionItem.ProdOrderBatchPlanID);
+                else
+                    batchPlan = FactoryBatchPlan(aCClassWF, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created);
+
+                WriteBatchPlanQuantities(suggestionItem, batchPlan);
+            }
             return success;
         }
 

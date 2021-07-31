@@ -49,6 +49,7 @@ namespace gip.bso.manufacturing
         public int? DurationSecAVG { get; set; }
         public int? StartOffsetSecAVG { get; set; }
 
+
         #endregion
 
         #region Properties -> Other (marked)
@@ -217,7 +218,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEqualPartslist(WizardSchedulerPartslist second)
         {
-            return 
+            return
                 (ProdOrderPartslistID != null && second.ProdOrderPartslistID != null && ProdOrderPartslistID == second.ProdOrderPartslistID)
                 || (PartslistID == second.PartslistID);
         }

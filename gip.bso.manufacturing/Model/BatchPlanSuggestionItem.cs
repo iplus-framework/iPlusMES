@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using System;
 using System.ComponentModel;
 
 namespace gip.bso.manufacturing
@@ -169,6 +170,7 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public Guid? ProdOrderBatchPlanID { get; set; }
 
         public override string ToString()
         {
