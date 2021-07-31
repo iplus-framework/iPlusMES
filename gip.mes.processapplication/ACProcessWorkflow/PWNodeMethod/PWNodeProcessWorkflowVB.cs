@@ -85,6 +85,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("StartNextStage", typeof(StartNextStageMode), (short)StartNextStageMode.DoNothing, Global.ParamOption.Required));
             paramTranslation.Add("StartNextStage", "en{'Start next production stage'}de{'Nächste Fertigungsstufe starten'}");
 
+            method.ParameterValueList.Add(new ACValue("EndPList", typeof(EndPListMode), (short)EndPListMode.DoNothing, Global.ParamOption.Required));
+            paramTranslation.Add("EndPList", "en{'Mode for ending BOM-State'}de{'Stücklistenstatus Beenden Modus'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeProcessWorkflowVB), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeProcessWorkflowVB), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWNodeProcessWorkflowVB), HandleExecuteACMethod_PWNodeProcessWorkflowVB);
@@ -168,9 +171,25 @@ namespace gip.mes.processapplication
 
         public enum NextBatchState
         {
+            /// <summary>
+            /// If there are no batchplans that are active (>= GlobalApp.BatchPlanState.AutoStart && <= GlobalApp.BatchPlanState.InProcess)
+            /// </summary>
             NoPlanEntryFound = 0,
+
+            /// <summary>
+            /// All Batchplans that were activated with GlobalApp.BatchPlanState.AutoStart are completed 
+            /// </summary>
             CompletedNoNewEntry = 1,
+
+            /// <summary>
+            /// When PartialQuantity in a Batchplan was reached but the total batch count is not reached
+            /// </summary>
             UncompletedButPartialQuantityReached = 2,
+
+
+            /// <summary>
+            /// One Batch more can be started
+            /// </summary>
             EntryFound = 3
         }
         #endregion
@@ -393,6 +412,23 @@ namespace gip.mes.processapplication
                     }
                 }
                 return StartNextStageMode.DoNothing;
+            }
+        }
+
+        public EndPListMode EndProdOrderPartslistMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("EndPList");
+                    if (acValue != null)
+                    {
+                        return (EndPListMode)acValue.ParamAsInt16;
+                    }
+                }
+                return EndPListMode.DoNothing;
             }
         }
 
@@ -721,8 +757,8 @@ namespace gip.mes.processapplication
                             var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
                             if (contentACClassWFVB != null)
                             {
-                                var startableBatchPlans = LoadStartableBatchPlans(_CurrentProdOrderPartslist, contentACClassWFVB);
-                                ReCreateBatchPlanningTimes(startableBatchPlans);
+                                var uncompletedBatchPlans = LoadUncompletedBatchPlans(_CurrentProdOrderPartslist, contentACClassWFVB);
+                                ReCreateBatchPlanningTimes(uncompletedBatchPlans);
                             }
                         }
 
@@ -1751,6 +1787,15 @@ namespace gip.mes.processapplication
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
+            xmlChild = xmlACPropertyList["EndProdOrderPartslistMode"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("EndProdOrderPartslistMode");
+                if (xmlChild != null)
+                    xmlChild.InnerText = EndProdOrderPartslistMode.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+            
             xmlChild = xmlACPropertyList["CurrentProdOrderPartslist"];
             if (xmlChild == null)
             {
