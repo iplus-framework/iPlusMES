@@ -193,7 +193,6 @@ namespace gip.mes.datamodel
             set
             {
                 PlanStateIndex = (Int16)value;
-
                 OnPropertyChanged("PlanState");
             }
         }
@@ -575,6 +574,11 @@ namespace gip.mes.datamodel
             }
         }
 
+        partial void OnPlanStateIndexChanged()
+        {
+            OnPropertyChanged("PlanState");
+            OnPropertyChanged("PlanStateIndexName");
+        }
 
         [ACPropertyInfo(15, "", "en{'Called-up Quantity'}de{'Abgerufene Menge'}")]
         public double CalledUpQuantity

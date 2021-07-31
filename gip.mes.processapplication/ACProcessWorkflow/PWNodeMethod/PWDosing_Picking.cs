@@ -21,6 +21,25 @@ namespace gip.mes.processapplication
                 return pwMethodTransport != null ? pwMethodTransport.PickingManager : null;
             }
         }
+
+        private bool _RepeatDosingForPicking = false;
+        public bool RepeatDosingForPicking
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _RepeatDosingForPicking;
+                }
+            }
+            set
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    _RepeatDosingForPicking = value;
+                }
+            }
+        }
         #endregion
 
         public virtual StartNextCompResult StartNextPickingPos(PAProcessModule module)
@@ -28,8 +47,10 @@ namespace gip.mes.processapplication
             PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
             if (pwMethodTransport == null || pwMethodTransport.CurrentPicking == null)
                 return StartNextCompResult.Done;
+            var pwGroup = ParentPWGroup;
             // Nur einmal starten erlaubt:
-            if (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1)
+            if (   !RepeatDosingForPicking
+                && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
                 return StartNextCompResult.Done;
 
             Msg msg = null;
@@ -61,6 +82,8 @@ namespace gip.mes.processapplication
                     return StartNextCompResult.Done;
                 }
                 targetWeight = pickingPos.RemainingDosingQuantityUOM * -1;
+                if (targetWeight < 0.000001)
+                    targetWeight = 1;
 
                 IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                 ScaleBoundaries scaleBoundaries = null;
@@ -95,7 +118,7 @@ namespace gip.mes.processapplication
 
                 PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
                 double newRemainingQ = pickingPos.RemainingDosingQuantityUOM + targetWeight;
-                if (newRemainingQ >= -0.000001)
+                if (newRemainingQ >= -0.000001 && MinDosQuantity > -0.0000001)
                 {
                     lastBatchMode = PADosingLastBatchEnum.LastBatch;
                     if (ParentPWMethodVBBase != null)
@@ -332,11 +355,15 @@ namespace gip.mes.processapplication
                 if (mode == ManageDosingStatesMode.QueryOpenDosings)
                 {
                     var queryOpenDosings = picking.PickingPos_Picking.ToArray()
-                                        .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
-                                                    && c.MDDelivPosLoadState != null
+                                        .Where(c =>    c.MDDelivPosLoadState != null
                                                     && (c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
                                                         || c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
                                         .OrderBy(c => c.Sequence);
+
+                    // If not endless dosing, check Quantity
+                    if (MinDosQuantity > -0.0000001)
+                        queryOpenDosings = queryOpenDosings.Where(c => c.RemainingDosingQuantityUOM < -1.0).OrderBy(c => c.Sequence);
+
                     bool any = queryOpenDosings.Any();
                     if (any)
                         sumQuantity = queryOpenDosings.Sum(c => c.RemainingDosingQuantityUOM);
@@ -806,7 +833,7 @@ namespace gip.mes.processapplication
             {
                 if (((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
                     || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-                    || pickingPos.RemainingDosingQuantityUOM >= -1)
+                    || (pickingPos.RemainingDosingQuantityUOM >= -1 && MinDosQuantity > -0.0000001)) // No Endless Dosing
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                 }

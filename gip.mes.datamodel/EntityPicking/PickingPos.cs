@@ -305,6 +305,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        /// <summary>
+        /// Returns ActualQuantity - TargetQuantity (A negative value)
+        /// </summary>
         public double RemainingDosingQuantityUOM
         {
             get
@@ -376,6 +379,10 @@ namespace gip.mes.datamodel
                 this.PickingActualUOM = sumActualQuantityUOM;
         }
 
+        partial void OnPickingMaterialIDChanged()
+        {
+            OnPropertyChanged("Material");
+        }
 
         #endregion
 

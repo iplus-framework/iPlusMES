@@ -5,7 +5,7 @@ namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPlanningMR")]
     
-    [ACPropertyEntity(1, "PlanningMRNo", ConstApp.Number, "", "", true)]
+    [ACPropertyEntity(1, "PlanningMRNo", "en{'Schedule number'}de{'Plannummer'}", "", "", true)]
     [ACPropertyEntity(2, "PlanningName", "en{'Name'}de{'Name'}", "", "", true)]
     [ACPropertyEntity(3, "RangeFrom", "en{'Valid From'}de{'Gültig von'}", "", "", true)]
     [ACPropertyEntity(4, "RangeTo", "en{'Valid To'}de{'Gültig bis'}", "", "", true)]

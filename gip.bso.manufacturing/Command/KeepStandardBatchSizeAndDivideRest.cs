@@ -17,10 +17,11 @@ namespace gip.bso.manufacturing
             double rest = 0;
             rest = totalSize;
 
+
             if (totalSize > 0)
             {
-                if ( (   Math.Abs(standardBatchSize) <= Double.Epsilon 
-                      && Math.Abs(maxBatchSize) <= Double.Epsilon 
+                if ((Math.Abs(standardBatchSize) <= Double.Epsilon
+                      && Math.Abs(maxBatchSize) <= Double.Epsilon
                       && Math.Abs(minBatchSize) <= Double.Epsilon)
                    || totalSize < minBatchSize)
                 {
@@ -28,8 +29,8 @@ namespace gip.bso.manufacturing
                     calcBatchSize = totalSize;
                     rest = 0;
                 }
-                else if (   standardBatchSize > Double.Epsilon 
-                         && Math.Abs(maxBatchSize) <= Double.Epsilon 
+                else if (standardBatchSize > Double.Epsilon
+                         && Math.Abs(maxBatchSize) <= Double.Epsilon
                          && Math.Abs(minBatchSize) <= Double.Epsilon)
                 {
                     if (totalSize <= standardBatchSize)
@@ -44,10 +45,10 @@ namespace gip.bso.manufacturing
                         calcBatchCount = (int)(totalSize / calcBatchSize);
                         rest = totalSize - calcBatchSize * calcBatchCount;
                     }
-                   
+
                 }
-                else if (   standardBatchSize > Double.Epsilon 
-                         && minBatchSize > Double.Epsilon 
+                else if (standardBatchSize > Double.Epsilon
+                         && minBatchSize > Double.Epsilon
                          && maxBatchSize > Double.Epsilon)
                 {
                     if (totalSize <= standardBatchSize)
@@ -88,6 +89,24 @@ namespace gip.bso.manufacturing
 
             if (calcBatchCount > 0 && calcBatchSize > Double.Epsilon)
                 Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount);
+            else
+            {
+                bool isOkForOneBatch = false;
+                if (totalSize >= minBatchSize)
+                {
+                    if (maxBatchSize > 0 && maxBatchSize >= totalSize)
+                        isOkForOneBatch = true;
+                    else
+                        isOkForOneBatch = true;
+                }
+                if (isOkForOneBatch)
+                {
+                    calcBatchCount = 1;
+                    calcBatchSize = totalSize;
+                    rest = 0;
+                }
+                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount);
+            }
             Rest = rest;
         }
 

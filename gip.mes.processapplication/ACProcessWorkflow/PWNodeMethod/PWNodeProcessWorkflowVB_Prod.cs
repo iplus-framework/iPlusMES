@@ -127,24 +127,24 @@ namespace gip.mes.processapplication
 
         #region Helper methods
 
-        private List<ProdOrderBatchPlan> LoadStartableBatchPlans(ProdOrderPartslist currentProdOrderPartslist, gip.mes.datamodel.ACClassWF contentACClassWFVB)
+        private List<ProdOrderBatchPlan> LoadUncompletedBatchPlans(ProdOrderPartslist currentProdOrderPartslist, gip.mes.datamodel.ACClassWF contentACClassWFVB)
         {
             if (currentProdOrderPartslist == null || contentACClassWFVB == null)
                 return new List<ProdOrderBatchPlan>();
-            var startableBatchPlans = contentACClassWFVB.ProdOrderBatchPlan_VBiACClassWF.Where(c => c.ProdOrderPartslistID == currentProdOrderPartslist.ProdOrderPartslistID
-                                                                    && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.InProcess)
+            var uncompletedBatchPlans = contentACClassWFVB.ProdOrderBatchPlan_VBiACClassWF.Where(c => c.ProdOrderPartslistID == currentProdOrderPartslist.ProdOrderPartslistID
+                                                                    && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.Paused)
                                                                     .OrderByDescending(c => c.PlanStateIndex)
                                                                     .ThenBy(c => c.PlannedStartDate)
                                                                     .ToList();
-            return startableBatchPlans;
+            return uncompletedBatchPlans;
         }
 
-        private void ReCreateBatchPlanningTimes(List<ProdOrderBatchPlan> startableBatchPlans)
+        private void ReCreateBatchPlanningTimes(List<ProdOrderBatchPlan> uncompletedBatchPlans)
         {
-            if (startableBatchPlans != null && startableBatchPlans.Any())
+            if (uncompletedBatchPlans != null && uncompletedBatchPlans.Any())
             {
-                var batchPlanningTimes = startableBatchPlans
-                                        .Where(c => c.PlanState > GlobalApp.BatchPlanState.Created && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
+                var batchPlanningTimes = uncompletedBatchPlans
+                                        .Where(c => c.PlanState >= GlobalApp.BatchPlanState.AutoStart && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
                                         .Select(c => new BatchPlanningTime()
                                         {
                                             ProdOrderBatchPlanID = c.ProdOrderBatchPlanID,
@@ -225,13 +225,13 @@ namespace gip.mes.processapplication
                 var currentProdOrderPartslist = CurrentProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
                 var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
 
-                //perfEvent = vbDump != null ? vbDump.PerfLogger.Start(loggerInstance, 201) : null;
-                var startableBatchPlans = LoadStartableBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
-                //if (perfEvent != null)
-                //    vbDump.PerfLogger.Stop(loggerInstance, 201, perfEvent);
+                var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
+                ReCreateBatchPlanningTimes(uncompletedBatchPlans);
 
-                ReCreateBatchPlanningTimes(startableBatchPlans);
-
+                var startableBatchPlans = uncompletedBatchPlans.Where(c =>     c.PlanState >= GlobalApp.BatchPlanState.AutoStart 
+                                                                            && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
+                                                                    .OrderByDescending(c => c.PlanStateIndex)
+                                                                    .ThenBy(c => c.PlannedStartDate);
                 var activeBatchPlan = startableBatchPlans.FirstOrDefault();
                 if (activeBatchPlan == null)
                 {
@@ -335,30 +335,29 @@ namespace gip.mes.processapplication
                     return StartNextBatchResult.CycleWait;
                 }
 
-                //ProdOrderBatchPlan[] queryBatchPlans = intermediatePosition.ProdOrderBatchPlan_ProdOrderPartslistPos
-                //    .Where(c => c.VBiACClassWFID.HasValue && c.VBiACClassWFID == ContentACClassWF.ACClassWFID).ToArray();
-                //if (!queryBatchPlans.Any())
-                if (!startableBatchPlans.Any())
-                {
-                    // Error00123: No batchplan found for this intermediate material
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1070, "Error00123");
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    return StartNextBatchResult.CycleWait;
-                }
+                // Deactivated 31.07.2021, because veryfication is done before at row with "if (activeBatchPlan == null)"
+                //if (!startableBatchPlans.Any())
+                //{
+                //    // Error00123: No batchplan found for this intermediate material
+                //    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1070, "Error00123");
+                //    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                //    return StartNextBatchResult.CycleWait;
+                //}
 
                 // Schaue nach aktiven Batch-Planungseinträgen
                 int nextBatchNo = 0;
                 ProdOrderBatch prevBatch = null;
                 double tolerance = intermediatePosition.TargetQuantityUOM * ProdOrderManager.TolRemainingCallQ * 0.01;
+                bool totalSizeReached;
 
                 //perfEvent = vbDump != null ? vbDump.PerfLogger.Start(loggerInstance, 202) : null;
-                NextBatchState nbResult = ManageStateAndGetNextBatchFromPlanEntry(intermediatePosition, currentProdOrderPartslist, dbApp, startableBatchPlans, null, false, null, false,
-                                                out batchPlanEntry, out prevBatch, out nextBatchNo, out isLastBatch, tolerance);
+                NextBatchState nbResult = ManageStateAndGetNextBatchFromPlanEntry(intermediatePosition, currentProdOrderPartslist, dbApp, uncompletedBatchPlans, null, false, null, false,
+                                                out batchPlanEntry, out prevBatch, out nextBatchNo, out isLastBatch, out totalSizeReached, tolerance);
                 //if (perfEvent != null)
                 //    vbDump.PerfLogger.Stop(loggerInstance, 202, perfEvent);
 
                 // Falls Status eines BatchPlans auf ERledigt gesetzt wurde, dann erneut aktualisiseren
-                ReCreateBatchPlanningTimes(startableBatchPlans);
+                ReCreateBatchPlanningTimes(uncompletedBatchPlans);
 
                 if (prevBatch != null)
                 {
@@ -400,36 +399,66 @@ namespace gip.mes.processapplication
 
                 if (nbResult == NextBatchState.CompletedNoNewEntry)
                 {
-                    //Error50203: Subtasks Order {0}, Recipe {1}, Position {2} are completed.
-                    string message = Root.Environment.TranslateMessage(this, "Error50203",
-                                                    intermediatePosition.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                    intermediatePosition.ProdOrderPartslist.Partslist.PartslistNo,
-                                                    intermediatePosition.BookingMaterial.MaterialName1);
-                    msg = new Msg(message, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1080);
-                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                        Messages.LogDebug(this.GetACUrl(), "MN_ReadAndStartNextBatch", msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    if (StartNextStage == StartNextStageMode.CompleteOnLastBatch)
+                    if (AlarmOnCompleted)
                     {
-                        List<ProdOrderBatchPlan> batchPlans = ProdOrderManager.GetBatchplansOfNextStages(dbApp, intermediatePosition.ProdOrderPartslist);
-                        bool canCompletePOLists = !batchPlans.Any(c => c.PlanState > GlobalApp.BatchPlanState.Created && c.PlanState < GlobalApp.BatchPlanState.Completed);
-                        batchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created).ToList().ForEach(c => c.PlanState = GlobalApp.BatchPlanState.Cancelled);
-                        if (canCompletePOLists)
-                        {
-                            var finishedState = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
-                            if (finishedState != null)
-                                ProdOrderManager.GetNextStages(dbApp, intermediatePosition.ProdOrderPartslist).ForEach(c => c.MDProdOrderState = finishedState);
-                        }
-                        dbApp.ACSaveChanges();
+                        //Error50203: Subtasks Order {0}, Recipe {1}, Position {2} are completed.
+                        string message = Root.Environment.TranslateMessage(this, "Error50203",
+                                                        intermediatePosition.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                        intermediatePosition.ProdOrderPartslist.Partslist.PartslistNo,
+                                                        intermediatePosition.BookingMaterial.MaterialName1);
+                        msg = new Msg(message, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1080);
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogDebug(this.GetACUrl(), "MN_ReadAndStartNextBatch", msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     }
+
+                    if (   (totalSizeReached && EndProdOrderPartslistMode == EndPListMode.OrderSizeReached)
+                        || (!uncompletedBatchPlans.Where(c => c.PlanState < GlobalApp.BatchPlanState.Completed).Any() && EndProdOrderPartslistMode == EndPListMode.AllBatchPlansCompleted))
+                    {
+                        // Complete this ProdorderPartslist
+                        MDProdOrderState finishedState = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
+                        if (finishedState != null)
+                            intermediatePosition.ProdOrderPartslist.MDProdOrderState = finishedState;
+
+                        // Complete following ProdorderPartslist
+                        if (StartNextStage == StartNextStageMode.CompleteOnLastBatch)
+                        {
+                            List<ProdOrderBatchPlan> batchPlans = ProdOrderManager.GetBatchplansOfNextStages(dbApp, intermediatePosition.ProdOrderPartslist);
+                            bool canCompletePOLists = !batchPlans.Any(c => c.PlanState > GlobalApp.BatchPlanState.Created && c.PlanState < GlobalApp.BatchPlanState.Completed);
+                            batchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created).ToList().ForEach(c => c.PlanState = GlobalApp.BatchPlanState.Cancelled);
+                            if (canCompletePOLists)
+                            {
+                                if (finishedState != null)
+                                    ProdOrderManager.GetNextStages(dbApp, intermediatePosition.ProdOrderPartslist).ForEach(c => c.MDProdOrderState = finishedState);
+                            }
+                        }
+
+                        // Complete whole ProdOrder
+                        IEnumerable<ProdOrderPartslist> allProdOrderPartslists = dbApp.ProdOrderPartslist
+                                                                                .Include(c => c.MDProdOrderState)
+                                                                                .Include(c => c.ProdOrder)
+                                                                                .Where(c => c.ProdOrderID == intermediatePosition.ProdOrderPartslist.ProdOrderID).ToArray();
+                        if (   allProdOrderPartslists != null
+                            && !allProdOrderPartslists.Where(c => c.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished).Any())
+                        {
+                            intermediatePosition.ProdOrderPartslist.ProdOrder.MDProdOrderState = finishedState;
+                        }
+                    }
+
+                    if (dbApp.IsChanged)
+                        dbApp.ACSaveChanges();
+
+                    OnBatchplanCompleted(dbApp, intermediatePosition, batchPlanEntry);
                 }
-                else if (nbResult == NextBatchState.NoPlanEntryFound && startableBatchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created).Any())
+                else if (    nbResult == NextBatchState.NoPlanEntryFound 
+                          && uncompletedBatchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created || c.PlanState == GlobalApp.BatchPlanState.Paused).Any())
                 {
                     //// Error00123: No batchplan found for this intermediate material
                     msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1090, "Error00123");
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     return StartNextBatchResult.CycleWait;
                 }
+                // When PartialQuantity in a Batchplan was reached but the total batch count is not reached: 
                 else if (nbResult == NextBatchState.UncompletedButPartialQuantityReached)
                 {
                     // No Alarm or Warning!
@@ -601,21 +630,42 @@ namespace gip.mes.processapplication
             //queryBatchPlans.Where();
         }
 
+        protected virtual void OnBatchplanCompleted(DatabaseApp dbApp, ProdOrderPartslistPos intermediatePosition, ProdOrderBatchPlan lastBatchPlanEntry)
+        {
+        }
 
         public Guid? CurrentProdOrderBatchPlanID { get; set; }
 
 
+        /// <summary>
+        /// ManageStateAndGetNextBatchFromPlanEntry
+        /// </summary>
+        /// <param name="prodOrderPartslistPos">Root Position of intermediate Pos</param>
+        /// <param name="currentProdOrderPartslist"></param>
+        /// <param name="dbApp"></param>
+        /// <param name="batchSizePlanList"></param>
+        /// <param name="batchSize"></param>
+        /// <param name="adaptToRestQuantity"></param>
+        /// <param name="acClassOfMachine"></param>
+        /// <param name="ignoreModuleSelection"></param>
+        /// <param name="batchPlanEntry"></param>
+        /// <param name="prevBatch"></param>
+        /// <param name="nextBatchNo"></param>
+        /// <param name="isLastBatch"></param>
+        /// <param name="toleranceRemainingQuantity"></param>
+        /// <returns></returns>
         public virtual NextBatchState ManageStateAndGetNextBatchFromPlanEntry(ProdOrderPartslistPos prodOrderPartslistPos, ProdOrderPartslist currentProdOrderPartslist, DatabaseApp dbApp,
                                                                         IEnumerable<ProdOrderBatchPlan> batchSizePlanList,
                                                                         Nullable<double> batchSize, bool adaptToRestQuantity,
                                                                         gip.core.datamodel.ACClass acClassOfMachine, bool ignoreModuleSelection,
-                                                                        out ProdOrderBatchPlan batchPlanEntry, out ProdOrderBatch prevBatch, out int nextBatchNo, out bool isLastBatch,
+                                                                        out ProdOrderBatchPlan batchPlanEntry, out ProdOrderBatch prevBatch, out int nextBatchNo, out bool isLastBatch, out bool totalSizeReached,
                                                                         double? toleranceRemainingQuantity = null)
         {
             batchPlanEntry = null;
             prevBatch = null;
             nextBatchNo = 0;
             isLastBatch = false;
+            totalSizeReached = false;
             if (batchSizePlanList != null && batchSizePlanList.Any())
             {
                 var batchPlanForMachine = batchSizePlanList.Where(c => c.PlanState == GlobalApp.BatchPlanState.AutoStart
@@ -656,9 +706,15 @@ namespace gip.mes.processapplication
                 {
                     if (batchPlanEntry.BatchActualCount < batchPlanEntry.BatchTargetCount)
                     {
-                        if (   !batchPlanEntry.DiffPartialCount.HasValue
+                        if (!batchPlanEntry.DiffPartialCount.HasValue
                             || batchPlanEntry.DiffPartialCount > 0)
-                            createOneBatchMore = true;
+                        {
+                            // Somebody has reset the PartialTargetCount-Property during the partial production => don't create a batch
+                            if (batchPlanEntry.PartialActualCount.HasValue && !batchPlanEntry.DiffPartialCount.HasValue)
+                                createOneBatchMore = false;
+                            else
+                                createOneBatchMore = true;
+                        }
                         if (batchPlanEntry.BatchActualCount + 1 >= batchPlanEntry.BatchTargetCount)
                             isLastBatch = true;
                     }
@@ -677,7 +733,6 @@ namespace gip.mes.processapplication
                     }
                 }
 
-                bool totalSizeReached = false;
                 if (toleranceRemainingQuantity.HasValue && prodOrderPartslistPos.RemainingCallQuantity < 0)
                     totalSizeReached = (prodOrderPartslistPos.RemainingCallQuantity * -1) > toleranceRemainingQuantity;
                 else
@@ -690,16 +745,17 @@ namespace gip.mes.processapplication
                 {
                     NextBatchState nextBatchState = NextBatchState.CompletedNoNewEntry;
                     if (batchPlanEntry.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
-                        || (   isLastBatch 
-                            && (   !batchPlanEntry.DiffPartialCount.HasValue 
-                                || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
+                        || isLastBatch 
+                            //&& (   !batchPlanEntry.DiffPartialCount.HasValue 
+                            //    || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
                         || totalSizeReached)
                     {
                         batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Completed;
                         batchPlanEntry.PartialTargetCount = null;
                         batchPlanEntry.PartialActualCount = null;
                     }
-                    else if (batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
+                    else if (  (batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
+                            || (!batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.PartialActualCount.HasValue))
                     {
                         nextBatchState = NextBatchState.UncompletedButPartialQuantityReached;
                         batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Paused;
@@ -714,6 +770,7 @@ namespace gip.mes.processapplication
                             prodOrderPartslistPos.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
                             // prodOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
                             prodOrderPartslistPos.ProdOrderPartslist.RecalcActualQuantitySP(dbApp);
+                            //if (EndPList == 
                         }
                         else
                             prodOrderPartslistPos.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted).FirstOrDefault();
@@ -807,8 +864,8 @@ namespace gip.mes.processapplication
                 var currentProdOrderPartslist = CurrentProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
                 var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
 
-                var startableBatchPlans = LoadStartableBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
-                ReCreateBatchPlanningTimes(startableBatchPlans);
+                var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
+                ReCreateBatchPlanningTimes(uncompletedBatchPlans);
             }
 
             using (ACMonitor.Lock(_20015_LockValue))

@@ -498,11 +498,11 @@ namespace gip.bso.masterdata
         {
             base.BgWorkerDoWork(sender, e);
             ACBackgroundWorker worker = sender as ACBackgroundWorker;
-            string command = e.Argument.ToString();
-            switch (command)
+            KeyValuePair<string, bool> command = (KeyValuePair<string, bool>)e.Argument;
+            switch (command.Key)
             {
                 case BGWorkerMehtod_DeleteFile:
-                    e.Result = DoDeleteFile(worker, e, DeleteFilesNames);
+                    e.Result = DoDeleteFile(worker, e, DeleteFilesNames, command.Value);
                     break;
             }
         }
@@ -512,7 +512,7 @@ namespace gip.bso.masterdata
             base.BgWorkerCompleted(sender, e);
             CloseWindow(this, DesignNameProgressBar);
             ACBackgroundWorker worker = sender as ACBackgroundWorker;
-            string command = worker.EventArgs.Argument.ToString();
+            KeyValuePair<string, bool> command = (KeyValuePair<string, bool>)worker.EventArgs.Argument;
 
             if (e.Cancelled)
             {
@@ -524,11 +524,13 @@ namespace gip.bso.masterdata
             }
             else
             {
-                switch (command)
+                switch (command.Key)
                 {
                     case BGWorkerMehtod_DeleteFile:
-                        bool success = (bool)e.Result;
+                        KeyValuePair<bool, bool> success = (KeyValuePair<bool, bool>)e.Result;
                         DeleteFilesNames = new List<string>();
+                        if (OnDefaultImageDelete != null && success.Key && success.Value)
+                            OnDefaultImageDelete(this, new EventArgs());
                         break;
                 }
             }
@@ -537,7 +539,7 @@ namespace gip.bso.masterdata
 
         #region BackgroundWorker -> BGWorker mehtods -> Methods for call
 
-        public bool DoDeleteFile(ACBackgroundWorker worker, DoWorkEventArgs e, List<string> fileNames)
+        public KeyValuePair<bool, bool> DoDeleteFile(ACBackgroundWorker worker, DoWorkEventArgs e, List<string> fileNames, bool isDefault)
         {
             bool success = true;
             worker.ProgressInfo.OnlyTotalProgress = true;
@@ -551,7 +553,7 @@ namespace gip.bso.masterdata
                 if (worker.CancellationPending == true)
                 {
                     e.Cancel = true;
-                    return false;
+                    return new KeyValuePair<bool, bool>(false, isDefault);
                 }
 
                 bool isDeleted = false;
@@ -573,7 +575,7 @@ namespace gip.bso.masterdata
                 }
                 success = success && isDeleted;
             }
-            return success;
+            return new KeyValuePair<bool, bool>(success, isDefault);
         }
 
         #endregion
@@ -586,7 +588,8 @@ namespace gip.bso.masterdata
 
         public void LoadMedia(IACObject aCObject)
         {
-            if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder)) return;
+            if (currentACObject == aCObject || !Directory.Exists(MediaSettings.MediaRootFolder)) 
+                return;
             currentACObject = aCObject;
             MediaController = new MediaController(MediaSettings, aCObject);
             ImageMediaSet = MediaController.Items[MediaItemTypeEnum.Image];
@@ -794,7 +797,8 @@ namespace gip.bso.masterdata
                 if (item.ThumbExistAndIsNotGeneric())
                     DeleteFilesNames.Add(item.ThumbPath);
 
-                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeleteFile);
+                KeyValuePair<string,bool> param = new KeyValuePair<string, bool>(BGWorkerMehtod_DeleteFile, item.IsDefault);
+                BackgroundWorker.RunWorkerAsync(param);
                 ShowDialog(this, DesignNameProgressBar);
             }
         }

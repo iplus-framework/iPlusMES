@@ -39,6 +39,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("MethodIDCompare", "en{'Compare only identical identifier'}de{'Vergleiche nur gleiche Identifier'}");
             method.ParameterValueList.Add(new ACValue("BatchSizeLoss", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("BatchSizeLoss", "en{'Batchsize inputdependant (Lossreduction)'}de{'Batchgröße einsatzabhängig (reduziert um Verlust)'}");
+            method.ParameterValueList.Add(new ACValue("AlarmOnCompleted", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AlarmOnCompleted", "en{'Alarm on completed batch plan'}de{'Alarmmeldung wenn Batchplan abgearbeitet'}");
 
 
             #region Batch Duration Planning - Forecast Scheduler - Params
@@ -82,6 +84,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("StartNextStage", typeof(StartNextStageMode), (short)StartNextStageMode.DoNothing, Global.ParamOption.Required));
             paramTranslation.Add("StartNextStage", "en{'Start next production stage'}de{'Nächste Fertigungsstufe starten'}");
+
+            method.ParameterValueList.Add(new ACValue("EndPList", typeof(EndPListMode), (short)EndPListMode.DoNothing, Global.ParamOption.Required));
+            paramTranslation.Add("EndPList", "en{'Mode for ending BOM-State'}de{'Stücklistenstatus Beenden Modus'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeProcessWorkflowVB), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeProcessWorkflowVB), ACStateConst.SMStarting, wrapper);
@@ -166,9 +171,25 @@ namespace gip.mes.processapplication
 
         public enum NextBatchState
         {
+            /// <summary>
+            /// If there are no batchplans that are active (>= GlobalApp.BatchPlanState.AutoStart && <= GlobalApp.BatchPlanState.InProcess)
+            /// </summary>
             NoPlanEntryFound = 0,
+
+            /// <summary>
+            /// All Batchplans that were activated with GlobalApp.BatchPlanState.AutoStart are completed 
+            /// </summary>
             CompletedNoNewEntry = 1,
+
+            /// <summary>
+            /// When PartialQuantity in a Batchplan was reached but the total batch count is not reached
+            /// </summary>
             UncompletedButPartialQuantityReached = 2,
+
+
+            /// <summary>
+            /// One Batch more can be started
+            /// </summary>
             EntryFound = 3
         }
         #endregion
@@ -391,6 +412,40 @@ namespace gip.mes.processapplication
                     }
                 }
                 return StartNextStageMode.DoNothing;
+            }
+        }
+
+        public EndPListMode EndProdOrderPartslistMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("EndPList");
+                    if (acValue != null)
+                    {
+                        return (EndPListMode)acValue.ParamAsInt16;
+                    }
+                }
+                return EndPListMode.DoNothing;
+            }
+        }
+
+        public bool AlarmOnCompleted
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("AlarmOnCompleted");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
             }
         }
 
@@ -702,8 +757,8 @@ namespace gip.mes.processapplication
                             var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
                             if (contentACClassWFVB != null)
                             {
-                                var startableBatchPlans = LoadStartableBatchPlans(_CurrentProdOrderPartslist, contentACClassWFVB);
-                                ReCreateBatchPlanningTimes(startableBatchPlans);
+                                var uncompletedBatchPlans = LoadUncompletedBatchPlans(_CurrentProdOrderPartslist, contentACClassWFVB);
+                                ReCreateBatchPlanningTimes(uncompletedBatchPlans);
                             }
                         }
 
@@ -847,6 +902,11 @@ namespace gip.mes.processapplication
             ACPropertyValueEvent<ACStateEnum> valueEventT = e.ValueEvent as ACPropertyValueEvent<ACStateEnum>;
             if (valueEventT.Sender == EventRaiser.Target)
                 return;
+            InformSchedulerOnStateChange();
+        }
+
+        protected void InformSchedulerOnStateChange()
+        {
             var appManager = this.ApplicationManager;
             if (appManager != null)
             {
@@ -908,7 +968,6 @@ namespace gip.mes.processapplication
         {
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _PreventHandleStartNextBatchAgain;
@@ -916,7 +975,6 @@ namespace gip.mes.processapplication
             }
             set
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     _PreventHandleStartNextBatchAgain = value;
@@ -929,7 +987,6 @@ namespace gip.mes.processapplication
         {
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _PlanningWait.HasValue && _PlanningWait.Value > DateTime.Now;
@@ -941,11 +998,18 @@ namespace gip.mes.processapplication
         { 
             get
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     return _PlanningWait.HasValue;
                 }
+            }
+        }
+
+        public void ResetPlanningWait()
+        {
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _PlanningWait = null;
             }
         }
 
@@ -960,12 +1024,14 @@ namespace gip.mes.processapplication
         {
             bool wasInPlanningWait = IsInPlanningWaitNotElapsed;
             HandleStartNextBatch();
-            if (!wasInPlanningWait && this.CurrentACState == ACStateEnum.SMStarting)
+            if (this.Root != null && !this.Root.Initialized && IsSubscribedToWorkCycle)
+                return;
+            if (   !wasInPlanningWait 
+                && (BatchPlanningTimes == null || !BatchPlanningTimes.Any()) 
+                && this.CurrentACState == ACStateEnum.SMStarting)
             {
-                int countParallelNodes = 0;
-                int startingParallelNodes = 0;
-                int completedParallelNodes = 0;
-                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes);
+                int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
+                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
                 if (completable)
                 {
                     if (CompleteParallelNodes(out countParallelNodes))
@@ -1007,18 +1073,13 @@ namespace gip.mes.processapplication
                 HandleStartNextBatch();
             else if (!HasActiveSubworkflows)
             {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _PlanningWait = null;
-                }
+                ResetPlanningWait();
                 UnSubscribeToProjectWorkCycle();
 
-                int countParallelNodes = 0;
-                int startingParallelNodes = 0;
-                int completedParallelNodes = 0;
+                int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
                 bool resetToSMStarting = false;
-                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes);
-                if (!completable && (startingParallelNodes + completedParallelNodes) < countParallelNodes)
+                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
+                if (!completable)
                     resetToSMStarting = true;
                 countParallelNodes = 0;
                 if (CompleteParallelNodes(out countParallelNodes))
@@ -1037,7 +1098,7 @@ namespace gip.mes.processapplication
                     SubscribeToProjectWorkCycle();
                     CurrentACSubState = ACSubStateEnum.SMIdle;
                     CurrentACState = ACStateEnum.SMStarting;
-                    OnBatchplanCompleted();
+                    OnSubworkflowsCompleted();
                 }
             }
             else if (IsSubscribedToWorkCycle)
@@ -1046,7 +1107,7 @@ namespace gip.mes.processapplication
                 {
                     if (_PlanningWait.HasValue)
                     {
-                        _PlanningWait = null;
+                        ResetPlanningWait();
                         UnSubscribeToProjectWorkCycle();
                     }
                     else
@@ -1055,19 +1116,16 @@ namespace gip.mes.processapplication
             }
             else
             {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _PlanningWait = null;
-                }
+                ResetPlanningWait();
             }
         }
 
-        private bool AreOtherParallelNodesCompletable(out int countParallelNodes, out int startingParallelNodes, out int completedParallelNodes)
+        private bool AreOtherParallelNodesCompletable(out int countParallelNodes, out int startingParallelNodes, out int completedParallelNodes, out int nodesWithBatchPlanningTimes)
         {
             countParallelNodes = 0;
             startingParallelNodes = 0;
             completedParallelNodes = 0;
+            nodesWithBatchPlanningTimes = 0;
             if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
                 return false;
             // Are there any parallel nodes which starts the same Sub-Method for parallel Production
@@ -1081,8 +1139,11 @@ namespace gip.mes.processapplication
             var completedNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMIdle && c.IterationCount.ValueT > 0);
             if (completedNodes != null)
                 completedParallelNodes = completedNodes.Count();
-            return completedParallelNodes > 0 
-                && (countParallelNodes - completedParallelNodes == startingParallelNodes);
+            var withBatchPlanningTimes = parallelNodes.Where(c => c.BatchPlanningTimes != null && c.BatchPlanningTimes.Any() && c.CurrentACState != ACStateEnum.SMIdle);
+            if (withBatchPlanningTimes != null)
+                nodesWithBatchPlanningTimes = withBatchPlanningTimes.Count();
+            return     (startingParallelNodes + completedParallelNodes == countParallelNodes)
+                    && (nodesWithBatchPlanningTimes <= 0);
         }
 
         private bool CompleteParallelNodes(out int countParallelNodes)
@@ -1096,9 +1157,10 @@ namespace gip.mes.processapplication
                 return true;
             countParallelNodes = parallelNodes.Count;
 
-            var completedNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMStarting 
-                                        || (c.CurrentACState == ACStateEnum.SMStopping && !c.HasActiveSubworkflows) 
-                                        || c.CurrentACState == ACStateEnum.SMIdle);
+            var completedNodes = parallelNodes.Where(c =>      (     c.CurrentACState == ACStateEnum.SMStarting 
+                                                                 && (c.BatchPlanningTimes == null || !c.BatchPlanningTimes.Any()))
+                                                            || (c.CurrentACState == ACStateEnum.SMStopping && !c.HasActiveSubworkflows) 
+                                                            || c.CurrentACState == ACStateEnum.SMIdle);
 
             // Are all completed?
             if (completedNodes != null && completedNodes.Count() == countParallelNodes)
@@ -1168,11 +1230,7 @@ namespace gip.mes.processapplication
             if (IsInPlanningWaitNotElapsed)
                 return;
 
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _PlanningWait = null;
-            }
-
+            ResetPlanningWait();
 
             if (!IgnoreFIFO)
             {
@@ -1266,9 +1324,12 @@ namespace gip.mes.processapplication
                             if (compareOnlySameACIdentifers && otherPriorPlanningNode.ACIdentifier != this.ACIdentifier)
                                 continue;
 
-                            // Option "canStartIfPredecessorIsStopping": If other node is in Stpping-State, than this node can start.
-                            if (canStartIfPredecessorIsStopping && otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStopping)
-                                continue;
+                            // Option "canStartIfPredecessorIsStopping": If other node is in Stopping-State, than this node can start.
+                            if (   canStartIfPredecessorIsStopping 
+                                && (   (otherPriorPlanningNode.CurrentACState >= ACStateEnum.SMCompleted && otherPriorPlanningNode.CurrentACState <= ACStateEnum.SMResetting) // Node has already started it's batches an waits till last subworkflow has completed
+                                    || (otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IterationCount.ValueT > 0)) // Node has already started it's batches an waits for a new batchplan
+                               )
+                               continue;
 
                             // Option "SkipWaitingNodes":  If other node waits, because no batchplan was defined for it, than this node can be priorized
                             if ( (   (otherPriorPlanningNode.CurrentACState == ACStateEnum.SMStarting && otherPriorPlanningNode.IsInPlanningWait)
@@ -1348,6 +1409,8 @@ namespace gip.mes.processapplication
                     PreventHandleStartNextBatchAgain = true;
                     if (CurrentACState == ACStateEnum.SMStarting)
                         CurrentACState = ACStateEnum.SMRunning;
+                    else
+                        InformSchedulerOnStateChange();
                     return;
                 }
                 else
@@ -1374,6 +1437,7 @@ namespace gip.mes.processapplication
                         _PlanningWait = DateTime.Now.AddSeconds(10);
                     }
                     SubscribeToProjectWorkCycle();
+                    InformSchedulerOnStateChange();
                     return;
                 }
             }
@@ -1384,30 +1448,33 @@ namespace gip.mes.processapplication
                     if (IsEnabledStopp())
                     {
                         PreventHandleStartNextBatchAgain = true;
-                        OnBatchplanCompleted();
                         Stopp();
                     }
                     return;
                 }
                 else if (BatchPlanningTimes == null || !BatchPlanningTimes.Any())
                 {
-                    int countParallelNodes = 0;
-                    int startingParallelNodes = 0;
-                    int completedParallelNodes = 0;
-                    bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes);
+                    int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
+                    bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
                     CurrentACSubState = ACSubStateEnum.SMIdle;
-                    if (!completable && (startingParallelNodes + completedParallelNodes) < countParallelNodes)
+                    if (!completable)
                     {
                         using (ACMonitor.Lock(_20015_LockValue))
                         {
-                            _PlanningWait = DateTime.Now.AddSeconds(10);
+                            _PlanningWait = DateTime.Now.AddSeconds(30);
+                        }
+                        if (CurrentACState == ACStateEnum.SMRunning)
+                        {
+                            OnSubworkflowsCompleted();
+                            CurrentACState = ACStateEnum.SMStarting;
                         }
                         SubscribeToProjectWorkCycle();
                         return;
                     }
                     else
                     {
-                        OnBatchplanCompleted();
+                        if (CurrentACState != ACStateEnum.SMStarting)
+                            OnSubworkflowsCompleted();
                         CurrentACState = ACStateEnum.SMCompleted;
                     }
                 }
@@ -1428,10 +1495,7 @@ namespace gip.mes.processapplication
 
         public override void UnSubscribeToProjectWorkCycle()
         {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _PlanningWait = null;
-            }
+            ResetPlanningWait();
             base.UnSubscribeToProjectWorkCycle();
         }
 
@@ -1441,7 +1505,7 @@ namespace gip.mes.processapplication
             base.SMCompleted();
         }
 
-        protected virtual void OnBatchplanCompleted()
+        protected virtual void OnSubworkflowsCompleted()
         {
             if (IsProduction)
             {
@@ -1450,7 +1514,6 @@ namespace gip.mes.processapplication
                     schedulingManager.UpdateBatchPlanDuration(null, CurrentProdOrderBatchPlanID.Value, Root.CurrentInvokingUser.Initials);
             }
         }
-
 
         /// <summary>
         /// Fills Parameterlist in ACMethod with values from Config-Store-Hierarchy
@@ -1724,6 +1787,15 @@ namespace gip.mes.processapplication
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
+            xmlChild = xmlACPropertyList["EndProdOrderPartslistMode"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("EndProdOrderPartslistMode");
+                if (xmlChild != null)
+                    xmlChild.InnerText = EndProdOrderPartslistMode.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+            
             xmlChild = xmlACPropertyList["CurrentProdOrderPartslist"];
             if (xmlChild == null)
             {

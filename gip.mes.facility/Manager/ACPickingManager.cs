@@ -955,12 +955,24 @@ namespace gip.mes.facility
                     currentPickingPos.DeleteACObject(dbApp, true);
             }
             else if (deletePickingPos)
+            {
+                // Falls bereits Buchungen drauf liefen, dann kann Position nicht mehr abgewählt werden
+                if (currentPickingPos.FacilityBooking_PickingPos.Any())
+                {
+                    return new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Info,
+                        ACIdentifier = "UnassignPickingPos(3)",
+                        Message = Root.Environment.TranslateMessage(this, "Info50007")
+                    };
+                }
                 currentPickingPos.DeleteACObject(dbApp, true);
+            }
 
             PostExecute("UnassignPickingPos");
             return null;
         }
-
         #endregion
 
         #region Booking

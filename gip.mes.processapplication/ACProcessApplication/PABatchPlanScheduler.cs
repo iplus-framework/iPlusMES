@@ -232,8 +232,8 @@ namespace gip.mes.processapplication
                             if (instancesOfThisSchedule.Any())
                             {
                                 // If there are any active nodes, that are not completed, than next Batchplans must wait
-                                if (instancesOfThisSchedule.Where(c => (c.CurrentACState >= ACStateEnum.SMRunning && c.CurrentACState < ACStateEnum.SMStopping)
-                                                                       || (c.CurrentACState == ACStateEnum.SMStarting && !c.SkipWaitingNodes))
+                                if (instancesOfThisSchedule.Where(c =>    (c.CurrentACState >= ACStateEnum.SMRunning && c.CurrentACState < ACStateEnum.SMCompleted)
+                                                                       || (c.CurrentACState == ACStateEnum.SMStarting && c.IterationCount.ValueT <= 0 && !c.SkipWaitingNodes))
                                                             .Any())
                                     continue;
                             }
@@ -303,6 +303,18 @@ namespace gip.mes.processapplication
                             {
                                 startableBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
                                 saveMessage = dbApp.ACSaveChanges();
+                                if (saveMessage == null)
+                                {
+                                    if (activeInstanceForBatchplan.CurrentACState == ACStateEnum.SMStopping)
+                                    {
+                                        activeInstanceForBatchplan.Resume();
+                                    }
+                                    else if (  activeInstanceForBatchplan.CurrentACState == ACStateEnum.SMStarting
+                                            && activeInstanceForBatchplan.IsInPlanningWaitNotElapsed)
+                                    {
+                                        activeInstanceForBatchplan.ResetPlanningWait();
+                                    }
+                                }
                             }
                             // New workflow must be instantiated
                             else

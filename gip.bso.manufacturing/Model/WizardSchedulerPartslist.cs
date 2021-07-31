@@ -9,8 +9,21 @@ namespace gip.bso.manufacturing
 {
 
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'SchedulerPartslist'}de{'SchedulerPartslist.'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
-    public class WizardSchedulerPartslist: INotifyPropertyChanged
+    public class WizardSchedulerPartslist : INotifyPropertyChanged
     {
+
+        #region const
+        public const string Const_SelectedMDSchedulingGroup = @"SelectedMDSchedulingGroup";
+        public const string Const_TargetQuantityUOM = @"TargetQuantityUOM";
+        public const string Const_NewTargetQuantityUOM = @"NewTargetQuantityUOM";
+        public const string Const_NewSyncTargetQuantityUOM = @"NewSyncTargetQuantityUOM";
+        #endregion
+
+        #region event
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
 
         #region ctor's
         public WizardSchedulerPartslist()
@@ -18,32 +31,28 @@ namespace gip.bso.manufacturing
 
         }
         #endregion
-        public event PropertyChangedEventHandler PropertyChanged;
+
+        #region Properties
+
+        #region Properties -> Not marked (private)
 
         public string ProgramNo { get; set; }
+
         public Guid? ProdOrderPartslistID { get; set; }
+
         public Guid PartslistID { get; set; }
 
-        private MDSchedulingGroup _SelectedMDSchedulingGroup;
-        [ACPropertySelected(109, "MDSchedulingGroup", "en{'Line'}de{'Linie'}")]
-        public MDSchedulingGroup SelectedMDSchedulingGroup
-        {
-            get
-            {
-                return _SelectedMDSchedulingGroup;
-            }
-            set
-            {
-                if(_SelectedMDSchedulingGroup != value)
-                {
-                    _SelectedMDSchedulingGroup = value;
-                    OnPropertyNotifyChaged("SelectedMDSchedulingGroup");
-                }
-            }
-        }
+        public GlobalApp.BatchPlanMode? PlanMode { get; set; }
 
-        [ACPropertyList(110, "MDSchedulingGroup", "en{'List'}de{'List'}")]
-        public List<MDSchedulingGroup> MDSchedulingGroupList { get; set; }
+        public BatchSuggestionCommandModeEnum? BatchSuggestionMode { get; set; }
+
+        public int? DurationSecAVG { get; set; }
+        public int? StartOffsetSecAVG { get; set; }
+
+
+        #endregion
+
+        #region Properties -> Other (marked)
 
         [ACPropertyInfo(100, "Sn", "en{'No'}de{'Nr'}")]
         public int Sn { get; set; }
@@ -68,12 +77,113 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #endregion
+
+        #region Properties -> MDSchedulingGroup
+
+        private MDSchedulingGroup _SelectedMDSchedulingGroup;
+        [ACPropertySelected(109, "MDSchedulingGroup", "en{'Line'}de{'Linie'}")]
+        public MDSchedulingGroup SelectedMDSchedulingGroup
+        {
+            get
+            {
+                return _SelectedMDSchedulingGroup;
+            }
+            set
+            {
+                if (_SelectedMDSchedulingGroup != value)
+                {
+                    _SelectedMDSchedulingGroup = value;
+                    OnPropertyChanged("SelectedMDSchedulingGroup");
+                }
+            }
+        }
+
+        [ACPropertyList(110, "MDSchedulingGroup", "en{'List'}de{'List'}")]
+        public List<MDSchedulingGroup> MDSchedulingGroupList { get; set; }
+
+        #endregion
+
+        #region Properties -> Quantities
+
         [ACPropertyInfo(105, "TargetQuantity", "en{'Required quantity'}de{'Bedarfsmenge'}")]
         public double TargetQuantity { get; set; }
 
 
+        private double _TargetQuantityUOM;
         [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Required quantity (UOM)'}de{'Bedarfsmenge (UOM)'}")]
-        public double TargetQuantityUOM { get; set; }
+        public double TargetQuantityUOM
+        {
+            get
+            {
+                return _TargetQuantityUOM;
+            }
+            set
+            {
+                if (_TargetQuantityUOM != value)
+                {
+                    quantityInChange = true;
+                    _TargetQuantityUOM = value;
+                    _NewTargetQuantityUOM = value;
+                    OnPropertyChanged("TargetQuantityUOM");
+                    OnPropertyChanged("NewTargetQuantityUOM");
+                    quantityInChange = false;
+                }
+            }
+        }
+
+        private bool quantityInChange;
+        public double _NewTargetQuantityUOM;
+        /// <summary>
+        /// Doc  NewTargetQuantityUOM
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'NewTargetQuantityUOM'}de{'NewTargetQuantityUOM'}")]
+        public double NewTargetQuantityUOM
+        {
+            get
+            {
+                return _NewTargetQuantityUOM;
+            }
+            set
+            {
+                if (_NewTargetQuantityUOM != value && !quantityInChange)
+                {
+                    quantityInChange = true;
+                    _NewTargetQuantityUOM = value;
+                    OnPropertyChanged("NewTargetQuantityUOM");
+                    quantityInChange = false;
+                }
+            }
+        }
+
+        public double? _NewSyncTargetQuantityUOM;
+        /// <summary>
+        /// Doc  NewSyncTargetQuantityUOM
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'NewSyncTargetQuantityUOM'}de{'NewSyncTargetQuantityUOM'}")]
+        public double? NewSyncTargetQuantityUOM
+        {
+            get
+            {
+                return _NewSyncTargetQuantityUOM;
+            }
+            set
+            {
+                if (_NewSyncTargetQuantityUOM != value && !quantityInChange)
+                {
+                    quantityInChange = true;
+                    _NewSyncTargetQuantityUOM = value;
+                    OnPropertyChanged("NewSyncTargetQuantityUOM");
+                    quantityInChange = false;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Properties -> MDUnit
 
         [ACPropertyInfo(107, "MDUnit", "en{'MDUnit'}de{'MDUnit'}")]
         public MDUnit MDUnit { get; set; }
@@ -81,10 +191,9 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(999, "BaseMDUnit", "en{'BaseMDUnit'}de{'BaseMDUnit'}")]
         public MDUnit BaseMDUnit { get; set; }
 
-        public void OnPropertyNotifyChaged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion
+
+        #region Properties -> Batch
 
         [ACPropertyInfo(999, "BatchSizeMin", "en{'Min. Batchsize'}de{'Min. Batchgröße'}")]
         public double BatchSizeMin { get; set; }
@@ -99,17 +208,32 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(999, "PlanModeName", "en{'Batch planning mode'}de{'Batch Planmodus'}")]
         public string PlanModeName { get; set; }
 
-        public GlobalApp.BatchPlanMode? PlanMode { get; set; }
+        #endregion
 
-        public BatchSuggestionCommandModeEnum? BatchSuggestionMode { get; set; }
 
-        public int? DurationSecAVG { get; set; }
-        public int? StartOffsetSecAVG { get; set; }
+        #endregion
+
+        #region Methods
+
+
+        public bool IsEqualPartslist(WizardSchedulerPartslist second)
+        {
+            return
+                (ProdOrderPartslistID != null && second.ProdOrderPartslistID != null && ProdOrderPartslistID == second.ProdOrderPartslistID)
+                || (PartslistID == second.PartslistID);
+        }
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public override string ToString()
         {
             return string.Format(@"ProgramNo: {0}, PartslistNo: {1}, IsSolved:{2}, TargetQuantityUOM: {3}", ProgramNo, PartslistNo, IsSolved, TargetQuantityUOM);
         }
+
+        #endregion
 
     }
 }

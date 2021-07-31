@@ -101,6 +101,7 @@ namespace gip.mes.processapplication
                 _CachedEmptySiloHandlingOption = null;
                 _MaxWeightAlarmSet = false;
                 _EmptyScaleAlarm = EmptyScaleAlarmState.None;
+                _RepeatDosingForPicking = false;
             }
 
             ClearMyConfiguration();
@@ -121,6 +122,7 @@ namespace gip.mes.processapplication
                 _CachedEmptySiloHandlingOption = null;
                 _MaxWeightAlarmSet = false;
                 _EmptyScaleAlarm = EmptyScaleAlarmState.None;
+                _RepeatDosingForPicking = false;
             }
             ClearMyConfiguration();
             base.Recycle(content, parentACObject, parameter, acIdentifier);
@@ -804,6 +806,7 @@ namespace gip.mes.processapplication
             CurrentParallelPWDosings = null;
             MaxWeightAlarmSet = false;
             EmptyScaleAlarm = EmptyScaleAlarmState.None;
+            RepeatDosingForPicking = false;
         }
 
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
@@ -915,6 +918,9 @@ namespace gip.mes.processapplication
                 }
                 else if (result == StartNextCompResult.NextCompStarted || result == StartNextCompResult.WaitForNextEvent)
                 {
+                    // Falls durch Wiederholschleife der Workfloknoten gestartet worden ist, dann setze den Substatus zurück, damit nur einmal dosiert wird.
+                    RepeatDosingForPicking = false;
+
                     // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
                     if (CurrentACState == ACStateEnum.SMStarting)
                         CurrentACState = ACStateEnum.SMRunning;
@@ -922,6 +928,9 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
+                    // Falls durch Wiederholschleife der Workfloknoten gestartet worden ist, dann setze den Substatus zurück, damit nur einmal dosiert wird.
+                    RepeatDosingForPicking = false;
+
                     UnSubscribeToProjectWorkCycle();
                     // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
                     if (CurrentACState == ACStateEnum.SMStarting && !_RepeatAfterCompleted)
@@ -1013,6 +1022,8 @@ namespace gip.mes.processapplication
                     }
                     else if (result == StartNextCompResult.NextCompStarted || result == StartNextCompResult.WaitForNextEvent)
                     {
+                        // Falls durch Wiederholschleife der Workfloknoten gestartet worden ist, dann setze den Substatus zurück, damit nur einmal dosiert wird.
+                        RepeatDosingForPicking = false;
                         SubscribeToProjectWorkCycle();
                         //UnSubscribeToProjectWorkCycle();
                         //CurrentACState = PABaseState.SMRunning;
@@ -1020,6 +1031,8 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
+                        // Falls durch Wiederholschleife der Workfloknoten gestartet worden ist, dann setze den Substatus zurück, damit nur einmal dosiert wird.
+                        RepeatDosingForPicking = false;
                         UnSubscribeToProjectWorkCycle();
                         // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
                         if (CurrentACState == ACStateEnum.SMRunning)
@@ -1227,7 +1240,7 @@ namespace gip.mes.processapplication
                         {
                             // Warning50005: No Silo/Tank/Container found for component {0}
                             Msg msg = new Msg(this, eMsgLevel.Warning, PWClassName, "OnHandleStateCheckEmptySilo(100)", 100, "Warning50005",
-                                            silo.MaterialName);
+                                            silo.MaterialName != null ? silo.MaterialName.ValueT : "");
 
                             if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                 Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
@@ -1640,6 +1653,14 @@ namespace gip.mes.processapplication
                                                     c => c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is PWDosingLoop).Any(),
                                                     40);
         }
+
+        internal virtual void OnDosingLoopDecision(PWDosingLoop dosingloop, bool willRepeatDosing)
+        {
+            if (willRepeatDosing && IsTransport && ParentPWGroup != null)
+            {
+                RepeatDosingForPicking = true;
+            }
+        }
         #endregion
 
 
@@ -1803,6 +1824,15 @@ namespace gip.mes.processapplication
                 xmlChild = doc.CreateElement("MaxWeightAlarmSet");
                 if (xmlChild != null)
                     xmlChild.InnerText = MaxWeightAlarmSet.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList["RepeatDosingForPicking"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("RepeatDosingForPicking");
+                if (xmlChild != null)
+                    xmlChild.InnerText = RepeatDosingForPicking.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 

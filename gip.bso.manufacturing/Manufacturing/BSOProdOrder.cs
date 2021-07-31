@@ -625,7 +625,7 @@ namespace gip.bso.manufacturing
                 .Where(c => c.PlanningMRProposal_ProdOrder.Any());
             }
 
-            if(FilterShowPlanningProdOrder != null)
+            if(FilterShowPlanningProdOrder != null && !InShowDialogOrderInfo)
                 result = result.Where(c=> c.PlanningMRProposal_ProdOrder.Any() == (FilterShowPlanningProdOrder ?? false));
 
             if (FilterProdOrderState != null)
@@ -3686,12 +3686,14 @@ namespace gip.bso.manufacturing
             _IsEnabledACProgram = true;
         }
 
+        private bool InShowDialogOrderInfo = false;
+
         [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1)]
         public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
-
+            InShowDialogOrderInfo = true;
             // Falls Produktionsauftrag
             ProdOrderPartslistPosRelation relation = null;
             ProdOrderBatch batch = null;
@@ -3856,6 +3858,7 @@ namespace gip.bso.manufacturing
                 prodOrderPartslistID = poPartslist.ProdOrderPartslistID;
             }
             ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID);
+            InShowDialogOrderInfo = false;
         }
 
         [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]

@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using System;
 using System.ComponentModel;
 
 namespace gip.bso.manufacturing
@@ -145,6 +146,31 @@ namespace gip.bso.manufacturing
                 }
             }
         }
+
+
+        private bool _IsEditable;
+        /// <summary>
+        /// Doc  IsEditable
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(401, "IsEditable", "en{'IsEditable'}de{'IsEditable'}")]
+        public bool IsEditable
+        {
+            get
+            {
+                return _IsEditable;
+            }
+            set
+            {
+                if (_IsEditable != value)
+                {
+                    _IsEditable = value;
+                    OnPropertyChanged("IsEditable");
+                }
+            }
+        }
+
+        public Guid? ProdOrderBatchPlanID { get; set; }
 
         public override string ToString()
         {

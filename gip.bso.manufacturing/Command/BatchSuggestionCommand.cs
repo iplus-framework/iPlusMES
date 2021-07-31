@@ -10,7 +10,7 @@ namespace gip.bso.manufacturing
         public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode)
         {
             BatchPlanSuggestion = new BatchPlanSuggestion();
-            BatchPlanSuggestion.TotalSize = wizardSchedulerPartslist.TargetQuantityUOM;
+            BatchPlanSuggestion.TotalSize = wizardSchedulerPartslist.NewTargetQuantityUOM;
             BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
             if (BatchPlanSuggestion.TotalSize > 0)

@@ -1,7 +1,12 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.facility;
+using gip.mes.processapplication;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 namespace gip.bso.manufacturing
@@ -12,6 +17,7 @@ namespace gip.bso.manufacturing
         #region const
         public const string ClassName = @"BSOTemplateSchedule";
         public const string Const_BSOBatchPlanScheduler_Child = @"BSOBatchPlanScheduler_Child";
+        public const string BGWorkerMehtod_GeneratePlan = @"GeneratePlan";
         #endregion
 
         #region c´tors
@@ -28,13 +34,37 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
             var test = BSOBatchPlanScheduler_Child;
+
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
             Search();
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_ProdOrderManager != null)
+                ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
+
             return base.ACDeInit(deleteACClassTask);
+        }
+
+        #endregion
+
+        #region Managers
+
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        public ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
+            }
         }
 
         #endregion
@@ -148,6 +178,7 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
 
         #region BSO->ACMethod
         /// <summary>
@@ -281,8 +312,115 @@ namespace gip.bso.manufacturing
             if (BSOBatchPlanScheduler_Child != null && BSOBatchPlanScheduler_Child.Value != null)
                 BSOBatchPlanScheduler_Child.Value.FilterPlanningMR = planningMR ?? new PlanningMR();
         }
+
+
+        /// <summary>
+        /// Method GeneratePlan
+        /// </summary>
+        [ACMethodInfo("GeneratePlan", "en{'Add to schedule'}de{'Übernehme in Terminplan'}", 100)]
+        public void GeneratePlan()
+        {
+            if (!IsEnabledGeneratePlan())
+                return;
+            // Info50075.
+            if (Root.Root.Messages.Question(this, "Info50075", Global.MsgResult.No, false) == Global.MsgResult.Yes)
+            {
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_GeneratePlan);
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public bool IsEnabledGeneratePlan()
+        {
+            return SelectedPlanningMR != null
+                && SelectedPlanningMR.PlanningMRProposal_PlanningMR.Any();
+        }
+
+
+        private void GenerateProdOrders()
+        {
+            List<ProdOrder> prodOrders = SelectedPlanningMR.PlanningMRProposal_PlanningMR.Where(c => c.ProdOrder != null).Select(c => c.ProdOrder).Distinct().ToList();
+            if (prodOrders != null && prodOrders.Any())
+                GenerateProdOrders(prodOrders);
+        }
+
+        private void GenerateProdOrders(List<ProdOrder> prodOrders)
+        {
+            List<ProdOrder> generated = new List<ProdOrder>();
+            try
+            {
+                foreach (var sourceProdOrder in prodOrders)
+                {
+                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, PWNodeProcessWorkflowVB.PWClassName);
+                    generated.Add(targetProdOrder);
+                }
+
+                MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+                if (msgWithDetails == null)
+                {
+                    string[] generatedNos = generated.Select(c => c.ProgramNo).OrderBy(c => c).ToArray();
+                    Root.Root.Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
+                }
+                else
+                    Root.Root.Messages.Msg(msgWithDetails);
+            }
+            catch (Exception ec)
+            {
+                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+                Root.Root.Messages.Msg(msg);
+            }
+        }
+
         #endregion
 
+        #region BackgroundWorker
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            switch (command)
+            {
+                case BGWorkerMehtod_GeneratePlan:
+                    GenerateProdOrders();
+                    break;
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            BSOBatchPlanScheduler_Child.Value.ClearMessages();
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+
+            if (e.Cancelled)
+            {
+                BSOBatchPlanScheduler_Child.Value.SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                BSOBatchPlanScheduler_Child.Value.SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                Root.Root.Messages.Info(this, "Info50074");
+            }
+        }
+
+        #endregion
 
     }
 }
