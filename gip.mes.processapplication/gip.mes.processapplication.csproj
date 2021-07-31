@@ -58,6 +58,7 @@
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScrew.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAETransport.cs" />
     <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAMTank.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWTemperature.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskScanBase.cs" />
     <Compile Include="ACProcessWorkflow\PWGroupVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodTransportBase.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="Manager\DischargingItemManager.cs" />
     <Compile Include="Manager\DischargingItemNoValidator.cs" />
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
+    <Compile Include="Model\EndPListMode.cs" />
     <Compile Include="Model\StartNextStageMode.cs" />
     <Compile Include="Model\BatchSuggestionCommandModeEnum.cs" />
     <Compile Include="Model\BinSelectionItem.cs" />
