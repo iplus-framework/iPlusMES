@@ -1054,6 +1054,17 @@ namespace gip.mes.processapplication
             }
 
             HandleStartNextBatch();
+
+            // HandleStartNextBatch has completed this node (not in stopping or starting) because there are no other nodes that are active
+            if (CurrentACState == ACStateEnum.SMCompleted || CurrentACState == ACStateEnum.SMIdle)
+            {
+                int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
+                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
+                if (completable)
+                {
+                    CompleteParallelNodes(out countParallelNodes);
+                }
+            }
         }
 
 
@@ -1126,12 +1137,12 @@ namespace gip.mes.processapplication
             startingParallelNodes = 0;
             completedParallelNodes = 0;
             nodesWithBatchPlanningTimes = 0;
-            if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
-                return false;
+            //if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
+            //    return false;
             // Are there any parallel nodes which starts the same Sub-Method for parallel Production
             var parallelNodes = AllParallelNodes; // ParallelNodes;
             if (parallelNodes == null || !parallelNodes.Any())
-                return false;
+                return true;
             countParallelNodes = parallelNodes.Count;
             var startingNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMStarting);
             if (startingNodes != null)
@@ -1149,8 +1160,8 @@ namespace gip.mes.processapplication
         private bool CompleteParallelNodes(out int countParallelNodes)
         {
             countParallelNodes = 0;
-            if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
-                return true;
+            //if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
+            //    return true;
             // Are there any parallel nodes which starts the same Sub-Method for parallel Production
             var parallelNodes = AllParallelNodes; //ParallelNodes;
             if (parallelNodes == null || !parallelNodes.Any())
