@@ -1619,7 +1619,8 @@ namespace gip.bso.manufacturing
             return BatchPlanSuggestion != null
                 && BatchPlanSuggestion.ItemsList != null
                 && BatchPlanSuggestion.SelectedItems != null
-                && !BatchPlanSuggestion.SelectedItems.IsInProduction;
+                && !BatchPlanSuggestion.SelectedItems.IsInProduction
+                && !BatchPlanSuggestion.SelectedItems.IsEditable;
         }
 
         private BatchPlanSuggestion _BatchPlanSuggestion;
@@ -2843,8 +2844,8 @@ namespace gip.bso.manufacturing
                 item.IsEditable =
                     (
                         intermediate == null ||
-                        intermediate.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished ||
-                        intermediate.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
+                        (intermediate.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished &&
+                        intermediate.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished)
                     )
                     &&
                     !(batchPlan.PlanState >= GlobalApp.BatchPlanState.Completed);
@@ -3339,7 +3340,8 @@ namespace gip.bso.manufacturing
                 LocalBSOBatchPlan.BatchPlanForIntermediateList.Add(batchPlan);
 
             LocalBSOBatchPlan.SelectedBatchPlanForIntermediate = batchPlan;
-            LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = targetQuantityUOM;
+            if (Math.Abs(LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM - targetQuantityUOM) > Double.Epsilon)
+                LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = targetQuantityUOM;
 
             LocalBSOBatchPlan.OnPropertyChanged("IsVisibleInCurrentContext");
         }
