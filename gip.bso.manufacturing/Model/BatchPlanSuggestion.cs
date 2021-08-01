@@ -1,6 +1,5 @@
 ﻿using gip.core.datamodel;
-using System;
-using System.Collections.Generic;
+using gip.mes.datamodel;
 using System.ComponentModel;
 
 namespace gip.bso.manufacturing
@@ -17,7 +16,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties
-
+        public ProdOrderPartslistPos Intermediate { get;set;}
 
         [ACPropertyInfo(100, "TotalBatchSize", "en{'Total Size'}de{'Gesamtgröße'}")]
         public double TotalSize { get; set; }

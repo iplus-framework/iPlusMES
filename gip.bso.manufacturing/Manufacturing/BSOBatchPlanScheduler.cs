@@ -1587,7 +1587,14 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledAddSuggestion()
         {
-            return BatchPlanSuggestion != null;
+            return BatchPlanSuggestion != null
+                 && (BatchPlanSuggestion.ItemsList == null
+                 || BatchPlanSuggestion.Intermediate == null
+                 || BatchPlanSuggestion.Intermediate == null
+                 || !(
+                        BatchPlanSuggestion.Intermediate.ProdOrderPartslist.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished
+                        || BatchPlanSuggestion.Intermediate.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished
+                    ));
         }
 
         [ACMethodInfo("RemoveSuggestion", "en{'Delete'}de{'Löschen'}", 999)]
@@ -1611,7 +1618,9 @@ namespace gip.bso.manufacturing
         {
             return BatchPlanSuggestion != null
                 && BatchPlanSuggestion.ItemsList != null
-                && BatchPlanSuggestion.SelectedItems != null;
+                && BatchPlanSuggestion.SelectedItems != null
+                && !BatchPlanSuggestion.SelectedItems.IsInProduction
+                && !BatchPlanSuggestion.SelectedItems.IsEditable;
         }
 
         private BatchPlanSuggestion _BatchPlanSuggestion;
@@ -2377,7 +2386,9 @@ namespace gip.bso.manufacturing
             return
                 !IsWizard
                 && SelectedScheduleForPWNode != null
-                && SelectedProdOrderPartslist != null;
+                && SelectedProdOrderPartslist != null
+                && SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
+                && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished;
         }
 
         #endregion
@@ -2822,6 +2833,7 @@ namespace gip.bso.manufacturing
         private BatchPlanSuggestion LoadExistingBatchSuggestion(ProdOrderPartslistPos intermediate)
         {
             BatchPlanSuggestion suggestion = new BatchPlanSuggestion();
+            suggestion.Intermediate = intermediate;
             suggestion.TotalSize = intermediate.TargetQuantityUOM;
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in intermediate.ProdOrderBatchPlan_ProdOrderPartslistPos)
@@ -2829,6 +2841,17 @@ namespace gip.bso.manufacturing
                 nr++;
                 BatchPlanSuggestionItem item = new BatchPlanSuggestionItem(nr, batchPlan.BatchSize, batchPlan.BatchTargetCount, batchPlan.TotalSize);
                 item.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
+                item.IsEditable =
+                    (
+                        intermediate == null ||
+                        (intermediate.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished &&
+                        intermediate.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished)
+                    )
+                    &&
+                    !(batchPlan.PlanState >= GlobalApp.BatchPlanState.Completed);
+                item.IsInProduction =
+                    batchPlan.PlanState >= GlobalApp.BatchPlanState.ReadyToStart
+                    && batchPlan.PlanState <= GlobalApp.BatchPlanState.Paused;
                 suggestion.ItemsList.Add(item);
             }
             return suggestion;
@@ -3317,7 +3340,8 @@ namespace gip.bso.manufacturing
                 LocalBSOBatchPlan.BatchPlanForIntermediateList.Add(batchPlan);
 
             LocalBSOBatchPlan.SelectedBatchPlanForIntermediate = batchPlan;
-            LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = targetQuantityUOM;
+            if (Math.Abs(LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM - targetQuantityUOM) > Double.Epsilon)
+                LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = targetQuantityUOM;
 
             LocalBSOBatchPlan.OnPropertyChanged("IsVisibleInCurrentContext");
         }

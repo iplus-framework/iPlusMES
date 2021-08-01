@@ -78,7 +78,7 @@ namespace gip.bso.manufacturing
 
         double _BatchSize;
         [ACPropertyInfo(300, "BatchSize", "en{'Batch Size'}de{'Batchgröße'}")]
-        public double BatchSize 
+        public double BatchSize
         {
             get
             {
@@ -166,6 +166,28 @@ namespace gip.bso.manufacturing
                 {
                     _IsEditable = value;
                     OnPropertyChanged("IsEditable");
+                }
+            }
+        }
+
+        private bool _IsInProduction;
+        /// <summary>
+        /// Doc  IsEditable
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(402, "IsInProduction", "en{'In Production'}de{'In Arbeit'}")]
+        public bool IsInProduction
+        {
+            get
+            {
+                return _IsInProduction;
+            }
+            set
+            {
+                if (_IsInProduction != value)
+                {
+                    _IsInProduction = value;
+                    OnPropertyChanged("IsInProduction");
                 }
             }
         }

@@ -1515,6 +1515,8 @@ namespace gip.bso.manufacturing
                 //MainSyncContext.Send((object state) =>
                 //{
                     WeighingMaterialList = GetWeighingMaterials(dbApp, iconDesign);
+
+                WeighingMaterialList = WeighingMaterialList.ToArray();
                 //}, new object());
                 Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel after GetWeighingMaterials. Count " + WeighingMaterialList?.Count());
             }
