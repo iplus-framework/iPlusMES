@@ -192,6 +192,19 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Doc  IsEditable
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(402, "IsEditableBatchSize", "en{'IsEditableBatchSize'}de{'IsEditableBatchSize'}")]
+        public bool IsEditableBatchSize
+        {
+            get
+            {
+                return !_IsInProduction && IsEditable;
+            }
+        }
+
         public Guid? ProdOrderBatchPlanID { get; set; }
 
         public override string ToString()

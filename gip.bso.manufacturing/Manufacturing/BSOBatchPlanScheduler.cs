@@ -1620,7 +1620,7 @@ namespace gip.bso.manufacturing
                 && BatchPlanSuggestion.ItemsList != null
                 && BatchPlanSuggestion.SelectedItems != null
                 && !BatchPlanSuggestion.SelectedItems.IsInProduction
-                && !BatchPlanSuggestion.SelectedItems.IsEditable;
+                && BatchPlanSuggestion.SelectedItems.IsEditable;
         }
 
         private BatchPlanSuggestion _BatchPlanSuggestion;
