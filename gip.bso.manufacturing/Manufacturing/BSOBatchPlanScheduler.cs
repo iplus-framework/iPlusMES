@@ -23,6 +23,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoBackwardScheduling = @"DoBackwardScheduling";
         public const string BGWorkerMehtod_DoForwardScheduling = @"DoForwardScheduling";
         public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
+        public const int Const_MaxFilterDaySpan = 10;
         #endregion
 
         #region Configuration
@@ -835,14 +836,62 @@ namespace gip.bso.manufacturing
 
         #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search)
 
+        private DateTime? _FilterStartTime;
         [ACPropertyInfo(525, "FilterStartTime", "en{'From'}de{'Von'}")]
-        public DateTime? FilterStartTime { get; set; }
+        public DateTime? FilterStartTime
+        {
+            get
+            {
+                return _FilterStartTime;
+            }
+            set
+            {
+                if (_FilterStartTime != value)
+                {
+                    _FilterStartTime = value;
+                    OnPropertyChanged("FilterStartTime");
+                }
+            }
+        }
 
+        private DateTime? _FilterEndTime;
         [ACPropertyInfo(526, "FilterEndTime", "en{'To'}de{'Zum'}")]
-        public DateTime? FilterEndTime { get; set; }
+        public DateTime? FilterEndTime
+        {
+            get
+            {
+                return _FilterEndTime;
+            }
+            set
+            {
+                if (_FilterEndTime != value)
+                {
+                    _FilterEndTime = value;
+                    OnPropertyChanged("FilterEndTime");
+                }
+            }
+        }
 
-        [ACPropertyInfo(527, "FilterIncludeInProduction", "en{'In production'}de{'In Produktion'}")]
-        public bool FilterIncludeInProduction { get; set; }
+
+        private bool _FilterIsCompleted;
+        [ACPropertyInfo(527, "FilterIncludeInProduction", "en{'Completed'}de{'Erledigt'}")]
+        public bool FilterIsCompleted
+        {
+            get
+            {
+                return _FilterIsCompleted;
+            }
+            set
+            {
+                if (_FilterIsCompleted != value)
+                {
+                    _FilterIsCompleted = value;
+                    OnPropertyChanged("FilterIsCompleted");
+                    OnPropertyChanged("FilterStartTime");
+                    OnPropertyChanged("FilterEndTime");
+                }
+            }
+        }
 
         #endregion
 
@@ -917,11 +966,11 @@ namespace gip.bso.manufacturing
 
             vd.GlobalApp.BatchPlanState startState = GlobalApp.BatchPlanState.Created;
             vd.GlobalApp.BatchPlanState endState = GlobalApp.BatchPlanState.Paused;
-            MDProdOrderState.ProdOrderStates? prodOrderState = null;
-            if (FilterIncludeInProduction)
+            MDProdOrderState.ProdOrderStates? minProdOrderState = null;
+            if (FilterIsCompleted)
             {
                 endState = GlobalApp.BatchPlanState.Completed;
-                prodOrderState = MDProdOrderState.ProdOrderStates.InProduction;
+                minProdOrderState = MDProdOrderState.ProdOrderStates.ProdFinished;
             }
             ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = null;
             try
@@ -936,7 +985,7 @@ namespace gip.bso.manufacturing
                         endState,
                         FilterStartTime,
                         FilterEndTime,
-                        prodOrderState,
+                        minProdOrderState,
                         FilterPlanningMR?.PlanningMRID);
             }
             finally
@@ -2059,6 +2108,44 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler
 
+        #region Methods -> (Tab)BatchPlanScheduler -> ResetFilter
+
+        /// <summary>
+        /// Method ResetFilterStartTime
+        /// </summary>
+        [ACMethodInfo("ResetFilterStartTime", "en{'Reset'}de{'Zurücksetzen'}", 700)]
+        public void ResetFilterStartTime()
+        {
+            if (!IsEnabledResetFilterStartTime())
+                return;
+            FilterStartTime = null;
+        }
+
+        public bool IsEnabledResetFilterStartTime()
+        {
+            return FilterStartTime != null;
+        }
+
+        /// <summary>
+        /// Method ResetFilterEndTime
+        /// </summary>
+        [ACMethodInfo("ResetFilterEndTime", "en{'Reset'}de{'Zurücksetzen'}", 701)]
+        public void ResetFilterEndTime()
+        {
+            if (!IsEnabledResetFilterEndTime())
+                return;
+            FilterEndTime = null;
+        }
+
+        public bool IsEnabledResetFilterEndTime()
+        {
+            return FilterEndTime != null;
+        }
+
+
+
+        #endregion
+
         #region Methods -> (Tab)BatchPlanScheduler -> New, Delete, Search
         /// <summary>
         /// Searches this instance.
@@ -2068,6 +2155,17 @@ namespace gip.bso.manufacturing
         {
             OnPropertyChanged("ScheduleForPWNodeList");
             LoadProdOrderBatchPlanList();
+        }
+
+        public bool IsEnabledSearch()
+        {
+            return
+                !FilterIsCompleted
+                || (
+                        FilterStartTime != null
+                        && FilterEndTime != null
+                        && (FilterEndTime.Value - FilterStartTime).Value.TotalDays > 0
+                        && (FilterEndTime.Value - FilterStartTime).Value.TotalDays <= Const_MaxFilterDaySpan);
         }
 
         [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New)]
@@ -2980,7 +3078,7 @@ namespace gip.bso.manufacturing
             vd.GlobalApp.BatchPlanState startState = GlobalApp.BatchPlanState.Created;
             vd.GlobalApp.BatchPlanState endState = GlobalApp.BatchPlanState.Paused;
             MDProdOrderState.ProdOrderStates? prodOrderState = null;
-            if (FilterIncludeInProduction)
+            if (FilterIsCompleted)
             {
                 endState = GlobalApp.BatchPlanState.Completed;
                 prodOrderState = MDProdOrderState.ProdOrderStates.InProduction;
@@ -3098,6 +3196,36 @@ namespace gip.bso.manufacturing
                             result = Global.ControlModes.Enabled;
                         else
                             result = Global.ControlModes.Disabled;
+                        break;
+                    case "FilterStartTime":
+                        result = Global.ControlModes.Enabled;
+                        bool filterStartTimeIsRequired =
+                            FilterIsCompleted
+                            && (
+                                    FilterStartTime == null
+                                    || (
+                                            FilterStartTime != null
+                                            && FilterEndTime != null
+                                            && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
+                                        )
+                                );
+                        if (filterStartTimeIsRequired)
+                            result = Global.ControlModes.EnabledWrong;
+                        break;
+                    case "FilterEndTime":
+                        result = Global.ControlModes.Enabled;
+                        bool filterEndTimeIsRequired =
+                            FilterIsCompleted
+                            && (
+                                    FilterEndTime == null
+                                    || (
+                                            FilterStartTime != null
+                                            && FilterEndTime != null
+                                            && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
+                                        )
+                                );
+                        if (filterEndTimeIsRequired)
+                            result = Global.ControlModes.EnabledWrong;
                         break;
                 }
             }

@@ -982,12 +982,12 @@ namespace gip.mes.facility
         #region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
         CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, toOrderState, planningMRID) => ctx.ProdOrderBatchPlan
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID) => ctx.ProdOrderBatchPlan
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
-                                            && (toOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex <= toOrderState)
-                                            && (toOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= toOrderState)
+                                            && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                                            && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
                                                  || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
                                                  || (c.CalculatedStartDate != null && c.CalculatedStartDate >= filterStartTime))
@@ -1010,10 +1010,10 @@ namespace gip.mes.facility
             GlobalApp.BatchPlanState toPlanState,
             DateTime? filterStartTime,
             DateTime? filterEndTime,
-            MDProdOrderState.ProdOrderStates? toOrderState,
+            MDProdOrderState.ProdOrderStates? minProdOrderState,
             Guid? planningMRID)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, toOrderState.HasValue ? (short?)toOrderState.Value : null, planningMRID) as ObjectQuery<ProdOrderBatchPlan>;
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null, planningMRID) as ObjectQuery<ProdOrderBatchPlan>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
