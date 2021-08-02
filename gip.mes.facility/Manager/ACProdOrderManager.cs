@@ -1502,7 +1502,7 @@ namespace gip.mes.facility
         }
 
 
-        public List<SchedulingMaxBPOrder> GetMaxScheduledOrder(DatabaseApp databaseApp, string pwClassName)
+        public List<SchedulingMaxBPOrder> GetMaxScheduledOrder(DatabaseApp databaseApp, string planningMRNo)
         {
             GlobalApp.BatchPlanState startState = GlobalApp.BatchPlanState.Created;
             GlobalApp.BatchPlanState endState = GlobalApp.BatchPlanState.Paused;
@@ -1521,8 +1521,14 @@ namespace gip.mes.facility
                                 maxOrder =
                                            x.VBiACClassWF
                                            .ProdOrderBatchPlan_VBiACClassWF
-                                           .Where(a => a.PlanStateIndex >= (short)startState
-                                                        && a.PlanStateIndex <= (short)endState)
+                                           .Where(a =>
+                                                        (
+                                                            (string.IsNullOrEmpty(planningMRNo) && !a.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                                                            || (!string.IsNullOrEmpty(planningMRNo) && a.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Where(y => y.PlanningMR.PlanningMRNo == planningMRNo).Any())
+                                                        )
+                                                        && a.PlanStateIndex >= (short)startState
+                                                        && a.PlanStateIndex <= (short)endState
+                                            )
                                            .Select(y => y.ScheduledOrder)
                                            .DefaultIfEmpty()
                                            .Max()
@@ -1548,7 +1554,7 @@ namespace gip.mes.facility
 
         #region ProdOrder -> Clone ProdOrder
 
-        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string pwClassName)
+        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo)
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
             ProdOrder targetProdOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
@@ -1556,7 +1562,7 @@ namespace gip.mes.facility
             targetProdOrder.MDProdOrderState = sourceProdOrder.MDProdOrderState;
             targetProdOrder.CPartnerCompany = sourceProdOrder.CPartnerCompany;
 
-            List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, pwClassName);
+            List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, planningMRNo);
 
             Dictionary<Guid, Guid> connectionOldNewItems = new Dictionary<Guid, Guid>();
 

@@ -351,7 +351,7 @@ namespace gip.bso.manufacturing
             {
                 foreach (var sourceProdOrder in prodOrders)
                 {
-                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, PWNodeProcessWorkflowVB.PWClassName);
+                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null);
                     generated.Add(targetProdOrder);
                 }
 

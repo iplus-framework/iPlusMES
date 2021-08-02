@@ -95,7 +95,7 @@ namespace gip.bso.manufacturing
             }
 
             if (calcBatchSize > 0 && calcBatchCount > 0)
-                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount);
+                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
             Rest = rest;
         }
         #endregion

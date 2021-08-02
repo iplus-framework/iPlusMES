@@ -88,7 +88,7 @@ namespace gip.bso.manufacturing
 
 
             if (calcBatchCount > 0 && calcBatchSize > Double.Epsilon)
-                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount);
+                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
             else
             {
                 bool isOkForOneBatch = false;
@@ -105,7 +105,7 @@ namespace gip.bso.manufacturing
                     calcBatchSize = totalSize;
                     rest = 0;
                 }
-                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount);
+                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
             }
             Rest = rest;
         }

@@ -39,6 +39,7 @@ namespace gip.bso.manufacturing
         public string ProgramNo { get; set; }
 
         public Guid? ProdOrderPartslistID { get; set; }
+        public Guid? ProdOrderPartslistPosID { get; set; }
 
         public Guid PartslistID { get; set; }
 
@@ -111,7 +112,7 @@ namespace gip.bso.manufacturing
 
 
         private double _TargetQuantityUOM;
-        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Required quantity (UOM)'}de{'Bedarfsmenge (UOM)'}")]
+        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Quantity'}de{'Menge'}")]
         public double TargetQuantityUOM
         {
             get
@@ -138,7 +139,7 @@ namespace gip.bso.manufacturing
         /// Doc  NewTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'NewTargetQuantityUOM'}de{'NewTargetQuantityUOM'}")]
+        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'New quantity'}de{'Menge Neu'}")]
         public double NewTargetQuantityUOM
         {
             get
@@ -162,7 +163,7 @@ namespace gip.bso.manufacturing
         /// Doc  NewSyncTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'NewSyncTargetQuantityUOM'}de{'NewSyncTargetQuantityUOM'}")]
+        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'New sync. quantity'}de{'Menge Neu Sync.'}")]
         public double? NewSyncTargetQuantityUOM
         {
             get
