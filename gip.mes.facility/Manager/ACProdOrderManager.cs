@@ -407,7 +407,7 @@ namespace gip.mes.facility
 
             batches.ForEach(x => x.DeleteACObject(dbApp, false));
 
-            prodOrderPartslist.DeleteACObject(dbApp, true);
+            prodOrderPartslist.DeleteACObject(dbApp, false);
 
             PostExecute("PartslistRemove");
             return msg;

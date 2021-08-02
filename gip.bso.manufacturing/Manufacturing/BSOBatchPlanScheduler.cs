@@ -2425,7 +2425,7 @@ namespace gip.bso.manufacturing
                     batchPlan.DeleteACObject(this.DatabaseApp, true);
                 }
             }
-
+            MsgWithDetails saveMsg = null;
             foreach (ProdOrderPartslist partslist in partslists)
             {
                 ProdOrder prodOrder = partslist.ProdOrder;
@@ -2436,6 +2436,8 @@ namespace gip.bso.manufacturing
                     {
                         SendMessage(msg);
                     }
+                    saveMsg = DatabaseApp.ACSaveChanges();
+                    prodOrder.ProdOrderPartslist_ProdOrder.AutoRefresh();
                     if (prodOrder.ProdOrderPartslist_ProdOrder.Any())
                     {
                         var tempPlList = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
@@ -2447,10 +2449,11 @@ namespace gip.bso.manufacturing
                         foreach (var planningMRProposal in planningMRProposals)
                             planningMRProposal.DeleteACObject(DatabaseApp, false);
                         prodOrder.DeleteACObject(DatabaseApp, false);
+                        saveMsg = DatabaseApp.ACSaveChanges();
                     }
                 }
             }
-            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+            saveMsg = DatabaseApp.ACSaveChanges();
             if (saveMsg != null)
                 SendMessage(saveMsg);
             LoadProdOrderBatchPlanList();
