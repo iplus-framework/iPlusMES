@@ -88,7 +88,6 @@ namespace gip.bso.manufacturing
             else
                 ConfigPreselectedLine = null;
             ACSaveChanges();
-
         }
 
         public string ConfigPreselectedLineCurrentUser
@@ -112,6 +111,15 @@ namespace gip.bso.manufacturing
                 else
                     ConfigPreselectedLineDict[Root.CurrentInvokingUser.Initials] = value;
             }
+        }
+
+        public void SaveSelectedLine(PAScheduleForPWNode line)
+        {
+            if (line != null && line.MDSchedulingGroup != null)
+                ConfigPreselectedLineCurrentUser = line.MDSchedulingGroup.MDKey;
+            else
+                ConfigPreselectedLineCurrentUser = null;
+            SetConfigPreselectedLineDict(ConfigPreselectedLineDict);
         }
 
         #endregion
@@ -328,12 +336,6 @@ namespace gip.bso.manufacturing
             MediaSettings = null;
             SelectedProdOrderBatchPlan = null;
             IsWizard = false;
-
-            if (SelectedScheduleForPWNode != null)
-                ConfigPreselectedLineCurrentUser = SelectedScheduleForPWNode.MDSchedulingGroup.MDKey;
-            else
-                ConfigPreselectedLineCurrentUser = null;
-            SetConfigPreselectedLineDict(ConfigPreselectedLineDict);
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -741,6 +743,8 @@ namespace gip.bso.manufacturing
                         SelectedTargetScheduleForPWNode = null;
 
                     SelectedTargetScheduleForPWNode = null;
+
+                    SaveSelectedLine(value);
                 }
             }
         }
@@ -2153,6 +2157,8 @@ namespace gip.bso.manufacturing
         [ACMethodCommand("Search", "en{'Search'}de{'Suche'}", (short)MISort.Search)]
         public void Search()
         {
+            if(!IsEnabledSearch())
+                return;
             OnPropertyChanged("ScheduleForPWNodeList");
             LoadProdOrderBatchPlanList();
         }
@@ -2160,12 +2166,17 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSearch()
         {
             return
-                !FilterIsCompleted
-                || (
-                        FilterStartTime != null
-                        && FilterEndTime != null
-                        && (FilterEndTime.Value - FilterStartTime).Value.TotalDays > 0
-                        && (FilterEndTime.Value - FilterStartTime).Value.TotalDays <= Const_MaxFilterDaySpan);
+                SelectedScheduleForPWNode != null
+                &&
+                (
+                    !FilterIsCompleted
+                    || (
+                            FilterStartTime != null
+                            && FilterEndTime != null
+                            && (FilterEndTime.Value - FilterStartTime).Value.TotalDays > 0
+                            && (FilterEndTime.Value - FilterStartTime).Value.TotalDays <= Const_MaxFilterDaySpan)
+                );
+                
         }
 
         [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New)]
