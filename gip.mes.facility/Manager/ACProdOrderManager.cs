@@ -407,7 +407,13 @@ namespace gip.mes.facility
 
             batches.ForEach(x => x.DeleteACObject(dbApp, false));
 
+            foreach (PlanningMRProposal plan in prodOrderPartslist.PlanningMRProposal_ProdOrderPartslist.ToArray())
+            {
+                plan.DeleteACObject(dbApp, false);
+            }
+
             prodOrderPartslist.DeleteACObject(dbApp, false);
+
 
             PostExecute("PartslistRemove");
             return msg;

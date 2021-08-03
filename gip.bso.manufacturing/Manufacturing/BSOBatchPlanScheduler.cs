@@ -2521,9 +2521,6 @@ namespace gip.bso.manufacturing
                 }
                 if (prodOrder.ProdOrderPartslist_ProdOrder == null || !prodOrder.ProdOrderPartslist_ProdOrder.Any())
                 {
-                    List<PlanningMRProposal> planningMRProposals = prodOrder.PlanningMRProposal_ProdOrder.ToList();
-                    foreach (var planningMRProposal in planningMRProposals)
-                        planningMRProposal.DeleteACObject(DatabaseApp, false);
                     prodOrder.DeleteACObject(DatabaseApp, false);
                     saveMsg = DatabaseApp.ACSaveChanges();
                     if (saveMsg != null)

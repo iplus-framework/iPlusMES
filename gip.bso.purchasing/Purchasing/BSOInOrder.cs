@@ -657,7 +657,18 @@ namespace gip.bso.purchasing
             {
                 if (CurrentInOrder == null)
                     return null;
-                return CurrentInOrder.InOrderPos_InOrder.OrderBy(c => c.Sequence);
+                if (CurrentInOrder.MDInOrderType.OrderType == GlobalApp.OrderTypes.ReleaseOrder)
+                {
+                    return CurrentInOrder.InOrderPos_InOrder
+                        .Where(c => c.MaterialPosTypeIndex == (int)GlobalApp.MaterialPosTypes.InwardPart && !c.DeliveryNotePos_InOrderPos.Any())
+                        .OrderBy(c => c.Sequence);
+                }
+                else
+                {
+                    return CurrentInOrder.InOrderPos_InOrder
+                        .Where(c => !c.ParentInOrderPosID.HasValue)
+                        .OrderBy(c => c.Sequence);
+                }
             }
         }
 
