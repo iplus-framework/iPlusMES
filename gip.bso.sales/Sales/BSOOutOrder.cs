@@ -422,7 +422,18 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOrder == null)
                     return null;
-                return CurrentOutOrder.OutOrderPos_OutOrder.OrderBy(c => c.Sequence);
+                if (CurrentOutOrder.MDOutOrderType.OrderType == GlobalApp.OrderTypes.ReleaseOrder)
+                {
+                    return CurrentOutOrder.OutOrderPos_OutOrder
+                        .Where(c => c.MaterialPosTypeIndex == (int)GlobalApp.MaterialPosTypes.OutwardPart && !c.DeliveryNotePos_OutOrderPos.Any())
+                        .OrderBy(c => c.Sequence);
+                }
+                else
+                {
+                    return CurrentOutOrder.OutOrderPos_OutOrder
+                        .Where(c => !c.ParentOutOrderPosID.HasValue)
+                        .OrderBy(c => c.Sequence);
+                }
             }
         }
 
