@@ -2431,7 +2431,7 @@ namespace gip.bso.manufacturing
                 SendMessage(saveMsg);
             LoadProdOrderBatchPlanList();
         }
-       
+
         public bool IsEnabledSetBatchStateCancelled()
         {
             return ProdOrderBatchPlanList != null
@@ -2451,12 +2451,13 @@ namespace gip.bso.manufacturing
             {
                 if (!pl.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
                     prodOrderPartslists.Add(pl.ProdOrderPartslist);
-            foreach (ProdOrderPartslist partslist in prodOrderPartslists)
-                RemovePartslist(partslist);
-            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
-            if (saveMsg != null)
-                SendMessage(saveMsg);
-            LoadProdOrderBatchPlanList();
+                foreach (ProdOrderPartslist partslist in prodOrderPartslists)
+                    RemovePartslist(partslist);
+                MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+                if (saveMsg != null)
+                    SendMessage(saveMsg);
+                LoadProdOrderBatchPlanList();
+            }
         }
 
         public bool IsEnabledRemoveSelectedProdorderPartslist()
