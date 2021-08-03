@@ -286,10 +286,7 @@ namespace gip.bso.manufacturing
 
 
             if (LocalBSOBatchPlan != null)
-            {
                 LocalBSOBatchPlan.PropertyChanged += ChildBSO_PropertyChanged;
-                LocalBSOBatchPlan.OnPreselectReservationTarget += SetReservationFromCache;
-            }
 
 
             if (BSOMaterialPreparationChild != null && BSOMaterialPreparationChild.Value != null)
@@ -2448,16 +2445,14 @@ namespace gip.bso.manufacturing
                 return;
             List<ProdOrderPartslist> prodOrderPartslists = new List<ProdOrderPartslist>();
             foreach (ProdOrderPartslistPlanWrapper pl in ProdOrderPartslistList.Where(c => c.IsSelected))
-            {
                 if (!pl.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
                     prodOrderPartslists.Add(pl.ProdOrderPartslist);
-                foreach (ProdOrderPartslist partslist in prodOrderPartslists)
-                    RemovePartslist(partslist);
-                MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
-                if (saveMsg != null)
-                    SendMessage(saveMsg);
-                LoadProdOrderBatchPlanList();
-            }
+            foreach (ProdOrderPartslist partslist in prodOrderPartslists)
+                RemovePartslist(partslist);
+            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+            if (saveMsg != null)
+                SendMessage(saveMsg);
+            LoadProdOrderBatchPlanList();
         }
 
         public bool IsEnabledRemoveSelectedProdorderPartslist()
@@ -2777,7 +2772,6 @@ namespace gip.bso.manufacturing
                             SendMessage(noBachSuggestionsErr);
                         }
                         TargetQuantityUOM = SelectedWizardSchedulerPartslist.NewTargetQuantityUOM;
-                        ClearReservationsCache();
                         success = true;
                         break;
                     case NewScheduledBatchWizardPhaseEnum.DefineTargets:
@@ -3075,7 +3069,6 @@ namespace gip.bso.manufacturing
             WizardSolvedTasks.Clear();
             IsWizardExistingBatch = false;
             ClearMessages();
-            ClearReservationsCache();
         }
 
         #endregion
