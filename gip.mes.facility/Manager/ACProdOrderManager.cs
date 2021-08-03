@@ -981,7 +981,7 @@ namespace gip.mes.facility
 
         #region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>>(
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?,  IQueryable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID) => ctx.ProdOrderBatchPlan
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
@@ -989,8 +989,9 @@ namespace gip.mes.facility
                                             && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
-                                                 || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
-                                                 || (c.CalculatedStartDate != null && c.CalculatedStartDate >= filterStartTime))
+                                                 || ((c.ScheduledStartDate ?? c.UpdateDate) >= filterStartTime && minProdOrderState == null)
+                                                 || (c.UpdateDate >= filterStartTime && minProdOrderState != null)
+                                                )
                                             && (filterEndTime == null
                                                  || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
                                                  || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime))

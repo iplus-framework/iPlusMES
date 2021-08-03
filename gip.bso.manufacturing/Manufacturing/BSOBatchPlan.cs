@@ -12,7 +12,7 @@ using gip.mes.processapplication;
 
 namespace gip.bso.manufacturing
 {
-    public delegate void PreselectReservationTarget(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> targetList, ProdOrderBatchPlan selectedBatchPlanForIntermediate);
+    public delegate void PreselectReservationTarget(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> oldReservationCollection, ProdOrderBatchPlan selectedBatchPlanForIntermediate);
 
     /// <summary>
     /// Unter-BSO für VBBSOControlDialog
@@ -270,6 +270,14 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public BSOBatchPlanScheduler BSOBatchPlanSchedulerBSO
+        {
+            get
+            {
+                return FindParentComponent<BSOBatchPlanScheduler>();
+            }
+        }
+
         /// <summary>
         /// Partslist generated without BSOProdOrder
         /// </summary>
@@ -314,6 +322,9 @@ namespace gip.bso.manufacturing
                 var prodOrderBSO = ProdOrderBSO;
                 if (prodOrderBSO != null)
                     return prodOrderBSO.DatabaseApp;
+                var bSOBatchPlanSchedulerBSO = BSOBatchPlanSchedulerBSO;
+                if (bSOBatchPlanSchedulerBSO != null)
+                    return bSOBatchPlanSchedulerBSO.DatabaseApp;
                 return base.DatabaseApp;
             }
         }
@@ -763,10 +774,14 @@ namespace gip.bso.manufacturing
 
             // TODO: Wende Routing rules auf routes an umd resultat nochmals zu filtern
 
-            var selectedModules = DatabaseApp.FacilityReservation
-                .Include(c => c.Facility)
-                .Include(c => c.Facility.Material)
-                .Where(c => c.ProdOrderBatchPlanID == SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID).AutoMergeOption();
+            //List<FacilityReservation> selectedModules = DatabaseApp.FacilityReservation
+            //    .Include(c => c.Facility)
+            //    .Include(c => c.Facility.Material)
+            //    .Where(c => c.ProdOrderBatchPlanID == SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID).AutoMergeOption();
+            if (!SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged))
+                SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
+
+            List<FacilityReservation> selectedModules = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToList();
             //SelectedModule.SelectedReservation.FacilityReservation_ParentFacilityReservation.AutoLoad();
             //var selectedModules = SelectedModule.SelectedReservation.FacilityReservation_ParentFacilityReservation.ToArray();
             var reservationCollection = new BindingList<POPartslistPosReservation>();
@@ -814,6 +829,7 @@ namespace gip.bso.manufacturing
             // select first if only one is present
             if (OnPreselectReservationTarget != null)
                 OnPreselectReservationTarget(reservationCollection, TargetsList, SelectedBatchPlanForIntermediate);
+
             TargetsList = reservationCollection;
             SelectedTarget = TargetsList.FirstOrDefault();
         }

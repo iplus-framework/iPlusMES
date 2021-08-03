@@ -36,8 +36,6 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Not marked (private)
 
-        public string ProgramNo { get; set; }
-
         public Guid? ProdOrderPartslistID { get; set; }
         public Guid? ProdOrderPartslistPosID { get; set; }
 
@@ -54,6 +52,9 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties -> Other (marked)
+
+        [ACPropertyInfo(99, "ProgramNo", "en{'Order Number'}de{'Auftragsnummer'}")]
+        public string ProgramNo { get; set; }
 
         [ACPropertyInfo(100, "Sn", "en{'No'}de{'Nr'}")]
         public int Sn { get; set; }

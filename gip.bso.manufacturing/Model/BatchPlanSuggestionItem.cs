@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.ComponentModel;
 
@@ -205,7 +206,23 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public Guid? ProdOrderBatchPlanID { get; set; }
+        private ProdOrderBatchPlan _ProdOrderBatchPlan;
+        [ACPropertyInfo(403, "ProdOrderBatchPlan", "en{'ProdOrderBatchPlan'}de{'ProdOrderBatchPlan'}")]
+        public ProdOrderBatchPlan ProdOrderBatchPlan
+        {
+            get
+            {
+                return _ProdOrderBatchPlan;
+            }
+            set
+            {
+                if (_ProdOrderBatchPlan != value)
+                {
+                    _ProdOrderBatchPlan = value;
+                    OnPropertyChanged("ProdOrderBatchPlan");
+                }
+            }
+        }
 
         public override string ToString()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using gip.core.datamodel;
@@ -8,8 +9,32 @@ using gip.mes.datamodel;
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Order BOM Plan'}de{'Auftrag Stückliste Plan'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
-    public class ProdOrderPartslistPlanWrapper
+    public class ProdOrderPartslistPlanWrapper : INotifyPropertyChanged
     {
+        #region event
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        private bool _IsSelected;
+        [ACPropertyInfo(999, "IsSelected", "en{'Select'}de{'Auswahl'}")]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged("IsSelected");
+                }
+            }
+        }
+
         [ACPropertyInfo(1, "", ConstApp.ProdOrderPartslist)]
         public ProdOrderPartslist ProdOrderPartslist
         {
@@ -154,6 +179,12 @@ namespace gip.bso.manufacturing
                 return PlanningStateEnum.UnPlanned;
             }
         }
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
         public enum PlanningStateEnum
         {
