@@ -7,9 +7,10 @@ namespace gip.bso.manufacturing
     public class BatchSuggestionCommand
     {
         #region ctor's
-        public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode)
+        public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, int toleranceQuantity)
         {
             BatchPlanSuggestion = new BatchPlanSuggestion();
+            BatchPlanSuggestion.RestQuantityTolerance = toleranceQuantity;
             BatchPlanSuggestion.TotalSize = wizardSchedulerPartslist.NewTargetQuantityUOM;
             BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
@@ -26,7 +27,7 @@ namespace gip.bso.manufacturing
                         {
                             suggestion1 = new KeepStandardBatchSizeAndDivideRest(nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
                             if (suggestion1.Suggestion != null)
-                                BatchPlanSuggestion.ItemsList.Add(suggestion1.Suggestion);
+                                BatchPlanSuggestion.AddItem(suggestion1.Suggestion);
                             rest = suggestion1.Rest;
                             nr++;
                         }
@@ -38,7 +39,7 @@ namespace gip.bso.manufacturing
                         {
                             suggestion2 = new KeepEqualBatchSizes(nr, rest, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
                             if (suggestion2.Suggestion != null)
-                                BatchPlanSuggestion.ItemsList.Add(suggestion2.Suggestion);
+                                BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
                             rest = suggestion2.Rest;
                             nr++;
                         }

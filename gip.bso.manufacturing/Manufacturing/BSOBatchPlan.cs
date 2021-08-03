@@ -12,7 +12,6 @@ using gip.mes.processapplication;
 
 namespace gip.bso.manufacturing
 {
-    public delegate void PreselectReservationTarget(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> oldReservationCollection, ProdOrderBatchPlan selectedBatchPlanForIntermediate);
 
     /// <summary>
     /// Unter-BSO für VBBSOControlDialog
@@ -22,10 +21,6 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch planning'}de{'Batchplanung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
     public class BSOBatchPlan : VBBSOModulesSelector
     {
-
-        #region event
-        public event PreselectReservationTarget OnPreselectReservationTarget;
-        #endregion
 
         #region c´tors
 
@@ -86,6 +81,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties
+
+        public bool PreselectFirstFacilityReservation { get; set; }
         public virtual string VBBSORuleSelectionName
         {
             get
@@ -827,8 +824,8 @@ namespace gip.bso.manufacturing
             }
 
             // select first if only one is present
-            if (OnPreselectReservationTarget != null)
-                OnPreselectReservationTarget(reservationCollection, TargetsList, SelectedBatchPlanForIntermediate);
+            if(PreselectFirstFacilityReservation && SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
+                reservationCollection[0].IsChecked = true;
 
             TargetsList = reservationCollection;
             SelectedTarget = TargetsList.FirstOrDefault();

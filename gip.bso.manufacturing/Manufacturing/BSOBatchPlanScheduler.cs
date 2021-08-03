@@ -286,7 +286,10 @@ namespace gip.bso.manufacturing
 
 
             if (LocalBSOBatchPlan != null)
+            {
                 LocalBSOBatchPlan.PropertyChanged += ChildBSO_PropertyChanged;
+                LocalBSOBatchPlan.PreselectFirstFacilityReservation = true;
+            }
 
 
             if (BSOMaterialPreparationChild != null && BSOMaterialPreparationChild.Value != null)
@@ -1296,6 +1299,8 @@ namespace gip.bso.manufacturing
                 if (_TargetQuantityUOM != value)
                 {
                     _TargetQuantityUOM = value;
+                    if (BatchPlanSuggestion != null)
+                        BatchPlanSuggestion.TotalSize = value;
                     OnPropertyChanged("TargetQuantityUOM");
                     try
                     {
@@ -1606,7 +1611,7 @@ namespace gip.bso.manufacturing
                 return;
             if (SelectedWizardSchedulerPartslist.NewTargetQuantityUOM != TargetQuantityUOM)
                 SelectedWizardSchedulerPartslist.NewTargetQuantityUOM = TargetQuantityUOM;
-            BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, FilterBatchplanSuggestionMode.Value);
+            BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, FilterBatchplanSuggestionMode.Value, Const_ToleranceWeightDiff);
             BatchPlanSuggestion = cmd.BatchPlanSuggestion;
             OnPropertyChanged("BatchPlanSuggestion");
             OnPropertyChanged("BatchPlanSuggestion\\TotalSize");
@@ -1631,7 +1636,7 @@ namespace gip.bso.manufacturing
                 nr = BatchPlanSuggestion.ItemsList.Max(c => c.Nr);
             nr++;
             BatchPlanSuggestionItem newItem = new BatchPlanSuggestionItem(nr, 0, 0, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM) { IsEditable = true };
-            BatchPlanSuggestion.ItemsList.Add(newItem);
+            BatchPlanSuggestion.AddItem(newItem);
             BatchPlanSuggestion.SelectedItems = newItem;
             OnPropertyChanged("BatchPlanSuggestion\\ItemsList");
         }
@@ -2001,6 +2006,7 @@ namespace gip.bso.manufacturing
             BatchPlanSuggestion batchPlanSuggestion =
                new BatchPlanSuggestion()
                {
+                   RestQuantityTolerance = Const_ToleranceWeightDiff,
                    TotalSize = totalSize,
                    RestNotUsedQuantity = 0,
                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
@@ -2022,6 +2028,7 @@ namespace gip.bso.manufacturing
             BatchPlanSuggestion batchPlanSuggestion =
                 new BatchPlanSuggestion()
                 {
+                    RestQuantityTolerance = Const_ToleranceWeightDiff,
                     TotalSize = moveQuantity,
                     RestNotUsedQuantity = 0,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
@@ -2405,8 +2412,11 @@ namespace gip.bso.manufacturing
             ClearMessages();
             if (!IsEnabledSetBatchStateCancelled())
                 return;
+
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
             List<ProdOrderPartslist> partslists = selectedBatches.Select(c => c.ProdOrderPartslist).ToList();
+            List<ProdOrder> prodOrders = partslists.Select(c => c.ProdOrder).ToList();
+
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
                 if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
@@ -2421,11 +2431,39 @@ namespace gip.bso.manufacturing
                     batchPlan.DeleteACObject(this.DatabaseApp, true);
                 }
             }
+
+            MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
+            MDProdOrderState mDProdOrderStateCompleted = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
             foreach (ProdOrderPartslist partslist in partslists)
-                RemovePartslist(partslist);
+            {
+                if (partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Completed).Any())
+                {
+                    partslist.MDProdOrderState = mDProdOrderStateCompleted;
+                }
+                else if (partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Cancelled).Any())
+                {
+                    partslist.MDProdOrderState = mDProdOrderStateCancelled;
+                }
+            }
+
+            foreach (ProdOrder prodOrder in prodOrders)
+            {
+                if (!prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any())
+                {
+                    List<ProdOrderPartslist> emptyPartslists = partslists.Where(c => c.ProdOrder.ProgramNo == prodOrder.ProgramNo).ToList();
+                    foreach (ProdOrderPartslist pl in emptyPartslists)
+                        RemovePartslist(pl);
+                }
+                else if (!prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any(c => c.PlanStateIndex < (short)GlobalApp.BatchPlanState.Completed))
+                {
+                    prodOrder.MDProdOrderState = mDProdOrderStateCompleted;
+                }
+            }
+
             MsgWithDetails saveMsg = saveMsg = DatabaseApp.ACSaveChanges();
             if (saveMsg != null)
                 SendMessage(saveMsg);
+
             LoadProdOrderBatchPlanList();
         }
 
@@ -2443,11 +2481,12 @@ namespace gip.bso.manufacturing
             ClearMessages();
             if (!IsEnabledRemoveSelectedProdorderPartslist())
                 return;
-            List<ProdOrderPartslist> prodOrderPartslists = new List<ProdOrderPartslist>();
-            foreach (ProdOrderPartslistPlanWrapper pl in ProdOrderPartslistList.Where(c => c.IsSelected))
-                if (!pl.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
-                    prodOrderPartslists.Add(pl.ProdOrderPartslist);
-            foreach (ProdOrderPartslist partslist in prodOrderPartslists)
+            ProdOrderPartslist[] plForRemove =
+                ProdOrderPartslistList
+                .Where(c => c.IsSelected && !c.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+                .Select(c => c.ProdOrderPartslist)
+                .ToArray();
+            foreach (ProdOrderPartslist partslist in plForRemove)
                 RemovePartslist(partslist);
             MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
             if (saveMsg != null)
@@ -2966,10 +3005,11 @@ namespace gip.bso.manufacturing
             {
                 suggestion = new BatchPlanSuggestion()
                 {
+                    RestQuantityTolerance = Const_ToleranceWeightDiff,
                     TotalSize = SelectedWizardSchedulerPartslist.MDUnit != null ? SelectedWizardSchedulerPartslist.TargetQuantity : SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
-                suggestion.ItemsList.Add(new BatchPlanSuggestionItem(
+                suggestion.AddItem(new BatchPlanSuggestionItem(
                     1,
                     SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     1,
@@ -2984,7 +3024,7 @@ namespace gip.bso.manufacturing
                 if (SelectedWizardSchedulerPartslist.BatchSuggestionMode != null)
                     defMode = SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value;
                 SelectedFilterBatchplanSuggestionMode = FilterBatchplanSuggestionModeList.FirstOrDefault(c => (BatchSuggestionCommandModeEnum)c.Value == defMode);
-                BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, defMode);
+                BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, defMode, Const_ToleranceWeightDiff);
                 suggestion = cmd.BatchPlanSuggestion;
                 WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineBatch);
             }
@@ -2995,6 +3035,7 @@ namespace gip.bso.manufacturing
         private BatchPlanSuggestion LoadExistingBatchSuggestion(ProdOrderPartslistPos intermediate)
         {
             BatchPlanSuggestion suggestion = new BatchPlanSuggestion();
+            suggestion.RestQuantityTolerance = Const_ToleranceWeightDiff;
             suggestion.Intermediate = intermediate;
             suggestion.TotalSize = intermediate.TargetQuantityUOM;
             int nr = 0;
@@ -3014,7 +3055,7 @@ namespace gip.bso.manufacturing
                 item.IsInProduction =
                     batchPlan.PlanState >= GlobalApp.BatchPlanState.ReadyToStart
                     && batchPlan.PlanState <= GlobalApp.BatchPlanState.Paused;
-                suggestion.ItemsList.Add(item);
+                suggestion.AddItem(item);
             }
             return suggestion;
         }
@@ -3069,73 +3110,6 @@ namespace gip.bso.manufacturing
             WizardSolvedTasks.Clear();
             IsWizardExistingBatch = false;
             ClearMessages();
-        }
-
-        #endregion
-
-        #region Methods -> Wizard ->  Preselecting Targets
-
-        private void SetReservationFromCache(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> oldReservationCollection, ProdOrderBatchPlan selectedBatchPlanForIntermediate)
-        {
-            if (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID == null)
-            {
-                bool isForFirstSelect =
-                            reservationCollection != null
-                            &&
-                            (
-                                selectedFacilityPosReservationCache == null
-                                || !selectedFacilityPosReservationCache.Any(c => c.ParentBatchPlan.ProdOrderBatchPlanID == selectedBatchPlanForIntermediate.ProdOrderBatchPlanID)
-                            );
-                if (isForFirstSelect)
-                {
-                    POPartslistPosReservation firstItem = reservationCollection.FirstOrDefault();
-                    firstItem.IsChecked = true;
-                    if (selectedFacilityPosReservationCache == null)
-                        selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
-                    selectedFacilityPosReservationCache.Add(firstItem);
-                }
-                SelectReservationsFromCache(reservationCollection, oldReservationCollection);
-            }
-        }
-
-        private List<POPartslistPosReservation> selectedFacilityPosReservationCache { get; set; }
-        private void SelectReservationsFromCache(BindingList<POPartslistPosReservation> reservationCollection, BindingList<POPartslistPosReservation> oldReservationCollection)
-        {
-
-            if (selectedFacilityPosReservationCache == null)
-                selectedFacilityPosReservationCache = new List<POPartslistPosReservation>();
-
-            if (oldReservationCollection != null)
-            {
-                var forRemove =
-                    selectedFacilityPosReservationCache
-                    .Where(c => ReservationBelongToList(oldReservationCollection.ToList(), c))
-                    .ToList();
-                foreach (var item in forRemove)
-                    selectedFacilityPosReservationCache.Remove(item);
-
-                foreach (var item in oldReservationCollection.Where(c => c.IsChecked))
-                    selectedFacilityPosReservationCache.Add(item);
-            }
-
-            foreach (var item in reservationCollection)
-                item.IsChecked = ReservationBelongToList(selectedFacilityPosReservationCache, item);
-        }
-
-        private static bool ReservationBelongToList(List<POPartslistPosReservation> items, POPartslistPosReservation item)
-        {
-            return
-                items
-                .Where(x =>
-                            x.Module.ACClassID == item.Module.ACClassID
-                            && x.ParentBatchPlan.ProdOrderBatchPlanID == item.ParentBatchPlan.ProdOrderBatchPlanID
-                        )
-                        .Any();
-        }
-
-        private void ClearReservationsCache()
-        {
-            selectedFacilityPosReservationCache = null;
         }
 
         #endregion
@@ -3299,6 +3273,14 @@ namespace gip.bso.manufacturing
                                 );
                         if (filterEndTimeIsRequired)
                             result = Global.ControlModes.EnabledWrong;
+                        break;
+
+                    case "BatchPlanSuggestion\\Difference":
+                        result = Global.ControlModes.Enabled;
+                        if (BatchPlanSuggestion.Difference > Const_ToleranceWeightDiff)
+                        {
+                            result = Global.ControlModes.EnabledWrong;
+                        }
                         break;
                 }
             }
