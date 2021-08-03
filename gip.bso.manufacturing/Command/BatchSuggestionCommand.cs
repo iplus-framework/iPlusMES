@@ -7,7 +7,7 @@ namespace gip.bso.manufacturing
     public class BatchSuggestionCommand
     {
         #region ctor's
-        public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, int toleranceQuantity)
+        public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, double toleranceQuantity)
         {
             BatchPlanSuggestion = new BatchPlanSuggestion();
             BatchPlanSuggestion.RestQuantityTolerance = toleranceQuantity;

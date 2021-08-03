@@ -24,7 +24,6 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoForwardScheduling = @"DoForwardScheduling";
         public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
         public const int Const_MaxFilterDaySpan = 10;
-        public const int Const_ToleranceWeightDiff = 10;
         #endregion
 
         #region Configuration
@@ -1467,6 +1466,7 @@ namespace gip.bso.manufacturing
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            ClearMessages();
             WizardSchedulerPartslist item = sender as WizardSchedulerPartslist;
             if (item != null)
                 if (e.PropertyName == WizardSchedulerPartslist.Const_SelectedMDSchedulingGroup)
@@ -1492,11 +1492,26 @@ namespace gip.bso.manufacturing
                         // setup value to null
                         item._NewSyncTargetQuantityUOM = null;
                         foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
+                        {
                             if (wizardItem.ProdOrderPartslistID != null)
                             {
                                 ProdOrderPartslist prodOrderPartslist = DatabaseApp.ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistID == wizardItem.ProdOrderPartslistID);
-                                ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
+                                Msg changeMsg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
+                                if (changeMsg != null)
+                                    SendMessage(changeMsg);
+                                foreach (ProdOrderBatchPlan batchPlan in prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist)
+                                {
+                                    batchPlan.BatchSize = batchPlan.BatchSize * factor;
+                                    batchPlan.TotalSize = batchPlan.BatchSize * batchPlan.BatchTargetCount;
+                                }
                             }
+                        }
+                        if (DatabaseApp.IsChanged)
+                        {
+                            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+                            if (saveMsg != null)
+                                SendMessage(saveMsg);
+                        }
                         OnPropertyChanged("WizardSchedulerPartslistList");
                     }
                 }
@@ -1611,7 +1626,7 @@ namespace gip.bso.manufacturing
                 return;
             if (SelectedWizardSchedulerPartslist.NewTargetQuantityUOM != TargetQuantityUOM)
                 SelectedWizardSchedulerPartslist.NewTargetQuantityUOM = TargetQuantityUOM;
-            BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, FilterBatchplanSuggestionMode.Value, Const_ToleranceWeightDiff);
+            BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, FilterBatchplanSuggestionMode.Value, ProdOrderManager.TolRemainingCallQ);
             BatchPlanSuggestion = cmd.BatchPlanSuggestion;
             OnPropertyChanged("BatchPlanSuggestion");
             OnPropertyChanged("BatchPlanSuggestion\\TotalSize");
@@ -2006,7 +2021,7 @@ namespace gip.bso.manufacturing
             BatchPlanSuggestion batchPlanSuggestion =
                new BatchPlanSuggestion()
                {
-                   RestQuantityTolerance = Const_ToleranceWeightDiff,
+                   RestQuantityTolerance = ProdOrderManager.TolRemainingCallQ,
                    TotalSize = totalSize,
                    RestNotUsedQuantity = 0,
                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
@@ -2028,7 +2043,7 @@ namespace gip.bso.manufacturing
             BatchPlanSuggestion batchPlanSuggestion =
                 new BatchPlanSuggestion()
                 {
-                    RestQuantityTolerance = Const_ToleranceWeightDiff,
+                    RestQuantityTolerance = ProdOrderManager.TolRemainingCallQ,
                     TotalSize = moveQuantity,
                     RestNotUsedQuantity = 0,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
@@ -2415,7 +2430,7 @@ namespace gip.bso.manufacturing
 
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
             List<ProdOrderPartslist> partslists = selectedBatches.Select(c => c.ProdOrderPartslist).ToList();
-            List<ProdOrder> prodOrders = partslists.Select(c => c.ProdOrder).ToList();
+            List<ProdOrder> prodOrders = partslists.Select(c => c.ProdOrder).Distinct().ToList();
 
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
@@ -2507,25 +2522,15 @@ namespace gip.bso.manufacturing
             {
                 Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, prodOrder, partslist);
                 if (msg != null)
-                {
                     SendMessage(msg);
-                }
-                saveMsg = DatabaseApp.ACSaveChanges();
-                if (saveMsg != null)
-                    SendMessage(saveMsg);
-                prodOrder.ProdOrderPartslist_ProdOrder.AutoRefresh();
+                prodOrder.ProdOrderPartslist_ProdOrder.Remove(partslist);
                 if (prodOrder.ProdOrderPartslist_ProdOrder != null && prodOrder.ProdOrderPartslist_ProdOrder.Any())
                 {
                     var tempPlList = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
                     SequenceManager<ProdOrderPartslist>.Order(ref tempPlList);
                 }
                 if (prodOrder.ProdOrderPartslist_ProdOrder == null || !prodOrder.ProdOrderPartslist_ProdOrder.Any())
-                {
                     prodOrder.DeleteACObject(DatabaseApp, false);
-                    saveMsg = DatabaseApp.ACSaveChanges();
-                    if (saveMsg != null)
-                        SendMessage(saveMsg);
-                }
             }
         }
 
@@ -2713,17 +2718,8 @@ namespace gip.bso.manufacturing
                 case NewScheduledBatchWizardPhaseEnum.DefineBatch:
                     isEnabled = BatchPlanSuggestion != null
                         && BatchPlanSuggestion.ItemsList != null
-                        && BatchPlanSuggestion.ItemsList.Any();
-                    if (isEnabled)
-                    {
-                        bool weightOutOfTolerance = Math.Abs(BatchPlanSuggestion.TotalSize - BatchPlanSuggestion.ItemsList.Sum(c => c.BatchSize * c.BatchTargetCount)) > Const_ToleranceWeightDiff;
-                        if (weightOutOfTolerance)
-                        {
-                            isEnabled = false;
-                            Msg batchBatchCount = new Msg(this, eMsgLevel.Error, GetACUrl(), "WizardForward", 0, "Error50391", BatchPlanSuggestion.TotalSize, BatchPlanSuggestion.ItemsList.Sum(c => c.BatchSize * c.BatchTargetCount));
-                            SendMessage(batchBatchCount);
-                        }
-                    }
+                        && BatchPlanSuggestion.ItemsList.Any()
+                        && Math.Abs(BatchPlanSuggestion.TotalSize - BatchPlanSuggestion.ItemsList.Sum(c => c.BatchSize * c.BatchTargetCount)) <= ProdOrderManager.TolRemainingCallQ;
                     break;
                 case NewScheduledBatchWizardPhaseEnum.DefineTargets:
                     isEnabled =
@@ -3002,7 +2998,7 @@ namespace gip.bso.manufacturing
             {
                 suggestion = new BatchPlanSuggestion()
                 {
-                    RestQuantityTolerance = Const_ToleranceWeightDiff,
+                    RestQuantityTolerance = ProdOrderManager.TolRemainingCallQ,
                     TotalSize = SelectedWizardSchedulerPartslist.MDUnit != null ? SelectedWizardSchedulerPartslist.TargetQuantity : SelectedWizardSchedulerPartslist.NewTargetQuantityUOM,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
@@ -3021,7 +3017,7 @@ namespace gip.bso.manufacturing
                 if (SelectedWizardSchedulerPartslist.BatchSuggestionMode != null)
                     defMode = SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value;
                 SelectedFilterBatchplanSuggestionMode = FilterBatchplanSuggestionModeList.FirstOrDefault(c => (BatchSuggestionCommandModeEnum)c.Value == defMode);
-                BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, defMode, Const_ToleranceWeightDiff);
+                BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, defMode, ProdOrderManager.TolRemainingCallQ);
                 suggestion = cmd.BatchPlanSuggestion;
                 WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineBatch);
             }
@@ -3032,7 +3028,7 @@ namespace gip.bso.manufacturing
         private BatchPlanSuggestion LoadExistingBatchSuggestion(ProdOrderPartslistPos intermediate)
         {
             BatchPlanSuggestion suggestion = new BatchPlanSuggestion();
-            suggestion.RestQuantityTolerance = Const_ToleranceWeightDiff;
+            suggestion.RestQuantityTolerance = ProdOrderManager.TolRemainingCallQ;
             suggestion.Intermediate = intermediate;
             suggestion.TotalSize = intermediate.TargetQuantityUOM;
             int nr = 0;
@@ -3274,7 +3270,7 @@ namespace gip.bso.manufacturing
 
                     case "BatchPlanSuggestion\\Difference":
                         result = Global.ControlModes.Enabled;
-                        if (BatchPlanSuggestion.Difference > Const_ToleranceWeightDiff)
+                        if (BatchPlanSuggestion != null && BatchPlanSuggestion.Difference > ProdOrderManager.TolRemainingCallQ)
                         {
                             result = Global.ControlModes.EnabledWrong;
                         }
