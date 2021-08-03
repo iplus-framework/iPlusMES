@@ -2586,6 +2586,9 @@ namespace gip.bso.manufacturing
                             SendMessage(saveMsg);
                     }
                     WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
+                    OnPropertyChanged("WizardSchedulerPartslistList");
+                    if (WizardSchedulerPartslistList != null)
+                        SelectedWizardSchedulerPartslist = WizardSchedulerPartslistList.FirstOrDefault();
                 }
                 else
                 {
