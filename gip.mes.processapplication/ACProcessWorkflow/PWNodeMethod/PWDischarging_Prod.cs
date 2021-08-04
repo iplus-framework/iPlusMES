@@ -1136,6 +1136,52 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Booking
+
+        /// <summary>
+        /// If false is returned, then use actualQuantity, if true returned then CalcProducedBatchWeight() must be used
+        /// </summary>
+        /// <param name="eM"></param>
+        /// <param name="taskEntry"></param>
+        /// <param name="acMethod"></param>
+        /// <param name="dbApp"></param>
+        /// <param name="dbIPlus"></param>
+        /// <param name="currentBatchPos"></param>
+        /// <param name="actualQuantity"></param>
+        /// <returns></returns>
+        protected virtual void OnTaskCallbackCheckQuantity(ACMethodEventArgs eM, IACTask taskEntry, ACMethod acMethod, DatabaseApp dbApp, Database dbIPlus, ProdOrderPartslistPos currentBatchPos, ref double actualQuantity)
+        {
+            // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
+            // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
+            if (    actualQuantity <= 0.000001
+                && (   eM == null
+                    || eM.ResultState < Global.ACMethodResultState.Failed))
+            {
+                ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                if (prodOrderManager != null)
+                {
+                    double calculatedBatchWeight = 0;
+                    if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
+                    {
+                        double diff = calculatedBatchWeight - currentBatchPos.ActualQuantityUOM;
+                        if (diff > 0.00001)
+                            actualQuantity = diff;
+                    }
+                }
+            }
+
+            if ((this.IsSimulationOn/* || simulationWeight == 1*/)
+                && actualQuantity <= 0.000001
+                && currentBatchPos != null)
+            {
+                actualQuantity = currentBatchPos.TargetQuantityUOM;
+            }
+            // Entleerschritt liefert keine Menge
+            else if (actualQuantity <= 0.000001)
+            {
+                actualQuantity = -0.001;
+            }
+        }
+
         public virtual Msg DoInwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, Facility inwardFacility, ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
