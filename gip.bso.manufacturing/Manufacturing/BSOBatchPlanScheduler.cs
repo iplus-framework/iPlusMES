@@ -1499,6 +1499,11 @@ namespace gip.bso.manufacturing
                                 Msg changeMsg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
                                 if (changeMsg != null)
                                     SendMessage(changeMsg);
+                                foreach (ProdOrderBatchPlan batchPlan in prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist)
+                                {
+                                    batchPlan.BatchSize = batchPlan.BatchSize * factor;
+                                    batchPlan.TotalSize = batchPlan.BatchSize * batchPlan.BatchTargetCount;
+                                }
                             }
                         }
                         if (DatabaseApp.IsChanged)
@@ -1809,16 +1814,29 @@ namespace gip.bso.manufacturing
 
         protected override void OnPostSave()
         {
-            if (SelectedScheduleForPWNode != null)
+            if (SelectedScheduleForPWNode != null && ParentACObject != null && ParentACObject.ACType.ACIdentifier != BSOTemplateSchedule.ClassName)
             {
-                SelectedScheduleForPWNode.RefreshCounter++;
-                var result = BatchPlanScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { SelectedScheduleForPWNode });
-                if (result != null)
-                {
-                    SendMessage(result);
-                }
+                RefreshServerState(SelectedScheduleForPWNode);
             }
             base.OnPostSave();
+        }
+
+
+        public void RefreshServerState(Guid mdSchedulingGroupID)
+        {
+            PAScheduleForPWNode pAScheduleForPWNode = ScheduleForPWNodeList.FirstOrDefault(c => c.MDSchedulingGroupID == mdSchedulingGroupID);
+            if (pAScheduleForPWNode != null)
+                RefreshServerState(pAScheduleForPWNode);
+        }
+
+        public void RefreshServerState(PAScheduleForPWNode pAScheduleForPWNode)
+        {
+            pAScheduleForPWNode.RefreshCounter++;
+            var result = BatchPlanScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { pAScheduleForPWNode });
+            if (result != null)
+            {
+                SendMessage(result);
+            }
         }
 
 
@@ -2425,6 +2443,8 @@ namespace gip.bso.manufacturing
             if (!IsEnabledSetBatchStateCancelled())
                 return;
 
+            List<Guid> groupsForRefresh = new List<Guid>();
+
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
             List<ProdOrderPartslist> partslists = selectedBatches.Select(c => c.ProdOrderPartslist).ToList();
             List<ProdOrder> prodOrders = partslists.Select(c => c.ProdOrder).Distinct().ToList();
@@ -2440,6 +2460,9 @@ namespace gip.bso.manufacturing
                     {
                         reservation.DeleteACObject(this.DatabaseApp, true);
                     }
+                    Guid mdSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(x => x.MDSchedulingGroupID).FirstOrDefault();
+                    if(!groupsForRefresh.Contains(mdSchedulingGroupID))
+                        groupsForRefresh.Add(mdSchedulingGroupID);
                     batchPlan.DeleteACObject(this.DatabaseApp, true);
                 }
             }
@@ -2477,6 +2500,12 @@ namespace gip.bso.manufacturing
                 SendMessage(saveMsg);
 
             LoadProdOrderBatchPlanList();
+            if (ParentACObject != null && ParentACObject.ACType.ACIdentifier != BSOTemplateSchedule.ClassName)
+            {
+                if (groupsForRefresh.Any())
+                    foreach (var mdSchedulingGroupID in groupsForRefresh)
+                        RefreshServerState(mdSchedulingGroupID);
+            }
         }
 
         public bool IsEnabledSetBatchStateCancelled()
