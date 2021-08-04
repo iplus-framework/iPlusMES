@@ -2016,6 +2016,8 @@ namespace gip.bso.manufacturing
             double totalSize = moveBatchCount * prodOrderBatchPlan.BatchSize;
             int sn = 1;
             WizardSchedulerPartslist wizardSchedulerPartslist = GetWizardSchedulerPartslist(prodOrderBatchPlan.ProdOrderPartslist.Partslist, totalSize, sn, new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
+            wizardSchedulerPartslist.ProdOrderPartslistID = prodOrderBatchPlan.ProdOrderPartslistID;
+            wizardSchedulerPartslist.ProdOrderPartslistPosID = prodOrderBatchPlan.ProdOrderPartslistPosID;
             if (wizardSchedulerPartslist.SelectedMDSchedulingGroup != null)
                 LoadConfiguration(wizardSchedulerPartslist);
             BatchPlanSuggestion batchPlanSuggestion =
@@ -2029,7 +2031,7 @@ namespace gip.bso.manufacturing
                         new BatchPlanSuggestionItem(1, prodOrderBatchPlan.BatchSize, moveBatchCount, totalSize){IsEditable = true}
                    }
                };
-            string programNo = "";
+            string programNo = prodOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo;
             FactoryBatchPlans(batchPlanSuggestion, wizardSchedulerPartslist, ref programNo);
         }
 
@@ -2780,6 +2782,7 @@ namespace gip.bso.manufacturing
                             LoadExistingWizardSchedulerPartslistList();
                         else
                             LoadNewWizardSchedulerPartslistList();
+                        rootPartslistExpand = null;
                         foreach (var item in AllWizardSchedulerPartslistList)
                             if (item.SelectedMDSchedulingGroup != null)
                                 LoadConfiguration(item);
@@ -3456,7 +3459,7 @@ namespace gip.bso.manufacturing
                 wizardSchedulerPartslist.ProgramNo = prodOrder.ProgramNo;
 
                 SetBSOBatchPlan_BatchParents(vbACClassWF, prodOrderPartslist);
-                LoadGeneratedBatchInCurrentLine(firstBatchPlan, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM);
+                LoadGeneratedBatchInCurrentLine(firstBatchPlan, wizardSchedulerPartslist.NewTargetQuantityUOM);
             }
             return success;
         }
