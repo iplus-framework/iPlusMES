@@ -1499,11 +1499,6 @@ namespace gip.bso.manufacturing
                                 Msg changeMsg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, prodOrderPartslist, wizardItem.NewTargetQuantityUOM);
                                 if (changeMsg != null)
                                     SendMessage(changeMsg);
-                                foreach (ProdOrderBatchPlan batchPlan in prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist)
-                                {
-                                    batchPlan.BatchSize = batchPlan.BatchSize * factor;
-                                    batchPlan.TotalSize = batchPlan.BatchSize * batchPlan.BatchTargetCount;
-                                }
                             }
                         }
                         if (DatabaseApp.IsChanged)
