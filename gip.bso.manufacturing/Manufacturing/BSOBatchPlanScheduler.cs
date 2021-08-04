@@ -1656,7 +1656,7 @@ namespace gip.bso.manufacturing
                     && (
                             BatchPlanSuggestion == null 
                             || BatchPlanSuggestion.ItemsList == null 
-                            || !BatchPlanSuggestion.ItemsList.Any(c => c.ProdOrderBatchPlan != null)
+                            || !BatchPlanSuggestion.ItemsList.Any(c => c.ProdOrderBatchPlan.PlanStateIndex >= (short)GlobalApp.BatchPlanState.AutoStart)
                        );
         }
 
@@ -2590,7 +2590,6 @@ namespace gip.bso.manufacturing
 
         private void RemovePartslist(ProdOrderPartslist partslist)
         {
-            MsgWithDetails saveMsg = null;
             ProdOrder prodOrder = partslist.ProdOrder;
             if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
             {
