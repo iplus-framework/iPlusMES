@@ -1656,7 +1656,7 @@ namespace gip.bso.manufacturing
                     && (
                             BatchPlanSuggestion == null 
                             || BatchPlanSuggestion.ItemsList == null 
-                            || !BatchPlanSuggestion.ItemsList.Any(c => c.ProdOrderBatchPlan.PlanStateIndex >= (short)GlobalApp.BatchPlanState.AutoStart)
+                            || !BatchPlanSuggestion.ItemsList.Any(c => c.ProdOrderBatchPlan != null && c.ProdOrderBatchPlan.PlanStateIndex >= (short)GlobalApp.BatchPlanState.AutoStart)
                        );
         }
 
