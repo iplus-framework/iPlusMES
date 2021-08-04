@@ -88,6 +88,8 @@
         public const string IssuerCompanyAddress_ACCaption = "en{'Issuer Address'}de{'Emittentenadresse'}";
         public const string IssuerCompanyPerson_ACCaption = "en{'Issuer Person'}de{'Emittentenperson'}";
 
+        public const string MDSchedulingGroup = "en{'Scheduling Group'}de{'Planungsgruppe'}";
+
         #endregion
 
         #region Labels

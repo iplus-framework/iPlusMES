@@ -210,6 +210,9 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(999, "PlanModeName", "en{'Batch planning mode'}de{'Batch Planmodus'}")]
         public string PlanModeName { get; set; }
 
+        [ACPropertyInfo(999, "MDProdOrderState", "en{'MDProdOrderState'}de{'MDProdOrderState'}")]
+        public MDProdOrderState MDProdOrderState { get; set; }
+
         #endregion
 
 

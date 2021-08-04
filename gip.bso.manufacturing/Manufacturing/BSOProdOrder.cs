@@ -63,6 +63,8 @@ namespace gip.bso.manufacturing
             if (_MatReqManager == null)
                 throw new Exception("MatReqManager not configured");
 
+            AccessFilterPlanningMR.NavSearch();
+            SelectedFilterPlanningMR = null;
             Search();
             return true;
         }
@@ -140,6 +142,7 @@ namespace gip.bso.manufacturing
                 _AccessPrimary = null;
             }
             _BSOPartslistExplorer_Child = null;
+            _AccessFilterPlanningMR = null;
             return baseResult;
         }
 
@@ -408,32 +411,68 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Properties -> FilterShowPlanningProdOrder
+        #endregion
 
+        #region Properties -> FilterPlanningMR
 
-        private bool? _FilterShowPlanningProdOrder = false;
-        /// <summary>
-        /// Doc  FilterShowPlanningProdOrder
-        /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterShowPlanningProdOrder", "en{'Show planning orders'}de{'Planungsaufträge anzeigen'}")]
-        public bool? FilterShowPlanningProdOrder
+        #region FilterPlanningMR
+
+        ACAccessNav<PlanningMR> _AccessFilterPlanningMR;
+        [ACPropertyAccess(100, "FilterPlanningMR")]
+        public ACAccessNav<PlanningMR> AccessFilterPlanningMR
         {
             get
             {
-                return _FilterShowPlanningProdOrder;
+                if (_AccessFilterPlanningMR == null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + PlanningMR.ClassName, PlanningMR.ClassName);
+                    _AccessFilterPlanningMR = navACQueryDefinition.NewAccessNav<PlanningMR>(PlanningMR.ClassName, this);
+                    _AccessFilterPlanningMR.AutoSaveOnNavigation = false;
+                }
+                return _AccessFilterPlanningMR;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected FilterPlanningMR.
+        /// </summary>
+        /// <value>The selected FilterPlanningMR.</value>
+        [ACPropertySelected(101, PlanningMR.ClassName, ConstApp.PlanningMR)]
+        public PlanningMR SelectedFilterPlanningMR
+        {
+            get
+            {
+                if (AccessFilterPlanningMR == null)
+                    return null;
+                return AccessFilterPlanningMR.Selected;
             }
             set
             {
-                if (_FilterShowPlanningProdOrder != value)
-                {
-                    _FilterShowPlanningProdOrder = value;
-                    OnPropertyChanged("FilterShowPlanningProdOrder");
-                }
+                if (AccessFilterPlanningMR == null)
+                    return;
+                AccessFilterPlanningMR.Selected = value;
+                OnPropertyChanged("SelectedFilterPlanningMR");
+            }
+        }
+
+        /// <summary>
+        /// Gets the FilterPlanningMR list.
+        /// </summary>
+        /// <value>The facility list.</value>
+        [ACPropertyList(102, "FilterPlanningMR")]
+        public IEnumerable<PlanningMR> FilterPlanningMRList
+        {
+            get
+            {
+                if (AccessFilterPlanningMR == null)
+                    return null;
+                return AccessFilterPlanningMR.NavList;
             }
         }
 
         #endregion
+
+
         #endregion
 
         #region BSO handlers
@@ -621,12 +660,13 @@ namespace gip.bso.manufacturing
                 query.Include(c => c.MDProdOrderState);
                 query.Include("ProdOrderPartslist_ProdOrder");
                 query.Include("ProdOrderPartslist_ProdOrder.Partslist");
-                query.Include("ProdOrderPartslist_ProdOrder.Partslist.Material")
-                .Where(c => c.PlanningMRProposal_ProdOrder.Any());
+                query.Include("ProdOrderPartslist_ProdOrder.Partslist.Material");
             }
 
-            if(FilterShowPlanningProdOrder != null && !InShowDialogOrderInfo)
-                result = result.Where(c=> c.PlanningMRProposal_ProdOrder.Any() == (FilterShowPlanningProdOrder ?? false));
+            if (SelectedFilterPlanningMR != null)
+                result = result.Where(c => c.PlanningMRProposal_ProdOrder.Any(x => x.PlanningMRID == SelectedFilterPlanningMR.PlanningMRID));
+            else
+                result = result.Where(c => !c.PlanningMRProposal_ProdOrder.Any());
 
             if (FilterProdOrderState != null)
                 result = result.Where(x => x.MDProdOrderState.MDProdOrderStateIndex == (short)FilterProdOrderState);
@@ -819,11 +859,11 @@ namespace gip.bso.manufacturing
                 }
 
                 var selectedItem = SelectedProdOrder;
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.NavList.Remove(selectedItem);
                 List<PlanningMRProposal> planningMRProposals = selectedItem.PlanningMRProposal_ProdOrder.ToList();
-                foreach(var planningMRProposal in planningMRProposals)
+                foreach (var planningMRProposal in planningMRProposals)
                     planningMRProposal.DeleteACObject(DatabaseApp, false);
                 selectedItem.DeleteACObject(DatabaseApp, false);
                 SelectedProdOrder = AccessPrimary.NavList.FirstOrDefault();

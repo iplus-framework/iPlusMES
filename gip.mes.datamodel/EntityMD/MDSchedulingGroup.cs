@@ -3,7 +3,7 @@ using System;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'Scheduling Group'}de{'Planungsgruppe'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioSystem, ConstApp.MDSchedulingGroup, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]

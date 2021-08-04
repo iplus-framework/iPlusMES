@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
+using System;
 using System.ComponentModel;
 using System.Linq;
 
@@ -151,12 +152,21 @@ namespace gip.bso.manufacturing
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             string[] properties = new string[] { "BatchTargetCount", "TotalBatchSize", "BatchSize" };
-            if(properties.Contains(e.PropertyName))
+            if (properties.Contains(e.PropertyName))
             {
                 OnPropertyChanged("BatchSuggestionSum");
                 OnPropertyChanged("Difference");
             }
         }
+
+        public bool IsSuggestionValid()
+        {
+            if (ItemsList == null || ItemsList.Any(c => c.BatchTargetCount == 0))
+                return false;
+            double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSize);
+            return Math.Abs(TotalSize - sumSize) <= RestQuantityTolerance;
+        }
+
         #endregion
 
         private void OnPropertyChanged(string propertyName)

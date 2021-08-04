@@ -197,7 +197,7 @@ namespace gip.bso.manufacturing
         /// Doc  IsEditable
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(402, "IsEditableBatchSize", "en{'IsEditableBatchSize'}de{'IsEditableBatchSize'}")]
+        [ACPropertyInfo(403, "IsEditableBatchSize", "en{'IsEditableBatchSize'}de{'IsEditableBatchSize'}")]
         public bool IsEditableBatchSize
         {
             get
@@ -223,6 +223,8 @@ namespace gip.bso.manufacturing
                 }
             }
         }
+
+       
 
         public override string ToString()
         {
