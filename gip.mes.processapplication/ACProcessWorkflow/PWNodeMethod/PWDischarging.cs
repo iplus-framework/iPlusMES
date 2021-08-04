@@ -771,34 +771,7 @@ namespace gip.mes.processapplication
                                     currentBatchPos = ParentPWMethod<PWMethodProduction>().CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
                                     // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
                                     // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
-                                    if (  actualQuantity <= 0.000001 
-                                        && (  eM == null
-                                           || eM.ResultState < Global.ACMethodResultState.Failed))
-                                    {
-                                        ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
-                                        if (prodOrderManager != null)
-                                        {
-                                            double calculatedBatchWeight = 0;
-                                            if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
-                                            {
-                                                double diff = calculatedBatchWeight - currentBatchPos.ActualQuantityUOM;
-                                                if (diff > 0.00001)
-                                                    actualQuantity = diff;
-                                            }
-                                        }
-                                    }
-
-                                    if ((this.IsSimulationOn/* || simulationWeight == 1*/)
-                                        && actualQuantity <= 0.000001
-                                        && currentBatchPos != null)
-                                    {
-                                        actualQuantity = currentBatchPos.TargetQuantityUOM;
-                                    }
-                                    // Entleerschritt liefert keine Menge
-                                    else if (actualQuantity <= 0.000001)
-                                    {
-                                        actualQuantity = -0.001;
-                                    }
+                                    OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualQuantity);
 
                                     var routeItem = CurrentDischargingDest(dbIPlus);
                                     PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
