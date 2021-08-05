@@ -2744,7 +2744,7 @@ namespace gip.bso.manufacturing
                     || IsWizard
                     || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any()
                     || batchPlan.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished
-                    || batchPlan.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.ProdFinished;
+                    || batchPlan.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished;
             if(notValidBatchForChange)
                 return;
 
