@@ -709,7 +709,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return ParentACObject != null && ParentACObject.ACType.ACIdentifier == BSOTemplateSchedule.ClassName;
+                return ParentACComponent != null && ParentACComponent is BSOTemplateSchedule;
             }
         }
         #endregion
@@ -1651,8 +1651,8 @@ namespace gip.bso.manufacturing
                     && BatchPlanSuggestion != null
                     && TargetQuantityUOM > Double.Epsilon
                     && (
-                            BatchPlanSuggestion == null 
-                            || BatchPlanSuggestion.ItemsList == null 
+                            BatchPlanSuggestion == null
+                            || BatchPlanSuggestion.ItemsList == null
                             || !BatchPlanSuggestion.ItemsList.Any(c => c.ProdOrderBatchPlan != null && c.ProdOrderBatchPlan.PlanStateIndex >= (short)GlobalApp.BatchPlanState.AutoStart)
                        );
         }
@@ -2468,6 +2468,8 @@ namespace gip.bso.manufacturing
             List<Guid> groupsForRefresh = new List<Guid>();
 
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
+                batchPlan.AutoRefresh();
             List<ProdOrderPartslist> partslists = selectedBatches.Select(c => c.ProdOrderPartslist).ToList();
             List<ProdOrder> prodOrders = partslists.Select(c => c.ProdOrder).Distinct().ToList();
 
@@ -2489,24 +2491,31 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
             MDProdOrderState mDProdOrderStateCompleted = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
-            foreach (ProdOrderPartslist partslist in partslists)
-            {
-                SetProdorderPartslistState(mDProdOrderStateCancelled, mDProdOrderStateCompleted, partslist);
-            }
+            MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
 
             foreach (ProdOrder prodOrder in prodOrders)
             {
+                prodOrder.AutoRefresh();
+                ProdOrderPartslist[] allProdPartslists = prodOrder.ProdOrderPartslist_ProdOrder.ToArray();
                 if (!prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any())
                 {
-                    ProdOrderPartslist[] allProdPartslists = prodOrder.ProdOrderPartslist_ProdOrder.ToArray();
                     foreach (ProdOrderPartslist pl in allProdPartslists)
                         RemovePartslist(pl);
                 }
-                else if (!prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any(c => c.PlanStateIndex < (short)GlobalApp.BatchPlanState.Completed))
+                else if (!IsBSOTemplateScheduleParent)
                 {
-                    prodOrder.MDProdOrderState = mDProdOrderStateCompleted;
+                    if (
+                        prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any()
+                        && !prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any(c => c.PlanStateIndex < (short)GlobalApp.BatchPlanState.Completed))
+                    {
+                        foreach (ProdOrderPartslist pl in allProdPartslists)
+                            SetProdorderPartslistState(mDProdOrderStateCancelled, mDProdOrderStateCompleted, pl);
+                    }
+                    if (!prodOrder.ProdOrderPartslist_ProdOrder.Any(c => c.MDProdOrderState.MDProdOrderStateIndex < (short)(short)GlobalApp.BatchPlanState.Completed))
+                    {
+                        prodOrder.MDProdOrderState = mDProdOrderStateCompleted;
+                    }
                 }
             }
 
@@ -2523,85 +2532,12 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private bool SetProdorderPartslistState(MDProdOrderState mDProdOrderStateCancelled, MDProdOrderState mDProdOrderStateCompleted, ProdOrderPartslist partslist)
-        {
-            bool stateChanged = false;
-            if (partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Completed).Any())
-            {
-                partslist.MDProdOrderState = mDProdOrderStateCompleted;
-                stateChanged = true;
-            }
-            else if (
-                    partslist
-                    .ProdOrderBatchPlan_ProdOrderPartslist
-                    .Where(c => c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Cancelled)
-                    .Any()
-                    ||
-                    !partslist
-                    .ProdOrderBatchPlan_ProdOrderPartslist
-                    .Any())
-            {
-                partslist.MDProdOrderState = mDProdOrderStateCancelled;
-                stateChanged = true;
-            }
-            return stateChanged;
-        }
-
         public bool IsEnabledSetBatchStateCancelled()
         {
             return ProdOrderBatchPlanList != null
                 && ProdOrderBatchPlanList.Any(c => c.IsSelected
                                                     && (c.PlanState <= vd.GlobalApp.BatchPlanState.Created
                                                         || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused));
-        }
-
-        [ACMethodCommand("RemoveSelectedProdorderPartslist", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
-        public void RemoveSelectedProdorderPartslist()
-        {
-            ClearMessages();
-            if (!IsEnabledRemoveSelectedProdorderPartslist())
-                return;
-
-            MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
-            MDProdOrderState mDProdOrderStateCompleted = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
-
-            ProdOrderPartslist[] plForRemove = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToArray();
-            foreach (ProdOrderPartslist partslist in plForRemove)
-            {
-                if (!SetProdorderPartslistState(mDProdOrderStateCancelled, mDProdOrderStateCompleted, partslist))
-                {
-                    if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
-                        RemovePartslist(partslist);
-                }
-            }
-            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
-            if (saveMsg != null)
-                SendMessage(saveMsg);
-            LoadProdOrderBatchPlanList();
-        }
-
-        public bool IsEnabledRemoveSelectedProdorderPartslist()
-        {
-            return ProdOrderPartslistList != null && ProdOrderPartslistList.Any(c => c.IsSelected);
-        }
-
-        private void RemovePartslist(ProdOrderPartslist partslist)
-        {
-            ProdOrder prodOrder = partslist.ProdOrder;
-            if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
-            {
-                Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, prodOrder, partslist);
-                if (msg != null)
-                    SendMessage(msg);
-                prodOrder.ProdOrderPartslist_ProdOrder.Remove(partslist);
-                if (prodOrder.ProdOrderPartslist_ProdOrder != null && prodOrder.ProdOrderPartslist_ProdOrder.Any())
-                {
-                    var tempPlList = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
-                    SequenceManager<ProdOrderPartslist>.Order(ref tempPlList);
-                }
-                if (prodOrder.ProdOrderPartslist_ProdOrder == null || !prodOrder.ProdOrderPartslist_ProdOrder.Any())
-                    prodOrder.DeleteACObject(DatabaseApp, false);
-            }
         }
 
         #endregion
@@ -2640,6 +2576,40 @@ namespace gip.bso.manufacturing
                 && SelectedProdOrderPartslist != null
                 && SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
                 && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished;
+        }
+
+        [ACMethodCommand("RemoveSelectedProdorderPartslist", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
+        public void RemoveSelectedProdorderPartslist()
+        {
+            ClearMessages();
+            if (!IsEnabledRemoveSelectedProdorderPartslist())
+                return;
+
+            MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
+            MDProdOrderState mDProdOrderStateCompleted = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
+            ProdOrderPartslist[] plForRemove = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToArray();
+            foreach (ProdOrderPartslist partslist in plForRemove)
+            {
+                partslist.AutoRefresh();
+                if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+                    RemovePartslist(partslist);
+                else if (!IsBSOTemplateScheduleParent)
+                {
+                    if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any(c => c.PlanStateIndex >= (short)GlobalApp.BatchPlanState.ReadyToStart && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.InProcess))
+                    {
+                        SetProdorderPartslistState(mDProdOrderStateCancelled, mDProdOrderStateCompleted, partslist);
+                    }
+                }
+            }
+            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+            if (saveMsg != null)
+                SendMessage(saveMsg);
+            LoadProdOrderBatchPlanList();
+        }
+
+        public bool IsEnabledRemoveSelectedProdorderPartslist()
+        {
+            return ProdOrderPartslistList != null && ProdOrderPartslistList.Any(c => c.IsSelected);
         }
 
         #endregion
@@ -2739,13 +2709,13 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("ChangeBatchPlan", "en{'Change'}de{'Bearbeiten'}", 600)]
         public void ChangeBatchPlan(ProdOrderBatchPlan batchPlan)
         {
-            bool notValidBatchForChange=
+            bool notValidBatchForChange =
                     batchPlan == null
                     || IsWizard
                     || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any()
                     || batchPlan.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished
                     || batchPlan.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished;
-            if(notValidBatchForChange)
+            if (notValidBatchForChange)
                 return;
 
             ClearMessages();
@@ -3630,6 +3600,45 @@ namespace gip.bso.manufacturing
                 LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = targetQuantityUOM;
 
             LocalBSOBatchPlan.OnPropertyChanged("IsVisibleInCurrentContext");
+        }
+
+        #endregion
+
+        #region Methods -> Private -> Remove ProdORderPartslist or change state
+
+        private bool SetProdorderPartslistState(MDProdOrderState mDProdOrderStateCancelled, MDProdOrderState mDProdOrderStateCompleted, ProdOrderPartslist partslist)
+        {
+            bool isSetState = false;
+            if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any() || partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex != (short)GlobalApp.BatchPlanState.Completed).Any())
+            {
+                partslist.MDProdOrderState = mDProdOrderStateCancelled;
+                isSetState = true;
+            }
+            else if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex != (short)GlobalApp.BatchPlanState.Completed).Any())
+            {
+                partslist.MDProdOrderState = mDProdOrderStateCompleted;
+                isSetState = true;
+            }
+            return isSetState;
+        }
+
+        private void RemovePartslist(ProdOrderPartslist partslist)
+        {
+            ProdOrder prodOrder = partslist.ProdOrder;
+            if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+            {
+                Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, prodOrder, partslist);
+                if (msg != null)
+                    SendMessage(msg);
+                prodOrder.ProdOrderPartslist_ProdOrder.Remove(partslist);
+                if (prodOrder.ProdOrderPartslist_ProdOrder != null && prodOrder.ProdOrderPartslist_ProdOrder.Any())
+                {
+                    var tempPlList = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
+                    SequenceManager<ProdOrderPartslist>.Order(ref tempPlList);
+                }
+                if (prodOrder.ProdOrderPartslist_ProdOrder == null || !prodOrder.ProdOrderPartslist_ProdOrder.Any())
+                    prodOrder.DeleteACObject(DatabaseApp, false);
+            }
         }
 
         #endregion

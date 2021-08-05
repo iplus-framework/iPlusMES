@@ -987,8 +987,13 @@ namespace gip.mes.facility
 
         #region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?,  IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID) => ctx.ProdOrderBatchPlan
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID) =>
+                                    ctx.ProdOrderBatchPlan
+                                    .Include("ProdOrderPartslist")
+                                    .Include("ProdOrderPartslist.MDProdOrderState")
+                                    .Include("ProdOrderPartslist.ProdOrder")
+                                    .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
