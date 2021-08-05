@@ -824,7 +824,11 @@ namespace gip.bso.manufacturing
             }
 
             // select first if only one is present
-            if(PreselectFirstFacilityReservation && SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
+            if (   PreselectFirstFacilityReservation 
+                && (   (SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
+                    || (    (SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Unchanged || SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Modified)
+                            && reservationCollection.Count() == 1
+                            && !reservationCollection.Any(c => c.IsChecked))))
                 reservationCollection[0].IsChecked = true;
 
             TargetsList = reservationCollection;

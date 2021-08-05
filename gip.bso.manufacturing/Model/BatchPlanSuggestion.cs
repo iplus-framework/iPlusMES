@@ -164,7 +164,7 @@ namespace gip.bso.manufacturing
             if (ItemsList == null || ItemsList.Any(c => c.BatchTargetCount == 0))
                 return false;
             double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSize);
-            return Math.Abs(TotalSize - sumSize) <= RestQuantityTolerance;
+            return (sumSize - TotalSize) < RestQuantityTolerance;
         }
 
         #endregion
