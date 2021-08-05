@@ -540,9 +540,6 @@ namespace gip.bso.manufacturing
                 case "IsEnabledLoad":
                     result = IsEnabledLoad();
                     return true;
-                case "IsEnabledToChangeBatchPlan":
-                    result = IsEnabledToChangeBatchPlan();
-                    return true;
                 case "ChangeBatchPlan":
                     ChangeBatchPlan((ProdOrderBatchPlan)acParameter[0]);
                     return true;
@@ -2742,11 +2739,13 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("ChangeBatchPlan", "en{'Change'}de{'Bearbeiten'}", 600)]
         public void ChangeBatchPlan(ProdOrderBatchPlan batchPlan)
         {
-            if (
+            bool notValidBatchForChange=
                     batchPlan == null
-                    && !IsWizard
-                    && batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any()
-                )
+                    || IsWizard
+                    || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any()
+                    || batchPlan.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished
+                    || batchPlan.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.ProdFinished;
+            if(notValidBatchForChange)
                 return;
 
             ClearMessages();
@@ -2760,11 +2759,6 @@ namespace gip.bso.manufacturing
             LoadGeneratedBatchInCurrentLine(batchPlan, batchPlan.ProdOrderPartslist.TargetQuantity);
 
             OnPropertyChanged("CurrentLayout");
-        }
-
-        public bool IsEnabledToChangeBatchPlan()
-        {
-            return SelectedProdOrderBatchPlan != null && !SelectedProdOrderBatchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any();
         }
 
         public bool IsWizardExistingBatch { get; set; }
