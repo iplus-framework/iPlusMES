@@ -567,7 +567,8 @@ namespace gip.mes.processapplication
 
                 SubscribeToProjectWorkCycle();
 
-                if (IsSimulationOn && TareScaleState.ValueT == (short)TareScaleStateEnum.TareOK)
+                if (IsSimulationOn && ( ApplicationManager != null && !ApplicationManager.IsManualSimulation) 
+                                   && TareScaleState.ValueT == (short)TareScaleStateEnum.TareOK)
                 {
                     if (!_SimulationScaleIncrement.HasValue)
                     {

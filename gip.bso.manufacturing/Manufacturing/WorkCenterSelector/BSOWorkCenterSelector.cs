@@ -864,7 +864,7 @@ namespace gip.bso.manufacturing
                 foreach(var relation in inputList)
                 {
                     InputComponentItem compItem = new InputComponentItem(relation);
-                    OnInputComponentCreated(compItem, relation);
+                    OnInputComponentCreated(compItem, relation, DatabaseApp);
                     inputComponentsList.Add(compItem);
                 }
 
@@ -872,7 +872,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        protected virtual void OnInputComponentCreated(InputComponentItem item, ProdOrderPartslistPosRelation relation)
+        protected virtual void OnInputComponentCreated(InputComponentItem item, ProdOrderPartslistPosRelation relation, DatabaseApp dbApp)
         {
 
         }

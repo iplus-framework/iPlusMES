@@ -444,9 +444,9 @@ namespace gip.mes.processapplication
 
 #endregion
 
-#region Properties => Materials, Relations and FacilityCharge
+        #region Properties => Materials, Relations and FacilityCharge
 
-[ACPropertyInfo(999)]
+        [ACPropertyInfo(999)]
         public EntityKey CurrentEndBatchPosKey
         {
             get;
@@ -1438,7 +1438,7 @@ namespace gip.mes.processapplication
             return StartNextCompResult.NextCompStarted;
         }
 
-        private short DetermineWeighingComponentState(short posStateIndex)
+        public static short DetermineWeighingComponentState(short posStateIndex)
         {
             if (posStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
                 return (short)WeighingComponentState.WeighingCompleted;
