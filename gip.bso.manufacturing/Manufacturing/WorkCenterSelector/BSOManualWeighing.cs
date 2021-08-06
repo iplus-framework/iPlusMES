@@ -1253,13 +1253,14 @@ namespace gip.bso.manufacturing
             }
 
             _OrderInfo = orderInfo as IACContainerTNet<string>;
-            (_OrderInfo as IACPropertyNetBase).PropertyChanged += OrderInfoPropertyChanged;
 
             if (_CurrentOrderInfoValueLock == null)
                 _CurrentOrderInfoValueLock = new object();
             if (_PWNodeACStateLock == null)
                 _PWNodeACStateLock = new object();
             LoadWFNode();
+
+            (_OrderInfo as IACPropertyNetBase).PropertyChanged += OrderInfoPropertyChanged;
 
             return true;
         }
@@ -1351,11 +1352,13 @@ namespace gip.bso.manufacturing
 
         private void LoadWFNode()
         {
+            string orderInfo = null;
             lock (_CurrentOrderInfoValueLock)
             {
-                if (_CurrentOrderInfoValue == _OrderInfo.ValueT)
+                orderInfo = _OrderInfo.ValueT;
+                if (_CurrentOrderInfoValue == orderInfo)
                     return;
-                _CurrentOrderInfoValue = _OrderInfo.ValueT;
+                _CurrentOrderInfoValue = orderInfo;
             }
 
             lock (_PWNodeACStateLock)
@@ -1363,20 +1366,34 @@ namespace gip.bso.manufacturing
                 UnloadWFNode();
             }
 
-            if (!string.IsNullOrEmpty(_CurrentOrderInfoValue))
+            if (!string.IsNullOrEmpty(orderInfo))
             {
                 try
                 {
                     string[] accessArr = (string[])CurrentProcessModule?.ACUrlCommand("!SemaphoreAccessedFrom");
                     if (accessArr == null || !accessArr.Any())
-                        return;
+                    {
+                        lock (_CurrentOrderInfoValueLock)
+                        {
+                            _CurrentOrderInfoValue = null;
+                            Messages.LogError(this.GetACUrl(), "LoadWFNode(10)", "Returned");
+                            return;
+                        }
+                    }
 
                     string pwGroupACUrl = accessArr[0];
                     IACComponentPWNode pwGroup = null;
 
                     pwGroup = Root.ACUrlCommand(pwGroupACUrl) as IACComponentPWNode;
                     if (pwGroup == null)
-                        return;
+                    {
+                        lock (_CurrentOrderInfoValueLock)
+                        {
+                            _CurrentOrderInfoValue = null;
+                            Messages.LogError(this.GetACUrl(), "LoadWFNode(20)", "Returned");
+                            return;
+                        }
+                    }
 
                     OnGetPWGroup(pwGroup);
 
@@ -1392,7 +1409,14 @@ namespace gip.bso.manufacturing
                     }
 
                     if (pwNodes == null || !pwNodes.Any())
-                        return;
+                    {
+                        lock (_CurrentOrderInfoValueLock)
+                        {
+                            _CurrentOrderInfoValue = null;
+                            Messages.LogError(this.GetACUrl(), "LoadWFNode(30)", "Returned");
+                            return;
+                        }
+                    }
 
                     List<ManualWeighingPWNode> mwPWNodes = new List<ManualWeighingPWNode>();
                     var availableWFNodes = FindWFNodes(pwNodes, pwGroup);
@@ -1427,6 +1451,10 @@ namespace gip.bso.manufacturing
                         message = string.Format("ManualWeighingModel(LoadWFNode): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
                     Messages.Error(this, message, true);
+                    lock (_CurrentOrderInfoValueLock)
+                    {
+                        _CurrentOrderInfoValue = null;
+                    }
                 }
             }
         }
