@@ -11,7 +11,7 @@ using gip.core.autocomponent;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Mixing'}de{'Mischen'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWMixing.PWClassName, true)]
-    public class PAFMixing : PAProcessFunction
+    public class PAFMixing : PAProcessFunction, IPAFSwitchable
     {
         #region Constructors
 
@@ -59,6 +59,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("Speed", "en{'Speed'}de{'Geschwindigkeit'}");
             method.ParameterValueList.Add(new ACValue("MinWeight", typeof(Double), 0, Global.ParamOption.Optional));
             paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
+            method.ParameterValueList.Add(new ACValue("Direction", typeof(PAFMixingDirectionEnum), PAFMixingDirectionEnum.Right, Global.ParamOption.Optional));
+            paramTranslation.Add("Direction", "en{'Direction'}de{'Richtung'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, null);
         }
@@ -74,6 +76,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("Speed", "en{'Speed'}de{'Geschwindigkeit'}");
             method.ParameterValueList.Add(new ACValue("MinWeight", typeof(Double), 0, Global.ParamOption.Optional));
             paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
+            method.ParameterValueList.Add(new ACValue("Direction", typeof(PAFMixingDirectionEnum), PAFMixingDirectionEnum.Right, Global.ParamOption.Optional));
+            paramTranslation.Add("Direction", "en{'Direction'}de{'Richtung'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActDuration", typeof(TimeSpan), 0, Global.ParamOption.Required));
@@ -93,6 +97,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("Speed", "en{'Speed'}de{'Geschwindigkeit'}");
             method.ParameterValueList.Add(new ACValue("MinWeight", typeof(Double), 0, Global.ParamOption.Optional));
             paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
+            method.ParameterValueList.Add(new ACValue("Direction", typeof(PAFMixingDirectionEnum), PAFMixingDirectionEnum.Right, Global.ParamOption.Optional));
+            paramTranslation.Add("Direction", "en{'Direction'}de{'Richtung'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActTemperature", typeof(Double), 0.0, Global.ParamOption.Required));
@@ -103,5 +109,18 @@ namespace gip.mes.processapplication
 
         #endregion
 
+    }
+
+    [DataContract]
+    [ACSerializeableInfo]
+    [ACClassInfo(ACKind = Global.ACKinds.TACEnum)]
+    public enum PAFMixingDirectionEnum : short
+    {
+        [EnumMember]
+        Right = 0,
+        [EnumMember]
+        Left = 1,
+        [EnumMember]
+        Interval = 2
     }
 }

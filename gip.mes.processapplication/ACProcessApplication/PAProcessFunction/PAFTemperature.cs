@@ -8,7 +8,7 @@ using gip.core.autocomponent;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Temperature regulation'}de{'Temperieren'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWTemperature.PWClassName, true)]
-    public class PAFTemperature : PAProcessFunction
+    public class PAFTemperature : PAProcessFunction, IPAFSwitchable
     {
 
         #region Constructors
@@ -66,6 +66,12 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("MinWeightSwitchOn", typeof(Double), 0, Global.ParamOption.Optional));
             paramTranslation.Add("MinWeightSwitchOn", "en{'Min. Weight Switch On'}de{'Einschaltgewicht'}");
+
+            method.ParameterValueList.Add(new ACValue("Tare", typeof(Int16), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("Tare", "en{'Tare'}de{'Tarieren'}");
+
+            method.ParameterValueList.Add(new ACValue("SwitchOff", typeof(bool), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("SwitchOff", "en{'Switch off'}de{'Ausschalten'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ReachedTemperature", typeof(Double), 0.0, Global.ParamOption.Required));
