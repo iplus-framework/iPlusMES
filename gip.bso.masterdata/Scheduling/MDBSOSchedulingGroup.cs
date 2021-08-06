@@ -442,12 +442,7 @@ namespace gip.bso.masterdata.Scheduling
             return
                 SelectedMDSchedulingGroup != null
                 && AvailableACClassWFList != null
-                && AvailableACClassWFList.Any()
-                && (
-                        (MDSchedulingGroupWFList == null || !MDSchedulingGroupWFList.Any())
-                        ||
-                        !MDSchedulingGroupWFList.Any(c => c.MDSchedulingGroupID == SelectedMDSchedulingGroup.MDSchedulingGroupID)
-                    );
+                && AvailableACClassWFList.Any();
         }
 
         [ACMethodInfo("DeleteMDSchedulingGroupWF", "en{'<'}de{'<'}", 9999, false)]

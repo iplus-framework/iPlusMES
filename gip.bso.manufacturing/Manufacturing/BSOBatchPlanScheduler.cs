@@ -2538,9 +2538,17 @@ namespace gip.bso.manufacturing
             vd.ACClassWF tempACClassWFItem = DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
             ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(SelectedProdOrderPartslist.ProdOrderPartslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
             DefaultWizardSchedulerPartslist.ProdOrderPartslistPosID = finalMix.ProdOrderPartslistPosID;
-            IsWizard = true;
-            WizardPhase = NewScheduledBatchWizardPhaseEnum.BOMExplosion;
-            bool success = WizardForwardAction(WizardPhase);
+            try
+            {
+                IsWizard = true;
+                WizardPhase = NewScheduledBatchWizardPhaseEnum.BOMExplosion;
+                bool success = WizardForwardAction(WizardPhase);
+            }
+            catch (Exception ex)
+            {
+                IsWizard = false;
+                throw ex;
+            }
             OnPropertyChanged("CurrentLayout");
         }
 
@@ -2747,15 +2755,24 @@ namespace gip.bso.manufacturing
             if (notValidBatchForChange)
                 return;
 
-            ClearMessages();
-            WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
-            IsWizardExistingBatch = true;
-            IsWizard = true;
-            WizardForwardAction(WizardPhase);
+            try
+            {
+                ClearMessages();
+                WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
+                IsWizardExistingBatch = true;
+                IsWizard = true;
+                WizardForwardAction(WizardPhase);
 
-            vd.ACClassWF vbACClassWF = SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
-            SetBSOBatchPlan_BatchParents(vbACClassWF, batchPlan.ProdOrderPartslist);
-            LoadGeneratedBatchInCurrentLine(batchPlan, batchPlan.ProdOrderPartslist.TargetQuantity);
+                vd.ACClassWF vbACClassWF = SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
+                SetBSOBatchPlan_BatchParents(vbACClassWF, batchPlan.ProdOrderPartslist);
+                LoadGeneratedBatchInCurrentLine(batchPlan, batchPlan.ProdOrderPartslist.TargetQuantity);
+            }
+            catch (Exception ex)
+            {
+                IsWizardExistingBatch = false;
+                IsWizard = false;
+                throw ex;
+            }
 
             OnPropertyChanged("CurrentLayout");
         }
