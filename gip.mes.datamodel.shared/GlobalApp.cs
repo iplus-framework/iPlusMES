@@ -1242,7 +1242,7 @@ namespace gip.mes.datamodel
         /// </summary>
 #if NETFRAMEWORK
         [ACSerializeableInfo]
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'Batch planning mode'}de{'Batch Planmodus'}", Global.ACKinds.TACEnum)]
+        [ACClassInfo(Const.PackName_VarioAutomation, "en{'Batch planning mode'}de{'Batch Planmodus'}", Global.ACKinds.TACEnum)]
 #else
         [DataContract]
 #endif
