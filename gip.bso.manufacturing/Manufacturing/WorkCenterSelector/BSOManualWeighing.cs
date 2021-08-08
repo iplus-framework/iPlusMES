@@ -1218,33 +1218,6 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            //var wfNodes = CurrentProcessModule.GetPropertyNet("WFNodes");
-            //if (wfNodes == null)
-            //{
-            //    //Error50285: Initialization error: The process module doesn't have the property {0}.
-            //    // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-            //    Messages.Error(this, "Error50285", false, "WFNodes");
-            //    return false;
-            //}
-
-            //var hasAlarms = CurrentProcessModule.GetPropertyNet("HasAlarms");
-            //if (hasAlarms == null)
-            //{
-            //    //Error50285: Initialization error: The process module doesn't have the property {0}.
-            //    // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-            //    Messages.Error(this, "Error50285", false, "HasAlarms");
-            //    return false;
-            //}
-
-            //var alarmsAsText = CurrentProcessModule.GetPropertyNet("AlarmsAsText");
-            //if (alarmsAsText == null)
-            //{
-            //    //Error50285: Initialization error: The process module doesn't have the property {0}.
-            //    // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-            //    Messages.Error(this, "Error50285", false, "AlarmsAsText");
-            //    return false;
-            //}
-
             LoadPAFManualWeighing(pafManWeighingRef);
 
             if (ScaleObjectsList != null && ScaleObjectsList.Any())
@@ -1267,7 +1240,7 @@ namespace gip.bso.manufacturing
 
         public virtual IACComponent GetTargetFunction(IEnumerable<IACComponent> processModuleChildrenComponents)
         {
-            using (ACMonitor.Lock(Database.QueryLock_1X000))
+            using (ACMonitor.Lock(core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
             {
                 return processModuleChildrenComponents.FirstOrDefault(c => typeof(PAFManualWeighing).IsAssignableFrom(c.ComponentClass.ObjectType)
                                                                       && !typeof(PAFManualAddition).IsAssignableFrom(c.ComponentClass.ObjectType));
@@ -1613,28 +1586,6 @@ namespace gip.bso.manufacturing
 
             //TODO: lot order
         }
-
-        //internal void GetEndBatchPos(vd.DatabaseApp db)
-        //{
-        //    EntityKey endBatchPosKey = ComponentPWNode.ValueT.ACUrlCommand("CurrentEndBatchPosKey\\ValueT") as EntityKey;
-        //    if (endBatchPosKey == null)
-        //        endBatchPosKey = ComponentPWNode.ValueT.ACUrlCommand("CurrentEndBatchPosKey\\ValueT") as EntityKey;
-
-        //    if (endBatchPosKey != null)
-        //        using (ACMonitor.Lock(db.QueryLock_1X000))
-        //        {
-        //            var keyMember = endBatchPosKey.EntityKeyValues.FirstOrDefault();
-        //            if (keyMember != null)
-        //            {
-        //                Guid? id = keyMember.Value as Guid?;
-        //                if (id.HasValue)
-        //                    EndBatchPos = db.ProdOrderPartslistPos.Include(p => p.ProdOrderBatch).Include(pl => pl.ProdOrderPartslist.ProdOrder)
-        //                                                          .Include(m => m.Material).FirstOrDefault(c => c.ProdOrderPartslistPosID == id);
-        //            }
-
-        //            //.GetObjectByKey(endBatchPosKey) as vd.ProdOrderPartslistPos;
-        //        }
-        //}
 
         #endregion
 

@@ -1078,6 +1078,11 @@ namespace gip.bso.manufacturing
         private List<ACChildInstanceInfo> _CurrentWFNodesList;
 
         public readonly ACMonitorObject _60200_WFNodesListLock = new ACMonitorObject(60200);
+
+        public Func<WorkCenterItemFunction, bool> IsFunctionActive = new Func<WorkCenterItemFunction, bool>(c => c != null 
+                                                                                                             && (c.ACStateProperty != null && c.ACStateProperty.ValueT == ACStateEnum.SMRunning 
+                                                                                                                                           && c.ACStateProperty.ValueT == ACStateEnum.SMStarting) 
+                                                                                                             || (c.NeedWorkProperty != null && c.NeedWorkProperty.ValueT));
         #endregion
 
         #region Methods
@@ -1091,12 +1096,11 @@ namespace gip.bso.manufacturing
             {
                 ItemFunctions.Add(function);
                 function.ACStateProperty.PropertyChanged += ACStateProperty_PropertyChanged;
-                ActiveFunctionsCount = ItemFunctions.Count(c => (ACStateEnum)c.ACStateProperty.Value == ACStateEnum.SMRunning || (ACStateEnum)c.ACStateProperty.Value == ACStateEnum.SMStarting);
+                if (function.NeedWorkProperty != null)
+                    function.NeedWorkProperty.PropertyChanged += ACStateProperty_PropertyChanged;
+                ActiveFunctionsCount = ItemFunctions.Count(c => IsFunctionActive(c));
 
-                if (function.ACStateProperty != null && (ACStateEnum)function.ACStateProperty.Value == ACStateEnum.SMRunning || (ACStateEnum)function.ACStateProperty.Value == ACStateEnum.SMStarting)
-                    function.IsFunctionActive = true;
-                else
-                    function.IsFunctionActive = false;
+                function.IsFunctionActive = IsFunctionActive(function);
             }
             else
             {
@@ -1116,8 +1120,7 @@ namespace gip.bso.manufacturing
             {
                 foreach (var func in ItemFunctions)
                 {
-                    if (func.ACStateProperty != null && ((ACStateEnum)func.ACStateProperty.Value == ACStateEnum.SMRunning
-                                                         || (ACStateEnum)func.ACStateProperty.Value == ACStateEnum.SMStarting))
+                    if (IsFunctionActive(func))
                     {
                         func.IsFunctionActive = true;
                     }
@@ -1176,6 +1179,10 @@ namespace gip.bso.manufacturing
             {
                 if (func.ACStateProperty != null)
                     func.ACStateProperty.PropertyChanged -= ACStateProperty_PropertyChanged;
+
+                if (func.NeedWorkProperty != null)
+                    func.NeedWorkProperty.PropertyChanged -= ACStateProperty_PropertyChanged;
+
                 if (func._ProcessFunction != null)
                     func._ProcessFunction.Detach();
                 func._ProcessFunction = null;
@@ -1240,8 +1247,7 @@ namespace gip.bso.manufacturing
                 var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => x.ACIdentifier == BSOManualWeighing.ClassName));
                 if (func != null && func.IsFunctionActive && func.ACStateProperty != null)
                 {
-                    var acStateProp = (func.ACStateProperty as IACContainerTNet<ACStateEnum>);
-                    if (acStateProp != null && acStateProp.ValueT != ACStateEnum.SMRunning && acStateProp.ValueT != ACStateEnum.SMStarting)
+                    if (IsFunctionActive(func))
                     {
                         func.IsFunctionActive = false;
                         ActiveFunctionsCount = ItemFunctions.Count(c => c.IsFunctionActive);
@@ -1287,8 +1293,7 @@ namespace gip.bso.manufacturing
                 var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => ParentBSO.BSOManualWeighingType.IsAssignableFrom((x.ValueT as core.datamodel.ACClass)?.ObjectType)));
                 if (func != null && func.IsFunctionActive && func.ACStateProperty != null)
                 {
-                    var acStateProp = (func.ACStateProperty as IACContainerTNet<ACStateEnum>);
-                    if (acStateProp != null && acStateProp.ValueT != ACStateEnum.SMRunning && acStateProp.ValueT != ACStateEnum.SMStarting)
+                    if (IsFunctionActive(func))
                     {
                         func.IsFunctionActive = false;
                         ActiveFunctionsCount = ItemFunctions.Count(c => c.IsFunctionActive);
@@ -1343,13 +1348,6 @@ namespace gip.bso.manufacturing
             get;
             set;
         }
-
-        //[DataMember]
-        //public List<string> ProcessModulePAFName
-        //{
-        //    get;
-        //    set;
-        //}
     }
 
     public class WorkCenterItemFunction : INotifyPropertyChanged
@@ -1360,7 +1358,9 @@ namespace gip.bso.manufacturing
             if (paf != null)
             {
                 _ProcessFunction = new ACRef<ACComponent>(paf, parentProcessModule);
-                ACStateProperty = ProcessFunction.GetPropertyNet("ACState");
+                ACStateProperty = ProcessFunction.GetPropertyNet("ACState") as IACContainerTNet<ACStateEnum>;
+                NeedWorkProperty = ProcessFunction.GetPropertyNet("NeedWork") as IACContainerTNet<bool>;
+
             }
         }
 
@@ -1398,11 +1398,16 @@ namespace gip.bso.manufacturing
             get => _ProcessFunction?.ValueT;
         }
 
-        public IACPropertyNetBase ACStateProperty
+        public IACContainerTNet<ACStateEnum> ACStateProperty
         {
             get;
             set;
         }
 
+        public IACContainerTNet<bool> NeedWorkProperty
+        {
+            get;
+            set;
+        }
     }
 }
