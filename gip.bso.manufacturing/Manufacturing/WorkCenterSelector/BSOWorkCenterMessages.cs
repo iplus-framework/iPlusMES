@@ -125,7 +125,7 @@ namespace gip.bso.manufacturing
             UnSubscribeFromWFNodes();
         }
 
-        private void SubscribeToWFNodes()
+        protected void SubscribeToWFNodes()
         {
             if (ParentBSOWCS.CurrentProcessModule == null)
             {

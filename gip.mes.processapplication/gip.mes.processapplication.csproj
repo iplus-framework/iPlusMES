@@ -60,6 +60,7 @@
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAETransport.cs" />
     <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
