@@ -1081,7 +1081,7 @@ namespace gip.bso.manufacturing
 
         public Func<WorkCenterItemFunction, bool> IsFunctionActive = new Func<WorkCenterItemFunction, bool>(c => c != null 
                                                                                                              && (c.ACStateProperty != null && c.ACStateProperty.ValueT == ACStateEnum.SMRunning 
-                                                                                                                                           && c.ACStateProperty.ValueT == ACStateEnum.SMStarting) 
+                                                                                                                                           || c.ACStateProperty.ValueT == ACStateEnum.SMStarting) 
                                                                                                              || (c.NeedWorkProperty != null && c.NeedWorkProperty.ValueT));
         #endregion
 
