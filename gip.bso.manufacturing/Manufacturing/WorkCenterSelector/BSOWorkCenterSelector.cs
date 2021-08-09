@@ -220,7 +220,7 @@ namespace gip.bso.manufacturing
         private List<WorkCenterRule> _tempRules;
 
         private core.datamodel.VBUser _SelectedVBUser;
-        [ACPropertySelected(604, "VBUser", "en{'User to assign'}de{'Zuweisender Benutzer'}")]
+        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}")]
         public core.datamodel.VBUser SelectedVBUser
         {
             get => _SelectedVBUser;
@@ -267,7 +267,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItem _SelectedAvailableProcessModule;
-        [ACPropertySelected(608, "AvailableRules", "en{'Available process module'}de{'Available process module'}")]
+        [ACPropertySelected(608, "AvailableRules", "en{'Available work centers'}de{'Verfügbare Arbeitsplätze'}")]
         public ACValueItem SelectedAvailableProcessModule
         {
             get => _SelectedAvailableProcessModule;
@@ -492,10 +492,10 @@ namespace gip.bso.manufacturing
         public void ConfigureBSO()
         {
             _tempRules = GetStoredRules();
-            AssignedProcessModulesList = new List<ACValueItem>(_tempRules.Select(x => new ACValueItem(x.VBUserName + " => " + x.ProcessModuleACUrl, x, null)));
+            AssignedProcessModulesList = new List<ACValueItem>(_tempRules.Select(x => new ACValueItem(x.VBUserName + " => " + x.ProcessModuleACUrl, x, null)).OrderBy(c => c.ACCaption));
 
             var availablePAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray();
-            AvailableProcessModulesList = availablePAFs.Select(c => c.ACClass1_ParentACClass).Distinct().Select(x => new ACValueItem(x.ACUrlComponent, x.ACUrlComponent, null)).ToList();
+            AvailableProcessModulesList = availablePAFs.Select(c => c.ACClass1_ParentACClass).Distinct().Select(x => new ACValueItem(x.ACUrlComponent, x.ACUrlComponent, null)).OrderBy(c => c.ACCaption).ToList();
 
 
             ShowDialog(this, "ConfigurationDialog");
@@ -503,10 +503,10 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledConfigureBSO()
         {
-            return Root.Environment.User.IsSuperuser;
+            return true;//Root.Environment.User.IsSuperuser;
         }
 
-        [ACMethodInfo("", "en{'Add rule'}de{'Additionsregel'}", 602)]
+        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
         public void AddRule()
         {
             //Tuple<string, string> ruleValue = SelectedAvailableProcessModule.Value as Tuple<string, string>;
@@ -542,7 +542,7 @@ namespace gip.bso.manufacturing
             return SelectedVBUser != null && SelectedAvailableProcessModule != null;
         }
 
-        [ACMethodInfo("", "en{'Remove rule'}de{'Regel entfernen'}", 603)]
+        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
         public void RemoveRule()
         {
             WorkCenterRule rule = _tempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule.Value);
