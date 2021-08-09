@@ -113,7 +113,7 @@ namespace gip.mes.processapplication
 
     [DataContract]
     [ACSerializeableInfo]
-    [ACClassInfo(ACKind = Global.ACKinds.TACEnum)]
+    [ACClassInfo(ACKind = Global.ACKinds.TACEnum, ACCaptionTranslation = "en{'Mixing direction'}de{'Mischen Richtung'}", QRYConfig = "gip.mes.processapplication.ACValueListPAFMixingDirectionEnum")]
     public enum PAFMixingDirectionEnum : short
     {
         [EnumMember]
@@ -122,5 +122,16 @@ namespace gip.mes.processapplication
         Left = 1,
         [EnumMember]
         Interval = 2
+    }
+
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Mixing direction'}de{'Mischen Richtung'}", Global.ACKinds.TACEnumACValueList)]
+    public class ACValueListPAFMixingDirectionEnum : ACValueItemList
+    {
+        public ACValueListPAFMixingDirectionEnum() : base("PAFMixingDirectionEnum")
+        {
+            AddEntry(PAFMixingDirectionEnum.Right, "en{'Right'}de{'Rechts'}");
+            AddEntry(PAFMixingDirectionEnum.Left, "en{'Left'}de{'Links'}");
+            AddEntry(PAFMixingDirectionEnum.Interval, "en{'Interval'}de{'Intervall'}");
+        }
     }
 }
