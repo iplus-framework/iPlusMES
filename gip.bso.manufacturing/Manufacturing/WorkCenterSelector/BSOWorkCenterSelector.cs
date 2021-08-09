@@ -1098,9 +1098,11 @@ namespace gip.bso.manufacturing
                 function.ACStateProperty.PropertyChanged += ACStateProperty_PropertyChanged;
                 if (function.NeedWorkProperty != null)
                     function.NeedWorkProperty.PropertyChanged += ACStateProperty_PropertyChanged;
-                ActiveFunctionsCount = ItemFunctions.Count(c => IsFunctionActive(c));
-
+                
                 function.IsFunctionActive = IsFunctionActive(function);
+
+                ActiveFunctionsCount = ItemFunctions.Count(c => c.IsFunctionActive);
+
             }
             else
             {

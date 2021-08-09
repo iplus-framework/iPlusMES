@@ -2921,7 +2921,6 @@ namespace gip.bso.manufacturing
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + "UserAckNode", "", typeof(MessageItem), "UserAckNode", "", "")]
     public class MessageItem : IACObject, INotifyPropertyChanged
     {
-
         public MessageItem(IACComponent pwNode, IACBSO bso)
         {
             if (pwNode != null)
@@ -2934,6 +2933,11 @@ namespace gip.bso.manufacturing
                     Message = _AlarmsAsText.Value as string;
                 }
                 _BSOManualWeighing = bso as BSOManualWeighing;
+
+                using (ACMonitor.Lock(Database.GlobalDatabase.QueryLock_1X000))
+                {
+                    UserAckPWNodeType = UserAckPWNode.ValueT.ComponentClass.ObjectType;
+                }
             }
         }
 
@@ -2970,6 +2974,12 @@ namespace gip.bso.manufacturing
         }
 
         public ACRef<IACComponent> UserAckPWNode
+        {
+            get;
+            set;
+        }
+
+        public Type UserAckPWNodeType
         {
             get;
             set;
