@@ -1247,7 +1247,7 @@ namespace gip.bso.manufacturing
                 var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => x.ACIdentifier == BSOManualWeighing.ClassName));
                 if (func != null && func.IsFunctionActive && func.ACStateProperty != null)
                 {
-                    if (IsFunctionActive(func))
+                    if (!IsFunctionActive(func))
                     {
                         func.IsFunctionActive = false;
                         ActiveFunctionsCount = ItemFunctions.Count(c => c.IsFunctionActive);
@@ -1293,7 +1293,7 @@ namespace gip.bso.manufacturing
                 var func = ItemFunctions.FirstOrDefault(c => c.RelatedBSOs.Any(x => ParentBSO.BSOManualWeighingType.IsAssignableFrom((x.ValueT as core.datamodel.ACClass)?.ObjectType)));
                 if (func != null && func.IsFunctionActive && func.ACStateProperty != null)
                 {
-                    if (IsFunctionActive(func))
+                    if (!IsFunctionActive(func))
                     {
                         func.IsFunctionActive = false;
                         ActiveFunctionsCount = ItemFunctions.Count(c => c.IsFunctionActive);
