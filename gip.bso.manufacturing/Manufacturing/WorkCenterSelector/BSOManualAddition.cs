@@ -91,5 +91,39 @@ namespace gip.bso.manufacturing
 
             return result;
         }
+
+        public override void OnLoadPWConfiguration(ACMethod acMethod)
+        {
+            var onlyAck = acMethod.ParameterValueList.GetACValue("OnlyAcknowledge");
+            if (onlyAck != null)
+                OnlyAcknowledge = onlyAck.ParamAsBoolean;
+        }
+
+        public bool OnlyAcknowledge
+        {
+            get;
+            set;
+        }
+
+        public override double OnDetermineLotChangeActualQuantity()
+        {
+            if (OnlyAcknowledge && ScaleBckgrState == ScaleBackgroundState.InTolerance)
+            {
+                double quantity = 0;
+
+                if (SelectedWeighingMaterial.AddValue.HasValue)
+                {
+                    if (SelectedWeighingMaterial.AddValue < TargetWeight)
+                    {
+                        quantity = SelectedWeighingMaterial.AddValue.Value;
+                        SelectedWeighingMaterial.AddValue = null;
+                    }
+                }
+
+                return quantity;
+            }
+
+            return base.OnDetermineLotChangeActualQuantity();
+        }
     }
 }

@@ -719,7 +719,8 @@ namespace gip.bso.manufacturing
                 }
                 else if (_CallPWLotChange && value != null && ComponentPWNode != null && ComponentPWNode.ValueT != null)
                 {
-                    Msg msg = ComponentPWNode.ValueT.ACUrlCommand("!LotChange", value.FacilityChargeID, ScaleActualWeight, _IsLotConsumed, false) as Msg;
+                    double quantity = OnDetermineLotChangeActualQuantity();
+                    Msg msg = ComponentPWNode.ValueT.ACUrlCommand("!LotChange", value.FacilityChargeID, quantity, _IsLotConsumed, false) as Msg;
                     if (msg != null)
                     {
                         _SelectedFacilityCharge = null;
@@ -1054,6 +1055,11 @@ namespace gip.bso.manufacturing
         public virtual bool IsEnabledLotChange()
         {
             return SelectedWeighingMaterial != null;
+        }
+
+        public virtual double OnDetermineLotChangeActualQuantity()
+        {
+            return ScaleActualWeight;
         }
 
         [ACMethodInfo("", "en{'Bin change'}de{'Eimerwechsel'}", 605)]
@@ -1584,7 +1590,14 @@ namespace gip.bso.manufacturing
             if (enterLotManually != null)
                 EnterLotManually = enterLotManually.ParamAsBoolean;
 
+            OnLoadPWConfiguration(acMethod);
+
             //TODO: lot order
+        }
+
+        public virtual void OnLoadPWConfiguration(ACMethod acMethod)
+        {
+
         }
 
         #endregion
