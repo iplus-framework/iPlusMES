@@ -49,6 +49,20 @@ namespace gip.mes.processapplication
         }
         #endregion
 
+        [ACMethodInfo("", "en{'Refresh Facility'}de{'Aktualisiere Lagerplatz'}", 400, true)]
+        public virtual void RefreshFacility()
+        {
+            RefreshParkingSpace.ValueT = !RefreshParkingSpace.ValueT;
+        }
+
+        [ACPropertyBindingSource]
+        public IACContainerTNet<bool> RefreshParkingSpace
+        {
+            get;
+            set;
+        }
+
+
         #region Execute-Helper-Handlers
         public static bool HandleExecuteACMethod_PAMParkingspace(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
