@@ -1046,11 +1046,49 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 999)]
-        public virtual void CompleteWeighing(double actualQuantity)
+        public virtual void CompleteWeighing(double actualQuantity, bool bookAndWeighRest)
         {
             PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
-            if (manualWeighing != null)
+
+            if (bookAndWeighRest && manualWeighing != null)
+            {
+                var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
+                double targetQuantity = 0;
+                if (targetQ != null)
+                    targetQuantity = targetQ.ParamAsDouble;
+
+                if (actualQuantity > 0.000001 && actualQuantity < targetQuantity)
+                {
+                    var msgBooking = DoManualWeighingBooking(actualQuantity, false, false, CurrentFacilityCharge);
+                    if (msgBooking != null)
+                    {
+                        Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msgBooking, false);
+                        ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+
+                        return;
+                    }
+
+                    double rest = targetQuantity - actualQuantity;
+                    manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = rest;
+                    manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
+
+                    WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
+                    if (comp == null)
+                    {
+                        return;
+                    }
+
+                    comp.SwitchState(WeighingComponentState.PartialCompleted, ref _WeighingComponentsInfo);
+                    SetInfo(comp, WeighingComponentInfoType.State, null, null);
+                    comp.SwitchState(WeighingComponentState.InWeighing, ref _WeighingComponentsInfo);
+                    SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, CurrentFacilityCharge, null);
+                }
+            }
+            else if (manualWeighing != null)
+            {
                 manualWeighing.CompleteWeighing(actualQuantity);
+            }
         }
 
         [ACMethodInfo("", "", 999)]
@@ -2427,7 +2465,8 @@ namespace gip.mes.processapplication
                             targetQuantity = comp.TargetQuantity;
 
                         double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
-                        actualQuantity = actualQuantity - calcActualQuantity;
+                        if (actualQuantity > calcActualQuantity)
+                            actualQuantity = actualQuantity - calcActualQuantity;
 
                         if (actualQuantity > 0.000001)
                         {
@@ -2745,7 +2784,7 @@ namespace gip.mes.processapplication
                     result = StartWeighing(acParameter[0] as Guid?, acParameter[1] as Guid?, acParameter[2] as Guid?, (bool)acParameter[3]);
                     return true;
                 case "CompleteWeighing":
-                    CompleteWeighing((double)acParameter[0]);
+                    CompleteWeighing((double)acParameter[0], (bool)acParameter[1]);
                     return true;
                 case "TareScale":
                     TareScale();
@@ -2948,6 +2987,7 @@ namespace gip.mes.processapplication
         Selected = 5,
         InWeighing = 10,
         WeighingCompleted = 20,
+        PartialCompleted = 25,
         Aborted = 30
     }
 

@@ -274,6 +274,12 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public double? MaxScaleWeight
+        {
+            get;
+            set;
+        }
+
         private ScaleBackgroundState _ScaleBckgrState;
         public ScaleBackgroundState ScaleBckgrState
         {
@@ -952,6 +958,7 @@ namespace gip.bso.manufacturing
             {
                 if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
                 {
+                    //TODO: translate
                     MessageItem msgItem = new MessageItem(ComponentPWNode?.ValueT, this);
                     msgItem.Message = string.Format("Acknowledge weighing component: {0} {1} ", SelectedWeighingMaterial.MaterialNo, SelectedWeighingMaterial.MaterialName);
                     messagesToAck.Add(msgItem);
@@ -967,14 +974,14 @@ namespace gip.bso.manufacturing
                 if (messageToAck != null)
                     messageToAck.AcknowledgeMsg();
                 else if (ComponentPWNode != null && ComponentPWNode.ValueT != null)
-                    ComponentPWNode.ValueT.ACUrlCommand("!"+PWManualWeighing.MNCompleteWeighing, ScaleActualWeight);
+                    ComponentPWNode.ValueT.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, ScaleActualWeight, ScaleBckgrState != ScaleBackgroundState.InTolerance);
             }
         }
 
         public virtual bool IsEnabledAcknowledge()
         {
-            return (MessagesList.Any(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton) ||
-                                                       ScaleBckgrState == ScaleBackgroundState.InTolerance);
+            return (MessagesList.Any(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton) || (MaxScaleWeight.HasValue && TargetWeight > MaxScaleWeight)
+                                                                                            || ScaleBckgrState == ScaleBackgroundState.InTolerance);
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602)]
@@ -1315,6 +1322,13 @@ namespace gip.bso.manufacturing
                 // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
                 Messages.Error(this, "Error50292", false, "ActualWeight");
                 return;
+            }
+
+            MaxScaleWeight = null;
+            var maxWeightProp = scale.ValueT.GetPropertyNet("MaxScaleWeight") as IACContainerTNet<double>;
+            if (maxWeightProp != null && maxWeightProp.ValueT > 0.0001)
+            {
+                MaxScaleWeight = maxWeightProp.ValueT;
             }
 
             _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
@@ -2070,17 +2084,6 @@ namespace gip.bso.manufacturing
                 ScaleBackgroundState? result = OnDetermineBackgroundState(tolPlus, tolMinus, target, actual);
                 if (result.HasValue)
                     return result.Value;
-
-                //if (CurrentScaleObject != null && CurrentScaleObject.Value != null && !IsManualAddition)
-                //{
-                //    var activeScale = _ProcessModuleScales?.FirstOrDefault(c => c.ACUrl == CurrentScaleObject.GetStringValue());
-                //    if (activeScale != null && activeScale.ValueT != null)
-                //    {
-                //        bool? isTared = activeScale.ValueT.ACUrlCommand("IsTared") as bool?;
-                //        if (isTared != null && !isTared.Value)
-                //            return ScaleBackgroundState.Weighing;
-                //    }
-                //}
 
                 double act = Math.Round(actual, 3);
 
@@ -2879,7 +2882,7 @@ namespace gip.bso.manufacturing
 
         public void ChangeComponentState(WeighingComponentState newState, vd.DatabaseApp dbApp)
         {
-            if (_WeighingMaterialState == WeighingComponentState.InWeighing && (newState == WeighingComponentState.WeighingCompleted || newState == WeighingComponentState.Aborted))
+            if (_WeighingMaterialState == WeighingComponentState.InWeighing && newState >= WeighingComponentState.WeighingCompleted)
             {
                 try
                 {
@@ -2910,7 +2913,8 @@ namespace gip.bso.manufacturing
 
                 }
             }
-            WeighingMatState = newState;
+            if (newState != WeighingComponentState.PartialCompleted)
+                WeighingMatState = newState;
             ParentBSO?.OnComponentStateChanged(this);
         }
 
