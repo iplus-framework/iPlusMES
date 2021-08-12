@@ -141,7 +141,7 @@ namespace gip.mes.facility
         {
             List<Msg> msg = new List<Msg>();
 
-            IEnumerable<MatReqResult> result = CheckMaterialsRequirementOverAllOrders(dbApp, batchPlans);
+            IEnumerable<MatReqResult> result = CheckOrderMaterialsRequirement(dbApp, batchPlans);
 
             if (result != null)
             {
@@ -229,6 +229,48 @@ namespace gip.mes.facility
 
                     item.RequiredQuantity = item.RequiredQuantity + reqQuantity;
                 }
+
+                return currentOrderResult;
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), "CheckMaterialsRequirementOverAllOrders(10)", e);
+                return null;
+            }
+        }
+
+        public IEnumerable<MatReqResult> CheckOrderMaterialsRequirement(DatabaseApp dbApp, IEnumerable<ProdOrderBatchPlan> batchPlans)
+        {
+            try
+            {
+                ProdOrderBatchPlan[] batchPlanToCheck = batchPlans.Where(c => c.PlanStateIndex == (short)GlobalApp.BatchPlanState.AutoStart
+                                                                           || c.PlanStateIndex == (short)GlobalApp.BatchPlanState.InProcess
+                                                                           || c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Created).ToArray();
+
+                List<Tuple<Material, double>> requirementList = new List<Tuple<Material, double>>();
+
+                foreach (var bp in batchPlanToCheck)
+                {
+                    var rels = bp.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                                 .Where(pos => pos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern
+                                            && pos.ParentProdOrderPartslistPosID == null)
+                                 .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                                                   .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                                            && c.MDProdOrderPartslistPosState
+                                                                .MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled
+                                                            && c.MDProdOrderPartslistPosState
+                                                                .MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
+                                                   .Select(p => new Tuple<Material, double>(p.SourceProdOrderPartslistPos.Material,
+                                                                                           (bp.RemainingQuantity / bp.ProdOrderPartslist.TargetQuantity * p.TargetQuantity))));
+
+                    requirementList.AddRange(rels);
+                }
+
+                var currentOrderResult = requirementList.GroupBy(c => c.Item1).Select(g => new MatReqResult(g.Key, g.Sum(x => x.Item2),
+                                                                                                                   g.Key.MaterialStock_Material.Any() ?
+                                                                                                                    g.Key.MaterialStock_Material.Sum(q => q.StockQuantity) :
+                                                                                                                    0))
+                                                                              .ToArray();
 
                 return currentOrderResult;
             }

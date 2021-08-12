@@ -1479,6 +1479,7 @@ namespace gip.bso.manufacturing
         {
             if (ComponentPWNode != null)
             {
+                Messages.LogError(this.GetACUrl(), "ActivateWFNode(10)", "Returned");
                 return;
             }
 
@@ -1532,14 +1533,14 @@ namespace gip.bso.manufacturing
         {
             try
             {
-                Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel after GetEndBatchPos.");
+                Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel start.");
                 //MainSyncContext.Send((object state) =>
                 //{
                     WeighingMaterialList = GetWeighingMaterials(dbApp, iconDesign);
 
                 WeighingMaterialList = WeighingMaterialList.ToArray();
                 //}, new object());
-                Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel after GetWeighingMaterials. Count " + WeighingMaterialList?.Count());
+                Messages.LogInfo("ManualWeighingModel", "SetupModel", "SetupModel after GetWeighingMaterials. Count: " + WeighingMaterialList?.Count());
             }
             catch (Exception e)
             {
@@ -1887,6 +1888,7 @@ namespace gip.bso.manufacturing
             {
                 PAFCurrentMaterial = currentACMethod.ParameterValueList.GetString("Material");
                 TargetWeight = currentACMethod.ParameterValueList.GetDouble("TargetQuantity");
+                Messages.LogError(this.GetACUrl(), "HandlePAFCurrentACMethod(10)", "PAFCurrentMaterial is setted: " + PAFCurrentMaterial);
             }
             else
             {
