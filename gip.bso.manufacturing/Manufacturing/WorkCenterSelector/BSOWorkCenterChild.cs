@@ -207,6 +207,9 @@ namespace gip.bso.manufacturing
 
         public void ClearBookingData()
         {
+            if (ACFacilityManager == null)
+                return;
+
             if (_BookParamRelocationClone == null)
                 _BookParamRelocationClone = ACFacilityManager.ACUrlACTypeSignature("!" + gip.mes.datamodel.GlobalApp.FBT_Relocation_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             var clone = _BookParamRelocationClone.Clone() as ACMethodBooking;

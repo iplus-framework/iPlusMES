@@ -78,6 +78,12 @@ namespace gip.bso.manufacturing
 
             BSOManualWeighingType = null;
 
+            if (_CurrentPWGroup != null)
+            {
+                _CurrentPWGroup.Detach();
+                _CurrentPWGroup = null;
+            }
+
             if (_ApplicationQueue != null)
             {
                 _ApplicationQueue.StopWorkerThread();
@@ -211,6 +217,19 @@ namespace gip.bso.manufacturing
                         PAProcessModuleACCaption = null;
                 }
             }
+        }
+
+        private ACRef<IACComponentPWNode> _CurrentPWGroup;
+
+        public IACComponentPWNode CurrentPWGroup
+        {
+            get => _CurrentPWGroup?.ValueT;
+        }
+
+        public string CurrentVBContent
+        {
+            get;
+            set;
         }
 
         #endregion
@@ -443,6 +462,36 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties => FunctionMonitor
+
+        private IACContainerTNet<List<ACChildInstanceInfo>> _AccessedProcessModulesProp;
+
+        private ACComponent _SelectedProcessModuleMonitor;
+        [ACPropertySelected(650, "ModuleMonitor")]
+        public ACComponent SelectedProcessModuleMonitor
+        {
+            get => _SelectedProcessModuleMonitor;
+            set
+            {
+                _SelectedProcessModuleMonitor = value;
+                OnPropertyChanged("SelectedProcessModuleMonitor");
+            }
+        }
+
+        private IEnumerable<ACRef<ACComponent>> _ProcessModuleMonitorsList;
+        [ACPropertyList(650, "ModuleMonitor")]
+        public IEnumerable<ACRef<ACComponent>> ProcessModuleMonitorsList
+        {
+            get => _ProcessModuleMonitorsList;
+            set
+            {
+                _ProcessModuleMonitorsList = value;
+                OnPropertyChanged("ProcessModuleMonitorsList");
+            }
+        }
+
+        #endregion
+
         BSOWorkCenterChild CurrentChildBSO
         {
             get;
@@ -645,6 +694,11 @@ namespace gip.bso.manufacturing
             {
                 CurrentBatch = null;
                 EndBatchPos = null;
+                if (_CurrentPWGroup != null)
+                {
+                    _CurrentPWGroup.Detach();
+                    _CurrentPWGroup = null;
+                }
             }
             else
             {
@@ -657,12 +711,26 @@ namespace gip.bso.manufacturing
                 }
 
                 string pwGroupACUrl = accessArr[0];
-                ACComponent pwGroup = Root.ACUrlCommand(pwGroupACUrl) as ACComponent;
+                IACComponentPWNode pwGroup = Root.ACUrlCommand(pwGroupACUrl) as IACComponentPWNode;
+
+                if (pwGroup == null)
+                {
+                    Thread.Sleep(100);
+                    pwGroup = Root.ACUrlCommand(pwGroupACUrl) as IACComponentPWNode;
+                }
+
+                if (pwGroup == null)
+                {
+                    Messages.Error(this, "Can not get mapped PWGroup! ACUrl: "+pwGroupACUrl);
+                    return;
+                }
+
+                _CurrentPWGroup = new ACRef<IACComponentPWNode>(pwGroup, this);
 
                 PAOrderInfo currentOrderInfo = pwGroup?.ExecuteMethod("GetPAOrderInfo") as PAOrderInfo;
                 if (currentOrderInfo == null)
                 {
-                    Thread.Sleep(300);
+                    Thread.Sleep(200);
                     currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!GetPAOrderInfo") as PAOrderInfo;
                 }
                 if (currentOrderInfo != null)
@@ -777,16 +845,18 @@ namespace gip.bso.manufacturing
                 return;
 
             var childBSO = this.ACComponentChilds.FirstOrDefault(c => c.ACIdentifier == actionArgs.DropObject.VBContent) as BSOWorkCenterChild;
-            if (childBSO == null && (actionArgs.DropObject.VBContent != "Workflow" && actionArgs.DropObject.VBContent != "BOM"))
+            if (childBSO == null && (actionArgs.DropObject.VBContent != "Workflow" && actionArgs.DropObject.VBContent != "BOM" && actionArgs.DropObject.VBContent != "FuncMonitor"))
                 return;
 
-            if (CurrentChildBSO == childBSO && CurrentProcessModule == CurrentWorkCenterItem.ProcessModule)
+            if (CurrentVBContent == actionArgs.DropObject.VBContent && CurrentChildBSO == childBSO && CurrentProcessModule == CurrentWorkCenterItem.ProcessModule)
                 return;
 
             if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
             {
                 if (CurrentChildBSO != null)
                     CurrentChildBSO.DeActivate();
+
+                DeinitFunctionMonitor();
 
                 CurrentChildBSO = childBSO;
 
@@ -808,6 +878,12 @@ namespace gip.bso.manufacturing
                 {
                     LoadPartslist();
                 }
+                else if (actionArgs.DropObject.VBContent == "FuncMonitor")
+                {
+                    InitalizeFunctionMonitor();
+                }
+
+                CurrentVBContent = actionArgs.DropObject.VBContent;
 
                 if (processModuleChanged)
                     RegisterOnOrderInfoPropChanged(CurrentProcessModule);
@@ -886,6 +962,83 @@ namespace gip.bso.manufacturing
         {
 
         }
+
+        #region Methods => FunctionMonitor
+
+        private void InitalizeFunctionMonitor()
+        {
+            var rootPW = CurrentPWGroup?.ParentRootWFNode;
+            if (rootPW == null)
+            {
+                //error
+                return;
+            }
+
+            _AccessedProcessModulesProp = rootPW.GetPropertyNet(PWProcessFunction.PN_AccessedProcessModules) as IACContainerTNet<List<ACChildInstanceInfo>>;
+            if (_AccessedProcessModulesProp == null)
+            {
+                //TODO:error
+                return;
+            }
+
+            HandleAccessedPMsChanged(_AccessedProcessModulesProp.ValueT);
+
+            _AccessedProcessModulesProp.PropertyChanged += _AccessedProcessModulesProp_PropertyChanged;
+
+        }
+
+        private void DeinitFunctionMonitor()
+        {
+            if (_AccessedProcessModulesProp != null)
+            {
+                _AccessedProcessModulesProp.PropertyChanged -= _AccessedProcessModulesProp_PropertyChanged;
+                _AccessedProcessModulesProp = null;
+            }
+
+            ProcessModuleMonitorsList = null;
+            SelectedProcessModuleMonitor = null;
+        }
+
+        private void _AccessedProcessModulesProp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                var modules = _AccessedProcessModulesProp.ValueT.ToList();
+                ApplicationQueue.Add(() => HandleAccessedPMsChanged(modules));
+            }
+        }
+
+        private void HandleAccessedPMsChanged(List<ACChildInstanceInfo> activeModules)
+        {
+            List<ACRef<ACComponent>> result = new List<ACRef<ACComponent>>();
+
+            if (activeModules == null)
+                return;
+
+            foreach (ACChildInstanceInfo instaceInfo in activeModules)
+            {
+                string acUrl = instaceInfo.ACUrlParent + "\\" + instaceInfo.ACIdentifier;
+
+                ACRef<ACComponent> moduleRef = ProcessModuleMonitorsList?.FirstOrDefault(c => c.ValueT.ACUrl == acUrl);
+                if (moduleRef == null)
+                {
+                    ACComponent module = Root.ACUrlCommand(acUrl) as ACComponent;
+                    if (module == null)
+                    {
+                        Messages.Error(this, "Can not find a component with ACUrl: " + acUrl);
+                        continue;
+                    }
+
+                    moduleRef = new ACRef<ACComponent>(module, this);
+                }
+
+                result.Add(moduleRef);
+            }
+
+            ProcessModuleMonitorsList = result;
+        }
+
+        #endregion
 
         #endregion
 

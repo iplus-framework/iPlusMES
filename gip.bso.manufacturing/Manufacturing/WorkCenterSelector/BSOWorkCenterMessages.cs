@@ -235,8 +235,6 @@ namespace gip.bso.manufacturing
             {
                 RemoveFromMessageList(itemToRemove);
                 itemToRemove.DeInit();
-                //if (BtnAckBlink && !MessagesList.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage))
-                //    BtnAckBlink = false;
             }
 
             foreach (var instanceInfo in pwInstanceInfos)
@@ -251,8 +249,6 @@ namespace gip.bso.manufacturing
 
                 var userAckItem = new MessageItem(pwNode, this);
                 AddToMessageList(userAckItem);
-                //if (!BtnAckBlink)
-                //    BtnAckBlink = true;
             }
 
             OnHandleWFNodes(connectionList);
