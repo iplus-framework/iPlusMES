@@ -1008,6 +1008,7 @@ namespace gip.bso.manufacturing
             }
         }
 
+        //TODO deattach unused
         private void HandleAccessedPMsChanged(List<ACChildInstanceInfo> activeModules)
         {
             List<ACRef<ACComponent>> result = new List<ACRef<ACComponent>>();
@@ -1033,6 +1034,16 @@ namespace gip.bso.manufacturing
                 }
 
                 result.Add(moduleRef);
+            }
+
+            if (ProcessModuleMonitorsList != null)
+            {
+                var forDetach = ProcessModuleMonitorsList.Except(result);
+
+                foreach (ACRef<ACComponent> item in forDetach)
+                {
+                    item.Detach();
+                }
             }
 
             ProcessModuleMonitorsList = result;
