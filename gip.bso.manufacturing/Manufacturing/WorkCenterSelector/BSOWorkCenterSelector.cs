@@ -84,6 +84,8 @@ namespace gip.bso.manufacturing
                 _CurrentPWGroup = null;
             }
 
+            DeinitFunctionMonitor();
+
             if (_ApplicationQueue != null)
             {
                 _ApplicationQueue.StopWorkerThread();
@@ -466,6 +468,8 @@ namespace gip.bso.manufacturing
 
         private IACContainerTNet<List<ACChildInstanceInfo>> _AccessedProcessModulesProp;
 
+        private bool _IsSelectionManagerInitialized = false;
+
         private ACComponent _SelectedProcessModuleMonitor;
         [ACPropertySelected(650, "ModuleMonitor")]
         public ACComponent SelectedProcessModuleMonitor
@@ -489,6 +493,44 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged("ProcessModuleMonitorsList");
             }
         }
+
+        private ACRef<VBBSOSelectionManager> _SelectionManager;
+        public VBBSOSelectionManager SelectionManager
+        {
+            get
+            {
+                if (_SelectionManager != null)
+                    return _SelectionManager.ValueT;
+                return null;
+            }
+        }
+
+        private IEnumerable<core.datamodel.ACClassMethod> _FunctionCommands;
+        [ACPropertyInfo(651)]
+        public IEnumerable<core.datamodel.ACClassMethod> FunctionCommands
+        {
+            get => _FunctionCommands;
+            set
+            {
+                _FunctionCommands = value;
+                OnPropertyChanged("FunctionCommands");
+            }
+        }
+
+        private IACObject _SelectedFunction;
+        [ACPropertyInfo(652)]
+        public IACObject SelectedFunction
+        {
+            get => _SelectedFunction;
+            set
+            {
+                _SelectedFunction = value;
+                OnPropertyChanged("SelectedFunction");
+            }
+        }
+
+        private Type _PAProcFuncType = typeof(PAProcessFunction);
+        private Type _PAAlarmBaseType = typeof(PAClassAlarmingBase);
 
         #endregion
 
@@ -981,6 +1023,8 @@ namespace gip.bso.manufacturing
                 return;
             }
 
+            InitSelectionManger(Const.SelectionManagerCDesign_ClassName);
+
             HandleAccessedPMsChanged(_AccessedProcessModulesProp.ValueT);
 
             _AccessedProcessModulesProp.PropertyChanged += _AccessedProcessModulesProp_PropertyChanged;
@@ -995,8 +1039,18 @@ namespace gip.bso.manufacturing
                 _AccessedProcessModulesProp = null;
             }
 
+            if (SelectionManager != null)
+            {
+                SelectionManager.PropertyChanged -= SelectionManager_PropertyChanged;
+                _SelectionManager.Detach();
+                _SelectionManager = null;
+            }
+
+            _IsSelectionManagerInitialized = false;
+
             ProcessModuleMonitorsList = null;
             SelectedProcessModuleMonitor = null;
+            FunctionCommands = null;
         }
 
         private void _AccessedProcessModulesProp_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -1008,7 +1062,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        //TODO deattach unused
         private void HandleAccessedPMsChanged(List<ACChildInstanceInfo> activeModules)
         {
             List<ACRef<ACComponent>> result = new List<ACRef<ACComponent>>();
@@ -1047,6 +1100,51 @@ namespace gip.bso.manufacturing
             }
 
             ProcessModuleMonitorsList = result;
+        }
+
+        private void InitSelectionManger(string acIdentifier)
+        {
+            if (_IsSelectionManagerInitialized || SelectionManager != null)
+                return;
+
+            var childComp = GetChildComponent(acIdentifier) as VBBSOSelectionManager;
+            if (childComp == null)
+                childComp = StartComponent(acIdentifier, this, null) as VBBSOSelectionManager;
+
+            if (childComp == null)
+                return;
+
+            _SelectionManager = new ACRef<VBBSOSelectionManager>(childComp, this);
+
+            SelectionManager.PropertyChanged += SelectionManager_PropertyChanged;
+
+            _IsSelectionManagerInitialized = true;
+        }
+
+        private void SelectionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "SelectedACObject")
+            {
+                FunctionCommands = null;
+                var acClass = SelectionManager?.SelectedACObject?.ACType as core.datamodel.ACClass;
+                if (acClass != null && _PAProcFuncType.IsAssignableFrom(acClass.ObjectType))
+                {
+                    acClass = acClass.FromIPlusContext<core.datamodel.ACClass>(DatabaseApp.ContextIPlus);
+                    if (acClass != null)
+                    {
+                        SelectedFunction = SelectionManager.SelectedACObject;
+                        FunctionCommands = acClass.GetMethods().Where(c => c.IsInteraction && FilterFunctionCommands(c.ACIdentifier)
+                                                                                           && _PAAlarmBaseType.IsAssignableFrom(c.ACClass.ObjectType) 
+                                                                                           && CurrentRightsOfInvoker.GetControlMode(c) == Global.ControlModes.Enabled)
+                                                               .OrderBy(x => x.SortIndex).ThenBy(p => p.ACCaption).ToArray();
+                    }
+                }
+            }
+        }
+
+        protected virtual bool FilterFunctionCommands(string acIdentifier)
+        {
+            return acIdentifier != "ShowMaintenanceOrder" && acIdentifier != "ShowMaintenanceOrderHistory" && acIdentifier != "GenerateNewMaintenanceOrder";
         }
 
         #endregion
