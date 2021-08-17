@@ -468,6 +468,8 @@ namespace gip.bso.manufacturing
 
         private IACContainerTNet<List<ACChildInstanceInfo>> _AccessedProcessModulesProp;
 
+        private IACContainerTNet<bool> _AlarmsInPhysicalModel;
+
         private bool _IsSelectionManagerInitialized = false;
 
         private ACComponent _SelectedProcessModuleMonitor;
@@ -526,6 +528,18 @@ namespace gip.bso.manufacturing
             {
                 _SelectedFunction = value;
                 OnPropertyChanged("SelectedFunction");
+            }
+        }
+
+        private bool _AlarmInPhysicalModel;
+        [ACPropertyInfo(653)]
+        public bool AlarmInPhysicalModel
+        {
+            get => _AlarmInPhysicalModel;
+            set
+            {
+                _AlarmInPhysicalModel = value;
+                OnPropertyChanged("AlarmInPhysicalModel");
             }
         }
 
@@ -741,6 +755,14 @@ namespace gip.bso.manufacturing
                     _CurrentPWGroup.Detach();
                     _CurrentPWGroup = null;
                 }
+
+                if (_AlarmsInPhysicalModel != null)
+                {
+                    _AlarmsInPhysicalModel.PropertyChanged -= _AlarmsInPhysicalModel_PropertyChanged;
+                    _AlarmsInPhysicalModel = null;
+                }
+
+                AlarmInPhysicalModel = false;
             }
             else
             {
@@ -777,6 +799,24 @@ namespace gip.bso.manufacturing
                 }
                 if (currentOrderInfo != null)
                 {
+                    var rootPW = CurrentPWGroup?.ParentRootWFNode;
+                    if (rootPW == null)
+                    {
+                        //error
+                        return;
+                    }
+
+                    _AlarmsInPhysicalModel = rootPW.GetPropertyNet(PWProcessFunction.PN_AlarmsInPhysicalModel) as IACContainerTNet<bool>;
+                    if (_AlarmsInPhysicalModel == null)
+                    {
+                        //TODO:error
+                        return;
+                    }
+
+                    AlarmInPhysicalModel = _AlarmsInPhysicalModel.ValueT;
+
+                    _AlarmsInPhysicalModel.PropertyChanged += _AlarmsInPhysicalModel_PropertyChanged;
+
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
                     if (entry != null)
                     {
@@ -1028,7 +1068,6 @@ namespace gip.bso.manufacturing
             HandleAccessedPMsChanged(_AccessedProcessModulesProp.ValueT);
 
             _AccessedProcessModulesProp.PropertyChanged += _AccessedProcessModulesProp_PropertyChanged;
-
         }
 
         private void DeinitFunctionMonitor()
@@ -1100,6 +1139,14 @@ namespace gip.bso.manufacturing
             }
 
             ProcessModuleMonitorsList = result;
+        }
+
+        private void _AlarmsInPhysicalModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                AlarmInPhysicalModel = _AlarmsInPhysicalModel.ValueT;
+            }
         }
 
         private void InitSelectionManger(string acIdentifier)
