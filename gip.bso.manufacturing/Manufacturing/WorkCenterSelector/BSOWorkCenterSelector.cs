@@ -49,7 +49,6 @@ namespace gip.bso.manufacturing
         public override bool ACPostInit()
         {
             BuildWorkCenterItems();
-
             return base.ACPostInit();
         }
 
@@ -832,6 +831,7 @@ namespace gip.bso.manufacturing
                     }
                     else
                     {
+                        EndBatchPos = null;
                         entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == Picking.ClassName);
                         if (entry != null)
                         {
