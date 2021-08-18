@@ -1184,8 +1184,13 @@ namespace gip.bso.manufacturing
                                                                                            && _PAAlarmBaseType.IsAssignableFrom(c.ACClass.ObjectType) 
                                                                                            && CurrentRightsOfInvoker.GetControlMode(c) == Global.ControlModes.Enabled)
                                                                .OrderBy(x => x.SortIndex).ThenBy(p => p.ACCaption).ToArray();
+
+                        return;
                     }
                 }
+
+                SelectedFunction = null;
+                FunctionCommands = null;
             }
         }
 
