@@ -1096,7 +1096,7 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == Const.ValueT)
             {
-                var modules = _AccessedProcessModulesProp.ValueT.ToList();
+                var modules = _AccessedProcessModulesProp.ValueT?.ToList();
                 ApplicationQueue.Add(() => HandleAccessedPMsChanged(modules));
             }
         }
