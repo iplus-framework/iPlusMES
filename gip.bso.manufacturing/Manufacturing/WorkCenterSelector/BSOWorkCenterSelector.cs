@@ -49,7 +49,6 @@ namespace gip.bso.manufacturing
         public override bool ACPostInit()
         {
             BuildWorkCenterItems();
-
             return base.ACPostInit();
         }
 
@@ -832,6 +831,7 @@ namespace gip.bso.manufacturing
                     }
                     else
                     {
+                        EndBatchPos = null;
                         entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == Picking.ClassName);
                         if (entry != null)
                         {
@@ -1096,7 +1096,7 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == Const.ValueT)
             {
-                var modules = _AccessedProcessModulesProp.ValueT.ToList();
+                var modules = _AccessedProcessModulesProp.ValueT?.ToList();
                 ApplicationQueue.Add(() => HandleAccessedPMsChanged(modules));
             }
         }
@@ -1184,8 +1184,13 @@ namespace gip.bso.manufacturing
                                                                                            && _PAAlarmBaseType.IsAssignableFrom(c.ACClass.ObjectType) 
                                                                                            && CurrentRightsOfInvoker.GetControlMode(c) == Global.ControlModes.Enabled)
                                                                .OrderBy(x => x.SortIndex).ThenBy(p => p.ACCaption).ToArray();
+
+                        return;
                     }
                 }
+
+                SelectedFunction = null;
+                FunctionCommands = null;
             }
         }
 
