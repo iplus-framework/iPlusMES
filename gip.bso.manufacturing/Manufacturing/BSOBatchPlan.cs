@@ -9,6 +9,7 @@ using gip.core.manager;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
 using gip.mes.processapplication;
+using System.Data.Objects;
 
 namespace gip.bso.manufacturing
 {
@@ -769,18 +770,15 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            // TODO: Wende Routing rules auf routes an umd resultat nochmals zu filtern
-
-            //List<FacilityReservation> selectedModules = DatabaseApp.FacilityReservation
-            //    .Include(c => c.Facility)
-            //    .Include(c => c.Facility.Material)
-            //    .Where(c => c.ProdOrderBatchPlanID == SelectedBatchPlanForIntermediate.ProdOrderBatchPlanID).AutoMergeOption();
-            if (!SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged))
+            FacilityReservation[] selectedModules = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.CreateSourceQuery()
+                .Include(c => c.Facility)
+                .Include(c => c.Facility.Material)
+                .SetMergeOption(MergeOption.OverwriteChanges)
+                .ToArray();
+            if (   !SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged)
+                && SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Count != selectedModules.Count())
                 SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
 
-            List<FacilityReservation> selectedModules = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToList();
-            //SelectedModule.SelectedReservation.FacilityReservation_ParentFacilityReservation.AutoLoad();
-            //var selectedModules = SelectedModule.SelectedReservation.FacilityReservation_ParentFacilityReservation.ToArray();
             var reservationCollection = new BindingList<POPartslistPosReservation>();
             if (availableModules != null)
             {
@@ -794,7 +792,8 @@ namespace gip.bso.manufacturing
                 var queryUnselFacilities = this.DatabaseApp.Facility
                     .Include(c => c.Material)
                     .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))
-                    .ToList();
+                    .AutoMergeOption()
+                    .ToArray();
 
                 foreach (var routeItem in availableModules)
                 {
