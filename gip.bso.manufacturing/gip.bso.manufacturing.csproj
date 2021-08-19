@@ -88,6 +88,9 @@
     <Compile Include="Model\WizardSchedulerPartslist.cs" />
     <Compile Include="Model\SearchBatchMaterialModel.cs" />
     <Compile Include="Model\WorkCenter\InputComponentItem.cs" />
+    <Compile Include="Model\WorkCenter\WorkCenterItem.cs" />
+    <Compile Include="Model\WorkCenter\WorkCenterItemFunction.cs" />
+    <Compile Include="Model\WorkCenter\WorkCenterRule.cs" />
     <Compile Include="Planning\BSODemandOrder.cs" />
     <Compile Include="Planning\BSOProdMatRequirement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

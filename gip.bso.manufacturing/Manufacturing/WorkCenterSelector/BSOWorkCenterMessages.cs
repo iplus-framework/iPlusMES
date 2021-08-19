@@ -36,7 +36,10 @@ namespace gip.bso.manufacturing
 
         internal SynchronizationContext MainSyncContext;
 
-        private ACMonitorObject _WFNodesLock_40000 = new ACMonitorObject(40000);
+        private ACMonitorObject _WFNodesLock_70100 = new ACMonitorObject(70100);
+
+        private Type _MessageItemType = typeof(MessageItem);
+        internal static readonly Type _WCSMessagesType = typeof(BSOWorkCenterMessages);
 
         private IACContainerT<List<ACChildInstanceInfo>> _WFNodes;
         private IACContainerT<bool> _ScaleHasAlarms;
@@ -50,10 +53,10 @@ namespace gip.bso.manufacturing
             get => _MScaleWFNodes;
             set
             {
-                if (_WFNodesLock_40000 == null)
+                if (_WFNodesLock_70100 == null)
                     return;
 
-                using (ACMonitor.Lock(_WFNodesLock_40000))
+                using (ACMonitor.Lock(_WFNodesLock_70100))
                 {
                     if (_MScaleWFNodes != value)
                     {
@@ -272,7 +275,7 @@ namespace gip.bso.manufacturing
                 if (alarms == null)
                     return;
 
-                var messagesToRemove = MessagesList.Where(c => c.GetType() == typeof(MessageItem) && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
+                var messagesToRemove = MessagesList.Where(c => c.GetType() == _MessageItemType && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
                 foreach (var messageToRemove in messagesToRemove)
                     RemoveFromMessageList(messageToRemove);
 
