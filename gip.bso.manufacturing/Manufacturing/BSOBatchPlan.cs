@@ -770,14 +770,21 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            FacilityReservation[] selectedModules = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.CreateSourceQuery()
-                .Include(c => c.Facility)
-                .Include(c => c.Facility.Material)
-                .SetMergeOption(MergeOption.OverwriteChanges)
-                .ToArray();
-            if (   !SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged)
-                && SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Count != selectedModules.Count())
+            FacilityReservation[] selectedModules = new FacilityReservation[] { };
+            if (SelectedBatchPlanForIntermediate.EntityState != System.Data.EntityState.Added
+                && !SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged))
+            {
                 SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
+                selectedModules = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.CreateSourceQuery()
+                    .Include(c => c.Facility)
+                    .Include(c => c.Facility.Material)
+                    .AutoMergeOption()
+                    .ToArray();
+            }
+            else
+            {
+                selectedModules = SelectedBatchPlanForIntermediate.FacilityReservation_ProdOrderBatchPlan.ToArray();
+            }
 
             var reservationCollection = new BindingList<POPartslistPosReservation>();
             if (availableModules != null)
