@@ -96,6 +96,7 @@ namespace gip.bso.manufacturing
         }
 
         public const string ClassName = "BSOWorkCenterSelector";
+        public const string FunctionMonitorTabVBContent = "FuncMonitor";
 
         #endregion
 
@@ -812,6 +813,11 @@ namespace gip.bso.manufacturing
 
                     _AlarmsInPhysicalModel.PropertyChanged += _AlarmsInPhysicalModel_PropertyChanged;
 
+                    if (CurrentVBContent == FunctionMonitorTabVBContent)
+                    {
+                        InitFunctionMonitor();
+                    }
+
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
                     if (entry != null)
                     {
@@ -945,9 +951,9 @@ namespace gip.bso.manufacturing
                 {
                     LoadPartslist();
                 }
-                else if (actionArgs.DropObject.VBContent == "FuncMonitor")
+                else if (actionArgs.DropObject.VBContent == FunctionMonitorTabVBContent)
                 {
-                    InitalizeFunctionMonitor();
+                    InitFunctionMonitor();
                 }
 
                 CurrentVBContent = actionArgs.DropObject.VBContent;
@@ -1032,8 +1038,11 @@ namespace gip.bso.manufacturing
 
         #region Methods => FunctionMonitor
 
-        private void InitalizeFunctionMonitor()
+        private void InitFunctionMonitor()
         {
+            if (_AccessedProcessModulesProp != null)
+                return;
+
             var rootPW = CurrentPWGroup?.ParentRootWFNode;
             if (rootPW == null)
             {
@@ -1124,6 +1133,12 @@ namespace gip.bso.manufacturing
             }
 
             ProcessModuleMonitorsList = result;
+            if (!ProcessModuleMonitorsList.Any())
+            {
+                SelectedFunction = null;
+                FunctionCommands = null;
+            }
+
         }
 
         private void _AlarmsInPhysicalModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
