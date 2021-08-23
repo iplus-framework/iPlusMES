@@ -193,7 +193,8 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            BSOWorkCenterSelector.Messages.LogMessage(eMsgLevel.Exception, "WorkCenterItem", "HandleACStatePropertyChanged", exception);
+            if (exception != null)
+                BSOWorkCenterSelector.Messages.LogMessage(eMsgLevel.Exception, "WorkCenterItem", "HandleACStatePropertyChanged", exception);
         }
 
         public void OnItemSelected(BSOWorkCenterSelector parentBSO)

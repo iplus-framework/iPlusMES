@@ -543,6 +543,18 @@ namespace gip.bso.manufacturing
                 case "ChangeBatchPlan":
                     ChangeBatchPlan((ProdOrderBatchPlan)acParameter[0]);
                     return true;
+                case "IsEnabledSearch":
+                    result = IsEnabledSearch();
+                    return true;
+                case "IsEnabledAddSuggestion":
+                    result = IsEnabledAddSuggestion();
+                    return true;
+                case "IsEnabledRemoveSuggestion":
+                    result = IsEnabledRemoveSuggestion();
+                    return true;
+                case "WizardForwardSelectLinie":
+                    WizardForwardSelectLinie(acParameter[0]);
+                    return true;
                 default:
                     break;
             }

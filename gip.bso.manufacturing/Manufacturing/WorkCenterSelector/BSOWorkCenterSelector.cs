@@ -49,6 +49,14 @@ namespace gip.bso.manufacturing
         public override bool ACPostInit()
         {
             BuildWorkCenterItems();
+
+            Communications wcfManager = ACRoot.SRoot.GetChildComponent("Communications") as Communications;
+            if (wcfManager != null && wcfManager.WCFClientManager != null)
+            {
+                _ClientManager = wcfManager.WCFClientManager;
+                _ClientManager.PropertyChanged += _ClientManager_PropertyChanged;
+            }
+
             return base.ACPostInit();
         }
 
@@ -92,6 +100,12 @@ namespace gip.bso.manufacturing
                 }
             }
 
+            if (_ClientManager != null)
+            {
+                _ClientManager.PropertyChanged -= _ClientManager_PropertyChanged;
+                _ClientManager = null;
+            }
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -103,7 +117,6 @@ namespace gip.bso.manufacturing
         #region Properties
 
         private ACDelegateQueue _ApplicationQueue;
-
         public ACDelegateQueue ApplicationQueue
         {
             get
@@ -114,6 +127,8 @@ namespace gip.bso.manufacturing
                 }
             }
         }
+
+        private WCFClientManager _ClientManager;
 
         #region Properties => AccessNav
 
@@ -712,6 +727,19 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        private void _ClientManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ConnectionQuality")
+            {
+                if (_ClientManager.ConnectionQuality == ConnectionQuality.Good)
+                {
+                    var temp = CurrentWorkCenterItem;
+                    CurrentWorkCenterItem = null;
+                    CurrentWorkCenterItem = temp;
+                }
+            }
+        }
+
         private void RegisterOnOrderInfoPropChanged(ACComponent processModule)
         {
             if(ProcessModuleOrderInfo != null)
@@ -1294,5 +1322,6 @@ namespace gip.bso.manufacturing
         );
 
         #endregion
+
     }
 }

@@ -12,6 +12,8 @@ namespace gip.bso.manufacturing
 {
     public class BSOWorkCenterMessages : BSOWorkCenterChild
     {
+        #region c'tors
+
         public BSOWorkCenterMessages(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
@@ -31,6 +33,8 @@ namespace gip.bso.manufacturing
 
             return base.ACDeInit(deleteACClassTask);
         }
+
+        #endregion
 
         #region Properties 
 
@@ -53,19 +57,21 @@ namespace gip.bso.manufacturing
             get => _MScaleWFNodes;
             set
             {
-                if (_WFNodesLock_70100 == null)
-                    return;
+                //if (_WFNodesLock_70100 == null)
+                //    return;
 
-                using (ACMonitor.Lock(_WFNodesLock_70100))
-                {
+                //using (ACMonitor.Lock(_WFNodesLock_70100))
+                //{
                     if (_MScaleWFNodes != value)
                     {
                         _MScaleWFNodes = value;
                         HandleWFNodes(_MScaleWFNodes);
                     }
-                }
+                //}
             }
         }
+
+        protected readonly SafeList<MessageItem> _MessagesListSafe = new SafeList<MessageItem>();
 
         private List<MessageItem> _MessagesList = new List<MessageItem>();
         [ACPropertyList(610, "Messages")]
@@ -165,16 +171,20 @@ namespace gip.bso.manufacturing
 
 
             _WFNodes = wfNodes as IACContainerTNet<List<ACChildInstanceInfo>>;
-            (_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
+
             if (_WFNodes.ValueT != null)
                 ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
 
+            (_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
+           
             _AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
 
             _ScaleHasAlarms = hasAlarms as IACContainerTNet<bool>;
-            (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
+
             bool hasAlarmsTemp = _ScaleHasAlarms.ValueT;
-                HandleAlarms(hasAlarmsTemp);
+            HandleAlarms(hasAlarmsTemp);
+
+            (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
         }
 
         private void UnSubscribeFromWFNodes()
@@ -221,29 +231,34 @@ namespace gip.bso.manufacturing
             {
                 OnHandleWFNodes(connectionList);
 
-                var itemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null).ToArray();
+                var itemsToRemove = _MessagesListSafe.Where(c => c.UserAckPWNode != null).ToArray();
                 foreach (var itemToRemove in itemsToRemove)
                 {
                     RemoveFromMessageList(itemToRemove);
                     itemToRemove.DeInit();
                 }
+                if (itemsToRemove.Any())
+                    RefreshMessageList();
 
                 return;
             }
 
             var pwInstanceInfos = connectionList.Where(c => ParentBSOWCS.PWUserAckClasses.Contains(c.ACType.ValueT));
 
-            var userAckItemsToRemove = MessagesList.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
+            var userAckItemsToRemove = _MessagesListSafe.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
             foreach (var itemToRemove in userAckItemsToRemove)
             {
                 RemoveFromMessageList(itemToRemove);
                 itemToRemove.DeInit();
             }
+            if (userAckItemsToRemove.Any())
+                RefreshMessageList();
+
 
             foreach (var instanceInfo in pwInstanceInfos)
             {
                 string instanceInfoACUrl = instanceInfo.ACUrlParent + "\\" + instanceInfo.ACIdentifier;
-                if (MessagesList.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
+                if (_MessagesListSafe.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
                     continue;
 
                 var pwNode = Root.ACUrlCommand(instanceInfoACUrl) as IACComponent;
@@ -253,6 +268,8 @@ namespace gip.bso.manufacturing
                 var userAckItem = new MessageItem(pwNode, this);
                 AddToMessageList(userAckItem);
             }
+            if (pwInstanceInfos.Any())
+                RefreshMessageList();
 
             OnHandleWFNodes(connectionList);
         }
@@ -275,9 +292,12 @@ namespace gip.bso.manufacturing
                 if (alarms == null)
                     return;
 
-                var messagesToRemove = MessagesList.Where(c => c.GetType() == _MessageItemType && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
+                var messagesToRemove = _MessagesListSafe.Where(c => c.GetType() == _MessageItemType && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
                 foreach (var messageToRemove in messagesToRemove)
                     RemoveFromMessageList(messageToRemove);
+
+                if (messagesToRemove.Any())
+                    RefreshMessageList();
 
                 foreach (var alarm in alarms)
                 {
@@ -285,12 +305,17 @@ namespace gip.bso.manufacturing
                     msgItem.Message = BuildAlarmMessage(alarm);
                     AddToMessageList(msgItem);
                 }
+                if (alarms.Any())
+                    RefreshMessageList();
             }
-            else if (MessagesList != null)
+            else if (_MessagesListSafe != null)
             {
-                var messageList = MessagesList.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton).ToArray();
+                var messageList = _MessagesListSafe.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton).ToArray();
                 foreach (var messageItem in messageList)
                     RemoveFromMessageList(messageItem);
+
+                if (messageList.Any())
+                    RefreshMessageList();
             }
 
             _AlarmsAsTextCache = _AlarmsAsText.ValueT;
@@ -310,34 +335,35 @@ namespace gip.bso.manufacturing
 
         public bool AddToMessageList(MessageItem messageItem)
         {
-            if (MessagesList == null)
+            if (_MessagesListSafe == null)
                 return false;
 
-            if (MessagesList.Any(c => c.IsAlarmMessage && c.Message == messageItem.Message))
+            if (_MessagesListSafe.Any(c => c.IsAlarmMessage && c.Message == messageItem.Message))
                 return true;
 
-            List<MessageItem> msgList = new List<MessageItem>(MessagesList);
-            if (messageItem.IsAlarmMessage)
-                msgList.Add(messageItem);
+            if (!_MessagesListSafe.Any() ||  messageItem.IsAlarmMessage)
+                _MessagesListSafe.Add(messageItem);
             else
-                msgList.Insert(0, messageItem);
+                _MessagesListSafe.Insert(0, messageItem);
 
-            MessagesList = msgList;
-            
             return true;
         }
 
         public bool RemoveFromMessageList(MessageItem messageItem)
         {
-            if (MessagesList == null)
+            if (_MessagesListSafe == null)
                 return false;
 
-            List<MessageItem> msgList = new List<MessageItem>(MessagesList);
-            msgList.Remove(messageItem);
-
-            MessagesList = msgList;
+            _MessagesListSafe.Remove(messageItem);
 
             return true;
+        }
+
+        public void RefreshMessageList()
+        {
+            MainSyncContext.Send((object state) => 
+                MessagesList = _MessagesListSafe.ToList(), 
+            new object());
         }
 
         #endregion

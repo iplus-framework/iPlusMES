@@ -88,6 +88,10 @@
     <Compile Include="Model\WizardSchedulerPartslist.cs" />
     <Compile Include="Model\SearchBatchMaterialModel.cs" />
     <Compile Include="Model\WorkCenter\InputComponentItem.cs" />
+    <Compile Include="Model\WorkCenter\ManualWeighingPWNode.cs" />
+    <Compile Include="Model\WorkCenter\MessageItem.cs" />
+    <Compile Include="Model\WorkCenter\SingleDosingConfigItem.cs" />
+    <Compile Include="Model\WorkCenter\WeighingMaterial.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterItem.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterItemFunction.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterRule.cs" />
