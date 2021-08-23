@@ -1862,7 +1862,7 @@ namespace gip.bso.manufacturing
             {
                 PAFCurrentMaterial = currentACMethod.ParameterValueList.GetString("Material");
                 TargetWeight = currentACMethod.ParameterValueList.GetDouble("TargetQuantity");
-                Messages.LogError(this.GetACUrl(), "HandlePAFCurrentACMethod(10)", "PAFCurrentMaterial is setted: " + PAFCurrentMaterial);
+                //Messages.LogError(this.GetACUrl(), "HandlePAFCurrentACMethod(10)", "PAFCurrentMaterial is setted: " + PAFCurrentMaterial);
             }
             else
             {
@@ -2022,7 +2022,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                bool blink = MessagesList.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage);
+                bool blink = _MessagesListSafe.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage);
                 if (BtnAckBlink != blink)
                     BtnAckBlink = blink;
             }

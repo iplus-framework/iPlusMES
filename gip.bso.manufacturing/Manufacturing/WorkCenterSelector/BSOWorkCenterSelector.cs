@@ -733,9 +733,14 @@ namespace gip.bso.manufacturing
             {
                 if (_ClientManager.ConnectionQuality == ConnectionQuality.Good)
                 {
-                    var temp = CurrentWorkCenterItem;
-                    CurrentWorkCenterItem = null;
-                    CurrentWorkCenterItem = temp;
+                    ApplicationQueue.Add(() =>
+                    {
+                        if (CurrentChildBSO != null)
+                        {
+                            CurrentChildBSO.DeActivate();
+                            CurrentChildBSO.Activate(CurrentProcessModule);
+                        }
+                    });
                 }
             }
         }
