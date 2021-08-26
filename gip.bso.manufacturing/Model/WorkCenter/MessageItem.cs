@@ -25,10 +25,10 @@ namespace gip.bso.manufacturing
                 }
                 _BSOManualWeighing = bso as BSOManualWeighing;
 
-                using (ACMonitor.Lock(Database.GlobalDatabase.QueryLock_1X000))
-                {
-                    UserAckPWNodeType = UserAckPWNode.ValueT.ComponentClass.ObjectType;
-                }
+                //using (ACMonitor.Lock(Database.GlobalDatabase.QueryLock_1X000))
+                //{
+                //    UserAckPWNodeType = UserAckPWNode.ValueT.ComponentClass.ObjectType;
+                //}
             }
         }
 
@@ -56,11 +56,13 @@ namespace gip.bso.manufacturing
 
         public virtual bool IsAlarmMessage => UserAckPWNode == null;
 
+        private bool _HandleByAcknowledgeButton = true;
         public virtual bool HandleByAcknowledgeButton
         {
-            get
+            get => _HandleByAcknowledgeButton;
+            set
             {
-                return true;
+                _HandleByAcknowledgeButton = value;
             }
         }
 

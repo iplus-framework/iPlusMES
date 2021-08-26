@@ -192,7 +192,12 @@ namespace gip.bso.manufacturing
             }
             ACSaveChanges();
 
-            PreStartWorkflow(validRoute, workflow, picking);
+            bool result = PreStartWorkflow(validRoute, workflow, picking);
+            if (!result)
+            {
+                ClearBookingData();
+                return false;
+            }
 
             msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
@@ -296,6 +301,7 @@ namespace gip.bso.manufacturing
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
+            //TODO:
             //if (this.ACFacilityManager != null)
             //    return this.ACFacilityManager.C_PWMethodRelocClass; //TODO: single dosing info
             return "PWMethodSingleDosing";
@@ -397,7 +403,7 @@ namespace gip.bso.manufacturing
             return msg;
         }
 
-        protected virtual void PreStartWorkflow(Route validRoute, gip.core.datamodel.ACClassWF rootWF, Picking picking)
+        protected virtual bool PreStartWorkflow(Route validRoute, gip.core.datamodel.ACClassWF rootWF, Picking picking)
         {
             List<Tuple<gip.core.datamodel.ACClassWF, string>> subWFs = new List<Tuple<gip.core.datamodel.ACClassWF, string>>();
 
@@ -417,12 +423,13 @@ namespace gip.bso.manufacturing
                                                                                      .Select(p => new SingleDosingConfigItem() { PreConfigACUrl = subWF.Item2, PWGroup = p }));
             }
 
-            OnPreStartWorkflow(picking, configItems, validRoute, rootWF);
+            return OnPreStartWorkflow(picking, configItems, validRoute, rootWF);
+
         }
 
-        public virtual void OnPreStartWorkflow(Picking picking, List<SingleDosingConfigItem> configItems, Route validRoute, gip.core.datamodel.ACClassWF rootWF)
+        public virtual bool OnPreStartWorkflow(Picking picking, List<SingleDosingConfigItem> configItems, Route validRoute, gip.core.datamodel.ACClassWF rootWF)
         {
-
+            return true;
         }
 
         private void GetSubWorkflows(Tuple<gip.core.datamodel.ACClassWF, string> acClassWF, List<Tuple<gip.core.datamodel.ACClassWF, string>> subworkflows, int depth, int maxDepth = 4)

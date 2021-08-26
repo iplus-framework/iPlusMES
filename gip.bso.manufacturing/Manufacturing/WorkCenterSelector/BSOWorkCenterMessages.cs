@@ -333,7 +333,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        public bool AddToMessageList(MessageItem messageItem)
+        public virtual bool AddToMessageList(MessageItem messageItem)
         {
             if (_MessagesListSafe == null)
                 return false;
@@ -349,7 +349,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public bool RemoveFromMessageList(MessageItem messageItem)
+        public virtual bool RemoveFromMessageList(MessageItem messageItem)
         {
             if (_MessagesListSafe == null)
                 return false;

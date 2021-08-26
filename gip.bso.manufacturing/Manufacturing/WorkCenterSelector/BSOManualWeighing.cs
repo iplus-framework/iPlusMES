@@ -297,10 +297,15 @@ namespace gip.bso.manufacturing
 
         protected double _TolerancePlus = 0, _ToleranceMinus = 0;
 
-        internal bool WeighingMaterialsFSM
+        private bool _WeighingMaterialsFSM;
+        public bool WeighingMaterialsFSM
         {
-            get;
-            set;
+            get => _WeighingMaterialsFSM;
+            set
+            {
+                _WeighingMaterialsFSM = value;
+                OnPropertyChanged("WeighingMaterialsFSM");
+            }
         }
 
         private bool _EnterLotManually = false;
