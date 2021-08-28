@@ -197,7 +197,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999, "", "en{'Mode'}de{'Modus'}")]
+        [ACPropertyInfo(999, "", "en{'State'}de{'Status'}")]
         public string PlanStateIndexName
         {
             get

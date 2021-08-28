@@ -145,6 +145,8 @@ namespace gip.mes.processapplication
             {
                 var batchPlanningTimes = uncompletedBatchPlans
                                         .Where(c => c.PlanState >= GlobalApp.BatchPlanState.AutoStart && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
+                                        .OrderByDescending(c => c.PlanStateIndex)
+                                        .ThenBy(c => c.PlannedStartDate)
                                         .Select(c => new BatchPlanningTime()
                                         {
                                             ProdOrderBatchPlanID = c.ProdOrderBatchPlanID,
