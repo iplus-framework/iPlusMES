@@ -73,6 +73,12 @@ namespace gip.bso.manufacturing
 
             ProcessModuleOrderInfo = null;
 
+            if (_AlarmsInPhysicalModel != null)
+            {
+                _AlarmsInPhysicalModel.PropertyChanged -= _AlarmsInPhysicalModel_PropertyChanged;
+                _AlarmsInPhysicalModel = null;
+            }
+
             foreach (WorkCenterItem item in WorkCenterItems)
             {
                 item.DeInit();
@@ -532,9 +538,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private IACObject _SelectedFunction;
+        private ACComponent _SelectedFunction;
         [ACPropertyInfo(652)]
-        public IACObject SelectedFunction
+        public ACComponent SelectedFunction
         {
             get => _SelectedFunction;
             set
@@ -1178,7 +1184,9 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == Const.ValueT)
             {
-                AlarmInPhysicalModel = _AlarmsInPhysicalModel.ValueT;
+                IACContainerTNet<bool> senderProp = sender as IACContainerTNet<bool>;
+                if (senderProp != null)
+                    AlarmInPhysicalModel = senderProp.ValueT;
             }
         }
 
@@ -1207,12 +1215,15 @@ namespace gip.bso.manufacturing
             {
                 FunctionCommands = null;
                 var acClass = SelectionManager?.SelectedACObject?.ACType as core.datamodel.ACClass;
-                if (acClass != null && _PAProcFuncType.IsAssignableFrom(acClass.ObjectType))
+                if (acClass != null && acClass.ACKind == Global.ACKinds.TPAProcessFunction)
                 {
                     acClass = acClass.FromIPlusContext<core.datamodel.ACClass>(DatabaseApp.ContextIPlus);
                     if (acClass != null)
                     {
-                        SelectedFunction = SelectionManager.SelectedACObject;
+                        SelectedFunction = SelectionManager.SelectedACObject as ACComponent;
+                        if (SelectedFunction == null)
+                            return;
+
                         FunctionCommands = acClass.GetMethods().Where(c => c.IsInteraction && FilterFunctionCommands(c.ACIdentifier)
                                                                                            && _PAAlarmBaseType.IsAssignableFrom(c.ACClass.ObjectType) 
                                                                                            && CurrentRightsOfInvoker.GetControlMode(c) == Global.ControlModes.Enabled)

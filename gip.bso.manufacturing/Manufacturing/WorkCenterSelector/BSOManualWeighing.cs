@@ -765,8 +765,8 @@ namespace gip.bso.manufacturing
         }
 
         protected ACClass _SelectedSingleDosTargetStorage;
-        //todo translation
-        [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Target storage'}de{'Target storage'}")]
+        
+        [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Destination'}de{'Ziel'}")]
         public virtual ACClass SelectedSingleDosTargetStorage
         {
             get => _SelectedSingleDosTargetStorage;
@@ -2300,9 +2300,9 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            if (SingleDosTargetStorageList.Count() > 1)
+            if (SingleDosTargetStorageList.Count() > 1 && SelectedSingleDosTargetStorage == null)
             {
-                //todo Show selection dialog
+                //todo Select dosing target
             }
             else
             {
