@@ -30,6 +30,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
+    [ACPropertyEntity(9999, "XMLDesignStart", "en{'Design'}de{'Design'}")]
+    [ACPropertyEntity(9999, "XMLDesignEnd", "en{'Design'}de{'Design'}")]
     [ACQueryInfoPrimary(Const.PackName_VarioSales, Const.QueryPrefix + OutOrder.ClassName, "en{'Sales Order'}de{'Kundenauftrag'}", typeof(OutOrder), OutOrder.ClassName, "OutOrderNo", "OutOrderNo", new object[]
         {
                 new object[] {Const.QueryPrefix +  OutOrderPos.ClassName, "en{'Sales Order Pos.'}de{'Auftragsposition'}", typeof(OutOrderPos), OutOrderPos.ClassName + "_" + OutOrder.ClassName, "Sequence", "Sequence", new object[]

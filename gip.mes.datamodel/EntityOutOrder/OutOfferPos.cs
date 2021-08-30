@@ -324,8 +324,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        #endregion
-
         [ACPropertyInfo(38)]
         public string SalesTaxPrinted
         {
@@ -379,6 +377,8 @@ namespace gip.mes.datamodel
 
 
         public bool InRecalculation { get; set; }
+        #endregion
+
 
         #endregion
 

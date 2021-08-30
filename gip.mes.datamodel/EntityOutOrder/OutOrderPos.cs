@@ -40,6 +40,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, "PickupCompanyMaterial", "en{'Material for Pick-Up'}de{'Material für Abholung'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName, "", true)]
     [ACPropertyEntity(9999, OutOrder.ClassName, "en{'Sales Order'}de{'Auftrag'}", Const.ContextDatabase + "\\" + OutOrder.ClassName, "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
+    [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -265,6 +266,16 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IOutOrderPos
+
+        //[ACPropertyInfo(31)]
+        //public List<OutOfferPos> Items
+        //{
+        //    get
+        //    {
+        //        return OutOrderPos_GroupOutOrderPos?.ToList();
+        //    }
+        //}
+
         public GlobalApp.MaterialPosTypes MaterialPosType
         {
             get
@@ -274,6 +285,63 @@ namespace gip.mes.datamodel
             set
             {
                 MaterialPosTypeIndex = (Int16)value;
+            }
+        }
+
+        [ACPropertyInfo(34)]
+        public string PriceNetPrinted
+        {
+            get
+            {
+                if (!GroupSum)
+                    return PriceNet.ToString("N");
+                return "";
+            }
+        }
+
+        public string _TotalPricePrinted;
+        [ACPropertyInfo(35)]
+        public string TotalPricePrinted
+        {
+            get
+            {
+                if (_TotalPricePrinted != null)
+                    return _TotalPricePrinted;
+                if (!GroupSum)
+                    return TotalPrice.ToString("N");
+                return "";
+            }
+            set
+            {
+                _TotalPricePrinted = value;
+            }
+        }
+
+        private string _MaterialNo;
+        [ACPropertyInfo(36)]
+        public string MaterialNo
+        {
+            get
+            {
+                if (_MaterialNo != null)
+                    return _MaterialNo;
+
+                return Material?.MaterialNo;
+            }
+            set
+            {
+                _MaterialNo = value;
+            }
+        }
+
+        [ACPropertyInfo(38)]
+        public string SalesTaxPrinted
+        {
+            get
+            {
+                if (!GroupSum)
+                    return SalesTax.ToString("N");
+                return "";
             }
         }
 
@@ -318,9 +386,9 @@ namespace gip.mes.datamodel
         {
             get
             {
-                //if (TargetQuantity > 0)
-                return TargetQuantity + " " + DerivedMDUnit?.Symbol;
-                //return "";
+                if (!GroupSum)
+                    return TargetQuantity + " " + DerivedMDUnit?.Symbol;
+                return "";
             }
         }
 
