@@ -538,9 +538,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private ACComponent _SelectedFunction;
+        private IACObject _SelectedFunction;
         [ACPropertyInfo(652)]
-        public ACComponent SelectedFunction
+        public IACObject SelectedFunction
         {
             get => _SelectedFunction;
             set
@@ -1220,13 +1220,13 @@ namespace gip.bso.manufacturing
                     acClass = acClass.FromIPlusContext<core.datamodel.ACClass>(DatabaseApp.ContextIPlus);
                     if (acClass != null)
                     {
-                        SelectedFunction = SelectionManager.SelectedACObject as ACComponent;
+                        SelectedFunction = SelectionManager.SelectedACObject;
                         if (SelectedFunction == null)
                             return;
 
                         FunctionCommands = acClass.GetMethods().Where(c => c.IsInteraction && FilterFunctionCommands(c.ACIdentifier)
-                                                                                           && _PAAlarmBaseType.IsAssignableFrom(c.ACClass.ObjectType) 
-                                                                                           && CurrentRightsOfInvoker.GetControlMode(c) == Global.ControlModes.Enabled)
+                                                                                           && (!c.IsRightmanagement || acClass.RightManager.GetControlMode(c) == Global.ControlModes.Enabled)
+                                                                                           && _PAAlarmBaseType.IsAssignableFrom(c.ACClass.ObjectType))
                                                                .OrderBy(x => x.SortIndex).ThenBy(p => p.ACCaption).ToArray();
 
                         return;
