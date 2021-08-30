@@ -3534,6 +3534,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="GroupOutOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="OutOrderPosSplit">
           <Key>
@@ -3601,8 +3602,8 @@
           <Property Name="PreviousPartslistID" Type="uniqueidentifier" />
           <Property Name="DeleteDate" Type="datetime" />
           <Property Name="DeleteName" Type="varchar" MaxLength="5" />
-          <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="MaterialWFID" Type="uniqueidentifier" />
+          <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="ProductionUnits" Type="float" />
           <Property Name="XMLComment" Type="text" />
         </EntityType>
@@ -4206,7 +4207,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4730,7 +4731,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.TandTv2TempPos' does not have a 
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4751,7 +4752,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.ACProgramLogView' does not have 
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4763,7 +4764,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.ACProgramLogView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4778,7 +4779,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialPosView' does not
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4787,7 +4788,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialPosView' does not
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4802,7 +4803,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialRelView' does not
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4811,7 +4812,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialRelView' does not
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4825,7 +4826,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialView' does not ha
           <Property Name="Nr" Type="bigint" />
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4836,7 +4837,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4865,7 +4866,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosMachines' does not ha
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4888,14 +4889,14 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosView' does not have a
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PartslistSequence" Type="int" Nullable="false" />
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4930,14 +4931,14 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="BasedOnMachine" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="RelSequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
           <Property Name="ActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosSequence" Type="int" Nullable="false" />
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
@@ -10494,6 +10495,18 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_OutOrderPos_GroupOutOrderPosID">
+          <End Role="OutOrderPos" Type="Self.OutOrderPos" Multiplicity="0..1" />
+          <End Role="OutOrderPos1" Type="Self.OutOrderPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="OutOrderPos1">
+              <PropertyRef Name="GroupOutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_OutOrderPos_MaterialID">
           <End Role="Material" Type="Self.Material" Multiplicity="1" />
           <End Role="OutOrderPos" Type="Self.OutOrderPos" Multiplicity="*" />
@@ -15586,6 +15599,10 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             <End Role="CompanyAddressUnloadingpoint" EntitySet="CompanyAddressUnloadingpoint" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
           </AssociationSet>
+          <AssociationSet Name="FK_OutOrderPos_GroupOutOrderPosID" Association="Self.FK_OutOrderPos_GroupOutOrderPosID">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="OutOrderPos1" EntitySet="OutOrderPos" />
+          </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_MaterialID" Association="Self.FK_OutOrderPos_MaterialID">
             <End Role="Material" EntitySet="Material" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
@@ -18649,7 +18666,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <EntitySet Name="MDCountrySalesTax" EntityType="iPlusMESV4_Model.MDCountrySalesTax" />
           <EntitySet Name="MDCountrySalesTaxMaterial" EntityType="iPlusMESV4_Model.MDCountrySalesTaxMaterial" />
           <EntitySet Name="MDCountrySalesTaxMDMaterialGroup" EntityType="iPlusMESV4_Model.MDCountrySalesTaxMDMaterialGroup" />
-          <EntitySet Name="OutOfferPos" EntityType="iPlusMESV4_Model.OutOfferPos" />
           <EntitySet Name="OutOrderPos" EntityType="iPlusMESV4_Model.OutOrderPos" />
           <AssociationSet Name="FK_OutOrderPos_CompanyAddressUnloadingPointID" Association="iPlusMESV4_Model.FK_OutOrderPos_CompanyAddressUnloadingPointID">
             <End Role="CompanyAddressUnloadingpoint" EntitySet="CompanyAddressUnloadingpoint" />
@@ -18707,17 +18723,9 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             <End Role="MDCountrySalesTax" EntitySet="MDCountrySalesTax" />
             <End Role="MDCountrySalesTaxMDMaterialGroup" EntitySet="MDCountrySalesTaxMDMaterialGroup" />
           </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_MDCountrySalesTaxID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID">
-            <End Role="MDCountrySalesTax" EntitySet="MDCountrySalesTax" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_MDCountrySalesTaxID" Association="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxID">
             <End Role="MDCountrySalesTax" EntitySet="MDCountrySalesTax" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_MDCountrySalesTaxMaterialID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID">
-            <End Role="MDCountrySalesTaxMaterial" EntitySet="MDCountrySalesTaxMaterial" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_MDCountrySalesTaxMaterialID" Association="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMaterialID">
             <End Role="MDCountrySalesTaxMaterial" EntitySet="MDCountrySalesTaxMaterial" />
@@ -18726,10 +18734,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <AssociationSet Name="FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup" Association="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup">
             <End Role="MDMaterialGroup" EntitySet="MDMaterialGroup" />
             <End Role="MDCountrySalesTaxMDMaterialGroup" EntitySet="MDCountrySalesTaxMDMaterialGroup" />
-          </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID">
-            <End Role="MDCountrySalesTaxMDMaterialGroup" EntitySet="MDCountrySalesTaxMDMaterialGroup" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_MDCountrySalesTaxMDMaterialGroupID" Association="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMDMaterialGroupID">
             <End Role="MDCountrySalesTaxMDMaterialGroup" EntitySet="MDCountrySalesTaxMDMaterialGroup" />
@@ -18751,10 +18755,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             <End Role="MDOutOrderPosState" EntitySet="MDOutOrderPosState" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_MDTimeRangeID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID">
-            <End Role="MDTimeRange" EntitySet="MDTimeRange" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_MDTimeRangeID" Association="iPlusMESV4_Model.FK_OutOrderPos_MDTimeRangeID">
             <End Role="MDTimeRange" EntitySet="MDTimeRange" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
@@ -18771,21 +18771,9 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             <End Role="MDTransportMode" EntitySet="MDTransportMode" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_MDUnitID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID">
-            <End Role="MDUnit" EntitySet="MDUnit" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_MDUnitID" Association="iPlusMESV4_Model.FK_OutOrderPos_MDUnitID">
             <End Role="MDUnit" EntitySet="MDUnit" />
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_GroupOutOfferPosID" Association="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID">
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
-            <End Role="OutOfferPos1" EntitySet="OutOfferPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_ParentOutOfferPosID" Association="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID">
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
-            <End Role="OutOfferPos1" EntitySet="OutOfferPos" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOrderPos_ParentOutOrderPosID" Association="iPlusMESV4_Model.FK_OutOrderPos_ParentOutOrderPosID">
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
@@ -18897,10 +18885,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <AssociationSet Name="FK_OutOfferConfig_OutOfferID" Association="iPlusMESV4_Model.FK_OutOfferConfig_OutOfferID">
             <End Role="OutOffer" EntitySet="OutOffer" />
             <End Role="OutOfferConfig" EntitySet="OutOfferConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_OutOfferID" Association="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID">
-            <End Role="OutOffer" EntitySet="OutOffer" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOrder_BasedOnOutOfferID" Association="iPlusMESV4_Model.FK_OutOrder_BasedOnOutOfferID">
             <End Role="OutOffer" EntitySet="OutOffer" />
@@ -19233,10 +19217,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             <End Role="Material" EntitySet="Material" />
             <End Role="OutOfferConfig" EntitySet="OutOfferConfig" />
           </AssociationSet>
-          <AssociationSet Name="FK_OutOfferPos_MaterialID" Association="iPlusMESV4_Model.FK_OutOfferPos_MaterialID">
-            <End Role="Material" EntitySet="Material" />
-            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_OutOrderConfig_MaterialID" Association="iPlusMESV4_Model.FK_OutOrderConfig_MaterialID">
             <End Role="Material" EntitySet="Material" />
             <End Role="OutOrderConfig" EntitySet="OutOrderConfig" />
@@ -19542,6 +19522,47 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <AssociationSet Name="FK_PlanningMRProposal_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID">
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <EntitySet Name="OutOfferPos" EntityType="iPlusMESV4_Model.OutOfferPos" />
+          <AssociationSet Name="FK_OutOfferPos_MaterialID" Association="iPlusMESV4_Model.FK_OutOfferPos_MaterialID">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_MDCountrySalesTaxID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID">
+            <End Role="MDCountrySalesTax" EntitySet="MDCountrySalesTax" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_MDCountrySalesTaxMaterialID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID">
+            <End Role="MDCountrySalesTaxMaterial" EntitySet="MDCountrySalesTaxMaterial" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID">
+            <End Role="MDCountrySalesTaxMDMaterialGroup" EntitySet="MDCountrySalesTaxMDMaterialGroup" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_MDTimeRangeID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID">
+            <End Role="MDTimeRange" EntitySet="MDTimeRange" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_MDUnitID" Association="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID">
+            <End Role="MDUnit" EntitySet="MDUnit" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_OutOfferID" Association="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID">
+            <End Role="OutOffer" EntitySet="OutOffer" />
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_GroupOutOfferPosID" Association="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID">
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+            <End Role="OutOfferPos1" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOfferPos_ParentOutOfferPosID" Association="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID">
+            <End Role="OutOfferPos" EntitySet="OutOfferPos" />
+            <End Role="OutOfferPos1" EntitySet="OutOfferPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOrderPos_GroupOutOrderPosID" Association="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="OutOrderPos1" EntitySet="OutOrderPos" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -22702,11 +22723,11 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="MDTimeRange1_ParentMDTimeRange" Relationship="iPlusMESV4_Model.FK_MDShift_ParentMDTimeRangeID" FromRole="MDTimeRange1" ToRole="MDTimeRange" />
           <NavigationProperty Name="TourplanPos_MDTimeRange" Relationship="iPlusMESV4_Model.FK_TourplanPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="TourplanPos" />
           <NavigationProperty Name="InOrderPos_MDTimeRange" Relationship="iPlusMESV4_Model.FK_InOrderPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="InOrderPos" />
-          <NavigationProperty Name="OutOfferPos_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOrderPos" />
           <NavigationProperty Name="OutOffer_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOrder_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOrder" />
           <NavigationProperty Name="CompanyPerson_MDTimeRange" Relationship="iPlusMESV4_Model.FK_CompanyPerson_MDTimeRangeID" FromRole="MDTimeRange" ToRole="CompanyPerson" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDToleranceState">
           <Key>
@@ -22834,12 +22855,12 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="FacilityBooking_MDUnit" Relationship="iPlusMESV4_Model.FK_FacilityBooking_MDUnitID" FromRole="MDUnit" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBookingCharge_MDUnit" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_MDUnitID" FromRole="MDUnit" ToRole="FacilityBookingCharge" />
           <NavigationProperty Name="InOrderPos_MDUnit" Relationship="iPlusMESV4_Model.FK_InOrderPos_MDUnitID" FromRole="MDUnit" ToRole="InOrderPos" />
-          <NavigationProperty Name="OutOfferPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDUnitID" FromRole="MDUnit" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDUnit" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDUnitID" FromRole="MDUnit" ToRole="InvoicePos" />
           <NavigationProperty Name="Facility_MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID" FromRole="MDUnit" ToRole="Facility" />
           <NavigationProperty Name="Material_BaseMDUnit" Relationship="iPlusMESV4_Model.FK_Material_BaseMDUnitID" FromRole="MDUnit" ToRole="Material" />
           <NavigationProperty Name="Partslist_MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -24285,7 +24306,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -24310,7 +24331,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24332,7 +24353,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24353,7 +24374,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="Nr" Type="Int64" />
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24412,7 +24433,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PartslistSequence" Type="Int32" Nullable="false" />
@@ -24452,14 +24473,14 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="BasedOnMachine" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="RelSequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="ActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosSequence" Type="Int32" Nullable="false" />
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -30852,9 +30873,9 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="MDCountry" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTax_MDCountryID" FromRole="MDCountrySalesTax" ToRole="MDCountry" />
           <NavigationProperty Name="MDCountrySalesTaxMaterial_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_MDCountrySalesTax" FromRole="MDCountrySalesTax" ToRole="MDCountrySalesTaxMaterial" />
           <NavigationProperty Name="MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" FromRole="MDCountrySalesTax" ToRole="MDCountrySalesTaxMDMaterialGroup" />
-          <NavigationProperty Name="OutOfferPos_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="InvoicePos" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDCountrySalesTaxMaterial">
           <Key>
@@ -30865,10 +30886,10 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="MaterialID" Type="Guid" Nullable="false" />
           <Property Name="SalesTax" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
           <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_MDCountrySalesTax" FromRole="MDCountrySalesTaxMaterial" ToRole="MDCountrySalesTax" />
-          <NavigationProperty Name="OutOfferPos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="InvoicePos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_Material" FromRole="MDCountrySalesTaxMaterial" ToRole="Material" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDCountrySalesTaxMDMaterialGroup">
           <Key>
@@ -30880,55 +30901,9 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <Property Name="SalesTax" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
           <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="MDCountrySalesTax" />
           <NavigationProperty Name="MDMaterialGroup" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="MDMaterialGroup" />
-          <NavigationProperty Name="OutOfferPos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="InvoicePos" />
-        </EntityType>
-        <EntityType Name="OutOfferPos">
-          <Key>
-            <PropertyRef Name="OutOfferPosID" />
-          </Key>
-          <Property Name="OutOfferPosID" Type="Guid" Nullable="false" />
-          <Property Name="OutOfferID" Type="Guid" Nullable="false" />
-          <Property Name="ParentOutOfferPosID" Type="Guid" />
-          <Property Name="GroupOutOfferPosID" Type="Guid" />
-          <Property Name="MDTimeRangeID" Type="Guid" />
-          <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
-          <Property Name="MDCountrySalesTaxID" Type="Guid" />
-          <Property Name="MDCountrySalesTaxMDMaterialGroupID" Type="Guid" />
-          <Property Name="MDCountrySalesTaxMaterialID" Type="Guid" />
-          <Property Name="Sequence" Type="Int32" Nullable="false" />
-          <Property Name="MaterialID" Type="Guid" Nullable="false" />
-          <Property Name="MDUnitID" Type="Guid" />
-          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
-          <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="SalesTax" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="TargetWeight" Type="Double" Nullable="false" />
-          <Property Name="TargetDeliveryDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="TargetDeliveryMaxDate" Type="DateTime" Precision="3" />
-          <Property Name="TargetDeliveryPriority" Type="Int16" Nullable="false" />
-          <Property Name="GroupSum" Type="Boolean" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Comment2" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesign" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" FromRole="OutOfferPos" ToRole="MDCountrySalesTax" />
-          <NavigationProperty Name="MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" FromRole="OutOfferPos" ToRole="MDCountrySalesTaxMaterial" />
-          <NavigationProperty Name="MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="OutOfferPos" ToRole="MDCountrySalesTaxMDMaterialGroup" />
-          <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="OutOfferPos" ToRole="MDTimeRange" />
-          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="OutOfferPos" ToRole="MDUnit" />
-          <NavigationProperty Name="OutOfferPos_GroupOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
-          <NavigationProperty Name="OutOfferPos1_GroupOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
-          <NavigationProperty Name="OutOfferPos_ParentOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
-          <NavigationProperty Name="OutOfferPos1_ParentOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
-          <NavigationProperty Name="OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOfferPos" ToRole="OutOffer" />
-          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="OutOfferPos" ToRole="Material" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="OutOrderPos">
           <Key>
@@ -31011,6 +30986,9 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="InvoicePos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_InvoicePos_OutOrderPosID" FromRole="OutOrderPos" ToRole="InvoicePos" />
           <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderPos_OutOrderID" FromRole="OutOrderPos" ToRole="OutOrder" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" FromRole="OutOrderPos" ToRole="Material" />
+          <Property Name="GroupOutOrderPosID" Type="Guid" />
+          <NavigationProperty Name="OutOrderPos1" Relationship="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" FromRole="OutOrderPos" ToRole="OutOrderPos1" />
+          <NavigationProperty Name="OutOrderPos2" Relationship="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" FromRole="OutOrderPos1" ToRole="OutOrderPos" />
         </EntityType>
         <Association Name="FK_OutOrderPos_CompanyAddressUnloadingPointID">
           <End Type="iPlusMESV4_Model.CompanyAddressUnloadingpoint" Role="CompanyAddressUnloadingpoint" Multiplicity="0..1" />
@@ -31182,18 +31160,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_OutOfferPos_MDCountrySalesTaxID">
-          <End Type="iPlusMESV4_Model.MDCountrySalesTax" Role="MDCountrySalesTax" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDCountrySalesTax">
-              <PropertyRef Name="MDCountrySalesTaxID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
-              <PropertyRef Name="MDCountrySalesTaxID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_OutOrderPos_MDCountrySalesTaxID">
           <End Type="iPlusMESV4_Model.MDCountrySalesTax" Role="MDCountrySalesTax" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="*" />
@@ -31203,18 +31169,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Principal>
             <Dependent Role="OutOrderPos">
               <PropertyRef Name="MDCountrySalesTaxID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_OutOfferPos_MDCountrySalesTaxMaterialID">
-          <End Type="iPlusMESV4_Model.MDCountrySalesTaxMaterial" Role="MDCountrySalesTaxMaterial" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDCountrySalesTaxMaterial">
-              <PropertyRef Name="MDCountrySalesTaxMaterialID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
-              <PropertyRef Name="MDCountrySalesTaxMaterialID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -31239,18 +31193,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Principal>
             <Dependent Role="MDCountrySalesTaxMDMaterialGroup">
               <PropertyRef Name="MDMaterialGroupID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID">
-          <End Type="iPlusMESV4_Model.MDCountrySalesTaxMDMaterialGroup" Role="MDCountrySalesTaxMDMaterialGroup" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDCountrySalesTaxMDMaterialGroup">
-              <PropertyRef Name="MDCountrySalesTaxMDMaterialGroupID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
-              <PropertyRef Name="MDCountrySalesTaxMDMaterialGroupID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -31314,18 +31256,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_OutOfferPos_MDTimeRangeID">
-          <End Type="iPlusMESV4_Model.MDTimeRange" Role="MDTimeRange" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDTimeRange">
-              <PropertyRef Name="MDTimeRangeID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
-              <PropertyRef Name="MDTimeRangeID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_OutOrderPos_MDTimeRangeID">
           <End Type="iPlusMESV4_Model.MDTimeRange" Role="MDTimeRange" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="*" />
@@ -31374,18 +31304,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_OutOfferPos_MDUnitID">
-          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDUnit">
-              <PropertyRef Name="MDUnitID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
-              <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_OutOrderPos_MDUnitID">
           <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="*" />
@@ -31395,30 +31313,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Principal>
             <Dependent Role="OutOrderPos">
               <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_OutOfferPos_GroupOutOfferPosID">
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="OutOfferPos">
-              <PropertyRef Name="OutOfferPosID" />
-            </Principal>
-            <Dependent Role="OutOfferPos1">
-              <PropertyRef Name="GroupOutOfferPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_OutOfferPos_ParentOutOfferPosID">
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="OutOfferPos">
-              <PropertyRef Name="OutOfferPosID" />
-            </Principal>
-            <Dependent Role="OutOfferPos1">
-              <PropertyRef Name="ParentOutOfferPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -31640,12 +31534,12 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTermOfPaymentID" FromRole="OutOffer" ToRole="MDTermOfPayment" />
           <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTimeRangeID" FromRole="OutOffer" ToRole="MDTimeRange" />
           <NavigationProperty Name="OutOfferConfig_OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferConfig_OutOfferID" FromRole="OutOffer" ToRole="OutOfferConfig" />
-          <NavigationProperty Name="OutOfferPos_OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOffer" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrder_BasedOnOutOffer" Relationship="iPlusMESV4_Model.FK_OutOrder_BasedOnOutOfferID" FromRole="OutOffer" ToRole="OutOrder" />
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID" FromRole="OutOffer" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyAddress" FromRole="OutOffer" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" FromRole="OutOffer" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" FromRole="OutOffer" ToRole="CompanyPerson" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOffer" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="OutOrder">
           <Key>
@@ -31875,20 +31769,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
               <PropertyRef Name="OutOfferID" />
             </Principal>
             <Dependent Role="OutOfferConfig">
-              <PropertyRef Name="OutOfferID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_OutOfferPos_OutOfferID">
-          <End Type="iPlusMESV4_Model.OutOffer" Role="OutOffer" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="OutOffer">
-              <PropertyRef Name="OutOfferID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
               <PropertyRef Name="OutOfferID" />
             </Dependent>
           </ReferentialConstraint>
@@ -32622,7 +32502,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="MaterialWFRelation_SourceMaterial" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_Material1" FromRole="Material" ToRole="MaterialWFRelation" />
           <NavigationProperty Name="MDCountrySalesTaxMaterial_Material" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_Material" FromRole="Material" ToRole="MDCountrySalesTaxMaterial" />
           <NavigationProperty Name="OutOfferConfig_Material" Relationship="iPlusMESV4_Model.FK_OutOfferConfig_MaterialID" FromRole="Material" ToRole="OutOfferConfig" />
-          <NavigationProperty Name="OutOfferPos_Material" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="Material" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderConfig_Material" Relationship="iPlusMESV4_Model.FK_OutOrderConfig_MaterialID" FromRole="Material" ToRole="OutOrderConfig" />
           <NavigationProperty Name="OutOrderPos_Material" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" FromRole="Material" ToRole="OutOrderPos" />
           <NavigationProperty Name="OutOrderPosUtilization_Material" Relationship="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" FromRole="Material" ToRole="OutOrderPosUtilization" />
@@ -32639,6 +32518,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
           <NavigationProperty Name="TourplanConfig_Material" Relationship="iPlusMESV4_Model.FK_TourplanConfig_MaterialID" FromRole="Material" ToRole="TourplanConfig" />
           <NavigationProperty Name="Visitor_Material" Relationship="iPlusMESV4_Model.FK_Visitor_MaterialID" FromRole="Material" ToRole="Visitor" />
           <NavigationProperty Name="Partslist_Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
+          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="Material" ToRole="OutOfferPos" />
         </EntityType>
         <Association Name="FK_Material_StackCalculatorACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -33130,18 +33010,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
               <PropertyRef Name="MaterialID" />
             </Principal>
             <Dependent Role="OutOfferConfig">
-              <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_OutOfferPos_MaterialID">
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Material">
-              <PropertyRef Name="MaterialID" />
-            </Principal>
-            <Dependent Role="OutOfferPos">
               <PropertyRef Name="MaterialID" />
             </Dependent>
           </ReferentialConstraint>
@@ -34260,6 +34128,174 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
             </Principal>
             <Dependent Role="PlanningMRProposal">
               <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="OutOfferPos">
+          <Key>
+            <PropertyRef Name="OutOfferPosID" />
+          </Key>
+          <Property Name="OutOfferPosID" Type="Guid" Nullable="false" />
+          <Property Name="OutOfferID" Type="Guid" Nullable="false" />
+          <Property Name="ParentOutOfferPosID" Type="Guid" />
+          <Property Name="GroupOutOfferPosID" Type="Guid" />
+          <Property Name="MDTimeRangeID" Type="Guid" />
+          <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
+          <Property Name="MDCountrySalesTaxID" Type="Guid" />
+          <Property Name="MDCountrySalesTaxMDMaterialGroupID" Type="Guid" />
+          <Property Name="MDCountrySalesTaxMaterialID" Type="Guid" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="MaterialID" Type="Guid" Nullable="false" />
+          <Property Name="MDUnitID" Type="Guid" />
+          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
+          <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="SalesTax" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="TargetWeight" Type="Double" Nullable="false" />
+          <Property Name="TargetDeliveryDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TargetDeliveryMaxDate" Type="DateTime" Precision="3" />
+          <Property Name="TargetDeliveryPriority" Type="Int16" Nullable="false" />
+          <Property Name="GroupSum" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Comment2" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesign" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="OutOfferPos" ToRole="Material" />
+          <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" FromRole="OutOfferPos" ToRole="MDCountrySalesTax" />
+          <NavigationProperty Name="MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" FromRole="OutOfferPos" ToRole="MDCountrySalesTaxMaterial" />
+          <NavigationProperty Name="MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="OutOfferPos" ToRole="MDCountrySalesTaxMDMaterialGroup" />
+          <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="OutOfferPos" ToRole="MDTimeRange" />
+          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="OutOfferPos" ToRole="MDUnit" />
+          <NavigationProperty Name="OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOfferPos" ToRole="OutOffer" />
+          <NavigationProperty Name="OutOfferPos1" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
+          <NavigationProperty Name="OutOfferPos2" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos11" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
+          <NavigationProperty Name="OutOfferPos3" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
+        </EntityType>
+        <Association Name="FK_OutOfferPos_MaterialID">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_MDCountrySalesTaxID">
+          <End Type="iPlusMESV4_Model.MDCountrySalesTax" Role="MDCountrySalesTax" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCountrySalesTax">
+              <PropertyRef Name="MDCountrySalesTaxID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="MDCountrySalesTaxID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_MDCountrySalesTaxMaterialID">
+          <End Type="iPlusMESV4_Model.MDCountrySalesTaxMaterial" Role="MDCountrySalesTaxMaterial" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCountrySalesTaxMaterial">
+              <PropertyRef Name="MDCountrySalesTaxMaterialID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="MDCountrySalesTaxMaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID">
+          <End Type="iPlusMESV4_Model.MDCountrySalesTaxMDMaterialGroup" Role="MDCountrySalesTaxMDMaterialGroup" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCountrySalesTaxMDMaterialGroup">
+              <PropertyRef Name="MDCountrySalesTaxMDMaterialGroupID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="MDCountrySalesTaxMDMaterialGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_MDTimeRangeID">
+          <End Type="iPlusMESV4_Model.MDTimeRange" Role="MDTimeRange" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDTimeRange">
+              <PropertyRef Name="MDTimeRangeID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="MDTimeRangeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_MDUnitID">
+          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDUnit">
+              <PropertyRef Name="MDUnitID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="MDUnitID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_OutOfferID">
+          <End Type="iPlusMESV4_Model.OutOffer" Role="OutOffer" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOffer">
+              <PropertyRef Name="OutOfferID" />
+            </Principal>
+            <Dependent Role="OutOfferPos">
+              <PropertyRef Name="OutOfferID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_GroupOutOfferPosID">
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOfferPos">
+              <PropertyRef Name="OutOfferPosID" />
+            </Principal>
+            <Dependent Role="OutOfferPos1">
+              <PropertyRef Name="GroupOutOfferPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOfferPos_ParentOutOfferPosID">
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOfferPos" Role="OutOfferPos1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOfferPos">
+              <PropertyRef Name="OutOfferPosID" />
+            </Principal>
+            <Dependent Role="OutOfferPos1">
+              <PropertyRef Name="ParentOutOfferPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOrderPos_GroupOutOrderPosID">
+          <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="OutOrderPos1">
+              <PropertyRef Name="GroupOutOrderPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -38929,45 +38965,10 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="OutOfferPos">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.OutOfferPos">
-              <MappingFragment StoreEntitySet="OutOfferPos">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
-                <ScalarProperty Name="Comment2" ColumnName="Comment2" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="GroupSum" ColumnName="GroupSum" />
-                <ScalarProperty Name="TargetDeliveryPriority" ColumnName="TargetDeliveryPriority" />
-                <ScalarProperty Name="TargetDeliveryMaxDate" ColumnName="TargetDeliveryMaxDate" />
-                <ScalarProperty Name="TargetDeliveryDate" ColumnName="TargetDeliveryDate" />
-                <ScalarProperty Name="TargetWeight" ColumnName="TargetWeight" />
-                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
-                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
-                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
-                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
-                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
-                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
-                <ScalarProperty Name="MDCountrySalesTaxMaterialID" ColumnName="MDCountrySalesTaxMaterialID" />
-                <ScalarProperty Name="MDCountrySalesTaxMDMaterialGroupID" ColumnName="MDCountrySalesTaxMDMaterialGroupID" />
-                <ScalarProperty Name="MDCountrySalesTaxID" ColumnName="MDCountrySalesTaxID" />
-                <ScalarProperty Name="MaterialPosTypeIndex" ColumnName="MaterialPosTypeIndex" />
-                <ScalarProperty Name="MDTimeRangeID" ColumnName="MDTimeRangeID" />
-                <ScalarProperty Name="GroupOutOfferPosID" ColumnName="GroupOutOfferPosID" />
-                <ScalarProperty Name="ParentOutOfferPosID" ColumnName="ParentOutOfferPosID" />
-                <ScalarProperty Name="OutOfferID" ColumnName="OutOfferID" />
-                <ScalarProperty Name="OutOfferPosID" ColumnName="OutOfferPosID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="OutOrderPos">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.OutOrderPos">
               <MappingFragment StoreEntitySet="OutOrderPos">
+                <ScalarProperty Name="GroupOutOrderPosID" ColumnName="GroupOutOrderPosID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -39379,6 +39380,42 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
                 <ScalarProperty Name="InOrderID" ColumnName="InOrderID" />
                 <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
                 <ScalarProperty Name="PlanningMRProposalID" ColumnName="PlanningMRProposalID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OutOfferPos">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.OutOfferPos">
+              <MappingFragment StoreEntitySet="OutOfferPos">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
+                <ScalarProperty Name="Comment2" ColumnName="Comment2" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="GroupSum" ColumnName="GroupSum" />
+                <ScalarProperty Name="TargetDeliveryPriority" ColumnName="TargetDeliveryPriority" />
+                <ScalarProperty Name="TargetDeliveryMaxDate" ColumnName="TargetDeliveryMaxDate" />
+                <ScalarProperty Name="TargetDeliveryDate" ColumnName="TargetDeliveryDate" />
+                <ScalarProperty Name="TargetWeight" ColumnName="TargetWeight" />
+                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
+                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
+                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
+                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
+                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
+                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="MDCountrySalesTaxMaterialID" ColumnName="MDCountrySalesTaxMaterialID" />
+                <ScalarProperty Name="MDCountrySalesTaxMDMaterialGroupID" ColumnName="MDCountrySalesTaxMDMaterialGroupID" />
+                <ScalarProperty Name="MDCountrySalesTaxID" ColumnName="MDCountrySalesTaxID" />
+                <ScalarProperty Name="MaterialPosTypeIndex" ColumnName="MaterialPosTypeIndex" />
+                <ScalarProperty Name="MDTimeRangeID" ColumnName="MDTimeRangeID" />
+                <ScalarProperty Name="GroupOutOfferPosID" ColumnName="GroupOutOfferPosID" />
+                <ScalarProperty Name="ParentOutOfferPosID" ColumnName="ParentOutOfferPosID" />
+                <ScalarProperty Name="OutOfferID" ColumnName="OutOfferID" />
+                <ScalarProperty Name="OutOfferPosID" ColumnName="OutOfferPosID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -40101,7 +40138,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
         <EntityTypeShape EntityType="iPlusMESV4_Model.MDCountrySalesTax" Width="1.5" PointX="58" PointY="231.75" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MDCountrySalesTaxMaterial" Width="1.5" PointX="60.25" PointY="269.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.MDCountrySalesTaxMDMaterialGroup" Width="1.5" PointX="62.25" PointY="278" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.OutOfferPos" Width="1.5" PointX="64.5" PointY="277.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOrderPos" Width="1.5" PointX="64.5" PointY="288.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_CompanyAddressUnloadingPointID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_PickupCompanyMaterialID" />
@@ -40117,26 +40153,19 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountrySalesTax_MDCountryID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_MDCountrySalesTax" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMDMaterialGroupID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDDelivPosLoadStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDDelivPosStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDOutOrderPlanStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDOutOrderPosStateID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDToleranceStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDTourplanPosStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDTransportModeID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDUnitID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_ParentOutOrderPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPosSplit_OutOrderPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPosUtilization_OutOrderPosID" />
@@ -40167,7 +40196,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferConfig_OutOfferID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_BasedOnOutOfferID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderConfig_OutOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_OutOrderID" />
@@ -40253,7 +40281,6 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialWFRelation_Material1" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_Material" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferConfig_MaterialID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderConfig_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" />
@@ -40335,6 +40362,17 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.OutOfferPos" Width="1.5" PointX="75.75" PointY="266.75" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" />
       </Diagram>
     </Diagrams>
   </Designer>

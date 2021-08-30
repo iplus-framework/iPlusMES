@@ -37,6 +37,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(29, "Comment2", "en{'Comment 2'}de{'Bemerkung 2'}", "", "", true)]
     [ACPropertyEntity(30, "LineNumber", "en{'Item Number'}de{'Positionsnummer'}", "", "", true)]
     [ACPropertyEntity(31, MDTransportMode.ClassName, ConstApp.ESTransportMode, Const.ContextDatabase + "\\" + MDTransportMode.ClassName, "", true)]
+    [ACPropertyEntity(32, "GroupSum", "en{'Group subtotal'}de{'Zwischensummengruppe '}", "", "", true)]
     [ACPropertyEntity(9999, "PickupCompanyMaterial", "en{'Material for Pick-Up'}de{'Material für Abholung'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName, "", true)]
     [ACPropertyEntity(9999, OutOrder.ClassName, "en{'Sales Order'}de{'Auftrag'}", Const.ContextDatabase + "\\" + OutOrder.ClassName, "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
@@ -55,7 +56,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer wird automatisch bei der Anlage durchgeführt
         /// </summary>
-        public static OutOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject)
+        public static OutOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject, OutOrderPos parentGroupPos = null)
         {
             OutOrderPos entity = new OutOrderPos();
             entity.OutOrderPosID = Guid.NewGuid();
@@ -85,6 +86,26 @@ namespace gip.mes.datamodel
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardRoot;
                 outOrder.OutOrderPos_OutOrder.Add(entity);
             }
+
+            if (parentGroupPos == null)
+            {
+                if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue).Select(c => c.Sequence).Any())
+                {
+                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue && c.EntityState != System.Data.EntityState.Added)
+                                                                   .Select(c => c.Sequence).Max() + 1;
+                }
+                else
+                    entity.Sequence = 1;
+            }
+            else
+            {
+                if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence).Any())
+                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence).Max() + 1;
+                else
+                    entity.Sequence = 1;
+            }
+
+
             entity.TargetQuantityUOM = 0;
             entity.MDOutOrderPosState = MDOutOrderPosState.DefaultMDOutOrderPosState(dbApp);
             entity.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(dbApp);
@@ -267,14 +288,33 @@ namespace gip.mes.datamodel
 
         #region IOutOrderPos
 
-        //[ACPropertyInfo(31)]
-        //public List<OutOfferPos> Items
-        //{
-        //    get
-        //    {
-        //        return OutOrderPos_GroupOutOrderPos?.ToList();
-        //    }
-        //}
+        [ACPropertyInfo(30)]
+        public string Position
+        {
+            get
+            {
+                if (OutOrderPos1_GroupOutOrderPos == null)
+                    return Sequence.ToString("00");
+                else
+                {
+                    return OutOrderPos1_GroupOutOrderPos.Position + "." + Sequence.ToString("00");
+                }
+            }
+        }
+
+        partial void OnSequenceChanged()
+        {
+            OnPropertyChanged("Position");
+        }
+
+        [ACPropertyInfo(31)]
+        public List<OutOrderPos> Items
+        {
+            get
+            {
+                return OutOrderPos_GroupOutOrderPos?.ToList();
+            }
+        }
 
         public GlobalApp.MaterialPosTypes MaterialPosType
         {

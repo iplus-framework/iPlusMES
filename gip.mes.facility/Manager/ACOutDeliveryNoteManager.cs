@@ -630,7 +630,7 @@ namespace gip.mes.facility
                     outOrderPos.PriceNet = outOfferPos.PriceNet;
                     outOrderPos.PriceGross = outOfferPos.PriceGross;
                     outOrderPos.SalesTax = outOfferPos.SalesTax;
-
+                    outOrderPos.Sequence = outOfferPos.Sequence;
 
                     outOrderPos.GroupSum = outOfferPos.GroupSum;
                     outOrderPos.TargetDeliveryDate = outOfferPos.TargetDeliveryDate;
@@ -649,11 +649,19 @@ namespace gip.mes.facility
                 {
                     if (outOfferPos.ParentOutOfferPosID != null)
                     {
-                        Guid outOrderPosID = connection[outOffer.OutOfferID];
-                        OutOrderPos relatedPos = outOrder.OutOrderPos_OutOrder.Where(c => c.OutOrderID == outOrderPosID).FirstOrDefault();
+                        Guid outOrderPosID = connection[outOfferPos.OutOfferPosID];
+                        OutOrderPos relatedPos = outOrder.OutOrderPos_OutOrder.Where(c => c.OutOrderPosID == outOrderPosID).FirstOrDefault();
                         Guid parentOutOrderPosID = connection[outOfferPos.ParentOutOfferPosID ?? Guid.Empty];
                         OutOrderPos parentRelatedPos = outOrder.OutOrderPos_OutOrder.Where(c => c.OutOrderID == parentOutOrderPosID).FirstOrDefault();
                         relatedPos.OutOrderPos1_ParentOutOrderPos = parentRelatedPos;
+                    }
+
+                    if (outOfferPos.OutOfferPos1_GroupOutOfferPos != null)
+                    {
+                        Guid outOrderPosID = connection[outOfferPos.OutOfferPosID];
+                        OutOrderPos relatedPos = outOrder.OutOrderPos_OutOrder.Where(c => c.OutOrderPosID == outOrderPosID).FirstOrDefault();
+                        Guid groupOutOrderPosID = connection[outOfferPos.GroupOutOfferPosID ?? Guid.Empty];
+                        relatedPos.GroupOutOrderPosID = groupOutOrderPosID;
                     }
                 }
 
