@@ -20,7 +20,7 @@ namespace gip.bso.sales
     /// 
     /// TODO: Betroffene Tabellen: OutOffer, OutOfferPos
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Offering'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Offer'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
     public class BSOOutOffer : ACBSOvbNav, IOutOrderPosBSO
     {
         #region private

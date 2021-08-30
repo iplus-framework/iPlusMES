@@ -426,13 +426,13 @@ namespace gip.bso.sales
                 {
                     return CurrentOutOrder.OutOrderPos_OutOrder
                         .Where(c => c.MaterialPosTypeIndex == (int)GlobalApp.MaterialPosTypes.OutwardPart && !c.DeliveryNotePos_OutOrderPos.Any())
-                        .OrderBy(c => c.Sequence);
+                        .OrderBy(c => c.Position);
                 }
                 else
                 {
                     return CurrentOutOrder.OutOrderPos_OutOrder
                         .Where(c => !c.ParentOutOrderPosID.HasValue)
-                        .OrderBy(c => c.Sequence);
+                        .OrderBy(c => c.Position);
                 }
             }
         }
@@ -1859,19 +1859,19 @@ namespace gip.bso.sales
 
             List<OutOrderPos> posData = new List<OutOrderPos>();
 
-            foreach (var outOrderPos in CurrentOutOrder.OutOrderPos_OutOrder.Where(c => c.PriceNet >= 0).OrderBy(p => p.Sequence))
+            foreach (var outOrderPos in CurrentOutOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posData.Add(outOrderPos);
-                //BuildOutOfferPosDataRecursive(posData, outOrderPos.Items);
-                //if (outOrderPos.GroupSum)
-                //{
-                //    OutOrderPos sumPos = new OutOrderPos();
-                //    sumPos.Total = outOrderPos.Items.Sum(c => c.TotalPrice).ToString("N");
-                //    sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50063", langCode) + outOrderPos.Material.MaterialNo; // Info50063.
-                //    sumPos.Sequence = outOrderPos.Sequence;
-                //    sumPos.GroupSum = outOrderPos.GroupSum;
-                //    posData.Add(sumPos);
-                //}
+                BuildOutOrderPosDataRecursive(posData, outOrderPos.Items);
+                if (outOrderPos.GroupSum)
+                {
+                    OutOrderPos sumPos = new OutOrderPos();
+                    sumPos.TotalPricePrinted = outOrderPos.Items.Sum(c => c.TotalPrice).ToString("N");
+                    sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50076", langCode) + outOrderPos.Material.MaterialNo; // Info50063.
+                    sumPos.Sequence = outOrderPos.Sequence;
+                    sumPos.GroupSum = outOrderPos.GroupSum;
+                    posData.Add(sumPos);
+                }
             }
 
             OutOrderPosDataList = posData;
@@ -1879,18 +1879,18 @@ namespace gip.bso.sales
             if (OutOrderPosDiscountList != null && OutOrderPosDiscountList.Any())
             {
                 //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentOutOffer.PosPriceNetDiscount });
-                OutOrderPosDiscountList.Add(new OutOrderPos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50064", langCode), PriceNet = (decimal)CurrentOutOrder.PosPriceNetTotal }); //Info50064.
+                OutOrderPosDiscountList.Add(new OutOrderPos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50077", langCode), PriceNet = (decimal)CurrentOutOrder.PosPriceNetTotal }); //Info50064.
             }
 
             OutDeliveryNoteManager.CalculateTaxOverview(this, CurrentOutOrder, CurrentOutOrder.OutOrderPos_OutOrder.Select(c => (IOutOrderPos)c).ToList());
         }
 
-        private void BuildOutOfferPosDataRecursive(List<OutOfferPos> posDataList, IEnumerable<OutOfferPos> outOfferPosList)
+        private void BuildOutOrderPosDataRecursive(List<OutOrderPos> posDataList, IEnumerable<OutOrderPos> outOfferPosList)
         {
             foreach (var outOfferPos in outOfferPosList.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
             {
                 posDataList.Add(outOfferPos);
-                BuildOutOfferPosDataRecursive(posDataList, outOfferPos.Items);
+                BuildOutOrderPosDataRecursive(posDataList, outOfferPos.Items);
             }
         }
 
