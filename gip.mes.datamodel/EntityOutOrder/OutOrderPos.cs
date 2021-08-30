@@ -56,7 +56,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer wird automatisch bei der Anlage durchgeführt
         /// </summary>
-        public static OutOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject)
+        public static OutOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject, OutOrderPos parentGroupPos = null)
         {
             OutOrderPos entity = new OutOrderPos();
             entity.OutOrderPosID = Guid.NewGuid();
@@ -86,6 +86,26 @@ namespace gip.mes.datamodel
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardRoot;
                 outOrder.OutOrderPos_OutOrder.Add(entity);
             }
+
+            if (parentGroupPos == null)
+            {
+                if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue).Select(c => c.Sequence).Any())
+                {
+                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue && c.EntityState != System.Data.EntityState.Added)
+                                                                   .Select(c => c.Sequence).Max() + 1;
+                }
+                else
+                    entity.Sequence = 1;
+            }
+            else
+            {
+                if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence).Any())
+                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence).Max() + 1;
+                else
+                    entity.Sequence = 1;
+            }
+
+
             entity.TargetQuantityUOM = 0;
             entity.MDOutOrderPosState = MDOutOrderPosState.DefaultMDOutOrderPosState(dbApp);
             entity.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(dbApp);
