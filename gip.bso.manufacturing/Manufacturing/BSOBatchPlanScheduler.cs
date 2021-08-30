@@ -1624,18 +1624,10 @@ namespace gip.bso.manufacturing
             {
                 if (_FilterBatchplanSuggestionModeList == null)
                 {
-                    _FilterBatchplanSuggestionModeList = LoadFilterBatchplanSuggestionMode();
+                    _FilterBatchplanSuggestionModeList =  new ACValueListBatchSuggestionCommandModeEnum();
                 }
                 return _FilterBatchplanSuggestionModeList;
             }
-        }
-
-        private ACValueItemList LoadFilterBatchplanSuggestionMode()
-        {
-            ACValueItemList wizardPhaseTitleList = new ACValueItemList("FilterBatchplanSuggestionMode");
-            wizardPhaseTitleList.AddEntry(BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, "en{'According to Batchcount'}de{'Entsprechend der Batchanzahl'}");
-            wizardPhaseTitleList.AddEntry(BatchSuggestionCommandModeEnum.KeepStandardBatchSizeAndDivideRest, "en{'Keep standard batch size and divide rest'}de{'Standardbatchgröße einhalten und Rest aufteilen'}");
-            return wizardPhaseTitleList;
         }
 
         [ACMethodInfo("RecalculateBatchSuggestion", "en{'Calculate'}de{'Berechnung'}", 999)]
