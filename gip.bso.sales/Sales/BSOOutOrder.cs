@@ -1517,50 +1517,209 @@ namespace gip.bso.sales
         #region OutOrderPos
 
         #region OutOrderPos -> Manipulate (New, Edit, Delete ...)
-        [ACMethodInteraction(OutOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        //[ACMethodInteraction(OutOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        //public void NewOutOrderPos()
+        //{
+        //    if (!PreExecute("NewOutOrderPos"))
+        //        return;
+        //    // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
+        //    var outOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder);
+        //    OnPropertyChanged("OutOrderPosList");
+        //    CurrentOutOrderPos = outOrderPos;
+        //    SelectedOutOrderPos = outOrderPos;
+        //    PostExecute("NewOutOrderPos");
+        //}
+
+        //public bool IsEnabledNewOutOrderPos()
+        //{
+        //    return true;
+        //}
+
+        //[ACMethodInteraction(OutOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        //public void DeleteOutOrderPos()
+        //{
+        //    if (!PreExecute("DeleteOutOrderPos"))
+        //        return;
+        //    if (IsEnabledUnAssignContractPos())
+        //    {
+        //        UnAssignContractPos();
+        //    }
+        //    else
+        //    {
+        //        Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
+        //        if (msg != null)
+        //        {
+        //            Messages.Msg(msg);
+        //            return;
+        //        }
+        //        OnPropertyChanged("OutOrderPosList");
+        //    }
+        //    PostExecute("DeleteOutOrderPos");
+        //}
+
+        //public bool IsEnabledDeleteOutOrderPos()
+        //{
+        //    return CurrentOutOrder != null && CurrentOutOrderPos != null;
+        //}
+
+
+        [ACMethodInteraction("OutOrderPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
         public void NewOutOrderPos()
         {
-            if (!PreExecute("NewOutOrderPos"))
-                return;
+            if (!PreExecute("NewOutOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            var outOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder);
+            OutOrderPos groupPos = CurrentOutOrderPos?.OutOrderPos1_GroupOutOrderPos;
+            CurrentOutOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder, groupPos);
+            CurrentOutOrderPos.OutOrder = CurrentOutOrder;
+            CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos = groupPos;
+            CurrentOutOrder.OutOrderPos_OutOrder.Add(CurrentOutOrderPos);
             OnPropertyChanged("OutOrderPosList");
-            CurrentOutOrderPos = outOrderPos;
-            SelectedOutOrderPos = outOrderPos;
             PostExecute("NewOutOrderPos");
         }
 
         public bool IsEnabledNewOutOrderPos()
         {
-            return true;
+            return CurrentOutOrder != null;
         }
 
-        [ACMethodInteraction(OutOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        public void NewSubOutOrderPos()
+        {
+            if (!PreExecute("NewSubOutOrderPos")) return;
+            // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
+            OutOrderPos subOutOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder, CurrentOutOrderPos);
+            subOutOrderPos.OutOrderPos1_GroupOutOrderPos = CurrentOutOrderPos;
+            subOutOrderPos.OutOrder = CurrentOutOrder;
+            CurrentOutOrder.OutOrderPos_OutOrder.Add(subOutOrderPos);
+            OnPropertyChanged("OutOrderPosList");
+            CurrentOutOrderPos = subOutOrderPos;
+            PostExecute("NewSubOutOrderPos");
+        }
+
+        public bool IsEnabledSubOutOrderPos()
+        {
+            return SelectedOutOrderPos != null;
+        }
+
+        [ACMethodInteraction("OutOrderPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
         public void DeleteOutOrderPos()
         {
-            if (!PreExecute("DeleteOutOrderPos"))
+            if (!PreExecute("DeleteOutOrderPos")) return;
+            Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
                 return;
-            if (IsEnabledUnAssignContractPos())
-            {
-                UnAssignContractPos();
             }
-            else
-            {
-                Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
-                if (msg != null)
-                {
-                    Messages.Msg(msg);
-                    return;
-                }
-                OnPropertyChanged("OutOrderPosList");
-            }
+
             PostExecute("DeleteOutOrderPos");
+            OnPropertyChanged("OutOrderPosList");
+            if (CurrentOutOrder != null)
+            {
+                CurrentOutOrder.OnPricePropertyChanged();
+                OutDeliveryNoteManager.CalculateTaxOverview(this, CurrentOutOrder, CurrentOutOrder.OutOrderPos_OutOrder.Select(c => (IOutOrderPos)c).ToList());
+            }
         }
 
         public bool IsEnabledDeleteOutOrderPos()
         {
             return CurrentOutOrder != null && CurrentOutOrderPos != null;
         }
+
+        [ACMethodInteraction("OutOrderPos", "en{'Position up'}de{'Position oben'}", 10, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        public void OutOrderPosUp()
+        {
+            int sequencePre = 0;
+            if (CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos != null)
+            {
+                var posPre = CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos.OutOrderPos_GroupOutOrderPos
+                                                 .Where(c => c.Sequence < CurrentOutOrderPos.Sequence).OrderByDescending(x => x.Sequence)
+                                                 .FirstOrDefault();
+
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+
+                posPre.Sequence = CurrentOutOrderPos.Sequence;
+                CurrentOutOrderPos.Sequence = sequencePre;
+            }
+            else
+            {
+                var posPre = OutOrderPosList.Where(c => c.OutOrderPos1_GroupOutOrderPos == null && c.Sequence < CurrentOutOrderPos.Sequence)
+                                            .OrderByDescending(x => x.Sequence)
+                                            .FirstOrDefault();
+
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+                posPre.Sequence = CurrentOutOrderPos.Sequence;
+                CurrentOutOrderPos.Sequence = sequencePre;
+            }
+            OnPropertyChanged("OutOrderPosList");
+        }
+
+        public bool IsEnabledOutOrderPosUp()
+        {
+            return CurrentOutOrderPos != null && CurrentOutOrderPos.Sequence > 1;
+        }
+
+        [ACMethodInteraction("OutOrderPos", "en{'Position down'}de{'Position unten'}", 11, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        public void OutOrderPosDown()
+        {
+            int sequencePre = 0;
+            if (CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos != null)
+            {
+                var posPre = CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos.OutOrderPos_GroupOutOrderPos
+                                                 .Where(c => c.Sequence > CurrentOutOrderPos.Sequence)
+                                                 .OrderBy(x => x.Sequence)
+                                                 .FirstOrDefault();
+
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+
+                posPre.Sequence = CurrentOutOrderPos.Sequence;
+                CurrentOutOrderPos.Sequence = sequencePre;
+            }
+            else
+            {
+                var posPre = OutOrderPosList.Where(c => c.OutOrderPos1_GroupOutOrderPos == null && c.Sequence > CurrentOutOrderPos.Sequence)
+                                            .OrderBy(x => x.Sequence)
+                                            .FirstOrDefault();
+
+                if (posPre == null)
+                    return;
+
+                sequencePre = posPre.Sequence;
+                posPre.Sequence = CurrentOutOrderPos.Sequence;
+                CurrentOutOrderPos.Sequence = sequencePre;
+            }
+            OnPropertyChanged("OutOrderPosList");
+        }
+
+        public bool IsEnabledOutOrderPosDown()
+        {
+            if (CurrentOutOrderPos != null)
+            {
+                if (CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos == null)
+                {
+                    return CurrentOutOrderPos.Sequence < OutOrderPosList.Where(x => x.OutOrderPos1_GroupOutOrderPos == null).Max(c => c.Sequence);
+                }
+                else if (CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos != null)
+                {
+                    return CurrentOutOrderPos.Sequence < CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos.OutOrderPos_GroupOutOrderPos.Max(x => x.Sequence);
+                }
+
+            }
+
+            return false;
+        }
+
+
+
         #endregion
 
         #region Tracking
