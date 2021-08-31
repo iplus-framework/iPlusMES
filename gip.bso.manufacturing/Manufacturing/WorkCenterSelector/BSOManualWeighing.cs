@@ -32,14 +32,6 @@ namespace gip.bso.manufacturing
             if (!result)
                 return result;
 
-            
-
-            //using (ACMonitor.Lock(_20015_LockValue))
-            //{
-            //    _ApplicationQueue = new ACDelegateQueue(this.GetACUrl() + ";AppQueue");
-            //    _ApplicationQueue.StartWorkerThread();
-            //}
-
             return result;
         }
 
@@ -98,6 +90,8 @@ namespace gip.bso.manufacturing
                 return _DefaultMaterialIcon;
             }
         }
+
+
 
         #region Private fields
 

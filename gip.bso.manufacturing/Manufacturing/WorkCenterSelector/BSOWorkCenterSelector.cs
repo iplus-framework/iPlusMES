@@ -136,6 +136,9 @@ namespace gip.bso.manufacturing
 
         private WCFClientManager _ClientManager;
 
+        private bool _IsCurrentUserConfigured = false;
+        public bool IsCurrentUserConfigured => _IsCurrentUserConfigured;
+
         #region Properties => AccessNav
 
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -201,6 +204,7 @@ namespace gip.bso.manufacturing
 
                 if (value != null)
                 {
+                    
                     AccessPrimary.Current.OnItemSelected(this);
                     CurrentLayout = null;
                     CurrentLayout = AccessPrimary.Current.ItemLayout;
@@ -233,9 +237,14 @@ namespace gip.bso.manufacturing
                     if (_CurrentProcessModule != null)
                     {
                         PAProcessModuleACCaption = _CurrentProcessModule.ACCaption;
+                        _IsCurrentUserConfigured = _RulesForCurrentUser != null 
+                                                   && _RulesForCurrentUser.Any(c => c.ProcessModuleACUrl == _CurrentProcessModule.ACUrl);
                     }
                     else
+                    {
                         PAProcessModuleACCaption = null;
+                        _IsCurrentUserConfigured = false;
+                    }
                 }
             }
         }
@@ -257,7 +266,9 @@ namespace gip.bso.manufacturing
 
         #region Properties => Configuration (Rules)
 
-        private List<WorkCenterRule> _tempRules;
+        private List<WorkCenterRule> _TempRules;
+
+        private List<WorkCenterRule> _RulesForCurrentUser;
 
         private core.datamodel.VBUser _SelectedVBUser;
         [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}")]
@@ -613,8 +624,8 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("", "en{'Configure work center'}de{'Arbeitsplatz konfigurieren'}", 601, true)]
         public void ConfigureBSO()
         {
-            _tempRules = GetStoredRules();
-            AssignedProcessModulesList = new List<ACValueItem>(_tempRules.Select(x => new ACValueItem(x.VBUserName + " => " + x.ProcessModuleACUrl, x, null)).OrderBy(c => c.ACCaption));
+            _TempRules = GetStoredRules();
+            AssignedProcessModulesList = new List<ACValueItem>(_TempRules.Select(x => new ACValueItem(x.VBUserName + " => " + x.ProcessModuleACUrl, x, null)).OrderBy(c => c.ACCaption));
 
             var availablePAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray();
             AvailableProcessModulesList = availablePAFs.Select(c => c.ACClass1_ParentACClass).Distinct().Select(x => new ACValueItem(x.ACUrlComponent, x.ACUrlComponent, null)).OrderBy(c => c.ACCaption).ToList();
@@ -652,7 +663,7 @@ namespace gip.bso.manufacturing
                 VBUserName = SelectedVBUser.VBUserName,
                 //ProcessModulePAFName = ruleValue.Item2
             };
-            _tempRules.Add(rule);
+            _TempRules.Add(rule);
 
             var tempRules = AssignedProcessModulesList.ToList();
             tempRules.Add(new ACValueItem(string.Format("{0} => {1}", rule.VBUserName, rule.ProcessModuleACUrl), rule, null));
@@ -667,10 +678,10 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
         public void RemoveRule()
         {
-            WorkCenterRule rule = _tempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule.Value);
+            WorkCenterRule rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule.Value);
             if (rule != null)
             {
-                _tempRules.Remove(rule);
+                _TempRules.Remove(rule);
                 var tempRules = AssignedProcessModulesList.ToList();
                 tempRules.Remove(SelectedAssignedProcessModule);
                 AssignedProcessModulesList = tempRules.ToList();
@@ -692,7 +703,7 @@ namespace gip.bso.manufacturing
             using (XmlTextWriter xmlWriter = new XmlTextWriter(sw))
             {
                 DataContractSerializer serializer = new DataContractSerializer(typeof(List<WorkCenterRule>));
-                serializer.WriteObject(xmlWriter, _tempRules);
+                serializer.WriteObject(xmlWriter, _TempRules);
                 xml = sw.ToString();
             }
             BSOWorkCenterSelectorRules = xml;
@@ -892,12 +903,14 @@ namespace gip.bso.manufacturing
 
         public virtual void BuildWorkCenterItems()
         {
-            var configuredRules = GetRulesByCurrentUser();
+            _RulesForCurrentUser = GetRulesByCurrentUser();
             var relevantPAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray().OrderBy(c => c.ACCaption);
 
-            if (configuredRules != null && configuredRules.Any() && !Root.Environment.User.IsSuperuser)
-                relevantPAFs = relevantPAFs.Where(c => configuredRules.Any(x => x.ProcessModuleACUrl == c.ACClass1_ParentACClass.ACUrlComponent)).ToArray()
+            if (_RulesForCurrentUser != null && _RulesForCurrentUser.Any() && !Root.Environment.User.IsSuperuser)
+            {
+                relevantPAFs = relevantPAFs.Where(c => _RulesForCurrentUser.Any(x => x.ProcessModuleACUrl == c.ACClass1_ParentACClass.ACUrlComponent)).ToArray()
                                            .OrderBy(x => x.SortIndex);
+            }
 
             if (!relevantPAFs.Any())
                 return;
