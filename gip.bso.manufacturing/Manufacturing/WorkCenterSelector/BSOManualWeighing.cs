@@ -2281,6 +2281,8 @@ namespace gip.bso.manufacturing
 
             ClearBookingData();
 
+            result.ForEach(c => c.MaterialIconDesign = DefaultMaterialIcon);
+
             SingleDosingItemList = result;
             ShowDialog(this, "SingleDosingDialog");
         }

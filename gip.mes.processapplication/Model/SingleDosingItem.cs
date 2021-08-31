@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -11,7 +12,7 @@ namespace gip.mes.processapplication
     [DataContract]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Single dosing item'}de{'Single dosing item'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
-    public class SingleDosingItem
+    public class SingleDosingItem : IACObject, INotifyPropertyChanged
     {
         public SingleDosingItem()
         {
@@ -40,6 +41,50 @@ namespace gip.mes.processapplication
         {
             get;
             set;
+        }
+
+        [ACPropertyInfo(103)]
+        [IgnoreDataMember]
+        public ACClassDesign MaterialIconDesign
+        {
+            get;
+            set;
+        }
+
+        [IgnoreDataMember]
+        public IACObject ParentACObject => null;
+
+        [IgnoreDataMember]
+        public IACType ACType => this.ReflectACType();
+
+        public IEnumerable<IACObject> ACContentList => this.ReflectGetACContentList();
+
+        [IgnoreDataMember]
+        public string ACIdentifier => this.ReflectGetACIdentifier();
+
+        [IgnoreDataMember]
+        public string ACCaption => this.ACIdentifier;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool ACUrlBinding(string acUrl, ref IACType acTypeInfo, ref object source, ref string path, ref Global.ControlModes rightControlMode)
+        {
+            return this.ReflectACUrlBinding(acUrl, ref acTypeInfo, ref source, ref path, ref rightControlMode);
+        }
+
+        public object ACUrlCommand(string acUrl, params object[] acParameter)
+        {
+            return this.ReflectACUrlCommand(acUrl, acParameter);
+        }
+
+        public string GetACUrl(IACObject rootACObject = null)
+        {
+            return this.ReflectGetACUrl(rootACObject);
+        }
+
+        public bool IsEnabledACUrlCommand(string acUrl, params object[] acParameter)
+        {
+            return this.ReflectIsEnabledACUrlCommand(acUrl, acParameter);
         }
     }
 
