@@ -81,13 +81,18 @@
       <Project>{52DC947D-677D-42CA-BCA6-153A4E027272}</Project>
       <Name>gip.mes.facility</Name>
     </ProjectReference>
+    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
+      <Project>{D1320FB8-333D-4072-880D-BD5137933D2F}</Project>
+      <Name>gip.mes.processapplication</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="VBControlScripts\2021-08-31 10-40_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="VBControlScripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

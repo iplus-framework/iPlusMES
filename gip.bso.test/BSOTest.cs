@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -97,6 +98,24 @@ namespace gip.bso.test
             set
             {
                 msgList = value;
+            }
+        }
+
+        private BatchSuggestionCommandModeEnum _FilterSuggestionMode;
+        [ACPropertyInfo(999, "FilterSuggestionMode", "en{'Suggestion mode'}de{'Suggestion mode'}")]
+        public BatchSuggestionCommandModeEnum FilterSuggestionMode
+        {
+            get
+            {
+                return _FilterSuggestionMode;
+            }
+            set
+            {
+                if(_FilterSuggestionMode != value)
+                {
+                    _FilterSuggestionMode = value;
+                    OnPropertyChanged("FilterSuggestionMode");
+                }
             }
         }
 
