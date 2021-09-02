@@ -2095,8 +2095,8 @@ namespace gip.bso.sales
 
         private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
         {
-            OutOfferPos pos = e.ParentDataRow as OutOfferPos;
-            if (pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
+            OutOrderPos pos = e.ParentDataRow as OutOrderPos;
+            if (pos != null && pos.GroupSum && pos.OutOrderPosID == new Guid())
             {
                 var inlineCell = e.FlowDocObj as InlineTableCellValue;
                 if (inlineCell != null)
