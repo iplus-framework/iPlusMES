@@ -89,18 +89,22 @@ namespace gip.mes.datamodel
 
             if (parentGroupPos == null)
             {
-                if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue).Select(c => c.Sequence).Any())
+                var existingOutOrderPos = outOrder?.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue
+                                                                                  && c.EntityState != System.Data.EntityState.Added).Select(c => c.Sequence);
+
+                if (existingOutOrderPos != null && existingOutOrderPos.Any())
                 {
-                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue && c.EntityState != System.Data.EntityState.Added)
-                                                                   .Select(c => c.Sequence).Max() + 1;
+                    entity.Sequence = existingOutOrderPos.Max() + 1;
                 }
                 else
                     entity.Sequence = 1;
             }
             else
             {
-                if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence).Any())
-                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence).Max() + 1;
+                var existingOutOrderPos = outOrder?.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence);
+
+                if (existingOutOrderPos != null && existingOutOrderPos.Any())
+                    entity.Sequence = existingOutOrderPos.Max() + 1;
                 else
                     entity.Sequence = 1;
             }
