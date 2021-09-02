@@ -84,6 +84,10 @@ namespace gip.bso.masterdata
             if (_FacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
             Search();
             return true;
         }
@@ -93,7 +97,12 @@ namespace gip.bso.masterdata
             ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
             if (_AccessConfigurationTransfer != null)
                 _AccessConfigurationTransfer.NavSearchExecuting -= _AccessConfigurationTransfer_NavSearchExecuting;
+
             _PartslistManager = null;
+            if (_ProdOrderManager != null)
+                ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
+
             this._SelectedPartslistPos = null;
             this._AccessInputMaterial = null;
             this._AlternativeSelectedPartslistPos = null;
@@ -144,6 +153,17 @@ namespace gip.bso.masterdata
             }
         }
 
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        public ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
+            }
+        }
+
         #endregion
 
         #region Partslist
@@ -169,6 +189,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("UndoSave")) return;
             OnUndoSave();
+
             Search(SelectedPartslist);
             PostExecute("UndoSave");
             this.VisitedMethods = null;
@@ -199,6 +220,8 @@ namespace gip.bso.masterdata
             }
             if (!ConfigManagerIPlus.MustConfigBeReloadedOnServer(this, VisitedMethods, this.Database))
                 this.VisitedMethods = null;
+
+            // UpdatePlanningMROrders();
 
             return result;
         }
@@ -383,6 +406,56 @@ namespace gip.bso.masterdata
             return SelectedPartslist != null && SelectedPartslist.PartslistPos_Partslist.Any();
         }
 
+        #endregion
+
+        #region Partslist-> Methods -> Update PlanningMR Orders
+
+        public void UpdatePlanningMROrders()
+        {
+            List<Partslist> changedFormulaPartslist = new List<Partslist>();
+            foreach (Partslist partslist in PartslistList)
+            {
+                bool isChanged = PartslistManager.IsFormulaChanged(DatabaseApp, partslist);
+                if (isChanged)
+                {
+                    changedFormulaPartslist.Add(partslist);
+                    partslist.LastFormulaChange = DateTime.Now;
+                }
+            }
+            CheckPlConnectedWithPlanningMR(changedFormulaPartslist);
+        }
+
+        public void CheckPlConnectedWithPlanningMR(List<Partslist> changedFormulaPartslist)
+        {
+            if (changedFormulaPartslist != null && changedFormulaPartslist.Any())
+            {
+                List<Partslist> changedConnectedWithTemplate = changedFormulaPartslist.Where(c => c.ProdOrderPartslist_Partslist.Any(x => x.PlanningMRProposal_ProdOrderPartslist.Any())).ToList();
+                if (changedConnectedWithTemplate != null && changedConnectedWithTemplate.Any())
+                {
+                    string changedPlartslistNo = string.Join(",", changedConnectedWithTemplate.Select(c => c.PartslistNo).Distinct().OrderBy(c => c));
+                    MsgResult msgResult = Root.Messages.Question(this, "Question50065", MsgResult.Yes, false, changedPlartslistNo);
+                    if (msgResult == MsgResult.Yes)
+                    {
+                        UpdatePlanningMR(changedConnectedWithTemplate);
+                    }
+                }
+            }
+        }
+
+        public void UpdatePlanningMR(List<Partslist> changedConnectedWithTemplate)
+        {
+            foreach (Partslist partslist in changedConnectedWithTemplate)
+            {
+                List<ProdOrderPartslist> relatedTemplateProdPl =
+                    partslist
+                    .ProdOrderPartslist_Partslist
+                    .Where(c => c.PlanningMRProposal_ProdOrderPartslist.Any())
+                    .ToList();
+
+                foreach (ProdOrderPartslist prodOrderPartslist in relatedTemplateProdPl)
+                    ProdOrderManager.PartslistUpdate(DatabaseApp, partslist, prodOrderPartslist);
+            }
+        }
         #endregion
 
         #endregion
@@ -2038,7 +2111,7 @@ namespace gip.bso.masterdata
 
         private void OnVBDesignLoaded(string vbContent)
         {
-            if (vbContent == "SelectedRootWFNode" 
+            if (vbContent == "SelectedRootWFNode"
                 && SelectedIntermediate != null
                 && MaterialWFPresenter != null)
             {

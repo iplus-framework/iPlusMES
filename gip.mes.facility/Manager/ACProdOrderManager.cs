@@ -252,27 +252,12 @@ namespace gip.mes.facility
             prodOrderPartsList.IsEnabled = true;
             prodOrderPartsList.Partslist = partsList;
             prodOrderPartsList.Sequence = sequence;
+            prodOrderPartsList.LastFormulaChange = partsList.LastFormulaChange;
 
             List<ProdOrderPartslistPos> prodOrderPartsListPosItems = new List<ProdOrderPartslistPos>();
             foreach (var pos in partsListPosItems)
             {
-                ProdOrderPartslistPos prodPos = ProdOrderPartslistPos.NewACObject(dbApp, null);
-                prodPos.ProdOrderPartslistID = prodOrderPartsList.ProdOrderPartslistID;
-                prodPos.ProdOrderPartslist = prodOrderPartsList;
-                prodPos.Sequence = pos.Sequence;
-                prodPos.SequenceProduction = pos.Sequence;
-                prodPos.MaterialPosTypeIndex = pos.MaterialPosTypeIndex;
-                prodPos.MaterialID = pos.MaterialID;
-                prodPos.MDUnitID = pos.MDUnitID;
-                prodPos.ActualQuantity = 0;
-                prodPos.TargetQuantityUOM = pos.TargetQuantityUOM;
-                //prodPos.TargetQuantity = pos.TargetQuantity;
-                prodPos.ActualQuantityUOM = 0;
-                prodPos.IsBaseQuantityExcluded = false;
-                prodPos.ParentProdOrderPartslistPosID = null;
-                prodPos.AlternativeProdOrderPartslistPosID = null;
-                prodPos.LineNumber = pos.LineNumber;
-                prodPos.BasedOnPartslistPos = pos;
+                ProdOrderPartslistPos prodPos = GetProdOrderPartslistPos(dbApp, prodOrderPartsList, pos);
                 prodOrderPartsListPosItems.Add(prodPos);
                 prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist.Add(prodPos);
             }
@@ -288,25 +273,21 @@ namespace gip.mes.facility
                 );
 
             List<ProdOrderPartslistPosRelation> prodOrderPartsListPosRelationItems = new List<ProdOrderPartslistPosRelation>();
-            foreach (var posRelation in partsListPosRelationItems)
+            foreach (PartslistPosRelation posRelation in partsListPosRelationItems)
             {
-                ProdOrderPartslistPosRelation prodRelationItem = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
-                prodRelationItem.Sequence = posRelation.Sequence;
-                prodRelationItem.TargetQuantityUOM = posRelation.TargetQuantityUOM;
-                prodRelationItem.RetrogradeFIFO = posRelation.RetrogradeFIFO;
-                // build relation same to PartslistPosRelation
-                prodRelationItem.TargetProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);
-                prodRelationItem.SourceProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);// ToSetup
+                ProdOrderPartslistPosRelation prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
+                prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
                 prodOrderPartsListPosRelationItems.Add(prodRelationItem);
             }
 
-            foreach (var item in prodOrderPartsListPosItems)
-            {
-                List<ProdOrderPartslistPosRelation> targets = prodOrderPartsListPosRelationItems.Where(x => x.TargetProdOrderPartslistPosID == item.ProdOrderPartslistPosID).ToList();
-                List<ProdOrderPartslistPosRelation> sources = prodOrderPartsListPosRelationItems.Where(x => x.SourceProdOrderPartslistPosID == item.ProdOrderPartslistPosID).ToList();
-                targets.ForEach(x => item.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(x));
-                sources.ForEach(x => item.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Add(x));
-            }
+            // Think is not 
+            //foreach (var item in prodOrderPartsListPosItems)
+            //{
+            //    List<ProdOrderPartslistPosRelation> targets = prodOrderPartsListPosRelationItems.Where(x => x.TargetProdOrderPartslistPosID == item.ProdOrderPartslistPosID).ToList();
+            //    List<ProdOrderPartslistPosRelation> sources = prodOrderPartsListPosRelationItems.Where(x => x.SourceProdOrderPartslistPosID == item.ProdOrderPartslistPosID).ToList();
+            //    targets.ForEach(x => item.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(x));
+            //    sources.ForEach(x => item.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Add(x));
+            //}
 
             // Resize quantity
             BatchLinearResize(prodOrderPartsList, quantityFactor);
@@ -317,6 +298,42 @@ namespace gip.mes.facility
 
             PostExecute("PartslistAdd");
             return msg;
+        }
+
+        public ProdOrderPartslistPos GetProdOrderPartslistPos(DatabaseApp dbApp, ProdOrderPartslist prodOrderPartsList, PartslistPos pos)
+        {
+            ProdOrderPartslistPos prodPos = ProdOrderPartslistPos.NewACObject(dbApp, null);
+            prodPos.ProdOrderPartslistID = prodOrderPartsList.ProdOrderPartslistID;
+            prodPos.ProdOrderPartslist = prodOrderPartsList;
+            prodPos.Sequence = pos.Sequence;
+            prodPos.SequenceProduction = pos.Sequence;
+            prodPos.MaterialPosTypeIndex = pos.MaterialPosTypeIndex;
+            prodPos.MaterialID = pos.MaterialID;
+            prodPos.MDUnitID = pos.MDUnitID;
+            prodPos.ActualQuantity = 0;
+            prodPos.TargetQuantityUOM = pos.TargetQuantityUOM;
+            //prodPos.TargetQuantity = pos.TargetQuantity;
+            prodPos.ActualQuantityUOM = 0;
+            prodPos.IsBaseQuantityExcluded = false;
+            prodPos.ParentProdOrderPartslistPosID = null;
+            prodPos.AlternativeProdOrderPartslistPosID = null;
+            prodPos.LineNumber = pos.LineNumber;
+            prodPos.BasedOnPartslistPos = pos;
+
+            return prodPos;
+        }
+
+        public ProdOrderPartslistPosRelation GetProdOrderPartslistPosRelation(DatabaseApp dbApp, List<ProdOrderPartslistPos> prodOrderPartsListPosItems, PartslistPosRelation posRelation)
+        {
+            ProdOrderPartslistPosRelation prodRelationItem = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
+            prodRelationItem.Sequence = posRelation.Sequence;
+            prodRelationItem.TargetQuantityUOM = posRelation.TargetQuantityUOM;
+            prodRelationItem.RetrogradeFIFO = posRelation.RetrogradeFIFO;
+            // build relation same to PartslistPosRelation
+            prodRelationItem.TargetProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);
+            prodRelationItem.SourceProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);// ToSetup
+
+            return prodRelationItem;
         }
 
         /// <summary>
@@ -416,6 +433,99 @@ namespace gip.mes.facility
 
 
             PostExecute("PartslistRemove");
+            return msg;
+        }
+
+        /// <summary>
+        /// Update changed partslist
+        /// </summary>
+        /// <param name="dbApp"></param>
+        /// <param name="partsList"></param>
+        /// <param name="prodOrderPartsList"></param>
+        /// <returns></returns>
+        public Msg PartslistUpdate(DatabaseApp dbApp, Partslist partsList, ProdOrderPartslist prodOrderPartsList)
+        {
+            Msg msg = null;
+
+            // 1.0 Delete missing
+            // 1.1 Delete missing ProdOrderPartslistPosRelation
+            Guid[] posIDs = partsList.PartslistPos_Partslist.Select(c => c.PartslistPosID).ToArray();
+            List<ProdOrderPartslistPosRelation> missingRelations =
+                prodOrderPartsList
+                .ProdOrderPartslistPos_ProdOrderPartslist
+                .SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+                .Where(c =>
+                            (c.SourceProdOrderPartslistPos.BasedOnPartslistPosID != null
+                            && !posIDs.Contains(c.SourceProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty))
+                            ||
+                            (c.TargetProdOrderPartslistPos.BasedOnPartslistPosID != null
+                            && !posIDs.Contains(c.TargetProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty))
+                        )
+                .ToList();
+            foreach (ProdOrderPartslistPosRelation missingRelation in missingRelations)
+                missingRelation.DeleteACObject(dbApp, false);
+
+            // 1.2 Delete missing ProdOrderPartslistPos | posIds not contains BasedOnPartslistPosID
+            List<ProdOrderPartslistPos> missingPositions =
+                prodOrderPartsList
+                .ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(c => c.BasedOnPartslistPosID != null && !posIDs.Contains(c.BasedOnPartslistPosID ?? Guid.Empty))
+                .ToList();
+            foreach (ProdOrderPartslistPos missingPos in missingPositions)
+                missingPos.DeleteACObject(dbApp, false);
+
+            // 2.0 Add new added elements
+            // 2.1 Add new positions | BasedOnPartslistPosID not contains PartslistPosID
+            Guid[] basedPoses = prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.BasedOnPartslistPosID != null).Select(c => c.BasedOnPartslistPosID ?? Guid.Empty).ToArray();
+            List<PartslistPos> addedPositions = partsList.PartslistPos_Partslist.Where(c => !basedPoses.Contains(c.PartslistPosID)).ToList();
+            foreach (PartslistPos pos in addedPositions)
+            {
+                ProdOrderPartslistPos prodPos = GetProdOrderPartslistPos(dbApp, prodOrderPartsList, pos);
+                prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist.Add(prodPos);
+            }
+
+            // prepare pos item list
+            List<ProdOrderPartslistPos> prodOrderPartsListPosItems = prodOrderPartsList.ProdOrderPartslistPos_ProdOrderPartslist.ToList();
+
+            // 2.2 add new relations
+            List<PartslistPosRelation> posRelations =
+                partsList
+                .PartslistPos_Partslist
+                .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
+                .ToList();
+            foreach (PartslistPosRelation posRelation in posRelations)
+            {
+                ProdOrderPartslistPosRelation prodRelationItem = 
+                    prodOrderPartsList
+                    .ProdOrderPartslistPos_ProdOrderPartslist
+                    .SelectMany(c=>c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+                    .Where(c=> 
+                            ((c.SourceProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty) == posRelation.SourcePartslistPosID)
+                            && ((c.TargetProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty) == posRelation.TargetPartslistPosID)
+                        )
+                    .FirstOrDefault();
+                if(prodRelationItem == null)
+                {
+                    prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
+                    prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
+                }
+            }
+
+            // 3.0 Prepare now completed list
+            List<ProdOrderPartslistPosRelation> prodOrderPartsListPosRelationItems =
+                prodOrderPartsList
+                .ProdOrderPartslistPos_ProdOrderPartslist
+                .SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+                .ToList();
+
+
+            // 4.0 Make resizes of all lists
+            double quantityFactor = prodOrderPartsList.TargetQuantity / partsList.TargetQuantityUOM;
+            BatchLinearResize(prodOrderPartsListPosItems, quantityFactor);
+            BatchLinearResize(prodOrderPartsListPosRelationItems, quantityFactor);
+
+            // 5.0 Finally make update LastFormulaChange
+            prodOrderPartsList.LastFormulaChange = partsList.LastFormulaChange;
             return msg;
         }
 

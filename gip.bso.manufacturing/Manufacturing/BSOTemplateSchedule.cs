@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
@@ -178,7 +179,6 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
 
         #region BSO->ACMethod
         /// <summary>
@@ -352,17 +352,17 @@ namespace gip.bso.manufacturing
                 List<Guid> mdSchedulingGroupIDs = new List<Guid>();
                 foreach (var sourceProdOrder in prodOrders)
                 {
-                    
-                    Guid[] prodOrderMdSchedulingGroupIDs = 
+
+                    Guid[] prodOrderMdSchedulingGroupIDs =
                         sourceProdOrder
                         .ProdOrderPartslist_ProdOrder
-                        .SelectMany(c=>c.ProdOrderBatchPlan_ProdOrderPartslist)
-                        .SelectMany(c=>c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF)
-                        .Select(c=>c.MDSchedulingGroupID)
+                        .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                        .SelectMany(c => c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF)
+                        .Select(c => c.MDSchedulingGroupID)
                         .Distinct()
                         .ToArray();
-                    foreach(Guid prodOrderMdSchedulingGroupID in prodOrderMdSchedulingGroupIDs)
-                        if(!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
+                    foreach (Guid prodOrderMdSchedulingGroupID in prodOrderMdSchedulingGroupIDs)
+                        if (!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
                             mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
 
                     ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null);
@@ -378,7 +378,7 @@ namespace gip.bso.manufacturing
                 else
                     Root.Root.Messages.Msg(msgWithDetails);
 
-               foreach(Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
+                foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
                     BSOBatchPlanScheduler_Child.Value.RefreshServerState(mdSchedulingGroupID);
             }
             catch (Exception ec)
@@ -386,6 +386,43 @@ namespace gip.bso.manufacturing
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
                 Root.Root.Messages.Msg(msg);
             }
+        }
+
+        [ACMethodInfo("CheckIsPartslistChanged", "en{'Update template schedule orders'}de{'Aktualisiere Vorlageplan Produktionsaufträge'}", 101)]
+        public void CheckIsPartslistChanged()
+        {
+            if (!IsEnabledCheckIsPartslistChanged())
+                return;
+            List<ProdOrderPartslist> prodOrderPartslistsChanged =
+                SelectedPlanningMR
+                .PlanningMRProposal_PlanningMR
+                .Select(c => c.ProdOrderPartslist)
+                .Where(c => c.LastFormulaChange > c.Partslist.LastFormulaChange)
+                .Distinct()
+                .ToList();
+
+            if (prodOrderPartslistsChanged.Any())
+            {
+                string changedPlartslistNo = string.Join(",", prodOrderPartslistsChanged.Select(c => c.Partslist.PartslistNo).Distinct().OrderBy(c => c));
+                MsgResult msgResult = Root.Messages.Question(this, "Question50066", MsgResult.Yes, false, changedPlartslistNo);
+                if (msgResult == MsgResult.Yes)
+                {
+                    foreach (ProdOrderPartslist prodOrderPartslistChanged in prodOrderPartslistsChanged)
+                    {
+                        ProdOrderManager.PartslistUpdate(DatabaseApp, prodOrderPartslistChanged.Partslist, prodOrderPartslistChanged);
+                    }
+                }
+            }
+        }
+
+        public bool IsEnabledCheckIsPartslistChanged()
+        {
+            return
+                SelectedPlanningMR != null
+                && SelectedPlanningMR
+                .PlanningMRProposal_PlanningMR
+                .Select(c => c.ProdOrderPartslist)
+                .Any(c => c.LastFormulaChange > c.Partslist.LastFormulaChange);
         }
 
         #endregion

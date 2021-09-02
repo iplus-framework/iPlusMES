@@ -3606,6 +3606,7 @@
           <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="ProductionUnits" Type="float" />
           <Property Name="XMLComment" Type="text" />
+          <Property Name="LastFormulaChange" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -3963,6 +3964,7 @@
           <Property Name="XMLConfig" Type="text" />
           <Property Name="VBiACProgramID" Type="uniqueidentifier" />
           <Property Name="ExternProdOrderNo" Type="varchar" MaxLength="20" />
+          <Property Name="LastFormulaChange" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -4207,7 +4209,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4731,7 +4733,7 @@ warning 6002: The table/view 'gipSoft.dbo.TandTv2TempPos' does not have a primar
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4764,7 +4766,7 @@ warning 6002: The table/view 'gipSoft.dbo.ACProgramLogView' does not have a prim
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4788,7 +4790,7 @@ warning 6002: The table/view 'gipSoft.dbo.MachineMaterialPosView' does not have 
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4812,7 +4814,7 @@ warning 6002: The table/view 'gipSoft.dbo.MachineMaterialRelView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4837,7 +4839,7 @@ warning 6002: The table/view 'gipSoft.dbo.MachineMaterialView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4866,7 +4868,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogPosMachines' does not have a p
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4896,7 +4898,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogPosView' does not have a prima
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -16734,7 +16736,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <EntitySet Name="PickingPosProdOrderPartslistPos" EntityType="iPlusMESV4_Model.PickingPosProdOrderPartslistPos" />
           <EntitySet Name="ProdOrder" EntityType="iPlusMESV4_Model.ProdOrder" />
           <EntitySet Name="ProdOrderBatch" EntityType="iPlusMESV4_Model.ProdOrderBatch" />
-          <EntitySet Name="ProdOrderPartslist" EntityType="iPlusMESV4_Model.ProdOrderPartslist" />
           <EntitySet Name="ProdOrderPartslistConfig" EntityType="iPlusMESV4_Model.ProdOrderPartslistConfig" />
           <EntitySet Name="ProdOrderPartslistPosFacilityLot" EntityType="iPlusMESV4_Model.ProdOrderPartslistPosFacilityLot" />
           <EntitySet Name="ProdOrderPartslistPosRelation" EntityType="iPlusMESV4_Model.ProdOrderPartslistPosRelation" />
@@ -17310,10 +17311,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             <End Role="ACProgram" EntitySet="ACProgram" />
             <End Role="DemandOrderPos" EntitySet="DemandOrderPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslist_ACProgramID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID">
-            <End Role="ACProgram" EntitySet="ACProgram" />
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-          </AssociationSet>
           <AssociationSet Name="FK_ACProgramConfig_ParentACProgramConfigID" Association="iPlusMESV4_Model.FK_ACProgramConfig_ParentACProgramConfigID">
             <End Role="ACProgramConfig" EntitySet="ACProgramConfig" />
             <End Role="ACProgramConfig1" EntitySet="ACProgramConfig" />
@@ -17822,10 +17819,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             <End Role="MDProdOrderState" EntitySet="MDProdOrderState" />
             <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslist_MDProdOrderState" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState">
-            <End Role="MDProdOrderState" EntitySet="MDProdOrderState" />
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-          </AssociationSet>
           <AssociationSet Name="FK_RatingComplaint_MDRatingComplaintType" Association="iPlusMESV4_Model.FK_RatingComplaint_MDRatingComplaintType">
             <End Role="MDRatingComplaintType" EntitySet="MDRatingComplaintType" />
             <End Role="RatingComplaint" EntitySet="RatingComplaint" />
@@ -17926,29 +17919,13 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             <End Role="PickingPos" EntitySet="PickingPos" />
             <End Role="PickingPosProdOrderPartslistPos" EntitySet="PickingPosProdOrderPartslistPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslist_ProdOrderID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID">
-            <End Role="ProdOrder" EntitySet="ProdOrder" />
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-          </AssociationSet>
           <AssociationSet Name="FK_TandTv2StepItem_ProdOrderID" Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID">
             <End Role="ProdOrder" EntitySet="ProdOrder" />
             <End Role="TandTv2StepItem" EntitySet="TandTv2StepItem" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatch_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
-          </AssociationSet>
           <AssociationSet Name="FK_ProdOrderPartslistPosRelation_ProdOrderBatch" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch">
             <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
             <End Role="ProdOrderPartslistPosRelation" EntitySet="ProdOrderPartslistPosRelation" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslistConfig_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="ProdOrderPartslistConfig" EntitySet="ProdOrderPartslistConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TandTv2StepItem_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="TandTv2StepItem" EntitySet="TandTv2StepItem" />
           </AssociationSet>
           <AssociationSet Name="FK_ProdOrderPartslistConfig_ParentProdOrderPartslistConfigID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ParentProdOrderPartslistConfigID">
             <End Role="ProdOrderPartslistConfig" EntitySet="ProdOrderPartslistConfig" />
@@ -18213,14 +18190,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslistPos_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslistPos_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID">
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
             <End Role="ProdOrderPartslistPos1" EntitySet="ProdOrderPartslistPos" />
@@ -18349,10 +18318,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <AssociationSet Name="FK_ProdOrderBatch_ProdOrderBatchPlan" Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan">
             <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
             <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
           </AssociationSet>
           <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID">
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
@@ -19436,75 +19401,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             <End Role="VBUser" EntitySet="VBUser" />
             <End Role="UserSettings" EntitySet="UserSettings" />
           </AssociationSet>
-          <EntitySet Name="Partslist" EntityType="iPlusMESV4_Model.Partslist" />
-          <AssociationSet Name="FK_DemandOrderPos_PartsListID" Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="DemandOrderPos" EntitySet="DemandOrderPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Facility_PartsListID" Association="iPlusMESV4_Model.FK_Facility_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="Facility" EntitySet="Facility" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_InwardPartslistID" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBooking_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_InwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityBookingCharge_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityCharge_PartsListID" Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Partslist_MaterialID" Association="iPlusMESV4_Model.FK_Partslist_MaterialID">
-            <End Role="Material" EntitySet="Material" />
-            <End Role="Partslist" EntitySet="Partslist" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Partslist_MaterialWF" Association="iPlusMESV4_Model.FK_Partslist_MaterialWF">
-            <End Role="MaterialWF" EntitySet="MaterialWF" />
-            <End Role="Partslist" EntitySet="Partslist" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Partslist_MDUnitID" Association="iPlusMESV4_Model.FK_Partslist_MDUnitID">
-            <End Role="MDUnit" EntitySet="MDUnit" />
-            <End Role="Partslist" EntitySet="Partslist" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistACClassMethod_Partslist" Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistACClassMethod" EntitySet="PartslistACClassMethod" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistConfig_PartslistID" Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistConfig" EntitySet="PartslistConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_Partslist" Association="iPlusMESV4_Model.FK_PartslistPos_Partslist">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_PartsListID" Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistStock_PartslistID" Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistStock" EntitySet="PartslistStock" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslist_PartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-          </AssociationSet>
-          <AssociationSet Name="PreviousPartslistID_PartslistID" Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="Partslist1" EntitySet="Partslist" />
-          </AssociationSet>
           <EntitySet Name="PlanningMR" EntityType="iPlusMESV4_Model.PlanningMR" />
           <EntitySet Name="PlanningMRProposal" EntityType="iPlusMESV4_Model.PlanningMRProposal" />
           <AssociationSet Name="FK_PlanningMRProposal_InOrderID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID">
@@ -19517,10 +19413,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           </AssociationSet>
           <AssociationSet Name="FK_PlanningMRProposal_ProdOrderID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID">
             <End Role="ProdOrder" EntitySet="ProdOrder" />
-            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRProposal_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
           </AssociationSet>
           <EntitySet Name="OutOfferPos" EntityType="iPlusMESV4_Model.OutOfferPos" />
@@ -19563,6 +19455,116 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <AssociationSet Name="FK_OutOrderPos_GroupOutOrderPosID" Association="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID">
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
             <End Role="OutOrderPos1" EntitySet="OutOrderPos" />
+          </AssociationSet>
+          <EntitySet Name="Partslist" EntityType="iPlusMESV4_Model.Partslist" />
+          <EntitySet Name="ProdOrderPartslist" EntityType="iPlusMESV4_Model.ProdOrderPartslist" />
+          <AssociationSet Name="FK_ProdOrderPartslist_ACProgramID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID">
+            <End Role="ACProgram" EntitySet="ACProgram" />
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DemandOrderPos_PartsListID" Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="DemandOrderPos" EntitySet="DemandOrderPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Facility_PartsListID" Association="iPlusMESV4_Model.FK_Facility_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="Facility" EntitySet="Facility" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBooking_InwardPartslistID" Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBooking_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBooking" EntitySet="FacilityBooking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBookingCharge_InwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityBookingCharge_OutwardPartsListID" Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityBookingCharge" EntitySet="FacilityBookingCharge" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityCharge_PartsListID" Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Partslist_MaterialID" Association="iPlusMESV4_Model.FK_Partslist_MaterialID">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="Partslist" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Partslist_MaterialWF" Association="iPlusMESV4_Model.FK_Partslist_MaterialWF">
+            <End Role="MaterialWF" EntitySet="MaterialWF" />
+            <End Role="Partslist" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslist_MDProdOrderState" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState">
+            <End Role="MDProdOrderState" EntitySet="MDProdOrderState" />
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Partslist_MDUnitID" Association="iPlusMESV4_Model.FK_Partslist_MDUnitID">
+            <End Role="MDUnit" EntitySet="MDUnit" />
+            <End Role="Partslist" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistACClassMethod_Partslist" Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistACClassMethod" EntitySet="PartslistACClassMethod" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistConfig_PartslistID" Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistConfig" EntitySet="PartslistConfig" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_Partslist" Association="iPlusMESV4_Model.FK_PartslistPos_Partslist">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_PartsListID" Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistStock_PartslistID" Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistStock" EntitySet="PartslistStock" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslist_PartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+          </AssociationSet>
+          <AssociationSet Name="PreviousPartslistID_PartslistID" Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="Partslist1" EntitySet="Partslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslist_ProdOrderID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID">
+            <End Role="ProdOrder" EntitySet="ProdOrder" />
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatch_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslistConfig_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="ProdOrderPartslistConfig" EntitySet="ProdOrderPartslistConfig" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslistPos_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslistPos_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TandTv2StepItem_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="TandTv2StepItem" EntitySet="TandTv2StepItem" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -20187,7 +20189,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="ACProgramConfig_ACProgram" Relationship="iPlusMESV4_Model.FK_ACProgramConfig_ACProgramID" FromRole="ACProgram" ToRole="ACProgramConfig" />
           <NavigationProperty Name="ACProgramLog_ACProgram" Relationship="iPlusMESV4_Model.FK_ACProgramLog_ACProgramID" FromRole="ACProgram" ToRole="ACProgramLog" />
           <NavigationProperty Name="DemandOrderPos_ACProgram" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_ACProgramID" FromRole="ACProgram" ToRole="DemandOrderPos" />
-          <NavigationProperty Name="ProdOrderPartslist_VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ACProgram" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ACProgram" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ACProgramConfig">
           <Key>
@@ -21793,7 +21795,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MaterialWFRelation_MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_MaterialWF" FromRole="MaterialWF" ToRole="MaterialWFRelation" />
           <NavigationProperty Name="MaterialWFACClassMethod_MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFACClassMethod_MaterialWF" FromRole="MaterialWF" ToRole="MaterialWFACClassMethod" />
-          <NavigationProperty Name="Partslist_MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="MaterialWF" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="MaterialWF" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="MaterialWFACClassMethodConfig">
           <Key>
@@ -22613,7 +22615,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ProdOrder_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="MDProdOrderState" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderBatch_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderPartslist_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="MDRatingComplaintType">
           <Key>
@@ -22727,7 +22729,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OutOffer_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOrder_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOrder" />
           <NavigationProperty Name="CompanyPerson_MDTimeRange" Relationship="iPlusMESV4_Model.FK_CompanyPerson_MDTimeRangeID" FromRole="MDTimeRange" ToRole="CompanyPerson" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="MDTimeRange" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDToleranceState">
           <Key>
@@ -22859,8 +22861,8 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="InvoicePos_MDUnit" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDUnitID" FromRole="MDUnit" ToRole="InvoicePos" />
           <NavigationProperty Name="Facility_MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID" FromRole="MDUnit" ToRole="Facility" />
           <NavigationProperty Name="Material_BaseMDUnit" Relationship="iPlusMESV4_Model.FK_Material_BaseMDUnitID" FromRole="MDUnit" ToRole="Material" />
-          <NavigationProperty Name="Partslist_MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -23329,9 +23331,9 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <Property Name="CPartnerCompanyID" Type="Guid" />
           <NavigationProperty Name="CPartnerCompany" Relationship="iPlusMESV4_Model.FK_ProdOrder_CPartnerCompanyID" FromRole="ProdOrder" ToRole="Company" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="ProdOrder" ToRole="MDProdOrderState" />
-          <NavigationProperty Name="ProdOrderPartslist_ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="TandTv2StepItem_ProdOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID" FromRole="ProdOrder" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="PlanningMRProposal_ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ProdOrderBatch">
           <Key>
@@ -23349,48 +23351,10 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ProdOrderBatchPlanID" Type="Guid" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_MDProdOrderState" FromRole="ProdOrderBatch" ToRole="MDProdOrderState" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPosRelation_ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslistPosRelation" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatch" ToRole="ProdOrderBatchPlan" />
-        </EntityType>
-        <EntityType Name="ProdOrderPartslist">
-          <Key>
-            <PropertyRef Name="ProdOrderPartslistID" />
-          </Key>
-          <Property Name="ProdOrderPartslistID" Type="Guid" Nullable="false" />
-          <Property Name="ProdOrderID" Type="Guid" Nullable="false" />
-          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
-          <Property Name="ActualQuantity" Type="Double" Nullable="false" />
-          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="LossComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="ProdUserEndDate" Type="DateTime" Precision="3" />
-          <Property Name="ProdUserEndName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="DepartmentUserDate" Type="DateTime" Precision="3" />
-          <Property Name="DepartmentUserName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="StartDate" Type="DateTime" Precision="3" />
-          <Property Name="EndDate" Type="DateTime" Precision="3" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="PartslistID" Type="Guid" />
-          <Property Name="Sequence" Type="Int32" Nullable="false" />
-          <Property Name="MDProdOrderStateID" Type="Guid" Nullable="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="VBiACProgramID" Type="Guid" />
-          <Property Name="ExternProdOrderNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
-          <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="ProdOrderPartslist" ToRole="MDProdOrderState" />
-          <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
-          <NavigationProperty Name="ProdOrderBatch_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
-          <NavigationProperty Name="TandTv2StepItem_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="TandTv2StepItem" />
-          <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
-          <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -23418,10 +23382,10 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="VBiValueTypeACClass" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ValueTypeACClassID" FromRole="ProdOrderPartslistConfig" ToRole="ACClass" />
           <NavigationProperty Name="VBiACClassPropertyRelation" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassPropertyRelationID" FromRole="ProdOrderPartslistConfig" ToRole="ACClassPropertyRelation" />
           <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassWFID" FromRole="ProdOrderPartslistConfig" ToRole="ACClassWF" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslistConfig" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistConfig_ParentProdOrderPartslistConfig" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ParentProdOrderPartslistConfigID" FromRole="ProdOrderPartslistConfig" ToRole="ProdOrderPartslistConfig1" />
           <NavigationProperty Name="ProdOrderPartslistConfig1_ParentProdOrderPartslistConfig" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ParentProdOrderPartslistConfigID" FromRole="ProdOrderPartslistConfig1" ToRole="ProdOrderPartslistConfig" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_MaterialID" FromRole="ProdOrderPartslistConfig" ToRole="Material" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslistConfig" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosFacilityLot">
           <Key>
@@ -23633,7 +23597,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="FacilityPreBooking" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_FacilityPreBooking" FromRole="TandTv2StepItem" ToRole="FacilityPreBooking" />
           <NavigationProperty Name="InOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_InOrderID" FromRole="TandTv2StepItem" ToRole="InOrder" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID" FromRole="TandTv2StepItem" ToRole="ProdOrder" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" FromRole="TandTv2StepItem" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistPosRelationID" FromRole="TandTv2StepItem" ToRole="ProdOrderPartslistPosRelation" />
           <NavigationProperty Name="TandTv2ItemType" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_TandTv2ItemTypeID" FromRole="TandTv2StepItem" ToRole="TandTv2ItemType" />
           <NavigationProperty Name="TandTv2Operation" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_TandTv2OperationID" FromRole="TandTv2StepItem" ToRole="TandTv2Operation" />
@@ -23648,6 +23611,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_OutOrderPosID" FromRole="TandTv2StepItem" ToRole="OutOrderPos" />
           <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_OutOrderID" FromRole="TandTv2StepItem" ToRole="OutOrder" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_FacilityID" FromRole="TandTv2StepItem" ToRole="Facility" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" FromRole="TandTv2StepItem" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="TandTv2StepItemRelation">
           <Key>
@@ -26103,18 +26067,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProdOrderPartslist_ACProgramID">
-          <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ACProgram">
-              <PropertyRef Name="ACProgramID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslist">
-              <PropertyRef Name="VBiACProgramID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ACProgramConfig_ParentACProgramConfigID">
           <End Type="iPlusMESV4_Model.ACProgramConfig" Role="ACProgramConfig" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.ACProgramConfig" Role="ACProgramConfig1" Multiplicity="*" />
@@ -27699,18 +27651,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProdOrderPartslist_MDProdOrderState">
-          <End Type="iPlusMESV4_Model.MDProdOrderState" Role="MDProdOrderState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDProdOrderState">
-              <PropertyRef Name="MDProdOrderStateID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslist">
-              <PropertyRef Name="MDProdOrderStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_RatingComplaint_MDRatingComplaintType">
           <End Type="iPlusMESV4_Model.MDRatingComplaintType" Role="MDRatingComplaintType" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.RatingComplaint" Role="RatingComplaint" Multiplicity="*" />
@@ -28015,20 +27955,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProdOrderPartslist_ProdOrderID">
-          <End Type="iPlusMESV4_Model.ProdOrder" Role="ProdOrder" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrder">
-              <PropertyRef Name="ProdOrderID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_TandTv2StepItem_ProdOrderID">
           <End Type="iPlusMESV4_Model.ProdOrder" Role="ProdOrder" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.TandTv2StepItem" Role="TandTv2StepItem" Multiplicity="*" />
@@ -28041,18 +27967,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProdOrderBatch_ProdOrderPartslist">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatch" Role="ProdOrderBatch" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatch">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ProdOrderPartslistPosRelation_ProdOrderBatch">
           <End Type="iPlusMESV4_Model.ProdOrderBatch" Role="ProdOrderBatch" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.ProdOrderPartslistPosRelation" Role="ProdOrderPartslistPosRelation" Multiplicity="*" />
@@ -28062,32 +27976,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Principal>
             <Dependent Role="ProdOrderPartslistPosRelation">
               <PropertyRef Name="ProdOrderBatchID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderPartslistConfig_ProdOrderPartslistID">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.ProdOrderPartslistConfig" Role="ProdOrderPartslistConfig" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslistConfig">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TandTv2StepItem_ProdOrderPartslistID">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.TandTv2StepItem" Role="TandTv2StepItem" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="TandTv2StepItem">
-              <PropertyRef Name="ProdOrderPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -28825,8 +28713,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OrderLog_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_OrderLog_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="OrderLog" />
           <NavigationProperty Name="PickingPosProdOrderPartslistPos_ProdorderPartslistPos" Relationship="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PickingPosProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPos_AlternativeProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPos1" />
           <NavigationProperty Name="ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos1" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_ParentProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ParentProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPos1" />
@@ -28843,6 +28729,8 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="FacilityBooking_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBookingCharge_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityBookingCharge" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MaterialID" FromRole="ProdOrderPartslistPos" ToRole="Material" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist1" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="Weighing">
           <Key>
@@ -29009,32 +28897,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Principal>
             <Dependent Role="ProdOrderPartslistPos">
               <PropertyRef Name="ProdOrderBatchID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderPartslistPos_ProdOrderPartslist">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslistPos">
-              <PropertyRef Name="SourceProdOrderPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderPartslistPos_ProdOrderPartslistID">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslistPos">
-              <PropertyRef Name="ProdOrderPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -29329,9 +29191,9 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="PartslistPosSplit_PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
           <NavigationProperty Name="ProdOrderPartslistPos_BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="PartslistPos" ToRole="Material" />
-          <NavigationProperty Name="ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
-        </EntityType>
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
+          </EntityType>
         <Association Name="FK_PartslistPos_MDUnitID">
           <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
@@ -29505,8 +29367,8 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="FacilityReservation_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="ProdOrderBatchPlan" ToRole="FacilityReservation" />
           <NavigationProperty Name="MaterialWFACClassMethod" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" FromRole="ProdOrderBatchPlan" ToRole="MaterialWFACClassMethod" />
           <NavigationProperty Name="ProdOrderBatch_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslist" />
         </EntityType>
         <Association Name="FK_ProdOrderBatchPlan_VBiACClassWFID">
           <End Type="iPlusMESV4_Model.ACClassWF" Role="ACClassWF" Multiplicity="0..1" />
@@ -29553,18 +29415,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Principal>
             <Dependent Role="ProdOrderBatch">
               <PropertyRef Name="ProdOrderBatchPlanID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslist">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatchPlan">
-              <PropertyRef Name="ProdOrderPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -29682,9 +29532,9 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID" FromRole="FacilityBooking" ToRole="Facility" />
           <NavigationProperty Name="InwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardMaterialID" FromRole="FacilityBooking" ToRole="Material" />
           <NavigationProperty Name="OutwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardMaterialID" FromRole="FacilityBooking" ToRole="Material" />
-          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="FacilityBooking" ToRole="Partslist" />
-          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="FacilityBooking" ToRole="Partslist" />
-        </EntityType>
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="FacilityBooking" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="FacilityBooking" ToRole="Partslist" />
+          </EntityType>
         <EntityType Name="FacilityBookingCharge">
           <Key>
             <PropertyRef Name="FacilityBookingChargeID" />
@@ -29786,9 +29636,9 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID" FromRole="FacilityBookingCharge" ToRole="Facility" />
           <NavigationProperty Name="InwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardMaterialID" FromRole="FacilityBookingCharge" ToRole="Material" />
           <NavigationProperty Name="OutwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardMaterialID" FromRole="FacilityBookingCharge" ToRole="Material" />
-          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
-          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
-        </EntityType>
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
+          </EntityType>
         <EntityType Name="FacilityInventory">
           <Key>
             <PropertyRef Name="FacilityInventoryID" />
@@ -30875,7 +30725,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax" FromRole="MDCountrySalesTax" ToRole="MDCountrySalesTaxMDMaterialGroup" />
           <NavigationProperty Name="OutOrderPos_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="InvoicePos" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" FromRole="MDCountrySalesTax" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDCountrySalesTaxMaterial">
           <Key>
@@ -30889,7 +30739,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OutOrderPos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="InvoicePos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMaterial_Material" FromRole="MDCountrySalesTaxMaterial" ToRole="Material" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMaterialID" FromRole="MDCountrySalesTaxMaterial" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="MDCountrySalesTaxMDMaterialGroup">
           <Key>
@@ -30903,7 +30753,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="MDMaterialGroup" Relationship="iPlusMESV4_Model.FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="MDMaterialGroup" />
           <NavigationProperty Name="OutOrderPos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="OutOrderPos" />
           <NavigationProperty Name="InvoicePos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="InvoicePos" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxMDMaterialGroupID" FromRole="MDCountrySalesTaxMDMaterialGroup" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="OutOrderPos">
           <Key>
@@ -30987,8 +30837,8 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderPos_OutOrderID" FromRole="OutOrderPos" ToRole="OutOrder" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MaterialID" FromRole="OutOrderPos" ToRole="Material" />
           <Property Name="GroupOutOrderPosID" Type="Guid" />
-          <NavigationProperty Name="OutOrderPos1" Relationship="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" FromRole="OutOrderPos" ToRole="OutOrderPos1" />
-          <NavigationProperty Name="OutOrderPos2" Relationship="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" FromRole="OutOrderPos1" ToRole="OutOrderPos" />
+          <NavigationProperty Name="OutOrderPos_GroupOutOrderPos" Relationship="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" FromRole="OutOrderPos" ToRole="OutOrderPos1" />
+          <NavigationProperty Name="OutOrderPos1_GroupOutOrderPos" Relationship="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" FromRole="OutOrderPos1" ToRole="OutOrderPos" />
         </EntityType>
         <Association Name="FK_OutOrderPos_CompanyAddressUnloadingPointID">
           <End Type="iPlusMESV4_Model.CompanyAddressUnloadingpoint" Role="CompanyAddressUnloadingpoint" Multiplicity="0..1" />
@@ -31539,7 +31389,7 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyAddress" FromRole="OutOffer" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" FromRole="OutOffer" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" FromRole="OutOffer" ToRole="CompanyPerson" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOffer" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOffer" ToRole="OutOfferPos" />
         </EntityType>
         <EntityType Name="OutOrder">
           <Key>
@@ -32517,8 +32367,8 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="TourplanConfig_Material" Relationship="iPlusMESV4_Model.FK_TourplanConfig_MaterialID" FromRole="Material" ToRole="TourplanConfig" />
           <NavigationProperty Name="Visitor_Material" Relationship="iPlusMESV4_Model.FK_Visitor_MaterialID" FromRole="Material" ToRole="Visitor" />
-          <NavigationProperty Name="Partslist_Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
-          <NavigationProperty Name="OutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="Material" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_Material" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="Material" ToRole="OutOfferPos" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
         </EntityType>
         <Association Name="FK_Material_StackCalculatorACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -33786,267 +33636,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Partslist">
-          <Key>
-            <PropertyRef Name="PartslistID" />
-          </Key>
-          <Property Name="PartslistID" Type="Guid" Nullable="false" />
-          <Property Name="PartslistNo" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="PartslistName" Type="String" MaxLength="350" FixedLength="false" Unicode="true" />
-          <Property Name="PartslistVersion" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialID" Type="Guid" Nullable="false" />
-          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="MDUnitID" Type="Guid" />
-          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
-          <Property Name="GrossWeight" Type="Double" Nullable="false" />
-          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="EnabledFrom" Type="DateTime" Precision="3" />
-          <Property Name="EnabledTo" Type="DateTime" Precision="3" />
-          <Property Name="ProductionWeight" Type="Single" Nullable="false" />
-          <Property Name="IsStandard" Type="Boolean" Nullable="false" />
-          <Property Name="IsProductionUnit" Type="Boolean" Nullable="false" />
-          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesign" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="PreviousPartslistID" Type="Guid" />
-          <Property Name="DeleteDate" Type="DateTime" Precision="3" />
-          <Property Name="DeleteName" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialWFID" Type="Guid" />
-          <Property Name="IsInEnabledPeriod" Type="Boolean" annotation:StoreGeneratedPattern="Computed" />
-          <Property Name="ProductionUnits" Type="Double" />
-          <Property Name="XMLComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="DemandOrderPos_Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
-          <NavigationProperty Name="Facility_Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
-          <NavigationProperty Name="FacilityBooking_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBooking_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBookingCharge_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityBookingCharge_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityCharge_Partslist" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="Partslist" ToRole="FacilityCharge" />
-          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Partslist" ToRole="Material" />
-          <NavigationProperty Name="MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="Partslist" ToRole="MaterialWF" />
-          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="Partslist" ToRole="MDUnit" />
-          <NavigationProperty Name="PartslistACClassMethod_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
-          <NavigationProperty Name="PartslistConfig_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
-          <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistStock_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
-          <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="Partslist_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
-          <NavigationProperty Name="Partslist1_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
-        </EntityType>
-        <Association Name="FK_DemandOrderPos_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.DemandOrderPos" Role="DemandOrderPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="DemandOrderPos">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Facility_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="Facility">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_InwardPartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="InwardPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBooking_OutwardPartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBooking">
-              <PropertyRef Name="OutwardPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_InwardPartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="InwardPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityBookingCharge_OutwardPartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityBookingCharge">
-              <PropertyRef Name="OutwardPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityCharge_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="FacilityCharge">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Partslist_MaterialID">
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Material">
-              <PropertyRef Name="MaterialID" />
-            </Principal>
-            <Dependent Role="Partslist">
-              <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Partslist_MaterialWF">
-          <End Type="iPlusMESV4_Model.MaterialWF" Role="MaterialWF" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaterialWF">
-              <PropertyRef Name="MaterialWFID" />
-            </Principal>
-            <Dependent Role="Partslist">
-              <PropertyRef Name="MaterialWFID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Partslist_MDUnitID">
-          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDUnit">
-              <PropertyRef Name="MDUnitID" />
-            </Principal>
-            <Dependent Role="Partslist">
-              <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistACClassMethod_Partslist">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistACClassMethod" Role="PartslistACClassMethod" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistACClassMethod">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistConfig_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PartslistConfig" Role="PartslistConfig" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistConfig">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_Partslist">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="ParentPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistStock_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PartslistStock" Role="PartslistStock" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistStock">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderPartslist_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslist">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="PreviousPartslistID_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="Partslist1">
-              <PropertyRef Name="PreviousPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="PlanningMR">
           <Key>
             <PropertyRef Name="PlanningMRID" />
@@ -34119,18 +33708,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PlanningMRProposal_ProdOrderPartslistID">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="PlanningMRProposal">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="OutOfferPos">
           <Key>
             <PropertyRef Name="OutOfferPosID" />
@@ -34172,10 +33749,10 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
           <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDTimeRangeID" FromRole="OutOfferPos" ToRole="MDTimeRange" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="OutOfferPos" ToRole="MDUnit" />
           <NavigationProperty Name="OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOfferPos" ToRole="OutOffer" />
-          <NavigationProperty Name="OutOfferPos1" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
-          <NavigationProperty Name="OutOfferPos2" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
-          <NavigationProperty Name="OutOfferPos11" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
-          <NavigationProperty Name="OutOfferPos3" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_GroupOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
+          <NavigationProperty Name="OutOfferPos1_GroupOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
+          <NavigationProperty Name="OutOfferPos_ParentOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos" ToRole="OutOfferPos1" />
+          <NavigationProperty Name="OutOfferPos1_ParentOutOfferPos" Relationship="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" FromRole="OutOfferPos1" ToRole="OutOfferPos" />
         </EntityType>
         <Association Name="FK_OutOfferPos_MaterialID">
           <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
@@ -34296,6 +33873,433 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
             </Principal>
             <Dependent Role="OutOrderPos1">
               <PropertyRef Name="GroupOutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Partslist">
+          <Key>
+            <PropertyRef Name="PartslistID" />
+          </Key>
+          <Property Name="PartslistID" Type="Guid" Nullable="false" />
+          <Property Name="PartslistNo" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="PartslistName" Type="String" MaxLength="350" FixedLength="false" Unicode="true" />
+          <Property Name="PartslistVersion" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialID" Type="Guid" Nullable="false" />
+          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="MDUnitID" Type="Guid" />
+          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
+          <Property Name="GrossWeight" Type="Double" Nullable="false" />
+          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="EnabledFrom" Type="DateTime" Precision="3" />
+          <Property Name="EnabledTo" Type="DateTime" Precision="3" />
+          <Property Name="ProductionWeight" Type="Single" Nullable="false" />
+          <Property Name="IsStandard" Type="Boolean" Nullable="false" />
+          <Property Name="IsProductionUnit" Type="Boolean" Nullable="false" />
+          <Property Name="IsDefault" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesign" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PreviousPartslistID" Type="Guid" />
+          <Property Name="DeleteDate" Type="DateTime" Precision="3" />
+          <Property Name="DeleteName" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialWFID" Type="Guid" />
+          <Property Name="IsInEnabledPeriod" Type="Boolean" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ProductionUnits" Type="Double" />
+          <Property Name="XMLComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="LastFormulaChange" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="DemandOrderPos" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
+          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
+          <NavigationProperty Name="FacilityBooking" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
+          <NavigationProperty Name="FacilityBooking1" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
+          <NavigationProperty Name="FacilityBookingCharge" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
+          <NavigationProperty Name="FacilityBookingCharge1" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
+          <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="Partslist" ToRole="FacilityCharge" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Partslist" ToRole="Material" />
+          <NavigationProperty Name="MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="Partslist" ToRole="MaterialWF" />
+          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="Partslist" ToRole="MDUnit" />
+          <NavigationProperty Name="PartslistACClassMethod" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
+          <NavigationProperty Name="PartslistConfig" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
+          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPos1" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistStock" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
+          <NavigationProperty Name="Partslist2" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
+        </EntityType>
+        <EntityType Name="ProdOrderPartslist">
+          <Key>
+            <PropertyRef Name="ProdOrderPartslistID" />
+          </Key>
+          <Property Name="ProdOrderPartslistID" Type="Guid" Nullable="false" />
+          <Property Name="ProdOrderID" Type="Guid" Nullable="false" />
+          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
+          <Property Name="ActualQuantity" Type="Double" Nullable="false" />
+          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LossComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ProdUserEndDate" Type="DateTime" Precision="3" />
+          <Property Name="ProdUserEndName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DepartmentUserDate" Type="DateTime" Precision="3" />
+          <Property Name="DepartmentUserName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PartslistID" Type="Guid" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="MDProdOrderStateID" Type="Guid" Nullable="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="VBiACProgramID" Type="Guid" />
+          <Property Name="ExternProdOrderNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="LastFormulaChange" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="ACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
+          <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="ProdOrderPartslist" ToRole="MDProdOrderState" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
+          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
+          <NavigationProperty Name="ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
+          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
+          <NavigationProperty Name="ProdOrderPartslistConfig" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
+          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderPartslistPos1" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="TandTv2StepItem" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="TandTv2StepItem" />
+        </EntityType>
+        <Association Name="FK_ProdOrderPartslist_ACProgramID">
+          <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACProgram">
+              <PropertyRef Name="ACProgramID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslist">
+              <PropertyRef Name="VBiACProgramID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DemandOrderPos_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.DemandOrderPos" Role="DemandOrderPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="DemandOrderPos">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Facility_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="Facility">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBooking_InwardPartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBooking">
+              <PropertyRef Name="InwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBooking_OutwardPartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBooking" Role="FacilityBooking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBooking">
+              <PropertyRef Name="OutwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBookingCharge_InwardPartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBookingCharge">
+              <PropertyRef Name="InwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityBookingCharge_OutwardPartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityBookingCharge" Role="FacilityBookingCharge" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityBookingCharge">
+              <PropertyRef Name="OutwardPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityCharge_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="FacilityCharge">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Partslist_MaterialID">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="Partslist">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Partslist_MaterialWF">
+          <End Type="iPlusMESV4_Model.MaterialWF" Role="MaterialWF" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaterialWF">
+              <PropertyRef Name="MaterialWFID" />
+            </Principal>
+            <Dependent Role="Partslist">
+              <PropertyRef Name="MaterialWFID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslist_MDProdOrderState">
+          <End Type="iPlusMESV4_Model.MDProdOrderState" Role="MDProdOrderState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDProdOrderState">
+              <PropertyRef Name="MDProdOrderStateID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslist">
+              <PropertyRef Name="MDProdOrderStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Partslist_MDUnitID">
+          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDUnit">
+              <PropertyRef Name="MDUnitID" />
+            </Principal>
+            <Dependent Role="Partslist">
+              <PropertyRef Name="MDUnitID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistACClassMethod_Partslist">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistACClassMethod" Role="PartslistACClassMethod" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistACClassMethod">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistConfig_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PartslistConfig" Role="PartslistConfig" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistConfig">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_Partslist">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="ParentPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistStock_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PartslistStock" Role="PartslistStock" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistStock">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslist_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslist">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PreviousPartslistID_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="Partslist1">
+              <PropertyRef Name="PreviousPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_ProdOrderPartslistID">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslist_ProdOrderID">
+          <End Type="iPlusMESV4_Model.ProdOrder" Role="ProdOrder" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrder">
+              <PropertyRef Name="ProdOrderID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatch_ProdOrderPartslist">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatch" Role="ProdOrderBatch" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatch">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslist">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslistConfig_ProdOrderPartslistID">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistConfig" Role="ProdOrderPartslistConfig" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslistConfig">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslistPos_ProdOrderPartslist">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslistPos">
+              <PropertyRef Name="SourceProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslistPos_ProdOrderPartslistID">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslistPos">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TandTv2StepItem_ProdOrderPartslistID">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.TandTv2StepItem" Role="TandTv2StepItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="TandTv2StepItem">
+              <PropertyRef Name="ProdOrderPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -37542,34 +37546,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ProdOrderPartslist">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslist">
-              <MappingFragment StoreEntitySet="ProdOrderPartslist">
-                <ScalarProperty Name="ExternProdOrderNo" ColumnName="ExternProdOrderNo" />
-                <ScalarProperty Name="VBiACProgramID" ColumnName="VBiACProgramID" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="MDProdOrderStateID" ColumnName="MDProdOrderStateID" />
-                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
-                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
-                <ScalarProperty Name="DepartmentUserName" ColumnName="DepartmentUserName" />
-                <ScalarProperty Name="DepartmentUserDate" ColumnName="DepartmentUserDate" />
-                <ScalarProperty Name="ProdUserEndName" ColumnName="ProdUserEndName" />
-                <ScalarProperty Name="ProdUserEndDate" ColumnName="ProdUserEndDate" />
-                <ScalarProperty Name="LossComment" ColumnName="LossComment" />
-                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
-                <ScalarProperty Name="ActualQuantity" ColumnName="ActualQuantity" />
-                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
-                <ScalarProperty Name="ProdOrderID" ColumnName="ProdOrderID" />
-                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ProdOrderPartslistConfig">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslistConfig">
               <MappingFragment StoreEntitySet="ProdOrderPartslistConfig">
@@ -39314,42 +39290,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Partslist">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.Partslist">
-              <MappingFragment StoreEntitySet="Partslist">
-                <ScalarProperty Name="XMLComment" ColumnName="XMLComment" />
-                <ScalarProperty Name="ProductionUnits" ColumnName="ProductionUnits" />
-                <ScalarProperty Name="IsInEnabledPeriod" ColumnName="IsInEnabledPeriod" />
-                <ScalarProperty Name="MaterialWFID" ColumnName="MaterialWFID" />
-                <ScalarProperty Name="DeleteName" ColumnName="DeleteName" />
-                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
-                <ScalarProperty Name="PreviousPartslistID" ColumnName="PreviousPartslistID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="IsDefault" ColumnName="IsDefault" />
-                <ScalarProperty Name="IsProductionUnit" ColumnName="IsProductionUnit" />
-                <ScalarProperty Name="IsStandard" ColumnName="IsStandard" />
-                <ScalarProperty Name="ProductionWeight" ColumnName="ProductionWeight" />
-                <ScalarProperty Name="EnabledTo" ColumnName="EnabledTo" />
-                <ScalarProperty Name="EnabledFrom" ColumnName="EnabledFrom" />
-                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
-                <ScalarProperty Name="GrossWeight" ColumnName="GrossWeight" />
-                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
-                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
-                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="PartslistVersion" ColumnName="PartslistVersion" />
-                <ScalarProperty Name="PartslistName" ColumnName="PartslistName" />
-                <ScalarProperty Name="PartslistNo" ColumnName="PartslistNo" />
-                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="PlanningMR">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMR">
               <MappingFragment StoreEntitySet="PlanningMR">
@@ -39416,6 +39356,72 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
                 <ScalarProperty Name="ParentOutOfferPosID" ColumnName="ParentOutOfferPosID" />
                 <ScalarProperty Name="OutOfferID" ColumnName="OutOfferID" />
                 <ScalarProperty Name="OutOfferPosID" ColumnName="OutOfferPosID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Partslist">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.Partslist">
+              <MappingFragment StoreEntitySet="Partslist">
+                <ScalarProperty Name="LastFormulaChange" ColumnName="LastFormulaChange" />
+                <ScalarProperty Name="XMLComment" ColumnName="XMLComment" />
+                <ScalarProperty Name="ProductionUnits" ColumnName="ProductionUnits" />
+                <ScalarProperty Name="IsInEnabledPeriod" ColumnName="IsInEnabledPeriod" />
+                <ScalarProperty Name="MaterialWFID" ColumnName="MaterialWFID" />
+                <ScalarProperty Name="DeleteName" ColumnName="DeleteName" />
+                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
+                <ScalarProperty Name="PreviousPartslistID" ColumnName="PreviousPartslistID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="XMLDesign" ColumnName="XMLDesign" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="IsDefault" ColumnName="IsDefault" />
+                <ScalarProperty Name="IsProductionUnit" ColumnName="IsProductionUnit" />
+                <ScalarProperty Name="IsStandard" ColumnName="IsStandard" />
+                <ScalarProperty Name="ProductionWeight" ColumnName="ProductionWeight" />
+                <ScalarProperty Name="EnabledTo" ColumnName="EnabledTo" />
+                <ScalarProperty Name="EnabledFrom" ColumnName="EnabledFrom" />
+                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
+                <ScalarProperty Name="GrossWeight" ColumnName="GrossWeight" />
+                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
+                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="PartslistVersion" ColumnName="PartslistVersion" />
+                <ScalarProperty Name="PartslistName" ColumnName="PartslistName" />
+                <ScalarProperty Name="PartslistNo" ColumnName="PartslistNo" />
+                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProdOrderPartslist">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslist">
+              <MappingFragment StoreEntitySet="ProdOrderPartslist">
+                <ScalarProperty Name="LastFormulaChange" ColumnName="LastFormulaChange" />
+                <ScalarProperty Name="ExternProdOrderNo" ColumnName="ExternProdOrderNo" />
+                <ScalarProperty Name="VBiACProgramID" ColumnName="VBiACProgramID" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="MDProdOrderStateID" ColumnName="MDProdOrderStateID" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="DepartmentUserName" ColumnName="DepartmentUserName" />
+                <ScalarProperty Name="DepartmentUserDate" ColumnName="DepartmentUserDate" />
+                <ScalarProperty Name="ProdUserEndName" ColumnName="ProdUserEndName" />
+                <ScalarProperty Name="ProdUserEndDate" ColumnName="ProdUserEndDate" />
+                <ScalarProperty Name="LossComment" ColumnName="LossComment" />
+                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
+                <ScalarProperty Name="ActualQuantity" ColumnName="ActualQuantity" />
+                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
+                <ScalarProperty Name="ProdOrderID" ColumnName="ProdOrderID" />
+                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -39595,7 +39601,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <EntityTypeShape EntityType="iPlusMESV4_Model.PickingPosProdOrderPartslistPos" Width="1.5" PointX="53.75" PointY="284.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrder" Width="1.5" PointX="35.75" PointY="313.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderBatch" Width="1.5" PointX="56.75" PointY="281.5" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslist" Width="1.5" PointX="38" PointY="283.5" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslistConfig" Width="1.5" PointX="29.75" PointY="269.25" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslistPosFacilityLot" Width="1.5" PointX="51.5" PointY="283" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslistPosRelation" Width="1.5" PointX="62" PointY="281.5" />
@@ -39784,7 +39789,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramConfig_ACProgramID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramLog_ACProgramID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrderPos_ACProgramID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramConfig_ParentACProgramConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramLog_ParentACProgramLogID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramLogTask_ACProgramLogID" />
@@ -39912,7 +39916,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_MDProdOrderState" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_RatingComplaint_MDRatingComplaintType" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_MDReleaseStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDShift_ParentMDTimeRangeID" />
@@ -39938,12 +39941,8 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingPos_PickingID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingConfig_ParentPickingConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_PickingPos" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ParentProdOrderPartslistConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistPosRelationID" />
@@ -40012,8 +40011,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_PickingPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ParentProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos" />
@@ -40050,7 +40047,6 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityBooking" Width="1.5" PointX="73.25" PointY="263.75" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityBookingCharge" Width="1.5" PointX="77.5" PointY="276.75" />
@@ -40338,30 +40334,11 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_UserSettings_VBUser" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.Partslist" Width="1.5" PointX="79.75" PointY="274.75" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_PartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialWF" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MDUnitID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_Partslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMR" Width="1.5" PointX="38" PointY="316.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRProposal" Width="1.5" PointX="40.25" PointY="307.875" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.OutOfferPos" Width="1.5" PointX="75.75" PointY="266.75" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDCountrySalesTaxID" />
@@ -40373,6 +40350,35 @@ warning 6002: The table/view 'gipSoft.dbo.OrderLogRelView' does not have a prima
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_GroupOutOfferPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_ParentOutOfferPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_GroupOutOrderPosID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.Partslist" Width="1.5" PointX="79.75" PointY="274.625" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslist" Width="1.5" PointX="82" PointY="292" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Facility_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialWF" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MDUnitID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_Partslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" />
       </Diagram>
     </Diagrams>
   </Designer>

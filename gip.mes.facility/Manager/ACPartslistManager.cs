@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
+using System.Data.Objects.DataClasses;
 using System.Linq;
 
 namespace gip.mes.facility
@@ -36,6 +37,10 @@ namespace gip.mes.facility
         }
 
         public const string C_DefaultServiceACIdentifier = "PartslistManager";
+        #endregion
+
+        #region const
+        public const string Const_PartslistPosRelation_Change_Fields = @"MaterialPosTypeIndex,MaterialID,TargetQuantityUOM,MDUnitID";
         #endregion
 
         #region Attach / Deattach
@@ -715,6 +720,78 @@ namespace gip.mes.facility
             if (!msgWd.MsgDetails.Any())
                 return null;
             return msgWd;
+        }
+        #endregion
+
+        #region Change detection
+
+        /// <summary>
+        /// Check is Partslist formula changed
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="partslist"></param>
+        /// <returns></returns>
+        public bool IsFormulaChanged(DatabaseApp databaseApp, Partslist partslist)
+        {
+            bool isChangedIngredients =
+
+                // added or deleted positions
+                partslist
+                .PartslistPos_Partslist.Any(c =>
+                    c.EntityState == EntityState.Added ||
+                    c.EntityState == EntityState.Deleted)
+               ||
+               // added or deleted relations
+               partslist
+               .PartslistPos_Partslist
+               .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
+               .Any(c =>
+                    c.EntityState == EntityState.Added ||
+                    c.EntityState == EntityState.Deleted);
+
+            bool isChangedQuantities = false;
+            if (!isChangedIngredients)
+            {
+                List<EntityObject> changedPositions =
+                     partslist
+                     .PartslistPos_Partslist
+                     .Where(c => c.EntityState == EntityState.Modified)
+                     .Select(c => c as EntityObject)
+                     .ToList();
+
+                List<EntityObject> changedRelations =
+                    partslist
+                    .PartslistPos_Partslist
+                    .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
+                    .Where(c => c.EntityState == EntityState.Modified)
+                    .Select(c => c as EntityObject)
+                    .ToList();
+
+                List<EntityObject> changedObjects = changedPositions.Union(changedRelations).ToList();
+
+                isChangedQuantities = IsChangedPartslistPosProperty(databaseApp, changedObjects);
+            }
+            return isChangedIngredients || isChangedQuantities;
+        }
+
+        private bool IsChangedPartslistPosProperty(DatabaseApp databaseApp, List<EntityObject> changedObjects)
+        {
+
+            bool isChangedQuantities = false;
+            foreach (EntityObject changedObject in changedObjects)
+            {
+                ObjectStateEntry myObjectState = databaseApp.ObjectStateManager.GetObjectStateEntry(changedObject.EntityKey);
+                IEnumerable<string> modifiedProperties = myObjectState.GetModifiedProperties();
+                foreach (string modifiedProperty in modifiedProperties)
+                {
+                    if (Const_PartslistPosRelation_Change_Fields.Contains(modifiedProperty))
+                    {
+                        isChangedQuantities = true;
+                        break;
+                    }
+                }
+            }
+            return isChangedQuantities;
         }
         #endregion
 

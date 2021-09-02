@@ -21,6 +21,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(12, "TargetQuantity", ConstApp.TargetQuantity, "", "", true)]
     [ACPropertyEntity(13, "ActualQuantity", ConstApp.ActualQuantity, "", "", true)]
     [ACPropertyEntity(14, "ExternProdOrderNo", "en{'Ext prod. ord. No'}de{'Ext FANr'}", "", "", true)]
+    [ACPropertyEntity(15, "LastFormulaChange", "en{'Last formula change'}de{'Letzte Formeländerung'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
