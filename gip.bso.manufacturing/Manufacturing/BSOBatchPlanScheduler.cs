@@ -2330,6 +2330,15 @@ namespace gip.bso.manufacturing
                     EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslistID,
                     EntityName = ProdOrderPartslist.ClassName
                 });
+                if(SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                {
+                   info.Entities.Add(
+                   new PAOrderInfoEntry()
+                   {
+                       EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Select(c=>c.PlanningMRID).FirstOrDefault(),
+                       EntityName = PlanningMR.ClassName
+                   });
+                }
                 service.ShowDialogOrder(this, info);
             }
         }

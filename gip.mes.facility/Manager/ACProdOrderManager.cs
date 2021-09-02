@@ -495,16 +495,16 @@ namespace gip.mes.facility
                 .ToList();
             foreach (PartslistPosRelation posRelation in posRelations)
             {
-                ProdOrderPartslistPosRelation prodRelationItem = 
+                ProdOrderPartslistPosRelation prodRelationItem =
                     prodOrderPartsList
                     .ProdOrderPartslistPos_ProdOrderPartslist
-                    .SelectMany(c=>c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-                    .Where(c=> 
+                    .SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+                    .Where(c =>
                             ((c.SourceProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty) == posRelation.SourcePartslistPosID)
                             && ((c.TargetProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty) == posRelation.TargetPartslistPosID)
                         )
                     .FirstOrDefault();
-                if(prodRelationItem == null)
+                if (prodRelationItem == null)
                 {
                     prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
                     prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
@@ -518,13 +518,29 @@ namespace gip.mes.facility
                 .SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                 .ToList();
 
+            // 4.0 Setup initial quantities
+            foreach (ProdOrderPartslistPos prodPos in prodOrderPartsListPosItems)
+                prodPos.TargetQuantityUOM = prodPos.BasedOnPartslistPos.TargetQuantityUOM;
 
-            // 4.0 Make resizes of all lists
+            foreach (ProdOrderPartslistPosRelation prodRel in prodOrderPartsListPosRelationItems)
+            {
+                PartslistPosRelation posRel =
+                    posRelations
+                    .Where(c => 
+                        c.SourcePartslistPosID == (prodRel.SourceProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty)
+                        && c.TargetPartslistPosID == (prodRel.TargetProdOrderPartslistPos.BasedOnPartslistPosID ?? Guid.Empty)
+                        )
+                    .FirstOrDefault();
+                prodRel.TargetQuantityUOM = posRel.TargetQuantityUOM;
+            }
+
+
+            // 5.0 Make resizes of all lists
             double quantityFactor = prodOrderPartsList.TargetQuantity / partsList.TargetQuantityUOM;
             BatchLinearResize(prodOrderPartsListPosItems, quantityFactor);
             BatchLinearResize(prodOrderPartsListPosRelationItems, quantityFactor);
 
-            // 5.0 Finally make update LastFormulaChange
+            // 6.0 Finally make update LastFormulaChange
             prodOrderPartsList.LastFormulaChange = partsList.LastFormulaChange;
             return msg;
         }

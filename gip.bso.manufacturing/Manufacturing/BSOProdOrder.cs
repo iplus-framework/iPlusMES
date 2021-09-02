@@ -3616,7 +3616,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null)
+        public void ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
         {
             if (AccessPrimary == null)
                 return;
@@ -3634,6 +3634,9 @@ namespace gip.bso.manufacturing
             }
             else
                 filterItem.SearchWord = orderNo;
+
+            if(planningMRID != null)
+                SelectedFilterPlanningMR = FilterPlanningMRList.FirstOrDefault(c=>c.PlanningMRID == planningMRID);
 
             this.Search();
             if (CurrentProdOrder != null && ProdOrderPartslistList != null && prodOrderPartslistID != Guid.Empty)
@@ -3741,6 +3744,7 @@ namespace gip.bso.manufacturing
             ProdOrderPartslist poPartslist = null;
             FacilityBooking facilityBooking = null;
             FacilityPreBooking facilityPreBooking = null;
+            PlanningMR planningMR = null;
 
             foreach (var entry in paOrderInfo.Entities)
             {
@@ -3789,6 +3793,10 @@ namespace gip.bso.manufacturing
                 {
                     facilityPreBooking = DatabaseApp.FacilityPreBooking.FirstOrDefault(c => c.FacilityPreBookingID == entry.EntityID);
                 }
+                else if(entry.EntityName == PlanningMR.ClassName)
+                {
+                    planningMR =   DatabaseApp.PlanningMR.FirstOrDefault(c=>c.PlanningMRID == entry.EntityID);
+                }
             }
 
             if (batch == null && relation == null && partslistPos == null && poPartslist == null)
@@ -3800,6 +3808,9 @@ namespace gip.bso.manufacturing
             Guid intermBatchPosID = Guid.Empty;
             Guid? facilityBookingID = null;
             Guid? facilityPreBookingID = null;
+            Guid? planningMRID = null;
+            if(planningMR != null)
+                planningMRID = planningMR.PlanningMRID;
 
             if (facilityBooking != null)
             {
@@ -3897,7 +3908,7 @@ namespace gip.bso.manufacturing
                 orderNo = poPartslist.ProdOrder.ProgramNo;
                 prodOrderPartslistID = poPartslist.ProdOrderPartslistID;
             }
-            ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID);
+            ShowDialogOrder(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID);
             //InShowDialogOrderInfo = false;
         }
 

@@ -397,7 +397,7 @@ namespace gip.bso.manufacturing
                 SelectedPlanningMR
                 .PlanningMRProposal_PlanningMR
                 .Select(c => c.ProdOrderPartslist)
-                .Where(c => c.LastFormulaChange > c.Partslist.LastFormulaChange)
+                .Where(c => c.Partslist.LastFormulaChange > c.LastFormulaChange)
                 .Distinct()
                 .ToList();
 
@@ -422,7 +422,8 @@ namespace gip.bso.manufacturing
                 && SelectedPlanningMR
                 .PlanningMRProposal_PlanningMR
                 .Select(c => c.ProdOrderPartslist)
-                .Any(c => c.LastFormulaChange > c.Partslist.LastFormulaChange);
+                .Where(c => c.Partslist.LastFormulaChange > c.LastFormulaChange)
+                .Any();
         }
 
         #endregion

@@ -221,7 +221,7 @@ namespace gip.bso.masterdata
             if (!ConfigManagerIPlus.MustConfigBeReloadedOnServer(this, VisitedMethods, this.Database))
                 this.VisitedMethods = null;
 
-            // UpdatePlanningMROrders();
+            UpdatePlanningMROrders();
 
             return result;
         }
