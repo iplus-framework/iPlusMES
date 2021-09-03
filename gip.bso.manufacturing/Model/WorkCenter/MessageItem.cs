@@ -12,7 +12,7 @@ namespace gip.bso.manufacturing
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + "UserAckNode", "", typeof(MessageItem), "UserAckNode", "", "")]
     public class MessageItem : IACObject, INotifyPropertyChanged
     {
-        public MessageItem(IACComponent pwNode, IACBSO bso)
+        public MessageItem(IACComponent pwNode, IACBSO bso, eMsgLevel msgLevel = eMsgLevel.Default)
         {
             if (pwNode != null)
             {
@@ -24,12 +24,8 @@ namespace gip.bso.manufacturing
                     Message = _AlarmsAsText.Value as string;
                 }
                 _BSOManualWeighing = bso as BSOManualWeighing;
-
-                //using (ACMonitor.Lock(Database.GlobalDatabase.QueryLock_1X000))
-                //{
-                //    UserAckPWNodeType = UserAckPWNode.ValueT.ComponentClass.ObjectType;
-                //}
             }
+            _MessgeLevel = msgLevel;
         }
 
         private IACPropertyNetBase _AlarmsAsText;
@@ -72,11 +68,9 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        public Type UserAckPWNodeType
-        {
-            get;
-            set;
-        }
+        private eMsgLevel _MessgeLevel;
+        public eMsgLevel MessageLevel => _MessgeLevel;
+
 
         public IACObject ParentACObject => null;
 
@@ -134,12 +128,31 @@ namespace gip.bso.manufacturing
             {
                 if (_BSOManualWeighing != null && _BSOManualWeighing.CurrentComponentPWNode == UserAckPWNode.ValueT)
                 {
-                    UserAckPWNode.ValueT.ACUrlCommand("!" + PWManualWeighing.MNCompleteWeighing, _BSOManualWeighing.ScaleActualWeight);
+                    UserAckPWNode.ValueT.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, _BSOManualWeighing.ScaleActualWeight, 
+                                                       _BSOManualWeighing.ScaleBckgrState != ScaleBackgroundState.InTolerance);
                 }
                 else
                 {
-                    UserAckPWNode.ValueT.ACUrlCommand("!" + PWNodeUserAck.MN_AckStartClient);
+                    UserAckPWNode.ValueT.ExecuteMethod(PWNodeUserAck.MN_AckStartClient);
                 }
+            }
+        }
+
+        [ACMethodInfo("", "en{'Yes'}de{'Ja'}", 101)]
+        public virtual void QuestionYes()
+        {
+            if (UserAckPWNode != null && UserAckPWNode.ValueT != null)
+            {
+                UserAckPWNode.ValueT.ACUrlCommand("!UserResponseYes");
+            }
+        }
+
+        [ACMethodInfo("", "en{'No'}de{'Nein'}", 102)]
+        public virtual void QuestionNo()
+        {
+            if (UserAckPWNode != null && UserAckPWNode.ValueT != null)
+            {
+                UserAckPWNode.ValueT.ACUrlCommand("!UserResponseNo");
             }
         }
 

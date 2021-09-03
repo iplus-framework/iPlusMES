@@ -39,7 +39,6 @@ namespace gip.bso.manufacturing
         {
             DeactivateManualWeighingModel();
             _DefaultMaterialIcon = null;
-            MainSyncContext = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -76,7 +75,9 @@ namespace gip.bso.manufacturing
                 _CurrentProcessModule = value;
                 OnPropertyChanged("CurrentProcessModule");
                 if (_CurrentProcessModule != null)
-                    ActivateManualWeighingModel();
+                {
+                    ParentBSOWCS.ApplicationQueue.Add(() => ActivateManualWeighingModel());
+                }
             }
         }
 
@@ -220,6 +221,7 @@ namespace gip.bso.manufacturing
                 _TargetWeight = value;
                 OnPropertyChanged("TargetWeight");
                 OnPropertyChanged("ScaleDifferenceWeight");
+                ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, _TargetWeight, ScaleActualWeight);
             }
         }
 
@@ -870,7 +872,8 @@ namespace gip.bso.manufacturing
 
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
-            if (messagesToAck.Count > 1 || (messagesToAck.Any() && ScaleBckgrState == ScaleBackgroundState.InTolerance))
+            if (messagesToAck.Count > 1 || (messagesToAck.Any() && ScaleBckgrState == ScaleBackgroundState.InTolerance) 
+                                        || messagesToAck.Any(x => x.MessageLevel == eMsgLevel.Question))
             {
                 if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
                 {
@@ -906,6 +909,38 @@ namespace gip.bso.manufacturing
             if (item != null)
             {
                 item.AcknowledgeMsg();
+                AckMessageList.Remove(item);
+                AckMessageList = AckMessageList.ToList();
+
+                if (!AckMessageList.Any())
+                {
+                    CloseTopDialog();
+                }
+            }
+        }
+
+        [ACMethodInfo("", "en{'Yes'}de{'Ja'}", 602)]
+        public void QuestionYes(MessageItem item)
+        {
+            if (item != null)
+            {
+                item.QuestionYes();
+                AckMessageList.Remove(item);
+                AckMessageList = AckMessageList.ToList();
+
+                if (!AckMessageList.Any())
+                {
+                    CloseTopDialog();
+                }
+            }
+        }
+
+        [ACMethodInfo("", "en{'No'}de{'Nein'}", 602)]
+        public void QuestionNo(MessageItem item)
+        {
+            if (item != null)
+            {
+                item.QuestionNo();
                 AckMessageList.Remove(item);
                 AckMessageList = AckMessageList.ToList();
 
@@ -1163,7 +1198,7 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            LoadPAFManualWeighing(pafManWeighingRef);
+            ACMethod acMethod = LoadPAFManualWeighing(pafManWeighingRef);
 
             if (ScaleObjectsList != null && ScaleObjectsList.Any())
             {
@@ -1173,6 +1208,8 @@ namespace gip.bso.manufacturing
             _OrderInfo = orderInfo as IACContainerTNet<string>;
 
             LoadWFNode(CurrentProcessModule);
+
+            HandlePAFCurrentACMethod(acMethod);
 
             (_OrderInfo as IACPropertyNetBase).PropertyChanged += OrderInfoPropertyChanged;
 
@@ -1193,7 +1230,7 @@ namespace gip.bso.manufacturing
 
         }
 
-        private void LoadPAFManualWeighing(ACRef<IACComponent> pafManWeighing)
+        private ACMethod LoadPAFManualWeighing(ACRef<IACComponent> pafManWeighing)
         {
             UnloadPAFManualWeighing();
 
@@ -1205,7 +1242,7 @@ namespace gip.bso.manufacturing
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
                 Messages.Info(this, "Error50287", false, "CurrentACMethod");
-                return;
+                return null;
             }
 
             var manuallyAddedQuantity = pafManWeighing.ValueT.GetPropertyNet("ManuallyAddedQuantity");
@@ -1214,7 +1251,7 @@ namespace gip.bso.manufacturing
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
                 Messages.Info(this, "Error50287", false, "ManuallyAddedQuantity");
-                return;
+                return null;
             }
 
             var tareScaleState = pafManWeighing.ValueT.GetPropertyNet("TareScaleState");
@@ -1223,19 +1260,21 @@ namespace gip.bso.manufacturing
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
                 Messages.Info(this, "Error50287", false, "TareScaleState");
-                return;
+                return null;
             }
 
             _PAFCurrentACMethod = currentACMethod as IACContainerTNet<ACMethod>;
             (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged += PAFCurrentACMethodPropChanged;
             ACMethod temp = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
-            ParentBSOWCS.ApplicationQueue.Add(() => HandlePAFCurrentACMethod(temp));
+            ///*ParentBSOWCS.ApplicationQueue.Add(() =>*/ HandlePAFCurrentACMethod(temp);
 
             _PAFManuallyAddedQuantity = manuallyAddedQuantity as IACContainerTNet<double>;
             (_PAFManuallyAddedQuantity as IACPropertyNetBase).PropertyChanged += PAFManuallyAddedQuantityPropChanged;
             ScaleAddAcutalWeight = _PAFManuallyAddedQuantity.ValueT;
 
             _TareScaleState = tareScaleState as IACContainerT<short>;
+
+            return temp;
         }
 
         private void ActivateScale(ACRef<IACComponent> scale)
@@ -1364,7 +1403,8 @@ namespace gip.bso.manufacturing
                     ManualWeighingPWNode runningNode = mwPWNodes.FirstOrDefault(c => c.ComponentPWNodeACState.ValueT == ACStateEnum.SMRunning);
                     if (runningNode != null && runningNode.ComponentPWNode.ValueT.ConnectionState == ACObjectConnectionState.ValuesReceived)
                     {
-                        ParentBSOWCS?.ApplicationQueue.Add(() => HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT));
+                        //ParentBSOWCS?.ApplicationQueue.Add(() => HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT));
+                        HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT);
                     }
                 }
                 catch (Exception e)
@@ -1468,7 +1508,8 @@ namespace gip.bso.manufacturing
             if (_WeighingComponentInfo != null)
             {
                 WeighingComponentInfo tempCompInfo = _WeighingComponentInfo.ValueT;
-                ParentBSOWCS?.ApplicationQueue.Add(() => HandleWeighingComponentInfo(tempCompInfo));
+                //ParentBSOWCS?.ApplicationQueue.Add(() => HandleWeighingComponentInfo(tempCompInfo));
+                HandleWeighingComponentInfo(tempCompInfo);
                 (_WeighingComponentInfo as IACPropertyNetBase).PropertyChanged += WeighingComponentInfoPropChanged;
             }
         }
@@ -1590,8 +1631,11 @@ namespace gip.bso.manufacturing
 
         private void DeactivateWFNode(bool reset = false)
         {
-            WeighingMaterialList = null;
-            SelectedWeighingMaterial = null;
+            DelegateToMainThread((object state) =>
+            {
+                WeighingMaterialList = null;
+                SelectedWeighingMaterial = null;
+            });
             
             
             IsBinChangeAvailable = false;
@@ -1906,33 +1950,33 @@ namespace gip.bso.manufacturing
                             if (comp == null)
                                 return;
 
-                            MainSyncContext.Send((object state) =>
-                            {
-                                if (SelectedWeighingMaterial != comp)
-                                    SelectedWeighingMaterial = comp;
-
-                                comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
-                                SelectActiveScaleObject(comp);
-                                if (comp.WeighingMatState == WeighingComponentState.InWeighing)
-                                    BtnWeighBlink = false;
-
-                                if (compInfo.FacilityCharge != null)
+                                DelegateToMainThread((object state) =>
                                 {
-                                    var fcItem = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
-                                    SelectedMaterialF_FC = fcItem;
-                                }
-                                else if (compInfo.Facility != null)
-                                {
-                                    var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
-                                    SelectedMaterialF_FC = fItem;
-                                }
-                            }, new object());
+                                    if (SelectedWeighingMaterial != comp)
+                                        SelectedWeighingMaterial = comp;
+
+                                    comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
+                                    SelectActiveScaleObject(comp);
+                                    if (comp.WeighingMatState == WeighingComponentState.InWeighing)
+                                        BtnWeighBlink = false;
+
+                                    if (compInfo.FacilityCharge != null)
+                                    {
+                                        var fcItem = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
+                                        SelectedMaterialF_FC = fcItem;
+                                    }
+                                    else if (compInfo.Facility != null)
+                                    {
+                                        var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
+                                        SelectedMaterialF_FC = fItem;
+                                    }
+                                });
                             break;
                         }
                     case WeighingComponentInfoType.SelectCompReturnFC_F:
                         {
                             WeighingMaterial comp = WeighingMaterialList.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
-                            MainSyncContext.Send((object state) =>
+                            DelegateToMainThread((object state) =>
                             {
                                 if (SelectedWeighingMaterial != comp)
                                 {
@@ -1940,7 +1984,7 @@ namespace gip.bso.manufacturing
                                     SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
                                     _StartWeighingFromF_FC = true;
                                 }
-                            }, new object());
+                            });
                             break;
                         }
                     case WeighingComponentInfoType.StateSelectFC_F:
@@ -1948,7 +1992,7 @@ namespace gip.bso.manufacturing
                         {
                             WeighingMaterial comp = WeighingMaterialList.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
 
-                            MainSyncContext.Send((object state) =>
+                            DelegateToMainThread((object state) =>
                             {
                                 if (compInfoType == WeighingComponentInfoType.StateSelectFC_F && (WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
                                 && SelectedWeighingMaterial == null)
@@ -1989,7 +2033,7 @@ namespace gip.bso.manufacturing
                                         OnPropertyChanged("SelectedMaterialF_FC");
                                     }
                                 }
-                            }, new object());
+                            });
                             break;
                         }
                 }
@@ -2118,25 +2162,25 @@ namespace gip.bso.manufacturing
                 string activeScaleACUrl = CurrentPAFManualWeighing?.ACUrlCommand("!GetActiveScaleObjectACUrl") as string;
                 if (!string.IsNullOrEmpty(activeScaleACUrl))
                 {
-                    MainSyncContext.Send((object state) =>
+                    DelegateToMainThread((object state) =>
                     {
                         CurrentScaleObject = ScaleObjectsList.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
-                    }, new object());
+                    });
                 }
                 else if (setIfNotSelected)
                 {
-                    MainSyncContext.Send((object state) =>
+                    DelegateToMainThread((object state) =>
                     {
                         CurrentScaleObject = ScaleObjectsList.FirstOrDefault();
-                    }, new object());
+                    });
                 }
             }
             else
             {
-                MainSyncContext.Send((object state) =>
+                DelegateToMainThread((object state) =>
                 {
                     CurrentScaleObject = ScaleObjectsList.FirstOrDefault();
-                }, new object());
+                });
             }
         }
 

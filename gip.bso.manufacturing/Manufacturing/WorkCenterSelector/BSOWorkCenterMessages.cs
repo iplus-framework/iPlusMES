@@ -21,16 +21,15 @@ namespace gip.bso.manufacturing
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            MainSyncContext = SynchronizationContext.Current;
+            _MainSyncContext = SynchronizationContext.Current;
             return base.ACInit(startChildMode);
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _MScaleWFNodes = null;
-            MainSyncContext = null;
+            _MainSyncContext = null;
             UnSubscribeFromWFNodes();
-
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -38,9 +37,8 @@ namespace gip.bso.manufacturing
 
         #region Properties 
 
-        internal SynchronizationContext MainSyncContext;
-
-        private ACMonitorObject _WFNodesLock_70100 = new ACMonitorObject(70100);
+        private SynchronizationContext _MainSyncContext;
+        //private ACMonitorObject _70050_MainSyncContextLock = new ACMonitorObject(70050);
 
         private Type _MessageItemType = typeof(MessageItem);
         internal static readonly Type _WCSMessagesType = typeof(BSOWorkCenterMessages);
@@ -361,10 +359,15 @@ namespace gip.bso.manufacturing
 
         public void RefreshMessageList()
         {
-            MainSyncContext.Send((object state) => 
-                MessagesList = _MessagesListSafe.ToList(), 
-            new object());
+            DelegateToMainThread((object state) =>
+                MessagesList = _MessagesListSafe.ToList());
         }
+
+        public void DelegateToMainThread(SendOrPostCallback d)
+        {
+            _MainSyncContext.Send(d, new object());
+        }
+
 
         #endregion
     }
