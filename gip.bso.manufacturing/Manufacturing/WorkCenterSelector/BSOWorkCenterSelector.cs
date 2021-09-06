@@ -200,17 +200,18 @@ namespace gip.bso.manufacturing
                 if (AccessPrimary.Current != null)
                     AccessPrimary.Current.OnItemDeselected();
 
+                bool changedWFContext = AccessPrimary.Current != value;
                 AccessPrimary.Current = value;
+
+                if (changedWFContext)
+                    TaskPresenter?.Unload();
 
                 if (value != null)
                 {
-                    
                     AccessPrimary.Current.OnItemSelected(this);
                     CurrentLayout = null;
                     CurrentLayout = AccessPrimary.Current.ItemLayout;
                 }
-                else
-                    TaskPresenter?.Unload();
 
                 OnPropertyChanged("CurrentWorkCenterItem");
             }
@@ -949,7 +950,7 @@ namespace gip.bso.manufacturing
 
                 BSOs = OnAddFunctionBSOs(paf, BSOs);
 
-                WorkCenterItemFunction func = new WorkCenterItemFunction(workCenterItem.ProcessModule, paf.ACIdentifier, BSOs);
+                WorkCenterItemFunction func = new WorkCenterItemFunction(workCenterItem.ProcessModule, paf.ACIdentifier, this, BSOs);
                 workCenterItem.AddItemFunction(func);
             }
 
@@ -1030,10 +1031,11 @@ namespace gip.bso.manufacturing
             if (!string.IsNullOrEmpty(wf))
             {
                 var wfInstance = Root.ACUrlCommand(wf) as IACComponentPWNode;
-                if (TaskPresenter != null && wfInstance != null && wfInstance.ParentRootWFNode != TaskPresenter.SelectedRootWFNode)
+                if (TaskPresenter != null && wfInstance != null)
+                    //&& wfInstance.ParentRootWFNode != TaskPresenter.SelectedRootWFNode)
                 {
                     TaskPresenter.Unload();
-                    TaskPresenter.LoadWFInstance(wfInstance.ParentRootWFNode);
+                    TaskPresenter.Load(wfInstance.ParentRootWFNode);
                 }
             }
         }

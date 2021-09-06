@@ -1315,7 +1315,7 @@ namespace gip.bso.manufacturing
             string orderInfo = null;
             using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
             {
-                orderInfo = _OrderInfo.ValueT;
+                orderInfo = _OrderInfo != null ? _OrderInfo.ValueT: null;
                 if (_CurrentOrderInfoValue == orderInfo)
                     return;
                 _CurrentOrderInfoValue = orderInfo;
