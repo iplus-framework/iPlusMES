@@ -1218,11 +1218,8 @@ namespace gip.bso.manufacturing
 
         public virtual IACComponent GetTargetFunction(IEnumerable<IACComponent> processModuleChildrenComponents)
         {
-            using (ACMonitor.Lock(core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
-            {
-                return processModuleChildrenComponents.FirstOrDefault(c => typeof(PAFManualWeighing).IsAssignableFrom(c.ComponentClass.ObjectType)
-                                                                      && !typeof(PAFManualAddition).IsAssignableFrom(c.ComponentClass.ObjectType));
-            }
+            return processModuleChildrenComponents.FirstOrDefault(c => typeof(PAFManualWeighing).IsAssignableFrom(c.ComponentClass.ObjectType)
+                                                                    && !typeof(PAFManualAddition).IsAssignableFrom(c.ComponentClass.ObjectType));
         }
 
         public virtual void OnGetPWGroup(IACComponentPWNode pwGroup)
