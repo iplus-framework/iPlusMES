@@ -94,7 +94,7 @@ namespace gip.mes.datamodel
             partsListNewVersion.IsStandard = previusPartList.IsStandard;
             partsListNewVersion.IsProductionUnit = previusPartList.IsProductionUnit;
             partsListNewVersion.MaterialWF = previusPartList.MaterialWF;
-            partsListNewVersion.MaterialWF = previusPartList.MaterialWF;
+            partsListNewVersion.ProductionUnits = previusPartList.ProductionUnits;
 
             foreach (PartslistACClassMethod oldMehtod in previusPartList.PartslistACClassMethod_Partslist)
             {

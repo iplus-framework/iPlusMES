@@ -11,12 +11,12 @@ namespace gip.bso.manufacturing
 {
     public class WorkCenterItemFunction : INotifyPropertyChanged
     {
-        public WorkCenterItemFunction(ACComponent parentProcessModule, string PAFACIdentifier, ACComposition[] bsos)
+        public WorkCenterItemFunction(ACComponent parentProcessModule, string PAFACIdentifier, BSOWorkCenterSelector bso, ACComposition[] bsos)
         {
             ACComponent paf = parentProcessModule.ACUrlCommand(PAFACIdentifier) as ACComponent;
             if (paf != null)
             {
-                _ProcessFunction = new ACRef<ACComponent>(paf, parentProcessModule);
+                _ProcessFunction = new ACRef<ACComponent>(paf, bso);
                 ACStateProperty = ProcessFunction.GetPropertyNet("ACState") as IACContainerTNet<ACStateEnum>;
                 NeedWorkProperty = ProcessFunction.GetPropertyNet("NeedWork") as IACContainerTNet<bool>;
                 RelatedBSOs = bsos;
