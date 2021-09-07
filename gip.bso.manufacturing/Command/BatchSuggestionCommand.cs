@@ -14,6 +14,8 @@ namespace gip.bso.manufacturing
             BatchPlanSuggestion.TotalSize = wizardSchedulerPartslist.NewTargetQuantityUOM;
             BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
+            
+
             if (BatchPlanSuggestion.TotalSize > 0)
             {
 
@@ -31,7 +33,7 @@ namespace gip.bso.manufacturing
                             rest = suggestion1.Rest;
                             nr++;
                         }
-                        while (suggestion1 != null && suggestion1.Suggestion != null && rest > 0);
+                        while (suggestion1 != null && suggestion1.Suggestion != null && rest > double.Epsilon);
                         break;
                     case BatchSuggestionCommandModeEnum.KeepEqualBatchSizes:
                         KeepEqualBatchSizes suggestion2 = null;

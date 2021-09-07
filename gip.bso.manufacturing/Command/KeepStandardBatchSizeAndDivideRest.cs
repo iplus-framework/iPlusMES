@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -12,101 +8,51 @@ namespace gip.bso.manufacturing
         #region ctor's
         public KeepStandardBatchSizeAndDivideRest(int nr, double totalSize, int batchCount, double standardBatchSize, double minBatchSize, double maxBatchSize)
         {
-            int calcBatchCount = batchCount;
+            int calcBatchCount = 0;
             double calcBatchSize = 0;
             double rest = 0;
             rest = totalSize;
 
 
-            if (totalSize > 0)
+            if (totalSize > Double.Epsilon)
             {
                 if ((Math.Abs(standardBatchSize) <= Double.Epsilon
                       && Math.Abs(maxBatchSize) <= Double.Epsilon
                       && Math.Abs(minBatchSize) <= Double.Epsilon)
                    || totalSize < minBatchSize)
                 {
-                    calcBatchCount = 1;
-                    calcBatchSize = totalSize;
-                    rest = 0;
+                   // do nothing
                 }
                 else if (standardBatchSize > Double.Epsilon
                          && Math.Abs(maxBatchSize) <= Double.Epsilon
                          && Math.Abs(minBatchSize) <= Double.Epsilon)
                 {
-                    if (totalSize <= standardBatchSize)
+                    calcBatchSize = standardBatchSize;
+                }
+                else if (maxBatchSize > Double.Epsilon)
+                {
+                    calcBatchSize = maxBatchSize;
+                }
+
+
+                if(calcBatchSize > Double.Epsilon)
+                {
+                    if(totalSize <= calcBatchSize && totalSize >= minBatchSize)
                     {
                         calcBatchCount = 1;
                         calcBatchSize = totalSize;
-                        rest = 0;
                     }
                     else
                     {
-                        calcBatchSize = standardBatchSize;
                         calcBatchCount = (int)(totalSize / calcBatchSize);
-                        rest = totalSize - calcBatchSize * calcBatchCount;
                     }
-
-                }
-                else if (standardBatchSize > Double.Epsilon
-                         && minBatchSize > Double.Epsilon
-                         && maxBatchSize > Double.Epsilon)
-                {
-                    if (totalSize <= standardBatchSize)
-                    {
-                        calcBatchCount = 1;
-                        calcBatchSize = totalSize;
-                        rest = 0;
-                    }
-                    else
-                    {
-                        calcBatchSize = standardBatchSize;
-                        calcBatchCount = (int)(totalSize / calcBatchSize);
-                        rest = totalSize - calcBatchSize * calcBatchCount;
-                        if (rest < minBatchSize || rest > maxBatchSize)
-                        {
-                            calcBatchSize += rest / calcBatchCount;
-                            rest = totalSize - calcBatchSize * calcBatchCount;
-                        }
-                        if (calcBatchSize < minBatchSize || calcBatchSize > maxBatchSize)
-                        {
-                            if (calcBatchCount > 1)
-                            {
-                                calcBatchCount--;
-                                calcBatchSize = standardBatchSize;
-                                rest = totalSize - calcBatchSize * calcBatchCount;
-                            }
-                            else
-                            {
-                                calcBatchCount++;
-                                calcBatchSize = totalSize / calcBatchCount;
-                                rest = totalSize - calcBatchSize * calcBatchCount;
-                            }
-                        }
-                    }
+                    rest = totalSize - calcBatchCount * calcBatchSize;
                 }
             }
 
-
-            if (calcBatchCount > 0 && calcBatchSize > Double.Epsilon)
+            if (calcBatchCount > Double.Epsilon && calcBatchSize > Double.Epsilon)
                 Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
-            else
-            {
-                bool isOkForOneBatch = false;
-                if (totalSize >= minBatchSize)
-                {
-                    if (maxBatchSize > 0 && maxBatchSize >= totalSize)
-                        isOkForOneBatch = true;
-                    else
-                        isOkForOneBatch = true;
-                }
-                if (isOkForOneBatch)
-                {
-                    calcBatchCount = 1;
-                    calcBatchSize = totalSize;
-                    rest = 0;
-                }
-                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
-            }
+          
             Rest = rest;
         }
 

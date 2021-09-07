@@ -1165,7 +1165,7 @@ namespace gip.bso.manufacturing
                                                         .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
                                                         .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
                                                              && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
-                                                             && (   (!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
+                                                             && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
                                                                  || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                                                                 )
                                                              && c
@@ -1624,7 +1624,7 @@ namespace gip.bso.manufacturing
             {
                 if (_FilterBatchplanSuggestionModeList == null)
                 {
-                    _FilterBatchplanSuggestionModeList =  new ACValueListBatchSuggestionCommandModeEnum();
+                    _FilterBatchplanSuggestionModeList = new ACValueListBatchSuggestionCommandModeEnum();
                 }
                 return _FilterBatchplanSuggestionModeList;
             }
@@ -2330,14 +2330,14 @@ namespace gip.bso.manufacturing
                     EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslistID,
                     EntityName = ProdOrderPartslist.ClassName
                 });
-                if(SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                if (SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
                 {
-                   info.Entities.Add(
-                   new PAOrderInfoEntry()
-                   {
-                       EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Select(c=>c.PlanningMRID).FirstOrDefault(),
-                       EntityName = PlanningMR.ClassName
-                   });
+                    info.Entities.Add(
+                    new PAOrderInfoEntry()
+                    {
+                        EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Select(c => c.PlanningMRID).FirstOrDefault(),
+                        EntityName = PlanningMR.ClassName
+                    });
                 }
                 service.ShowDialogOrder(this, info);
             }
@@ -2905,8 +2905,14 @@ namespace gip.bso.manufacturing
                             BatchPlanSuggestion = LoadExistingBatchSuggestion(prodOrderPartslistPos);
                         }
                         else
-                            BatchPlanSuggestion = LoadNewBatchSuggestion();
-                        if (BatchPlanSuggestion.ItemsList == null || !BatchPlanSuggestion.ItemsList.Any())
+                        {
+                            Msg checkProdUnit = CheckProductionUnits();
+                            if (checkProdUnit == null)
+                                BatchPlanSuggestion = LoadNewBatchSuggestion();
+                            else
+                                SendMessage(checkProdUnit);
+                        }
+                        if (BatchPlanSuggestion == null || BatchPlanSuggestion.ItemsList == null || !BatchPlanSuggestion.ItemsList.Any())
                         {
                             // Error50392
                             Msg noBachSuggestionsErr = new Msg(this, eMsgLevel.Error, GetACUrl(), "WizardForward", 0, "Error50392");
@@ -2993,6 +2999,7 @@ namespace gip.bso.manufacturing
             }
             item.MDSchedulingGroupList = schedulingGroups;
             item.SelectedMDSchedulingGroup = item.MDSchedulingGroupList.FirstOrDefault();
+            item.ProductionUnits = partslist.ProductionUnits;
             return item;
         }
 
@@ -3101,6 +3108,20 @@ namespace gip.bso.manufacturing
             DefaultWizardSchedulerPartslist = AllWizardSchedulerPartslistList.LastOrDefault();
         }
 
+        private Msg CheckProductionUnits()
+        {
+            Msg msg = null;
+            if (SelectedWizardSchedulerPartslist.ProductionUnits != null && SelectedWizardSchedulerPartslist.ProductionUnits.Value > 0)
+            {
+                double rest = SelectedWizardSchedulerPartslist.TargetQuantityUOM % SelectedWizardSchedulerPartslist.ProductionUnits.Value;
+                if (rest > 0)
+                {
+                    msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "CheckProductionUnits", 3119, "Error50440", SelectedWizardSchedulerPartslist.TargetQuantityUOM, SelectedWizardSchedulerPartslist.ProductionUnits);
+                }
+            }
+            return msg;
+        }
+
         private BatchPlanSuggestion LoadNewBatchSuggestion()
         {
             BatchPlanSuggestion suggestion = null;
@@ -3128,6 +3149,7 @@ namespace gip.bso.manufacturing
                 if (SelectedWizardSchedulerPartslist.BatchSuggestionMode != null)
                     defMode = SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value;
                 SelectedFilterBatchplanSuggestionMode = FilterBatchplanSuggestionModeList.FirstOrDefault(c => (BatchSuggestionCommandModeEnum)c.Value == defMode);
+
                 BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, defMode, ProdOrderManager.TolRemainingCallQ);
                 suggestion = cmd.BatchPlanSuggestion;
                 WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineBatch);

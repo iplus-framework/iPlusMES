@@ -183,6 +183,25 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public double? _ProductionUnits;
+        [ACPropertyInfo(999, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}")]
+        public double? ProductionUnits
+
+        {
+            get
+            {
+                return _ProductionUnits;
+            }
+            set
+            {
+                if (_ProductionUnits != value)
+                {
+                    _ProductionUnits = value;
+                    OnPropertyChanged("ProductionUnits");
+                }
+            }
+        }
+
         #endregion
 
         #region Properties -> MDUnit
