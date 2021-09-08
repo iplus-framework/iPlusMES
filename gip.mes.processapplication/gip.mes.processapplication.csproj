@@ -157,18 +157,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
-      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
-      <Name>gip.core.autocomponent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
-      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
-      <Name>gip.core.datamodel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
-      <Project>{3a9383d8-5c6d-429c-89d3-57c1d2565ad1}</Project>
-      <Name>gip.core.manager</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
       <Project>{66484708-85BD-47C4-92DD-3010387465F4}</Project>
       <Name>gip.core.processapplication</Name>
