@@ -1172,10 +1172,7 @@ namespace gip.bso.manufacturing
 
             if (availableScales == null)
             {
-                using (ACMonitor.Lock(Database.QueryLock_1X000))
-                {
-                    scalesObjects = processModuleChildComps.Where(c => typeof(PAEScaleBase).IsAssignableFrom(c.ComponentClass.ObjectType)).ToArray();
-                }
+                scalesObjects = processModuleChildComps.Where(c => typeof(PAEScaleBase).IsAssignableFrom(c.ComponentClass.ObjectType)).ToArray();
             }
             else
             {
@@ -1207,11 +1204,11 @@ namespace gip.bso.manufacturing
 
             _OrderInfo = orderInfo as IACContainerTNet<string>;
 
-            LoadWFNode(CurrentProcessModule);
+            LoadWFNode(CurrentProcessModule, _OrderInfo.ValueT);
 
             HandlePAFCurrentACMethod(acMethod);
 
-            (_OrderInfo as IACPropertyNetBase).PropertyChanged += OrderInfoPropertyChanged;
+            orderInfo.PropertyChanged += OrderInfoPropertyChanged;
 
             return true;
         }
@@ -1263,7 +1260,6 @@ namespace gip.bso.manufacturing
             _PAFCurrentACMethod = currentACMethod as IACContainerTNet<ACMethod>;
             (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged += PAFCurrentACMethodPropChanged;
             ACMethod temp = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
-            ///*ParentBSOWCS.ApplicationQueue.Add(() =>*/ HandlePAFCurrentACMethod(temp);
 
             _PAFManuallyAddedQuantity = manuallyAddedQuantity as IACContainerTNet<double>;
             (_PAFManuallyAddedQuantity as IACPropertyNetBase).PropertyChanged += PAFManuallyAddedQuantityPropChanged;
@@ -1307,12 +1303,11 @@ namespace gip.bso.manufacturing
             OnPropertyChanged("CurrentScaleObject");
         }
 
-        private void LoadWFNode(ACComponent currentProcessModule)
+        private void LoadWFNode(ACComponent currentProcessModule, string orderInfo)
         {
-            string orderInfo = null;
+            //string orderInfo = null;
             using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
             {
-                orderInfo = _OrderInfo != null ? _OrderInfo.ValueT: null;
                 if (_CurrentOrderInfoValue == orderInfo)
                     return;
                 _CurrentOrderInfoValue = orderInfo;
@@ -1595,14 +1590,14 @@ namespace gip.bso.manufacturing
             DeactivateScale();
             UnloadPAFManualWeighing();
 
-            if (_OrderInfo != null)
-            {
-                (_OrderInfo as IACPropertyNetBase).PropertyChanged -= OrderInfoPropertyChanged;
-                _OrderInfo = null;
-            }
-
             using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
             {
+                if (_OrderInfo != null)
+                {
+                    (_OrderInfo as IACPropertyNetBase).PropertyChanged -= OrderInfoPropertyChanged;
+                    _OrderInfo = null;
+                }
+
                 _CurrentOrderInfoValue = null;
             }
 
@@ -1729,7 +1724,12 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT)
             {
                 ACComponent currentProcessModule = CurrentProcessModule;
-                ParentBSOWCS?.ApplicationQueue.Add(() => LoadWFNode(currentProcessModule));
+                IACContainerTNet<string> senderProp = sender as IACContainerTNet<string>;
+                string orderInfo = null;
+                if (senderProp != null)
+                    orderInfo = senderProp.ValueT;
+
+                ParentBSOWCS?.ApplicationQueue.Add(() => LoadWFNode(currentProcessModule, orderInfo));
             }
         }
 
@@ -1863,32 +1863,6 @@ namespace gip.bso.manufacturing
                 Messages.Error(this, message, true);
             }
         }
-
-        //private void HandlePWNodeACState(ManualWeighingPWNode mwPWNode, ACStateEnum pwNodeACstate)
-        //{
-        //    try
-        //    {
-        //        using (ACMonitor.Lock(_70500_ComponentPWNodeLock))
-        //        {
-        //            if (pwNodeACstate == ACStateEnum.SMRunning)
-        //                ActivateWFNode(mwPWNode.ComponentPWNode);
-        //            else if (pwNodeACstate == ACStateEnum.SMCompleted)
-        //                DeactivateWFNode();
-        //            else if (pwNodeACstate == ACStateEnum.SMResetting)
-        //                DeactivateWFNode(true);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        string message;
-        //        if (e.InnerException != null)
-        //            message = string.Format("ManualWeighingModel(HandlePWNodeACState): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
-        //        else
-        //            message = string.Format("ManualWeighingModel(HandlePWNodeACState): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
-
-        //        Messages.Error(this, message, true);
-        //    }
-        //}
 
         private void HandlePAFCurrentACMethod(ACMethod currentACMethod)
         {

@@ -38,7 +38,7 @@ namespace gip.bso.manufacturing
         #region Properties 
 
         private SynchronizationContext _MainSyncContext;
-        //private ACMonitorObject _70050_MainSyncContextLock = new ACMonitorObject(70050);
+        private ACMonitorObject _70050_MainSyncContextLock = new ACMonitorObject(70050);
 
         private Type _MessageItemType = typeof(MessageItem);
         internal static readonly Type _WCSMessagesType = typeof(BSOWorkCenterMessages);
@@ -365,9 +365,15 @@ namespace gip.bso.manufacturing
 
         public void DelegateToMainThread(SendOrPostCallback d)
         {
-            _MainSyncContext.Send(d, new object());
+            SynchronizationContext context = null;
+            using (ACMonitor.Lock(_70050_MainSyncContextLock))
+            {
+                context = _MainSyncContext;
+            }
+            
+            if (context != null)
+                context.Send(d, new object());
         }
-
 
         #endregion
     }
