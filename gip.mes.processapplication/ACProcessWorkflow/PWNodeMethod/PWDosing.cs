@@ -1191,18 +1191,18 @@ namespace gip.mes.processapplication
         /// </summary>
         public virtual void OnHandleStateCheckEmptySilo(PAFDosing dosing)
         {
-            double actualQuantity = 0;
-            PAEScaleBase scale = dosing.CurrentScaleForWeighing;
-            if (scale != null)
-            {
-                actualQuantity = scale.ActualWeight.ValueT;
-                if (!IsSimulationOn)
-                {
-                    PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
-                    if (totalizingScale != null)
-                        actualQuantity = totalizingScale.TotalActualWeight.ValueT;
-                }
-            }
+            //double actualQuantity = 0;
+            //PAEScaleBase scale = dosing.CurrentScaleForWeighing;
+            //if (scale != null)
+            //{
+            //    actualQuantity = scale.ActualWeight.ValueT;
+            //    if (!IsSimulationOn)
+            //    {
+            //        PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
+            //        if (totalizingScale != null)
+            //            actualQuantity = totalizingScale.TotalActualWeight.ValueT;
+            //    }
+            //}
 
             if (!ManuallyChangeSource
                 && dosing.StateLackOfMaterial.ValueT != PANotifyState.Off
@@ -1212,19 +1212,23 @@ namespace gip.mes.processapplication
                 PAMSilo silo = CurrentDosingSilo(null);
                 if (silo == null)
                     return;
+
+                DosingRestInfo restInfo = new DosingRestInfo(silo, dosing, 10);
+
                 //if (silo.MatSensorEmtpy == null
                 //    || (silo.MatSensorEmtpy != null && silo.MatSensorEmtpy.SensorState.ValueT != PANotifyState.Off))
                 {
-                    silo.RefreshFacility();
-                    double zeroTolerance = 10;
-                    if (silo.Facility.ValueT != null && silo.Facility.ValueT.ValueT != null)
-                        zeroTolerance = silo.Facility.ValueT.ValueT.Tolerance;
-                    if (zeroTolerance <= 0.1)
-                        zeroTolerance = 10;
+                    //silo.RefreshFacility();
+                    //double zeroTolerance = 10;
+                    //if (silo.Facility.ValueT != null && silo.Facility.ValueT.ValueT != null)
+                    //    zeroTolerance = silo.Facility.ValueT.ValueT.Tolerance;
+                    //if (zeroTolerance <= 0.1)
+                    //    zeroTolerance = 10;
 
                     // Überprüfe Rechnerischen Restbestand des Silos
-                    double rest = silo.FillLevel.ValueT - actualQuantity;
-                    if (rest < zeroTolerance)
+                    //double rest = silo.FillLevel.ValueT - actualQuantity;
+                    //if (rest < zeroTolerance)
+                    if (restInfo.InZeroTolerance)
                     {
                         // Falls Methode true zurückgibt
                         EmptySiloHandlingOptions handlingOptions = HandleAbortReasonOnEmptySilo(silo);

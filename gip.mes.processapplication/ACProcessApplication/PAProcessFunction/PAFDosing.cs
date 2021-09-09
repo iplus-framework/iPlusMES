@@ -493,6 +493,46 @@ namespace gip.mes.processapplication
             //    return true;
             //return false;
         }
+
+        public static bool AskUserSetAbortReasonEmpty(IACComponent acComponent)
+        {
+            return ValidateRemainingStock(acComponent);
+        }
+
+        private static bool ValidateRemainingStock(IACComponent acComponent)
+        {
+            if (acComponent == null)
+                return false;
+            DosingRestInfo restInfo = acComponent.ExecuteMethod("GetDosingRestInfo", null) as DosingRestInfo;
+            if (restInfo == null)
+                return true;
+            if (restInfo.IsZeroTolSet && !restInfo.InZeroTolerance)
+            {
+                // "Question50067": Es wurden {0:F3} kg aus der Quelle {1} dosiert, die zur Zeit einen Bestand von {2:F3} kg hat. Damit bleibt ein Rest von {3:F3} kg übrig, der größer ist als die eingestellte Leertoleranz von {4:F3} kg. Möchten Sie die Quelle tatsächlich leer buchen?
+                // "Question50067": {0:F3} kg were dosed from source {1}, which currently has a stock of {2:F3} kg. This leaves a residue of {3:F3} kg, which is greater than the set empty tolerance of {4:F3} kg. Do you really want to post the source empty?
+                Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50067", Global.MsgResult.Yes, false, restInfo.DosedQuantity, restInfo.FacilityName, restInfo.Stock, restInfo.RemainingStock, restInfo.ZeroTol);
+                if (questionRes == Global.MsgResult.Yes)
+                    return true;
+                return false;
+            }
+            return true;
+        }
+
+        [ACMethodInfo("", "en{'Remaining stock in silo'}de{'Restinhalt im Silo'}", 9999)]
+        public DosingRestInfo GetDosingRestInfo()
+        {
+            var acMethod = CurrentACMethod.ValueT;
+            if (acMethod == null)
+                return null;
+
+            PAMSilo currentSource = GetSourceSiloFromMethod(acMethod);
+            if (currentSource == null)
+                return null;
+
+            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null);
+            return restInfo;
+        }
+
         #endregion
 
         #region Change source, don't book silo empty
@@ -562,6 +602,8 @@ namespace gip.mes.processapplication
         {
             if (acComponent == null)
                 return false;
+            if (!ValidateRemainingStock(acComponent))
+                return false;
             // "Question50022": Do you want do cancel the current Dosing, then discharge to a alternate target and then dose the next component?
             Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50022", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
@@ -609,6 +651,8 @@ namespace gip.mes.processapplication
         {
             if (acComponent == null)
                 return false;
+            if (!ValidateRemainingStock(acComponent))
+                return false;
             // "Question50021": Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
             Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50021", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
@@ -654,7 +698,7 @@ namespace gip.mes.processapplication
 
         public static bool AskUserEndDosEndOrder(IACComponent acComponent)
         {
-            return true;
+            return ValidateRemainingStock(acComponent);
             //if (acComponent == null)
             //    return false;
             //// "Question50021": Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
@@ -704,6 +748,9 @@ namespace gip.mes.processapplication
         {
             if (acComponent == null)
                 return false;
+            if (!ValidateRemainingStock(acComponent))
+                return false;
+
             // "Question50021": Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
             Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50021", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
@@ -840,6 +887,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #endregion
+
 
         #region Interactionmethods on Result-Validation
         [ACMethodInteraction("", "en{'Accept zero quantity and take target quantity'}de{'Akzeptiere Null-Menge und übernehme Sollwert'}", 809, true)]
@@ -1002,6 +1050,9 @@ namespace gip.mes.processapplication
                 case Const.IsEnabledPrefix + "ForceSetLackOfMaterial":
                     result = IsEnabledForceSetLackOfMaterial();
                     return true;
+                case "GetDosingRestInfo":
+                    result = GetDosingRestInfo();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -1028,6 +1079,9 @@ namespace gip.mes.processapplication
                     return true;
                 case Const.AskUserPrefix + "EndDosAdjustRestWait":
                     result = AskUserEndDosAdjustRestWait(acComponent);
+                    return true;
+                case Const.AskUserPrefix + "SetAbortReasonEmpty":
+                    result = AskUserSetAbortReasonEmpty(acComponent);
                     return true;
             }
             return HandleExecuteACMethod_PAProcessFunction(out result, acComponent, acMethodName, acClassMethod, acParameter);
