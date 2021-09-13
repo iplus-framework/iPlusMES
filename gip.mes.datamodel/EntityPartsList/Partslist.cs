@@ -63,6 +63,7 @@ namespace gip.mes.datamodel
             entity.PartslistNo = secondaryKey;
             entity.PartslistVersion = "1";
             entity.IsEnabled = true;
+            entity.LastFormulaChange = DateTime.Now;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }

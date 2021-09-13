@@ -733,8 +733,15 @@ namespace gip.mes.facility
         /// <returns></returns>
         public bool IsFormulaChanged(DatabaseApp databaseApp, Partslist partslist)
         {
-            bool isChangedIngredients =
+            bool isChangedPartslist = partslist.EntityState == EntityState.Modified;
+            if (isChangedPartslist)
+                isChangedPartslist = IsChangedPartslistPosProperty(databaseApp, new List<EntityObject>() { partslist });
+            bool isChangedQuantities = false;
+            bool isChangedIngredients = false;
 
+            if (!isChangedPartslist)
+            {
+                isChangedIngredients =
                 // added or deleted positions
                 partslist
                 .PartslistPos_Partslist.Any(c =>
@@ -749,29 +756,30 @@ namespace gip.mes.facility
                     c.EntityState == EntityState.Added ||
                     c.EntityState == EntityState.Deleted);
 
-            bool isChangedQuantities = false;
-            if (!isChangedIngredients)
-            {
-                List<EntityObject> changedPositions =
-                     partslist
-                     .PartslistPos_Partslist
-                     .Where(c => c.EntityState == EntityState.Modified)
-                     .Select(c => c as EntityObject)
-                     .ToList();
+                if (!isChangedIngredients)
+                {
+                    List<EntityObject> changedPositions =
+                         partslist
+                         .PartslistPos_Partslist
+                         .Where(c => c.EntityState == EntityState.Modified)
+                         .Select(c => c as EntityObject)
+                         .ToList();
 
-                List<EntityObject> changedRelations =
-                    partslist
-                    .PartslistPos_Partslist
-                    .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
-                    .Where(c => c.EntityState == EntityState.Modified)
-                    .Select(c => c as EntityObject)
-                    .ToList();
+                    List<EntityObject> changedRelations =
+                        partslist
+                        .PartslistPos_Partslist
+                        .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
+                        .Where(c => c.EntityState == EntityState.Modified)
+                        .Select(c => c as EntityObject)
+                        .ToList();
 
-                List<EntityObject> changedObjects = changedPositions.Union(changedRelations).ToList();
+                    List<EntityObject> changedObjects = changedPositions.Union(changedRelations).ToList();
 
-                isChangedQuantities = IsChangedPartslistPosProperty(databaseApp, changedObjects);
+                    isChangedQuantities = IsChangedPartslistPosProperty(databaseApp, changedObjects);
+                }
             }
-            return isChangedIngredients || isChangedQuantities;
+
+            return isChangedPartslist || isChangedIngredients || isChangedQuantities;
         }
 
         private bool IsChangedPartslistPosProperty(DatabaseApp databaseApp, List<EntityObject> changedObjects)

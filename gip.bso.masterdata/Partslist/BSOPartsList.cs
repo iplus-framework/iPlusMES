@@ -221,7 +221,7 @@ namespace gip.bso.masterdata
             if (!ConfigManagerIPlus.MustConfigBeReloadedOnServer(this, VisitedMethods, this.Database))
                 this.VisitedMethods = null;
 
-            UpdatePlanningMROrders();
+            CheckForUpdatePlanningMROrders();
 
             return result;
         }
@@ -410,41 +410,48 @@ namespace gip.bso.masterdata
 
         #region Partslist-> Methods -> Update PlanningMR Orders
 
-        public void UpdatePlanningMROrders()
+        private void CheckForUpdatePlanningMROrders()
         {
-            List<Partslist> changedFormulaPartslist = new List<Partslist>();
+            UpdatePlLastFormulaChange();
+            List<Partslist> plForUpdatePlanningMRNodes = GetPlForUpdatePlanningMROrder();
+            if (plForUpdatePlanningMRNodes != null && plForUpdatePlanningMRNodes.Any())
+                UpdatePlanningMROrders(plForUpdatePlanningMRNodes);
+        }
+        private void UpdatePlLastFormulaChange()
+        {
             foreach (Partslist partslist in PartslistList)
             {
                 bool isChanged = PartslistManager.IsFormulaChanged(DatabaseApp, partslist);
                 if (isChanged)
-                {
-                    changedFormulaPartslist.Add(partslist);
                     partslist.LastFormulaChange = DateTime.Now;
-                }
             }
-            CheckPlConnectedWithPlanningMR(changedFormulaPartslist);
         }
 
-        public void CheckPlConnectedWithPlanningMR(List<Partslist> changedFormulaPartslist)
+        private List<Partslist> GetPlForUpdatePlanningMROrder()
         {
-            if (changedFormulaPartslist != null && changedFormulaPartslist.Any())
+            List<Partslist> partslists = null;
+            if (PartslistList != null && PartslistList.Any())
             {
-                List<Partslist> changedConnectedWithTemplate = changedFormulaPartslist.Where(c => c.ProdOrderPartslist_Partslist.Any(x => x.PlanningMRProposal_ProdOrderPartslist.Any())).ToList();
-                if (changedConnectedWithTemplate != null && changedConnectedWithTemplate.Any())
+                List<Partslist> changedPLConnectedWithTemplate =
+                    PartslistList
+                    .Where(c => c.ProdOrderPartslist_Partslist.Any(x => x.PlanningMRProposal_ProdOrderPartslist.Any(y => y.ProdOrderPartslist.LastFormulaChange < c.LastFormulaChange)))
+                    .ToList();
+                if (changedPLConnectedWithTemplate != null && changedPLConnectedWithTemplate.Any())
                 {
-                    string changedPlartslistNo = string.Join(",", changedConnectedWithTemplate.Select(c => c.PartslistNo).Distinct().OrderBy(c => c));
+                    string changedPlartslistNo = string.Join(",", changedPLConnectedWithTemplate.Select(c => c.PartslistNo).Distinct().OrderBy(c => c));
                     MsgResult msgResult = Root.Messages.Question(this, "Question50065", MsgResult.Yes, false, changedPlartslistNo);
                     if (msgResult == MsgResult.Yes)
                     {
-                        UpdatePlanningMR(changedConnectedWithTemplate);
+                        partslists = changedPLConnectedWithTemplate;
                     }
                 }
             }
+            return partslists;
         }
 
-        public void UpdatePlanningMR(List<Partslist> changedConnectedWithTemplate)
+        private void UpdatePlanningMROrders(List<Partslist> partslists)
         {
-            foreach (Partslist partslist in changedConnectedWithTemplate)
+            foreach (Partslist partslist in partslists)
             {
                 List<ProdOrderPartslist> relatedTemplateProdPl =
                     partslist
@@ -453,9 +460,10 @@ namespace gip.bso.masterdata
                     .ToList();
 
                 foreach (ProdOrderPartslist prodOrderPartslist in relatedTemplateProdPl)
-                    ProdOrderManager.PartslistUpdate(DatabaseApp, partslist, prodOrderPartslist);
+                    ProdOrderManager.PartslistRebuild(DatabaseApp, partslist, prodOrderPartslist);
             }
         }
+
         #endregion
 
         #endregion

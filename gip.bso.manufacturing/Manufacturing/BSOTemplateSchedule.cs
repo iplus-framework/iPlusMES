@@ -325,6 +325,20 @@ namespace gip.bso.manufacturing
             // Info50075.
             if (Root.Root.Messages.Question(this, "Info50075", Global.MsgResult.No, false) == Global.MsgResult.Yes)
             {
+                List<ProdOrderPartslist> prodOrderPartslistsChanged =
+                    SelectedPlanningMR
+                    .PlanningMRProposal_PlanningMR
+                    .Where(c => c.ProdOrder != null)
+                    .Select(c => c.ProdOrder).Distinct()
+                    .SelectMany(c => c.ProdOrderPartslist_ProdOrder)
+                    .Where(c => c.Partslist.LastFormulaChange > c.LastFormulaChange)
+                    .ToList();
+
+                if (prodOrderPartslistsChanged.Any())
+                {
+                    UpdateChangedPartslist(prodOrderPartslistsChanged);
+                }
+
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_GeneratePlan);
                 ShowDialog(this, DesignNameProgressBar);
             }
@@ -403,15 +417,7 @@ namespace gip.bso.manufacturing
 
             if (prodOrderPartslistsChanged.Any())
             {
-                string changedPlartslistNo = string.Join(",", prodOrderPartslistsChanged.Select(c => c.Partslist.PartslistNo).Distinct().OrderBy(c => c));
-                MsgResult msgResult = Root.Messages.Question(this, "Question50066", MsgResult.Yes, false, changedPlartslistNo);
-                if (msgResult == MsgResult.Yes)
-                {
-                    foreach (ProdOrderPartslist prodOrderPartslistChanged in prodOrderPartslistsChanged)
-                    {
-                        ProdOrderManager.PartslistUpdate(DatabaseApp, prodOrderPartslistChanged.Partslist, prodOrderPartslistChanged);
-                    }
-                }
+                UpdateChangedPartslist(prodOrderPartslistsChanged);
             }
         }
 
@@ -426,6 +432,19 @@ namespace gip.bso.manufacturing
                 .Any();
         }
 
+        public void UpdateChangedPartslist(List<ProdOrderPartslist> prodOrderPartslistsChanged)
+        {
+            string changedPlartslistNo = string.Join(",", prodOrderPartslistsChanged.Select(c => c.Partslist.PartslistNo).Distinct().OrderBy(c => c));
+            MsgResult msgResult = Root.Messages.Question(this, "Question50066", MsgResult.Yes, false, changedPlartslistNo);
+            if (msgResult == MsgResult.Yes)
+            {
+                foreach (ProdOrderPartslist prodOrderPartslistChanged in prodOrderPartslistsChanged)
+                {
+                    ProdOrderManager.PartslistRebuild(DatabaseApp, prodOrderPartslistChanged.Partslist, prodOrderPartslistChanged);
+                }
+            }
+        }
+      
         #endregion
 
         #region BackgroundWorker
