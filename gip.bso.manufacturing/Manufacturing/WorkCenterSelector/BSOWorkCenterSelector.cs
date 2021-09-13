@@ -35,6 +35,7 @@ namespace gip.bso.manufacturing
             if (!result)
                 return result;
 
+            _MainSyncContext = SynchronizationContext.Current;
             _BSOWorkCenterSelectorRules = new ACPropertyConfigValue<string>(this, "BSOWorkCenterSelectorRules", "");
 
             using (ACMonitor.Lock(_20015_LockValue))
@@ -73,10 +74,19 @@ namespace gip.bso.manufacturing
 
             ProcessModuleOrderInfo = null;
 
-            if (_AlarmsInPhysicalModel != null)
+            using (ACMonitor.Lock(_70050_MembersLock))
             {
-                _AlarmsInPhysicalModel.PropertyChanged -= _AlarmsInPhysicalModel_PropertyChanged;
-                _AlarmsInPhysicalModel = null;
+                if (_AlarmsInPhysicalModel != null)
+                {
+                    _AlarmsInPhysicalModel.PropertyChanged -= _AlarmsInPhysicalModel_PropertyChanged;
+                    _AlarmsInPhysicalModel = null;
+                }
+
+                if (_CurrentPWGroup != null)
+                {
+                    _CurrentPWGroup.Detach();
+                    _CurrentPWGroup = null;
+                }
             }
 
             foreach (WorkCenterItem item in WorkCenterItems)
@@ -89,17 +99,11 @@ namespace gip.bso.manufacturing
                 childBSO.DeActivate();
             }
 
-            if (_CurrentPWGroup != null)
-            {
-                _CurrentPWGroup.Detach();
-                _CurrentPWGroup = null;
-            }
-
             DeinitFunctionMonitor();
 
             if (_ApplicationQueue != null)
             {
-                _ApplicationQueue.StopWorkerThread();
+                _ApplicationQueue.StopWorkerThread(true);
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     _ApplicationQueue = null;
@@ -112,6 +116,8 @@ namespace gip.bso.manufacturing
                 _ClientManager = null;
             }
 
+            _MainSyncContext = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -121,6 +127,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties
+
+        private ACMonitorObject _70050_MembersLock = new ACMonitorObject(70050);
 
         private ACDelegateQueue _ApplicationQueue;
         public ACDelegateQueue ApplicationQueue
@@ -135,6 +143,7 @@ namespace gip.bso.manufacturing
         }
 
         private WCFClientManager _ClientManager;
+        private SynchronizationContext _MainSyncContext;
 
         private bool _IsCurrentUserConfigured = false;
         public bool IsCurrentUserConfigured => _IsCurrentUserConfigured;
@@ -252,10 +261,10 @@ namespace gip.bso.manufacturing
 
         private ACRef<IACComponentPWNode> _CurrentPWGroup;
 
-        public IACComponentPWNode CurrentPWGroup
-        {
-            get => _CurrentPWGroup?.ValueT;
-        }
+        //public IACComponentPWNode CurrentPWGroup
+        //{
+        //    get => _CurrentPWGroup?.ValueT;
+        //}
 
         public string CurrentVBContent
         {
@@ -753,11 +762,14 @@ namespace gip.bso.manufacturing
                 {
                     ApplicationQueue.Add(() =>
                     {
-                        if (CurrentChildBSO != null)
+                        _MainSyncContext?.Send((object state) =>
                         {
-                            CurrentChildBSO.DeActivate();
-                            CurrentChildBSO.Activate(CurrentProcessModule);
-                        }
+                            if (CurrentChildBSO != null)
+                            {
+                                CurrentChildBSO.DeActivate();
+                                CurrentChildBSO.Activate(CurrentProcessModule);
+                            }
+                        }, new object());
                     });
                 }
             }
@@ -779,41 +791,50 @@ namespace gip.bso.manufacturing
 
             ProcessModuleOrderInfo.PropertyChanged += ProcessModuleOrderInfo_PropertyChanged;
             string orderInfo = ProcessModuleOrderInfo.ValueT;
-            HandleOrderInfoPropChanged(orderInfo);
+            HandleOrderInfoPropChanged(orderInfo, processModule);
         }
 
         private void ProcessModuleOrderInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if(e.PropertyName == Const.ValueT)
             {
-                string orderInfo = ProcessModuleOrderInfo.ValueT;
-                ApplicationQueue?.Add(() => HandleOrderInfoPropChanged(orderInfo));
+                IACContainerTNet<string> senderProp = sender as IACContainerTNet<string>;
+                if (senderProp != null)
+                {
+                    string orderInfo = senderProp.ValueT;
+                    ACComponent currentProcessModule = senderProp.ParentACComponent as ACComponent;
+                    ApplicationQueue?.Add(() => HandleOrderInfoPropChanged(orderInfo, currentProcessModule));
+                }
             }
         }
 
-        private void HandleOrderInfoPropChanged(string orderInfo)
+        private void HandleOrderInfoPropChanged(string orderInfo, ACComponent currentProcessModule)
         {
             if (string.IsNullOrEmpty(orderInfo))
             {
                 CurrentBatch = null;
                 EndBatchPos = null;
-                if (_CurrentPWGroup != null)
-                {
-                    _CurrentPWGroup.Detach();
-                    _CurrentPWGroup = null;
-                }
 
-                if (_AlarmsInPhysicalModel != null)
+                using (ACMonitor.Lock(_70050_MembersLock))
                 {
-                    _AlarmsInPhysicalModel.PropertyChanged -= _AlarmsInPhysicalModel_PropertyChanged;
-                    _AlarmsInPhysicalModel = null;
+                    if (_CurrentPWGroup != null)
+                    {
+                        _CurrentPWGroup.Detach();
+                        _CurrentPWGroup = null;
+                    }
+
+                    if (_AlarmsInPhysicalModel != null)
+                    {
+                        _AlarmsInPhysicalModel.PropertyChanged -= _AlarmsInPhysicalModel_PropertyChanged;
+                        _AlarmsInPhysicalModel = null;
+                    }
                 }
 
                 AlarmInPhysicalModel = false;
             }
             else
             {
-                string[] accessArr = (string[])CurrentProcessModule?.ACUrlCommand("!SemaphoreAccessedFrom");
+                string[] accessArr = (string[])currentProcessModule?.ACUrlCommand("!SemaphoreAccessedFrom");
                 if (accessArr == null || !accessArr.Any())
                 {
                     CurrentBatch = null;
@@ -836,7 +857,10 @@ namespace gip.bso.manufacturing
                     return;
                 }
 
-                _CurrentPWGroup = new ACRef<IACComponentPWNode>(pwGroup, this);
+                using (ACMonitor.Lock(_70050_MembersLock))
+                {
+                    _CurrentPWGroup = new ACRef<IACComponentPWNode>(pwGroup, this);
+                }
 
                 PAOrderInfo currentOrderInfo = pwGroup?.ExecuteMethod("GetPAOrderInfo") as PAOrderInfo;
                 if (currentOrderInfo == null)
@@ -846,27 +870,31 @@ namespace gip.bso.manufacturing
                 }
                 if (currentOrderInfo != null)
                 {
-                    var rootPW = CurrentPWGroup?.ParentRootWFNode;
+                    var rootPW = pwGroup?.ParentRootWFNode;
                     if (rootPW == null)
                     {
                         //error
                         return;
                     }
 
-                    _AlarmsInPhysicalModel = rootPW.GetPropertyNet(PWProcessFunction.PN_AlarmsInPhysicalModel) as IACContainerTNet<bool>;
-                    if (_AlarmsInPhysicalModel == null)
+                    var alarmsInPhysicalModel = rootPW.GetPropertyNet(PWProcessFunction.PN_AlarmsInPhysicalModel) as IACContainerTNet<bool>;
+                    if (alarmsInPhysicalModel == null)
                     {
                         //TODO:error
                         return;
                     }
 
-                    AlarmInPhysicalModel = _AlarmsInPhysicalModel.ValueT;
+                    AlarmInPhysicalModel = alarmsInPhysicalModel.ValueT;
 
-                    _AlarmsInPhysicalModel.PropertyChanged += _AlarmsInPhysicalModel_PropertyChanged;
+                    using (ACMonitor.Lock(_70050_MembersLock))
+                    {
+                        _AlarmsInPhysicalModel = alarmsInPhysicalModel;
+                        _AlarmsInPhysicalModel.PropertyChanged += _AlarmsInPhysicalModel_PropertyChanged;
+                    }
 
                     if (CurrentVBContent == FunctionMonitorTabVBContent)
                     {
-                        InitFunctionMonitor();
+                        _MainSyncContext?.Send((object state) => InitFunctionMonitor(), new object());
                     }
 
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
@@ -896,9 +924,6 @@ namespace gip.bso.manufacturing
                         }
                     }
                 }
-
-                //if (CurrentChildBSO != null)
-                //    CurrentChildBSO.OnHandleOrderInfoChanged(orderInfo, pwGroupACUrl, pwGroup);
             }
         }
 
@@ -1097,7 +1122,13 @@ namespace gip.bso.manufacturing
             if (_AccessedProcessModulesProp != null)
                 return;
 
-            var rootPW = CurrentPWGroup?.ParentRootWFNode;
+            IACComponentPWNode pwGroup = null;
+            using (ACMonitor.Lock(_70050_MembersLock))
+            {
+                pwGroup = _CurrentPWGroup?.ValueT;
+            }
+
+            var rootPW = pwGroup?.ParentRootWFNode;
             if (rootPW == null)
             {
                 //error
@@ -1144,8 +1175,12 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == Const.ValueT)
             {
-                var modules = _AccessedProcessModulesProp.ValueT?.ToList();
-                ApplicationQueue.Add(() => HandleAccessedPMsChanged(modules));
+                IACContainerTNet<List<ACChildInstanceInfo>> senderProp = sender as IACContainerTNet<List<ACChildInstanceInfo>>;
+                if (senderProp != null)
+                {
+                    var modules = senderProp.ValueT?.ToList();
+                    ApplicationQueue.Add(() => HandleAccessedPMsChanged(modules));
+                }
             }
         }
 
@@ -1353,6 +1388,5 @@ namespace gip.bso.manufacturing
         );
 
         #endregion
-
     }
 }

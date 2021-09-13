@@ -48,6 +48,12 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public virtual ACComponent CurrentProcessModule
+        {
+            get;
+            protected set;
+        }
+
         #region Properties => Start workflow picking
 
         /// <summary>
@@ -129,7 +135,10 @@ namespace gip.bso.manufacturing
 
         }
 
-        public abstract void Activate(ACComponent selectedProcessModule);
+        public virtual void Activate(ACComponent selectedProcessModule)
+        {
+            CurrentProcessModule = selectedProcessModule;
+        }
 
         public virtual void DeActivate()
         {
@@ -152,10 +161,11 @@ namespace gip.bso.manufacturing
                 _ACPickingManager.Detach();
                 _ACPickingManager = null;
             }
+
+            CurrentProcessModule = null;
         }
 
         #region Methods => Start workflow picking
-
 
         public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod)
         {
@@ -396,7 +406,7 @@ namespace gip.bso.manufacturing
                 return msg;
             }
 
-            Guid currentModule = ParentBSOWCS.CurrentProcessModule.ComponentClass.ACClassID;
+            Guid currentModule = CurrentProcessModule.ComponentClass.ACClassID;
 
             validRoute = result.Routes.FirstOrDefault(c => c.Items.Any(x => x.SourceGuid == currentModule || x.TargetGuid == currentModule));
 

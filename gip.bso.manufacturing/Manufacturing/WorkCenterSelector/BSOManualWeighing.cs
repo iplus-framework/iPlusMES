@@ -64,19 +64,38 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        protected bool IsCurrentProcessModuleNull
+        {
+            get;
+            private set;
+        }
         private ACComponent _CurrentProcessModule;
         [ACPropertyInfo(601)]
-        public ACComponent CurrentProcessModule
+        public override  ACComponent CurrentProcessModule
         {
-            get => _CurrentProcessModule;
-            set
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _CurrentProcessModule;
+                }
+            }
+            protected set
             {
                 DeactivateManualWeighingModel();
-                _CurrentProcessModule = value;
-                OnPropertyChanged("CurrentProcessModule");
-                if (_CurrentProcessModule != null)
+                using (ACMonitor.Lock(_20015_LockValue))
                 {
+                    _CurrentProcessModule = value;
+                }
+                OnPropertyChanged("CurrentProcessModule");
+                if (value != null)
+                {
+                    IsCurrentProcessModuleNull = false;
                     ParentBSOWCS.ApplicationQueue.Add(() => ActivateManualWeighingModel());
+                }
+                else
+                {
+                    IsCurrentProcessModuleNull = true;
                 }
             }
         }
@@ -1135,7 +1154,8 @@ namespace gip.bso.manufacturing
 
         public bool ActivateManualWeighingModel()
         {
-            if (CurrentProcessModule == null)
+            ACComponent currentProcessModule = CurrentProcessModule;
+            if (currentProcessModule == null)
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
@@ -1143,10 +1163,10 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            PAProcessModuleACUrl = CurrentProcessModule.ACUrl;
-            PAProcessModuleACCaption = CurrentProcessModule.ACCaption;
+            PAProcessModuleACUrl = currentProcessModule.ACUrl;
+            PAProcessModuleACCaption = currentProcessModule.ACCaption;
 
-            if (CurrentProcessModule.ConnectionState == ACObjectConnectionState.DisConnected)
+            if (currentProcessModule.ConnectionState == ACObjectConnectionState.DisConnected)
             {
                 //Info50040: The server is unreachable. Reopen the program once the connection to the server has been established.
                 // Der Server ist nicht erreichbar. Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
@@ -1154,7 +1174,7 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            var processModuleChildComps = CurrentProcessModule.ACComponentChildsOnServer;
+            var processModuleChildComps = currentProcessModule.ACComponentChildsOnServer;
             IEnumerable<IACComponent> scalesObjects = null;
             IACComponent pafManWeighing = GetTargetFunction(processModuleChildComps);
 
@@ -1186,7 +1206,7 @@ namespace gip.bso.manufacturing
                 ScaleObjectsList = new List<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
             }
 
-            var orderInfo = CurrentProcessModule.GetPropertyNet("OrderInfo");
+            var orderInfo = currentProcessModule.GetPropertyNet("OrderInfo");
             if (orderInfo == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
@@ -1204,7 +1224,7 @@ namespace gip.bso.manufacturing
 
             _OrderInfo = orderInfo as IACContainerTNet<string>;
 
-            LoadWFNode(CurrentProcessModule, _OrderInfo.ValueT);
+            LoadWFNode(currentProcessModule, _OrderInfo.ValueT);
 
             HandlePAFCurrentACMethod(acMethod);
 
@@ -1608,8 +1628,7 @@ namespace gip.bso.manufacturing
             }
             _ProcessModuleScales = null;
 
-            _MessagesListSafe.Clear();
-            RefreshMessageList();
+
 
             BtnAckBlink = false;
             BtnWeighBlink = false;
@@ -1684,7 +1703,6 @@ namespace gip.bso.manufacturing
 
         private void UnloadPAFManualWeighing()
         {
-            //TargetWeight = 0;
             if (_PAFCurrentACMethod != null)
             {
                 (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged -= PAFCurrentACMethodPropChanged;
@@ -1753,19 +1771,6 @@ namespace gip.bso.manufacturing
                 ACStateEnum tempState = senderProp.ValueT;
                 ParentBSOWCS?.ApplicationQueue.Add(() => HandlePWNodeACState(senderProp, tempState));
             }
-
-            //if (e.PropertyName == Const.ValueT && ComponentPWNodesList != null)
-            //{
-            //    var targetNode = ComponentPWNodesList.FirstOrDefault(c => c.ComponentPWNodeACState == sender);
-
-            //    string info = string.Format("PWNodeACStateChanged");
-
-            //    if (targetNode != null && (CurrentComponentPWNode == null || targetNode.ComponentPWNode.ValueT.ACUrl == CurrentComponentPWNode.ACUrl))
-            //    {
-            //        ACStateEnum tempACState = targetNode.ComponentPWNodeACState.ValueT;
-            //        ParentBSOWCS?.ApplicationQueue.Add(() => HandlePWNodeACState(targetNode, tempACState));
-            //    }
-            //}
         }
 
         private void ActWeightProp_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -2036,7 +2041,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                bool blink = _MessagesListSafe.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage);
+                bool blink = MessagesListSafe.Any(c => c.HandleByAcknowledgeButton && !c.IsAlarmMessage);
                 if (BtnAckBlink != blink)
                     BtnAckBlink = blink;
             }
@@ -2170,10 +2175,19 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("", "en{'Settings'}de{'Einstellungen'}", 690, true)]
         public void OpenSettings()
         {
+            ACComponent currentProcessModule = CurrentProcessModule;
+            if (currentProcessModule == null)
+            {
+                //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
+                // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
+                Messages.Error(this, "Error50283");
+                return;
+            }
+
             using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
             {
                 var lastUsedLotConfigs = dbApp.MaterialConfig.Where(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl 
-                                                                      && c.VBiACClassID == CurrentProcessModule.ComponentClass.ACClassID);
+                                                                      && c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
 
                 List<vd.FacilityCharge> lastUsedLots = new List<vd.FacilityCharge>();
 
@@ -2198,14 +2212,23 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledOpenSettings()
         {
-            return CurrentProcessModule != null;
+            return !IsCurrentProcessModuleNull;
         }
 
         [ACMethodInfo("", "en{'Remove last used lot suggestion'}de{'Zuletzt verwendeten Chargenvorschlag entfernen'}", 691)]
         public void RemoveLastUsedLot()
         {
+            ACComponent currentProcessModule = CurrentProcessModule;
+            if (currentProcessModule == null)
+            {
+                //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
+                // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
+                Messages.Error(this, "Error50283");
+                return;
+            }
+
             var lastUsedLotConfig = SelectedLastUsedLot.Material.MaterialConfig_Material.FirstOrDefault(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl
-                                                                                                 && c.VBiACClassID == CurrentProcessModule.ComponentClass.ACClassID);
+                                                                                                 && c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
 
             if (lastUsedLotConfig == null)
                 return;
@@ -2237,6 +2260,15 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660)]
         public virtual void ShowSingleDosingDialog()
         {
+            ACComponent currentProcessModule = CurrentProcessModule;
+            if (currentProcessModule == null)
+            {
+                //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
+                // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
+                Messages.Error(this, "Error50283");
+                return;
+            }
+
             if (_RoutingService == null)
             {
                 _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
@@ -2248,7 +2280,7 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, CurrentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
+            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, currentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
                                                                     RouteDirections.Forwards, null, null, null, 0, true, true);
 
             if (rResult == null || rResult.Routes == null)
@@ -2274,7 +2306,7 @@ namespace gip.bso.manufacturing
 
             _ACPickingManager = ACRefToPickingManager();
 
-            var result = CurrentProcessModule.ACUrlCommand("!GetDosableComponents") as SingleDosingItems;
+            var result = currentProcessModule.ACUrlCommand("!GetDosableComponents") as SingleDosingItems;
             if (result == null)
             {
                 //Error50433: Can not get dosable components for single dosing.
@@ -2298,7 +2330,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledShowSingleDosingDialog()
         {
-            return CurrentProcessModule != null;
+            return !IsCurrentProcessModuleNull;
         }
 
         [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661)]
@@ -2308,6 +2340,15 @@ namespace gip.bso.manufacturing
             {
                 //Error50431: Can not find any target storage for this station.
                 Messages.Error(this, "Error50431");
+                return;
+            }
+
+            ACComponent currentProcessModule = CurrentProcessModule;
+            if (currentProcessModule == null)
+            {
+                //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
+                // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
+                Messages.Error(this, "Error50283");
                 return;
             }
 
@@ -2355,7 +2396,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var wfConfig = wfConfigs.FirstOrDefault(c => c.VBiACClassID == CurrentProcessModule.ComponentClass.ACClassID);
+            var wfConfig = wfConfigs.FirstOrDefault(c => c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
             if (wfConfig == null)
             {
                 wfConfig = wfConfigs.FirstOrDefault(c => !c.VBiACClassID.HasValue);

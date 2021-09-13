@@ -40,6 +40,9 @@ namespace gip.bso.manufacturing
         private SynchronizationContext _MainSyncContext;
         private ACMonitorObject _70050_MainSyncContextLock = new ACMonitorObject(70050);
 
+        private ACMonitorObject _70010_AlarmsLock = new ACMonitorObject(70010);
+        private ACMonitorObject _70100_MessageListLock = new ACMonitorObject(70100);
+
         private Type _MessageItemType = typeof(MessageItem);
         internal static readonly Type _WCSMessagesType = typeof(BSOWorkCenterMessages);
 
@@ -55,21 +58,26 @@ namespace gip.bso.manufacturing
             get => _MScaleWFNodes;
             set
             {
-                //if (_WFNodesLock_70100 == null)
-                //    return;
-
-                //using (ACMonitor.Lock(_WFNodesLock_70100))
-                //{
-                    if (_MScaleWFNodes != value)
-                    {
-                        _MScaleWFNodes = value;
-                        HandleWFNodes(_MScaleWFNodes);
-                    }
-                //}
+                if (_MScaleWFNodes != value)
+                {
+                    _MScaleWFNodes = value;
+                    HandleWFNodes(_MScaleWFNodes);
+                }
             }
         }
 
         protected readonly SafeList<MessageItem> _MessagesListSafe = new SafeList<MessageItem>();
+
+        public SafeList<MessageItem> MessagesListSafe
+        {
+            get
+            {
+                using (ACMonitor.Lock(_70100_MessageListLock))
+                {
+                    return _MessagesListSafe;
+                }
+            }
+        }
 
         private List<MessageItem> _MessagesList = new List<MessageItem>();
         [ACPropertyList(610, "Messages")]
@@ -124,7 +132,7 @@ namespace gip.bso.manufacturing
 
         public override void Activate(ACComponent selectedProcessModule)
         {
-            SubscribeToWFNodes();
+            SubscribeToWFNodes(selectedProcessModule);
         }
 
         public override void DeActivate()
@@ -132,15 +140,17 @@ namespace gip.bso.manufacturing
             UnSubscribeFromWFNodes();
         }
 
-        protected void SubscribeToWFNodes()
+        protected void SubscribeToWFNodes(ACComponent selectedProcessModule)
         {
-            if (ParentBSOWCS.CurrentProcessModule == null)
+            ACComponent currentProcessModule = selectedProcessModule;
+
+            if (currentProcessModule == null)
             {
                 //todo error;
                 return;
             }
 
-            var wfNodes = ParentBSOWCS.CurrentProcessModule.GetPropertyNet("WFNodes");
+            var wfNodes = currentProcessModule.GetPropertyNet("WFNodes");
             if (wfNodes == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
@@ -149,7 +159,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var hasAlarms = ParentBSOWCS.CurrentProcessModule.GetPropertyNet("HasAlarms");
+            var hasAlarms = currentProcessModule.GetPropertyNet("HasAlarms");
             if (hasAlarms == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
@@ -158,7 +168,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var alarmsAsText = ParentBSOWCS.CurrentProcessModule.GetPropertyNet("AlarmsAsText");
+            var alarmsAsText = currentProcessModule.GetPropertyNet("AlarmsAsText");
             if (alarmsAsText == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
@@ -171,16 +181,22 @@ namespace gip.bso.manufacturing
             _WFNodes = wfNodes as IACContainerTNet<List<ACChildInstanceInfo>>;
 
             if (_WFNodes.ValueT != null)
-                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes.ValueT);
+            {
+                List<ACChildInstanceInfo> tempList = _WFNodes.ValueT;
+                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = tempList);
+            }
 
             (_WFNodes as IACPropertyNetBase).PropertyChanged += WFNodes_PropertyChanged;
-           
-            _AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
+
+            using (ACMonitor.Lock(_70010_AlarmsLock))
+            {
+                _AlarmsAsText = alarmsAsText as IACContainerTNet<string>;
+            }
 
             _ScaleHasAlarms = hasAlarms as IACContainerTNet<bool>;
 
             bool hasAlarmsTemp = _ScaleHasAlarms.ValueT;
-            HandleAlarms(hasAlarmsTemp);
+            ParentBSOWCS?.ApplicationQueue.Add(() => HandleAlarms(hasAlarmsTemp));
 
             (_ScaleHasAlarms as IACPropertyNetBase).PropertyChanged += ScaleHasAlarms_PropertyChanged;
         }
@@ -199,23 +215,41 @@ namespace gip.bso.manufacturing
                 _ScaleHasAlarms = null;
             }
 
+            MessagesListSafe.Clear();
+            RefreshMessageList();
+
             _MScaleWFNodes = null;
-            _AlarmsAsTextCache = null;
-            _AlarmsAsText = null;
+
+            using (ACMonitor.Lock(_70010_AlarmsLock))
+            {
+                _AlarmsAsTextCache = null;
+                _AlarmsAsText = null;
+            }
         }
 
         private void WFNodes_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
-                ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = _WFNodes?.ValueT);
+            {
+                IACContainerTNet<List<ACChildInstanceInfo>> senderProp = sender as IACContainerTNet<List<ACChildInstanceInfo>>;
+                if (senderProp != null)
+                {
+                    List<ACChildInstanceInfo> temp = senderProp.ValueT;
+                    ParentBSOWCS?.ApplicationQueue.Add(() => MScaleWFNodes = temp);
+                }
+            }
         }
 
         private void ScaleHasAlarms_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
             {
-                bool hasAlarms = _ScaleHasAlarms.ValueT;
-                ParentBSOWCS?.ApplicationQueue.Add(() => HandleAlarms(hasAlarms));
+                IACContainerTNet<bool> senderProp = sender as IACContainerTNet<bool>;
+                if (senderProp != null)
+                {
+                    bool hasAlarms = senderProp.ValueT;
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandleAlarms(hasAlarms));
+                }
             }
         }
 
@@ -229,7 +263,7 @@ namespace gip.bso.manufacturing
             {
                 OnHandleWFNodes(connectionList);
 
-                var itemsToRemove = _MessagesListSafe.Where(c => c.UserAckPWNode != null).ToArray();
+                var itemsToRemove = MessagesListSafe.Where(c => c.UserAckPWNode != null).ToArray();
                 foreach (var itemToRemove in itemsToRemove)
                 {
                     RemoveFromMessageList(itemToRemove);
@@ -243,7 +277,7 @@ namespace gip.bso.manufacturing
 
             var pwInstanceInfos = connectionList.Where(c => ParentBSOWCS.PWUserAckClasses.Contains(c.ACType.ValueT));
 
-            var userAckItemsToRemove = _MessagesListSafe.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
+            var userAckItemsToRemove = MessagesListSafe.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
             foreach (var itemToRemove in userAckItemsToRemove)
             {
                 RemoveFromMessageList(itemToRemove);
@@ -256,7 +290,7 @@ namespace gip.bso.manufacturing
             foreach (var instanceInfo in pwInstanceInfos)
             {
                 string instanceInfoACUrl = instanceInfo.ACUrlParent + "\\" + instanceInfo.ACIdentifier;
-                if (_MessagesListSafe.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
+                if (MessagesListSafe.Any(c => c.UserAckPWNode != null && c.UserAckPWNode.ACUrl == instanceInfoACUrl))
                     continue;
 
                 var pwNode = Root.ACUrlCommand(instanceInfoACUrl) as IACComponent;
@@ -277,20 +311,28 @@ namespace gip.bso.manufacturing
 
         }
 
-
         private void HandleAlarms(bool hasAlarms)
         {
-            string alarmsAsText = _AlarmsAsText.ValueT;
-            if (alarmsAsText == _AlarmsAsTextCache)
+            ACComponent currentProcessModule = null;
+            using (ACMonitor.Lock(_70010_AlarmsLock))
+            {
+                string alarmsAsText = _AlarmsAsText?.ValueT;
+                if (alarmsAsText == _AlarmsAsTextCache)
+                    return;
+
+                currentProcessModule = _AlarmsAsText?.ParentACComponent as ACComponent;
+            }
+
+            if (currentProcessModule == null)
                 return;
 
             if (hasAlarms)
             {
-                var alarms = ParentBSOWCS.CurrentProcessModule?.ExecuteMethod("GetAlarms", true, true, true) as List<Msg>;
+                var alarms = currentProcessModule?.ExecuteMethod("GetAlarms", true, true, true) as List<Msg>;
                 if (alarms == null)
                     return;
 
-                var messagesToRemove = _MessagesListSafe.Where(c => c.GetType() == _MessageItemType && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
+                var messagesToRemove = MessagesListSafe.Where(c => c.GetType() == _MessageItemType && c.UserAckPWNode == null && !alarms.Any(x => BuildAlarmMessage(x) == c.Message)).ToArray();
                 foreach (var messageToRemove in messagesToRemove)
                     RemoveFromMessageList(messageToRemove);
 
@@ -306,17 +348,23 @@ namespace gip.bso.manufacturing
                 if (alarms.Any())
                     RefreshMessageList();
             }
-            else if (_MessagesListSafe != null)
+            else
             {
-                var messageList = _MessagesListSafe.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton).ToArray();
-                foreach (var messageItem in messageList)
-                    RemoveFromMessageList(messageItem);
+                var messageList = MessagesListSafe?.Where(c => c.UserAckPWNode == null && c.HandleByAcknowledgeButton)?.ToArray();
+                if (messageList != null)
+                {
+                    foreach (var messageItem in messageList)
+                        RemoveFromMessageList(messageItem);
 
-                if (messageList.Any())
-                    RefreshMessageList();
+                    if (messageList.Any())
+                        RefreshMessageList();
+                }
             }
 
-            _AlarmsAsTextCache = _AlarmsAsText.ValueT;
+            using (ACMonitor.Lock(_70010_AlarmsLock))
+            {
+                _AlarmsAsTextCache = _AlarmsAsText.ValueT;
+            }
         }
 
         private string BuildAlarmMessage(Msg msg)
@@ -333,34 +381,39 @@ namespace gip.bso.manufacturing
 
         public virtual bool AddToMessageList(MessageItem messageItem)
         {
-            if (_MessagesListSafe == null)
-                return false;
+            using (ACMonitor.Lock(_70100_MessageListLock))
+            {
+                if (_MessagesListSafe == null)
+                    return false;
 
-            if (_MessagesListSafe.Any(c => c.IsAlarmMessage && c.Message == messageItem.Message))
-                return true;
+                if (_MessagesListSafe.Any(c => c.IsAlarmMessage && c.Message == messageItem.Message))
+                    return true;
 
-            if (!_MessagesListSafe.Any() ||  messageItem.IsAlarmMessage)
-                _MessagesListSafe.Add(messageItem);
-            else
-                _MessagesListSafe.Insert(0, messageItem);
+                if (!_MessagesListSafe.Any() || messageItem.IsAlarmMessage)
+                    _MessagesListSafe.Add(messageItem);
+                else
+                    _MessagesListSafe.Insert(0, messageItem);
+            }
 
             return true;
         }
 
         public virtual bool RemoveFromMessageList(MessageItem messageItem)
         {
-            if (_MessagesListSafe == null)
-                return false;
+            using (ACMonitor.Lock(_70100_MessageListLock))
+            {
+                if (_MessagesListSafe == null)
+                    return false;
 
-            _MessagesListSafe.Remove(messageItem);
-
+                _MessagesListSafe.Remove(messageItem);
+            }
             return true;
         }
 
         public void RefreshMessageList()
         {
             DelegateToMainThread((object state) =>
-                MessagesList = _MessagesListSafe.ToList());
+                MessagesList = MessagesListSafe.ToList());
         }
 
         public void DelegateToMainThread(SendOrPostCallback d)
