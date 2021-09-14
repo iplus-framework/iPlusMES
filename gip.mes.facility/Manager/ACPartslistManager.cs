@@ -785,7 +785,7 @@ namespace gip.mes.facility
         private bool IsChangedPartslistPosProperty(DatabaseApp databaseApp, List<EntityObject> changedObjects)
         {
 
-            bool isChangedQuantities = false;
+            bool isChangedProperty = false;
             foreach (EntityObject changedObject in changedObjects)
             {
                 ObjectStateEntry myObjectState = databaseApp.ObjectStateManager.GetObjectStateEntry(changedObject.EntityKey);
@@ -794,12 +794,16 @@ namespace gip.mes.facility
                 {
                     if (Const_PartslistPosRelation_Change_Fields.Contains(modifiedProperty))
                     {
-                        isChangedQuantities = true;
-                        break;
+                        object oldValue = myObjectState.OriginalValues[modifiedProperty];
+                        object newValue = myObjectState.CurrentValues[modifiedProperty];
+                        bool isValuesEqual = (oldValue == null && newValue == null) || oldValue.Equals(newValue);
+                        isChangedProperty = !isValuesEqual;
+                        if (isChangedProperty)
+                            break;
                     }
                 }
             }
-            return isChangedQuantities;
+            return isChangedProperty;
         }
         #endregion
 
