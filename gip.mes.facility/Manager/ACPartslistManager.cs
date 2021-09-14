@@ -169,6 +169,27 @@ namespace gip.mes.facility
 
         #endregion
 
+        #region Properties
+
+        private double? _TolRemainingCallQ;
+        public double TolRemainingCallQ
+        {
+            get
+            {
+                if (_TolRemainingCallQ == null)
+                {
+                    var prodOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+                    if(prodOrderManager != null && prodOrderManager.ValueT != null)
+                        _TolRemainingCallQ = prodOrderManager.ValueT.TolRemainingCallQ;
+                    if (_TolRemainingCallQ == null)
+                        _TolRemainingCallQ = Double.Epsilon;
+                }
+                return _TolRemainingCallQ.Value;
+            }
+        }
+
+        #endregion
+
         #region Assing WF
         /// <summary>
         /// Clone structure from MaterialWF to PartslistPos
@@ -785,7 +806,7 @@ namespace gip.mes.facility
         private bool IsChangedPartslistPosProperty(DatabaseApp databaseApp, List<EntityObject> changedObjects)
         {
 
-            bool isChangedQuantities = false;
+            bool isChangedProperty = false;
             foreach (EntityObject changedObject in changedObjects)
             {
                 ObjectStateEntry myObjectState = databaseApp.ObjectStateManager.GetObjectStateEntry(changedObject.EntityKey);
@@ -794,12 +815,28 @@ namespace gip.mes.facility
                 {
                     if (Const_PartslistPosRelation_Change_Fields.Contains(modifiedProperty))
                     {
-                        isChangedQuantities = true;
-                        break;
+                        object oldValue = myObjectState.OriginalValues[modifiedProperty];
+                        object newValue = myObjectState.CurrentValues[modifiedProperty];
+                        bool isValuesEqual =
+                            (oldValue == null && newValue == null) ||
+                            (oldValue != null && newValue != null && IsValuesEquals(oldValue, newValue));
+                        isChangedProperty = !isValuesEqual;
+                        if (isChangedProperty)
+                            break;
                     }
                 }
             }
-            return isChangedQuantities;
+            return isChangedProperty;
+        }
+
+
+        private bool IsValuesEquals(object oldValue, object newValue)
+        {
+            if (oldValue is double)
+            {
+                return Math.Abs((double)oldValue) - ((double)newValue) < (TolRemainingCallQ * 0.01);
+            }
+            return oldValue.Equals(newValue);
         }
         #endregion
 
