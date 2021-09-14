@@ -169,27 +169,6 @@ namespace gip.mes.facility
 
         #endregion
 
-        #region Properties
-
-        private double? _TolRemainingCallQ;
-        public double TolRemainingCallQ
-        {
-            get
-            {
-                if (_TolRemainingCallQ == null)
-                {
-                    var prodOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
-                    if(prodOrderManager != null && prodOrderManager.ValueT != null)
-                        _TolRemainingCallQ = prodOrderManager.ValueT.TolRemainingCallQ;
-                    if (_TolRemainingCallQ == null)
-                        _TolRemainingCallQ = Double.Epsilon;
-                }
-                return _TolRemainingCallQ.Value;
-            }
-        }
-
-        #endregion
-
         #region Assing WF
         /// <summary>
         /// Clone structure from MaterialWF to PartslistPos
@@ -834,7 +813,9 @@ namespace gip.mes.facility
         {
             if (oldValue is double)
             {
-                return Math.Abs((double)oldValue) - ((double)newValue) < (TolRemainingCallQ * 0.01);
+                double oldValueD = Math.Round((double)oldValue, 6);
+                double newValueD = Math.Round((double)newValue, 6);
+                return Math.Abs(oldValueD - newValueD) < Double.Epsilon;
             }
             return oldValue.Equals(newValue);
         }
