@@ -60,8 +60,30 @@ namespace gip.bso.manufacturing
             {
                 if (_MScaleWFNodes != value)
                 {
-                    _MScaleWFNodes = value;
-                    HandleWFNodes(_MScaleWFNodes);
+                    bool changed = true;
+
+                    if (_MScaleWFNodes != null && value != null)
+                    {
+                        if (_MScaleWFNodes.Count != value.Count)
+                        {
+                            changed = true;
+                        }
+                        else
+                        {
+                            var newItems = value.Where(c => !_MScaleWFNodes.Any(x => x.ACUrlParent == c.ACUrlParent && x.ACIdentifier == x.ACIdentifier));
+                            var removedItems = _MScaleWFNodes.Where(c => !value.Any(x => x.ACUrlParent == c.ACUrlParent && x.ACIdentifier == x.ACIdentifier));
+                            if (!newItems.Any() && !removedItems.Any())
+                            {
+                                changed = false;
+                            }
+                        }
+                    }
+
+                    if (changed)
+                    {
+                        _MScaleWFNodes = value;
+                        HandleWFNodes(_MScaleWFNodes);
+                    }
                 }
             }
         }
@@ -277,7 +299,13 @@ namespace gip.bso.manufacturing
 
             var pwInstanceInfos = connectionList.Where(c => ParentBSOWCS.PWUserAckClasses.Contains(c.ACType.ValueT));
 
-            var userAckItemsToRemove = MessagesListSafe.Where(c => c.UserAckPWNode != null && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl)).ToArray();
+            List<MessageItem> userAckItemsToRemove = MessagesListSafe.Where(c => c.UserAckPWNode != null 
+                                                                              && !pwInstanceInfos.Any(x => x.ACUrlParent + "\\" + x.ACIdentifier == c.UserAckPWNode.ACUrl))
+                                                                     .ToList();
+
+            // override when we need manually control remove messages for user acknowledge nodes.
+            userAckItemsToRemove = OnHandleWFNodesRemoveMessageItems(userAckItemsToRemove);
+            
             foreach (var itemToRemove in userAckItemsToRemove)
             {
                 RemoveFromMessageList(itemToRemove);
@@ -304,6 +332,11 @@ namespace gip.bso.manufacturing
                 RefreshMessageList();
 
             OnHandleWFNodes(connectionList);
+        }
+
+        protected virtual List<MessageItem> OnHandleWFNodesRemoveMessageItems(List<MessageItem> messageItems)
+        {
+            return messageItems;
         }
 
         public virtual void OnHandleWFNodes(List<ACChildInstanceInfo> connectionList)
