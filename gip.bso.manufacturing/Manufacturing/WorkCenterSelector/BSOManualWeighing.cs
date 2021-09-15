@@ -1628,8 +1628,6 @@ namespace gip.bso.manufacturing
             }
             _ProcessModuleScales = null;
 
-
-
             BtnAckBlink = false;
             BtnWeighBlink = false;
             NextTaskInfo = ManualWeighingTaskInfo.None;
@@ -1970,18 +1968,28 @@ namespace gip.bso.manufacturing
 
                             DelegateToMainThread((object state) =>
                             {
-                                if (compInfoType == WeighingComponentInfoType.StateSelectFC_F && (WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
+                                if (/*compInfoType == WeighingComponentInfoType.StateSelectFC_F && */(WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
                                 && SelectedWeighingMaterial == null)
                                 {
                                     if (comp != null)
                                         SelectedWeighingMaterial = comp;
                                 }
 
-                                if (compInfoType == WeighingComponentInfoType.StateSelectFC_F && SelectedWeighingMaterial != null &&
-                                    SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation)
+                                if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation)
                                 {
-                                    SelectedWeighingMaterial.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
-                                    SelectActiveScaleObject(SelectedWeighingMaterial);
+                                    if (SelectedWeighingMaterial.WeighingMatState != (WeighingComponentState)compInfo.WeighingComponentState)
+                                    {
+                                        SelectedWeighingMaterial.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
+                                    }
+
+                                    if (compInfoType == WeighingComponentInfoType.StateSelectFC_F)
+                                    {
+                                        SelectActiveScaleObject(SelectedWeighingMaterial);
+                                    }
+                                    else
+                                    {
+                                        OnPropertyChanged("CurrentScaleObject");
+                                    }    
                                 }
 
                                 if (compInfo.FacilityCharge != null)

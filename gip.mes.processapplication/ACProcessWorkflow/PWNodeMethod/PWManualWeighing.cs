@@ -1186,7 +1186,8 @@ namespace gip.mes.processapplication
             if (msgSet == null)
             {
                 SaveLastUsedLot(newFacilityCharge, CurrentOpenMaterial);
-                SetInfo(null, WeighingComponentInfoType.SelectFC_F, newFacilityCharge, null, true, true);
+                WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
+                SetInfo(comp, WeighingComponentInfoType.SelectFC_F, newFacilityCharge, null, true, true);
             }
 
             return msgSet;
@@ -2682,7 +2683,6 @@ namespace gip.mes.processapplication
                     case WeighingComponentInfoType.StateSelectFC_F:
                     case WeighingComponentInfoType.StateSelectCompAndFC_F:
                         {
-
                             compInfo.PLPosRelation = weighingComp.PLPosRelation;
                             compInfo.WeighingComponentState = weighingComp.WeighState;
                             if (facilityCharge != null)
@@ -2705,6 +2705,8 @@ namespace gip.mes.processapplication
 
                             compInfo.FC_FAutoRefresh = dbAutoRefresh;
                             compInfo.IsLotChange = lotChange;
+                            compInfo.PLPosRelation = weighingComp.PLPosRelation;
+                            compInfo.WeighingComponentState = weighingComp.WeighState;
                             break;
                         }
                 }
