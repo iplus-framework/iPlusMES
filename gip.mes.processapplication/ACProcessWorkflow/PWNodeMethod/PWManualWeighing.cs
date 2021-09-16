@@ -816,13 +816,15 @@ namespace gip.mes.processapplication
                         if (facilityCharge != null && facilityCharge.Value != null)
                         {
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
-                            comp.WeighState = (short)WeighingComponentState.InWeighing;
+                            comp.SwitchState(WeighingComponentState.InWeighing, ref _WeighingComponentsInfo);
+                            //comp.WeighState = (short)WeighingComponentState.InWeighing;
                             SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, CurrentFacilityCharge, null);
                         }
                         else if (facility != null && facility.Value != null)
                         {
                             CurrentFacility = facility.ParamAsGuid;
-                            comp.WeighState = (short)WeighingComponentState.InWeighing;
+                            //comp.WeighState = (short)WeighingComponentState.InWeighing;
+                            comp.SwitchState(WeighingComponentState.InWeighing, ref _WeighingComponentsInfo);
                             SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, null, CurrentFacility);
                         }
                         else
@@ -988,7 +990,7 @@ namespace gip.mes.processapplication
             if(prodOrderPartslistPosRelation == null)
                 return null;
 
-            WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == prodOrderPartslistPosRelation);
+            WeighingComponent comp = WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == prodOrderPartslistPosRelation);
             if (comp == null || comp.WeighState == (short)WeighingComponentState.WeighingCompleted)
                 return null;
 
@@ -1254,7 +1256,7 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
+                    WeighingComponent comp = WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
                     if (comp == null)
                     {
                         //Error50270: The component {0} doesn't exist for weighing.
@@ -1527,10 +1529,12 @@ namespace gip.mes.processapplication
                         short newState = DetermineWeighingComponentState(rel.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex);
                         if(newState == (short)WeighingComponentState.ReadyToWeighing)
                         {
-                            comp.WeighState = newState;
+                            comp.SwitchState((WeighingComponentState)newState, ref _WeighingComponentsInfo);
+
+                            //comp.WeighState = newState;
                             comp.TargetQuantity = Math.Abs(rel.RemainingDosingQuantityUOM);
-                            if(_WeighingComponentsInfo != null && _WeighingComponentsInfo.ContainsKey(comp.PLPosRelation.ToString()))
-                                _WeighingComponentsInfo[comp.PLPosRelation.ToString()] = newState.ToString();
+                            //if(_WeighingComponentsInfo != null && _WeighingComponentsInfo.ContainsKey(comp.PLPosRelation.ToString()))
+                            //    _WeighingComponentsInfo[comp.PLPosRelation.ToString()] = newState.ToString();
                             SetInfo(comp, WeighingComponentInfoType.State, null, null);
                         }
                     }
@@ -2878,7 +2882,7 @@ namespace gip.mes.processapplication
         public short WeighState
         {
             get;
-            set;
+            private set;
         }
 
         public string ErrorInfoProgramNo
