@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.processapplication;
@@ -40,19 +41,19 @@ namespace gip.bso.test
 
         #region Properties
 
-        private string _TestName1;
-        [ACPropertyInfo(999, "TestName1", "en{'Test'}de{'Test'}")]
-        public string TestName1
+        private string _TestInput;
+        [ACPropertyInfo(999, "TestInput", "en{'Test input'}de{'Test input'}")]
+        public string TestInput
         {
             get
             {
-                return _TestName1;
+                return _TestInput;
             }
             set
             {
-                if (_TestName1 != value)
+                if (_TestInput != value)
                 {
-                    _TestName1 = value;
+                    _TestInput = value;
                 }
             }
         }
@@ -142,6 +143,22 @@ namespace gip.bso.test
         {
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWithSubTaskPlanned);
             ShowDialog(this, DesignNameProgressBar);
+        }
+
+        [ACMethodInfo("TestMethod", "en{'Test'}de{'Test'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void TestMethod()
+        {
+            Guid ID = Guid.Empty;
+            if(!string.IsNullOrEmpty(TestInput) && Guid.TryParse(TestInput, out ID))
+            {
+                IPrintManager printManager = HelperPrintManager.GetServiceInstance(this) as IPrintManager;
+                if (printManager != null)
+                {
+                    PAOrderInfo pAOrderInfo = new PAOrderInfo();
+                    pAOrderInfo.Add(FacilityCharge.ClassName, ID);
+                    printManager.Print(pAOrderInfo, 1);
+                }
+            }
         }
         #endregion
 
