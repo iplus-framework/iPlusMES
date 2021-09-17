@@ -98,7 +98,10 @@ namespace gip.bso.masterdata
             if (_AccessConfigurationTransfer != null)
                 _AccessConfigurationTransfer.NavSearchExecuting -= _AccessConfigurationTransfer_NavSearchExecuting;
 
+            if (_PartslistManager != null)
+                ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
             _PartslistManager = null;
+
             if (_ProdOrderManager != null)
                 ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;

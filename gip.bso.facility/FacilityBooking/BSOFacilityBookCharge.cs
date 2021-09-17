@@ -29,7 +29,7 @@ namespace gip.bso.facility
     /// </summary>
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Quant Management'}de{'Quantenverwaltung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityCharge.ClassName)]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityLot.ClassName, "en{'Quant Management'}de{'Quantenverwaltung'}", typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
-    public class BSOFacilityBookCharge : BSOFacilityBase
+    public class BSOFacilityBookCharge : BSOFacilityBase, IACPrintPrepare
     {
 
         #region c´tors
@@ -1765,6 +1765,20 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        #endregion
+
+        #region IACPrintPrepare
+        public string PrintPrepareAndGetReportName(PAOrderInfo orderInfo)
+        {
+            string reportName = null;
+            if (orderInfo != null && orderInfo.Entities != null)
+            {
+                PAOrderInfoEntry entry = orderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
+                CurrentFacilityCharge = DatabaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
+                reportName = "LabelQR";
+            }
+            return reportName;
+        }
         #endregion
     }
 

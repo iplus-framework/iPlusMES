@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.webservices;
+using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
@@ -82,6 +83,28 @@ namespace gip.mes.webservices
             return decoder.OnHandleNextBarcodeSequence(sequence);
         }
 
+        public WSResponse<bool> Print(PrintEntity printEntity)
+        {
+            bool success = false;
+            if (printEntity.Sequence == null || !printEntity.Sequence.Any())
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "No elements in Barcode Entity sequence!"));
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            IPrintManager printManager = HelperPrintManager.GetServiceInstance(myServiceHost) as IPrintManager;
+            if(printManager == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PrintManager instance is null!"));
+            PAOrderInfo pAOrderInfo = GetPAOrderInfo(printEntity.Sequence.ToArray());
+            success = printManager.Print(pAOrderInfo, printEntity.CopyCount);
+            return new WSResponse<bool>(success);
+        }
+
+        private PAOrderInfo GetPAOrderInfo(BarcodeEntity[] entities)
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            foreach(BarcodeEntity barcodeEntity in entities)
+                if (barcodeEntity.FacilityCharge != null)
+                    pAOrderInfo.Add(datamodel.FacilityCharge.ClassName, barcodeEntity.FacilityCharge.FacilityChargeID);
+            return pAOrderInfo;
+        }
 
         protected override void OnGetKnownTypes4Translation(ref List<Tuple<Type, Type>> knownTypes)
         {

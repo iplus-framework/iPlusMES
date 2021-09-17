@@ -34,6 +34,13 @@ namespace gip.mes.webservices
         Task<WSResponse<BarcodeSequence>> InvokeBarcodeSequenceAsync(BarcodeSequence sequence);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriPrint, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<bool> Print(PrintEntity printEntity);
+#elif NETSTANDARD
+        Task<WSResponse<bool>> Print(PrintEntity printEntity);
+#endif
         #endregion
     }
 }

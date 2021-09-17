@@ -44,9 +44,7 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            ACFSItem rootItem = GetRootFacilityACFSItem();
-            FactoryFacilityACFSItem(DatabaseApp, rootItem);
-            CurrentFacilityRoot = rootItem;
+            CurrentFacilityRoot = FacilityTree.LoadFacilityTree(DatabaseApp);
             CurrentFacility = CurrentFacilityRoot;
             return true;
         }
@@ -63,7 +61,7 @@ namespace gip.bso.masterdata
             if (CurrentFacility != null && CurrentFacility.ACObject != null)
             {
                 Facility facility = CurrentFacility.ACObject as Facility;
-                clonedBSOFacility.CurrentFacility = new ACFSItem(null, CurrentFacility.Container, facility, FacilityACCaption(facility), ResourceTypeEnum.IACObject);
+                clonedBSOFacility.CurrentFacility = new ACFSItem(null, CurrentFacility.Container, facility, FacilityTree.FacilityACCaption(facility), ResourceTypeEnum.IACObject);
             }
             return clonedBSOFacility;
         }
@@ -128,8 +126,8 @@ namespace gip.bso.masterdata
             if (e.PropertyName == "FacilityNo" || e.PropertyName == "FacilityName")
             {
                 ACFSItem current = CurrentFacility;
-                current.ACCaption = FacilityACCaption(CurrentFacility.ACObject as Facility);
-                CurrentFacilityRoot = GetNewRootFacilityACFSItem();
+                current.ACCaption = FacilityTree.FacilityACCaption(CurrentFacility.ACObject as Facility);
+                CurrentFacilityRoot = FacilityTree.GetNewRootFacilityACFSItem(Database as gip.core.datamodel.Database, CurrentFacilityRoot.Items);
                 CurrentFacility = current;
             }
         }
@@ -216,7 +214,7 @@ namespace gip.bso.masterdata
             if (parentFacility != null)
                 parentFacility.Facility_ParentFacility.Add(facility);
 
-            ACFSItem newFacilityACFSItem = new ACFSItem(null, CurrentFacility.Container, facility, FacilityACCaption(facility), ResourceTypeEnum.IACObject);
+            ACFSItem newFacilityACFSItem = new ACFSItem(null, CurrentFacility.Container, facility, FacilityTree.FacilityACCaption(facility), ResourceTypeEnum.IACObject);
             currentFacilityACFSItem.Add(newFacilityACFSItem);
             ACFSItem tmpItem = newFacilityACFSItem;
             while (tmpItem != null)
@@ -228,8 +226,7 @@ namespace gip.bso.masterdata
                     break;
             }
 
-
-            CurrentFacilityRoot = GetNewRootFacilityACFSItem();
+            CurrentFacilityRoot = FacilityTree.GetNewRootFacilityACFSItem(Database as gip.core.datamodel.Database, CurrentFacilityRoot.Items);
             CurrentFacility = newFacilityACFSItem;
         }
 
@@ -251,7 +248,7 @@ namespace gip.bso.masterdata
             Facility dbFacility = current.ACObject as Facility;
             MsgWithDetails msg = dbFacility.DeleteACObject(DatabaseApp, false);
 
-            CurrentFacilityRoot = GetNewRootFacilityACFSItem();
+            CurrentFacilityRoot = FacilityTree.GetNewRootFacilityACFSItem(Database as gip.core.datamodel.Database, CurrentFacilityRoot.Items);
             CurrentFacility = parent;
         }
 
@@ -263,50 +260,6 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #endregion
-
-
-        #region private methods
-
-
-        private ACFSItem GetRootFacilityACFSItem()
-        {
-            string rootACCaption = Translator.GetTranslation(ConstApp.Facility);
-            ACFSItem rootItem = new ACFSItem(null, new ACFSItemContainer(Database), null, rootACCaption, ResourceTypeEnum.IACObject);
-            rootItem.IsVisible = true;
-            return rootItem;
-        }
-
-        public ACFSItem GetNewRootFacilityACFSItem()
-        {
-            ACFSItem rootFacilityACFSItem = GetRootFacilityACFSItem();
-            foreach (var item in CurrentFacilityRoot.Items)
-                rootFacilityACFSItem.Add(item);
-            return rootFacilityACFSItem;
-        }
-
-        private void FactoryFacilityACFSItem(DatabaseApp databaseApp, ACFSItem parentACFSItem)
-        {
-            Guid? parentFaciltiyID = null;
-            if (parentACFSItem.ACObject != null)
-            {
-                Facility parentFacility = parentACFSItem.ACObject as Facility;
-                parentFaciltiyID = parentFacility.FacilityID;
-            }
-
-            List<Facility> levelFacilities = DatabaseApp.Facility.Where(c => (c.ParentFacilityID ?? Guid.Empty) == (parentFaciltiyID ?? Guid.Empty)).OrderBy(c => c.FacilityNo).ToList();
-            foreach (Facility facility in levelFacilities)
-            {
-                ACFSItem cFSItem = new ACFSItem(null, parentACFSItem.Container, facility, FacilityACCaption(facility), ResourceTypeEnum.IACObject);
-                FactoryFacilityACFSItem(databaseApp, cFSItem);
-                parentACFSItem.Add(cFSItem);
-            }
-        }
-
-        private string FacilityACCaption(Facility facility)
-        {
-            return string.Format(@"[{0}] {1}", facility.FacilityNo, facility.FacilityName);
-        }
         #endregion
 
         #endregion

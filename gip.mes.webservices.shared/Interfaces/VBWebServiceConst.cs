@@ -13,6 +13,8 @@ namespace gip.mes.webservices
 
         public const string UriBarcodeSequence = "BarcodeSequence";
 
+        public const string UriPrint="Print";
+
         #endregion
 
 

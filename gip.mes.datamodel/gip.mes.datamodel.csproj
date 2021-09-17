@@ -74,6 +74,7 @@
     <Compile Include="ACHandlingUnit\HUPosChargeList.cs" />
     <Compile Include="ACHandlingUnit\HUPosList.cs" />
     <Compile Include="ACHelperclasses\HelperIFacilityManager.cs" />
+    <Compile Include="ACHelperclasses\HelperPrintManager.cs" />
     <Compile Include="ACHelperclasses\POPartslistPosReservation.cs" />
     <Compile Include="ACInterfaces\ACHandlingUnit\IPackaging.cs" />
     <Compile Include="ACInterfaces\ACHandlingUnit\IPackagingHierarchy.cs" />
@@ -83,10 +84,12 @@
     <Compile Include="ACInterfaces\Document\DocumentSettings.cs" />
     <Compile Include="ACInterfaces\Document\DocumentTypesEnum.cs" />
     <Compile Include="ACInterfaces\Document\DoumentFilter.cs" />
+    <Compile Include="ACInterfaces\IACPrintPrepare.cs" />
     <Compile Include="ACInterfaces\IOutOrder.cs" />
     <Compile Include="ACInterfaces\IOutOrderPos.cs" />
     <Compile Include="ACInterfaces\FacilityManager\IFacilityManager.cs" />
     <Compile Include="ACInterfaces\IOutOrderPosBSO.cs" />
+    <Compile Include="ACInterfaces\IPrintManager.cs" />
     <Compile Include="ACInterfaces\ITargetQuantity.cs" />
     <Compile Include="ACInterfaces\PartslistPos\IPartslist.cs" />
     <Compile Include="ACInterfaces\PartslistPos\IPartslistPosRelation.cs" />

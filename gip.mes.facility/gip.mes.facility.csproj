@@ -65,6 +65,7 @@
     <Compile Include="Manager\ACPartslistManagerRouting.cs" />
     <Compile Include="Manager\ACPartslistManagerValidation.cs" />
     <Compile Include="Manager\ACPickingManager.cs" />
+    <Compile Include="Manager\ACPrintManager.cs" />
     <Compile Include="Manager\ACProdOrderManager.cs" />
     <Compile Include="Manager\ACProdOrderManagerValidation.cs" />
     <Compile Include="Manager\ACTrackingAndTracingManager.cs" />
@@ -282,6 +283,10 @@
       <Project>{3A9383D8-5C6D-429C-89D3-57C1D2565AD1}</Project>
       <Name>gip.core.manager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6AD88CAF-A168-4BC2-9ECE-F62E7B216465}</Project>
+      <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
       <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
       <Name>gip.mes.autocomponent</Name>
@@ -294,6 +299,9 @@
       <Project>{89D489D6-8881-4E43-A760-48051FAC6C41}</Project>
       <Name>gip.mes.manager</Name>
     </ProjectReference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

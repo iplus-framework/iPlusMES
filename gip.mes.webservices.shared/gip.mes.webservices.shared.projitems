@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\SearchFacilityCharge.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeSequence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\General\BarcodeEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\General\PrintEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\Picking.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\PickingPos.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrder.cs" />
