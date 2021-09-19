@@ -597,6 +597,7 @@ namespace gip.mes.facility
                 outOrder.IssuerCompanyPerson = outOffer.IssuerCompanyPerson;
                 outOrder.DeliveryCompanyAddress = outOffer.DeliveryCompanyAddress;
                 outOrder.BillingCompanyAddress = outOffer.BillingCompanyAddress;
+                outOrder.MDCurrency = outOffer.MDCurrency;
                 outOrder.TargetDeliveryDate = outOffer.TargetDeliveryDate;
                 outOrder.TargetDeliveryMaxDate = outOffer.TargetDeliveryMaxDate;
                 outOrder.MDTimeRange = outOffer.MDTimeRange;
@@ -768,6 +769,10 @@ namespace gip.mes.facility
                 invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
                 invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
                 invoice.IssuerCompanyAddress = outOrder.IssuerCompanyAddress;
+
+                // @ Sasa TODO: Set Excahnge-Rate if outOrder.MDCurrency different to MDCurrency of issuer + Recalc positions from EUR to kuna
+                invoice.MDCurrency = invoice.IssuerCompanyAddress.MDCountry.MDCurrency;
+
                 invoice.IssuerCompanyPerson = outOrder.IssuerCompanyPerson;
                 invoice.MDTermOfPayment = outOrder.MDTermOfPayment;
                 invoice.XMLDesignStart = outOrder.XMLDesignStart;
@@ -821,7 +826,12 @@ namespace gip.mes.facility
                             item.DeliveryCompanyAddress = null;
                         }
                         break;
-
+                    case "BillingCompanyAddressID":
+                        if (item.BillingCompanyAddress != null && item.BillingCompanyAddress.MDCountry != null && item.MDCurrency == null)
+                        {
+                            item.MDCurrency = item.BillingCompanyAddress.MDCountry.MDCurrency;
+                        }
+                        break;
                 }
             }
 

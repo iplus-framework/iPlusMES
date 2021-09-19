@@ -597,7 +597,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(303, "BillingCompanyAddress", "en{'Billing Address'}de{'Rechnungsadresse'}")]
+        [ACPropertyCurrent(303, "BillingCompanyAddress", ConstApp.BillingCompanyAddress)]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -616,7 +616,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(304, "DeliveryCompanyAddress", "en{'Delivery Address'}de{'Lieferandresse'}")]
+        [ACPropertyCurrent(304, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress)]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
