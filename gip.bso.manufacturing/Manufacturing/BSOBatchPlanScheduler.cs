@@ -2762,7 +2762,7 @@ namespace gip.bso.manufacturing
             bool notValidBatchForChange =
                     batchPlan == null
                     || IsWizard
-                    || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any()
+                    //|| batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any()
                     || batchPlan.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished
                     || batchPlan.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished;
             if (notValidBatchForChange)
