@@ -748,11 +748,19 @@ namespace gip.mes.processapplication
                     NextBatchState nextBatchState = NextBatchState.CompletedNoNewEntry;
                     if (batchPlanEntry.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
                         || isLastBatch 
-                            //&& (   !batchPlanEntry.DiffPartialCount.HasValue 
-                            //    || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
                         || totalSizeReached)
                     {
-                        batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Completed;
+                        if ((isLastBatch
+                                && (!batchPlanEntry.DiffPartialCount.HasValue
+                                    || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
+                            || totalSizeReached)
+                            batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Completed;
+                        else if ((batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
+                            || (!batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.PartialActualCount.HasValue))
+                        {
+                            nextBatchState = NextBatchState.UncompletedButPartialQuantityReached;
+                            batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Paused;
+                        }
                         batchPlanEntry.PartialTargetCount = null;
                         batchPlanEntry.PartialActualCount = null;
                     }
