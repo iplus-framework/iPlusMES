@@ -29,7 +29,7 @@ namespace gip.bso.facility
     /// </summary>
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Quant Management'}de{'Quantenverwaltung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityCharge.ClassName)]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityLot.ClassName, "en{'Quant Management'}de{'Quantenverwaltung'}", typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
-    public class BSOFacilityBookCharge : BSOFacilityBase, IACPrintPrepare
+    public class BSOFacilityBookCharge : BSOFacilityBase
     {
 
         #region c´tors
@@ -1768,16 +1768,22 @@ namespace gip.bso.facility
         #endregion
 
         #region IACPrintPrepare
-        public string PrintPrepareAndGetReportName(PAOrderInfo orderInfo)
+        public override Msg PrintViaOrderInfo(string designName, string printerName, short numberOfCopies, PAOrderInfo wfOrderInfo)
         {
-            string reportName = null;
-            if (orderInfo != null && orderInfo.Entities != null)
+            Msg msg = null;
+            if (wfOrderInfo != null && wfOrderInfo.Entities != null)
             {
-                PAOrderInfoEntry entry = orderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
+                PAOrderInfoEntry entry = wfOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
                 CurrentFacilityCharge = DatabaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
-                reportName = "LabelQR";
+                gip.core.datamodel.ACClassDesign design = GetDesign(designName);
+                if (design == null)
+                {
+                    Messages.Error(this, string.Format(@"The {0} report is missing!", designName));
+                    return new Msg();
+                }
+                msg = PrintDesign(design, printerName, numberOfCopies, false);
             }
-            return reportName;
+            return msg;
         }
         #endregion
     }

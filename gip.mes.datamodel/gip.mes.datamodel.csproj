@@ -84,7 +84,6 @@
     <Compile Include="ACInterfaces\Document\DocumentSettings.cs" />
     <Compile Include="ACInterfaces\Document\DocumentTypesEnum.cs" />
     <Compile Include="ACInterfaces\Document\DoumentFilter.cs" />
-    <Compile Include="ACInterfaces\IACPrintPrepare.cs" />
     <Compile Include="ACInterfaces\IOutOrder.cs" />
     <Compile Include="ACInterfaces\IOutOrderPos.cs" />
     <Compile Include="ACInterfaces\FacilityManager\IFacilityManager.cs" />
@@ -441,9 +440,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-09-19_18-10_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-09-19_18-10_dlisak.sql" />
     <Content Include="DbScripts\iPlusMES\dbsync_2021-07-23_08-15_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

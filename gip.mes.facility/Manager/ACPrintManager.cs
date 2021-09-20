@@ -97,30 +97,21 @@ namespace gip.mes.facility
             try
             {
                 string bsoName = "";
+                string designName = "";
                 if (pAOrderInfo.Entities.Any(c => c.EntityName == FacilityCharge.ClassName))
+                {
                     bsoName = "\\Businessobjects#BSOFacilityBookCharge";
-                IACPrintPrepare bso =this.Root.ACUrlCommand(bsoName) as IACPrintPrepare;
+                    designName = "LabelQR";
+                }
+                ACBSO bso = this.Root.ACUrlCommand(bsoName) as ACBSO;
                 if (bso != null)
                 {
-                    string reportName = null;
-                    if ((reportName = bso.PrintPrepareAndGetReportName(pAOrderInfo)) != null)
-                    {
-                        PrinterInfo printerInfo = GetPrinterInfo(pAOrderInfo);
-                        VBBSOReportDialog reportDialog = bso.ACUrlCommand("VBBSOReportDialog") as VBBSOReportDialog;
-                        if (reportDialog != null)
-                        {
-                            reportDialog.PreventClone = true;
-                            reportDialog.PrinterName = printerInfo.PrinterName;
-                            reportDialog.CopyCount = copyCount;
-                            reportDialog.SelectedACClassDesign = bso.ACType.Designs.Where(c => c.ACIdentifier == reportName).FirstOrDefault();
-                            if (reportDialog.SelectedACClassDesign != null)
-                                reportDialog.ReportPrint();
-                        }
-                    }
+                    PrinterInfo printerInfo = GetPrinterInfo(pAOrderInfo);
+                    bso.PrintViaOrderInfo(designName, printerInfo.PrinterName, (short)copyCount, pAOrderInfo);
                 }
                 success = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Root.Messages.LogException(ACPrintManager.C_DefaultServiceACIdentifier, "Print(125)", ex);
             }
@@ -144,8 +135,8 @@ namespace gip.mes.facility
 
         private PrinterInfo GetPrinterInfo(Facility facility)
         {
-            PrinterInfo printerInfo = ConfiguredPrinterList.FirstOrDefault(c=>c.FacilityNo == facility.FacilityNo);
-            if(printerInfo == null && facility.Facility1_ParentFacility != null)
+            PrinterInfo printerInfo = ConfiguredPrinterList.FirstOrDefault(c => c.FacilityNo == facility.FacilityNo);
+            if (printerInfo == null && facility.Facility1_ParentFacility != null)
                 printerInfo = GetPrinterInfo(facility.Facility1_ParentFacility);
             return printerInfo;
         }
