@@ -88,7 +88,4 @@
   <ItemGroup>
     <None Include="Programmability\udw\ProdOrderConnectionsDetailView.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <Build Include="build\build-file-2020-06-18_11-25.sql" />
-  </ItemGroup>
 </Project>
