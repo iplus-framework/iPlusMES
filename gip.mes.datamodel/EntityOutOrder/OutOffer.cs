@@ -25,6 +25,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(17, ConstApp.IssuerCompanyAddress, ConstApp.IssuerCompanyAddress_ACCaption, Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
     [ACPropertyEntity(18, ConstApp.IssuerCompanyPerson, ConstApp.IssuerCompanyPerson_ACCaption, Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
     [ACPropertyEntity(19, "Comment", ConstApp.Comment, "", "", true)]
+    [ACPropertyEntity(20, MDCurrency.ClassName, "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -65,6 +66,7 @@ namespace gip.mes.datamodel
             
             entity.IssuerCompanyAddress = null;
             entity.IssuerCompanyPerson = null;
+            entity.MDCurrencyID = null;
             
             return entity;
         }

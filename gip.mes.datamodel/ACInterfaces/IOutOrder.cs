@@ -6,6 +6,7 @@ namespace gip.mes.datamodel
         Company CustomerCompany { get; set; }
         CompanyAddress DeliveryCompanyAddress { get; set; }
         CompanyAddress BillingCompanyAddress { get; set; }
+        MDCurrency MDCurrency { get; set; }
 
         CompanyAddress IssuerCompanyAddress { get; set; }
         CompanyPerson IssuerCompanyPerson { get; set; }

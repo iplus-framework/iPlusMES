@@ -637,7 +637,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(617, "BillingCompanyAddress", "en{'Billing Address'}de{'Rechnungsadresse'}")]
+        [ACPropertyCurrent(617, "BillingCompanyAddress", ConstApp.BillingCompanyAddress)]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -646,17 +646,18 @@ namespace gip.bso.sales
                     return null;
                 return CurrentOutOrder.BillingCompanyAddress;
             }
-            set
-            {
-                if (CurrentOutOrder != null && value != null)
-                {
-                    CurrentOutOrder.BillingCompanyAddress = value;
-                    OnPropertyChanged("CurrentBillingCompanyAddress");
-                }
-            }
+            //set
+            //{
+            //    if (CurrentOutOrder == null || value == null)
+            //        return;
+            //    CurrentOutOrder.BillingCompanyAddress = value;
+            //    OnPropertyChanged("CurrentBillingCompanyAddress");
+            //    if (CurrentOutOrder.MDCurrency == null && CurrentOutOrder.BillingCompanyAddress != null)
+            //        CurrentOutOrder.MDCurrency = CurrentOutOrder.BillingCompanyAddress.MDCountry.MDCurrency;
+            //}
         }
 
-        [ACPropertyCurrent(618, "DeliveryCompanyAddress", "en{'Delivery Address'}de{'Lieferandresse'}")]
+        [ACPropertyCurrent(618, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress)]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get

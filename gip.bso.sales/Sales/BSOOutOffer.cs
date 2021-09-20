@@ -392,7 +392,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(612, "BillingCompanyAddress")]
+        [ACPropertyCurrent(612, "BillingCompanyAddress", ConstApp.BillingCompanyAddress)]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -401,9 +401,18 @@ namespace gip.bso.sales
                     return null;
                 return CurrentOutOffer.BillingCompanyAddress;
             }
+            //set
+            //{
+            //    if (CurrentOutOffer == null || value == null)
+            //        return;
+            //    CurrentOutOffer.BillingCompanyAddress = value;
+            //    OnPropertyChanged("CurrentBillingCompanyAddress");
+            //    if (CurrentOutOffer.MDCurrency == null && CurrentOutOffer.BillingCompanyAddress != null)
+            //        CurrentOutOffer.MDCurrency = CurrentOutOffer.BillingCompanyAddress.MDCountry.MDCurrency;
+            //}
         }
 
-        [ACPropertyCurrent(613, "DeliveryCompanyAddress")]
+        [ACPropertyCurrent(613, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress)]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -411,6 +420,13 @@ namespace gip.bso.sales
                 if (CurrentOutOffer == null)
                     return null;
                 return CurrentOutOffer.DeliveryCompanyAddress;
+            }
+            set
+            {
+                if (CurrentOutOffer == null)
+                    return;
+                CurrentOutOffer.DeliveryCompanyAddress = value;
+                OnPropertyChanged("CurrentDeliveryCompanyAddress");
             }
         }
 

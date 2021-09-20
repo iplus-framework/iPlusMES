@@ -1755,6 +1755,8 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="MDCurrencyID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MDCurrencyExchangeID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="InvoicePos">
           <Key>
@@ -2404,12 +2406,13 @@
           <Property Name="MDCurrencyExchangeID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MDCurrencyID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ToMDCurrencyID" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ExchangeRate" Type="real" Nullable="false" />
+          <Property Name="ExchangeRate" Type="float" Nullable="false" />
           <Property Name="XMLConfig" Type="text" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="ExchangeNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="MDDelivNoteState">
           <Key>
@@ -3370,6 +3373,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="MDCurrencyID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="OutOfferConfig">
           <Key>
@@ -3461,6 +3465,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="MDCurrencyID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="OutOrderConfig">
           <Key>
@@ -3602,8 +3607,8 @@
           <Property Name="PreviousPartslistID" Type="uniqueidentifier" />
           <Property Name="DeleteDate" Type="datetime" />
           <Property Name="DeleteName" Type="varchar" MaxLength="5" />
-          <Property Name="MaterialWFID" Type="uniqueidentifier" />
           <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
+          <Property Name="MaterialWFID" Type="uniqueidentifier" />
           <Property Name="ProductionUnits" Type="float" />
           <Property Name="XMLComment" Type="text" />
           <Property Name="LastFormulaChange" Type="datetime" Nullable="false" />
@@ -4754,7 +4759,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.ACProgramLogView' does not have a p
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4781,7 +4786,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4805,7 +4810,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4828,7 +4833,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.MachineMaterialView' does not have 
           <Property Name="Nr" Type="bigint" />
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4891,7 +4896,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PartslistSequence" Type="int" Nullable="false" />
@@ -4933,14 +4938,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="BasedOnMachine" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="RelSequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosSequence" Type="int" Nullable="false" />
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
@@ -8619,6 +8624,30 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Invoice_MDCurrencyExchangeID">
+          <End Role="MDCurrencyExchange" Type="Self.MDCurrencyExchange" Multiplicity="0..1" />
+          <End Role="Invoice" Type="Self.Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrencyExchange">
+              <PropertyRef Name="MDCurrencyExchangeID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDCurrencyExchangeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDCurrencyID">
+          <End Role="MDCurrency" Type="Self.MDCurrency" Multiplicity="1" />
+          <End Role="Invoice" Type="Self.Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDCurrencyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Invoice_MDInvoiceStateID">
           <End Role="MDInvoiceState" Type="Self.MDInvoiceState" Multiplicity="1" />
           <End Role="Invoice" Type="Self.Invoice" Multiplicity="*" />
@@ -10009,6 +10038,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_OutOffer_MDCurrencyID">
+          <End Role="MDCurrency" Type="Self.MDCurrency" Multiplicity="0..1" />
+          <End Role="OutOffer" Type="Self.OutOffer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="OutOffer">
+              <PropertyRef Name="MDCurrencyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_OutOffer_MDDelivTypeID">
           <End Role="MDDelivType" Type="Self.MDDelivType" Multiplicity="1" />
           <End Role="OutOffer" Type="Self.OutOffer" Multiplicity="*" />
@@ -10334,6 +10375,18 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="OutOrder">
               <PropertyRef Name="DeliveryCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOrder_MDCurrencyID">
+          <End Role="MDCurrency" Type="Self.MDCurrency" Multiplicity="0..1" />
+          <End Role="OutOrder" Type="Self.OutOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="OutOrder">
+              <PropertyRef Name="MDCurrencyID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14993,6 +15046,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="CompanyPerson" EntitySet="CompanyPerson" />
             <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDCurrencyExchangeID" Association="Self.FK_Invoice_MDCurrencyExchangeID">
+            <End Role="MDCurrencyExchange" EntitySet="MDCurrencyExchange" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDCurrencyID" Association="Self.FK_Invoice_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
           <AssociationSet Name="FK_Invoice_MDInvoiceStateID" Association="Self.FK_Invoice_MDInvoiceStateID">
             <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
             <End Role="Invoice" EntitySet="Invoice" />
@@ -15441,6 +15502,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="OutOffer" EntitySet="OutOffer" />
           </AssociationSet>
+          <AssociationSet Name="FK_OutOffer_MDCurrencyID" Association="Self.FK_OutOffer_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="OutOffer" EntitySet="OutOffer" />
+          </AssociationSet>
           <AssociationSet Name="FK_OutOffer_MDDelivTypeID" Association="Self.FK_OutOffer_MDDelivTypeID">
             <End Role="MDDelivType" EntitySet="MDDelivType" />
             <End Role="OutOffer" EntitySet="OutOffer" />
@@ -15547,6 +15612,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           </AssociationSet>
           <AssociationSet Name="FK_OutOrder_DeliveryCompanyAddressID" Association="Self.FK_OutOrder_DeliveryCompanyAddressID">
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="OutOrder" EntitySet="OutOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOrder_MDCurrencyID" Association="Self.FK_OutOrder_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
             <End Role="OutOrder" EntitySet="OutOrder" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOrder_MDDelivTypeID" Association="Self.FK_OutOrder_MDDelivTypeID">
@@ -19566,6 +19635,22 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="TandTv2StepItem" EntitySet="TandTv2StepItem" />
           </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDCurrencyExchangeID" Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID">
+            <End Role="MDCurrencyExchange" EntitySet="MDCurrencyExchange" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDCurrencyID" Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOffer_MDCurrencyID" Association="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="OutOffer" EntitySet="OutOffer" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OutOrder_MDCurrencyID" Association="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="OutOrder" EntitySet="OutOrder" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -20189,7 +20274,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="ACProgramConfig_ACProgram" Relationship="iPlusMESV4_Model.FK_ACProgramConfig_ACProgramID" FromRole="ACProgram" ToRole="ACProgramConfig" />
           <NavigationProperty Name="ACProgramLog_ACProgram" Relationship="iPlusMESV4_Model.FK_ACProgramLog_ACProgramID" FromRole="ACProgram" ToRole="ACProgramLog" />
           <NavigationProperty Name="DemandOrderPos_ACProgram" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_ACProgramID" FromRole="ACProgram" ToRole="DemandOrderPos" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ACProgram" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ACProgram" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ACProgramConfig">
           <Key>
@@ -21795,7 +21880,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MaterialWFRelation_MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFRelation_MaterialWF" FromRole="MaterialWF" ToRole="MaterialWFRelation" />
           <NavigationProperty Name="MaterialWFACClassMethod_MaterialWF" Relationship="iPlusMESV4_Model.FK_MaterialWFACClassMethod_MaterialWF" FromRole="MaterialWF" ToRole="MaterialWFACClassMethod" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="MaterialWF" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist_MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="MaterialWF" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="MaterialWFACClassMethodConfig">
           <Key>
@@ -21969,6 +22054,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="MDCurrencyExchange_MDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_MDCurrencyID" FromRole="MDCurrency" ToRole="MDCurrencyExchange" />
           <NavigationProperty Name="MDCurrencyExchange_ToMDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_ToMDCurrencyID" FromRole="MDCurrency" ToRole="MDCurrencyExchange" />
           <NavigationProperty Name="PriceList_MDCurrency" Relationship="iPlusMESV4_Model.FK_PriceList_MDCurrency" FromRole="MDCurrency" ToRole="PriceList" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="MDCurrency" ToRole="Invoice" />
+          <NavigationProperty Name="OutOffer" Relationship="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOffer" />
+          <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOrder" />
         </EntityType>
         <EntityType Name="MDCurrencyExchange">
           <Key>
@@ -21985,6 +22073,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_MDCurrencyID" FromRole="MDCurrencyExchange" ToRole="MDCurrency" />
           <NavigationProperty Name="ToMDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_ToMDCurrencyID" FromRole="MDCurrencyExchange" ToRole="MDCurrency" />
+          <Property Name="ExchangeNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="MDCurrencyExchange" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDDelivNoteState">
           <Key>
@@ -22615,7 +22705,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ProdOrder_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="MDProdOrderState" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderBatch_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="MDRatingComplaintType">
           <Key>
@@ -22862,7 +22952,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="Facility_MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID" FromRole="MDUnit" ToRole="Facility" />
           <NavigationProperty Name="Material_BaseMDUnit" Relationship="iPlusMESV4_Model.FK_Material_BaseMDUnitID" FromRole="MDUnit" ToRole="Material" />
           <NavigationProperty Name="OutOfferPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist_MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -23333,7 +23423,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="ProdOrder" ToRole="MDProdOrderState" />
           <NavigationProperty Name="TandTv2StepItem_ProdOrder" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderID" FromRole="ProdOrder" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="PlanningMRProposal_ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ProdOrderBatch">
           <Key>
@@ -24270,7 +24360,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -24295,7 +24385,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24317,7 +24407,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24338,7 +24428,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="Nr" Type="Int64" />
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -24397,7 +24487,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PartslistSequence" Type="Int32" Nullable="false" />
@@ -24437,14 +24527,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="BasedOnMachine" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="RelSequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosSequence" Type="Int32" Nullable="false" />
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -28729,8 +28819,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="FacilityBooking_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBookingCharge_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityBookingCharge" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MaterialID" FromRole="ProdOrderPartslistPos" ToRole="Material" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="ProdOrderPartslist1" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="Weighing">
           <Key>
@@ -29191,9 +29281,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="PartslistPosSplit_PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
           <NavigationProperty Name="ProdOrderPartslistPos_BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="PartslistPos" ToRole="Material" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
-          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
-          </EntityType>
+          <NavigationProperty Name="ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
+        </EntityType>
         <Association Name="FK_PartslistPos_MDUnitID">
           <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
@@ -29532,9 +29622,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardFacilityLocationID" FromRole="FacilityBooking" ToRole="Facility" />
           <NavigationProperty Name="InwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardMaterialID" FromRole="FacilityBooking" ToRole="Material" />
           <NavigationProperty Name="OutwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardMaterialID" FromRole="FacilityBooking" ToRole="Material" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="FacilityBooking" ToRole="Partslist" />
-          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="FacilityBooking" ToRole="Partslist" />
-          </EntityType>
+          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="FacilityBooking" ToRole="Partslist" />
+          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="FacilityBooking" ToRole="Partslist" />
+        </EntityType>
         <EntityType Name="FacilityBookingCharge">
           <Key>
             <PropertyRef Name="FacilityBookingChargeID" />
@@ -29636,9 +29726,9 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="OutwardFacilityLocation" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardFacilityLocationID" FromRole="FacilityBookingCharge" ToRole="Facility" />
           <NavigationProperty Name="InwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardMaterialID" FromRole="FacilityBookingCharge" ToRole="Material" />
           <NavigationProperty Name="OutwardMaterial" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardMaterialID" FromRole="FacilityBookingCharge" ToRole="Material" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
-          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
-          </EntityType>
+          <NavigationProperty Name="InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
+          <NavigationProperty Name="OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="FacilityBookingCharge" ToRole="Partslist" />
+        </EntityType>
         <EntityType Name="FacilityInventory">
           <Key>
             <PropertyRef Name="FacilityInventoryID" />
@@ -31390,6 +31480,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" FromRole="OutOffer" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" FromRole="OutOffer" ToRole="CompanyPerson" />
           <NavigationProperty Name="OutOfferPos_OutOffer" Relationship="iPlusMESV4_Model.FK_OutOfferPos_OutOfferID" FromRole="OutOffer" ToRole="OutOfferPos" />
+          <Property Name="MDCurrencyID" Type="Guid" />
+          <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" FromRole="OutOffer" ToRole="MDCurrency" />
         </EntityType>
         <EntityType Name="OutOrder">
           <Key>
@@ -31440,6 +31532,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyAddress" FromRole="OutOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_DeliveryCompanyAddressID" FromRole="OutOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" FromRole="OutOrder" ToRole="CompanyPerson" />
+          <Property Name="MDCurrencyID" Type="Guid" />
+          <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" FromRole="OutOrder" ToRole="MDCurrency" />
         </EntityType>
         <Association Name="FK_Company_VBUser">
           <End Type="iPlusMESV4_Model.VBUser" Role="VBUser" Multiplicity="0..1" />
@@ -32190,6 +32284,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
+          <Property Name="MDCurrencyID" Type="Guid" Nullable="false" />
+          <Property Name="MDCurrencyExchangeID" Type="Guid" />
+          <NavigationProperty Name="MDCurrencyExchange" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="Invoice" ToRole="MDCurrencyExchange" />
+          <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="Invoice" ToRole="MDCurrency" />
         </EntityType>
         <Association Name="FK_Invoice_CompanyID">
           <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
@@ -32368,7 +32466,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="TourplanConfig_Material" Relationship="iPlusMESV4_Model.FK_TourplanConfig_MaterialID" FromRole="Material" ToRole="TourplanConfig" />
           <NavigationProperty Name="Visitor_Material" Relationship="iPlusMESV4_Model.FK_Visitor_MaterialID" FromRole="Material" ToRole="Visitor" />
           <NavigationProperty Name="OutOfferPos_Material" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MaterialID" FromRole="Material" ToRole="OutOfferPos" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist_Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
         </EntityType>
         <Association Name="FK_Material_StackCalculatorACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -33911,24 +34009,24 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProductionUnits" Type="Double" />
           <Property Name="XMLComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="LastFormulaChange" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="DemandOrderPos" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
-          <NavigationProperty Name="FacilityBooking" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBooking1" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
-          <NavigationProperty Name="FacilityBookingCharge" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityBookingCharge1" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
-          <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="Partslist" ToRole="FacilityCharge" />
+          <NavigationProperty Name="DemandOrderPos_Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
+          <NavigationProperty Name="Facility_Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
+          <NavigationProperty Name="FacilityBooking_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
+          <NavigationProperty Name="FacilityBooking_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
+          <NavigationProperty Name="FacilityBookingCharge_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_InwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
+          <NavigationProperty Name="FacilityBookingCharge_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBookingCharge" />
+          <NavigationProperty Name="FacilityCharge_Partslist" Relationship="iPlusMESV4_Model.FK_FacilityCharge_PartsListID" FromRole="Partslist" ToRole="FacilityCharge" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Partslist" ToRole="Material" />
           <NavigationProperty Name="MaterialWF" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialWF" FromRole="Partslist" ToRole="MaterialWF" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="Partslist" ToRole="MDUnit" />
-          <NavigationProperty Name="PartslistACClassMethod" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
-          <NavigationProperty Name="PartslistConfig" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
-          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPos1" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistStock" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
-          <NavigationProperty Name="Partslist2" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
+          <NavigationProperty Name="PartslistACClassMethod_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
+          <NavigationProperty Name="PartslistConfig_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
+          <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistStock_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
+          <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="Partslist_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
+          <NavigationProperty Name="Partslist1_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
         </EntityType>
         <EntityType Name="ProdOrderPartslist">
           <Key>
@@ -33957,17 +34055,17 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="VBiACProgramID" Type="Guid" />
           <Property Name="ExternProdOrderNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="LastFormulaChange" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="ACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
+          <NavigationProperty Name="VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="ProdOrderPartslist" ToRole="MDProdOrderState" />
           <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
-          <NavigationProperty Name="ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
-          <NavigationProperty Name="ProdOrderPartslistConfig" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
-          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="ProdOrderPartslistPos1" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="TandTv2StepItem" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="TandTv2StepItem" />
+          <NavigationProperty Name="ProdOrderBatch_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
+          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
+          <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
+          <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="TandTv2StepItem_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="TandTv2StepItem" />
         </EntityType>
         <Association Name="FK_ProdOrderPartslist_ACProgramID">
           <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
@@ -34300,6 +34398,54 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="TandTv2StepItem">
               <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDCurrencyExchangeID">
+          <End Type="iPlusMESV4_Model.MDCurrencyExchange" Role="MDCurrencyExchange" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrencyExchange">
+              <PropertyRef Name="MDCurrencyExchangeID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDCurrencyExchangeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDCurrencyID">
+          <End Type="iPlusMESV4_Model.MDCurrency" Role="MDCurrency" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDCurrencyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOffer_MDCurrencyID">
+          <End Type="iPlusMESV4_Model.MDCurrency" Role="MDCurrency" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOffer" Role="OutOffer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="OutOffer">
+              <PropertyRef Name="MDCurrencyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OutOrder_MDCurrencyID">
+          <End Type="iPlusMESV4_Model.MDCurrency" Role="MDCurrency" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OutOrder" Role="OutOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="OutOrder">
+              <PropertyRef Name="MDCurrencyID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -36298,6 +36444,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="MDCurrencyExchange">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.MDCurrencyExchange">
               <MappingFragment StoreEntitySet="MDCurrencyExchange">
+                <ScalarProperty Name="ExchangeNo" ColumnName="ExchangeNo" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -39023,6 +39170,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="OutOffer">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.OutOffer">
               <MappingFragment StoreEntitySet="OutOffer">
+                <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -39057,6 +39205,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="OutOrder">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.OutOrder">
               <MappingFragment StoreEntitySet="OutOrder">
+                <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -39141,6 +39290,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="Invoice">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Invoice">
               <MappingFragment StoreEntitySet="Invoice">
+                <ScalarProperty Name="MDCurrencyExchangeID" ColumnName="MDCurrencyExchangeID" />
+                <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
                 <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
@@ -40379,6 +40530,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" />
       </Diagram>
     </Diagrams>
   </Designer>

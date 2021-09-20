@@ -23,6 +23,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, "PriceNet", ConstApp.PriceNet, "", "", true)]
     [ACPropertyEntity(15, "PriceGross", ConstApp.PriceGross, "", "", true)]
     [ACPropertyEntity(16, MDTermOfPayment.ClassName, ConstApp.TermsOfPayment, Const.ContextDatabase + "\\" + MDTermOfPayment.ClassName, "", true)]
+    [ACPropertyEntity(20, MDCurrency.ClassName, "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
+    [ACPropertyEntity(21, MDCurrencyExchange.ClassName, "en{'Currency-Exchange'}de{'Währungsumrechnung'}", Const.ContextDatabase + "\\" + MDCurrencyExchange.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -68,6 +70,8 @@ namespace gip.mes.datamodel
 
             entity.XMLDesignStart = Const_XMLDesign;
             entity.XMLDesignEnd = Const_XMLDesign;
+            entity.MDCurrencyExchangeID = null;
+            entity.MDCurrency = MDCurrency.DefaultMDCurrency(dbApp);
 
             return entity;
         }

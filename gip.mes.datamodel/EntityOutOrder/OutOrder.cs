@@ -26,6 +26,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(18, "CPartnerCompany", "en{'Contract Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\CPartnerCompanyList", "", true)]
     [ACPropertyEntity(19, ConstApp.IssuerCompanyAddress, ConstApp.IssuerCompanyAddress_ACCaption, Const.ContextDatabase + "\\" + CompanyAddress.ClassName, "", true)]
     [ACPropertyEntity(20, ConstApp.IssuerCompanyPerson, ConstApp.IssuerCompanyPerson_ACCaption, Const.ContextDatabase + "\\" + CompanyPerson.ClassName, "", true)]
+    [ACPropertyEntity(21, MDCurrency.ClassName, "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -64,6 +65,7 @@ namespace gip.mes.datamodel
             entity.MDDelivType = MDDelivType.DefaultMDDelivType(dbApp);
             entity.OutOrderNo = secondaryKey;
             entity.TargetDeliveryDate = DateTime.Now;
+            entity.MDCurrencyID = null;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
