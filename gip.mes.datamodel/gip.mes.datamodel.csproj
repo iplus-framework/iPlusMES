@@ -440,34 +440,36 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DbScripts\iPlusMES\dbsync_2021-09-19_18-10_dlisak.sql" />
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-07-23_08-15_dlisak.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-09-19_18-10_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-07-20_10-00_aagincic.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-23_08-15_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-07-16_09-31_aagincic.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-20_10-00_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-07-08_10-53_aagincic.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-16_09-31_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-06-29_10-35_aagincic.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-07-08_10-53_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-05-14_12-19_aagincic.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-06-29_10-35_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-05-11_13-32_ihrastinski.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-05-14_12-19_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-09-01_13-20_aagincic.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-05-11_13-32_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-08-30_10-54_ihrastinski.sql">
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-09-01_13-20_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-08-30_10-54_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
