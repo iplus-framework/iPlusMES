@@ -109,7 +109,7 @@ namespace gip.mes.facility
                 if (bso == null)
                     msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Print(110) fail! No mandatory BSO found!" };
 
-                if (printerInfo != null)
+                if (printerInfo == null)
                     msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Print(113) fail! No mandatory printer found!" };
 
                 if (msg == null)
