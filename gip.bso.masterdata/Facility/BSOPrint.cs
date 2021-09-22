@@ -328,7 +328,7 @@ namespace gip.bso.masterdata
                     _SelectedWindowsPrinter = value;
                     if (value != null)
                     {
-                        SelectedESCPosPrinter = null;
+                        SelectedPrinterComponent = null;
                         PrinterName = value.PrinterName;
                     }
                     OnPropertyChanged("SelectedWindowsPrinter");
@@ -370,53 +370,53 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Properties -> ESCPos printers
+        #region Properties ->  PrinterComponent
 
-        private PrinterInfo _SelectedESCPosPrinter;
+        private PrinterInfo _SelectedPrinterComponent;
         /// <summary>
         /// Selected property for PrinterInfo
         /// </summary>
         /// <value>The selected ESCPosPrinter</value>
-        [ACPropertySelected(9999, "ESCPosPrinter", "en{'TODO: ESCPosPrinter'}de{'TODO: ESCPosPrinter'}")]
-        public PrinterInfo SelectedESCPosPrinter
+        [ACPropertySelected(9999, "PrinterComponent", "en{'TODO: ESCPosPrinter'}de{'TODO: ESCPosPrinter'}")]
+        public PrinterInfo SelectedPrinterComponent
         {
             get
             {
-                return _SelectedESCPosPrinter;
+                return _SelectedPrinterComponent;
             }
             set
             {
-                if (_SelectedESCPosPrinter != value)
+                if (_SelectedPrinterComponent != value)
                 {
-                    _SelectedESCPosPrinter = value;
+                    _SelectedPrinterComponent = value;
                     if (value != null)
                     {
                         SelectedWindowsPrinter = null;
                         PrinterName = value.PrinterACUrl;
                     }
-                    OnPropertyChanged("SelectedESCPosPrinter");
+                    OnPropertyChanged("SelectedPrinterComponent");
                 }
             }
         }
 
 
-        private List<PrinterInfo> _ESCPosPrinterList;
+        private List<PrinterInfo> _PrinterComponentList;
         /// <summary>
         /// List property for PrinterInfo
         /// </summary>
         /// <value>The ESCPosPrinter list</value>
-        [ACPropertyList(9999, "ESCPosPrinter")]
-        public List<PrinterInfo> ESCPosPrinterList
+        [ACPropertyList(9999, "PrinterComponent")]
+        public List<PrinterInfo> PrinterComponentList
         {
             get
             {
-                if (_ESCPosPrinterList == null)
-                    _ESCPosPrinterList = LoadESCPosPrinterList();
-                return _ESCPosPrinterList;
+                if (_PrinterComponentList == null)
+                    _PrinterComponentList = LoadPrinterComponentList();
+                return _PrinterComponentList;
             }
         }
 
-        private List<PrinterInfo> LoadESCPosPrinterList()
+        private List<PrinterInfo> LoadPrinterComponentList()
         {
             return new List<PrinterInfo>();
         }
@@ -473,7 +473,7 @@ namespace gip.bso.masterdata
             }
             else
             {
-                _ESCPosPrinterList = LoadESCPosPrinterList();
+                _PrinterComponentList = LoadPrinterComponentList();
                 OnPropertyChanged("ESCPosPrinterList");
             }
             SelectedConfiguredPrinter = ConfiguredPrinterList.FirstOrDefault();
@@ -503,19 +503,19 @@ namespace gip.bso.masterdata
 
                 SelectedWindowsPrinter = WindowsPrinterList.FirstOrDefault();
             }
-            else if (SelectedESCPosPrinter != null)
+            else if (SelectedPrinterComponent != null)
             {
                 if (CurrentFacility != null)
-                    SelectedESCPosPrinter.FacilityNo = (CurrentFacility.Value as Facility).FacilityNo;
+                    SelectedPrinterComponent.FacilityNo = (CurrentFacility.Value as Facility).FacilityNo;
                 else if (SelectedMachine != null)
-                    SelectedESCPosPrinter.MachineACUrl = SelectedMachine.ACUrl;
+                    SelectedPrinterComponent.MachineACUrl = SelectedMachine.ACUrl;
 
-                ConfiguredPrinterList.Add(SelectedESCPosPrinter);
-                ESCPosPrinterList.Remove(SelectedESCPosPrinter);
+                ConfiguredPrinterList.Add(SelectedPrinterComponent);
+                PrinterComponentList.Remove(SelectedPrinterComponent);
                 OnPropertyChanged("ConfiguredPrinterList");
                 OnPropertyChanged("ESCPosPrinterList");
 
-                SelectedESCPosPrinter = ESCPosPrinterList.FirstOrDefault();
+                SelectedPrinterComponent = PrinterComponentList.FirstOrDefault();
             }
         }
 
@@ -523,11 +523,11 @@ namespace gip.bso.masterdata
         {
             return
                 ((CurrentFacility != null && CurrentFacility.Value != null) || SelectedMachine != null)
-                && (SelectedWindowsPrinter != null || SelectedESCPosPrinter != null)
+                && (SelectedWindowsPrinter != null || SelectedPrinterComponent != null)
                 && !ConfiguredPrinterList.Any(c =>
                     (
                         (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
-                        || (SelectedESCPosPrinter != null && c.PrinterACUrl == SelectedESCPosPrinter.PrinterACUrl)
+                        || (SelectedPrinterComponent != null && c.PrinterACUrl == SelectedPrinterComponent.PrinterACUrl)
                     )
                     && ((SelectedMachine != null && SelectedMachine.ACUrl == c.MachineACUrl) || (CurrentFacility != null && c.FacilityNo == (CurrentFacility.Value as Facility).FacilityNo))
                 );

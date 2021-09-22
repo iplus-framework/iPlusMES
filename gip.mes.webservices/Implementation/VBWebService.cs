@@ -85,7 +85,6 @@ namespace gip.mes.webservices
 
         public WSResponse<bool> Print(PrintEntity printEntity)
         {
-            bool success = false;
             if (printEntity.Sequence == null || !printEntity.Sequence.Any())
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "No elements in Barcode Entity sequence!"));
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
@@ -93,8 +92,8 @@ namespace gip.mes.webservices
             if(printManager == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PrintManager instance is null!"));
             PAOrderInfo pAOrderInfo = GetPAOrderInfo(printEntity.Sequence.ToArray());
-            success = printManager.Print(pAOrderInfo, printEntity.CopyCount);
-            return new WSResponse<bool>(success);
+            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount);
+            return new WSResponse<bool>(msg == null) { Message = msg };
         }
 
         private PAOrderInfo GetPAOrderInfo(BarcodeEntity[] entities)

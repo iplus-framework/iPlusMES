@@ -91,9 +91,9 @@ namespace gip.mes.facility
 
         #region Methods
 
-        public bool Print(PAOrderInfo pAOrderInfo, int copyCount)
+        public Msg Print(PAOrderInfo pAOrderInfo, int copyCount)
         {
-            bool success = false;
+            Msg msg = null;
             try
             {
                 string bsoName = "";
@@ -104,18 +104,26 @@ namespace gip.mes.facility
                     designName = "LabelQR";
                 }
                 ACBSO bso = this.Root.ACUrlCommand(bsoName) as ACBSO;
-                if (bso != null)
-                {
-                    PrinterInfo printerInfo = GetPrinterInfo(pAOrderInfo);
-                    bso.PrintViaOrderInfo(designName, printerInfo.PrinterName, (short)copyCount, pAOrderInfo);
-                }
-                success = true;
+                PrinterInfo printerInfo = GetPrinterInfo(pAOrderInfo);
+
+                if (bso == null)
+                    msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Print(110) fail! No mandatory BSO found!" };
+
+                if (printerInfo != null)
+                    msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Print(113) fail! No mandatory printer found!" };
+
+                if (msg == null)
+                    msg = bso.PrintViaOrderInfo(designName, printerInfo.PrinterName, (short)copyCount, pAOrderInfo);
+
+                if (msg != null)
+                    Root.Messages.LogError(this.GetACUrl(), "Print(119)", msg.Message);
             }
             catch (Exception ex)
             {
+                msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Print(120) fail! Error: " + ex.Message };
                 Root.Messages.LogException(ACPrintManager.C_DefaultServiceACIdentifier, "Print(125)", ex);
             }
-            return success;
+            return msg;
         }
 
         public PrinterInfo GetPrinterInfo(PAOrderInfo pAOrderInfo)
