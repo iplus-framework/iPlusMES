@@ -52,11 +52,16 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "en{'Refresh Facility'}de{'Aktualisiere Lagerplatz'}", 400, true)]
         public virtual void RefreshFacility()
         {
-            RefreshParkingSpace.ValueT = !RefreshParkingSpace.ValueT;
+            int current = RefreshParkingSpace.ValueT;
+            current++;
+            if (current > 1000)
+                current = 0;
+
+            RefreshParkingSpace.ValueT = current;
         }
 
         [ACPropertyBindingSource]
-        public IACContainerTNet<bool> RefreshParkingSpace
+        public IACContainerTNet<int> RefreshParkingSpace
         {
             get;
             set;

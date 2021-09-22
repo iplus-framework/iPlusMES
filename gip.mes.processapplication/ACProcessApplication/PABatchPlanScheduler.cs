@@ -225,7 +225,8 @@ namespace gip.mes.processapplication
                         if (startMode == GlobalApp.BatchPlanStartModeEnum.AutoTime)
                         {
                             IQueryable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
-                            startableBatchPlans = readyBatchPlans.Where(c => (c.ScheduledStartDate != null ? (c.ScheduledStartDate ?? DateTime.Now) : (c.CalculatedStartDate ?? DateTime.Now)) <= DateTime.Now).ToList();
+                            DateTime dateTimeIfNull = DateTime.Now.AddDays(1);
+                            startableBatchPlans = readyBatchPlans.Where(c => (c.ScheduledStartDate != null ? c.ScheduledStartDate : (c.CalculatedStartDate ?? dateTimeIfNull)) <= DateTime.Now).ToList();
                         }
                         else
                         {
