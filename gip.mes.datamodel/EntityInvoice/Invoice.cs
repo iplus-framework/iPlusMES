@@ -172,9 +172,16 @@ namespace gip.mes.datamodel
         #endregion
 
         #region Additional
+        public bool IsReverseCharge
+        {
+            get
+            {
+                return !InvoicePos_Invoice.Where(c => c.SalesTax > 0).Any();
+            }
+        }
 
-        [ACPropertyInfo(31, "", "en{'Neto total'}de{'Neto total'}")]
-        public double PosPriceNetTotal
+        [ACPropertyInfo(31, "", "en{'Net total'}de{'Netto Gesamt'}")]
+        public decimal PosPriceNetTotal
         {
             get
             {
@@ -183,36 +190,101 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(32, "", "en{'Discount'}de{'Rabatt'}")]
-        public double PosPriceNetDiscount
+        public decimal PosPriceNetDiscount
         {
             get
             {
                 if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
                 {
-                    return (double)(InvoicePos_Invoice.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet));
+                    return InvoicePos_Invoice.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet);
                 }
                 return 0;
             }
         }
 
-        [ACPropertyInfo(33, "", "en{'Neto'}de{'Neto'}")]
-        public double PosPriceNetSum
+        [ACPropertyInfo(33, "", "en{'Net'}de{'Netto'}")]
+        public decimal PosPriceNetSum
         {
             get
             {
                 if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
                 {
-                    return (double)(InvoicePos_Invoice.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice));
+                    return InvoicePos_Invoice.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice);
                 }
                 return 0;
             }
         }
+
+        [ACPropertyInfo(34, "", "en{'Net in f. currency'}de{'Netto in Fremdwährung'}")]
+        public decimal? ForeginPosPriceNetSum
+        {
+            get
+            {
+                if (MDCurrencyExchange == null)
+                    return null;
+                return MDCurrencyExchange.ConvertToForeignCurrency(PosPriceNetSum);
+            }
+        }
+
+        [ACPropertyInfo(35, "", "en{'Discount in f. currency'}de{'Rabatt in Fremdwährung'}")]
+        public decimal? ForeginPosPriceNetDiscount
+        {
+            get
+            {
+                if (MDCurrencyExchange == null)
+                    return null;
+                return MDCurrencyExchange.ConvertToForeignCurrency(PosPriceNetDiscount);
+            }
+        }
+
+        [ACPropertyInfo(36, "", "en{'Net total in f. currency'}de{'Netto Gesamt in Fremdwährung'}")]
+        public decimal? ForeginPosPriceNetTotal
+        {
+            get
+            {
+                if (MDCurrencyExchange == null)
+                    return null;
+                return MDCurrencyExchange.ConvertToForeignCurrency(PosPriceNetTotal);
+            }
+        }
+
+        [ACPropertyInfo(37, "", ConstApp.ForeignPriceGross)]
+        public decimal? ForeignPriceGross
+        {
+            get
+            {
+                if (MDCurrencyExchange == null)
+                    return null;
+                return MDCurrencyExchange.ConvertToForeignCurrency(PriceGross);
+            }
+        }
+
 
         public void OnPricePropertyChanged()
         {
             OnPropertyChanged("PosPriceNetTotal");
             OnPropertyChanged("PosPriceNetDiscount");
             OnPropertyChanged("PosPriceNetSum");
+            OnPropertyChanged("ForeginPosPriceNetTotal");
+            OnPropertyChanged("ForeginPosPriceNetDiscount");
+            OnPropertyChanged("ForeginPosPriceNetSum");
+        }
+
+        partial void OnPriceGrossChanged()
+        {
+            OnPropertyChanged("ForeignPriceGross");
+        }
+
+        [ACPropertyInfo(38, "", "en{'Due date'}de{'Fälligkeitsdatum'}")]
+        public DateTime DueDate
+        {
+            get
+            {
+                if (MDTermOfPayment == null)
+                    return InvoiceDate.AddDays(10);
+                else
+                    return InvoiceDate.AddDays(MDTermOfPayment.TermOfPaymentDays);
+            }
         }
 
 
@@ -227,6 +299,39 @@ namespace gip.mes.datamodel
                 element.Sequence = sequence;
                 sequence++;
             }
+        }
+
+        public bool IsExchangeRateValid
+        {
+            get
+            {
+                if (this.OutOrder != null)
+                {
+                    if (!this.OutOrder.MDCurrencyID.HasValue)
+                        return true;
+                    if (this.MDCurrencyID == this.OutOrder.MDCurrencyID)
+                        return true;
+                    else if (this.MDCurrencyExchange == null)
+                        return false;
+                    if (this.MDCurrencyExchange != null)
+                    {
+                        DateTime dateTimeFrom = new DateTime(InvoiceDate.Year, InvoiceDate.Month, InvoiceDate.Day);
+                        DateTime dateTimeTo = dateTimeFrom.AddDays(1);
+                        return this.MDCurrencyExchange.InsertDate >= dateTimeFrom && this.MDCurrencyExchange.InsertDate <= dateTimeTo;
+                    }
+                }
+                //else if (this.InOrder != null)
+                //{
+                //}
+                return true;
+            }
+        }
+
+        public void UpdateExchangeRate()
+        {
+            if (IsExchangeRateValid)
+                return;
+            MDCurrencyExchange = MDCurrency.GetExchangeRate(OutOrder.MDCurrency, InvoiceDate);
         }
         #endregion
 

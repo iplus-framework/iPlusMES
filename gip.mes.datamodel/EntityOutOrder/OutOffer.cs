@@ -318,8 +318,8 @@ namespace gip.mes.datamodel
 
         #region Additional properties
 
-        [ACPropertyInfo(100, "", "en{'Neto total'}de{'Neto total'}")]
-        public double PosPriceNetTotal
+        [ACPropertyInfo(100, "", "en{'Net total'}de{'Netto Gesamt'}")]
+        public decimal PosPriceNetTotal
         {
             get
             {
@@ -328,26 +328,26 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(100, "", "en{'Discount'}de{'Rabatt'}")]
-        public double PosPriceNetDiscount
+        public decimal PosPriceNetDiscount
         {
             get
             {
                 if (OutOfferPos_OutOffer != null && OutOfferPos_OutOffer.Any())
                 {
-                    return (double)(OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet));
+                    return OutOfferPos_OutOffer.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet);
                 }
                 return 0;
             }
         }
 
-        [ACPropertyInfo(100, "", "en{'Neto'}de{'Neto'}")]
-        public double PosPriceNetSum
+        [ACPropertyInfo(100, "", "en{'Net'}de{'Netto'}")]
+        public decimal PosPriceNetSum
         {
             get
             {
                 if (OutOfferPos_OutOffer != null && OutOfferPos_OutOffer.Any())
                 {
-                    return (double)(OutOfferPos_OutOffer.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice));
+                    return OutOfferPos_OutOffer.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice);
                 }
                 return 0;
             }

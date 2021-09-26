@@ -101,5 +101,21 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        #region Methods
+        public decimal ConvertToForeignCurrency(decimal localValue)
+        {
+            if (ExchangeRate <= 0.00000000001 || localValue == 0)
+                return 0;
+            return Convert.ToDecimal(Math.Round(Convert.ToDouble(localValue) / ExchangeRate, 2));
+        }
+
+        public decimal ConvertBackToLocalCurrency(decimal foreignValue)
+        {
+            if (ExchangeRate <= 0.00000000001 || foreignValue == 0)
+                return 0;
+            return Convert.ToDecimal(Math.Round(Convert.ToDouble(foreignValue) * ExchangeRate, 2));
+        }
+        #endregion
+
     }
 }

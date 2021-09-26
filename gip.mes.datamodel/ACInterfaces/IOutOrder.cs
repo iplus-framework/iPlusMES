@@ -11,9 +11,9 @@ namespace gip.mes.datamodel
         CompanyAddress IssuerCompanyAddress { get; set; }
         CompanyPerson IssuerCompanyPerson { get; set; }
 
-        double PosPriceNetDiscount { get; }
-        double PosPriceNetSum { get; }
-        double PosPriceNetTotal { get;  }
+        decimal PosPriceNetDiscount { get; }
+        decimal PosPriceNetSum { get; }
+        decimal PosPriceNetTotal { get;  }
 
         decimal PriceNet { get; set; }
         decimal PriceGross { get; set; }

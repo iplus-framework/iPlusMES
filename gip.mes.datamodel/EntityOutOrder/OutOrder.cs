@@ -343,8 +343,8 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IOutOrder additional members
-        [ACPropertyInfo(100, "", "en{'Neto total'}de{'Neto total'}")]
-        public double PosPriceNetTotal
+        [ACPropertyInfo(100, "", "en{'Net total'}de{'Netto Gesamt'}")]
+        public decimal PosPriceNetTotal
         {
             get
             {
@@ -353,26 +353,26 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(100, "", "en{'Discount'}de{'Rabatt'}")]
-        public double PosPriceNetDiscount
+        public decimal PosPriceNetDiscount
         {
             get
             {
                 if (OutOrderPos_OutOrder != null && OutOrderPos_OutOrder.Any())
                 {
-                    return (double)(OutOrderPos_OutOrder.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet));
+                    return OutOrderPos_OutOrder.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet);
                 }
                 return 0;
             }
         }
 
-        [ACPropertyInfo(100, "", "en{'Neto'}de{'Neto'}")]
-        public double PosPriceNetSum
+        [ACPropertyInfo(100, "", "en{'Net'}de{'Netto'}")]
+        public decimal PosPriceNetSum
         {
             get
             {
                 if (OutOrderPos_OutOrder != null && OutOrderPos_OutOrder.Any())
                 {
-                    return (double)(OutOrderPos_OutOrder.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice));
+                    return OutOrderPos_OutOrder.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice);
                 }
                 return 0;
             }

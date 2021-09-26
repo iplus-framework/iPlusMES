@@ -2140,11 +2140,11 @@ namespace gip.bso.sales
         {
             if (!PreExecute("CreateInvoice"))
                 return;
-            if (Root.Messages.Question(this, "Question50060", Global.MsgResult.Yes, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.Yes)
+            if (Messages.Question(this, "Question50060", Global.MsgResult.Yes, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.Yes)
             {
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder);
                 if (msg != null)
-                    Root.Messages.Msg(msg);
+                    Messages.Msg(msg);
             }
             PostExecute("CreateInvoice");
         }

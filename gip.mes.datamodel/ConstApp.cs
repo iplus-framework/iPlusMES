@@ -225,6 +225,10 @@
         public const string PriceGrossTotal = "en{'Gross total'}de{'Brutto Gesamt'}";
         public const string VATPerUnit = "en{'VAT per unit'}de{'MwSt. pro Einheit'}";
         public const string VATTotal = "en{'VAT total'}de{'MwSt. gesamt'}";
+        public const string ForeignPriceNet = "en{'Net Price in f. currency'}de{'Nettopreis in Fremdwährung'}";
+        public const string ForeignPriceGross = "en{'Gross Price in f. currency'}de{'Bruttopreis in Fremdwährung'}";
+        public const string ForeignTotalPrice = "en{'Net Total in f. currency'}de{'Netto Gesamt in Fremdwährung'}";
+        public const string ForeignPriceGrossTotal = "en{'Gross Total in f. currency'}de{'Gross Gesamt in Fremdwährung'}";
 
         // Addition
         public const string Addition1Percent = "en{'Percent 1'}de{'Prozent 1'}";

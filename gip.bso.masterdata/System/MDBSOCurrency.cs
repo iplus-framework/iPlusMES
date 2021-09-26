@@ -19,9 +19,36 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using System.Data;
 using gip.mes.autocomponent;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
+    public class HNBResult
+    {
+        public string broj_tecajnice { get; set; }
+        public string datum_primjene { get; set; }
+        public string drzava { get; set; }
+        public string drzava_iso { get; set; }
+        public string sifra_valute { get; set; }
+        public string valuta { get; set; }
+        public int jedinica { get; set; }
+        public string kupovni_tecaj { get; set; }
+        public string srednji_tecaj { get; set; }
+        public string prodajni_tecaj { get; set; }
+
+        public float ExchangeRate
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(kupovni_tecaj))
+                    return 1;
+                return float.Parse(srednji_tecaj, System.Globalization.NumberStyles.AllowDecimalPoint);
+            }
+        }
+    }
+
     /// <summary>
     /// Allgemeine Stammdatenmaske für MDCurrency
     /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
@@ -217,8 +244,7 @@ namespace gip.bso.masterdata
                 //if (_MDCurrencyExchangeList == null)
                 //    _MDCurrencyExchangeList = Database.MDCurrencyExchange.ToList();
                 //return _MDCurrencyExchangeList;
-                return from c in CurrentCurrency.MDCurrencyExchange_MDCurrency
-                       select c;
+                return CurrentCurrency.MDCurrencyExchange_MDCurrency.ToList();
 
             }
         }
@@ -462,6 +488,42 @@ namespace gip.bso.masterdata
             }
             CurrentNewCurrencyExchange = null;
         }
+
+
+        [ACMethodCommand("GetCurrencyFromWebApi", "en{'Read Online-Exchangerate'}de{'Lese Online-Wechselkurs'}", 500)]
+        public async void GetExchangeRateFromWebApi()
+        {
+            if (CurrentCurrencyExchange == null 
+                || CurrentCurrency == null 
+                || CurrentCurrencyExchange.ToMDCurrency == null)
+                return;
+            try
+            {
+                if (CurrentCurrency.MDCurrencyShortname.ToLower() == "kn")
+                {
+                    HttpClient httpClient = new HttpClient();
+                    HttpResponseMessage response = await httpClient.GetAsync(String.Format("https://api.hnb.hr/tecajn/v2?valuta={0}&datum-primjene={1:yyyy-MM-dd}",
+                        CurrentCurrencyExchange.ToMDCurrency.MDCurrencyShortname,
+                        CurrentCurrencyExchange.InsertDate));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string json = await response.Content.ReadAsStringAsync();
+                        var result = await Task.Run(() => JsonConvert.DeserializeObject<HNBResult[]>(json));
+                        var excRes = result.FirstOrDefault();
+                        CurrentCurrencyExchange.ExchangeRate = excRes.ExchangeRate;
+                        CurrentCurrencyExchange.ExchangeNo = excRes.broj_tecajnice;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Messages.LogException(this.GetACUrl(), "GetExchangeRateFromWebApi()", ex);
+                this.Messages.Exception(this, ex.Message, true);
+            }
+
+            //CurrentNewCurrencyExchange
+        }
+
         #endregion
         #endregion
 
@@ -525,6 +587,9 @@ namespace gip.bso.masterdata
                     return true;
                 case "NewCurrencyExchangeCancel":
                     NewCurrencyExchangeCancel();
+                    return true;
+                case "GetExchangeRateFromWebApi":
+                    GetExchangeRateFromWebApi();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

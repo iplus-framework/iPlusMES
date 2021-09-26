@@ -124,7 +124,17 @@ namespace gip.mes.datamodel
             }
         }
 
-#endregion
+        public MDCurrencyExchange GetExchangeRate(MDCurrency toCurreny, DateTime invoiceDate)
+        {
+            if (toCurreny == null)
+                return null;
+            DateTime dateTimeFrom = new DateTime(invoiceDate.Year, invoiceDate.Month, invoiceDate.Day);
+            DateTime dateTimeTo = dateTimeFrom.AddDays(1);
+            return MDCurrencyExchange_MDCurrency.Where(c => c.ToMDCurrencyID == toCurreny.MDCurrencyID && c.InsertDate >= dateTimeFrom && c.InsertDate <= dateTimeTo).FirstOrDefault();
+            //return null;
+        }
+
+        #endregion
 
     }
 }

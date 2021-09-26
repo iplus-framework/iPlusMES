@@ -1,11 +1,15 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.reporthandler.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
+using System.Windows.Media;
+
 namespace gip.bso.sales
 {
     [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechunungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName)]
@@ -163,6 +167,40 @@ namespace gip.bso.sales
 
         #endregion
 
+        #endregion
+
+        #region ControlMode
+        public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
+        {
+            //CurrentInvoice.MDCurrencyExchange
+            if (vbControl == null)
+                return base.OnGetControlModes(vbControl);
+
+            Global.ControlModes result = base.OnGetControlModes(vbControl);
+            if (result < Global.ControlModes.Enabled)
+                return result;
+            if (!String.IsNullOrEmpty(vbControl.VBContent))
+            {
+                if (vbControl.VBContent.StartsWith("CurrentInvoice\\MDCurrencyExchange"))
+                {
+                    if (CurrentInvoice == null || !CurrentInvoice.IsExchangeRateValid)
+                        return Global.ControlModes.EnabledWrong;
+                    else
+                        return Global.ControlModes.Disabled;
+                }
+            }
+            //switch (vbControl.VBContent)
+            //{
+            //    case "CurrentInvoice\\MDCurrencyExchange":
+            //        {
+            //            if (CurrentInvoice == null || !CurrentInvoice.IsExchangeRateValid)
+            //                return Global.ControlModes.EnabledWrong;
+            //            break;
+            //        }
+            //}
+
+            return result;
+        }
         #endregion
 
         #region Managers
@@ -1337,6 +1375,25 @@ namespace gip.bso.sales
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("InvoiceList");
         }
+
+        [ACMethodCommand("ExchangeRate", "en{'Update Exchange Rate'}de{'Wechselkurs aktualisieren'}", 850, true)]
+        public void UpdateExchangeRate()
+        {
+            if (!IsEnabledUpdateExchangeRate())
+                return;
+            CurrentInvoice.UpdateExchangeRate();
+            if (!CurrentInvoice.IsExchangeRateValid)
+            {
+                this.Messages.Warning(this, "Please open the businesss object for exchange rates and add a exchange rate for this invoice date", true);
+            }
+        }
+
+        public bool IsEnabledUpdateExchangeRate()
+        {
+            if (CurrentInvoice == null)
+                return false;
+            return !CurrentInvoice.IsExchangeRateValid;
+        }
         #endregion
 
         #region InvoicePos
@@ -1543,6 +1600,172 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Methods => Report
+
+        [ACPropertyInfo(650)]
+        public List<InvoicePos> InvoiceDataList
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(651)]
+        public List<InvoicePos> InvoiceDiscountList
+        {
+            get;
+            set;
+        }
+
+        private void BuildInvoicePosData(string langCode)
+        {
+            if (CurrentInvoice == null)
+                return;
+
+            List<InvoicePos> posData = new List<InvoicePos>();
+
+            //foreach (var invoicePos in CurrentInvoice.InvoicePos_Invoice.Where(c => c.GroupInvoicePosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
+            foreach (var invoicePos in CurrentInvoice.InvoicePos_Invoice.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
+            {
+                posData.Add(invoicePos);
+                //BuildInvoicePosDataRecursive(posData, invoicePos.Items);
+                //if (invoicePos.GroupSum)
+                //{
+                //    InvoicePos sumPos = new InvoicePos();
+                //    sumPos.TotalPricePrinted = invoicePos.Items.Sum(c => c.TotalPrice).ToString("N");
+                //    sumPos.MaterialNo = Root.Environment.TranslateMessageLC(this, "Info50063", langCode) + invoicePos.Material.MaterialNo; // Info50063.
+                //    sumPos.Sequence = invoicePos.Sequence;
+                //    sumPos.GroupSum = invoicePos.GroupSum;
+                //    posData.Add(sumPos);
+                //}
+            }
+
+            InvoiceDataList = posData;
+            InvoiceDiscountList = CurrentInvoice.InvoicePos_Invoice.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
+            if (InvoiceDiscountList != null && InvoiceDiscountList.Any())
+            {
+                //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentInvoice.PosPriceNetDiscount });
+                InvoiceDiscountList.Add(new InvoicePos() { Comment = Root.Environment.TranslateMessageLC(this, "Info50064", langCode), PriceNet = (decimal)CurrentInvoice.PosPriceNetTotal }); //Info50064.
+            }
+
+            OutDeliveryNoteManager.CalculateTaxOverview(this, CurrentInvoice, CurrentInvoice.InvoicePos_Invoice.Select(c => (IOutOrderPos)c).ToList());
+        }
+
+        private void BuildInvoicePosDataRecursive(List<InvoicePos> posDataList, IEnumerable<InvoicePos> invoicePosList)
+        {
+            foreach (var invoicePos in invoicePosList.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
+            {
+                posDataList.Add(invoicePos);
+                //BuildInvoicePosDataRecursive(posDataList, invoicePos.Items);
+            }
+        }
+
+        public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
+        {
+            if (printingPhase == ACPrintingPhase.Started)
+            {
+                ReportDocument doc = reportEngine as ReportDocument;
+                if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null
+                                                                                 && (c.ACClassDesign.ACIdentifier == "InvoiceDe") || c.ACClassDesign.ACIdentifier == "InvoiceEn" || c.ACClassDesign.ACIdentifier == "InvoiceHr"))
+                {
+                    doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
+                    gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
+                    string langCode = "de";
+                    if (design != null)
+                    {
+                        if (design.ACIdentifier == "InvoiceHr")
+                            langCode = "hr";
+                        if (design.ACIdentifier == "InvoiceEn")
+                            langCode = "en";
+                    }
+                    BuildInvoicePosData(langCode);
+                }
+            }
+            else
+            {
+                ReportDocument doc = reportEngine as ReportDocument;
+                if (doc != null)
+                {
+                    doc.SetFlowDocObjValue -= Doc_SetFlowDocObjValue;
+                }
+            }
+
+            base.OnPrintingPhase(reportEngine, printingPhase);
+        }
+
+        private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
+        {
+            InvoicePos pos = e.ParentDataRow as InvoicePos;
+            if (e.FlowDocObj != null && e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge")
+            {
+                if (CurrentInvoice != null && !CurrentInvoice.IsReverseCharge)
+                {
+                    var inlineCell = e.FlowDocObj as InlineContextValue;
+                    if (inlineCell != null)
+                    {
+                        var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
+                        if (tableCell != null)
+                        {
+                            TableRow tableRow = tableCell.Parent as TableRow;
+                            if (tableRow != null)
+                                tableRow.Cells.Remove(tableCell);
+                        }
+                    }
+                }
+            }
+            if (e.FlowDocObj != null && e.FlowDocObj.VBContent == "CurrentInvoice\\MDCurrencyExchange\\ExchangeNo")
+            {
+                if (CurrentInvoice != null && CurrentInvoice.MDCurrencyExchange == null)
+                {
+                    var inlineCell = e.FlowDocObj as InlineContextValue;
+                    if (inlineCell != null)
+                    {
+                        var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
+                        if (tableCell != null)
+                        {
+                            TableRow tableRow = tableCell.Parent as TableRow;
+                            if (tableRow != null)
+                                tableRow.Cells.Remove(tableCell);
+                        }
+                    }
+                }
+            }
+            //if (pos != null && pos.GroupSum && pos.OutOfferPosID == new Guid())
+            //{
+            //    var inlineCell = e.FlowDocObj as InlineTableCellValue;
+            //    if (inlineCell != null)
+            //    {
+            //        var tableCell = (inlineCell.Parent as Paragraph)?.Parent as TableCell;
+            //        if (tableCell != null)
+            //        {
+            //            if (inlineCell.VBContent == "MaterialNo")
+            //            {
+            //                TableRow tableRow = tableCell.Parent as TableRow;
+            //                if (tableRow != null && tableRow.Cells.Count > 6)
+            //                {
+            //                    tableRow.Cells.RemoveAt(2);
+            //                    tableRow.Cells.RemoveAt(2);
+            //                    tableRow.Cells.RemoveAt(2);
+            //                    tableRow.Cells.RemoveAt(2);
+            //                }
+            //                tableCell.ColumnSpan = 2;
+            //            }
+
+            //            else if (inlineCell.VBContent == "TotalPricePrinted")
+            //            {
+            //                tableCell.ColumnSpan = 4;
+            //                tableCell.BorderBrush = Brushes.Black;
+            //                tableCell.BorderThickness = new System.Windows.Thickness(0, 1, 0, 1);
+            //                tableCell.TextAlignment = System.Windows.TextAlignment.Right;
+            //            }
+            //            tableCell.FontWeight = System.Windows.FontWeights.Bold;
+            //        }
+            //    }
+            //}
+        }
+
+        #endregion
+
+
         #region Execute-Helper-Handlers
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
@@ -1600,6 +1823,12 @@ namespace gip.bso.sales
                     return true;
                 case "FilterDialogContractPos":
                     FilterDialogContractPos();
+                    return true;
+                case "UpdateExchangeRate":
+                    UpdateExchangeRate();
+                    return true;
+                case "IsEnabledUpdateExchangeRate":
+                    result = IsEnabledUpdateExchangeRate();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

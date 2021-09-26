@@ -170,7 +170,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return "Position " + Sequence.ToString();
+                return Sequence.ToString("00");
             }
         }
 
@@ -239,6 +239,181 @@ namespace gip.mes.datamodel
         }
 
         public bool InRecalculation { get; set; }
+        //private bool _InLocalRecalc = false;
+
+        [ACPropertyInfo(38, "", ConstApp.ForeignPriceNet)]
+        public decimal? ForeignPriceNet
+        {
+            get
+            {
+                if (Invoice == null || Invoice.MDCurrencyExchange == null)
+                    return null;
+                return Invoice.MDCurrencyExchange.ConvertToForeignCurrency(this.PriceNet);
+            }
+            set
+            {
+                if (Invoice == null || Invoice.MDCurrencyExchange == null || value == null)
+                    return;
+                PriceNet = Invoice.MDCurrencyExchange.ConvertBackToLocalCurrency(value.Value);
+                //OnPropertyChanged("ForeignPriceNet");
+            }
+        }
+
+        [ACPropertyInfo(38, "", ConstApp.ForeignPriceGross)]
+        public decimal? ForeignPriceGross
+        {
+            get
+            {
+                if (Invoice == null || Invoice.MDCurrencyExchange == null)
+                    return null;
+                return Invoice.MDCurrencyExchange.ConvertToForeignCurrency(this.PriceGross);
+            }
+            set
+            {
+                if (Invoice == null || Invoice.MDCurrencyExchange == null || value == null)
+                    return;
+                PriceGross = Invoice.MDCurrencyExchange.ConvertBackToLocalCurrency(value.Value);
+                //OnPropertyChanged("ForeignPriceGross");
+            }
+        }
+
+        [ACPropertyInfo(39, "", ConstApp.ForeignTotalPrice)]
+        public decimal? ForeignTotalPrice
+        {
+            get
+            {
+                if (Invoice == null || Invoice.MDCurrencyExchange == null)
+                    return null;
+                return Invoice.MDCurrencyExchange.ConvertToForeignCurrency(this.TotalPrice);
+            }
+        }
+
+        [ACPropertyInfo(40, "", ConstApp.ForeignPriceGrossTotal)]
+        public decimal? ForeignTotalPriceWithTax
+        {
+            get
+            {
+                if (Invoice == null || Invoice.MDCurrencyExchange == null)
+                    return null;
+                return Invoice.MDCurrencyExchange.ConvertToForeignCurrency(this.TotalPriceWithTax);
+            }
+        }
+
+        partial void OnPriceGrossChanged()
+        {
+            OnPropertyChanged("ForeignPriceGross");
+        }
+
+        partial void OnPriceNetChanged()
+        {
+            OnPropertyChanged("ForeignPriceNet");
+        }
+
+
+        private string _MaterialNo;
+        [ACPropertyInfo(41)]
+        public string MaterialNo
+        {
+            get
+            {
+                if (_MaterialNo != null)
+                    return _MaterialNo;
+
+                return Material?.MaterialNo;
+            }
+            set
+            {
+                _MaterialNo = value;
+            }
+        }
+
+        [ACPropertyInfo(42)]
+        public string SalesTaxPrinted
+        {
+            get
+            {
+                //if (!GroupSum)
+                    return SalesTax.ToString("N");
+                //return "";
+            }
+        }
+
+        [ACPropertyInfo(43)]
+        public string PriceNetPrinted
+        {
+            get
+            {
+                //if (!GroupSum)
+                    return FormatWithCurrency(PriceNet.ToString("N"));
+                //return "";
+            }
+        }
+
+        public string _TotalPricePrinted;
+        [ACPropertyInfo(44)]
+        public string TotalPricePrinted
+        {
+            get
+            {
+                if (_TotalPricePrinted != null)
+                    return FormatWithCurrency(_TotalPricePrinted);
+                //if (!GroupSum)
+                    return FormatWithCurrency(TotalPrice.ToString("N"));
+                //return "";
+            }
+            set
+            {
+                _TotalPricePrinted = value;
+            }
+        }
+
+        [ACPropertyInfo(45)]
+        public string ForeignPriceNetPrinted
+        {
+            get
+            {
+                //if (!GroupSum)
+                if (!ForeignPriceNet.HasValue)
+                    return "";
+                return FormatWithForeignCurrency(ForeignPriceNet.Value.ToString("N"));
+                //return "";
+            }
+        }
+
+        public string _ForeignTotalPricePrinted;
+        [ACPropertyInfo(46)]
+        public string ForeignTotalPricePrinted
+        {
+            get
+            {
+                if (_ForeignTotalPricePrinted != null)
+                    return FormatWithForeignCurrency(_ForeignTotalPricePrinted);
+                //if (!GroupSum)
+                if (!ForeignTotalPrice.HasValue)
+                    return "";
+                return FormatWithForeignCurrency(ForeignTotalPrice.Value.ToString("N"));
+                //return "";
+            }
+            set
+            {
+                _ForeignTotalPricePrinted = value;
+            }
+        }
+
+        public string FormatWithCurrency(string value)
+        {
+            if (Invoice == null)
+                return null;
+            return String.Format("{0} {1}", value, Invoice.MDCurrency.MDCurrencyShortname);
+        }
+
+        public string FormatWithForeignCurrency(string value)
+        {
+            if (Invoice == null || Invoice.MDCurrencyExchange == null)
+                return null;
+            return String.Format("({0} {1})", value, Invoice.MDCurrencyExchange.ToMDCurrency.MDCurrencyShortname);
+        }
+
         #endregion
 
     }
