@@ -889,16 +889,21 @@ namespace gip.bso.manufacturing
 
             var messagesToAck = MessagesList.Where(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton).ToList();
 
+            bool isCompExceedsMaxScaleWeight = MaxScaleWeight.HasValue && TargetWeight > MaxScaleWeight;
+
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
-            if (messagesToAck.Count > 1 || (messagesToAck.Any() && ScaleBckgrState == ScaleBackgroundState.InTolerance) 
+            if (messagesToAck.Count > 1 || (messagesToAck.Any() && (ScaleBckgrState == ScaleBackgroundState.InTolerance || isCompExceedsMaxScaleWeight)) 
                                         || messagesToAck.Any(x => x.MessageLevel == eMsgLevel.Question))
             {
-                if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
+                if (ScaleBckgrState == ScaleBackgroundState.InTolerance || isCompExceedsMaxScaleWeight)
                 {
-                    //TODO: translate
+                    string text = Root.Environment.TranslateText(this, "txtAckWeighComp");
+                    if (string.IsNullOrEmpty(text))
+                        text = "Acknowledge weighing component: {0} {1} ";
+
                     MessageItem msgItem = new MessageItem(componentPWNode, this);
-                    msgItem.Message = string.Format("Acknowledge weighing component: {0} {1} ", SelectedWeighingMaterial?.MaterialNo, SelectedWeighingMaterial.MaterialName);
+                    msgItem.Message = string.Format(text, SelectedWeighingMaterial?.MaterialNo, SelectedWeighingMaterial.MaterialName);
                     messagesToAck.Add(msgItem);
                 }
 
@@ -912,7 +917,16 @@ namespace gip.bso.manufacturing
                 if (messageToAck != null)
                     messageToAck.AcknowledgeMsg();
                 else if (componentPWNode != null)
+                {
+                    if (isCompExceedsMaxScaleWeight && ScaleBckgrState != ScaleBackgroundState.InTolerance)
+                    {
+                        //Question50072 : Are you sure that you want acknowledge current component?
+                        if (Messages.Question(this, "Question50072") != Global.MsgResult.Yes)
+                            return;
+                    }
+
                     componentPWNode.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, ScaleActualWeight, ScaleBckgrState != ScaleBackgroundState.InTolerance);
+                }
             }
         }
 
