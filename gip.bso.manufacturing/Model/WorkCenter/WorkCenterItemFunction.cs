@@ -46,7 +46,7 @@ namespace gip.bso.manufacturing
         public bool IsReponsibleForUserAck
         {
             get => _IsReponsibleForUserAck;
-            private set
+            internal set
             {
                 _IsReponsibleForUserAck = value;
             }
