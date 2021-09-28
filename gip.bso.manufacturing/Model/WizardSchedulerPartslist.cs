@@ -235,9 +235,6 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(999, "OffsetToEndTime", "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}")]
         public TimeSpan? OffsetToEndTime { get; set; }
 
-        [ACPropertyInfo(999, "ExpectedBatchEndTime", "en{'Expected batch end time'}de{'Erwartete Batch-Endzeit'}")]
-        public DateTime? ExpectedBatchEndTime { get; set; }
-
         #endregion
 
 

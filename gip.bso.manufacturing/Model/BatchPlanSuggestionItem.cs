@@ -224,7 +224,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-       
+        [ACPropertyInfo(999, "ExpectedBatchEndTime", "en{'Expected batch end time'}de{'Erwartete Batch-Endzeit'}")]
+        public DateTime? ExpectedBatchEndTime { get; set; }
+
 
         public override string ToString()
         {
