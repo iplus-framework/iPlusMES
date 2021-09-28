@@ -128,6 +128,15 @@ namespace gip.bso.manufacturing
             {
                 if (_BSOManualWeighing != null && _BSOManualWeighing.CurrentComponentPWNode == UserAckPWNode.ValueT)
                 {
+                    bool isCompExceedsMaxScaleWeight = _BSOManualWeighing.MaxScaleWeight.HasValue && _BSOManualWeighing.TargetWeight > _BSOManualWeighing.MaxScaleWeight;
+
+                    if (isCompExceedsMaxScaleWeight && _BSOManualWeighing.ScaleBckgrState != ScaleBackgroundState.InTolerance)
+                    {
+                        //Question50072 : Are you sure that you want acknowledge current component?
+                        if (_BSOManualWeighing.Messages.Question(_BSOManualWeighing, "Question50072") != Global.MsgResult.Yes)
+                            return;
+                    }
+
                     UserAckPWNode.ValueT.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, _BSOManualWeighing.ScaleActualWeight, 
                                                        _BSOManualWeighing.ScaleBckgrState != ScaleBackgroundState.InTolerance);
                 }
