@@ -200,6 +200,7 @@ namespace gip.bso.manufacturing
             IACConfig batchSuggestionMode = GetConfig("BatchSuggestionMode", partslist, aCClassWF, vbACClassWF);
             IACConfig durationSecAVG = GetConfig("DurationSecAVG", partslist, aCClassWF, vbACClassWF);
             IACConfig startOffsetSecAVG = GetConfig("StartOffsetSecAVG", partslist, aCClassWF, vbACClassWF);
+            IACConfig offsetToEndTime = GetConfig("OffsetToEndTime", partslist, aCClassWF, vbACClassWF);
 
             if (batchSizeMin != null && batchSizeMin.Value != null)
                 schedulerPartslist.BatchSizeMin = (double)batchSizeMin.Value;
@@ -217,19 +218,35 @@ namespace gip.bso.manufacturing
             }
 
             if (batchSuggestionMode != null && batchSuggestionMode.Value != null)
-            {
                 schedulerPartslist.BatchSuggestionMode = (BatchSuggestionCommandModeEnum)batchSuggestionMode.Value;
-            }
 
             if (durationSecAVG != null)
-            {
                 schedulerPartslist.DurationSecAVG = (int)durationSecAVG.Value;
-            }
 
             if (startOffsetSecAVG != null)
-            {
                 schedulerPartslist.StartOffsetSecAVG = (int)startOffsetSecAVG.Value;
-            }
+
+            if (offsetToEndTime != null)
+                schedulerPartslist.OffsetToEndTime = (TimeSpan)offsetToEndTime.Value;
+
+
+            if (schedulerPartslist.OffsetToEndTime != null)
+                if (schedulerPartslist.OffsetToEndTime.Value.TotalMinutes == 0)
+                    schedulerPartslist.ExpectedBatchEndTime = GetExpectedBatchEndTime();
+                else
+                    schedulerPartslist.ExpectedBatchEndTime = DateTime.Now.AddMinutes(schedulerPartslist.OffsetToEndTime.Value.TotalMinutes);
+        }
+
+        private DateTime? GetExpectedBatchEndTime()
+        {
+            vd.ACClassWF vbACClassWF = SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
+            Partslist partslist = DatabaseApp.Partslist.FirstOrDefault(c => c.PartslistNo == SelectedWizardSchedulerPartslist.PartslistNo);
+            var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(vbACClassWF, partslist.MaterialWFID);
+            // Setup TargetQuantityUOM
+
+            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
+            TimeSpan? duration = poManager.GetCalculatedBatchPlanDuration(DatabaseApp, materialWFConnection.MaterialWFACClassMethodID, vbACClassWF.ACClassWFID);
+            return DateTime.Now.AddMinutes(duration?.TotalMinutes ?? 0);
         }
 
         #endregion
@@ -2694,6 +2711,12 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledWizardForward())
                 return;
+            Msg validationMsg = IsEnabledWizardForwardValidation();
+            if (validationMsg != null)
+            {
+                SendMessage(validationMsg);
+                return;
+            }
             if (IsWizard && WizardPhase < NewScheduledBatchWizardPhaseEnum.DefineTargets)
             {
                 int wizardPhaseInt = (int)WizardPhase;
@@ -2711,8 +2734,6 @@ namespace gip.bso.manufacturing
                         MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
                         if (saveMsg != null)
                             SendMessage(saveMsg);
-                        //if(!IsBSOTemplateScheduleParent)
-                        //    RefreshServerState(SelectedScheduleForPWNode.MDSchedulingGroupID);
                     }
                     WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
                     OnPropertyChanged("WizardSchedulerPartslistList");
@@ -2838,6 +2859,31 @@ namespace gip.bso.manufacturing
                     break;
             }
             return isEnabled;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Msg IsEnabledWizardForwardValidation()
+        {
+            Msg msg = null;
+            switch (WizardPhase)
+            {
+                case NewScheduledBatchWizardPhaseEnum.DefineBatch:
+                    bool isValidBatchExpectedEndTime =
+                        SelectedWizardSchedulerPartslist != null
+                        &&
+                            (
+                                SelectedWizardSchedulerPartslist.OffsetToEndTime == null
+                                ||
+                                SelectedWizardSchedulerPartslist.ExpectedBatchEndTime != null
+                            );
+                    if (!isValidBatchExpectedEndTime)
+                        msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "WizardForward()", 2880, "Error50472");
+                    break;
+            }
+            return msg;
         }
 
         private bool WizardForwardAction(NewScheduledBatchWizardPhaseEnum wizardPhase)
@@ -3494,7 +3540,8 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Private(Helper) Mehtods -> Factory Batch
 
-        private vd.ProdOrderBatchPlan FactoryBatchPlan(vd.ACClassWF vbACClassWF, vd.Partslist partslist, vd.ProdOrderPartslist prodOrderPartslist, vd.GlobalApp.BatchPlanState startMode, ref int maxScheduledOrder)
+        private vd.ProdOrderBatchPlan FactoryBatchPlan(vd.ACClassWF vbACClassWF, vd.Partslist partslist,
+            vd.ProdOrderPartslist prodOrderPartslist, vd.GlobalApp.BatchPlanState startMode, ref int maxScheduledOrder, DateTime? calculatedEndDate)
         {
 
             vd.ProdOrderBatchPlan prodOrderBatchPlan = vd.ProdOrderBatchPlan.NewACObject(DatabaseApp, prodOrderPartslist);
@@ -3511,6 +3558,8 @@ namespace gip.bso.manufacturing
                                                .Select(c => c.MaterialWFACClassMethod)
                                                .FirstOrDefault();
             prodOrderBatchPlan.ProdOrderPartslistPos = ProdOrderManager.GetIntermediate(prodOrderPartslist, materialWFConnection);
+
+            prodOrderBatchPlan.CalculatedEndDate = calculatedEndDate;
 
             return prodOrderBatchPlan;
         }
@@ -3577,7 +3626,7 @@ namespace gip.bso.manufacturing
                 foreach (var item in suggestion.ItemsList)
                 {
                     nr++;
-                    vd.ProdOrderBatchPlan batchPlan = FactoryBatchPlan(vbACClassWF, partslist, prodOrderPartslist, CreatedBatchState, ref maxSchedulingOrder);
+                    vd.ProdOrderBatchPlan batchPlan = FactoryBatchPlan(vbACClassWF, partslist, prodOrderPartslist, CreatedBatchState, ref maxSchedulingOrder, wizardSchedulerPartslist.ExpectedBatchEndTime);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                     WriteBatchPlanQuantities(item, batchPlan);
                     batchPlan.Sequence = nr;
@@ -3628,7 +3677,7 @@ namespace gip.bso.manufacturing
                         .Select(c => c.MaxScheduledOrder)
                         .DefaultIfEmpty()
                         .Max();
-                    batchPlan = FactoryBatchPlan(vbACClassWF, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, ref maxSchedulingOrder);
+                    batchPlan = FactoryBatchPlan(vbACClassWF, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, ref maxSchedulingOrder, wizardSchedulerPartslist.ExpectedBatchEndTime);
                     prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                 }

@@ -1243,7 +1243,7 @@ namespace gip.bso.manufacturing
         private TimeSpan? GetCalculatedBatchPlanDuration(ProdOrderBatchPlan batchPlan)
         {
             ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
-            return poManager.GetCalculatedBatchPlanDuration(DatabaseApp, batchPlan);
+            return poManager.GetCalculatedBatchPlanDuration(DatabaseApp, batchPlan.MaterialWFACClassMethodID ?? Guid.Empty, batchPlan.VBiACClassWFID ?? Guid.Empty);
         }
 
         #endregion
