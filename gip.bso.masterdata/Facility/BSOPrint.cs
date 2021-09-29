@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using gip.bso.iplus;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -19,6 +20,7 @@ namespace gip.bso.masterdata
     {
         #region const
         public const string ClassName = @"BSOPrint";
+        public const string BGWorkerMehtod_LoadMachinesAndPrinters = "LoadMachinesAndPrinters";
         #endregion
 
         #region c'tors
@@ -44,6 +46,8 @@ namespace gip.bso.masterdata
         /// <returns>True if is initialization success, otherwise returns false.</returns>
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
+            bool baseInit = base.ACInit(startChildMode);
+
             _PrintManager = ACPrintManager.ACRefToServiceInstance(this);
             if (_PrintManager == null)
                 throw new Exception("ACPrintManager not configured");
@@ -51,7 +55,10 @@ namespace gip.bso.masterdata
             CurrentFacilityRoot = FacilityTree.LoadFacilityTree(DatabaseApp);
             CurrentFacility = CurrentFacilityRoot;
 
-            return base.ACInit(startChildMode);
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_LoadMachinesAndPrinters);
+            ShowDialog(this, DesignNameProgressBar);
+
+            return baseInit;
         }
 
         /// <summary>
@@ -86,6 +93,86 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Properties
+
+        protected WorkerResult BSOPrinterWorkerResult { get; set; }
+
+        #region Properties -> Messages
+
+        public void SendMessage(object result)
+        {
+            Msg msg = result as Msg;
+            if (msg != null)
+            {
+                SendMessage(msg);
+            }
+        }
+
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged("CurrentMsg");
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged("MsgList");
+        }
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged("MsgList");
+        }
+        #endregion
+
+        #region Properties -> Project Manager
+
+        ACProjectManager _ACProjectManager;
+        public ACProjectManager ProjectManager
+        {
+            get
+            {
+                if (_ACProjectManager != null)
+                    return _ACProjectManager;
+                _ACProjectManager = new ACProjectManager(DatabaseApp.ContextIPlus, Root);
+                return _ACProjectManager;
+            }
+        }
+
+        #endregion
 
         #region Properties -> FacilityTree
 
@@ -169,8 +256,6 @@ namespace gip.bso.masterdata
 
         #region Properties -> Machines
 
-
-        #region Machine
         private ACComponent _SelectedMachine;
         /// <summary>
         /// Selected property for ACComponent
@@ -210,16 +295,10 @@ namespace gip.bso.masterdata
             get
             {
                 if (_MachineList == null)
-                    _MachineList = LoadMachineList();
+                    _MachineList = new List<ACComponent>();
                 return _MachineList;
             }
         }
-
-        private List<ACComponent> LoadMachineList()
-        {
-            return new List<ACComponent>();
-        }
-        #endregion
 
         #endregion
 
@@ -411,14 +490,9 @@ namespace gip.bso.masterdata
             get
             {
                 if (_PrinterComponentList == null)
-                    _PrinterComponentList = LoadPrinterComponentList();
+                    _PrinterComponentList = new List<PrinterInfo>();
                 return _PrinterComponentList;
             }
-        }
-
-        private List<PrinterInfo> LoadPrinterComponentList()
-        {
-            return new List<PrinterInfo>();
         }
 
         #endregion
@@ -466,17 +540,6 @@ namespace gip.bso.masterdata
             bool isWindowsPrinter = !string.IsNullOrEmpty(SelectedConfiguredPrinter.PrinterName);
             ConfiguredPrinterList.Remove(SelectedConfiguredPrinter);
             OnPropertyChanged("ConfiguredPrinterList");
-            if (isWindowsPrinter)
-            {
-                _WindowsPrinterList = LoadWindowsPrinterList();
-                OnPropertyChanged("WindowsPrinterList");
-            }
-            else
-            {
-                _PrinterComponentList = LoadPrinterComponentList();
-                OnPropertyChanged("ESCPosPrinterList");
-            }
-            SelectedConfiguredPrinter = ConfiguredPrinterList.FirstOrDefault();
         }
 
         public bool IsEnabledRemovePrinter()
@@ -497,11 +560,7 @@ namespace gip.bso.masterdata
                     SelectedWindowsPrinter.MachineACUrl = SelectedMachine.ACUrl;
 
                 ConfiguredPrinterList.Add(SelectedWindowsPrinter);
-                WindowsPrinterList.Remove(SelectedWindowsPrinter);
                 OnPropertyChanged("ConfiguredPrinterList");
-                OnPropertyChanged("WindowsPrinterList");
-
-                SelectedWindowsPrinter = WindowsPrinterList.FirstOrDefault();
             }
             else if (SelectedPrinterComponent != null)
             {
@@ -511,11 +570,7 @@ namespace gip.bso.masterdata
                     SelectedPrinterComponent.MachineACUrl = SelectedMachine.ACUrl;
 
                 ConfiguredPrinterList.Add(SelectedPrinterComponent);
-                PrinterComponentList.Remove(SelectedPrinterComponent);
                 OnPropertyChanged("ConfiguredPrinterList");
-                OnPropertyChanged("ESCPosPrinterList");
-
-                SelectedPrinterComponent = PrinterComponentList.FirstOrDefault();
             }
         }
 
@@ -533,6 +588,114 @@ namespace gip.bso.masterdata
                 );
         }
 
+        #endregion
+
+        #region Background worker
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            switch (command)
+            {
+                case BGWorkerMehtod_LoadMachinesAndPrinters:
+                    e.Result = DoLoadMachinesAndPrinters(worker, Database.ContextIPlus, ProjectManager);
+                    break;
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                BSOPrinterWorkerResult = (WorkerResult)e.Result;
+                _PrinterComponentList = LoadPrinterComponentList();
+                _MachineList = LoadMachineList();
+                OnPropertyChanged("PrinterComponentList");
+                OnPropertyChanged("MachineList");
+            }
+        }
+
+        private WorkerResult DoLoadMachinesAndPrinters(ACBackgroundWorker worker, Database database, ACProjectManager projectManager)
+        {
+            WorkerResult workerResult = new WorkerResult();
+            workerResult.Printers = new List<IACComponent>();
+            workerResult.Machines = new List<IACComponent>();
+
+
+            List<gip.core.datamodel.ACProject> projects =
+                database
+                .ACProject
+                .Where(c => c.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application).ToList();
+
+            foreach (gip.core.datamodel.ACProject project in projects)
+            {
+                worker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"Loading machines and printers for project {0} ...", project.ACProjectName);
+                gip.core.datamodel.ACProject acProject = projectManager.LoadACProject(project);
+                ACComponent rootACComponent = Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).FirstOrDefault();
+
+                List<ACComponent> machines = rootACComponent.FindChildComponents<ACComponent>(c => c is PAClassPhysicalBase);
+                List<ACComponent> printers = rootACComponent.FindChildComponents<ACComponent>(c => c is ACPrintServerBase);
+
+                if (machines != null)
+                    workerResult.Machines.AddRange(machines);
+                if (printers != null)
+                    workerResult.Printers.AddRange(printers);
+            }
+            return workerResult;
+        }
+
+        private List<PrinterInfo> LoadPrinterComponentList()
+        {
+            return
+                BSOPrinterWorkerResult
+                .Printers
+                //.Where(c => !ConfiguredPrinterList.Select(x => x.PrinterACUrl).Contains(c.ACUrl))
+                .Select(c =>
+                new PrinterInfo()
+                {
+                    PrinterACUrl = c.ACUrl
+                })
+                .ToList();
+        }
+
+        private List<ACComponent> LoadMachineList()
+        {
+            return BSOPrinterWorkerResult
+                .Machines
+                //.Where(c => !ConfiguredPrinterList.Select(x => x.MachineACUrl).Contains(c.ACUrl))
+                .Select(c => c as ACComponent)
+                .ToList();
+        }
+
+        protected struct WorkerResult
+        {
+            public List<IACComponent> Printers { get; set; }
+            public List<IACComponent> Machines { get; set; }
+        }
         #endregion
 
     }

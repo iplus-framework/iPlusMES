@@ -10,9 +10,10 @@ using System.Linq;
 
 namespace gip.mes.facility
 {
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'PrintManager'}de{'PrintManager'}", Global.ACKinds.TPARole, Global.ACStorableTypes.NotStorable, false, false)]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'ACPrintManager'}de{'ACPrintManager'}", Global.ACKinds.TPARole, Global.ACStorableTypes.NotStorable, false, false)]
     public class ACPrintManager : PARole, IPrintManager
     {
+
         #region c'tors
         public ACPrintManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
            : base(acType, content, parentACObject, parameter, acIdentifier)
