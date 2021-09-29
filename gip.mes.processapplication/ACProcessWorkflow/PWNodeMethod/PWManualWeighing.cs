@@ -2437,8 +2437,11 @@ namespace gip.mes.processapplication
                                 if (currentOpenMaterial != null && changeState)
                                 {
                                     WeighingComponent weighingComp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
-                                    weighingComp.SwitchState(state);
-                                    SetInfo(weighingComp, WeighingComponentInfoType.State, currentFacilityCharge, CurrentFacility);
+                                    if (weighingComp != null)
+                                    {
+                                        weighingComp.SwitchState(state);
+                                        SetInfo(weighingComp, WeighingComponentInfoType.State, currentFacilityCharge, CurrentFacility);
+                                    }
                                 }
                             }
                         }
