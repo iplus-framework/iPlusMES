@@ -1430,6 +1430,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private string _WizardPhaseErrorMessage;
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "WizardPhaseErrorMessage", "en{'Message'}de{'Meldung'}")]
+        public string WizardPhaseErrorMessage
+        {
+            get
+            {
+                return _WizardPhaseErrorMessage;
+            }
+            set
+            {
+                if (_WizardPhaseErrorMessage != value)
+                {
+                    _WizardPhaseErrorMessage = value;
+                    OnPropertyChanged("WizardPhaseErrorMessage");
+                }
+            }
+        }
+
         #endregion
 
         #region Properties -> Wizard -> WizardSchedulerPartslist
@@ -2864,6 +2886,7 @@ namespace gip.bso.manufacturing
             switch (WizardPhase)
             {
                 case NewScheduledBatchWizardPhaseEnum.DefineBatch:
+                    WizardPhaseErrorMessage = "";
                     bool isValidBatchExpectedEndTime =
                         SelectedWizardSchedulerPartslist != null
                         &&
@@ -2875,7 +2898,10 @@ namespace gip.bso.manufacturing
                                 !BatchPlanSuggestion.ItemsList.Any(c => c.ExpectedBatchEndTime == null || c.ExpectedBatchEndTime == (new DateTime()))
                             );
                     if (!isValidBatchExpectedEndTime)
+                    {
                         msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "WizardForward()", 2880, "Error50472");
+                        WizardPhaseErrorMessage = msg.Message;
+                    }
                     break;
             }
             return msg;
