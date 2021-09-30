@@ -232,6 +232,9 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(999, "MDProdOrderState", "en{'MDProdOrderState'}de{'MDProdOrderState'}")]
         public MDProdOrderState MDProdOrderState { get; set; }
 
+        [ACPropertyInfo(999, "OffsetToEndTime", "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}")]
+        public TimeSpan? OffsetToEndTime { get; set; }
+
         #endregion
 
 

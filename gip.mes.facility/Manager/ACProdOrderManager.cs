@@ -1151,15 +1151,15 @@ namespace gip.mes.facility
         #endregion
 
         #region Public -> Batch -> Duration Calculation
-        public TimeSpan? GetCalculatedBatchPlanDuration(DatabaseApp databaseApp, ProdOrderBatchPlan batchPlan)
+        public TimeSpan? GetCalculatedBatchPlanDuration(DatabaseApp databaseApp, Guid materialWFACClassMethodID, Guid vBiACClassWFID)
         {
             TimeSpan? duration = null;
             ProdOrderBatchPlan prevousBatchPlan =
                 databaseApp
                 .ProdOrderBatchPlan
                 .Where(c =>
-                    c.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID &&
-                    c.VBiACClassWFID == batchPlan.VBiACClassWFID &&
+                    c.MaterialWFACClassMethodID == materialWFACClassMethodID &&
+                    c.VBiACClassWFID == vBiACClassWFID &&
                     c.ProdOrderPartslistPos.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed &&
                     c.ProdOrderPartslistPos.OrderLog_ProdOrderPartslistPos.Any()
                   )

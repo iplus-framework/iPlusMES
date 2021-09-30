@@ -131,6 +131,12 @@ namespace gip.bso.manufacturing
             {
                 using (ACMonitor.Lock(_70200_ItemFunctionsLock))
                 {
+                    bool anyFunctionForUserAck = ItemFunctions.Any(c => c.IsReponsibleForUserAck);
+                    if (anyFunctionForUserAck)
+                    {
+                        function.IsReponsibleForUserAck = false;
+                    }
+
                     ItemFunctions.Add(function);
 
                     function.ACStateProperty.PropertyChanged += ACStateProperty_PropertyChanged;

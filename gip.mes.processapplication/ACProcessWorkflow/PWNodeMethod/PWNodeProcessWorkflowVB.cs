@@ -77,6 +77,10 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("LineOrderInPlan", typeof(int), false, Global.ParamOption.Optional));
             paramTranslation.Add("LineOrderInPlan", "en{'Order of line selection in production plan'}de{'Reihenfolge der Linienauswahl im Produktionsplan'}");
 
+            // OffsetToEndTime
+            method.ParameterValueList.Add(new ACValue("OffsetToEndTime", typeof(TimeSpan?), null, Global.ParamOption.Optional));
+            paramTranslation.Add("OffsetToEndTime", "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}");
+
             #endregion
 
             method.ParameterValueList.Add(new ACValue("SkipWaitingNodes", typeof(bool), false, Global.ParamOption.Required));

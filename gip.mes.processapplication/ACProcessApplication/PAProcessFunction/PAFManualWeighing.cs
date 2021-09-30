@@ -652,6 +652,8 @@ namespace gip.mes.processapplication
                 return;
             }
 
+            if (CurrentACMethod.ValueT == null)
+                return;
 
             var targetScale = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetScaleACIdentifier");
             string targetScaleACIdentifier = null;
