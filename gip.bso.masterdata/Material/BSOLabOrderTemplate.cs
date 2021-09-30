@@ -30,6 +30,8 @@ namespace gip.bso.masterdata
 
         #endregion
 
+
+        #region Properties
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         /// <summary>
         /// The _ access primary
@@ -80,6 +82,7 @@ namespace gip.bso.masterdata
                     }
 
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>("LabOrder", this);
+                    _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
@@ -131,6 +134,37 @@ namespace gip.bso.masterdata
             }
         }
 
+        #region Find and Replace
+        public override IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
+        {
+            result = base.LabOrder_AccessPrimary_NavSearchExecuting(result);
+            if (IsEnabledApplyValueFilter())
+            {
+            }
+            return result;
+        }
+
+        private double? _UpdateWithValue;
+        [ACPropertyInfo(612, "", "en{'Value for mass update'}de{'Massenaktualisierungswert'}")]
+        public double? UpdateWithValue
+        {
+            get
+            {
+                return _UpdateWithValue;
+            }
+            set
+            {
+                _UpdateWithValue = value;
+                OnPropertyChanged("UpdateWithValue");
+            }
+        }
+
+        #endregion
+        #endregion
+
+
+        #region Methods
+
         public override void New()
         {
             if (!PreExecute("New"))
@@ -149,5 +183,77 @@ namespace gip.bso.masterdata
             OnPropertyChanged("LabOrderPosList");
             PostExecute("New");
         }
+
+        #region Filter
+        [ACMethodCommand("ValueFilterField", "en{'Mass update'}de{'Massenaktualisierung'}", 503, false)]
+        public void MassUpdateOnValues()
+        {
+            if (!IsEnabledMassUpdateOnValues())
+                return;
+            foreach (var labOrder in AccessPrimary.NavList)
+            {
+                LabOrderPos posToUpdate = null;
+                if (ValueFilterFieldType == LOPosValueFieldEnum.MinMin)
+                {
+                    posToUpdate = labOrder.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMinMin >= FilterValueFrom.Value
+                                                                    && l.ValueMinMin <= FilterValueTo.Value).FirstOrDefault();
+                    if (posToUpdate != null)
+                        posToUpdate.ValueMinMin = UpdateWithValue;
+                }
+                else if (ValueFilterFieldType == LOPosValueFieldEnum.Min)
+                {
+                    posToUpdate = labOrder.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMin >= FilterValueFrom.Value
+                                                                    && l.ValueMin <= FilterValueTo.Value).FirstOrDefault();
+                    if (posToUpdate != null)
+                        posToUpdate.ValueMin = UpdateWithValue;
+                }
+                else if (ValueFilterFieldType == LOPosValueFieldEnum.Max)
+                {
+                    posToUpdate = labOrder.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMax >= FilterValueFrom.Value
+                                                                    && l.ValueMax <= FilterValueTo.Value).FirstOrDefault();
+                    if (posToUpdate != null)
+                        posToUpdate.ValueMax = UpdateWithValue;
+                }
+                else //if (ValueFilterFieldType == LOPosValueFieldEnum.MaxMax)
+                    posToUpdate = labOrder.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMaxMax >= FilterValueFrom.Value
+                                                                    && l.ValueMaxMax <= FilterValueTo.Value).FirstOrDefault();
+                if (posToUpdate != null)
+                    posToUpdate.ValueMaxMax = UpdateWithValue;
+            }
+        }
+
+        public virtual bool IsEnabledMassUpdateOnValues()
+        {
+            return FilterValueFrom.HasValue
+                && FilterValueTo.HasValue
+                && UpdateWithValue.HasValue
+                && SelectedValueFilterField != null
+                && SelectedLabTag != null;
+        }
+        #endregion
+
+        #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case "MassUpdateOnValues":
+                    MassUpdateOnValues();
+                    return true;
+                case "IsEnabledMassUpdateOnValues":
+                    result = IsEnabledMassUpdateOnValues();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
+        #endregion
     }
 }

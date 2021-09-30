@@ -119,9 +119,34 @@ namespace gip.bso.masterdata
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>("LabOrder", this);
+                    _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
+        }
+
+        public virtual IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
+        {
+            if (IsEnabledApplyValueFilter())
+            {
+                if (ValueFilterFieldType == LOPosValueFieldEnum.MinMin)
+                    result = result.Where(c => c.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID 
+                                                                    && l.ValueMinMin >= FilterValueFrom.Value
+                                                                    && l.ValueMinMin <= FilterValueTo.Value).Any());
+                else if (ValueFilterFieldType == LOPosValueFieldEnum.Min)
+                    result = result.Where(c => c.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMin >= FilterValueFrom.Value
+                                                                    && l.ValueMin <= FilterValueTo.Value).Any());
+                else if (ValueFilterFieldType == LOPosValueFieldEnum.Max)
+                    result = result.Where(c => c.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMax >= FilterValueFrom.Value
+                                                                    && l.ValueMax <= FilterValueTo.Value).Any());
+                else //if (ValueFilterFieldType == LOPosValueFieldEnum.MaxMax)
+                    result = result.Where(c => c.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
+                                                                    && l.ValueMaxMax >= FilterValueFrom.Value
+                                                                    && l.ValueMaxMax <= FilterValueTo.Value).Any());
+            }
+            return result;
         }
 
         /// <summary>
@@ -305,6 +330,98 @@ namespace gip.bso.masterdata
                 OnPropertyChanged("SelectedLabOrderPos");
             }
         }
+        #endregion
+
+        #region Find and Replace
+        private double? _FilterValueFrom;
+        [ACPropertyInfo(610, "", "en{'Limit value from'}de{'Grenzwert von'}")]
+        public double? FilterValueFrom
+        {
+            get
+            {
+                return _FilterValueFrom;
+            }
+            set 
+            {
+                _FilterValueFrom = value;
+                OnPropertyChanged("FilterValueFrom");
+            }
+        }
+
+        private double? _FilterValueTo;
+        [ACPropertyInfo(611, "", "en{'Limit value to'}de{'Grenzwert bis'}")]
+        public double? FilterValueTo
+        {
+            get
+            {
+                return _FilterValueTo;
+            }
+            set
+            {
+                _FilterValueTo = value;
+                OnPropertyChanged("FilterValueTo");
+            }
+        }
+
+        private ACValueListLOPosValueFieldEnum _ValueFilterFieldList = new ACValueListLOPosValueFieldEnum();
+        [ACPropertyList(620, "ValueFilterField", "en{'Search in Field'}de{'Suche in Feld'}")]
+        public List<ACValueItem> ValueFilterFieldList
+        {
+            get
+            {
+                return _ValueFilterFieldList;
+            }
+        }
+
+        ACValueItem _SelectedValueFilterField;
+        [ACPropertySelected(621, "ValueFilterField", "en{'Search in Field'}de{'Suche in Feld'}")]
+        public ACValueItem SelectedValueFilterField
+        {
+            get
+            {
+                return _SelectedValueFilterField;
+            }
+            set
+            {
+                _SelectedValueFilterField = value;
+                OnPropertyChanged("ValueFilterField");
+            }
+        }
+
+        public LOPosValueFieldEnum ValueFilterFieldType
+        {
+            get
+            {
+                if (SelectedValueFilterField == null)
+                    return LOPosValueFieldEnum.MinMin;
+                return (LOPosValueFieldEnum) SelectedValueFilterField.Value;
+            }
+        }
+
+        MDLabTag _SelectedLabTag;
+        [ACPropertySelected(624, "MDLabTag", "en{'Laboratory Tag'}de{'Laborkennzeichen'}")]
+        public MDLabTag SelectedLabTag
+        {
+            get
+            {
+                return _SelectedLabTag;
+            }
+            set
+            {
+                _SelectedLabTag = value;
+                OnPropertyChanged("SelectedLabTag");
+            }
+        }
+
+        [ACPropertyList(625, "MDLabTag", "en{'Laboratory Tag'}de{'Laborkennzeichen'}")]
+        public IEnumerable<MDLabTag> LabTagList
+        {
+            get
+            {
+                return DatabaseApp.MDLabTag.ToArray();
+            }
+        }
+
         #endregion
 
         #endregion
@@ -546,6 +663,40 @@ namespace gip.bso.masterdata
             return CurrentLabOrder != null && CurrentLabOrderPos != null;
         }
 
+        #region Filter
+        [ACMethodCommand("ValueFilterField", "en{'Search over filtered value range'}de{'Suche per gefiltertem Grenzwert'}", 500, false)]
+        public void ApplyValueFilter()
+        {
+            if (!IsEnabledApplyValueFilter())
+                return;
+            Search();
+        }
+
+        public virtual bool IsEnabledApplyValueFilter()
+        {
+            return FilterValueFrom.HasValue 
+                && FilterValueTo.HasValue 
+                && SelectedValueFilterField != null
+                && SelectedLabTag != null;
+        }
+
+        [ACMethodCommand("ValueFilterField", "en{'Clear search filter'}de{'Lösche Suchfilter'}", 501, false)]
+        public void ClearValueFilter()
+        {
+            FilterValueFrom = null;
+            FilterValueTo = null;
+            //SelectedValueFilterField = null;
+            SelectedLabTag = null;
+            Search();
+        }
+
+        public virtual bool IsEnabledClearValueFilter()
+        {
+            return true;
+        }
+
+        #endregion
+
         #endregion
         #endregion
 
@@ -606,6 +757,18 @@ namespace gip.bso.masterdata
                     return true;
                 case "IsEnabledDeleteLabOrderPos":
                     result = IsEnabledDeleteLabOrderPos();
+                    return true;
+                case "ApplyValueFilter":
+                    ApplyValueFilter();
+                    return true;
+                case "IsEnabledApplyValueFilter":
+                    result = IsEnabledApplyValueFilter();
+                    return true;
+                case "ClearValueFilter":
+                    ClearValueFilter();
+                    return true;
+                case "IsEnabledClearValueFilter":
+                    result = IsEnabledClearValueFilter();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

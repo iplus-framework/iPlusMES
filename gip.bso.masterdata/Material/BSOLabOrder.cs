@@ -261,8 +261,9 @@ namespace gip.bso.masterdata
             }
         }
 
-        public virtual IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
+        public override IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
         {
+            result = base.LabOrder_AccessPrimary_NavSearchExecuting(result);
             if (IsConnectedWithDeliveryNote)
             {
                 result = result.Where(x => x.InOrderPosID != null && x.InOrderPos.DeliveryNotePos_InOrderPos.Any());
