@@ -230,6 +230,19 @@ namespace gip.mes.processapplication
                 if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, pickingPos, sourceSilo))
                     return StartNextCompResult.CycleWait;
 
+                ACValue configuredQuantityValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                if (configuredQuantityValue != null)
+                {
+                    double configuredQuantity = configuredQuantityValue.ParamAsDouble;
+                    if (configuredQuantity > 0.00001)
+                    {
+                        if (targetWeight > configuredQuantity)
+                        {
+                            targetWeight = configuredQuantity;
+                        }
+                    }
+                }
+
                 acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;
 
                 acMethod["PLPosRelation"] = pickingPos.PickingPosID;
@@ -836,6 +849,26 @@ namespace gip.mes.processapplication
                     || (pickingPos.RemainingDosingQuantityUOM >= -1 && MinDosQuantity > -0.0000001)) // No Endless Dosing
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                }
+
+                bool dosingLoop = this.FindSuccessors<PWDosingLoop>(true, c => c is PWDosingLoop, d => d is PWDosing).Any();
+
+                if (dosingLoop)
+                {
+                    var pwGroup = ParentPWGroup as PWGroupVB;
+
+                    if ((dosingFuncResultState == PADosingAbortReason.NotSet || dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource)
+                        && MinDosQuantity < -0.0000001
+                        && pickingPos.MDDelivPosLoadState != null
+                        && pickingPos.MDDelivPosLoadState.DelivPosLoadState < MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+                    {
+                        pwGroup.CurrentACSubState = (uint)ACSubStateEnum.SMDisThenNextComp;
+                    }
+                    else
+                    {
+                        pwGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
+                        pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                    }
                 }
             }
             return true;
