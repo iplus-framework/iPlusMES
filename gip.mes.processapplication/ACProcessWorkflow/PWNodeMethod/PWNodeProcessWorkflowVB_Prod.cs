@@ -753,7 +753,8 @@ namespace gip.mes.processapplication
                         if ((isLastBatch
                                 && (!batchPlanEntry.DiffPartialCount.HasValue
                                     || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
-                            || totalSizeReached)
+                            || totalSizeReached
+                            || batchPlanEntry.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount)
                             batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Completed;
                         else if ((batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
                             || (!batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.PartialActualCount.HasValue))
