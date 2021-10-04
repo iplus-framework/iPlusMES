@@ -21,6 +21,7 @@ namespace gip.bso.masterdata
         #region const
         public const string ClassName = @"BSOPrint";
         public const string BGWorkerMehtod_LoadMachinesAndPrinters = "LoadMachinesAndPrinters";
+        public const string BGWorkerMehtod_RefreshPrintServers = "RefreshPrintServers";
         #endregion
 
         #region c'tors
@@ -407,7 +408,7 @@ namespace gip.bso.masterdata
                     _SelectedWindowsPrinter = value;
                     if (value != null)
                     {
-                        SelectedPrinterComponent = null;
+                        SelectedPrintServer = null;
                         PrinterName = value.PrinterName;
                     }
                     OnPropertyChanged("SelectedWindowsPrinter");
@@ -443,55 +444,55 @@ namespace gip.bso.masterdata
             return
                 windowsPrintersList
                 .Where(c => !configuredPrinters.Contains(c))
-                .Select(c => new PrinterInfo() { PrinterName = c })
+                .Select(c => new PrinterInfo() { PrinterName = c, Name = c })
                 .ToList();
         }
 
         #endregion
 
-        #region Properties ->  PrinterComponent
+        #region Properties ->  PrintServer
 
-        private PrinterInfo _SelectedPrinterComponent;
+        private PrinterInfo _SelectedPrintServer;
         /// <summary>
         /// Selected property for PrinterInfo
         /// </summary>
         /// <value>The selected ESCPosPrinter</value>
-        [ACPropertySelected(9999, "PrinterComponent", "en{'TODO: ESCPosPrinter'}de{'TODO: ESCPosPrinter'}")]
-        public PrinterInfo SelectedPrinterComponent
+        [ACPropertySelected(9999, "PrintServer", "en{'TODO: ESCPosPrinter'}de{'TODO: ESCPosPrinter'}")]
+        public PrinterInfo SelectedPrintServer
         {
             get
             {
-                return _SelectedPrinterComponent;
+                return _SelectedPrintServer;
             }
             set
             {
-                if (_SelectedPrinterComponent != value)
+                if (_SelectedPrintServer != value)
                 {
-                    _SelectedPrinterComponent = value;
+                    _SelectedPrintServer = value;
                     if (value != null)
                     {
                         SelectedWindowsPrinter = null;
                         PrinterName = value.PrinterACUrl;
                     }
-                    OnPropertyChanged("SelectedPrinterComponent");
+                    OnPropertyChanged("SelectedPrintServer");
                 }
             }
         }
 
 
-        private List<PrinterInfo> _PrinterComponentList;
+        private List<PrinterInfo> _PrintServerList;
         /// <summary>
         /// List property for PrinterInfo
         /// </summary>
         /// <value>The ESCPosPrinter list</value>
-        [ACPropertyList(9999, "PrinterComponent")]
-        public List<PrinterInfo> PrinterComponentList
+        [ACPropertyList(9999, "PrintServer")]
+        public List<PrinterInfo> PrintServerList
         {
             get
             {
-                if (_PrinterComponentList == null)
-                    _PrinterComponentList = new List<PrinterInfo>();
-                return _PrinterComponentList;
+                if (_PrintServerList == null)
+                    _PrintServerList = new List<PrinterInfo>();
+                return _PrintServerList;
             }
         }
 
@@ -526,6 +527,24 @@ namespace gip.bso.masterdata
         #endregion
 
         #endregion
+
+
+        #region LastPrintServersCacheDate
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "LastPrintServersCacheDate", "en{'Cache date'}de{'Cache-Datum'}")]
+        public DateTime? LastPrintServersCacheDate
+        {
+            get
+            {
+                return PrintManager.LastPrintServersCacheDate;
+            }
+        }
+
+        #endregion
+
 
         #endregion
 
@@ -562,15 +581,15 @@ namespace gip.bso.masterdata
                 ConfiguredPrinterList.Add(SelectedWindowsPrinter);
                 OnPropertyChanged("ConfiguredPrinterList");
             }
-            else if (SelectedPrinterComponent != null)
+            else if (SelectedPrintServer != null)
             {
                 if (CurrentFacility != null)
-                    SelectedPrinterComponent.FacilityNo = (CurrentFacility.Value as Facility).FacilityNo;
+                    SelectedPrintServer.FacilityNo = (CurrentFacility.Value as Facility).FacilityNo;
                 else if (SelectedMachine != null)
-                    SelectedPrinterComponent.MachineACUrl = SelectedMachine.ACUrl;
+                    SelectedPrintServer.MachineACUrl = SelectedMachine.ACUrl;
 
-                ConfiguredPrinterList.Add(SelectedPrinterComponent);
-                OnPropertyChanged("ConfiguredPrinterList");
+                ConfiguredPrinterList.Add(SelectedPrintServer);
+                OnPropertyChanged("PrintServerList");
             }
         }
 
@@ -578,14 +597,25 @@ namespace gip.bso.masterdata
         {
             return
                 ((CurrentFacility != null && CurrentFacility.Value != null) || SelectedMachine != null)
-                && (SelectedWindowsPrinter != null || SelectedPrinterComponent != null)
+                && (SelectedWindowsPrinter != null || SelectedPrintServer != null)
                 && !ConfiguredPrinterList.Any(c =>
                     (
                         (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
-                        || (SelectedPrinterComponent != null && c.PrinterACUrl == SelectedPrinterComponent.PrinterACUrl)
+                        || (SelectedPrintServer != null && c.PrinterACUrl == SelectedPrintServer.PrinterACUrl)
                     )
                     && ((SelectedMachine != null && SelectedMachine.ACUrl == c.MachineACUrl) || (CurrentFacility != null && c.FacilityNo == (CurrentFacility.Value as Facility).FacilityNo))
                 );
+        }
+
+
+        [ACMethodInfo(BSOPrint.ClassName, "en{'Refresh print servers'}de{'Druckserver aktualisieren'}", 9999)]
+
+        public void RefreshPrintServers()
+        {
+            if (BackgroundWorker.IsBusy)
+                return;
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_RefreshPrintServers);
+            ShowDialog(this, DesignNameProgressBar);
         }
 
         #endregion
@@ -611,6 +641,9 @@ namespace gip.bso.masterdata
                 case BGWorkerMehtod_LoadMachinesAndPrinters:
                     e.Result = DoLoadMachinesAndPrinters(worker, Database.ContextIPlus, ProjectManager);
                     break;
+                case BGWorkerMehtod_RefreshPrintServers:
+                    e.Result = DoRefreshPrintServer(worker, Database.ContextIPlus, ProjectManager);
+                    break;
             }
         }
 
@@ -631,56 +664,121 @@ namespace gip.bso.masterdata
             }
             else
             {
-                BSOPrinterWorkerResult = (WorkerResult)e.Result;
-                _PrinterComponentList = LoadPrinterComponentList();
-                _MachineList = LoadMachineList();
-                OnPropertyChanged("PrinterComponentList");
-                OnPropertyChanged("MachineList");
+                switch (command)
+                {
+                    case BGWorkerMehtod_LoadMachinesAndPrinters:
+                        BSOPrinterWorkerResult = (WorkerResult)e.Result;
+                        _PrintServerList = BSOPrinterWorkerResult.Printers;
+                        _MachineList = LoadMachineList();
+                        OnPropertyChanged("PrintServerList");
+                        OnPropertyChanged("MachineList");
+                        break;
+                    case BGWorkerMehtod_RefreshPrintServers:
+                        BSOPrinterWorkerResult = (WorkerResult)e.Result;
+                        _PrintServerList = BSOPrinterWorkerResult.Printers;
+                        OnPropertyChanged("PrintServerList");
+                        break;
+                }
+                OnPropertyChanged("LastPrintServersCacheDate");
             }
         }
 
         private WorkerResult DoLoadMachinesAndPrinters(ACBackgroundWorker worker, Database database, ACProjectManager projectManager)
         {
             WorkerResult workerResult = new WorkerResult();
-            workerResult.Printers = new List<IACComponent>();
+            workerResult.Printers = new List<PrinterInfo>();
             workerResult.Machines = new List<IACComponent>();
-
 
             List<gip.core.datamodel.ACProject> projects =
                 database
                 .ACProject
-                .Where(c => c.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application).ToList();
+                .Where(c => c.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application)
+                .ToList();
+
+            if (PrintManager.LastPrintServersCacheDate != null && !string.IsNullOrEmpty(PrintManager.PrintServers))
+                workerResult.Printers = JsonConvert.DeserializeObject<List<PrinterInfo>>(PrintManager.PrintServers);
 
             foreach (gip.core.datamodel.ACProject project in projects)
             {
                 worker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"Loading machines and printers for project {0} ...", project.ACProjectName);
                 gip.core.datamodel.ACProject acProject = projectManager.LoadACProject(project);
                 ACComponent rootACComponent = Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).FirstOrDefault();
-
                 List<ACComponent> machines = rootACComponent.FindChildComponents<ACComponent>(c => c is PAClassPhysicalBase);
-                List<ACComponent> printers = rootACComponent.FindChildComponents<ACComponent>(c => c is ACPrintServerBase);
-
                 if (machines != null)
                     workerResult.Machines.AddRange(machines);
-                if (printers != null)
-                    workerResult.Printers.AddRange(printers);
+
+                if (PrintManager.LastPrintServersCacheDate == null)
+                {
+                    List<ACComponent> printers = rootACComponent.FindChildComponents<ACComponent>(c => c is ACPrintServerBase);
+                    if (printers != null)
+                    {
+                        var tmpPrinters = printers
+                        .Select(c =>
+                                    new PrinterInfo()
+                                    {
+                                        PrinterACUrl = c.ACUrl,
+                                        Name = c.ACCaption
+                                    })
+                        .OrderBy(c => c.PrinterACUrl)
+                        .ToList();
+                        workerResult.Printers.AddRange(tmpPrinters);
+                    }
+                }
+            }
+
+            if (PrintManager.LastPrintServersCacheDate == null)
+            {
+                PrintManager.LastPrintServersCacheDate = DateTime.Now;
+                if (workerResult.Printers.Any())
+                    PrintManager.PrintServers = JsonConvert.SerializeObject(workerResult.Printers);
+                ACSaveChanges();
             }
             return workerResult;
         }
 
-        private List<PrinterInfo> LoadPrinterComponentList()
+        private WorkerResult DoRefreshPrintServer(ACBackgroundWorker worker, Database database, ACProjectManager projectManager)
         {
-            return
-                BSOPrinterWorkerResult
-                .Printers
-                //.Where(c => !ConfiguredPrinterList.Select(x => x.PrinterACUrl).Contains(c.ACUrl))
-                .Select(c =>
-                new PrinterInfo()
-                {
-                    PrinterACUrl = c.ACUrl
-                })
+            WorkerResult workerResult = new WorkerResult();
+            workerResult.Printers = new List<PrinterInfo>();
+
+            List<gip.core.datamodel.ACProject> projects =
+                database
+                .ACProject
+                .Where(c => c.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application)
                 .ToList();
+
+
+            foreach (gip.core.datamodel.ACProject project in projects)
+            {
+                worker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"Loading print servers for project {0} ...", project.ACProjectName);
+                gip.core.datamodel.ACProject acProject = projectManager.LoadACProject(project);
+                ACComponent rootACComponent = Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).FirstOrDefault();
+                List<ACComponent> printers = rootACComponent.FindChildComponents<ACComponent>(c => c is ACPrintServerBase);
+                if (printers != null)
+                {
+                    var tmpPrinters = printers
+                    .Select(c =>
+                                new PrinterInfo()
+                                {
+                                    PrinterACUrl = c.ACUrl,
+                                    Name = c.ACCaption
+                                })
+                    .OrderBy(c => c.PrinterACUrl)
+                    .ToList();
+                    workerResult.Printers.AddRange(tmpPrinters);
+                }
+            }
+
+            PrintManager.LastPrintServersCacheDate = DateTime.Now;
+            if (workerResult.Printers.Any())
+                PrintManager.PrintServers = JsonConvert.SerializeObject(workerResult.Printers);
+            else
+                PrintManager.PrintServers = null;
+            ACSaveChanges();
+            return workerResult;
         }
+
+
 
         private List<ACComponent> LoadMachineList()
         {
@@ -691,9 +789,9 @@ namespace gip.bso.masterdata
                 .ToList();
         }
 
-        protected struct WorkerResult
+        protected class WorkerResult
         {
-            public List<IACComponent> Printers { get; set; }
+            public List<PrinterInfo> Printers { get; set; }
             public List<IACComponent> Machines { get; set; }
         }
         #endregion
