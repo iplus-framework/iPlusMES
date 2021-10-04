@@ -572,7 +572,7 @@ namespace gip.mes.processapplication
                                     msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
                                                     intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                                                                              intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                                             intermediateChildPos.BookingMaterial.MaterialName1);
+                                                                             relation.SourceProdOrderPartslistPos.Material.MaterialName1);
 
                                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
