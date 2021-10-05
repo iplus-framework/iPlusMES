@@ -19,8 +19,6 @@ namespace gip.mes.facility
            : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _ConfiguredPrinters = new ACPropertyConfigValue<string>(this, "ConfiguredPrinters", "");
-            _PrintServers = new ACPropertyConfigValue<string>(this, "PrintServers", "");
-            _LastPrintServerCacheDate = new ACPropertyConfigValue<DateTime?>(this, "ComponentPrinter", null);
         }
         public const string C_DefaultServiceACIdentifier = "ACPrintManager";
 
@@ -78,34 +76,6 @@ namespace gip.mes.facility
             set
             {
                 _ConfiguredPrinters.ValueT = value;
-            }
-        }
-
-        private ACPropertyConfigValue<string> _PrintServers;
-        [ACPropertyConfig("en{'Print servers (cached)'}de{'Druckserver (zwischengespeichert)'}")]
-        public string PrintServers
-        {
-            get
-            {
-                return _PrintServers.ValueT;
-            }
-            set
-            {
-                _PrintServers.ValueT = value;
-            }
-        }
-
-        private ACPropertyConfigValue<DateTime?> _LastPrintServerCacheDate;
-        [ACPropertyConfig("en{'Cache date'}de{'Cache-Datum'}")]
-        public DateTime? LastPrintServersCacheDate
-        {
-            get
-            {
-                return _LastPrintServerCacheDate.ValueT;
-            }
-            set
-            {
-                _LastPrintServerCacheDate.ValueT = value;
             }
         }
 
@@ -202,6 +172,25 @@ namespace gip.mes.facility
                 }
             }
             return printerInfo;
+        }
+
+        public List<PrinterInfo> GetPrintServers()
+        {
+            gip.core.datamodel.ACClass basePrintServerClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(ACPrintServerBase));
+            IQueryable<gip.core.datamodel.ACClass> queryClasses = FacilityManager.s_cQry_GetAvailableModulesAsACClass(Database.ContextIPlus, basePrintServerClass.ACIdentifier);
+            List<PrinterInfo> printServers = new List<PrinterInfo>();
+            if(queryClasses != null && queryClasses.Any())
+            {
+                gip.core.datamodel.ACClass[] acClasses  = queryClasses.ToArray();
+                foreach(gip.core.datamodel.ACClass aCClass in acClasses)
+                {
+                    PrinterInfo printerInfo = new PrinterInfo();
+                    printerInfo.Name = aCClass.ACIdentifier;
+                    printerInfo.PrinterACUrl = ACItem.FactoryACUrlComponent(aCClass);
+                    printServers.Add(printerInfo);
+                }
+            }
+            return printServers;
         }
 
         #endregion
