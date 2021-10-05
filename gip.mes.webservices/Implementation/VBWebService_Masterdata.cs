@@ -274,7 +274,7 @@ namespace gip.mes.webservices
                     if (guid == Guid.Empty)
                         return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
                     Facility facility = s_cQry_GetFacility(dbApp, guid, null, null, null).FirstOrDefault();
-                    if (facility.ParentFacilityID != null)
+                    if (facility != null && facility.ParentFacilityID != null)
                         facility.ParentFacility = s_cQry_GetFacility(dbApp, facility.ParentFacilityID, null, null, null).FirstOrDefault();
                     return new WSResponse<Facility>(facility);
                 }
