@@ -272,6 +272,10 @@
     <Compile Include="TrackingCommon\TrackingCommonStart.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
+      <Project>{763EA3DC-3FB4-4D74-A252-A6A8811F0461}</Project>
+      <Name>gip.bso.iplus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
       <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
       <Name>gip.core.autocomponent</Name>

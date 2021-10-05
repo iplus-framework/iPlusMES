@@ -1,6 +1,6 @@
-﻿using gip.core.autocomponent;
+﻿using gip.bso.iplus;
+using gip.core.autocomponent;
 using gip.core.datamodel;
-using gip.core.reporthandler;
 using gip.mes.datamodel;
 using Newtonsoft.Json;
 using System;
@@ -19,8 +19,17 @@ namespace gip.mes.facility
            : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _ConfiguredPrinters = new ACPropertyConfigValue<string>(this, "ConfiguredPrinters", "");
+            _PrintServers = new ACPropertyConfigValue<string>(this, "PrintServers", "");
+            _LastPrintServerCacheDate = new ACPropertyConfigValue<DateTime?>(this, "ComponentPrinter", null);
         }
         public const string C_DefaultServiceACIdentifier = "ACPrintManager";
+
+
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            bool baseACInit = base.ACInit(startChildMode);
+            return baseACInit;
+        }
         #endregion
 
         #region Attach / Deattach
@@ -38,7 +47,26 @@ namespace gip.mes.facility
         }
         #endregion
 
-        #region Config
+        #region Properties
+
+        #region Properties -> Project Manager
+
+        ACProjectManager _ACProjectManager;
+        public ACProjectManager ProjectManager
+        {
+            get
+            {
+                if (_ACProjectManager != null)
+                    return _ACProjectManager;
+                _ACProjectManager = new ACProjectManager(Database, Root);
+                return _ACProjectManager;
+            }
+        }
+
+        #endregion
+
+        #region Properties -> Configuration
+
         private ACPropertyConfigValue<string> _ConfiguredPrinters;
         [ACPropertyConfig("en{'Configured printers'}de{'Konfigurierte Drucker'}")]
         public string ConfiguredPrinters
@@ -52,9 +80,39 @@ namespace gip.mes.facility
                 _ConfiguredPrinters.ValueT = value;
             }
         }
+
+        private ACPropertyConfigValue<string> _PrintServers;
+        [ACPropertyConfig("en{'Print servers (cached)'}de{'Druckserver (zwischengespeichert)'}")]
+        public string PrintServers
+        {
+            get
+            {
+                return _PrintServers.ValueT;
+            }
+            set
+            {
+                _PrintServers.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<DateTime?> _LastPrintServerCacheDate;
+        [ACPropertyConfig("en{'Cache date'}de{'Cache-Datum'}")]
+        public DateTime? LastPrintServersCacheDate
+        {
+            get
+            {
+                return _LastPrintServerCacheDate.ValueT;
+            }
+            set
+            {
+                _LastPrintServerCacheDate.ValueT = value;
+            }
+        }
+
         #endregion
 
-        #region xx
+        #region Properties -> ConfiguredPrinter
+
         private ObservableCollection<PrinterInfo> _ConfiguredPrinterList;
         /// <summary>
         /// List property for PrinterInfo
@@ -90,9 +148,13 @@ namespace gip.mes.facility
 
         #endregion
 
+        #endregion
+
         #region Methods
 
-        public Msg Print(PAOrderInfo pAOrderInfo, int copyCount)
+        #region Methods -> Public
+
+        public virtual Msg Print(PAOrderInfo pAOrderInfo, int copyCount)
         {
             Msg msg = null;
             try
@@ -127,7 +189,7 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public PrinterInfo GetPrinterInfo(PAOrderInfo pAOrderInfo)
+        public virtual PrinterInfo GetPrinterInfo(PAOrderInfo pAOrderInfo)
         {
             PrinterInfo printerInfo = null;
             using (DatabaseApp databaseApp = new DatabaseApp())
@@ -142,6 +204,10 @@ namespace gip.mes.facility
             return printerInfo;
         }
 
+        #endregion
+
+        #region Methods -> Private
+
         private PrinterInfo GetPrinterInfo(Facility facility)
         {
             PrinterInfo printerInfo = ConfiguredPrinterList.FirstOrDefault(c => c.FacilityNo == facility.FacilityNo);
@@ -149,6 +215,8 @@ namespace gip.mes.facility
                 printerInfo = GetPrinterInfo(facility.Facility1_ParentFacility);
             return printerInfo;
         }
+
+        #endregion
 
         #endregion
     }
