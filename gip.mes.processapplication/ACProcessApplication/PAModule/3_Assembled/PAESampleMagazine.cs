@@ -140,7 +140,9 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 999)]
         public virtual bool IsEnabledOnEmptySampleMagazine()
         {
-            if (GetSampleMagazineState() != SampleMagazineState.Idle)
+            SampleMagazineState state = GetSampleMagazineState();
+
+            if (state != SampleMagazineState.Idle && state != SampleMagazineState.Full)
                 return false;
 
             if (string.IsNullOrEmpty(PAFSamplingACUrl))
