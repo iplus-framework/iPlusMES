@@ -7,10 +7,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing.Printing;
 using System.Linq;
-using static System.Drawing.Printing.PrinterSettings;
 
 namespace gip.bso.masterdata
 {
@@ -346,12 +346,10 @@ namespace gip.bso.masterdata
             {
                 if (_ConfiguredPrinterList == null)
                 {
-                    if (string.IsNullOrEmpty(PrintManager.ConfiguredPrinters))
-                        _ConfiguredPrinterList = new ObservableCollection<PrinterInfo>();
-                    else
+                    if (PrintManager.ConfiguredPrintersConfig != null && PrintManager.ConfiguredPrintersConfig.Any())
                     {
-                        PrinterInfo[] tmpList = JsonConvert.DeserializeObject<PrinterInfo[]>(PrintManager.ConfiguredPrinters);
-                        _ConfiguredPrinterList = new ObservableCollection<PrinterInfo>(tmpList);
+                        PrinterInfo[] printerInfos = PrintManager.ConfiguredPrintersConfig.Select(c => c.Value as PrinterInfo).ToArray();
+                        _ConfiguredPrinterList = new ObservableCollection<PrinterInfo>(printerInfos);
                     }
                     _ConfiguredPrinterList.CollectionChanged += _ConfiguredPrinterList_CollectionChanged;
                 }
@@ -361,10 +359,21 @@ namespace gip.bso.masterdata
 
         private void _ConfiguredPrinterList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (_ConfiguredPrinterList.Any())
-                PrintManager.ConfiguredPrinters = JsonConvert.SerializeObject(_ConfiguredPrinterList.ToArray());
-            else
-                PrintManager.ConfiguredPrinters = null;
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                PrinterInfo newPrinterInfo = e.NewItems[0] as PrinterInfo;
+                core.datamodel.ACClassConfig newClassConfig = core.datamodel.ACClassConfig.NewACObject(Database.ContextIPlus, PrintManager.ACType);
+                newClassConfig.KeyACUrl = ACPrintManager.Const_KeyACUrl_ConfiguredPrintersConfig;
+                newClassConfig.Value = newPrinterInfo;
+                PrintManager.ConfiguredPrintersConfig.Add(newClassConfig);
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                PrinterInfo oldPrinterInfo = e.OldItems[0] as PrinterInfo;
+                core.datamodel.ACClassConfig existingConfig =
+                    PrintManager.ConfiguredPrintersConfig.Where(c => (c.Value as PrinterInfo) == oldPrinterInfo).FirstOrDefault();
+                PrintManager.ConfiguredPrintersConfig.Remove(existingConfig);
+            }
         }
 
         #endregion
@@ -417,7 +426,7 @@ namespace gip.bso.masterdata
         private List<PrinterInfo> LoadWindowsPrinterList()
         {
             string[] configuredPrinters = ConfiguredPrinterList.Select(c => c.PrinterName).ToArray();
-            StringCollection windowsPrinters = PrinterSettings.InstalledPrinters;
+            System.Drawing.Printing.PrinterSettings.StringCollection windowsPrinters = PrinterSettings.InstalledPrinters;
             List<string> windowsPrintersList = new List<string>();
             foreach (string printer in windowsPrinters)
             {
@@ -639,7 +648,7 @@ namespace gip.bso.masterdata
             if (queryClasses != null && queryClasses.Any())
             {
                 gip.core.datamodel.ACClass[] aCClasses = queryClasses.ToArray();
-                foreach(gip.core.datamodel.ACClass cClass in aCClasses)
+                foreach (gip.core.datamodel.ACClass cClass in aCClasses)
                 {
                     ACItem aCItem = new ACItem();
                     aCItem.ReadACClassData(cClass);

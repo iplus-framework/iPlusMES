@@ -1768,21 +1768,28 @@ namespace gip.bso.facility
         #endregion
 
         #region IACPrintPrepare
-        public override Msg PrintViaOrderInfo(string designName, string printerName, short numberOfCopies, PAOrderInfo wfOrderInfo)
+
+        public override Msg SetDataFromPAOrderInfo(PAOrderInfo wfOrderInfo)
         {
-            Msg msg = null;
-            if (wfOrderInfo != null && wfOrderInfo.Entities != null)
+            if (wfOrderInfo != null)
             {
                 PAOrderInfoEntry entry = wfOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
                 CurrentFacilityCharge = DatabaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
-                gip.core.datamodel.ACClassDesign design = GetDesign(designName);
-                if (design == null)
-                {
-                    Messages.Error(this, string.Format(@"The {0} report is missing!", designName));
-                    return new Msg();
-                }
-                msg = PrintDesign(design, printerName, numberOfCopies, false);
+                return null;
             }
+            return new Msg() { MessageLevel = eMsgLevel.Error, Message = "" };
+        }
+
+        public override Msg PrintViaOrderInfo(string designName, string printerName, short numberOfCopies)
+        {
+            Msg msg = null;
+            gip.core.datamodel.ACClassDesign design = GetDesign(designName);
+            if (design == null)
+            {
+                Messages.Error(this, string.Format(@"The {0} report is missing!", designName));
+                return new Msg();
+            }
+            msg = PrintDesign(design, printerName, numberOfCopies, false);
             return msg;
         }
         #endregion

@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Objects;
 using System.Linq;
 
 namespace gip.mes.facility
@@ -14,11 +15,15 @@ namespace gip.mes.facility
     public class ACPrintManager : PARole, IPrintManager
     {
 
+        #region const
+        public const string Const_KeyACUrl_ConfiguredPrintersConfig = ".\\ACClassProperty(ConfiguredPrintersConfig)";
+        #endregion
+
         #region c'tors
         public ACPrintManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
            : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _ConfiguredPrinters = new ACPropertyConfigValue<string>(this, "ConfiguredPrinters", "");
+
         }
         public const string C_DefaultServiceACIdentifier = "ACPrintManager";
 
@@ -63,57 +68,32 @@ namespace gip.mes.facility
 
         #endregion
 
-        #region Properties -> Configuration
+        #region Properties -> ConfiguredPrinters
 
-        private ACPropertyConfigValue<string> _ConfiguredPrinters;
-        [ACPropertyConfig("en{'Configured printers'}de{'Konfigurierte Drucker'}")]
-        public string ConfiguredPrinters
+        [ACPropertyPointConfig(9999, "", typeof(PrinterInfo), "en{'Configured printers'}de{'Konfigurierte Drucker'}")]
+        public List<gip.core.datamodel.ACClassConfig> ConfiguredPrintersConfig
         {
             get
             {
-                return _ConfiguredPrinters.ValueT;
-            }
-            set
-            {
-                _ConfiguredPrinters.ValueT = value;
-            }
-        }
-
-        #endregion
-
-        #region Properties -> ConfiguredPrinter
-
-        private ObservableCollection<PrinterInfo> _ConfiguredPrinterList;
-        /// <summary>
-        /// List property for PrinterInfo
-        /// </summary>
-        /// <value>The ConfiguredPrinters list</value>
-        [ACPropertyList(9999, "ConfiguredPrinter")]
-        public ObservableCollection<PrinterInfo> ConfiguredPrinterList
-        {
-            get
-            {
-                if (_ConfiguredPrinterList == null)
+                List<gip.core.datamodel.ACClassConfig> result = null;
+                ACClassTaskQueue.TaskQueue.ProcessAction(() =>
                 {
-                    if (string.IsNullOrEmpty(ConfiguredPrinters))
-                        _ConfiguredPrinterList = new ObservableCollection<PrinterInfo>();
-                    else
+                    try
                     {
-                        PrinterInfo[] tmpList = JsonConvert.DeserializeObject<PrinterInfo[]>(ConfiguredPrinters);
-                        _ConfiguredPrinterList = new ObservableCollection<PrinterInfo>(tmpList);
+                        ACTypeFromLiveContext.ACClassConfig_ACClass.Load(MergeOption.OverwriteChanges);
+                        var query = ACTypeFromLiveContext.ACClassConfig_ACClass.Where(c => c.KeyACUrl == Const_KeyACUrl_ConfiguredPrintersConfig);
+                        if (query.Any())
+                            result = query.ToList();
+                        else
+                            result = new List<gip.core.datamodel.ACClassConfig>();
                     }
-                    _ConfiguredPrinterList.CollectionChanged += _ConfiguredPrinterList_CollectionChanged;
-                }
-                return _ConfiguredPrinterList;
+                    catch (Exception e)
+                    {
+                        Messages.LogException(this.GetACUrl(), "ConfiguredPrintersConfig", e.Message);
+                    }
+                });
+                return result;
             }
-        }
-
-        private void _ConfiguredPrinterList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (_ConfiguredPrinterList.Any())
-                ConfiguredPrinters = JsonConvert.SerializeObject(_ConfiguredPrinterList.ToArray());
-            else
-                ConfiguredPrinters = null;
         }
 
         #endregion
@@ -146,7 +126,11 @@ namespace gip.mes.facility
                     msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = "Print(113) fail! No mandatory printer found!" };
 
                 if (msg == null)
-                    msg = bso.PrintViaOrderInfo(designName, printerInfo.PrinterName, (short)copyCount, pAOrderInfo);
+                {
+                    msg = bso.SetDataFromPAOrderInfo(pAOrderInfo);
+                    if (msg == null)
+                        msg = bso.PrintViaOrderInfo(designName, printerInfo.PrinterName, (short)copyCount);
+                }
 
                 if (msg != null)
                     Root.Messages.LogError(this.GetACUrl(), "Print(119)", msg.Message);
@@ -179,10 +163,10 @@ namespace gip.mes.facility
             gip.core.datamodel.ACClass basePrintServerClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(ACPrintServerBase));
             IQueryable<gip.core.datamodel.ACClass> queryClasses = FacilityManager.s_cQry_GetAvailableModulesAsACClass(Database.ContextIPlus, basePrintServerClass.ACIdentifier);
             List<PrinterInfo> printServers = new List<PrinterInfo>();
-            if(queryClasses != null && queryClasses.Any())
+            if (queryClasses != null && queryClasses.Any())
             {
-                gip.core.datamodel.ACClass[] acClasses  = queryClasses.ToArray();
-                foreach(gip.core.datamodel.ACClass aCClass in acClasses)
+                gip.core.datamodel.ACClass[] acClasses = queryClasses.ToArray();
+                foreach (gip.core.datamodel.ACClass aCClass in acClasses)
                 {
                     PrinterInfo printerInfo = new PrinterInfo();
                     printerInfo.Name = aCClass.ACIdentifier;
@@ -199,7 +183,7 @@ namespace gip.mes.facility
 
         private PrinterInfo GetPrinterInfo(Facility facility)
         {
-            PrinterInfo printerInfo = ConfiguredPrinterList.FirstOrDefault(c => c.FacilityNo == facility.FacilityNo);
+            PrinterInfo printerInfo = ConfiguredPrintersConfig.Select(c => c.Value as PrinterInfo).FirstOrDefault(c => c.FacilityNo == facility.FacilityNo);
             if (printerInfo == null && facility.Facility1_ParentFacility != null)
                 printerInfo = GetPrinterInfo(facility.Facility1_ParentFacility);
             return printerInfo;
