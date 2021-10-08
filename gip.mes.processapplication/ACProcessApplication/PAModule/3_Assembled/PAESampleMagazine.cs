@@ -176,7 +176,7 @@ namespace gip.mes.processapplication
             if (TargetPosition.ValueT == ActualPosition.ValueT || 
                 (ApplicationManager != null && ApplicationManager.IsSimulationOn && TargetPosition.ValueT == SimActualPosition))
             {
-                if (TargetPosition.ValueT > SampleMagazineSize)
+                if (TargetPosition.ValueT >= SampleMagazineSize)
                     return SampleMagazineState.Full;
                 return SampleMagazineState.Idle;
             }
