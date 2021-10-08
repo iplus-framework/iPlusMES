@@ -76,6 +76,10 @@
       <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
       <Name>gip.core.processapplication</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
+      <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.webservices\gip.core.webservices.csproj">
       <Project>{7931f65b-3c2a-4db9-a5a6-4bc5b4d12c00}</Project>
       <Name>gip.core.webservices</Name>

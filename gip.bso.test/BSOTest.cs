@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using gip.core.reporthandler;
 
 namespace gip.bso.test
 {
@@ -151,12 +152,12 @@ namespace gip.bso.test
             Guid ID = Guid.Empty;
             if(!string.IsNullOrEmpty(TestInput) && Guid.TryParse(TestInput, out ID))
             {
-                IPrintManager printManager = HelperPrintManager.GetServiceInstance(this) as IPrintManager;
-                if (printManager != null)
+                ACComponent printManager = ACPrintManager.GetServiceInstance(this);
+                if (printManager != null && printManager.ConnectionState == ACObjectConnectionState.Connected)
                 {
                     PAOrderInfo pAOrderInfo = new PAOrderInfo();
                     pAOrderInfo.Add(FacilityCharge.ClassName, ID);
-                    printManager.Print(pAOrderInfo, 1);
+                    printManager.ACUrlCommand("!Print", pAOrderInfo, 1);
                 }
             }
         }

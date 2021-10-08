@@ -1,0 +1,6 @@
+update ACClass set ACIdentifier = 'ACPrintManager', AssemblyQualifiedName = 'gip.core.reporthandler.ACPrintManager, gip.core.reporthandler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'ACPrintManager';
+update ACClass set ACIdentifier = 'ACPrintServerBase', AssemblyQualifiedName = 'gip.core.reporthandler.ACPrintServerBase, gip.core.reporthandler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'ACPrintServerBase';
+update ACClass set ACIdentifier = 'BSOPrint', AssemblyQualifiedName = 'gip.core.reporthandler.BSOPrint, gip.core.reporthandler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'BSOPrint';
+update ACClass set ACIdentifier = 'PrinterInfo', AssemblyQualifiedName = 'gip.core.reporthandler.PrinterInfo, gip.core.reporthandler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'PrinterInfo';
+update ACClass set ACIdentifier = 'PWNodePrint', AssemblyQualifiedName = 'gip.core.reporthandler.PWNodePrint, gip.core.reporthandler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'PWNodePrint';
+update ACClass set ACIdentifier = 'ESCPosPrinter', AssemblyQualifiedName = 'gip.core.communication.ESCPosPrinter, gip.core.communication, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'ESCPosPrinter';

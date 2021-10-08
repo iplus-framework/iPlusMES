@@ -106,7 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Facility\BSOFacility.cs" />
-    <Compile Include="Facility\BSOPrint.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
     <Compile Include="Logistics\MDBSOTransportMode.cs" />

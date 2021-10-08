@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using gip.core.reporthandler;
 
 namespace gip.mes.webservices
 {
@@ -88,11 +89,11 @@ namespace gip.mes.webservices
             if (printEntity.Sequence == null || !printEntity.Sequence.Any())
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "No elements in Barcode Entity sequence!"));
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-            IPrintManager printManager = HelperPrintManager.GetServiceInstance(myServiceHost) as IPrintManager;
+            ACPrintManager printManager = ACPrintManager.GetServiceInstance(myServiceHost) as ACPrintManager;
             if(printManager == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PrintManager instance is null!"));
             PAOrderInfo pAOrderInfo = GetPAOrderInfo(printEntity.Sequence.ToArray());
-            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount);
+            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount) as Msg;
             return new WSResponse<bool>(msg == null) { Message = msg };
         }
 
