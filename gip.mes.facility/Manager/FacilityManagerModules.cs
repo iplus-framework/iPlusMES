@@ -61,7 +61,7 @@ namespace gip.mes.facility
 
         public gip.core.datamodel.ACClass GetACClassForIdentifier(string acIdentifier, Database db)
         {
-            return s_cQry_ACClassIdentifier(db, acIdentifier);
+            return ACClassManager.s_cQry_ACClassIdentifier(db, acIdentifier);
         }
 
 
@@ -88,42 +88,14 @@ namespace gip.mes.facility
 
         #endregion
 
-        #region Precompiled Queries
-        public static readonly Func<Database, string, gip.core.datamodel.ACClass> s_cQry_ACClassIdentifier =
-        CompiledQuery.Compile<Database, string, gip.core.datamodel.ACClass>(
-            (ctx, acIdentifier) => ctx.ACClass.Where(c => c.ACIdentifier == acIdentifier).FirstOrDefault()
-        );
-
-        public static readonly Func<Database, string, IQueryable<gip.core.datamodel.ACClass>> s_cQry_GetAvailableModulesAsACClass =
-        CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
-            (ctx, acIdentifier) => ctx.ACClass.Where(c => (c.BasedOnACClassID.HasValue
-                                                            && (c.ACClass1_BasedOnACClass.ACIdentifier == acIdentifier // 1. Ableitungsstufe
-                                                                || (c.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
-                                                                        && (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == acIdentifier // 2. Ableitungsstufe
-                                                                            || (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
-                                                                                        && (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == acIdentifier // 3. Ableitungsstufe
-                                                                                            || (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
-                                                                                                && c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == acIdentifier) // 4. Ableitungsstufe
-                                                                                            )
-                                                                                )
-                                                                            )
-                                                                    )
-                                                                )
-                                                            )
-                                                            && c.ACProject != null && c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application)
-                                                            .OrderBy(c => c.ACIdentifier)
-        );
-
-
-        #endregion
-
         #region DeliveryNotePos
 
         #region Available Modules
 
         public virtual IList<gip.core.datamodel.ACClass> GetAvailableIntakeModulesAsACClass(Database db)
         {
-            return s_cQry_GetAvailableModulesAsACClass(db, C_IntakeClass).ToList();
+            
+            return ACClassManager.s_cQry_GetAvailableModulesAsACClass(db, C_IntakeClass).ToList();
         }
 
 
@@ -148,7 +120,7 @@ namespace gip.mes.facility
                 return result.Routes.Select(c => c.Last().Target).OrderBy(c => c.ACIdentifier).ToList();
             else
             {
-                gip.core.datamodel.ACClass acClassSilo = s_cQry_ACClassIdentifier(db, C_SiloClass);
+                gip.core.datamodel.ACClass acClassSilo = ACClassManager.s_cQry_ACClassIdentifier(db, C_SiloClass);
                 if (acClassSilo == null || acClassSilo.ObjectType == null)
                     return null;
                 return result.Routes.Select(c => c.Last().Target)

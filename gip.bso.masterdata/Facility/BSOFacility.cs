@@ -1,11 +1,8 @@
 ﻿using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
-using Microsoft.WindowsAPICodePack.ShellExtensions;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Spatial;
 using System.Linq;
 
 namespace gip.bso.masterdata
