@@ -2151,9 +2151,7 @@ namespace gip.bso.sales
 
         public bool IsEnabledCreateInvoice()
         {
-            return CurrentOutOrder != null
-                && OutDeliveryNoteManager != null
-                && !CurrentOutOrder.OutOrderPos_OutOrder.SelectMany(c => c.InvoicePos_OutOrderPos).Any();
+            return CurrentOutOrder != null && OutDeliveryNoteManager != null;
         }
         #endregion
 
