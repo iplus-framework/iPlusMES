@@ -26,7 +26,7 @@ namespace gip.mes.processapplication.Manager
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            bool initSuccess =  base.ACInit(startChildMode);
+            bool initSuccess = base.ACInit(startChildMode);
 
             _PrintManager = ACPrintManager.ACRefToServiceInstance(this);
             if (_PrintManager == null)
@@ -36,7 +36,7 @@ namespace gip.mes.processapplication.Manager
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            bool deinitSuccess =  base.ACDeInit(deleteACClassTask);
+            bool deinitSuccess = base.ACDeInit(deleteACClassTask);
 
             if (_PrintManager != null)
                 ACPrintManager.DetachACRefFromServiceInstance(this, _PrintManager);
@@ -95,30 +95,30 @@ namespace gip.mes.processapplication.Manager
         {
             Guid? facilityID = null;
             Guid? aCClassID = null;
-            if (pAOrderInfo.Entities.Any(c=>c.EntityName == Facility.ClassName))
-                facilityID = pAOrderInfo.Entities.Where(c=>c.EntityName == Facility.ClassName).Select(c=>c.EntityID).FirstOrDefault();
-            else if(pAOrderInfo.Entities.Any(c=>c.EntityName == FacilityCharge.ClassName))
+            if (pAOrderInfo.Entities.Any(c => c.EntityName == Facility.ClassName))
+                facilityID = pAOrderInfo.Entities.Where(c => c.EntityName == Facility.ClassName).Select(c => c.EntityID).FirstOrDefault();
+            else if (pAOrderInfo.Entities.Any(c => c.EntityName == FacilityCharge.ClassName))
             {
                 Guid facilityChargeID = pAOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).Select(c => c.EntityID).FirstOrDefault();
-                FacilityCharge facilityCharge = (Database as gip.mes.datamodel.DatabaseApp).FacilityCharge.FirstOrDefault(c=>c.FacilityChargeID  == facilityChargeID);
+                FacilityCharge facilityCharge = (Database as gip.mes.datamodel.DatabaseApp).FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
                 facilityID = facilityCharge.FacilityID;
             }
-            else if(pAOrderInfo.Entities.Any(c=>c.EntityName == gip.core.datamodel.ACClass.ClassName))
+            else if (pAOrderInfo.Entities.Any(c => c.EntityName == gip.core.datamodel.ACClass.ClassName))
                 aCClassID = pAOrderInfo.Entities.Where(c => c.EntityName == gip.core.datamodel.ACClass.ClassName).Select(c => c.EntityID).FirstOrDefault();
 
 
             PrinterInfo printerInfo = null;
             gip.core.datamodel.ACClass aCClass = null;
             List<PrinterInfo> configuredPrinters = null;
-            using(Database database = new core.datamodel.Database())
+            using (Database database = new core.datamodel.Database())
             {
-                configuredPrinters = ACPrintManager.GetConfiguredPrinters(database, PrintManager.ComponentClass.ACClassID);
-                if(aCClassID != null)
+                configuredPrinters = ACPrintManager.GetConfiguredPrinters(database, PrintManager.ComponentClass.ACClassID, false);
+                if (aCClassID != null)
                     aCClass = database.ACClass.FirstOrDefault();
             }
-            
-           
-            if(facilityID != null)
+
+
+            if (facilityID != null)
                 printerInfo = GetPrinterInfoFromFacility(facilityID, configuredPrinters);
             else
                 printerInfo = GetPrinterInfoFromMachine(aCClass, configuredPrinters);
@@ -127,24 +127,24 @@ namespace gip.mes.processapplication.Manager
 
         private PrinterInfo GetPrinterInfoFromFacility(Guid? facilityID, List<PrinterInfo> configuredPrinters)
         {
-            using(DatabaseApp databaseApp = new DatabaseApp())
+            using (DatabaseApp databaseApp = new DatabaseApp())
             {
-                Facility facility = databaseApp.Facility.FirstOrDefault(c=>c.FacilityID == facilityID); 
+                Facility facility = databaseApp.Facility.FirstOrDefault(c => c.FacilityID == facilityID);
                 return GetPrinterInfoFromFacility(facility, configuredPrinters);
             }
         }
 
         private PrinterInfo GetPrinterInfoFromFacility(Facility facility, List<PrinterInfo> configuredPrinters)
         {
-            PrinterInfo printerInfo = configuredPrinters.FirstOrDefault(c=>c.FacilityID == facility.FacilityID);
-            if(printerInfo == null && facility.Facility1_ParentFacility != null)
+            PrinterInfo printerInfo = configuredPrinters.FirstOrDefault(c => c.FacilityID == facility.FacilityID);
+            if (printerInfo == null && facility.Facility1_ParentFacility != null)
                 printerInfo = GetPrinterInfoFromFacility(facility.Facility1_ParentFacility, configuredPrinters);
             return printerInfo;
         }
 
         private PrinterInfo GetPrinterInfoFromMachine(gip.core.datamodel.ACClass acClass, List<PrinterInfo> configuredPrinters)
         {
-            return configuredPrinters.FirstOrDefault(c=>c.MachineACUrl ==  acClass.ACURLCached);
+            return configuredPrinters.FirstOrDefault(c => c.MachineACUrl == acClass.ACURLCached);
         }
 
         #endregion

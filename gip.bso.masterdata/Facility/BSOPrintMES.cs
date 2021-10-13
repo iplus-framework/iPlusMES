@@ -145,6 +145,11 @@ namespace gip.bso.masterdata
         #region Methods
 
         #region Methods -> Overrides
+        public override void LoadConfiguredPrinters()
+        {
+            ConfiguredPrinterList = ACPrintManager.GetConfiguredPrinters(Database as gip.core.datamodel.Database, PrintManager.ComponentClass.ACClassID, false);
+        }
+
 
         public override void OnSelectedMachineChanged(ACItem machine)
         {
