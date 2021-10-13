@@ -1769,7 +1769,7 @@ namespace gip.bso.facility
 
         #region IACPrintPrepare
 
-        public override Msg SetDataFromPAOrderInfo(PAOrderInfo wfOrderInfo)
+        public override Msg SetOrderInfo(PAOrderInfo wfOrderInfo)
         {
             if (wfOrderInfo != null)
             {

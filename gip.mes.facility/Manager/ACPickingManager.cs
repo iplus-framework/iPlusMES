@@ -1294,7 +1294,7 @@ namespace gip.mes.facility
             Msg msg = null;
 
             Type siloType = null;
-            gip.core.datamodel.ACClass acClassSilo = FacilityManager.s_cQry_ACClassIdentifier(dbiPlus, FacilityManager.SiloClass);
+            gip.core.datamodel.ACClass acClassSilo = ACClassManager.s_cQry_ACClassIdentifier(dbiPlus, FacilityManager.SiloClass);
             if (acClassSilo != null)
                 siloType = acClassSilo.ObjectType;
             if (acClassSilo == null || siloType == null)

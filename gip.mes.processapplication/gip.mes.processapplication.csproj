@@ -104,6 +104,7 @@
     <Compile Include="Manager\DischargingItemManager.cs" />
     <Compile Include="Manager\DischargingItemNoValidator.cs" />
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
+    <Compile Include="Manager\PAOrderInfoManagerMES.cs" />
     <Compile Include="Model\DosingRestInfo.cs" />
     <Compile Include="Model\EndPListMode.cs" />
     <Compile Include="Model\StartNextStageMode.cs" />
@@ -169,6 +170,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
       <Project>{66484708-85BD-47C4-92DD-3010387465F4}</Project>
       <Name>gip.core.processapplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6AD88CAF-A168-4BC2-9ECE-F62E7B216465}</Project>
+      <Name>gip.core.reporthandler</Name>
     </ProjectReference>
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
       <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>

@@ -129,6 +129,10 @@
       <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
       <Name>gip.core.datamodel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6AD88CAF-A168-4BC2-9ECE-F62E7B216465}</Project>
+      <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
       <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
       <Name>gip.mes.autocomponent</Name>

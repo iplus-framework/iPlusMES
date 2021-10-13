@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Facility\BSOFacility.cs" />
+    <Compile Include="Facility\BSOPrintMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
     <Compile Include="Logistics\MDBSOTransportMode.cs" />
@@ -306,10 +307,10 @@
     <None Include="VBControlScripts\2021-09-26 20-41_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-10-05 15-20_aaginic.zip">
+    <None Include="VBControlScripts\2021-10-07 17-27_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2021-10-07 17-27_dlisak.zip">
+    <None Include="VBControlScripts\2021-10-12 15-09_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
