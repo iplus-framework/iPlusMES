@@ -1218,6 +1218,11 @@ namespace gip.mes.facility
                 pickingPos.FromFacility = relocationBooking.OutwardFacility;
                 pickingPos.ToFacility = relocationBooking.InwardFacility;
             }
+            else if (relocationBooking.OutwardMaterial != null && relocationBooking.InwardFacility != null)
+            {
+                pickingPos.PickingMaterial = relocationBooking.OutwardMaterial;
+                pickingPos.ToFacility = relocationBooking.InwardFacility;
+            }
             pickingPos.PickingQuantityUOM = relocationBooking.OutwardQuantity;
             if (setReadyToLoad)
                 pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad).FirstOrDefault();
@@ -1308,133 +1313,245 @@ namespace gip.mes.facility
             foreach (PickingPos pos in picking.PickingPos_Picking.Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                         .OrderBy(c => c.Sequence))
             {
-                if (pos.FromFacility == null || pos.ToFacility == null || pos.FromFacility.MDFacilityType == null || pos.ToFacility.MDFacilityType == null)
+                if (pos.FromFacility != null)
                 {
-                    //Error50113: No source, no target or no facilitytype defined in Line {0}.
-                    msg = new Msg
-                    {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "CheckResourcesAndRouting(20)",
-                        Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
-                    };
-                    detailMessages.AddDetailMessage(msg);
-                    continue;
+                    CheckResourcesAndRoutingKnownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType);
                 }
-                if (!pos.FromFacility.VBiFacilityACClassID.HasValue || !pos.ToFacility.VBiFacilityACClassID.HasValue)
+                else
                 {
-                    //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
-                    msg = new Msg
-                    {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "CheckResourcesAndRouting(30)",
-                        Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
-                    };
-                    detailMessages.AddDetailMessage(msg);
-                    continue;
+                    CheckResourcesAndRoutingUnknownSource(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, pos, siloType);
                 }
-
-                if (validationBehaviour == PARole.ValidationBehaviour.Strict
-                    && pos.FromFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
-                    && pos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
-                {
-                    if (!pos.FromFacility.MaterialID.HasValue)
-                    {
-                        //Error50115: No Material assigned to Bin/Silo/Container {0}.
-                        msg = new Msg
-                        {
-                            Source = GetACUrl(),
-                            MessageLevel = eMsgLevel.Error,
-                            ACIdentifier = "CheckResourcesAndRouting(40)",
-                            Message = Root.Environment.TranslateMessage(this, "Error50115", pos.FromFacility.FacilityNo)
-                        };
-                        detailMessages.AddDetailMessage(msg);
-                        continue;
-                    }
-                    if (pos.ToFacility.MaterialID.HasValue && pos.FromFacility.MaterialID.HasValue && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.FromFacility.Material))
-                    {
-                        //Error50116: Material {0} in source {1} is not equal to Material {2} in target {3}.
-                        msg = new Msg
-                        {
-                            Source = GetACUrl(),
-                            MessageLevel = eMsgLevel.Error,
-                            ACIdentifier = "CheckResourcesAndRouting(50)",
-                            Message = Root.Environment.TranslateMessage(this, "Error50116",
-                                    pos.FromFacility.Material.MaterialNo, pos.FromFacility.FacilityNo,
-                                    pos.ToFacility.Material.MaterialNo, pos.ToFacility.FacilityNo)
-                        };
-                        detailMessages.AddDetailMessage(msg);
-                        continue;
-                    }
-                    if (pos.ToFacility.PartslistID.HasValue && pos.FromFacility.PartslistID.HasValue && pos.ToFacility.PartslistID.Value != pos.FromFacility.PartslistID.Value)
-                    {
-                        //Error50117: Bill of material {0} in source {1} is not equal to Bill of material {2} in target {3}.
-                        msg = new Msg
-                        {
-                            Source = GetACUrl(),
-                            MessageLevel = eMsgLevel.Error,
-                            ACIdentifier = "CheckResourcesAndRouting(60)",
-                            Message = Root.Environment.TranslateMessage(this, "Error50117",
-                                    pos.FromFacility.Partslist.PartslistNo, pos.FromFacility.FacilityNo,
-                                    pos.ToFacility.Partslist.PartslistNo, pos.ToFacility.FacilityNo)
-                        };
-                        detailMessages.AddDetailMessage(msg);
-                        continue;
-                    }
-                    if (!pos.ToFacility.InwardEnabled)
-                    {
-                        //Error50118: Inward to Bin/Silo/Container {0} is not enabled.
-                        msg = new Msg
-                        {
-                            Source = GetACUrl(),
-                            MessageLevel = eMsgLevel.Error,
-                            ACIdentifier = "CheckResourcesAndRouting(70)",
-                            Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
-                        };
-                        detailMessages.AddDetailMessage(msg);
-                        continue;
-                    }
-                    if (!pos.FromFacility.OutwardEnabled)
-                    {
-                        //Error50119: Outward from Bin/Silo/Container {0} is not enabled.
-                        msg = new Msg
-                        {
-                            Source = GetACUrl(),
-                            MessageLevel = eMsgLevel.Error,
-                            ACIdentifier = "CheckResourcesAndRouting(80)",
-                            Message = Root.Environment.TranslateMessage(this, "Error50119", pos.FromFacility.FacilityNo)
-                        };
-                        detailMessages.AddDetailMessage(msg);
-                        continue;
-                    }
-                }
-
-                var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
-                var toClass = pos.ToFacility.GetFacilityACClass(dbiPlus);
-
-                RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
-                                        fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
-                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)), // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                        0, true, true, false, false, 10);
-                if (result.Routes == null || !result.Routes.Any())
-                {
-                    //Error50120: No route found for transport from {0} to {1}
-                    msg = new Msg
-                    {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "CheckResourcesAndRouting(90)",
-                        Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
-                    };
-                    detailMessages.AddDetailMessage(msg);
-                    continue;
-                }
-
             }
         }
 
+        private void CheckResourcesAndRoutingKnownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType)
+        {
+            Msg msg;
+
+            if (pos.FromFacility == null || pos.ToFacility == null || pos.FromFacility.MDFacilityType == null || pos.ToFacility.MDFacilityType == null)
+            {
+                //Error50113: No source, no target or no facilitytype defined in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+            if (!pos.FromFacility.VBiFacilityACClassID.HasValue || !pos.ToFacility.VBiFacilityACClassID.HasValue)
+            {
+                //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+
+            if (validationBehaviour == PARole.ValidationBehaviour.Strict
+                && pos.FromFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
+                && pos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+            {
+                if (!pos.FromFacility.MaterialID.HasValue)
+                {
+                    //Error50115: No Material assigned to Bin/Silo/Container {0}.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(40)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50115", pos.FromFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+                if (pos.ToFacility.MaterialID.HasValue && pos.FromFacility.MaterialID.HasValue && !Material.IsMaterialEqual(pos.ToFacility.Material, pos.FromFacility.Material))
+                {
+                    //Error50116: Material {0} in source {1} is not equal to Material {2} in target {3}.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(50)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50116",
+                                pos.FromFacility.Material.MaterialNo, pos.FromFacility.FacilityNo,
+                                pos.ToFacility.Material.MaterialNo, pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+                if (pos.ToFacility.PartslistID.HasValue && pos.FromFacility.PartslistID.HasValue && pos.ToFacility.PartslistID.Value != pos.FromFacility.PartslistID.Value)
+                {
+                    //Error50117: Bill of material {0} in source {1} is not equal to Bill of material {2} in target {3}.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(60)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50117",
+                                pos.FromFacility.Partslist.PartslistNo, pos.FromFacility.FacilityNo,
+                                pos.ToFacility.Partslist.PartslistNo, pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+                if (!pos.ToFacility.InwardEnabled)
+                {
+                    //Error50118: Inward to Bin/Silo/Container {0} is not enabled.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(70)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+                if (!pos.FromFacility.OutwardEnabled)
+                {
+                    //Error50119: Outward from Bin/Silo/Container {0} is not enabled.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(80)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50119", pos.FromFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+            }
+
+            var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
+            var toClass = pos.ToFacility.GetFacilityACClass(dbiPlus);
+
+            RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
+                                    fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
+                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pos.ToFacility.VBiFacilityACClassID == c.ACClassID,
+                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && (pos.FromFacility.VBiFacilityACClassID == c.ACClassID || siloType.IsAssignableFrom(c.ObjectType)), // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
+                                    0, true, true, false, false, 10);
+            if (result.Routes == null || !result.Routes.Any())
+            {
+                //Error50120: No route found for transport from {0} to {1}
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(90)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50120", pos.FromFacility.FacilityNo, pos.ToFacility.FacilityNo)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+        }
+
+        private void CheckResourcesAndRoutingUnknownSource(DatabaseApp dbApp, Database dbiPlus, Picking picking, List<IACConfigStore> configStores,
+                                                         PARole.ValidationBehaviour validationBehaviour, MsgWithDetails detailMessages, PickingPos pos, Type siloType)
+        {
+            Msg msg;
+
+            if (pos.ToFacility == null || pos.ToFacility.MDFacilityType == null)
+            {
+                //Error50113: No source, no target or no facilitytype defined in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(20)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50113", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+
+            if (!pos.ToFacility.VBiFacilityACClassID.HasValue)
+            {
+                //Error50114: Source or target is not referenced to a Processmodule-instance in Line {0}.
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50114", pos.Sequence)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+
+            if (pos.ToFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer && !pos.PickingMaterialID.HasValue)
+            {
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(30)",
+                    Message = "No material assigned to picking position."
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+
+            if (validationBehaviour == PARole.ValidationBehaviour.Strict
+                    && pos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+            {
+                if (!pos.ToFacility.MaterialID.HasValue && pos.PickingMaterialID.HasValue)
+                {
+                    //Error50115: No Material assigned to Bin/Silo/Container {0}.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(40)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50115", pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+
+                if (!pos.ToFacility.InwardEnabled)
+                {
+                    //Error50118: Inward to Bin/Silo/Container {0} is not enabled.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "CheckResourcesAndRouting(70)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50118", pos.ToFacility.FacilityNo)
+                    };
+                    detailMessages.AddDetailMessage(msg);
+                    return;
+                }
+            }
+
+
+            IList<Facility> possibleSilos = null;
+            core.datamodel.ACClass compClass = pos.ToFacility.FacilityACClass;
+
+            IEnumerable<Route> routes = GetRoutes(pos, dbApp, dbiPlus, compClass, ACPartslistManager.SearchMode.SilosWithOutwardEnabled, null, out possibleSilos, null);
+
+            if (routes == null || !routes.Any())
+            {
+                //Error50120: No route found for transport from {0} to {1}
+                msg = new Msg
+                {
+                    Source = GetACUrl(),
+                    MessageLevel = eMsgLevel.Error,
+                    ACIdentifier = "CheckResourcesAndRouting(90)",
+                    Message = Root.Environment.TranslateMessage(this, "Error50120", "", pos.ToFacility.FacilityNo)
+                };
+                detailMessages.AddDetailMessage(msg);
+                return;
+            }
+        }
 
 
         //protected gip.mes.datamodel.ACClass[] ApplyRulesOnProjects(Database dbiPlus, gip.mes.datamodel.ACClass[] possibleProjects, MapPosToWFConn mapPosWF, List<IACConfigStore> configStores)
@@ -1483,6 +1600,216 @@ namespace gip.mes.facility
         #endregion
 
         #endregion
+
+        #endregion
+
+        #region Routing
+
+        public virtual IEnumerable<Route> GetRoutes(PickingPos pickingPos,
+                                DatabaseApp dbApp, Database dbIPlus,
+                                gip.core.datamodel.ACClass currentProcessModule,
+                                ACPartslistManager.SearchMode searchMode,
+                                DateTime? filterTimeOlderThan,
+                                out IList<Facility> possibleSilos,
+                                Guid? ignoreFacilityID,
+                                IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
+                                ACValueList projSpecificParams = null,
+                                bool onlyContainer = true)
+        {
+            if (currentProcessModule == null)
+            {
+                throw new NullReferenceException("AccessedProcessModule is null");
+            }
+
+            possibleSilos = FindSilos(pickingPos, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, exclusionList, projSpecificParams, onlyContainer);
+            if (possibleSilos == null || !possibleSilos.Any())
+                return null;
+
+            RoutingResult result = null;
+            if (searchMode == ACPartslistManager.SearchMode.OnlyEnabledOldestSilo)
+            {
+                Facility oldestSilo = possibleSilos.FirstOrDefault();
+                if (oldestSilo == null)
+                    return null;
+                if (!oldestSilo.VBiFacilityACClassID.HasValue)
+                    return null;
+                var oldestSiloClass = oldestSilo.GetFacilityACClass(dbIPlus);
+
+                result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
+                                        currentProcessModule, oldestSiloClass, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && oldestSilo.VBiFacilityACClassID == c.ACClassID,
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
+                                        0, true, true, false, false, 10);
+                if (result.Routes == null || !result.Routes.Any())
+                {
+                    // TODO: Fehler
+                    return null;
+                }
+            }
+            else
+            {
+                // 2. Suche Routen zu dieser Waage die von den vorgeschlagenen Silos aus führen
+                var acClassIDsOfPossibleSilos = possibleSilos.Where(c => c.VBiFacilityACClassID.HasValue).Select(c => c.VBiFacilityACClassID.Value);
+                IEnumerable<string> possibleSilosACUrl = possibleSilos.Where(c => c.FacilityACClass != null).Select(x => x.FacilityACClass.GetACUrlComponent());
+
+                result = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
+                                        currentProcessModule, possibleSilosACUrl, RouteDirections.Backwards, "PAMSilo.Deselector", new object[] { },
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && acClassIDsOfPossibleSilos.Contains(c.ACClassID),
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != currentProcessModule.ACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
+                                        0, true, true, false, false, 10);
+
+                if (result.Routes == null || !result.Routes.Any())
+                {
+                    // TODO: Fehler
+                    return null;
+                }
+            }
+            return result.Routes;
+        }
+
+        public virtual IList<Facility> FindSilos(PickingPos pickingPos,
+                                DatabaseApp dbApp, Database dbIPlus,
+                                ACPartslistManager.SearchMode searchMode,
+                                DateTime? filterTimeOlderThan,
+                                Guid? ignoreFacilityID,
+                                IEnumerable<gip.core.datamodel.ACClass> exclusionList = null,
+                                ACValueList projSpecificParams = null,
+                                bool onlyContainer = true)
+        {
+            IList<Facility> possibleSilos = null;
+            Material material = pickingPos.Material;
+
+            // 1. Suche freie Silos, mit dem zu dosierenden Material + die Freigegeben sind + die keine gesperrte Chargen haben
+            // soriert nach der ältesten eingelagerten Charge
+            ACPartslistManager.QrySilosResult facilityQuery = null;
+            if (material != null)
+            {
+                if (filterTimeOlderThan.HasValue)
+                {
+                    facilityQuery = SilosWithMaterial(dbApp, pickingPos, filterTimeOlderThan.Value, searchMode != ACPartslistManager.SearchMode.AllSilos, projSpecificParams, onlyContainer);
+                }
+                else
+                {
+                    facilityQuery = SilosWithMaterial(dbApp, pickingPos, searchMode != ACPartslistManager.SearchMode.AllSilos, projSpecificParams, onlyContainer);
+                }
+            }
+
+            possibleSilos = facilityQuery.FoundSilos
+                            .ToList()
+                            .Distinct()
+                            .Where(c => !c.QryHasBlockedQuants.Any())
+                            .ToList();
+            ACPartslistManager.RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
+
+            return possibleSilos;
+        }
+
+        /// <summary>
+        /// Queries Silos 
+        /// which contains this material 
+        /// </summary>
+        virtual public ACPartslistManager.QrySilosResult SilosWithMaterial(DatabaseApp ctx,
+                                                        PickingPos pickingPos,
+                                                        bool checkOutwardEnabled = true,
+                                                        ACValueList projSpecificParams = null,
+                                                        bool onlyContainer = true)
+        {
+            try
+            {
+                Material material = pickingPos?.Material;
+                if (material == null)
+                    return new ACPartslistManager.QrySilosResult(new List<Facility>());
+
+                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterial(ctx, material, checkOutwardEnabled, onlyContainer).ToArray().Distinct().ToList());
+            }
+            catch (Exception ec)
+            {
+                string msg = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msg += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException("ACPartslistManager", "SilosWithMaterial(110)", msg);
+
+                return new ACPartslistManager.QrySilosResult(new List<Facility>());
+            }
+        }
+
+        virtual public ACPartslistManager.QrySilosResult SilosWithMaterial(DatabaseApp ctx,
+                                                        PickingPos pickingPos,
+                                                        DateTime filterTimeOlderThan,
+                                                        bool checkOutwardEnabled = true,
+                                                        ACValueList projSpecificParams = null,
+                                                        bool onlyContainer = true)
+        {
+            try
+            {
+                Material material = pickingPos?.Material;
+                if (material == null)
+                    return new ACPartslistManager.QrySilosResult(new List<Facility>());
+
+                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterialTime(ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer).ToArray().Distinct().ToList());
+            }
+            catch (Exception ec)
+            {
+                string msg = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msg += " Inner:" + ec.InnerException.Message;
+
+                Messages.LogException("ACPartslistManager", "SilosWithMaterial(110)", msg);
+
+                return new ACPartslistManager.QrySilosResult(new List<Facility>());
+            }
+        }
+
+        /// <summary>
+        /// Queries Silos 
+        /// which contains this material 
+        /// </summary>
+        protected static readonly Func<DatabaseApp, Material, bool, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterial =
+        CompiledQuery.Compile<DatabaseApp, Material, bool, bool, IQueryable<Facility>>(
+            (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+                                                .Include("Facility.FacilityStock_Facility")
+                                                .Where(c => c.NotAvailable == false
+                                                        && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
+                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                        && ((!onlyContainer
+                                                                && ((material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID)
+                                                                    || (!material.ProductionMaterialID.HasValue && c.MaterialID == material.MaterialID)))
+                                                            || (onlyContainer && c.Facility.MaterialID.HasValue
+                                                                && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
+                                                                    || (!material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.MaterialID)))
+                                                            )
+                                                      && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
+                                                          || !checkOutwardEnabled)
+                                                      && c.FillingDate.HasValue)
+                                               .OrderBy(c => c.FillingDate)
+                                               .Select(c => c.Facility)
+        );
+
+        /// <summary>
+        /// Queries Silos 
+        /// which contains this material 
+        /// </summary>
+        protected static readonly Func<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>> s_cQry_PickingSilosWithMaterialTime =
+        CompiledQuery.Compile<DatabaseApp, Material, bool, DateTime, bool, IQueryable<Facility>>(
+            (ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer) => ctx.FacilityCharge
+                                                .Include("Facility.FacilityStock_Facility")
+                                                .Where(c => c.NotAvailable == false
+                                                        && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
+                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                        && ((!onlyContainer
+                                                                && ((material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID)
+                                                                    || (!material.ProductionMaterialID.HasValue && c.MaterialID == material.MaterialID)))
+                                                            || (onlyContainer && c.Facility.MaterialID.HasValue
+                                                                && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
+                                                                    || (!material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.MaterialID)))
+                                                            )
+                                                      && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
+                                                          || !checkOutwardEnabled)
+                                                      && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)
+                                               .OrderBy(c => c.FillingDate)
+                                               .Select(c => c.Facility)
+        );
 
         #endregion
 

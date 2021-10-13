@@ -1580,6 +1580,26 @@ namespace gip.mes.processapplication
                                         queryParams.ExclusionList);
         }
 
+        public virtual IEnumerable<Route> GetRoutes(PickingPos pickingPos,
+                                                    DatabaseApp dbApp, Database dbIPlus,
+                                                    RouteQueryParams queryParams,
+                                                    out IList<Facility> possibleSilos)
+        {
+            if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PickingManager == null)
+            {
+                throw new NullReferenceException("AccessedProcessModule is null");
+            }
+
+            core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
+            return PickingManager.GetRoutes(pickingPos, dbApp, dbIPlus,
+                                        accessAClass,
+                                        queryParams.SearchMode,
+                                        queryParams.FilterTimeOlderThan,
+                                        out possibleSilos,
+                                        queryParams.IgnoreFacilityID,
+                                        queryParams.ExclusionList);
+        }
+
         public virtual RouteItem CurrentDosingSource(Database db)
         {
             if (CurrentDosingRoute == null)
