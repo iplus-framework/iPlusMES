@@ -1502,6 +1502,7 @@ namespace gip.bso.facility
         }
         #endregion
 
+
         #endregion
 
         #region Eventhandling
@@ -1791,6 +1792,17 @@ namespace gip.bso.facility
             }
             msg = PrintDesign(design, printerName, numberOfCopies, false);
             return msg;
+        }
+        #endregion
+
+        #region Overrides
+
+        public override PAOrderInfo GetOrderInfo()
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            if(SelectedFacilityCharge != null)
+                pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
+            return pAOrderInfo;
         }
         #endregion
     }
