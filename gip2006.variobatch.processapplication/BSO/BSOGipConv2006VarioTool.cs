@@ -59,6 +59,9 @@ namespace gip2006.variobatch.processapplication
         [ACMethodInfo("","",9999)]
         public void InsertDBAndOffsetAccordingAggrNo()
         {
+            if (!Root.Environment.User.IsSuperuser)
+                return;
+
             List<string> errorACUrl = new List<string>();
 
             var appManagers = Root.FindChildComponents<ApplicationManager>(c => c is ApplicationManager 
