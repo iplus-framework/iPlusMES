@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BSO\BSOGipConv2006VarioTool.cs" />
     <Compile Include="BSO\BSOTableImport.cs" />
     <Compile Include="GIP2006TableImport\GIPConv2006TableImportArtikel.cs" />
     <Compile Include="GIP2006TableImport\GIPConv2006TableImportRezept.cs" />
