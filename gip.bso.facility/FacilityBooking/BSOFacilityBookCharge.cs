@@ -1804,6 +1804,14 @@ namespace gip.bso.facility
                 pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
             return pAOrderInfo;
         }
+
+        public override bool IsPoolable
+        {
+            get
+            {
+                return true;
+            }
+        }
         #endregion
     }
 
