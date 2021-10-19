@@ -24,10 +24,20 @@ namespace gip.mes.datamodel
     {
         public static DatabaseApp GetAppContextForBSO(this ACComponent bso)
         {
-            if (bso.ParentACComponent != null && bso.ParentACComponent.Database != null && bso.ParentACComponent.Database is DatabaseApp)
+            bool forceSeperateContext = false;
+            ACBSO acBSO = bso as ACBSO;
+            if (acBSO != null)
+                forceSeperateContext = acBSO.IsSeperateDBContextForced;
+            
+            if (   !forceSeperateContext 
+                && bso.ParentACComponent != null 
+                && bso.ParentACComponent.Database != null 
+                && bso.ParentACComponent.Database is DatabaseApp)
                 return bso.ParentACComponent.Database as DatabaseApp;
+
             DatabaseApp dbApp = ACObjectContextManager.GetContext("BSOAppContext") as DatabaseApp;
-            if (dbApp == null)
+            if (   dbApp == null
+                || forceSeperateContext)
             {
                 Database parentIPlusContext = new Database();
                 dbApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>("BSOAppContext", null, parentIPlusContext);
