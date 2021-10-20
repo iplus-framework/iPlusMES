@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BSO\BSOGipConv2006VarioTool.cs" />
     <Compile Include="BSO\BSOTableImport.cs" />
     <Compile Include="GIP2006TableImport\GIPConv2006TableImportArtikel.cs" />
     <Compile Include="GIP2006TableImport\GIPConv2006TableImportRezept.cs" />
@@ -121,11 +122,12 @@
       <Name>gip.mes.processapplication</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="VBControlScripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="VBControlScripts\2021-10-19 19-57_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
