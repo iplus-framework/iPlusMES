@@ -198,7 +198,8 @@ namespace gip.mes.processapplication
 
             module.TaskInvocationPoint.ClearMyInvocations(this);
             _CurrentMethodEventArgs = null;
-            if (!module.TaskInvocationPoint.AddTask(acMethod, this))
+            IACPointEntry task = module.TaskInvocationPoint.AddTask(acMethod, this);
+            if (!IsTaskStarted(task))
             {
                 CurrentDisEntityID.ValueT = Guid.Empty;
                 ACMethodEventArgs eM = _CurrentMethodEventArgs;
@@ -224,7 +225,8 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
             AcknowledgeAlarms();
-            return StartDisResult.WaitForCallback;
+            return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
+            //return StartDisResult.WaitForCallback;
         }
 
         protected virtual StartDisResult OnHandleStateCheckFullSiloRelocation(PAFDischarging discharging, PAProcessModule targetContainer, PAProcessModule module)

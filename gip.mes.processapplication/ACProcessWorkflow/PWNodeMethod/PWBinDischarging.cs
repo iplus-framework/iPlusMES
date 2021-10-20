@@ -415,7 +415,8 @@ namespace gip.mes.processapplication
                         return;
                     module.TaskInvocationPoint.ClearMyInvocations(this);
                     _CurrentMethodEventArgs = null;
-                    if (!module.TaskInvocationPoint.AddTask(acMethod, this))
+                    IACPointEntry task = module.TaskInvocationPoint.AddTask(acMethod, this);
+                    if (!IsTaskStarted(task))
                     {
                         ACMethodEventArgs eM = _CurrentMethodEventArgs;
                         if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
@@ -490,10 +491,11 @@ namespace gip.mes.processapplication
                 //    SubscribeToProjectWorkCycle();
                 else
                 {
-                    IACTask task = module.TaskInvocationPoint.GetTaskOfACMethod(acMethod);
+                    IACPointEntry task = module.TaskInvocationPoint.GetTaskOfACMethod(acMethod);
                     module.TaskInvocationPoint.ClearMyInvocations(this);
                     _CurrentMethodEventArgs = null;
-                    if (!module.TaskInvocationPoint.AddTask(acMethod, this))
+                    task = module.TaskInvocationPoint.AddTask(acMethod, this);
+                    if (!IsTaskStarted(task))
                     {
                         ACMethodEventArgs eM = _CurrentMethodEventArgs;
                         if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)

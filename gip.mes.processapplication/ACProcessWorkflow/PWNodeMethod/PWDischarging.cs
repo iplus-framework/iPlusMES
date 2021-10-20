@@ -177,18 +177,7 @@ namespace gip.mes.processapplication
         {
             get
             {
-                ACPointAsyncRMISubscrWrap<ACComponent> taskEntry = null;
-
-                using (ACMonitor.Lock(TaskSubscriptionPoint.LockLocalStorage_20033))
-                {
-                    taskEntry = this.TaskSubscriptionPoint.ConnectionList.FirstOrDefault();
-                }
-                // Falls Dosierung zur Zeit aktiv ist, dann gibt es auch einen Eintrag in der TaskSubscriptionListe
-                if (taskEntry != null && ParentPWGroup != null)
-                {
-                    return ParentPWGroup.GetExecutingFunction<PAFDischarging>(taskEntry.RequestID);
-                }
-                return null;
+                return GetCurrentExecutingFunction<PAFDischarging>();
             }
         }
 
