@@ -1571,7 +1571,7 @@ namespace gip.mes.processapplication
                     }
 
                     Route[] routes;
-                    AvailableStorages = GetManualScaleStorages(module, out routes);
+                    AvailableStorages = GetAvailableStorages(module, out routes);
                     AvailableRoutes = routes;
                     if (AvailableStorages == null || !AvailableStorages.Any())
                     {
@@ -1863,7 +1863,7 @@ namespace gip.mes.processapplication
             set;
         }
 
-        public Guid[] GetManualScaleStorages(ACComponent toComponent, out Route[] availableRoutes)
+        public virtual Guid[] GetAvailableStorages(ACComponent toComponent, out Route[] availableRoutes)
         {
             availableRoutes = null;
 
