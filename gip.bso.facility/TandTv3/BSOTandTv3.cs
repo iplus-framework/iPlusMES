@@ -81,7 +81,7 @@ namespace gip.bso.facility
 
         #region c´tors
         /// <summary>
-        /// Initializes a new instance of the <see cref="BSOProdOrderGeneric"/> class.
+        /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="acType">Type of the ac.</param>
         /// <param name="content">The content.</param>

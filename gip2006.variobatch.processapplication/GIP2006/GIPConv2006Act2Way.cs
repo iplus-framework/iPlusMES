@@ -55,17 +55,17 @@ namespace gip2006.variobatch.processapplication
             base.Response_PropertyChanged(sender, e, phase);
             if ((e.ValueEvent.Sender == EventRaiser.Source) && (e.ValueEvent.EventType == EventTypes.ValueChangedInSource))
             {
-                /// Zustandsautomat:
-                ///                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open
-                /// A.) Links:                  1, 0, 0  | 1, 0
-                /// B.) Ansteuerung Rechts      1, 0, 0  | 0, 1
-                /// C.) Geht nach R:            1, 0, 1  | 0, 1
-                /// D.) Verlässt R-Stellung:    0, 0, 1  | 0, 1
-                /// E.) Rechts:                 0, 1, 0  | 0, 1
-                /// F.) Ansteuerung Links:      0, 1, 0  | 1, 0
-                /// G.) Geht nach L:            0, 1, 1  | 1, 0
-                /// E.) Verlässt L-Stellung:    0, 0, 1  | 0, 1
-                /// wieder A.)
+                // Zustandsautomat:
+                //                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open
+                // A.) Links:                  1, 0, 0  | 1, 0
+                // B.) Ansteuerung Rechts      1, 0, 0  | 0, 1
+                // C.) Geht nach R:            1, 0, 1  | 0, 1
+                // D.) Verlässt R-Stellung:    0, 0, 1  | 0, 1
+                // E.) Rechts:                 0, 1, 0  | 0, 1
+                // F.) Ansteuerung Links:      0, 1, 0  | 1, 0
+                // G.) Geht nach L:            0, 1, 1  | 1, 0
+                // E.) Verlässt L-Stellung:    0, 0, 1  | 0, 1
+                // wieder A.)
                 _LockResend_ReqRunState = true;
                 if ((Pos1 != null) && (Pos2 != null))
                 {

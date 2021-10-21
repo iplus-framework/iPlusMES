@@ -20,7 +20,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Initializes a new instance of the <see cref="MDBSOTimeRange"/> class.
         /// </summary>
         /// <param name="acType">Type of the ac.</param>
-        /// <param name="content">The content.</pawp
+        /// <param name="content">The content.</param>
         /// <param name="parentACObject">The parent AC object.</param>
         /// <param name="parameter">The parameter.</param>
         /// <param name="acIdentifier">The ac identifier.</param>

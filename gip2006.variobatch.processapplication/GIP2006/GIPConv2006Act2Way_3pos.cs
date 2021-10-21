@@ -65,25 +65,26 @@ namespace gip2006.variobatch.processapplication
             base.Response_PropertyChanged(sender, e, phase);
             if ((e.ValueEvent.Sender == EventRaiser.Source) && (e.ValueEvent.EventType == EventTypes.ValueChangedInSource))
             {
-                /// Zustandsautomat:
-                ///                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit03_Mid, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open, Bit03_Pos3Mid
-                /// A.) R1/Links:               1, 0, 0, 0  | 1, 0, 0
-                /// B.) Ansteuerung R3/Unten:   1, 0, 0, 0  | 0, 0, 1
-                /// C.) Geht richtung R3/Unten: 1, 0, 0, 1  | 0, 0, 1
-                /// D.) Verlässt R1-Stellung:   0, 0, 0, 1  | 0, 0, 1
-                /// E.) R3/Unten:               0, 0, 1, 0  | 0, 0, 1
-                /// F.) Ansteuerung R2/Rechts:  0, 0, 1, 0  | 0, 1, 0
-                /// G.) Geht richtung R2:       0, 0, 1, 1  | 0, 1, 0
-                /// D.) Verlässt R3-Stellung    0, 0, 0, 1  | 0, 1, 0
-                /// F.) R2/Rechts:              0, 1, 0, 0  | 0, 1, 0
-                /// G.) Ansteuerung R3/Unten:   0, 1, 0, 0  | 0, 0, 1
-                /// H.) Geht richtung R3/Unten: 0, 1, 0, 1  | 0, 0, 1
-                /// I.) Verlässt R2-Stellung    0, 0, 0, 1  | 0, 0, 1
-                /// E.) R3/Unten:
-                /// J.) Ansteuerung R1/Links:   0, 0, 1, 0  | 1, 0, 0
-                /// K.) Geht richtung R1/Links: 0, 0, 1, 1  | 1, 0, 0
-                /// L.) Verlässt R3-Stellung:   0, 0, 0, 1  | 1, 0, 0
-                /// wieder A.)
+                // Zustandsautomat:
+                //                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit03_Mid, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open, Bit03_Pos3Mid
+                // A.) R1/Links:               1, 0, 0, 0  | 1, 0, 0
+                // B.) Ansteuerung R3/Unten:   1, 0, 0, 0  | 0, 0, 1
+                // C.) Geht richtung R3/Unten: 1, 0, 0, 1  | 0, 0, 1
+                // D.) Verlässt R1-Stellung:   0, 0, 0, 1  | 0, 0, 1
+                // E.) R3/Unten:               0, 0, 1, 0  | 0, 0, 1
+                // F.) Ansteuerung R2/Rechts:  0, 0, 1, 0  | 0, 1, 0
+                // G.) Geht richtung R2:       0, 0, 1, 1  | 0, 1, 0
+                // D.) Verlässt R3-Stellung    0, 0, 0, 1  | 0, 1, 0
+                // F.) R2/Rechts:              0, 1, 0, 0  | 0, 1, 0
+                // G.) Ansteuerung R3/Unten:   0, 1, 0, 0  | 0, 0, 1
+                // H.) Geht richtung R3/Unten: 0, 1, 0, 1  | 0, 0, 1
+                // I.) Verlässt R2-Stellung    0, 0, 0, 1  | 0, 0, 1
+                // E.) R3/Unten:
+                // J.) Ansteuerung R1/Links:   0, 0, 1, 0  | 1, 0, 0
+                // K.) Geht richtung R1/Links: 0, 0, 1, 1  | 1, 0, 0
+                // L.) Verlässt R3-Stellung:   0, 0, 0, 1  | 1, 0, 0
+                // wieder A.)
+
                 _LockResend_ReqRunState = true;
                 if ((Pos1 != null) && (Pos2 != null))
                 {

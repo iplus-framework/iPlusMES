@@ -63,25 +63,25 @@ namespace gip2006.variobatch.processapplication
             base.Response_PropertyChanged(sender, e, phase);
             if ((e.ValueEvent.Sender == EventRaiser.Source) && (e.ValueEvent.EventType == EventTypes.ValueChangedInSource))
             {
-                /// Zustandsautomat:
-                ///                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit03_Mid, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open, Bit03_Pos3Mid
-                /// A.) Zu:                     1, 0, 0, 0  | 1, 0, 0
-                /// B.) Ansteuerung Mitte:      1, 0, 0, 0  | 0, 0, 1
-                /// C.) Geht richtung Mitte:    1, 0, 0, 1  | 0, 0, 1
-                /// D.) Verlässt Zu-Stellung:   0, 0, 0, 1  | 0, 0, 1
-                /// E.) Mitte:                  0, 0, 1, 0  | 0, 0, 1
-                /// F.) Ansteuerung Auf:        0, 0, 1, 0  | 0, 1, 0
-                /// G.) Geht richtung auf:      0, 0, 1, 1  | 0, 1, 0
-                /// D.) Verlässt Mitte-Stellung 0, 0, 0, 1  | 0, 1, 0
-                /// F.) Offen:                  0, 1, 0, 0  | 0, 1, 0
-                /// G.) Ansteuerung Mitte:      0, 1, 0, 0  | 0, 0, 1
-                /// H.) Geht richtung Mitte:    0, 1, 0, 1  | 0, 0, 1
-                /// I.) Verlässt Auf-Stellung   0, 0, 0, 1  | 0, 0, 1
-                /// E.) Mitte:
-                /// J.) Ansteuerung Zu:         0, 0, 1, 0  | 1, 0, 0
-                /// K.) Geht richtung Zu:       0, 0, 1, 1  | 1, 0, 0
-                /// L.) Verlässt Mitte-Stellung 0, 0, 0, 1  | 1, 0, 0
-                /// wieder A.)
+                // Zustandsautomat:
+                //                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit03_Mid, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open, Bit03_Pos3Mid
+                // A.) Zu:                     1, 0, 0, 0  | 1, 0, 0
+                // B.) Ansteuerung Mitte:      1, 0, 0, 0  | 0, 0, 1
+                // C.) Geht richtung Mitte:    1, 0, 0, 1  | 0, 0, 1
+                // D.) Verlässt Zu-Stellung:   0, 0, 0, 1  | 0, 0, 1
+                // E.) Mitte:                  0, 0, 1, 0  | 0, 0, 1
+                // F.) Ansteuerung Auf:        0, 0, 1, 0  | 0, 1, 0
+                // G.) Geht richtung auf:      0, 0, 1, 1  | 0, 1, 0
+                // D.) Verlässt Mitte-Stellung 0, 0, 0, 1  | 0, 1, 0
+                // F.) Offen:                  0, 1, 0, 0  | 0, 1, 0
+                // G.) Ansteuerung Mitte:      0, 1, 0, 0  | 0, 0, 1
+                // H.) Geht richtung Mitte:    0, 1, 0, 1  | 0, 0, 1
+                // I.) Verlässt Auf-Stellung   0, 0, 0, 1  | 0, 0, 1
+                // E.) Mitte:
+                // J.) Ansteuerung Zu:         0, 0, 1, 0  | 1, 0, 0
+                // K.) Geht richtung Zu:       0, 0, 1, 1  | 1, 0, 0
+                // L.) Verlässt Mitte-Stellung 0, 0, 0, 1  | 1, 0, 0
+                // wieder A.)
 
                 _LockResend_ReqRunState = true;
                 if ((Pos1 != null) && (Pos2 != null))

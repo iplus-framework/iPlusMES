@@ -182,7 +182,6 @@ namespace gip.bso.sales
         //    }
         //}
 
-        /// <summary>
         #endregion
 
         #region BSO->ACMethod

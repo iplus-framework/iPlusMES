@@ -2087,7 +2087,7 @@ namespace gip.bso.manufacturing
                     &&
                     x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
                     ).Sum(x => x.TargetQuantityUOM);
-                /// TODO: Implement calculation of used material i production order mixures
+                // TODO: Implement calculation of used material i production order mixures
                 //if (IntermediateList != null)
                 //item.RestQuantity = item.RestQuantity -
                 //    IntermediateList.Where(x => x..MaterialID == item.MaterialID).Sum(x => x.Quantity);
@@ -3232,11 +3232,10 @@ namespace gip.bso.manufacturing
             CreateBatchAutomaticallyCalcList = null;
         }
 
-        /// <summary>
-        /// Generate batch set for every intermediate
-        /// </summary>
-        /// <param name="batchDefinition"></param>
-        /// <param name="intermediates"></param>
+        /// <summary>Generate batch set for every intermediate</summary>
+        /// <param name="batchQuantityDefinition"></param>
+        /// <param name="intermediateList"></param>
+        /// <param name="batchHandleModel"></param>
         private void BatchCreateGenerateBatch(List<BatchQuantityModel> batchQuantityDefinition, List<PosIntermediateDepthWrap> intermediateList, RestHandleModeEnum batchHandleModel)
         {
             if (intermediateList == null || !intermediateList.Any() || batchQuantityDefinition == null || !batchQuantityDefinition.Any()) return;

@@ -63,21 +63,21 @@ namespace gip2006.variobatch.processapplication
             base.Response_PropertyChanged(sender, e, phase);
             if ((e.ValueEvent.Sender == EventRaiser.Source) && (e.ValueEvent.EventType == EventTypes.ValueChangedInSource))
             {
-                /// Zustandsautomat:
-                ///                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit03_Mid, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open, Bit03_Pos3Mid
-                /// A.) R2/Rechts/Durchfluss:   0, 0, 1, 0  | 0, 0, 1
-                /// B.) Ansteuerung R1/Unten:   0, 0, 1, 0  | 0, 1, 0
-                /// C.) Geht richtung R1/Unten: 0, 0, 1, 1  | 0, 1, 0
-                /// D.) Verlässt R2-Stellung:   0, 0, 0, 1  | 0, 1, 0
-                /// E.) R3/Unten:               0, 1, 0, 0  | 0, 1, 0
-                /// F.) Ansteuerung Beide:      0, 1, 0, 0  | 1, 0, 0
-                /// G.) Geht richtung Beide:    0, 1, 0, 1  | 1, 0, 0
-                /// D.) Verlässt R3-Stellung    0, 0, 0, 1  | 1, 0, 0
-                /// F.) Beide:                  1, 0, 0, 0  | 1, 0, 0
-                /// G.) Ansteuerung Durchfluss: 1, 0, 0, 0  | 0, 0, 1
-                /// H.) Geht richtung Durchfl.: 1, 0, 0, 1  | 0, 0, 1
-                /// D.) Verlässt Beide-Stellung 0, 0, 0, 1  | 0, 0, 1
-                /// wieder A.) 
+                // Zustandsautomat:
+                //                         Bit00_Pos1Closed, Bit02_Pos2Open, Bit03_Mid, Bit01_Triggered | Bit00_Pos1Close, Bit02_Pos2Open, Bit03_Pos3Mid
+                // A.) R2/Rechts/Durchfluss:   0, 0, 1, 0  | 0, 0, 1
+                // B.) Ansteuerung R1/Unten:   0, 0, 1, 0  | 0, 1, 0
+                // C.) Geht richtung R1/Unten: 0, 0, 1, 1  | 0, 1, 0
+                // D.) Verlässt R2-Stellung:   0, 0, 0, 1  | 0, 1, 0
+                // E.) R3/Unten:               0, 1, 0, 0  | 0, 1, 0
+                // F.) Ansteuerung Beide:      0, 1, 0, 0  | 1, 0, 0
+                // G.) Geht richtung Beide:    0, 1, 0, 1  | 1, 0, 0
+                // D.) Verlässt R3-Stellung    0, 0, 0, 1  | 1, 0, 0
+                // F.) Beide:                  1, 0, 0, 0  | 1, 0, 0
+                // G.) Ansteuerung Durchfluss: 1, 0, 0, 0  | 0, 0, 1
+                // H.) Geht richtung Durchfl.: 1, 0, 0, 1  | 0, 0, 1
+                // D.) Verlässt Beide-Stellung 0, 0, 0, 1  | 0, 0, 1
+                // wieder A.) 
 
                 _LockResend_ReqRunState = true;
                 if ((Pos1 != null) && (Pos2 != null) && (Pos3 != null))

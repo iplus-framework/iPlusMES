@@ -25,9 +25,7 @@ namespace gip.bso.facility
         #endregion
 
         #region c´tors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BSOFacilityVehicle"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the class.</summary>
         /// <param name="acType">Type of the ac.</param>
         /// <param name="content">The content.</param>
         /// <param name="parentACObject">The parent AC object.</param>
@@ -1656,8 +1654,6 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null;
         }
 
-        /// Searches this instance.
-        /// </summary>
         [ACMethodInfo(FacilityInventoryPos.ClassName, "en{'Search'}de{'Suche'}", 205)]
         public void SearchPos()
         {
@@ -1671,8 +1667,6 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null;
         }
 
-        /// Searches this instance.
-        /// </summary>
         [ACMethodInfo(FacilityInventoryPos.ClassName, "en{'Clear filter'}de{'Filter löschen'}", 501)]
         public void ClearSearchPos()
         {
@@ -1948,7 +1942,6 @@ namespace gip.bso.facility
         #endregion
 
         #region Methods -> ACvBSO -> Save
-        /// </summary>
         [ACMethodCommand("Save", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {

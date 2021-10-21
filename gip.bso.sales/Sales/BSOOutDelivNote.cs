@@ -1085,7 +1085,6 @@ namespace gip.bso.sales
         }
         #endregion
 
-        /// <summary>
         #endregion
 
         #region BSO->ACMethod

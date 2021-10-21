@@ -9,10 +9,7 @@ using System.Reflection;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// The bussiness object for a laboratory orders.
-    /// </summary>
-    ///<summary xml:lang="de">
-    /// Das Geschäftsobjekt für einen Laborauftrag.
+    /// The business object for a laboratory orders.
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Lab Order'}de{'Laborauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + LabOrder.ClassName)]
     [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + LabOrder.ClassName, "en{'Lab Order'}de{'Laborauftrag'}", typeof(LabOrder), LabOrder.ClassName, "LabOrderTypeIndex", "LabOrderNo")]
@@ -665,22 +662,12 @@ namespace gip.bso.masterdata
             }
         }
 
-        /// <summary>
-        /// Crates a new laboratory order in dialog.
-        /// </summary>
-        /// <param name="inOrderPos">The in order position.</param>
-        /// <param name="outOrderPos">The out order position.</param>
-        /// <param name="prodOrderPartslistPos">The production order partslist position</param>
-        /// <param name="facilityLot">The facility lot.</param>
-        /// <returns>The result in <see cref="VBDialogResult"/> object</returns>
-        /// <summary xml:lang="de">
-        /// Crates a new laboratory order in dialog.
-        /// </summary>
-        /// <param xml:lang="de" name="inOrderPos">The in order position.</param>
-        /// <param xml:lang="de" name="outOrderPos">The out order position.</param>
-        /// <param xml:lang="de" name="prodOrderPartslistPos">The production order partslist position</param>
-        /// <param xml:lang="de" name="facilityLot">The facility lot.</param>
-        /// <returns xml:lang="de">The result in <see cref="VBDialogResult"/> object</returns>
+        /// <summary>Crates a new laboratory order in dialog.</summary>
+        /// <param name="inOrderPos">The in order position.The in order position.</param>
+        /// <param name="outOrderPos">The out order position.The out order position.</param>
+        /// <param name="prodOrderPartslistPos">The production order partslist positionThe production order partslist position</param>
+        /// <param name="facilityLot">The facility lot.The facility lot.</param>
+        /// <returns>The result in <see cref="VBDialogResult" /> object</returns>
         [ACMethodInfo("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 701)]
         public VBDialogResult NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot)
         {
@@ -816,16 +803,6 @@ namespace gip.bso.masterdata
         /// <param name="labOrder">The laboratory order.</param>
         /// <param name="filter">The filter, enables or disables filter.</param>
         /// <param name="orderInfo"> The PAOrderInfo.</param>
-        /// <summary xml:lang="de">
-        /// Zeigt den Laborauftrag in einem Dialog an.
-        /// </summary>
-        /// <param xml:lang="de" name="inOrderPos">Die in der Reihenfolge.</param>
-        /// <param xml:lang="de" name="outOrderPos">Die Out-Order-Position.</param>
-        /// <param xml:lang="de" name="prodOrderPartslistPos">Die Position der Fertigungsauftragsstückliste.</param>
-        /// <param xml:lang="de" name="facilityLot">Das Grundstück der Einrichtung.</param>
-        /// <param xml:lang="de" name="labOrder">Der Laborauftrag.</param>
-        /// <param xml:lang="de" name="filter">Der Filter, aktiviert oder deaktiviert den Filter.</param>
-        /// <param xml:lang="de" name="orderInfo">Die PAOrderInfo.</param>
         [ACMethodInteraction("Dialog", "en{'View Lab Order'}de{'Laborauftrag anzeigen'}", 704, true, "ShowLabOrderViewDialog", Global.ACKinds.MSMethodPrePost)]
         public void ShowLabOrderViewDialog(
             InOrderPos inOrderPos,

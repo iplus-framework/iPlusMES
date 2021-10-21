@@ -493,11 +493,6 @@ namespace gip.bso.masterdata
         /// <summary>
         /// The _ AC config list
         /// </summary>
-        //List<MaterialConfig> _ACConfigList;
-        /// <summary>
-        /// Gets the AC config list.
-        /// </summary>
-        /// <value>The AC config list.</value>
         [ACPropertyList(9999, "ACConfig")]
         public IEnumerable<MaterialConfig> ACConfigList
         {

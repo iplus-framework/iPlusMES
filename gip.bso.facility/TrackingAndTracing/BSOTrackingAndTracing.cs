@@ -25,7 +25,7 @@ namespace gip.bso.facility
     {
         #region c´tors
         /// <summary>
-        /// Initializes a new instance of the <see cref="BSOProdOrderGeneric"/> class.
+        /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="acType">Type of the ac.</param>
         /// <param name="content">The content.</param>
@@ -828,7 +828,7 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Populate sub items presented in combo box by via form T&T of InOrder(Pos) and DeliveryNote(Pos) via InOrderNo and DeliveryNoteNo
+        /// Populate sub items presented in combo box by via form T and T of InOrder(Pos) and DeliveryNote(Pos) via InOrderNo and DeliveryNoteNo
         /// </summary>
         [ACMethodCommand("Filter", "en{'Refresh'}de{'Aktualisieren'}", (short)MISort.Search)]
         public void RefreshRelated()
@@ -922,7 +922,7 @@ namespace gip.bso.facility
         /// <summary>
         /// For independent usage form without predefined Caller Object
         /// Using Item number and selected position (InOrder, OutOrder, DeliveryNote) for retrive objects 
-        /// where we search T&T: FacilityBooking, FacilityPreBooking, InOrderPos, OutOrderPos, DeliveryNotePos
+        /// where we search T and T: FacilityBooking, FacilityPreBooking, InOrderPos, OutOrderPos, DeliveryNotePos
         /// </summary>
         private IACObject RetriveCallerObjectFromFilter()
         {
@@ -963,7 +963,7 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        ///  Retrive result tree from T&T layer
+        ///  Retrieve result tree from T and T layer
         /// </summary>
         private void RetriveResult()
         {
