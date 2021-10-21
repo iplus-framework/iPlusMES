@@ -62,7 +62,6 @@ namespace gip.mes.processapplication
         {
             ClearMyConfiguration();
 
-
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _CacheModuleDestinations = null;
@@ -73,6 +72,8 @@ namespace gip.mes.processapplication
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
             }
+
+            CurrentDisEntityID.ValueT = Guid.Empty;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -89,6 +90,8 @@ namespace gip.mes.processapplication
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
             }
+
+            CurrentDisEntityID.ValueT = Guid.Empty;
 
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
@@ -483,7 +486,6 @@ namespace gip.mes.processapplication
         {
             CacheModuleDestinations = null;
             LastTargets = null;
-            CurrentDisEntityID.ValueT = Guid.Empty;
             base.SMIdle();
         }
 
