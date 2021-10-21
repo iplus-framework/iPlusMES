@@ -12,11 +12,13 @@ namespace gip.mes.processapplication
     public class PAMParkingspace : PAProcessModuleVB
     {
         public const string SelRuleID_ParkingSpace = "PAMParkingSpace";
+        public const string SelRuleID_ParkingSpace_Deselector = "PAMParkingSpace.Deselector";
 
         static PAMParkingspace()
         {
             RegisterExecuteHandler(typeof(PAMParkingspace), HandleExecuteACMethod_PAMParkingspace);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_ParkingSpace, (c, p) => c.Component.ValueT is PAMParkingspace, (c, p) => c.Component.ValueT is PAProcessModule);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_ParkingSpace_Deselector, null, (c, p) => c.Component.ValueT is PAMParkingspace);
         }
 
         public PAMParkingspace(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")

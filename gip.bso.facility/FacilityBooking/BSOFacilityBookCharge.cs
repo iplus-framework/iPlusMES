@@ -44,6 +44,7 @@ namespace gip.bso.facility
         public BSOFacilityBookCharge(gip.core.datamodel.ACClass typeACClass, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(typeACClass, content, parentACObject, parameter)
         {
+
         }
 
         /// <summary>
@@ -55,7 +56,9 @@ namespace gip.bso.facility
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            Search();
+            bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
+            if (!skipSearchOnStart)
+                Search();
             return true;
         }
 
@@ -376,6 +379,11 @@ namespace gip.bso.facility
         protected virtual IQueryable<FacilityCharge> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityCharge> result)
         {
             ObjectQuery<FacilityCharge> query = result as ObjectQuery<FacilityCharge>;
+            query =
+                query
+                .Include(c => c.Facility)
+                .Include(c => c.FacilityLot)
+                .Include(c => c.Material);
             return query;
         }
 
@@ -1775,7 +1783,13 @@ namespace gip.bso.facility
             if (wfOrderInfo != null)
             {
                 PAOrderInfoEntry entry = wfOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
-                CurrentFacilityCharge = DatabaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
+                CurrentFacilityCharge =
+                    DatabaseApp
+                    .FacilityCharge
+                    .Include(c => c.Facility)
+                    .Include(c => c.FacilityLot)
+                    .Include(c => c.Material)
+                    .FirstOrDefault(c => c.FacilityChargeID == entry.EntityID);
                 return null;
             }
             return new Msg() { MessageLevel = eMsgLevel.Error, Message = "" };
@@ -1800,7 +1814,7 @@ namespace gip.bso.facility
         public override PAOrderInfo GetOrderInfo()
         {
             PAOrderInfo pAOrderInfo = new PAOrderInfo();
-            if(SelectedFacilityCharge != null)
+            if (SelectedFacilityCharge != null)
                 pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
             return pAOrderInfo;
         }
