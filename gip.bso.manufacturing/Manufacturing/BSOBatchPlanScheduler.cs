@@ -30,96 +30,34 @@ namespace gip.bso.manufacturing
 
         #region Configuration -> ConfigPreselectedLine
 
-        private ACPropertyConfigValue<string> _ConfigPreselectedLine;
-        [ACPropertyConfig("ConfigPreselectedLine")]
-        public string ConfigPreselectedLine
+        public IACConfig GetSelectedLineConfig()
         {
-            get
-            {
-                if (_ConfigPreselectedLine.ValueT == null)
-                    return null;
-                return _ConfigPreselectedLine.ValueT;
-            }
-            set
-            {
-                _ConfigPreselectedLine.ValueT = value;
-            }
+            var configs = ACType.GetConfigByKeyACUrl(Root.CurrentInvokingUser.GetACUrl());
+            IACConfig config = configs.FirstOrDefault();
+            return config;
         }
 
-        private Dictionary<string, string> _ConfigPreselectedLineDict;
-        public Dictionary<string, string> ConfigPreselectedLineDict
+        public string GetSelectedLine()
         {
-            get
-            {
-                if (_ConfigPreselectedLineDict == null)
-                    _ConfigPreselectedLineDict = GetConfigPreselectedLineDict();
-                return _ConfigPreselectedLineDict;
-            }
+
+            IACConfig config = GetSelectedLineConfig();
+            return config != null ?
+                (config.Value != null ? config.Value.ToString() : "") : "";
         }
 
-        private Dictionary<string, string> GetConfigPreselectedLineDict()
+        public void SetSelectedLineConfig(PAScheduleForPWNode line)
         {
-            Dictionary<string, string> preselectedLines = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(ConfigPreselectedLine))
+            IACConfig config = GetSelectedLineConfig();
+            if (config == null && line != null)
             {
-                string[] preselectedLinesRows = ConfigPreselectedLine.Split(';');
-                foreach (string row in preselectedLinesRows)
-                {
-                    string[] preselectDef = row.Split(':');
-                    if (preselectDef.Length == 2)
-                        if (!preselectedLines.Keys.Contains(preselectDef[0]))
-                            preselectedLines.Add(preselectDef[0], preselectDef[1]);
-                }
+                config = ACType.ValueTypeACClass.NewACConfig(null, ACType.ValueTypeACClass.Database.GetACType(typeof(string)));
+                config.KeyACUrl = Root.CurrentInvokingUser.GetACUrl();
             }
-            return preselectedLines;
-        }
-
-        private void SetConfigPreselectedLineDict(Dictionary<string, string> preselectedLines)
-        {
-            StringBuilder sb = new StringBuilder();
-            if (preselectedLines != null && preselectedLines.Any())
-            {
-                foreach (var item in preselectedLines)
-                {
-                    sb.Append(item.Key + ":" + item.Value);
-                }
-                ConfigPreselectedLine = sb.ToString();
-            }
-            else
-                ConfigPreselectedLine = null;
-            ACSaveChanges();
-        }
-
-        public string ConfigPreselectedLineCurrentUser
-        {
-            get
-            {
-                if (!ConfigPreselectedLineDict.Keys.Contains(Root.CurrentInvokingUser.Initials))
-                    return null;
-                return ConfigPreselectedLineDict[Root.CurrentInvokingUser.Initials];
-            }
-            set
-            {
-                if (value == null)
-                {
-                    if (ConfigPreselectedLineDict.Keys.Contains(Root.CurrentInvokingUser.Initials))
-                        ConfigPreselectedLineDict.Remove(Root.CurrentInvokingUser.Initials);
-                }
-                else
-                if (!ConfigPreselectedLineDict.Keys.Contains(Root.CurrentInvokingUser.Initials))
-                    ConfigPreselectedLineDict.Add(Root.CurrentInvokingUser.Initials, value);
-                else
-                    ConfigPreselectedLineDict[Root.CurrentInvokingUser.Initials] = value;
-            }
-        }
-
-        public void SaveSelectedLine(PAScheduleForPWNode line)
-        {
-            if (line != null && line.MDSchedulingGroup != null)
-                ConfigPreselectedLineCurrentUser = line.MDSchedulingGroup.MDKey;
-            else
-                ConfigPreselectedLineCurrentUser = null;
-            SetConfigPreselectedLineDict(ConfigPreselectedLineDict);
+            if (line != null)
+                config.Value = line.MDSchedulingGroup.MDKey;
+            else if (config != null)
+                (config as VBEntityObject).DeleteACObject(Database, false);
+            Msg msg = DatabaseApp.ContextIPlus.ACSaveChanges();
         }
 
         #endregion
@@ -250,7 +188,7 @@ namespace gip.bso.manufacturing
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, "PABatchPlanSchedulerURL", "");
-            _ConfigPreselectedLine = new ACPropertyConfigValue<string>(this, "ConfigPreselectedLine", "");
+            //_ConfigPreselectedLine = new ACPropertyConfigValue<string>(this, "ConfigPreselectedLine", "");
         }
 
         #region c´tors -> ACInit
@@ -260,7 +198,7 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
 
-            _ConfigPreselectedLineDict = GetConfigPreselectedLineDict();
+            //_ConfigPreselectedLineDict = GetConfigPreselectedLineDict();
 
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
@@ -285,7 +223,9 @@ namespace gip.bso.manufacturing
             MediaSettings.LoadTypeFolder(dummyMaterial);
 
             InitBatchPlanSchedulerComponent();
-            LoadScheduleListForPWNodes(ConfigPreselectedLineCurrentUser);
+
+            string selectedLine = GetSelectedLine();
+            LoadScheduleListForPWNodes(selectedLine);
 
             if (BSOPartslistExplorer_Child != null && BSOPartslistExplorer_Child.Value != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value != null)
                 BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.PropertyChanged += ChildBSO_PropertyChanged;
@@ -589,7 +529,8 @@ namespace gip.bso.manufacturing
 
         private void SchedulesForPWNodesProp_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            LoadScheduleListForPWNodes(ConfigPreselectedLineCurrentUser);
+            string selectedLine = GetSelectedLine();
+            LoadScheduleListForPWNodes(selectedLine);
         }
 
         #endregion
@@ -774,7 +715,12 @@ namespace gip.bso.manufacturing
 
                     SelectedTargetScheduleForPWNode = null;
 
-                    SaveSelectedLine(value);
+                    string selectedLinie = GetSelectedLine();
+                    string mdKey = "";
+                    if (value != null)
+                        mdKey = value.MDSchedulingGroup.MDKey;
+                    if (selectedLinie != mdKey)
+                        SetSelectedLineConfig(value);
                 }
             }
         }
