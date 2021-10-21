@@ -1819,13 +1819,13 @@ namespace gip.bso.facility
             return pAOrderInfo;
         }
 
-        public override bool IsPoolable
-        {
-            get
-            {
-                return true;
-            }
-        }
+        //public override bool IsPoolable
+        //{
+        //    get
+        //    {
+        //        return true;
+        //    }
+        //}
         #endregion
     }
 
