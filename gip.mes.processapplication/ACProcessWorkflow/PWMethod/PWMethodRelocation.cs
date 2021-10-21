@@ -257,7 +257,7 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            else if (recalcExpectedConfigStoresCount)
+            else if (recalcExpectedConfigStoresCount && CurrentFacilityBooking == null)
             {
                 Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(20)", "CurrentPicking is null => ConfigStore-Validation will fail!");
                 using (ACMonitor.Lock(_20015_LockStoreList))
