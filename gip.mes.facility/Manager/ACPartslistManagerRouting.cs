@@ -755,7 +755,8 @@ namespace gip.mes.facility
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
-                                                      && c.FillingDate.HasValue)
+                                                      && c.FillingDate.HasValue
+                                                      && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
                                                .OrderBy(c => c.FillingDate)
                                                .Select(c => c.Facility)
         );

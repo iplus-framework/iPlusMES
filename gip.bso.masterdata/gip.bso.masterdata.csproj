@@ -60,6 +60,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>..\bin\Release\gip.bso.masterdata.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="gip.bso.iplus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
