@@ -335,7 +335,8 @@ namespace gip.mes.processapplication
 
                         module.TaskInvocationPoint.ClearMyInvocations(this);
                         _CurrentMethodEventArgs = null;
-                        if (!module.TaskInvocationPoint.AddTask(acMethod, this))
+                        IACPointEntry task = module.TaskInvocationPoint.AddTask(acMethod, this);
+                        if (!IsTaskStarted(task))
                         {
                             ACMethodEventArgs eM = _CurrentMethodEventArgs;
                             if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
@@ -363,8 +364,8 @@ namespace gip.mes.processapplication
                             return StartDisResult.CycleWait;
                         }
                         AcknowledgeAlarms();
-                        return StartDisResult.WaitForCallback;
-
+                        return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
+                        //return StartDisResult.WaitForCallback;
                     }
                     // Sonst ist dieser Entleerschritt eine Entleerung in einen Zwischenbehälter/Processmodul
                     else
@@ -533,7 +534,8 @@ namespace gip.mes.processapplication
 
                                 module.TaskInvocationPoint.ClearMyInvocations(this);
                                 _CurrentMethodEventArgs = null;
-                                if (!module.TaskInvocationPoint.AddTask(acMethod, this))
+                                IACPointEntry task = module.TaskInvocationPoint.AddTask(acMethod, this);
+                                if (!IsTaskStarted(task))
                                 {
                                     ACMethodEventArgs eM = _CurrentMethodEventArgs;
                                     if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
@@ -553,7 +555,8 @@ namespace gip.mes.processapplication
                                 UpdateCurrentACMethod();
 
                                 AcknowledgeAlarms();
-                                return StartDisResult.WaitForCallback;
+                                return task.State == PointProcessingState.Deleted ? StartDisResult.CancelDischarging : StartDisResult.WaitForCallback;
+                                //return StartDisResult.WaitForCallback;
                             }
                             else
                             {

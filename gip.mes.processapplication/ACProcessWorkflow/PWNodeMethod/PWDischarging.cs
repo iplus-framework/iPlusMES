@@ -62,7 +62,6 @@ namespace gip.mes.processapplication
         {
             ClearMyConfiguration();
 
-
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _CacheModuleDestinations = null;
@@ -73,6 +72,8 @@ namespace gip.mes.processapplication
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
             }
+
+            CurrentDisEntityID.ValueT = Guid.Empty;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -89,6 +90,8 @@ namespace gip.mes.processapplication
                 _IsWaitingOnTarget = false;
                 _CurrentDischargingRoute = null;
             }
+
+            CurrentDisEntityID.ValueT = Guid.Empty;
 
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
@@ -177,18 +180,7 @@ namespace gip.mes.processapplication
         {
             get
             {
-                ACPointAsyncRMISubscrWrap<ACComponent> taskEntry = null;
-
-                using (ACMonitor.Lock(TaskSubscriptionPoint.LockLocalStorage_20033))
-                {
-                    taskEntry = this.TaskSubscriptionPoint.ConnectionList.FirstOrDefault();
-                }
-                // Falls Dosierung zur Zeit aktiv ist, dann gibt es auch einen Eintrag in der TaskSubscriptionListe
-                if (taskEntry != null && ParentPWGroup != null)
-                {
-                    return ParentPWGroup.GetExecutingFunction<PAFDischarging>(taskEntry.RequestID);
-                }
-                return null;
+                return GetCurrentExecutingFunction<PAFDischarging>();
             }
         }
 
@@ -494,7 +486,6 @@ namespace gip.mes.processapplication
         {
             CacheModuleDestinations = null;
             LastTargets = null;
-            CurrentDisEntityID.ValueT = Guid.Empty;
             base.SMIdle();
         }
 
