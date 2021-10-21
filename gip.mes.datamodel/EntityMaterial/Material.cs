@@ -119,10 +119,6 @@ namespace gip.mes.datamodel
 
         #region IACObject Member
 
-        /// <summary>
-        /// Returns a <see cref=TypeAnalyser._TypeName_String /> that represents this instance.
-        /// </summary>
-        /// <returns>A <see cref=TypeAnalyser._TypeName_String /> that represents this instance.</returns>
         public override string ToString()
         {
             return MaterialNo + "/" + MaterialName1;
