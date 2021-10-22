@@ -805,6 +805,17 @@ namespace gip.mes.datamodel
             }
         }
 
+        public IQueryable<FacilityCharge> QryHasFreeQuants
+        {
+            get
+            {
+                return this.FacilityCharge_Facility.CreateSourceQuery()
+                                                    .Where(c => c.NotAvailable == false
+                                                            && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
+                                                            && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree));
+            }
+        }
+
         [ACPropertyInfo(45, "", "en{'Available Space'}de{'Verfügbarer Platz'}")]
         public double AvailableSpace
         {

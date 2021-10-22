@@ -373,6 +373,7 @@ namespace gip.mes.datamodel
             clonedObject.OutOfferNo = this.OutOfferNo;
             clonedObject.OutOfferVersion = this.OutOfferVersion;
             clonedObject.OutOfferDate = this.OutOfferDate;
+            clonedObject.MDCurrencyID = this.MDCurrencyID;
             clonedObject.MDOutOrderTypeID = this.MDOutOrderTypeID;
             clonedObject.MDOutOfferStateID = this.MDOutOfferStateID;
             clonedObject.CustomerCompanyID = this.CustomerCompanyID;

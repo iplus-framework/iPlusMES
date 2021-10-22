@@ -1694,11 +1694,23 @@ namespace gip.mes.facility
                 }
             }
 
-            possibleSilos = facilityQuery.FoundSilos
-                            .ToList()
-                            .Distinct()
-                            .Where(c => !c.QryHasBlockedQuants.Any())
-                            .ToList();
+            if (onlyContainer)
+            {
+                possibleSilos = facilityQuery.FoundSilos
+                                .ToList()
+                                .Distinct()
+                                .Where(c => !c.QryHasBlockedQuants.Any())
+                                .ToList();
+            }
+            else
+            {
+                possibleSilos = facilityQuery.FoundSilos
+                                .ToList()
+                                .Distinct()
+                                .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                           || (!c.QryHasBlockedQuants.Any()))
+                                .ToList();
+            }
             ACPartslistManager.RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
 
             return possibleSilos;

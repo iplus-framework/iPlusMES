@@ -755,8 +755,7 @@ namespace gip.mes.facility
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
-                                                      && c.FillingDate.HasValue
-                                                      && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                      && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
                                                .Select(c => c.Facility)
         );
@@ -1151,11 +1150,23 @@ namespace gip.mes.facility
                 }
             }
 
-            possibleSilos = facilityQuery.FoundSilos
-                            .ToList()
-                            .Distinct()
-                            .Where(c => !c.QryHasBlockedQuants.Any())
-                            .ToList();
+            if (onlyContainer)
+            {
+                possibleSilos = facilityQuery.FoundSilos
+                                .ToList()
+                                .Distinct()
+                                .Where(c => !c.QryHasBlockedQuants.Any())
+                                .ToList();
+            }
+            else
+            {
+                possibleSilos = facilityQuery.FoundSilos
+                                .ToList()
+                                .Distinct()
+                                .Where(c =>   (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                           || (!c.QryHasBlockedQuants.Any()) )
+                                .ToList();
+            }
             RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
             if (possibleSilos.Any())
                 return possibleSilos;
@@ -1189,11 +1200,24 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, false, projSpecificParams, onlyContainer);
                         }
                     }
-                    possibleSilos = facilityQuery.FoundSilos
-                                    .ToList()
-                                    .Distinct()
-                                    .Where(c => !c.QryHasBlockedQuants.Any())
-                                    .ToList();
+
+                    if (onlyContainer)
+                    {
+                        possibleSilos = facilityQuery.FoundSilos
+                                        .ToList()
+                                        .Distinct()
+                                        .Where(c => !c.QryHasBlockedQuants.Any())
+                                        .ToList();
+                    }
+                    else
+                    {
+                        possibleSilos = facilityQuery.FoundSilos
+                                        .ToList()
+                                        .Distinct()
+                                        .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                                   || (!c.QryHasBlockedQuants.Any()))
+                                        .ToList();
+                    }
                     RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
                     if (possibleSilos.Any())
                         return possibleSilos;
@@ -1234,11 +1258,24 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, poRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
-                    possibleSilos = facilityQuery.FoundSilos
-                                    .ToList()
-                                    .Distinct()
-                                    .Where(c => !c.QryHasBlockedQuants.Any())
-                                    .ToList();
+                    if (onlyContainer)
+                    {
+                        possibleSilos = facilityQuery.FoundSilos
+                                        .ToList()
+                                        .Distinct()
+                                        .Where(c => !c.QryHasBlockedQuants.Any())
+                                        .ToList();
+                    }
+                    else
+                    {
+                        possibleSilos = facilityQuery.FoundSilos
+                                        .ToList()
+                                        .Distinct()
+                                        .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                                   || (!c.QryHasBlockedQuants.Any()))
+                                        .ToList();
+                    }
+
                     RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
                     return possibleSilos;
                 }
@@ -1269,11 +1306,24 @@ namespace gip.mes.facility
                             facilityQuery = SilosWithMaterial(dbApp, plRelation, searchMode != SearchMode.AllSilos, true, projSpecificParams, onlyContainer);
                         }
                     }
-                    possibleSilos = facilityQuery.FoundSilos
-                                    .ToList()
-                                    .Distinct()
-                                    .Where(c => !c.QryHasBlockedQuants.Any())
-                                    .ToList();
+
+                    if (onlyContainer)
+                    {
+                        possibleSilos = facilityQuery.FoundSilos
+                                        .ToList()
+                                        .Distinct()
+                                        .Where(c => !c.QryHasBlockedQuants.Any())
+                                        .ToList();
+                    }
+                    else
+                    {
+                        possibleSilos = facilityQuery.FoundSilos
+                                        .ToList()
+                                        .Distinct()
+                                        .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                                   || (!c.QryHasBlockedQuants.Any()))
+                                        .ToList();
+                    }
                     RemoveFacility(ignoreFacilityID, exclusionList, possibleSilos);
                     return possibleSilos;
                 }

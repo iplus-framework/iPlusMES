@@ -2476,10 +2476,13 @@ namespace gip.mes.facility
                             Global.ACMethodResultState bookingSubResult = Global.ACMethodResultState.Succeeded;
                             FacilityChargeList facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot).Include(d => d.Facility)
                                                                                                      where (c.Facility.FacilityID == storeForRetrogradePosting.FacilityID)
-                                                                                                            && ((c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID)
-                                                                                                            || (relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID))
+                                                                                                            && (   (c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID)
+                                                                                                                || (relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID))
                                                                                                             && (c.NotAvailable == false)
-                                                                                                        select c);
+                                                                                                            && (c.IsEnabled)
+                                                                                                            && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
+                                                                                                            && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
+                                                                                                     select c);
 
                             StackItemList stackItemListInOut;
                             MsgBooking msgBookingInOut;
