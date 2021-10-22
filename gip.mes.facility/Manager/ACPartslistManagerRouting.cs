@@ -101,8 +101,7 @@ namespace gip.mes.facility
                                                                               )
                                                                            && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
-                                                                           && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan
-                                                                           && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                                           && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)
                                                                     .OrderBy(c => c.FillingDate)
                                                                     .Select(c => c.Facility)
         );
@@ -182,8 +181,7 @@ namespace gip.mes.facility
                                                                               && c.Facility.PartslistID == pos.PartslistID)
                                                                            && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
-                                                                           && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan
-                                                                           && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                                           && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)
                                                                     .OrderBy(c => c.FillingDate)
                                                                     .Select(c => c.Facility)
         );
@@ -269,8 +267,7 @@ namespace gip.mes.facility
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)
-                                                      && c.FillingDate.HasValue
-                                                      && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                      && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
                                                .Select(c => c.Facility)
         );
@@ -342,8 +339,7 @@ namespace gip.mes.facility
                                                          || (c.Facility.PartslistID.HasValue && c.Facility.PartslistID == pos.PartslistID))
                                                       && (  (checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                          || !checkOutwardEnabled)
-                                                      && c.FillingDate.HasValue
-                                                      && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                      && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
                                                .Select(c => c.Facility)
         );
@@ -425,8 +421,7 @@ namespace gip.mes.facility
                                                                                             )
                                                                                        && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                                           || !checkOutwardEnabled)
-                                                                                       && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan
-                                                                                       && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                                                       && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)
                                                                            .OrderBy(c => c.FillingDate)
                                                                            .Select(c => c.Facility)
         );
@@ -509,8 +504,7 @@ namespace gip.mes.facility
                                                                               )
                                                                            && (  (checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
-                                                                           && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan
-                                                                           && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                                           && c.FillingDate.HasValue && c.FillingDate <= filterTimeOlderThan)
                                                                     .OrderBy(c => c.FillingDate)
                                                                     .Select(c => c.Facility)
         );
@@ -599,8 +593,7 @@ namespace gip.mes.facility
                                                                                 )
                                                                             && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
                                                                                 || !checkOutwardEnabled)
-                                                                            && c.InwardFacilityCharge.FillingDate.HasValue && c.InwardFacilityCharge.FillingDate <= filterTimeOlderThan
-                                                                            && (c.InwardFacilityCharge.MDReleaseState == null || c.InwardFacilityCharge.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                                            && c.InwardFacilityCharge.FillingDate.HasValue && c.InwardFacilityCharge.FillingDate <= filterTimeOlderThan)
                                                                     .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                                     .Select(c => c.InwardFacility)
         );
@@ -677,8 +670,7 @@ namespace gip.mes.facility
                                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
                                                                            && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
                                                                               || !checkOutwardEnabled)
-                                                                          && c.InwardFacilityCharge.FillingDate.HasValue && c.InwardFacilityCharge.FillingDate <= filterTimeOlderThan
-                                                                          && (c.InwardFacilityCharge.MDReleaseState == null || c.InwardFacilityCharge.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                                          && c.InwardFacilityCharge.FillingDate.HasValue && c.InwardFacilityCharge.FillingDate <= filterTimeOlderThan)
                                                                     .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                                     .Select(c => c.InwardFacility)
         );
@@ -838,8 +830,7 @@ namespace gip.mes.facility
                                                                  && c.Facility.PartslistID == pos.ProdOrderPartslist.PartslistID))
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                          || !checkOutwardEnabled)
-                                                      && c.FillingDate.HasValue
-                                                      && (c.MDReleaseState == null || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                      && c.FillingDate.HasValue)
                                                .OrderBy(c => c.FillingDate)
                                                .Select(c => c.Facility)
         );
@@ -915,8 +906,7 @@ namespace gip.mes.facility
                                                                 || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID.HasValue && c.InwardFacilityCharge.Facility.MaterialID == pos.MaterialID))))
                                                      && c.InwardFacilityCharge.FillingDate.HasValue
                                                      && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
-                                                          || !checkOutwardEnabled)
-                                                     && (c.InwardFacilityCharge.MDReleaseState == null || c.InwardFacilityCharge.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                          || !checkOutwardEnabled))
                                                .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                .Select(c => c.InwardFacility)
         );
@@ -983,8 +973,7 @@ namespace gip.mes.facility
                                                           || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
                                                      && c.InwardFacilityCharge.FillingDate.HasValue
                                                      && ((checkOutwardEnabled && c.InwardFacility.OutwardEnabled)
-                                                          || !checkOutwardEnabled)
-                                                     && (c.InwardFacilityCharge.MDReleaseState == null || c.InwardFacilityCharge.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                          || !checkOutwardEnabled))
                                                .OrderBy(c => c.InwardFacilityCharge.FillingDate)
                                                .Select(c => c.InwardFacility)
         );
