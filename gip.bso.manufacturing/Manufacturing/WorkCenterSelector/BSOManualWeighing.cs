@@ -112,7 +112,6 @@ namespace gip.bso.manufacturing
         }
 
 
-
         #region Private fields
 
         private bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
