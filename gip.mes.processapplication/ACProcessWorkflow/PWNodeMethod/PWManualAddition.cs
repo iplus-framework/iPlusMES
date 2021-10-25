@@ -57,6 +57,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("AutoInsertQuantToStore", typeof(string), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoInsertQuantToStore", "en{'Store for automatic quant creation'}de{'Lagerplatz für automatische Quantanlage'}");
 
+            method.ParameterValueList.Add(new ACValue("IncludeContainerStores", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("IncludeContainerStores", "en{'IncludeContainerStores'}de{'IncludeContainerStores'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualAddition), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualAddition), ACStateConst.SMStarting, wrapper);
         }

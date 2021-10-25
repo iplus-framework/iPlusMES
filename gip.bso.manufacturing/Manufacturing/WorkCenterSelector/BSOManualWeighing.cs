@@ -241,6 +241,8 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged("TargetWeight");
                 OnPropertyChanged("ScaleDifferenceWeight");
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, _TargetWeight, ScaleActualWeight);
+
+                DelegateToMainThread((object state) => OnTargetWeightChanged(value));
             }
         }
 
@@ -459,12 +461,11 @@ namespace gip.bso.manufacturing
                 {
                     _SelectedWeighingMaterial = value;
                     _FacilityChargeList = null;
-                    _FacilityList = null;
                     OnPropertyChanged("SelectedWeighingMaterial");
-                    OnPropertyChanged("MaterialF_FCList");
+                    OnPropertyChanged("FacilityChargeList");
                     FacilityChargeNo = null;
                     ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
-                    SelectedMaterialF_FC = null;
+                    SelectedFacilityCharge = null;
                     if (_SelectedWeighingMaterial != null)
                         ShowSelectFacilityLotInfo = true;
                     BtnWeighBlink = false;
@@ -484,129 +485,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertySelected(626, "F_FC")]
-        public VBEntityObject SelectedMaterialF_FC
-        {
-            get
-            {
-                if (SelectedWeighingMaterial == null)
-                    return null;
-
-                if (SelectedWeighingMaterial.IsLotManaged)
-                    return _SelectedFacilityCharge;
-                return _SelectedFacility;
-            }
-            set
-            {
-                if (SelectedWeighingMaterial == null || SelectedWeighingMaterial.PosRelation == null || SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos == null)
-                {
-                    SelectedFacilityCharge = null;
-                    SelectedFacility = null;
-                }
-                else if (SelectedWeighingMaterial.IsLotManaged)
-                {
-                    if (SelectedFacilityCharge != value)
-                    {
-                        SelectedFacilityCharge = value as vd.FacilityCharge;
-                    }
-                }
-                else
-                {
-                    if (SelectedFacility != value)
-                    {
-                        SelectedFacility = value as vd.Facility;
-                    }
-                }
-                OnPropertyChanged("SelectedMaterialF_FC");
-            }
-        }
-
-        [ACPropertyList(627, "F_FC")]
-        public IEnumerable<VBEntityObject> MaterialF_FCList
-        {
-            get
-            {
-                if (SelectedWeighingMaterial == null || WeighingMaterialList == null)
-                    return null;
-                if (SelectedWeighingMaterial.IsLotManaged)
-                    return FacilityChargeList;
-                return FacilityList;
-            }
-        }
-
-        private vd.Facility _SelectedFacility;
-        public vd.Facility SelectedFacility
-        {
-            get
-            {
-                return _SelectedFacility;
-            }
-            set
-            {
-                _SelectedFacility = value;
-                if (value != null)
-                    ShowSelectFacilityLotInfo = false;
-
-                OnPropertyChanged("SelectedFacility");
-
-                IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
-
-                if (_StartWeighingFromF_FC)
-                {
-                    StartWeighing(false);
-                    _StartWeighingFromF_FC = false;
-                }
-                else if (_CallPWLotChange && value != null && componentPWNode != null)
-                {
-                    componentPWNode?.ACUrlCommand("!LotChange", value.EntityKey, ScaleActualWeight, _IsLotConsumed, false);
-                    _CallPWLotChange = false;
-                }
-                else if (_SelectedFacility != null && WeighingMaterialsFSM && SelectedWeighingMaterial != null
-                                                   && SelectedWeighingMaterial.WeighingMatState != WeighingComponentState.InWeighing)
-                {
-                    componentPWNode?.ACUrlCommand("ManualWeihgingNextTask", ManualWeighingTaskInfo.WaitForStart);
-                }
-            }
-        }
-
-        private vd.Facility[] _FacilityList;
-        public virtual IEnumerable<vd.Facility> FacilityList
-        {
-            get
-            {
-                try
-                {
-                    IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
-
-                    if (_FacilityList == null && SelectedWeighingMaterial != null)
-                    {
-                        using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
-                        {
-                            ACValueList facilities = componentPWNode?.ACUrlCommand("!GetAvailableFacilities", SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
-                            if (facilities == null)
-                                return null;
-                            _FacilityList = facilities.Select(c => dbApp.Facility.FirstOrDefault(x => x.FacilityID == c.ParamAsGuid)).ToArray();
-                        }
-                    }
-                    return _FacilityList;
-                }
-                catch (Exception e)
-                {
-                    string message = null;
-                    if (e.InnerException != null)
-                        message = string.Format("ManualWeighingModel(FacilityList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
-                    else
-                        message = string.Format("ManualWeighingModel(FacilityList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
-
-                    Messages.Error(this, message, true);
-                    return null;
-                }
-            }
-        }
-
-        private vd.FacilityCharge _SelectedFacilityCharge;
+        private FacilityChargeItem _SelectedFacilityCharge;
         [ACPropertySelected(628, "FacilityCharge")]
-        public vd.FacilityCharge SelectedFacilityCharge
+        public FacilityChargeItem SelectedFacilityCharge
         {
             get => _SelectedFacilityCharge;
             set
@@ -671,9 +552,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        vd.FacilityCharge[] _FacilityChargeList;
+        FacilityChargeItem[] _FacilityChargeList;
         [ACPropertyList(629, "FacilityCharge")]
-        public virtual IEnumerable<vd.FacilityCharge> FacilityChargeList
+        public virtual IEnumerable<FacilityChargeItem> FacilityChargeList
         {
             get
             {
@@ -687,8 +568,8 @@ namespace gip.bso.manufacturing
                         if (facilityCharges == null)
                             return null;
                         using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
-                            _FacilityChargeList = facilityCharges.Select(c => dbApp.FacilityCharge.Include("FacilityLot").Include("MDUnit").Include("Material")
-                                                                                                             .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid)).ToArray();
+                            _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge.Include("FacilityLot").Include("MDUnit").Include("Material")
+                                                                                                             .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight)).ToArray();
                     }
                     return _FacilityChargeList;
                 }
@@ -866,7 +747,7 @@ namespace gip.bso.manufacturing
                     SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
                 {
                     Msg msg = componentPWNode.ACUrlCommand("!StartWeighing", SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID,
-                                                                             SelectedFacilityCharge?.FacilityChargeID, SelectedFacility?.FacilityID, forceSetFC_F) as Msg;
+                                                                             SelectedFacilityCharge?.FacilityChargeID, null, forceSetFC_F) as Msg;
                     return msg;
                 }
                 else
@@ -1007,14 +888,14 @@ namespace gip.bso.manufacturing
             if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
             {
                 ShowSelectFacilityLotInfo = true;
-                OnPropertyChanged("SelectedMaterialF_FC");
+                OnPropertyChanged("SelectedFacilityCharge");
                 _CallPWLotChange = true;
                 _IsLotConsumed = false;
                 if (SelectedWeighingMaterial.IsLotManaged)
                 {
                     //Question50047: Was the material with the lot number {0} used up?
                     // Wurde das Material mit der Chargennummer{0} aufgebraucht?
-                    Global.MsgResult result = Messages.Question(this, "Question50047", Global.MsgResult.Cancel, false, SelectedMaterialF_FC?.ACCaption);
+                    Global.MsgResult result = Messages.Question(this, "Question50047", Global.MsgResult.Cancel, false, SelectedFacilityCharge.FacilityChargeNo);
                     if (result == Global.MsgResult.Yes)
                     {
                         var zeroBookTolerance = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.Material?.ZeroBookingTolerance;
@@ -1816,6 +1697,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private void OnTargetWeightChanged(double targetWeight)
+        {
+            var facilityCharges = FacilityChargeList;
+            if (facilityCharges == null || !facilityCharges.Any())
+                return;
+
+            foreach (var fc in facilityCharges)
+            {
+                fc.OnTargetQunatityChanged(targetWeight);
+            }
+        }
+
         #endregion
 
         #region Methods => HandlePropertyChanged
@@ -1950,14 +1843,14 @@ namespace gip.bso.manufacturing
 
                                     if (compInfo.FacilityCharge != null)
                                     {
-                                        var fcItem = FacilityChargeList.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
-                                        SelectedMaterialF_FC = fcItem;
+                                        var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
+                                        SelectedFacilityCharge = fcItem;
                                     }
-                                    else if (compInfo.Facility != null)
-                                    {
-                                        var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
-                                        SelectedMaterialF_FC = fItem;
-                                    }
+                                    //else if (compInfo.Facility != null)
+                                    //{
+                                    //    var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
+                                    //    SelectedMaterialF_FC = fItem;
+                                    //}
                                 });
                             break;
                         }
@@ -2009,28 +1902,28 @@ namespace gip.bso.manufacturing
                                 if (compInfo.FacilityCharge != null)
                                 {
                                     bool autoRefresh = compInfo.FC_FAutoRefresh;
-                                    if (SelectedMaterialF_FC == null || _CallPWLotChange || compInfo.IsLotChange)
+                                    if (SelectedFacilityCharge == null || _CallPWLotChange || compInfo.IsLotChange)
                                     {
                                         if (autoRefresh)
                                         {
-                                            SelectedMaterialF_FC = null; //check if this needed
+                                            SelectedFacilityCharge = null; //check if this needed
                                             _FacilityChargeList = null;
-                                            OnPropertyChanged("MaterialF_FCList");
+                                            OnPropertyChanged("FacilityChargeList");
                                         }
 
                                         var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
-                                        SelectedMaterialF_FC = fcItem;
+                                        SelectedFacilityCharge = fcItem;
                                     }
                                 }
-                                else if (compInfo.Facility != null)
-                                {
-                                    var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
-                                    if (SelectedMaterialF_FC == null)
-                                    {
-                                        SelectedMaterialF_FC = fItem;
-                                        OnPropertyChanged("SelectedMaterialF_FC");
-                                    }
-                                }
+                                //else if (compInfo.Facility != null)
+                                //{
+                                //    var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
+                                //    if (SelectedMaterialF_FC == null)
+                                //    {
+                                //        SelectedMaterialF_FC = fItem;
+                                //        OnPropertyChanged("SelectedMaterialF_FC");
+                                //    }
+                                //}
                             });
                             break;
                         }
@@ -2080,14 +1973,14 @@ namespace gip.bso.manufacturing
             if (SelectedWeighingMaterial != null)
             {
                 _FacilityChargeList = null;
-                _FacilityList = null;
-                OnPropertyChanged("MaterialF_FCList");
+                //_FacilityList = null;
+                OnPropertyChanged("FacilityChargeList");
             }
         }
 
         public bool IsEnabledRefreshMaterialOrFC_F()
         {
-            return SelectedMaterialF_FC == null || _CallPWLotChange;
+            return SelectedFacilityCharge == null || _CallPWLotChange;
         }
 
         protected ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
@@ -2467,13 +2360,13 @@ namespace gip.bso.manufacturing
 
             switch (vbControl.VBContent)
             {
-                case "SelectedWeighingMaterial":
-                    {
-                        if (WeighingMaterialsFSM)
-                            return Global.ControlModes.Enabled;
-                        return Global.ControlModes.Disabled;
-                    }
-                case "SelectedMaterialF_FC":
+                //case "SelectedWeighingMaterial":
+                //    {
+                //        if (WeighingMaterialsFSM)
+                //            return Global.ControlModes.Enabled;
+                //        return Global.ControlModes.Disabled;
+                //    }
+                case "SelectedFacilityCharge":
                     {
                         if (ShowSelectFacilityLotInfo)
                             return Global.ControlModes.Enabled;

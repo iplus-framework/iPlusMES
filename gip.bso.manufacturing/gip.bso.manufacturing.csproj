@@ -88,6 +88,7 @@
     <Compile Include="Model\ProductionOpenPosition.cs" />
     <Compile Include="Model\WizardSchedulerPartslist.cs" />
     <Compile Include="Model\SearchBatchMaterialModel.cs" />
+    <Compile Include="Model\WorkCenter\FacilityChargeItem.cs" />
     <Compile Include="Model\WorkCenter\InputComponentItem.cs" />
     <Compile Include="Model\WorkCenter\ManualWeighingPWNode.cs" />
     <Compile Include="Model\WorkCenter\MessageItem.cs" />
@@ -223,6 +224,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-10-15 17-03_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-10-24 22-13_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
