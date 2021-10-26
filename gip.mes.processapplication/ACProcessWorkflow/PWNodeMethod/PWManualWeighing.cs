@@ -1215,7 +1215,7 @@ namespace gip.mes.processapplication
                 manualWeighing.ActiveScaleObject?.Tare();
         }
 
-        internal Msg SelectFC_FFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
+        protected internal Msg SelectFC_FFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
         {
             Guid? currentOpenMaterial = CurrentOpenMaterial;
 
@@ -1379,16 +1379,18 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    WeighingComponent comp = GetWeighingComponent(plPosRelation); //WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
-                    if (comp == null)
-                    {
-                        //Error50270: The component {0} doesn't exist for weighing.
-                        msg = new Msg(this, eMsgLevel.Exception, PWClassName, "OnApplyManuallyEnteredLot(35)", 1058, "Error50270", plPosRelation);
-                        Messages.Msg(msg);
-                        return msg;
-                    }
+                    SelectFC_FFromPAF(fc.FacilityChargeID, 0, false, false);
 
-                    SetInfo(comp, WeighingComponentInfoType.SelectFC_F, fc.FacilityChargeID, null, true);
+                    //WeighingComponent comp = GetWeighingComponent(plPosRelation); //WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
+                    //if (comp == null)
+                    //{
+                    //    //Error50270: The component {0} doesn't exist for weighing.
+                    //    msg = new Msg(this, eMsgLevel.Exception, PWClassName, "OnApplyManuallyEnteredLot(35)", 1058, "Error50270", plPosRelation);
+                    //    Messages.Msg(msg);
+                    //    return msg;
+                    //}
+
+                    //SetInfo(comp, WeighingComponentInfoType.SelectFC_F, fc.FacilityChargeID, null, true);
                 }
             }
             catch (Exception e)
@@ -1839,6 +1841,13 @@ namespace gip.mes.processapplication
 
         private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
         {
+            IEnumerable<Facility> facilities = GetAvailableFacilitiesForMaterial(dbApp, posRel);
+
+            return FacilityChargeListQuery(facilities, posRel.SourceProdOrderPartslistPos.MaterialID);
+        }
+
+        public IEnumerable<Facility> GetAvailableFacilitiesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
+        {
             if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PartslistManager == null)
             {
                 throw new NullReferenceException("AccessedProcessModule is null");
@@ -1858,7 +1867,7 @@ namespace gip.mes.processapplication
                                                                     false);
 
             if (routes == null || facilities == null)
-                return new List<FacilityCharge>();
+                return new List<Facility>();
 
             var routeList = routes.ToList();
 
@@ -1904,14 +1913,13 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            
 
             if (!IncludeContainerStores)
             {
                 routableFacilities = routableFacilities.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).ToList();
             }
 
-            return FacilityChargeListQuery(routableFacilities, posRel.SourceProdOrderPartslistPos.MaterialID);
+            return routableFacilities;
         }
 
         /// <summary>

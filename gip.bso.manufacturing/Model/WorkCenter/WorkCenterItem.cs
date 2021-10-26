@@ -29,6 +29,7 @@ namespace gip.bso.manufacturing
             ItemFunctions = new List<WorkCenterItemFunction>();
             _BSOWorkCenterSelector = bso;
             _UserPWNodeAckInfo = new SafeList<string>();
+            SortIndex = processModule.ComponentClass.SortIndex;
         }
 
         #endregion
@@ -95,6 +96,12 @@ namespace gip.bso.manufacturing
         }
 
         public string ItemLayout
+        {
+            get;
+            private set;
+        }
+
+        public short SortIndex
         {
             get;
             private set;

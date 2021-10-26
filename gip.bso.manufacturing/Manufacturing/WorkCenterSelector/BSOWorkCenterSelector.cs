@@ -979,7 +979,7 @@ namespace gip.bso.manufacturing
                 workCenterItem.AddItemFunction(func);
             }
 
-            AccessPrimary.ToNavList(workCenterItems.OrderBy(c => c.ACCaption));
+            AccessPrimary.ToNavList(workCenterItems.OrderBy(c => c.SortIndex).ThenBy(c => c.ACCaption));
             SelectedWorkCenterItem = WorkCenterItems.FirstOrDefault();
         }
 
