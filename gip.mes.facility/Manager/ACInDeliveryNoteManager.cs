@@ -102,9 +102,9 @@ namespace gip.mes.facility
 
         #region Contract Assignment
         [ACMethodInfo("", "en{'Assign'}de{'Zuordnen'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual Msg AssignContractInOrderPos(InOrderPos currentInOrderPos, InOrder currentContract, Nullable<double> enteredPartialQuantity, DatabaseApp dbApp, ACComponent facilityManager, List<object> resultNewEntities)
+        public virtual Msg AssignContractInOrderPos(InOrderPos currentInOrderPos, InOrder currentReleasingOrder, Nullable<double> enteredPartialQuantity, DatabaseApp dbApp, ACComponent facilityManager, List<object> resultNewEntities)
         {
-            if (currentInOrderPos == null || currentContract == null)
+            if (currentInOrderPos == null || currentReleasingOrder == null)
             {
                 throw new ArgumentNullException(Root.Environment.TranslateMessage(this, "Error50009"));
             }
@@ -136,8 +136,8 @@ namespace gip.mes.facility
 
             // 1. Erzeuge Unterposition
             currentInOrderPos.AutoRefresh(dbApp);
-            InOrderPos childInOrderPos = InOrderPos.NewACObject(dbApp, currentInOrderPos);
-            childInOrderPos.InOrder = currentContract;
+            InOrderPos childInOrderPos = InOrderPos.NewACObject(dbApp, currentInOrderPos, currentReleasingOrder);
+            //childInOrderPos.InOrder = currentReleasingOrder;
             childInOrderPos.MaterialPosType = GlobalApp.MaterialPosTypes.InwardPart;
             var queryInOrderPosState = s_cQry_InOrderInProcess.Invoke(dbApp);
             if (!queryInOrderPosState.Any())

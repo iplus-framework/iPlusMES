@@ -1569,6 +1569,8 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="CPartnerCompanyID" Type="uniqueidentifier" />
+          <Property Name="IssuerCompanyPersonID" Type="uniqueidentifier" />
+          <Property Name="MDCurrencyID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="InOrderConfig">
           <Key>
@@ -8021,6 +8023,30 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             </Principal>
             <Dependent Role="InOrder">
               <PropertyRef Name="DeliveryCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InOrder_IssuerCompanyPersonID">
+          <End Role="CompanyPerson" Type="Self.CompanyPerson" Multiplicity="0..1" />
+          <End Role="InOrder" Type="Self.InOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyPerson">
+              <PropertyRef Name="CompanyPersonID" />
+            </Principal>
+            <Dependent Role="InOrder">
+              <PropertyRef Name="IssuerCompanyPersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InOrder_MDCurrencyID">
+          <End Role="MDCurrency" Type="Self.MDCurrency" Multiplicity="0..1" />
+          <End Role="InOrder" Type="Self.InOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="InOrder">
+              <PropertyRef Name="MDCurrencyID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14850,6 +14876,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="InOrder" EntitySet="InOrder" />
           </AssociationSet>
+          <AssociationSet Name="FK_InOrder_IssuerCompanyPersonID" Association="Self.FK_InOrder_IssuerCompanyPersonID">
+            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
+            <End Role="InOrder" EntitySet="InOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InOrder_MDCurrencyID" Association="Self.FK_InOrder_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="InOrder" EntitySet="InOrder" />
+          </AssociationSet>
           <AssociationSet Name="FK_InOrder_MDDelivTypeID" Association="Self.FK_InOrder_MDDelivTypeID">
             <End Role="MDDelivType" EntitySet="MDDelivType" />
             <End Role="InOrder" EntitySet="InOrder" />
@@ -19652,6 +19686,14 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
             <End Role="MDCurrency" EntitySet="MDCurrency" />
             <End Role="OutOrder" EntitySet="OutOrder" />
           </AssociationSet>
+          <AssociationSet Name="FK_InOrder_IssuerCompanyPersonID" Association="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID">
+            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
+            <End Role="InOrder" EntitySet="InOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InOrder_MDCurrencyID" Association="iPlusMESV4_Model.FK_InOrder_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="InOrder" EntitySet="InOrder" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -21292,6 +21334,10 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_BillingCompanyAddressID" FromRole="InOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" FromRole="InOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="PlanningMRProposal_InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="InOrder" ToRole="PlanningMRProposal" />
+          <Property Name="IssuerCompanyPersonID" Type="Guid" />
+          <Property Name="MDCurrencyID" Type="Guid" />
+          <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID" FromRole="InOrder" ToRole="CompanyPerson" />
+          <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_InOrder_MDCurrencyID" FromRole="InOrder" ToRole="MDCurrency" />
         </EntityType>
         <EntityType Name="InOrderConfig">
           <Key>
@@ -22058,6 +22104,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="Invoice_MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="MDCurrency" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOrder" />
+          <NavigationProperty Name="InOrder_MDCurrency" Relationship="iPlusMESV4_Model.FK_InOrder_MDCurrencyID" FromRole="MDCurrency" ToRole="InOrder" />
         </EntityType>
         <EntityType Name="MDCurrencyExchange">
           <Key>
@@ -33242,6 +33289,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <NavigationProperty Name="UserSettings_InvoiceCompanyPerson" Relationship="iPlusMESV4_Model.FK_UserSettings_CompanyPerson" FromRole="CompanyPerson" ToRole="UserSettings" />
           <NavigationProperty Name="Visitor_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_Visitor_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
+          <NavigationProperty Name="InOrder_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID" FromRole="CompanyPerson" ToRole="InOrder" />
         </EntityType>
         <EntityType Name="UserSettings">
           <Key>
@@ -34446,6 +34494,30 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
               <PropertyRef Name="MDCurrencyID" />
             </Principal>
             <Dependent Role="OutOrder">
+              <PropertyRef Name="MDCurrencyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InOrder_IssuerCompanyPersonID">
+          <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.InOrder" Role="InOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyPerson">
+              <PropertyRef Name="CompanyPersonID" />
+            </Principal>
+            <Dependent Role="InOrder">
+              <PropertyRef Name="IssuerCompanyPersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InOrder_MDCurrencyID">
+          <End Type="iPlusMESV4_Model.MDCurrency" Role="MDCurrency" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.InOrder" Role="InOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="InOrder">
               <PropertyRef Name="MDCurrencyID" />
             </Dependent>
           </ReferentialConstraint>
@@ -35746,6 +35818,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
           <EntitySetMapping Name="InOrder">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.InOrder">
               <MappingFragment StoreEntitySet="InOrder">
+                <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
+                <ScalarProperty Name="IssuerCompanyPersonID" ColumnName="IssuerCompanyPersonID" />
                 <ScalarProperty Name="CPartnerCompanyID" ColumnName="CPartnerCompanyID" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
@@ -40535,6 +40609,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.OrderLogRelView' does not have a pr
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_MDCurrencyID" />
       </Diagram>
     </Diagrams>
   </Designer>
