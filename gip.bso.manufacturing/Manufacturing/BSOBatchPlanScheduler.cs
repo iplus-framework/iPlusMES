@@ -32,7 +32,7 @@ namespace gip.bso.manufacturing
 
         public IACConfig GetSelectedLineConfig()
         {
-            var configs = ACType.GetConfigByKeyACUrl(Root.CurrentInvokingUser.GetACUrl());
+            var configs = ACType.GetConfigByKeyACUrl(Root.Environment.User.GetACUrl());
             IACConfig config = configs.FirstOrDefault();
             return config;
         }
@@ -51,7 +51,7 @@ namespace gip.bso.manufacturing
             if (config == null && line != null)
             {
                 config = ACType.ValueTypeACClass.NewACConfig(null, ACType.ValueTypeACClass.Database.GetACType(typeof(string)));
-                config.KeyACUrl = Root.CurrentInvokingUser.GetACUrl();
+                config.KeyACUrl = Root.Environment.User.GetACUrl();
             }
             if (line != null)
                 config.Value = line.MDSchedulingGroup.MDKey;
@@ -3806,7 +3806,7 @@ namespace gip.bso.manufacturing
             string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
             worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
 
-            string updateName = Root.CurrentInvokingUser.Initials;
+            string updateName = Root.Environment.User.Initials;
             switch (command)
             {
                 case BGWorkerMehtod_DoBackwardScheduling:
@@ -3828,7 +3828,7 @@ namespace gip.bso.manufacturing
                                             ScheduledStartDate.Value);
                     break;
                 case BGWorkerMehtod_DoCalculateAll:
-                    SchedulingForecastManager.UpdateAllBatchPlanDurations(Root.CurrentInvokingUser.Initials);
+                    SchedulingForecastManager.UpdateAllBatchPlanDurations(Root.Environment.User.Initials);
                     break;
             }
         }

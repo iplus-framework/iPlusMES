@@ -274,7 +274,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledSetUserSettings()) return;
             if (CurrentUserSettings == null)
             {
-                CurrentUserSettings = UserSettings.NewACObject(DatabaseApp, Root.CurrentInvokingUser);
+                CurrentUserSettings = UserSettings.NewACObject(DatabaseApp, Root.Environment.User);
                 DatabaseApp.UserSettings.AddObject(CurrentUserSettings);
             }
             CurrentUserSettings.TenantCompany = SelectedCompany;
