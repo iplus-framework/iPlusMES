@@ -1542,7 +1542,7 @@ namespace gip.bso.facility
         {
             SelectedFilter.BackgroundWorker = worker;
             SelectedFilter.DoWorkEventArgs = e;
-            TandTv3.TandTResult result = TandTv3Manager.DoTracking(DatabaseApp, SelectedFilter, Root.CurrentInvokingUser.Initials, UseGroupResult);
+            TandTv3.TandTResult result = TandTv3Manager.DoTracking(DatabaseApp, SelectedFilter, Root.Environment.User.Initials, UseGroupResult);
             return result;
         }
 
@@ -1551,7 +1551,7 @@ namespace gip.bso.facility
             if (SelectedFilter == null) return null;
             SelectedFilter.BackgroundWorker = worker;
             SelectedFilter.DoWorkEventArgs = e;
-            TandTv3.TandTResult result = TandTv3Manager.DoSelect(DatabaseApp, SelectedFilter, Root.CurrentInvokingUser.Initials, UseGroupResult);
+            TandTv3.TandTResult result = TandTv3Manager.DoSelect(DatabaseApp, SelectedFilter, Root.Environment.User.Initials, UseGroupResult);
             return result;
         }
 
@@ -1563,7 +1563,7 @@ namespace gip.bso.facility
             TandTv3FilterTracking nextFilter = FilterList.FirstOrDefault(c => c.TandTv3FilterTrackingID != SelectedFilter.TandTv3FilterTrackingID);
             TandTv3.TandTResult result = null;
             if (nextFilter != null)
-                result = TandTv3Manager.DoSelect(DatabaseApp, nextFilter, Root.CurrentInvokingUser.Initials, UseGroupResult);
+                result = TandTv3Manager.DoSelect(DatabaseApp, nextFilter, Root.Environment.User.Initials, UseGroupResult);
             else
                 result = new TandTv3.TandTResult() { Success = false };
             return new KeyValuePair<TandTv3.TandTResult, MsgWithDetails>(result, msg);

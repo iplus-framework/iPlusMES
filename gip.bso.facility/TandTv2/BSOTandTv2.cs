@@ -1100,7 +1100,7 @@ namespace gip.bso.facility
 
         public TandTv2Result DoSearchAsync()
         {
-            TandTv2Result result = TandT2Manager.DoTracking(SelectedJob, Root.CurrentInvokingUser.Initials);
+            TandTv2Result result = TandT2Manager.DoTracking(SelectedJob, Root.Environment.User.Initials);
             TandT2Manager.ApplyFilter(result, GetIncludedItemTypes(), BuildGraphic);
             return result;
         }

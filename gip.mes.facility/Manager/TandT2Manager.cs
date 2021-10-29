@@ -195,7 +195,7 @@ namespace gip.mes.facility
             job.TrackingStyleEnum = TandTv2TrackingStyleEnum.Backward;
             job.RecalcAgain = true;
             job.IsDynamic = true;
-            TandTv2Result tandTResult = DoTracking(databaseApp, job, Root.CurrentInvokingUser.Initials);
+            TandTv2Result tandTResult = DoTracking(databaseApp, job, Root.Environment.User.Initials);
             if (tandTResult.Success)
                 facilityCharges = tandTResult
                                    .StepItems

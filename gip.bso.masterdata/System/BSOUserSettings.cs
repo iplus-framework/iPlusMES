@@ -34,7 +34,7 @@ namespace gip.bso.masterdata
             if (!base.ACInit(startChildMode))
                 return false;
             AccessCompany.NavSearch();
-            CurrentUserSettings = DatabaseApp.UserSettings.FirstOrDefault(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID);
+            CurrentUserSettings = DatabaseApp.UserSettings.FirstOrDefault(c => c.VBUserID == Root.Environment.User.VBUserID);
             if (CurrentUserSettings != null)
             {
                 if (!CompanyList.Contains(CurrentUserSettings.TenantCompany))
@@ -274,7 +274,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledSetUserSettings()) return;
             if (CurrentUserSettings == null)
             {
-                CurrentUserSettings = UserSettings.NewACObject(DatabaseApp, Root.CurrentInvokingUser);
+                CurrentUserSettings = UserSettings.NewACObject(DatabaseApp, Root.Environment.User);
                 DatabaseApp.UserSettings.AddObject(CurrentUserSettings);
             }
             CurrentUserSettings.TenantCompany = SelectedCompany;
