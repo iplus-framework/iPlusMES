@@ -225,7 +225,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return (PreConfigACUrl != null ? PreConfigACUrl + @"\" : "") + LocalConfigACUrl;
+                return ACUrlHelper.BuildConfigACUrl(this);
             }
         }
 

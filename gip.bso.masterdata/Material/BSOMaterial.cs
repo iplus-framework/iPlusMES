@@ -243,6 +243,7 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("ConvertableUnits");
                     OnPropertyChanged("TranslationList");
                     OnPropertyChanged("SingleDosingConfigList");
+                    OnPropertyChanged("WorkflowRootList");
                 }
             }
         }
@@ -1674,7 +1675,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                return SelectedMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.SingleDosingMaterialConfigKeyACUrl).ToList();
+                return CurrentMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.SingleDosingMaterialConfigKeyACUrl).ToList();
             }
         }
 
@@ -1696,14 +1697,21 @@ namespace gip.bso.masterdata
         {
             get
             {
-                return this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue
+                List<core.datamodel.ACClassWF> wfRootList =  
+                    this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue
                                                                 && (c.PWACClass.ACIdentifier == mes.processapplication.PWMethodSingleDosing.PWClassName
                                                                     || (c.PWACClass.BasedOnACClassID.HasValue
                                                                         && (c.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodSingleDosing.PWClassName
                                                                             || (c.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodSingleDosing.PWClassName))))
                                                                 && !c.ACClassMethod.IsSubMethod).SelectMany(x => x.ACClassWF_ParentACClassWF)
-                                                                .Where(c => c.PWACClass.ACIdentifier == mes.processapplication.PWNodeProcessWorkflowVB.PWClassName).ToArray()
-                                                                ;
+                                                                .Where(c => c.PWACClass.ACIdentifier == mes.processapplication.PWNodeProcessWorkflowVB.PWClassName)
+                                                                .AsEnumerable()
+                                                                .OrderBy(c => c.ACCaption)
+                                                                .ToList();
+                var configList = SingleDosingConfigList;
+                if (configList != null)
+                    wfRootList.RemoveAll(c => configList.Where(d => d.VBiACClassWFID == c.ACClassWFID).Any());
+                return wfRootList;
             }
         }
 
@@ -1755,9 +1763,11 @@ namespace gip.bso.masterdata
             if (SelectedSingleDosingMachine != null)
                 singleDosConfig.VBiACClassID = SelectedSingleDosingMachine.ACClassID;
 
-            DatabaseApp.MaterialConfig.AddObject(singleDosConfig);
+            CurrentMaterial.MaterialConfig_Material.Add(singleDosConfig);
+            //DatabaseApp.MaterialConfig.AddObject(singleDosConfig);
 
             OnPropertyChanged("SingleDosingConfigList");
+            OnPropertyChanged("WorkflowRootList");
             CloseTopDialog();
 
             SelectedWorkflowRoot = null;
@@ -1775,6 +1785,7 @@ namespace gip.bso.masterdata
             SelectedMaterial.MaterialConfig_Material.Remove(SingleDosingConfig);
             DatabaseApp.DeleteObject(SingleDosingConfig);
             OnPropertyChanged("SingleDosingConfigList");
+            OnPropertyChanged("WorkflowRootList");
         }
 
         public bool IsEnabledDeleteSingleDosingConfig()
