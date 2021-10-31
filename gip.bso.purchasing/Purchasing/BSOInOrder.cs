@@ -35,6 +35,10 @@ namespace gip.bso.purchasing
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "InOpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}", typeof(InOrderPos), InOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "Material\\MaterialNo,TargetDeliveryDate")]
     public class BSOInOrder : ACBSOvbNav, IOnTrackingCall
     {
+        #region private
+        private UserSettings CurrentUserSettings { get; set; }
+        #endregion
+
         #region c´tors
 
         /// <summary>
@@ -68,6 +72,8 @@ namespace gip.bso.purchasing
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
+
+            CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
 
             Search();
             return true;
@@ -290,6 +296,8 @@ namespace gip.bso.purchasing
                 OnPropertyChanged("DeliveryCompanyAddressList");
                 OnPropertyChanged("DistributorCompanyList");
                 OnPropertyChanged("ContractualCompanyList");
+
+                ResetAccessTenantCompanyFilter(value);
             }
         }
 
@@ -1061,6 +1069,249 @@ namespace gip.bso.purchasing
 
         #endregion
 
+        #region Tenant
+
+        #region Tenant -> TenantCompany
+
+        ACAccessNav<Company> _AccessTenantCompany;
+        [ACPropertyAccess(100, "TenantCompany")]
+        public ACAccessNav<Company> AccessTenantCompany
+        {
+            get
+            {
+                if (_AccessTenantCompany == null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Company", ACType.ACIdentifier);
+                    _AccessTenantCompany = navACQueryDefinition.NewAccessNav<Company>("Company", this);
+                    SetAccessTenantCompanyFilter(navACQueryDefinition);
+                    _AccessTenantCompany.AutoSaveOnNavigation = false;
+                }
+                return _AccessTenantCompany;
+            }
+        }
+
+        public void SetAccessTenantCompanyFilter(ACQueryDefinition navACQueryDefinition)
+        {
+            ACFilterItem filter = navACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "IsTenant").FirstOrDefault();
+            if (filter == null)
+            {
+                filter = new ACFilterItem(Global.FilterTypes.filter, "IsTenant", Global.LogicalOperators.equal, Global.Operators.and, "true", true);
+                navACQueryDefinition.ACFilterColumns.Add(filter);
+            }
+        }
+
+        public void ResetAccessTenantCompanyFilter()
+        {
+            AccessTenantCompany.NavACQueryDefinition.ACFilterColumns.Clear();
+            SetAccessTenantCompanyFilter(_AccessTenantCompany.NavACQueryDefinition);
+            AccessTenantCompany.NavSearch();
+        }
+
+        public void ResetAccessTenantCompanyFilter(InOrder inOrder)
+        {
+            ResetAccessTenantCompanyFilter();
+            Company tenantCompany = null;
+            if (inOrder != null)
+            {
+                if (inOrder.BillingCompanyAddress != null)
+                    tenantCompany = inOrder.BillingCompanyAddress.Company;
+                else if (inOrder.IssuerCompanyPerson != null)
+                    tenantCompany = inOrder.IssuerCompanyPerson.Company;
+
+                if (tenantCompany != null)
+                    SelectedTenantCompany = tenantCompany;
+
+                SelectedInvoiceCompanyAddress = inOrder.BillingCompanyAddress;
+                SelectedInvoiceCompanyPerson = inOrder.IssuerCompanyPerson;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected Company.
+        /// </summary>
+        /// <value>The selected Company.</value>
+        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}")]
+        public Company SelectedTenantCompany
+        {
+            get
+            {
+                if (AccessTenantCompany == null)
+                    return null;
+                return AccessTenantCompany.Selected;
+            }
+            set
+            {
+                if (AccessTenantCompany == null)
+                    return;
+                if (AccessTenantCompany.Selected != value)
+                {
+                    AccessTenantCompany.Selected = value;
+                    _InvoiceCompanyAddressList = null;
+                    _InvoiceCompanyPersonList = null;
+                    OnPropertyChanged("InvoiceCompanyAddressList");
+                    OnPropertyChanged("InvoiceCompanyPersonList");
+                }
+                OnPropertyChanged("SelectedTenantCompany");
+            }
+        }
+
+        /// <summary>
+        /// Gets the Company list.
+        /// </summary>
+        /// <value>The facility list.</value>
+        [ACPropertyList(102, "TenantCompany")]
+        public IEnumerable<Company> TenantCompanyList
+        {
+            get
+            {
+                if (AccessTenantCompany == null)
+                    return null;
+                return AccessTenantCompany.NavList;
+            }
+        }
+
+        #endregion
+
+
+        #region Tenant -> InvoiceCompanyAddress
+        private CompanyAddress _SelectedInvoiceCompanyAddress;
+        /// <summary>
+        /// Selected property for CompanyAddress
+        /// </summary>
+        /// <value>The selected CompanyAddress</value>
+        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}")]
+        public CompanyAddress SelectedInvoiceCompanyAddress
+        {
+            get
+            {
+                return _SelectedInvoiceCompanyAddress;
+            }
+            set
+            {
+                if (_SelectedInvoiceCompanyAddress != value)
+                {
+                    _SelectedInvoiceCompanyAddress = value;
+                    OnPropertyChanged("SelectedInvoiceCompanyAddress");
+                }
+            }
+        }
+
+
+        private List<CompanyAddress> _InvoiceCompanyAddressList;
+        /// <summary>
+        /// List property for CompanyAddress
+        /// </summary>
+        /// <value>The CompanyAddress list</value>
+        [ACPropertyList(9999, "InvoiceCompanyAddress")]
+        public List<CompanyAddress> InvoiceCompanyAddressList
+        {
+            get
+            {
+                if (_InvoiceCompanyAddressList == null)
+                    _InvoiceCompanyAddressList = LoadInvoiceCompanyAddressList();
+                return _InvoiceCompanyAddressList;
+            }
+        }
+
+        private List<CompanyAddress> LoadInvoiceCompanyAddressList()
+        {
+            if (SelectedTenantCompany == null) return null;
+            return SelectedTenantCompany.CompanyAddress_Company.OrderBy(c => c.Name1).ToList();
+
+        }
+        #endregion
+
+        #region Tenant -> InvoiceCompanyPerson
+        private CompanyPerson _SelectedInvoiceCompanyPerson;
+        /// <summary>
+        /// Selected property for CompanyPerson
+        /// </summary>
+        /// <value>The selected CompanyPerson</value>
+        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}")]
+        public CompanyPerson SelectedInvoiceCompanyPerson
+        {
+            get
+            {
+                return _SelectedInvoiceCompanyPerson;
+            }
+            set
+            {
+                if (_SelectedInvoiceCompanyPerson != value)
+                {
+                    _SelectedInvoiceCompanyPerson = value;
+                    OnPropertyChanged("SelectedInvoiceCompanyPerson");
+                }
+            }
+        }
+
+
+        private List<CompanyPerson> _InvoiceCompanyPersonList;
+        /// <summary>
+        /// List property for CompanyPerson
+        /// </summary>
+        /// <value>The CompanyPerson list</value>
+        [ACPropertyList(9999, "InvoiceCompanyPerson")]
+        public List<CompanyPerson> InvoiceCompanyPersonList
+        {
+            get
+            {
+                if (_InvoiceCompanyPersonList == null)
+                    _InvoiceCompanyPersonList = LoadInvoiceCompanyPersonList();
+                return _InvoiceCompanyPersonList;
+            }
+        }
+
+        private List<CompanyPerson> LoadInvoiceCompanyPersonList()
+        {
+            if (SelectedTenantCompany == null) return null;
+            return SelectedTenantCompany.CompanyPerson_Company.OrderBy(c => c.Name1).ThenBy(c => c.Name2).ToList();
+
+        }
+        #endregion
+
+        #endregion
+
+
+        //#region Issuer -> IssuerCompanyPerson
+
+        //private CompanyPerson _SelectedIssuerCompanyPerson;
+        ///// <summary>
+        ///// Selected property for CompanyPerson
+        ///// </summary>
+        ///// <value>The selected IssuerCompanyPerson</value>
+        //[ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}")]
+        //public CompanyPerson SelectedIssuerCompanyPerson
+        //{
+        //    get
+        //    {
+        //        return _SelectedIssuerCompanyPerson;
+        //    }
+        //    set
+        //    {
+        //        if (_SelectedIssuerCompanyPerson != value)
+        //        {
+        //            _SelectedIssuerCompanyPerson = value;
+        //            OnPropertyChanged("SelectedIssuerCompanyPerson");
+        //        }
+        //    }
+        //}
+
+        //private List<CompanyPerson> _IssuerCompanyPersonList = null;
+        ///// <summary>
+        ///// List property for CompanyPerson
+        ///// </summary>
+        ///// <value>The IssuerCompanyPerson list</value>
+        //[ACPropertyList(9999, "IssuerCompanyPerson")]
+        //public List<CompanyPerson> IssuerCompanyPersonList
+        //{
+        //    get
+        //    {
+        //        return _IssuerCompanyPersonList;
+        //    }
+        //}
+
+        //#endregion
+
 
         #endregion
 
@@ -1231,6 +1482,12 @@ namespace gip.bso.purchasing
             }
 
             DatabaseApp.InOrder.AddObject(CurrentInOrder);
+            if (CurrentUserSettings != null)
+            {
+                CurrentInOrder.BillingCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
+                CurrentInOrder.IssuerCompanyPerson = CurrentUserSettings.InvoiceCompanyPerson;
+            }
+
             SelectedInOrder = CurrentInOrder;
             if (AccessPrimary != null)
                 AccessPrimary.NavList.Add(CurrentInOrder);

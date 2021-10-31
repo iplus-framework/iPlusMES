@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
         public const string ClassName = "InOrderPos";
 
         #region New/Delete
-        public static InOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject)
+        public static InOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject, InOrder attachToOrder = null)
         {
             InOrderPos entity = new InOrderPos();
             entity.InOrderPosID = Guid.NewGuid();
@@ -58,7 +58,7 @@ namespace gip.mes.datamodel
                 InOrderPos parentInOrderPos = parentACObject as InOrderPos;
                 entity.InOrderPos1_ParentInOrderPos = parentInOrderPos;
                 entity.CopyFromParent(parentInOrderPos);
-                inOrder = parentInOrderPos.InOrder;
+                inOrder = attachToOrder != null ? attachToOrder : parentInOrderPos.InOrder;
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.InwardPart;
             }
             if (parentACObject is InOrder)
@@ -224,7 +224,8 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return "Position " + Sequence.ToString();
+                return Sequence.ToString("00");
+                //return "Position " + Sequence.ToString();
             }
         }
 

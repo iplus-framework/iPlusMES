@@ -951,7 +951,7 @@ namespace gip.mes.facility
 
                                         ActualSalesTax countrySalesTaxModel = null;
                                         // Fetch sales tax for same country if Tendant 
-                                        UserSettings userSettings = databaseApp.UserSettings.FirstOrDefault(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID);
+                                        UserSettings userSettings = databaseApp.UserSettings.FirstOrDefault(c => c.VBUserID == Root.Environment.User.VBUserID);
                                         if (userSettings != null && userSettings.InvoiceCompanyAddress != null)
                                         {
                                             if (userSettings.InvoiceCompanyAddress.MDCountryID == billingCompanyAddress.MDCountryID)

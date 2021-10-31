@@ -172,7 +172,7 @@ namespace gip.mes.webservices
                 BarcodeEntity facility = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
                 BarcodeEntity facilityLot = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
 
-                List<gip.mes.datamodel.FacilityCharge> foundedFacilityCharges = new List<gip.mes.datamodel.FacilityCharge>();
+                List<gip.mes.datamodel.FacilityCharge> foundFacilityCharges = new List<gip.mes.datamodel.FacilityCharge>();
                 List<gip.mes.datamodel.FacilityCharge> tmpChargeList = new List<gip.mes.datamodel.FacilityCharge>();
                 using (var dbApp = new gip.mes.datamodel.DatabaseApp())
                 {
@@ -207,7 +207,7 @@ namespace gip.mes.webservices
                                     )
                            .ToList();
 
-                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        foundFacilityCharges.AddRange(tmpChargeList);
                         if (tmpChargeList.Count > 1)
                         {
                             // Info50070
@@ -226,7 +226,7 @@ namespace gip.mes.webservices
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
                                     )
                              .ToList();
-                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        foundFacilityCharges.AddRange(tmpChargeList);
                         if (tmpChargeList.Count > 1)
                         {
                             // Info50071
@@ -245,7 +245,7 @@ namespace gip.mes.webservices
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
                                     )
                              .ToList();
-                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        foundFacilityCharges.AddRange(tmpChargeList);
                         if (tmpChargeList.Count > 1)
                         {
                             // Info50072
@@ -265,7 +265,7 @@ namespace gip.mes.webservices
                                         && c.FacilityLot.LotNo == facilityLot.FacilityLot.LotNo
                                     )
                              .ToList();
-                        foundedFacilityCharges.AddRange(tmpChargeList);
+                        foundFacilityCharges.AddRange(tmpChargeList);
                         if (tmpChargeList.Count > 1)
                         {
                             // Info50073
@@ -274,10 +274,10 @@ namespace gip.mes.webservices
                         }
                     }
 
-                    if (foundedFacilityCharges.Any())
+                    if (foundFacilityCharges.Any())
                     {
                         sequence.Sequence.AddRange(
-                            foundedFacilityCharges
+                            foundFacilityCharges
                             .Select(c=> new BarcodeEntity()
                                 {
                                     FacilityCharge = VBWebService.s_cQry_GetFacilityCharge(dbApp, c.FacilityChargeID).FirstOrDefault()

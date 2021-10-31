@@ -29,7 +29,7 @@ namespace gip.mes.facility
             UserSettings userSettings = dbApp.UserSettings
                                         .Include(c => c.InvoiceCompanyAddress)
                                         .Include(c => c.InvoiceCompanyAddress.MDCountry)
-                                        .FirstOrDefault(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID);
+                                        .FirstOrDefault(c => c.VBUserID == Root.Environment.User.VBUserID);
             if (userSettings != null 
                 && userSettings.InvoiceCompanyAddress != null 
                 && userSettings.InvoiceCompanyAddress.MDCountry != null)

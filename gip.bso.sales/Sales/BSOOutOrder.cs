@@ -56,7 +56,7 @@ namespace gip.bso.sales
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
-            CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID).FirstOrDefault();
+            CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
 
             Search();
 

@@ -36,7 +36,7 @@ namespace gip.bso.sales
             _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("OutDeliveryNoteManager not configured");
-            CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.CurrentInvokingUser.VBUserID).FirstOrDefault();
+            CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
             Search();
             SetSelectedPos();
 
