@@ -24,7 +24,7 @@ namespace gip.mes.datamodel
 
         #region ctors
 
-       
+
 
         public PartslistExpand(Partslist partsList, double treeQuantityRatio = 1)
         {
@@ -55,16 +55,45 @@ namespace gip.mes.datamodel
 
         #region Properties
 
-
-        #region Properties -> Helper
-
+        #region Properties -> Tree structure
         public int Sequence
         {
             get;
             set;
         }
 
+        public PartslistExpand Root
+        {
+            get
+            {
+                if (Parent == null)
+                    return this;
+                else
+                    return Parent.Root;
+            }
+        }
         public PartslistExpand Parent { get; set; }
+
+        private List<PartslistExpand> _Children;
+        public List<PartslistExpand> Children
+        {
+            get
+            {
+                if (_Children == null)
+                    _Children = new List<PartslistExpand>();
+                return _Children;
+            }
+            set
+            {
+                _Children = value;
+            }
+        }
+
+        #endregion
+
+
+        #region Properties -> Partslist
+
 
         public Partslist PartslistForPosition { get; set; }
 
@@ -81,20 +110,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        private List<PartslistExpand> _Children;
-        public List<PartslistExpand> Children
-        {
-            get
-            {
-                if (_Children == null)
-                    _Children = new List<PartslistExpand>();
-                return _Children;
-            }
-            set
-            {
-                _Children = value;
-            }
-        }
 
         public double TreeQuantityRatio { get; set; }
 
@@ -171,6 +186,15 @@ namespace gip.mes.datamodel
 
         #region Tree manipulation methods
 
+        public void CheckIsPartslistPresent(PartslistExpand item, Guid partslistID, ref bool isPartslistPresent)
+        {
+            isPartslistPresent = isPartslistPresent || item.PartslistForPosition.PartslistID == partslistID;
+            if (item.Children != null)
+                foreach (PartslistExpand childItem in item.Children)
+                    CheckIsPartslistPresent(childItem, partslistID, ref isPartslistPresent);
+        }
+
+
         /// <summary>
         /// Load partslist reference tree
         /// Load all materials they can be possible product of 
@@ -178,27 +202,34 @@ namespace gip.mes.datamodel
         /// </summary>
         public virtual void LoadTree()
         {
+            bool isPartslistPresent = false;
             int i = 1;
-            var posItems = 
+            var posItems =
                 PartslistForPosition
                 .PartslistPos_Partslist
-                .Where(x => 
-                        x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot 
+                .Where(x =>
+                        x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot
                         && x.AlternativePartslistPosID == null
                         && !(x.ExplosionOff ?? false))
                 .ToList();
-            foreach (var position in posItems)
+            foreach (PartslistPos position in posItems)
             {
                 PartslistExpand childExpand = null;
                 if (position.ParentPartslist != null)
                 {
-                    if (position.ParentPartslist.IsEnabled && (position.ParentPartslist.IsInEnabledPeriod ?? false))
+                    if (position.ParentPartslist.IsEnabled && (position.ParentPartslist.IsInEnabledPeriod ?? false) && (position.ExplosionOff ?? true) && position.ParentPartslist.DeleteDate == null)
                     {
-                        childExpand = new PartslistExpand(this, i, position.ParentPartslist, position);
-                        childExpand.IsChecked = childExpand.Parent != null ? childExpand.Parent.IsChecked : true;
-                        Children.Add(childExpand);
-                        i++;
-                        childExpand.LoadTree();
+                        isPartslistPresent = false;
+                        CheckIsPartslistPresent(this.Root, position.ParentPartslist.PartslistID, ref isPartslistPresent);
+
+                        if (!isPartslistPresent)
+                        {
+                            childExpand = new PartslistExpand(this, i, position.ParentPartslist, position);
+                            childExpand.IsChecked = childExpand.Parent != null ? childExpand.Parent.IsChecked : true;
+                            Children.Add(childExpand);
+                            i++;
+                            childExpand.LoadTree();
+                        }
                     }
                 }
                 else
@@ -208,18 +239,24 @@ namespace gip.mes.datamodel
                         position
                         .Material
                         .Partslist_Material
-                        .Where(pl => pl.IsEnabled && (pl.IsInEnabledPeriod ?? false))
+                        .Where(pl => pl.IsEnabled && (pl.IsInEnabledPeriod ?? false) && pl.DeleteDate == null)
                         .OrderByDescending(c => c.PartslistVersion)
                         .ToList();
                     int localI = 0;
-                    foreach (var partslistForPosition in positionPartslist)
+                    foreach (Partslist partslistForPosition in positionPartslist)
                     {
-                        childExpand = new PartslistExpand(this, i, partslistForPosition, position);
-                        childExpand.IsChecked = (childExpand.Parent != null ? childExpand.Parent.IsChecked : true) && localI <= 1;
-                        Children.Add(childExpand);
-                        i++;
-                        localI++;
-                        childExpand.LoadTree();
+                        isPartslistPresent = false;
+                        CheckIsPartslistPresent(this.Root, partslistForPosition.PartslistID, ref isPartslistPresent);
+
+                        if (!isPartslistPresent)
+                        {
+                            childExpand = new PartslistExpand(this, i, partslistForPosition, position);
+                            childExpand.IsChecked = (childExpand.Parent != null ? childExpand.Parent.IsChecked : true) && localI <= 1;
+                            Children.Add(childExpand);
+                            i++;
+                            localI++;
+                            childExpand.LoadTree();
+                        }
                     }
                 }
             }
@@ -259,6 +296,7 @@ namespace gip.mes.datamodel
 
 
         #region IACContainerWithItems
+
         /// <summary>Container-Childs</summary>
         /// <value>Container-Childs</value>
         [ACPropertyInfo(9999)]
@@ -433,5 +471,6 @@ namespace gip.mes.datamodel
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
+
     }
 }
