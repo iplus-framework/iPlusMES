@@ -201,7 +201,9 @@ namespace gip.bso.purchasing
         {
             if (_CurrentDeliveryNotePos != null && _CurrentDeliveryNotePos.InOrderPos != null)
             {
-                _CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.AutoLoad(this.DatabaseApp);
+                if (    _CurrentDeliveryNotePos.InOrderPos.EntityState == System.Data.EntityState.Modified 
+                     || _CurrentDeliveryNotePos.InOrderPos.EntityState == System.Data.EntityState.Unchanged)
+                    _CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.AutoLoad(this.DatabaseApp);
                 var selectedModules = _CurrentDeliveryNotePos.InOrderPos.FacilityReservation_InOrderPos.ToArray();
                 var reservationCollection = new BindingList<POPartslistPosReservation>();
                 var availableModules = GetAvailableModulesAsACClass(_CurrentDeliveryNotePos, this.Database.ContextIPlus);

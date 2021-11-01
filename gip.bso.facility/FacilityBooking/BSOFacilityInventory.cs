@@ -1055,7 +1055,7 @@ namespace gip.bso.facility
                             || !((c.NotAvailable || c.NewStockQuantity == null) ^ (FilterOpenLines ?? false))
                        )
                  )
-                .OrderBy(c => c.FacilityCharge != null ? c.FacilityCharge.FacilityLot.LotNo : "")
+                .OrderBy(c => c.FacilityCharge != null && c.FacilityCharge.FacilityLot != null ? c.FacilityCharge.FacilityLot.LotNo : "")
                 .Take(FilterPosPageSize)
                 .ToList();
         }
