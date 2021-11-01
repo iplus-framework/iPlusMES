@@ -217,7 +217,10 @@ namespace gip.mes.datamodel
                 PartslistExpand childExpand = null;
                 if (position.ParentPartslist != null)
                 {
-                    if (position.ParentPartslist.IsEnabled && (position.ParentPartslist.IsInEnabledPeriod ?? false) && !(position.ExplosionOff ?? false) && position.ParentPartslist.DeleteDate == null)
+                    if (
+                        position.ParentPartslist.IsEnabled 
+                        && (position.ParentPartslist.IsInEnabledPeriod ?? false) 
+                        && position.ParentPartslist.DeleteDate == null)
                     {
                         isPartslistPresent = false;
                         CheckIsPartslistPresent(this.Root, position.ParentPartslist.PartslistID, ref isPartslistPresent);
