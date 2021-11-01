@@ -11,6 +11,11 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Work center selector BSO base'}de{'Work center selector BSO base'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, "", true)]
     public abstract class PAFWorkCenterSelItemBase : PAProcessFunction
     {
+        static PAFWorkCenterSelItemBase()
+        {
+            RegisterExecuteHandler(typeof(PAFWorkCenterSelItemBase), HandleExecuteACMethod_PAFWorkCenterSelItemBase);
+        }
+
         public PAFWorkCenterSelItemBase(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
@@ -21,6 +26,11 @@ namespace gip.mes.processapplication
         {
             get;
             set;
+        }
+
+        public static bool HandleExecuteACMethod_PAFWorkCenterSelItemBase(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            return HandleExecuteACMethod_PAProcessFunction(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
     }
 }

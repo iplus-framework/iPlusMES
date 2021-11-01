@@ -1157,8 +1157,14 @@ namespace gip.mes.processapplication
                 case "SetDefaultACMethodValues":
                     SetDefaultACMethodValues(acParameter[0] as ACMethod);
                     return true;
+                case "SetActiveScaleObject":
+                    SetActiveScaleObject(acParameter[0] as string);
+                    return true;
                 case PAFWorkTaskScanBase.MN_OnScanEvent:
                     result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (bool)acParameter[1], (Guid)acParameter[2], (Guid)acParameter[3], (int)acParameter[4], (short?)acParameter[5]);
+                    return true;
+                case "GetAvailableScaleObjects":
+                    result = GetAvailableScaleObjects();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
