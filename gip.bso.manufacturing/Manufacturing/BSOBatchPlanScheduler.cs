@@ -3026,19 +3026,21 @@ namespace gip.bso.manufacturing
                     .SelectMany(c => c.SchedulingGroups)
                     .OrderBy(c => c.SortIndex)
                     .ToList();
-            Dictionary<int, Guid> items =
+            IEnumerable<Tuple<int, Guid>> items =
                 partslist
                 .PartslistConfig_Partslist
                 .Where(c => c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
-                .ToList()
-                .ToDictionary(key => (int)key.Value, val => val.VBiACClassWFID.Value);
+                .ToArray()
+                .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
+                .OrderBy(c => c.Item1)
+                .ToArray();
             if (items != null && items.Any())
             {
                 List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
                 if (schedulingGroups != null && schedulingGroups.Any())
-                    foreach (var item in items.OrderBy(c => c.Key))
+                    foreach (Tuple<int, Guid> item in items)
                     {
-                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == item.Value)).FirstOrDefault();
+                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == item.Item2)).FirstOrDefault();
                         if (mDSchedulingGroup != null)
                             tmpSchedulingGroups.Add(mDSchedulingGroup);
                     }
