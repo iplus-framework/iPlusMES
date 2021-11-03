@@ -139,12 +139,12 @@ namespace gip.mes.processapplication
 
         private readonly ACMonitorObject _65500_LotChangeLock = new ACMonitorObject(65500);
 
-        private readonly ACMonitorObject _65003_IsAbortedLock = new ACMonitorObject(65003);
+        protected readonly ACMonitorObject _65003_IsAbortedLock = new ACMonitorObject(65003);
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
 
-        private bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false;
+        protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false;
 
         private gip.core.datamodel.ACProgramLog _NewAddedProgramLog = null;
 
@@ -2062,7 +2062,7 @@ namespace gip.mes.processapplication
             return new List<FacilityCharge>();
         }
 
-        private void SaveLastUsedLot(Guid? facilityCharge, Guid? materialID)
+        protected void SaveLastUsedLot(Guid? facilityCharge, Guid? materialID)
         {
             if (!facilityCharge.HasValue || !materialID.HasValue)
                 return;
@@ -2320,9 +2320,6 @@ namespace gip.mes.processapplication
                 DoAutoInsertQuantToStore(weighingComponent);
             }
 
-            if (!OnStartManualWeighingNextComp(weighingComponent))
-                return StartNextCompResult.CycleWait;
-
             gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
             using (ACMonitor.Lock(this.ContextLockForACClassWF))
             {
@@ -2338,6 +2335,10 @@ namespace gip.mes.processapplication
                 OnNewAlarmOccurred(ProcessAlarm, msg, false);
                 return StartNextCompResult.CycleWait;
             }
+
+            if (!OnStartManualWeighingNextComp(weighingComponent, acMethod))
+                return StartNextCompResult.CycleWait;
+
             PAProcessFunction responsibleFunc = CanStartProcessFunc(module, acMethod);
             if (responsibleFunc == null)
                 return StartNextCompResult.CycleWait;
@@ -2421,7 +2422,7 @@ namespace gip.mes.processapplication
             return StartNextCompResult.NextCompStarted;
         }
 
-        public virtual bool OnStartManualWeighingNextComp(WeighingComponent component)
+        public virtual bool OnStartManualWeighingNextComp(WeighingComponent component, ACMethod acMethod)
         {
             return true;
         }
@@ -2579,7 +2580,7 @@ namespace gip.mes.processapplication
             _InCallback = false;
         }
 
-        private Msg SetRelationState(Guid? plPosRelationID, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates targetState, bool setOnTopRelation = false)
+        protected Msg SetRelationState(Guid? plPosRelationID, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates targetState, bool setOnTopRelation = false)
         {
             Msg msg = null;
             using (DatabaseApp dbApp = new DatabaseApp())
