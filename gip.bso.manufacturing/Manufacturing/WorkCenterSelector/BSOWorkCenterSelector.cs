@@ -64,6 +64,12 @@ namespace gip.bso.manufacturing
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_ClientManager != null)
+            {
+                _ClientManager.PropertyChanged -= _ClientManager_PropertyChanged;
+                _ClientManager = null;
+            }
+
             if (TaskPresenter != null)
             {
                 TaskPresenter.Unload();
@@ -111,10 +117,10 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if (_ClientManager != null)
+            if (_RoutingService != null)
             {
-                _ClientManager.PropertyChanged -= _ClientManager_PropertyChanged;
-                _ClientManager = null;
+                _RoutingService.Detach();
+                _RoutingService = null;
             }
 
             _MainSyncContext = null;
@@ -1446,6 +1452,9 @@ namespace gip.bso.manufacturing
                     return true;
                 case "IsEnabledShowWorkflow":
                     result = IsEnabledShowWorkflow();
+                    return true;
+                case "SwitchPWGroupToEmptyingMode":
+                    SwitchPWGroupToEmptyingMode();
                     return true;
             }
 

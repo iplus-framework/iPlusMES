@@ -768,6 +768,21 @@ namespace gip.mes.processapplication
         {
             return HandleExecuteACMethod_PWGroup(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+
+            switch(acMethodName)
+            {
+                case "SetExtraDisTarget":
+                    SetExtraDisTarget(acParameter[0] as string);
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
 
 
