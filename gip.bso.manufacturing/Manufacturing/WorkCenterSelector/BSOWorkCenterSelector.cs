@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using gip.mes.datamodel;
 using System.Threading;
+using gip.mes.processapplication;
 
 namespace gip.bso.manufacturing
 {
@@ -588,6 +589,30 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        public core.datamodel.ACClass _SelectedExtraDisTarget;
+        [ACPropertySelected(850, "ExtraDis")]
+        public core.datamodel.ACClass SelectedExtraDisTarget
+        {
+            get => _SelectedExtraDisTarget;
+            set
+            {
+                _SelectedExtraDisTarget = value;
+                OnPropertyChanged("SelectedExtraDisTarget");
+            }
+        }
+
+        private IEnumerable<core.datamodel.ACClass> _ExtraDisTargets;
+        [ACPropertyList(850, "ExtraDis")]
+        public IEnumerable<core.datamodel.ACClass> ExtraDisTargets
+        {
+            get => _ExtraDisTargets;
+            set
+            {
+                _ExtraDisTargets = value;
+                OnPropertyChanged("PumpTargets");
+            }
+        }
+
         BSOWorkCenterChild CurrentChildBSO
         {
             get;
@@ -624,6 +649,29 @@ namespace gip.bso.manufacturing
                 return _PWUserAckClasses;
             }
         }
+
+        #region Routing service
+
+        protected ACRef<ACComponent> _RoutingService = null;
+        public ACComponent RoutingService
+        {
+            get
+            {
+                if (_RoutingService == null)
+                    return null;
+                return _RoutingService.ValueT;
+            }
+        }
+
+        public bool IsRoutingServiceAvailable
+        {
+            get
+            {
+                return RoutingService != null && RoutingService.ConnectionState != ACObjectConnectionState.DisConnected;
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -1113,6 +1161,70 @@ namespace gip.bso.manufacturing
         public virtual void OnWorkcenterItemSelected(WorkCenterItem item, ref string dynamicContent)
         {
 
+        }
+
+        public virtual void SelectExtraDisTargetOnPWGroup()
+        {
+            IACComponentPWNode currentPWGroup = null;
+            using (ACMonitor.Lock(_70050_MembersLock))
+            {
+                currentPWGroup = _CurrentPWGroup.ValueT;
+            }
+
+            if (currentPWGroup == null)
+                return;
+
+            if (_RoutingService == null)
+            {
+                _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
+                if (_RoutingService == null)
+                {
+                    //Error50430: The routing service is unavailable.
+                    Messages.Error(this, "Error50430");
+                    return;
+                }
+            }
+
+            ACComponent currentProcessModule = CurrentProcessModule;
+
+            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, currentProcessModule.ComponentClass, PAMSilo.SelRuleID_Storage,
+                                                                    RouteDirections.Forwards, null, null, null, 0, true, true);
+
+            if (rResult == null || rResult.Routes == null)
+            {
+                //Error50431: Can not find any target storage for this station.
+                Messages.Error(this, "Error50431");
+                return;
+            }
+
+            ExtraDisTargets = rResult.Routes.SelectMany(c => c.GetRouteTargets()).Select(x => x.Target);
+
+            ShowDialog(this, "ExtraDisTargetDialog");
+        }
+
+        [ACMethodInfo("","",9999, true)]
+        public virtual void SwitchPWGroupToEmptyingMode()
+        {
+            if (SelectedExtraDisTarget == null)
+                return;
+
+            IACComponentPWNode currentPWGroup = null;
+            using (ACMonitor.Lock(_70050_MembersLock))
+            {
+                currentPWGroup = _CurrentPWGroup.ValueT;
+            }
+
+            if (currentPWGroup == null)
+                return;
+
+            _CurrentPWGroup.ValueT.ACUrlCommand("!SetExtraDisTarget", SelectedExtraDisTarget.ACUrlComponent);
+
+            CloseTopDialog();
+        }
+
+        public virtual bool IsEnabledSwitchPWGroupToEmptyingMode()
+        {
+            return SelectedExtraDisTarget != null;
         }
 
         #region Methods => FunctionMonitor

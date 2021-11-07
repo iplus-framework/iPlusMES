@@ -958,25 +958,32 @@ namespace gip.bso.manufacturing
 
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
-            if (componentPWNode == null)
-            {
-                Messages.Error(this, "ComponentPWNode is null!");
-                return;
-            }
+            //if (componentPWNode == null)
+            //{
+            //    Messages.Error(this, "ComponentPWNode is null!");
+            //    return;
+            //}
 
-            //Question50043: Do you want to abort the current weighing?
-            // Möchten Sie die aktuelle Verwiegung abbrechen?
-            if (Messages.YesNoCancel(this, "Question50043", Global.MsgResult.No) == Global.MsgResult.Yes)
+            if (componentPWNode != null)
             {
-                //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
-                // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
-                if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
+                //Question50043: Do you want to abort the current weighing?
+                // Möchten Sie die aktuelle Verwiegung abbrechen?
+                if (Messages.YesNoCancel(this, "Question50043", Global.MsgResult.No) == Global.MsgResult.Yes)
                 {
-                    componentPWNode?.ACUrlCommand("!Abort", true);
-                    return;
+                    //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
+                    // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
+                    if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
+                    {
+                        componentPWNode?.ACUrlCommand("!Abort", true);
+                        return;
+                    }
+                    componentPWNode?.ACUrlCommand("!Abort", false);
+                    ShowSelectFacilityLotInfo = false;
                 }
-                componentPWNode?.ACUrlCommand("!Abort", false);
-                ShowSelectFacilityLotInfo = false;
+            }
+            else
+            {
+                ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
             }
         }
 

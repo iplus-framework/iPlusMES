@@ -49,7 +49,7 @@ namespace gip.mes.processapplication
                 return StartNextCompResult.Done;
             var pwGroup = ParentPWGroup;
             // Nur einmal starten erlaubt:
-            if (   !RepeatDosingForPicking
+            if (!RepeatDosingForPicking
                 && (this.CurrentACMethod.ValueT != null || this.IterationCount.ValueT >= 1))
                 return StartNextCompResult.Done;
 
@@ -66,8 +66,8 @@ namespace gip.mes.processapplication
                 if (pickingPos == null)
                 {
                     pickingPos = picking.PickingPos_Picking
-                        .Where(c => c.MDDelivPosLoadStateID.HasValue 
-                                && (   c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad 
+                        .Where(c => c.MDDelivPosLoadStateID.HasValue
+                                && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
                                     || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
                         .OrderBy(c => c.Sequence)
                         .FirstOrDefault();
@@ -284,7 +284,7 @@ namespace gip.mes.processapplication
                     return StartNextCompResult.CycleWait;
 
                 var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
-                
+
                 var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                 var sourceClass = parentModule?.FirstOrDefault()?.Source;
                 if (sourcePoint == null || sourceClass == null)
@@ -447,7 +447,7 @@ namespace gip.mes.processapplication
                 if (mode == ManageDosingStatesMode.QueryOpenDosings)
                 {
                     var queryOpenDosings = picking.PickingPos_Picking.ToArray()
-                                        .Where(c =>    c.MDDelivPosLoadState != null
+                                        .Where(c => c.MDDelivPosLoadState != null
                                                     && (c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
                                                         || c.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
                                         .OrderBy(c => c.Sequence);
@@ -484,12 +484,12 @@ namespace gip.mes.processapplication
                     {
                         IEnumerable<FacilityBooking> bookings = null;
                         if (childPos.OutOrderPos != null)
-                            bookings = childPos.OutOrderPos.FacilityBooking_OutOrderPos.Where(c => c.PropertyACUrl == acUrl 
-                                                                && (   c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New
+                            bookings = childPos.OutOrderPos.FacilityBooking_OutOrderPos.Where(c => c.PropertyACUrl == acUrl
+                                                                && (c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New
                                                                     || c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.Processed));
                         else
-                            bookings = childPos.FacilityBooking_PickingPos.Where(c => c.PropertyACUrl == acUrl 
-                                                                && (  c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New
+                            bookings = childPos.FacilityBooking_PickingPos.Where(c => c.PropertyACUrl == acUrl
+                                                                && (c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New
                                                                    || c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.Processed));
 
                         if (bookings.Any())
@@ -505,8 +505,73 @@ namespace gip.mes.processapplication
 
         protected virtual EmptySiloHandlingOptions HandleAbortReasonOnEmptySiloPicking(PAMSilo silo)
         {
+            if (!IsTransport)
+                return EmptySiloHandlingOptions.NoSilosAvailable;
+
             if (CachedEmptySiloHandlingOption.HasValue)
                 return CachedEmptySiloHandlingOption.Value;
+
+            using (var dbIPlus = new Database())
+            using (var dbApp = new DatabaseApp(dbIPlus))
+            {
+                PickingPos pickingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == CurrentDosingPos.ValueT);
+                if (pickingPos != null && pickingPos.FromFacilityID == null)
+                {
+                    if (silo.Facility.ValueT == null || silo.Facility.ValueT.ValueT == null)
+                    {
+                        CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.NoSilosAvailable;
+                        return CachedEmptySiloHandlingOption.Value;
+                    }
+
+                    IList<Facility> possibleSilos;
+                    RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
+                        OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
+                    IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, out possibleSilos);
+                    if (routes == null || !routes.Any())
+                    {
+                        if (AutoChangeScale && possibleSilos != null && possibleSilos.Any())
+                        {
+                            var parallelActiveDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
+                                    && c != this
+                                    && (c as PWDosing).CurrentACState != ACStateEnum.SMIdle
+                                    && (c as PWDosing).ParentPWGroup != null
+                                    && (c as PWDosing).ParentPWGroup.AccessedProcessModule != null)
+                                    .ToList();
+                            if (parallelActiveDosings != null && parallelActiveDosings.Any())
+                            {
+                                foreach (var otherDosing in parallelActiveDosings)
+                                {
+                                    IList<Facility> alternativeSilos;
+                                    RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
+                                        OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                        null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
+                                    IEnumerable<Route> alternativeRoutes = otherDosing.GetRoutes(pickingPos, dbApp, dbIPlus, queryParams2, out alternativeSilos);
+                                    if (alternativeRoutes != null && alternativeRoutes.Any())
+                                    {
+                                        CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.OtherSilosAvailable | EmptySiloHandlingOptions.AvailableOnOtherModule;
+                                        if (queryParams2.SuggestedOptionResult > 0)
+                                            CachedEmptySiloHandlingOption |= queryParams2.SuggestedOptionResult;
+                                        return CachedEmptySiloHandlingOption.Value;
+                                    }
+                                }
+                            }
+                        }
+                        CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.NoSilosAvailable;
+                        if (queryParams.SuggestedOptionResult > 0)
+                            CachedEmptySiloHandlingOption |= queryParams.SuggestedOptionResult;
+                        return CachedEmptySiloHandlingOption.Value;
+                    }
+                    else
+                    {
+                        CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.OtherSilosAvailable | EmptySiloHandlingOptions.AvailabeOnThisModule;
+                        if (queryParams.SuggestedOptionResult > 0)
+                            CachedEmptySiloHandlingOption |= queryParams.SuggestedOptionResult;
+                        return CachedEmptySiloHandlingOption.Value;
+                    }
+                }
+            }
+
             CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.NoSilosAvailable;
             return CachedEmptySiloHandlingOption.Value;
         }
@@ -566,9 +631,9 @@ namespace gip.mes.processapplication
                 if (pickingPos.Material.MaterialID != outwardFacility.MaterialID.Value)
                 {
                     // Error50263: The dosing Material {0} / {1} doesn't match Material {2} / {3} in Source {4}.
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "CanResumeDosingPicking(4)", 1313, "Error50263", 
-                                pickingPos.Material.MaterialNo, pickingPos.Material.MaterialName1, 
-                                outwardFacility.Material.MaterialNo, outwardFacility.Material.MaterialName1, 
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "CanResumeDosingPicking(4)", 1313, "Error50263",
+                                pickingPos.Material.MaterialNo, pickingPos.Material.MaterialName1,
+                                outwardFacility.Material.MaterialNo, outwardFacility.Material.MaterialName1,
                                 outwardFacility.FacilityName);
                     return msg;
                 }
@@ -739,7 +804,7 @@ namespace gip.mes.processapplication
                                         collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
                                     }
 
-                                    if (   (!isEndlessDosing && (pickingPos.ActualQuantityUOM >= (pickingPos.TargetQuantityUOM - toleranceMinus)))
+                                    if ((!isEndlessDosing && (pickingPos.ActualQuantityUOM >= (pickingPos.TargetQuantityUOM - toleranceMinus)))
                                         || (ParentPWMethodVBBase != null && ParentPWMethodVBBase.IsLastBatch == PADosingLastBatchEnum.LastBatch))
                                     {
                                         changePosState = true;

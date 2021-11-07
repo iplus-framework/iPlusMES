@@ -839,6 +839,19 @@ namespace gip.mes.processapplication
             acUrlExtraDisDest = !String.IsNullOrEmpty(pwGroupExtraDisTargetDest) ? pwGroupExtraDisTargetDest : rootPWExtraDisTargetDest;
             return true;
         }
+
+        [ACMethodInfo("","",9999, true)]
+        public void SetExtraDisTarget(string acUrlExtraDisDest)
+        {
+            if (string.IsNullOrEmpty(acUrlExtraDisDest))
+                return;
+
+            ExtraDisTargetDest = acUrlExtraDisDest;
+
+            PWMethodVBBase root = RootPW as PWMethodVBBase;
+            root?.SwitchToEmptyingMode();
+        }
+
         #endregion
 
 
