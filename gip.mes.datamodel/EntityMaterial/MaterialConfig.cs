@@ -30,7 +30,7 @@ namespace gip.mes.datamodel
     {
         public const string ClassName = "MaterialConfig";
 
-        public const string SingleDosingMaterialConfigKeyACUrl = "SingleDosConfig";
+        public const string PWMethodNodeConfigKeyACUrl = "PWMethodNodeConfig";
 
         #region New/Delete
         /// <summary>

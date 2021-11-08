@@ -2322,7 +2322,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.SingleDosingMaterialConfigKeyACUrl);
+            var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.PWMethodNodeConfigKeyACUrl);
 
             if (wfConfigs == null || !wfConfigs.Any())
             {
