@@ -1174,7 +1174,7 @@ namespace gip.bso.manufacturing
             IACComponentPWNode currentPWGroup = null;
             using (ACMonitor.Lock(_70050_MembersLock))
             {
-                currentPWGroup = _CurrentPWGroup.ValueT;
+                currentPWGroup = _CurrentPWGroup?.ValueT;
             }
 
             if (currentPWGroup == null)
@@ -1217,7 +1217,7 @@ namespace gip.bso.manufacturing
             IACComponentPWNode currentPWGroup = null;
             using (ACMonitor.Lock(_70050_MembersLock))
             {
-                currentPWGroup = _CurrentPWGroup.ValueT;
+                currentPWGroup = _CurrentPWGroup?.ValueT;
             }
 
             if (currentPWGroup == null)
