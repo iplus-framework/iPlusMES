@@ -242,8 +242,8 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("MaterialUnitList");
                     OnPropertyChanged("ConvertableUnits");
                     OnPropertyChanged("TranslationList");
-                    OnPropertyChanged("SingleDosingConfigList");
-                    OnPropertyChanged("WorkflowRootList");
+                    OnPropertyChanged("AvailablePWMethodNodes");
+                    OnPropertyChanged("AssignedPWMethodNodes");
                 }
             }
         }
@@ -1659,78 +1659,118 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Single dosing workflow rules
+        #region Workflow
 
         #region Properties
 
-        [ACPropertySelected(800, "SingleDosing")]
-        public gip.mes.datamodel.MaterialConfig SingleDosingConfig
+        
+
+        private core.datamodel.ACClass _SelectedPWMethodNode;
+        [ACPropertySelected(800, "PWMethodNode")]
+        public core.datamodel.ACClass SelectedPWMethodNode
+        {
+            get => _SelectedPWMethodNode;
+            set
+            {
+                _SelectedPWMethodNode = value;
+                OnPropertyChanged("SelectedPWMethodNode");
+                OnPropertyChanged("AvailablePWMethodNodes");
+                OnPropertyChanged("AssignedPWMethodNodes");
+            }
+        }
+
+        private List<core.datamodel.ACClass> _PWMethodNodeList;
+        [ACPropertyList(800, "PWMethodNode")]
+        public IEnumerable<core.datamodel.ACClass> PWMethodNodeList
+        {
+            get
+            {
+                if (_PWMethodNodeList == null)
+                {
+                    _PWMethodNodeList = DatabaseApp.ContextIPlus.ACClass.Where(c => c.ACKindIndex == (short)Global.ACKinds.TPWMethod && !c.IsAbstract).ToList();
+                }
+
+                return _PWMethodNodeList;
+            }
+        }
+
+
+        [ACPropertySelected(800, "AssignedPWMethodNode")]
+        public gip.mes.datamodel.MaterialConfig SelectedAssignedPWMethodNode
         {
             get;
             set;
         }
 
-        [ACPropertyList(800, "SingleDosing")]
-        public List<gip.mes.datamodel.MaterialConfig> SingleDosingConfigList
+        [ACPropertyList(800, "AssignedPWMethodNode")]
+        public List<gip.mes.datamodel.MaterialConfig> AssignedPWMethodNodes
         {
             get
             {
-                return CurrentMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.SingleDosingMaterialConfigKeyACUrl).ToList();
+                if (SelectedPWMethodNode == null)
+                    return null;
+
+                return CurrentMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.PWMethodNodeConfigKeyACUrl 
+                                                                        && c.ACClassWF != null 
+                                                                        && c.ACClassWF.ACClassMethod != null 
+                                                                        && c.ACClassWF.ACClassMethod.WorkflowTypeACClass.ACClassID == SelectedPWMethodNode.ACClassID)
+                                                               .ToList();
             }
         }
 
-        private core.datamodel.ACClassWF _SelectedWorkflowRoot;
+        private core.datamodel.ACClassWF _SelectedAvailablePWMethodNode;
         [ACPropertySelected(800, "WF", "en{'Single dosing workflow'}de{'Einzeldosierung Workflow'}")]
-        public core.datamodel.ACClassWF SelectedWorkflowRoot
+        public core.datamodel.ACClassWF SelectedAvailablePWMethodNode
         {
-            get => _SelectedWorkflowRoot;
+            get => _SelectedAvailablePWMethodNode;
             set
             {
-                _SelectedWorkflowRoot = value;
-                OnPropertyChanged("SelectedWorkflowRoot");
-                OnPropertyChanged("SingleDosingMachineList");
+                _SelectedAvailablePWMethodNode = value;
+                OnPropertyChanged("SelectedAvailablePWMethodNode");
+                OnPropertyChanged("AvailableMachineList");
             }
         }
 
         [ACPropertyList(800, "WF")]
-        public IEnumerable<core.datamodel.ACClassWF> WorkflowRootList
+        public IEnumerable<core.datamodel.ACClassWF> AvailablePWMethodNodes
         {
             get
             {
+                if (SelectedPWMethodNode == null)
+                    return null;
+
                 List<core.datamodel.ACClassWF> wfRootList =  
-                    this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue
-                                                                && (c.PWACClass.ACIdentifier == mes.processapplication.PWMethodSingleDosing.PWClassName
-                                                                    || (c.PWACClass.BasedOnACClassID.HasValue
-                                                                        && (c.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodSingleDosing.PWClassName
-                                                                            || (c.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == mes.processapplication.PWMethodSingleDosing.PWClassName))))
-                                                                && !c.ACClassMethod.IsSubMethod).SelectMany(x => x.ACClassWF_ParentACClassWF)
-                                                                .Where(c => c.PWACClass.ACIdentifier == mes.processapplication.PWNodeProcessWorkflowVB.PWClassName)
+                    this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue && !c.ACClassMethod.IsSubMethod)
                                                                 .AsEnumerable()
+                                                                .Where(c => c.ACClassMethod.WorkflowTypeACClass != null
+                                                                       && c.ACClassMethod.WorkflowTypeACClass.ACClassID == SelectedPWMethodNode.ACClassID)
+                                                                .SelectMany(x => x.ACClassWF_ParentACClassWF)
+                                                                .Where(c => c.PWACClass.ACIdentifier == "PWNodeProcessWorkflowVB") //TODO: get from db 
                                                                 .OrderBy(c => c.ACCaption)
                                                                 .ToList();
-                var configList = SingleDosingConfigList;
+                var configList = AssignedPWMethodNodes;
                 if (configList != null)
                     wfRootList.RemoveAll(c => configList.Where(d => d.VBiACClassWFID == c.ACClassWFID).Any());
                 return wfRootList;
             }
         }
 
-        [ACPropertyInfo(810, "SDMachine", "en{'Single dosing machine'}de{'Einzel-Dosiermaschine'}")]
-        public core.datamodel.ACClass SelectedSingleDosingMachine
+        [ACPropertyInfo(810, "AvailableMachine", "en{'Single dosing machine'}de{'Einzel-Dosiermaschine'}")]
+        public core.datamodel.ACClass SelectedAvailableMachine
         {
             get;
             set;
         }
 
-        [ACPropertyList(810, "SDMachine")]
-        public IEnumerable<core.datamodel.ACClass> SingleDosingMachineList
+        [ACPropertyList(810, "AvailableMachine")]
+        public IEnumerable<core.datamodel.ACClass> AvailableMachineList
         {
             get
             {
-                if (SelectedWorkflowRoot == null)
+                if (SelectedAvailablePWMethodNode == null)
                     return null;
 
-                var pwGroups = SelectedWorkflowRoot.GetPWGroups();
+                var pwGroups = SelectedAvailablePWMethodNode.GetPWGroups();
 
                 var possibleMachines = pwGroups.SelectMany(c => c.RefPAACClass.DerivedClassesInProjects);
 
@@ -1742,55 +1782,44 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        [ACMethodInfo("", "en{'Add single dosing rule'}de{'Regel für Einzeldosierung hinzufügen'}", 800)]
-        public void ShowDialogAddSingleDosingConfig()
+        [ACMethodInfo("", "en{'Add rule'}de{'Regel hinzufügen'}", 800)]
+        public void AddPWMethodNodeConfig()
         {
-            ShowDialog(this, "SingleDosingDialog");
-        }
-
-        public bool IsEnabledShowDialogAddSingleDosingConfig()
-        {
-            return true;
-        }
-
-        [ACMethodInfo("", "en{'Add single dosing rule'}de{'Regel für Einzeldosierung hinzufügen'}", 800)]
-        public void AddSingleDosingConfig()
-        {
-            gip.mes.datamodel.MaterialConfig singleDosConfig = gip.mes.datamodel.MaterialConfig.NewACObject(DatabaseApp, CurrentMaterial);
-            singleDosConfig.KeyACUrl = MaterialConfig.SingleDosingMaterialConfigKeyACUrl;
-            singleDosConfig.VBiACClassWFID = SelectedWorkflowRoot.ACClassWFID;
+            MaterialConfig singleDosConfig = MaterialConfig.NewACObject(DatabaseApp, CurrentMaterial);
+            singleDosConfig.KeyACUrl = MaterialConfig.PWMethodNodeConfigKeyACUrl;
+            singleDosConfig.VBiACClassWFID = SelectedAvailablePWMethodNode.ACClassWFID;
             singleDosConfig.VBiValueTypeACClassID = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == "string").ACClassID;
-            if (SelectedSingleDosingMachine != null)
-                singleDosConfig.VBiACClassID = SelectedSingleDosingMachine.ACClassID;
+            if (SelectedAvailableMachine != null)
+                singleDosConfig.VBiACClassID = SelectedAvailableMachine.ACClassID;
 
             CurrentMaterial.MaterialConfig_Material.Add(singleDosConfig);
             //DatabaseApp.MaterialConfig.AddObject(singleDosConfig);
 
-            OnPropertyChanged("SingleDosingConfigList");
-            OnPropertyChanged("WorkflowRootList");
+            OnPropertyChanged("AssignedPWMethodNodes");
+            OnPropertyChanged("AvailablePWMethodNodes");
             CloseTopDialog();
 
-            SelectedWorkflowRoot = null;
-            SelectedSingleDosingMachine = null;
+            SelectedAvailablePWMethodNode = null;
+            SelectedAvailableMachine = null;
         }
 
-        public bool IsEnabledAddSingleDosingConfig()
+        public bool IsEnabledAddPWMethodNodeConfig()
         {
-            return SelectedWorkflowRoot != null && SelectedSingleDosingMachine != null;
+            return SelectedAvailablePWMethodNode != null && SelectedAvailableMachine != null;
         }
 
-        [ACMethodInfo("", "en{'Delete single dosing rule'}de{'Einzeldosierungsregel löschen'}", 800)]
-        public void DeleteSingleDosingConfig()
+        [ACMethodInfo("", "en{'Delete rule'}de{'Regel löschen'}", 800)]
+        public void DeletePWMethodNodeConfig()
         {
-            SelectedMaterial.MaterialConfig_Material.Remove(SingleDosingConfig);
-            DatabaseApp.DeleteObject(SingleDosingConfig);
-            OnPropertyChanged("SingleDosingConfigList");
-            OnPropertyChanged("WorkflowRootList");
+            SelectedMaterial.MaterialConfig_Material.Remove(SelectedAssignedPWMethodNode);
+            DatabaseApp.DeleteObject(SelectedAssignedPWMethodNode);
+            OnPropertyChanged("AssignedPWMethodNodes");
+            OnPropertyChanged("AvailablePWMethodNodes");
         }
 
-        public bool IsEnabledDeleteSingleDosingConfig()
+        public bool IsEnabledDeletePWMethodNodeConfig()
         {
-            return SingleDosingConfig != null;
+            return SelectedAssignedPWMethodNode != null;
         }
 
         #endregion
@@ -1963,6 +1992,19 @@ namespace gip.bso.masterdata
                 case "ConvertTestToBase":
                     ConvertTestToBase();
                     return true;
+                case "AddPWMethodNodeConfig":
+                    AddPWMethodNodeConfig();
+                    return true;
+                case "IsEnabledAddPWMethodNodeConfig":
+                    result = IsEnabledAddPWMethodNodeConfig();
+                    return true;
+                case "DeletePWMethodNodeConfig":
+                    DeletePWMethodNodeConfig();
+                    return true;
+                case "IsEnabledDeletePWMethodNodeConfig":
+                    result = IsEnabledDeletePWMethodNodeConfig();
+                    return true;
+
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
