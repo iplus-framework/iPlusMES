@@ -2218,6 +2218,7 @@ namespace gip.bso.purchasing
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 if (result != null)
                 {
+                    Save();
                     CurrentACMethodBooking.InwardFacilityLot = result;
                     OnNewCreatedFacilityLot(result);
                     OnPropertyChanged("BookableFacilityLots");

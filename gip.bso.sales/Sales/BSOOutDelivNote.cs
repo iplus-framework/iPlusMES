@@ -1847,8 +1847,10 @@ namespace gip.bso.sales
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 if (result != null)
                 {
+                    Save();
                     CurrentACMethodBooking.OutwardFacilityLot = result;
                     OnPropertyChanged("BookableFacilityLots");
+                    Save();
                 }
             }
             childBSO.Stop();

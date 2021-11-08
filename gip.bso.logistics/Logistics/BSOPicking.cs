@@ -676,7 +676,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return AccessBookingFacility.NavList;
+                return AccessBookingFacility?.NavList;
             }
         }
 
@@ -685,7 +685,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return AccessBookingFacilityTarget.NavList;
+                return AccessBookingFacilityTarget?.NavList;
             }
         }
 
@@ -1720,8 +1720,7 @@ namespace gip.bso.logistics
                 if (CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany != null && CurrentACMethodBooking.CPartnerCompany != CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany)
                     CurrentACMethodBooking.CPartnerCompany = CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany;
             }
-            if (CurrentACMethodBooking.InwardQuantity != CurrentACMethodBooking.OutwardQuantity)
-                CurrentACMethodBooking.InwardQuantity = CurrentACMethodBooking.OutwardQuantity;
+            OnValidateBookingParams();
 
             bool isCancellation = CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 
@@ -1744,7 +1743,12 @@ namespace gip.bso.logistics
             {
                 double changedQuantity = 0;
                 if (CurrentACMethodBooking != null)
-                    changedQuantity = CurrentACMethodBooking.OutwardQuantity.Value;
+                {
+                    if (CurrentACMethodBooking.OutwardQuantity.HasValue)
+                        changedQuantity = CurrentACMethodBooking.OutwardQuantity.Value;
+                    else if (CurrentACMethodBooking.InwardQuantity.HasValue)
+                        changedQuantity = CurrentACMethodBooking.InwardQuantity.Value;
+                }
 
                 DeleteFacilityPreBooking();
                 OnPropertyChanged("FacilityBookingList");
@@ -1804,14 +1808,28 @@ namespace gip.bso.logistics
             bool bRetVal = false;
             if (CurrentACMethodBooking != null)
             {
-                if (CurrentACMethodBooking.InwardQuantity != CurrentACMethodBooking.OutwardQuantity)
-                    CurrentACMethodBooking.InwardQuantity = CurrentACMethodBooking.OutwardQuantity;
+                OnValidateBookingParams();
                 bRetVal = CurrentACMethodBooking.IsEnabled();
             }
             else
                 return false;
             UpdateBSOMsg();
             return bRetVal;
+        }
+
+        protected virtual void OnValidateBookingParams()
+        {
+            if (CurrentACMethodBooking == null)
+                return;
+            if (CurrentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement || CurrentACMethodBooking.BookingType > GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
+            {
+                if (CurrentACMethodBooking.InwardQuantity.HasValue && !CurrentACMethodBooking.OutwardQuantity.HasValue)
+                    CurrentACMethodBooking.OutwardQuantity = CurrentACMethodBooking.InwardQuantity;
+                else if (!CurrentACMethodBooking.InwardQuantity.HasValue && CurrentACMethodBooking.OutwardQuantity.HasValue)
+                    CurrentACMethodBooking.InwardQuantity = CurrentACMethodBooking.OutwardQuantity;
+                else if (CurrentACMethodBooking.InwardQuantity != CurrentACMethodBooking.OutwardQuantity)
+                    CurrentACMethodBooking.InwardQuantity = CurrentACMethodBooking.OutwardQuantity;
+            }
         }
 
         [ACMethodCommand("PickingPos", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel)]
@@ -1857,16 +1875,27 @@ namespace gip.bso.logistics
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 if (result != null)
                 {
+                    Save();
                     CurrentACMethodBooking.InwardFacilityLot = result;
+                    OnNewCreatedFacilityLot(result);
                     OnPropertyChanged("BookableFacilityLots");
+                    Save();
                 }
             }
+        }
+
+        public virtual void OnNewCreatedFacilityLot(FacilityLot lot)
+        {
         }
 
         public bool IsEnabledNewFacilityLot()
         {
             // Nur bei Wareneingängen kann Charge ausgewählt werden
-            return CurrentACMethodBooking != null && CurrentPickingPos.InOrderPos != null;
+            return CurrentACMethodBooking != null
+                && CurrentPickingPos != null
+                && CurrentPickingPos.InOrderPos != null
+                && CurrentPickingPos.InOrderPos.Material != null
+                && CurrentPickingPos.InOrderPos.Material.IsLotManaged;
         }
 
         #endregion
