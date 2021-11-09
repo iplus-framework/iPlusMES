@@ -148,33 +148,15 @@ namespace gip.mes.processapplication
                                     0, true, true, false, false, 10);
                 }
 
-                //RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, dbIPlus, false,
-                //                    ParentPWGroup.AccessedProcessModule, PAMSilo.SelRuleID_Storage, RouteDirections.Backwards, new object[] { },
-                //                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
-                //                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                //                    0, false, false, 10);
-                if ((routes == null || !routes.Any()) && (rResult == null || rResult.Routes == null || !rResult.Routes.Any()))
-                {
-                    // TODO: MEssageID
-                    msg = new Msg
-                    {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "StartNextPickingPos(1.1)",
-                        Message = "Error...No route found"
-                    };
-                    return StartNextCompResult.Done;
-                }
-
                 Route dosingRoute = null;
 
-                if (pickingPos.FromFacility == null && possibleSilos != null && routes != null)
+                if (pickingPos.FromFacility == null && possibleSilos != null)
                 {
                     foreach (var prioSilo in possibleSilos)
                     {
                         if (!prioSilo.VBiFacilityACClassID.HasValue)
                             continue;
-                        dosingRoute = routes.Where(c => c.LastOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
+                        dosingRoute = routes == null ? null : routes.Where(c => c.LastOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
                         if (dosingRoute != null)
                             break;
                     }
@@ -198,24 +180,24 @@ namespace gip.mes.processapplication
                         }
                         else if (NoSourceFoundForDosing.ValueT == 2)
                         {
-                            //TODO
-                            //posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
-                            //if (posState == null)
-                            //{
-                            //    // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
-                            //    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9)", 1090, "Error50062",
-                            //                    intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                            //                    intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                            //                    intermediateChildPos.BookingMaterial.MaterialName1);
+                            MDDelivPosLoadState posLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
 
-                            //    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            //        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                            //    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                            //    return StartNextCompResult.CycleWait;
-                            //}
-                            //relation.MDProdOrderPartslistPosState = posState;
-                            //dbApp.ACSaveChanges();
-                            //continue; // Gehe zur nächsten Komponente
+                            if (posLoadState == null)
+                            {
+                                // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
+                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(30)", 181, "Error50062",
+                                                pickingPos.Picking.PickingNo,
+                                                "-",
+                                                pickingPos.PickingMaterial.MaterialNo);
+
+                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                return StartNextCompResult.CycleWait;
+                            }
+                            pickingPos.MDDelivPosLoadState = posLoadState;
+                            dbApp.ACSaveChanges();
+                            return StartNextCompResult.Done;
                         }
                     }
                     else if (NoSourceFoundForDosing.ValueT == 1)
@@ -226,6 +208,46 @@ namespace gip.mes.processapplication
 
                     CurrentDosingRoute = dosingRoute;
                     NoSourceFoundForDosing.ValueT = 0;
+                }
+                else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any())
+                {
+                    if (NoSourceFoundForDosing.ValueT == 0)
+                    {
+                        NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
+                        NoSourceFoundForDosing.ValueT = 1;
+
+                        // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
+                                                                 pickingPos.Material.MaterialNo,
+                                                                 picking.PickingNo,
+                                                                 "-");
+
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        return StartNextCompResult.CycleWait;
+                    }
+                    else if (NoSourceFoundForDosing.ValueT == 2)
+                    {
+                        MDDelivPosLoadState posLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+
+                        if (posLoadState == null)
+                        {
+                            // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
+                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(30)", 181, "Error50062",
+                                            pickingPos.Picking.PickingNo,
+                                            "-",
+                                            pickingPos.PickingMaterial.MaterialNo);
+
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                            return StartNextCompResult.CycleWait;
+                        }
+                        pickingPos.MDDelivPosLoadState = posLoadState;
+                        dbApp.ACSaveChanges();
+                        return StartNextCompResult.Done;
+                    }
                 }
                 else
                 {
