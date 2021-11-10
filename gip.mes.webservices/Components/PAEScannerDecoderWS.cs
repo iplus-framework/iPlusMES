@@ -51,9 +51,9 @@ namespace gip.mes.webservices
             WSResponse<BarcodeSequence> response = null;
             switch (sequence.BarcodeIssuer)
             {
-                case BarcodeSequenceBase.BarcodeIssuerEnum.General:
-                    response = OnHandleNextBarcodeSequenceGeneral(sequence);
-                    break;
+                //case BarcodeSequenceBase.BarcodeIssuerEnum.General:
+                //    response = OnHandleNextBarcodeSequenceGeneral(sequence);
+                //    break;
                 case BarcodeSequenceBase.BarcodeIssuerEnum.Picking:
                     response = OnHandleNextBarcodeSequencePicking(sequence);
                     break;

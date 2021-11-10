@@ -96,9 +96,9 @@ namespace gip.mes.datamodel
         public enum BarcodeIssuerEnum : short
         {
             Production = 0,
-            Picking = 1,
-            Inventory = 2,
-            General = 3
+            Picking = 10,
+            Inventory = 20,
+            Facility = 30
         }
     }
 }
