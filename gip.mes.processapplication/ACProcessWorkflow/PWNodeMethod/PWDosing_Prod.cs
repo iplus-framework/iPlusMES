@@ -111,8 +111,80 @@ namespace gip.mes.processapplication
                                                                 .OrderBy(c => c.Sequence)
                                                                 .ToArray();
 
-                        if (queryOpenDosings == null && !queryOpenDosings.Any())
+                        if (queryOpenDosings != null && queryOpenDosings.Any())
+                        {
+                            queryOpenDosings = OnSortOpenDosings(queryOpenDosings, dbIPlus, dbApp);
+                            foreach (ProdOrderPartslistPosRelation relation in queryOpenDosings)
+                            {
+                                if (!relation.SourceProdOrderPartslistPos.Material.UsageACProgram)
+                                    continue;
+                                double dosingQuantity = relation.RemainingDosingQuantityUOM;
+
+                                PAProcessFunction responsibleFunc = null;
+                                gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
+                                using (ACMonitor.Lock(this.ContextLockForACClassWF))
+                                {
+                                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
+                                }
+                                ACMethod acMethod = refPAACClassMethod.TypeACSignature();
+                                if (acMethod == null)
+                                {
+                                    return true;
+                                }
+
+                                IList<Facility> possibleSilos;
+
+                                RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
+                                    OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                    null, null, ExcludedSilos);
+                                IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, out possibleSilos);
+
+                                if (routes != null && routes.Any())
+                                {
+                                    PAProcessModule module = ParentPWGroup.AccessedProcessModule;
+
+                                    List<Route> routesList = routes.ToList();
+                                    module.GetACStateOfFunction(acMethod.ACIdentifier, out responsibleFunc);
+                                    if (responsibleFunc == null)
+                                    {
+                                        return false;
+                                    }
+
+                                    PAFDosing dosingFunc = responsibleFunc as PAFDosing;
+                                    if (dosingFunc != null)
+                                    {
+                                        foreach (Route currRoute in routes)
+                                        {
+                                            RouteItem lastRouteItem = currRoute.Items.LastOrDefault();
+                                            if (lastRouteItem != null && lastRouteItem.TargetProperty != null)
+                                            {
+                                                // Gehe zur nächsten Komponente, weil es mehrere Dosierfunktionen gibt und der Eingangspunkt des Prozessmoduls nicht mit dem Eingangspunkt dieser Funktion übereinstimmt.
+                                                // => eine andere Funktion ist dafür zuständig
+                                                if (!dosingFunc.PAPointMatIn1.ConnectionList.Where(c => ((c as PAEdge).Source as PAPoint).ACIdentifier == lastRouteItem.TargetProperty.ACIdentifier).Any())
+                                                {
+                                                    routesList.Remove(currRoute);
+                                                    //hasOpenDosings = true;
+                                                    //continue;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    routes = routesList;
+                                }
+
+                                if (routes != null && routes.Any())
+                                {
+                                    return true;
+                                }
+                            }
+
                             return false;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
 
