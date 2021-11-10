@@ -281,7 +281,7 @@ namespace gip.mes.datamodel
             get
             {
                 if (MDTermOfPayment == null)
-                    return InvoiceDate.AddDays(10);
+                    return InvoiceDate.AddDays(14);
                 else
                     return InvoiceDate.AddDays(MDTermOfPayment.TermOfPaymentDays);
             }
@@ -293,7 +293,7 @@ namespace gip.mes.datamodel
         /// </summary>
         public void RenumberSequence(int sequence)
         {
-            var elements = from c in InvoicePos_Invoice where c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted orderby c.Sequence select c;
+            var elements = InvoicePos_Invoice.AsEnumerable().Where(c => c.EntityState != System.Data.EntityState.Deleted && c.Sequence >= sequence).OrderBy(c => c.Sequence);
             foreach (var element in elements)
             {
                 element.Sequence = sequence;

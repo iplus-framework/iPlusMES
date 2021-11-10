@@ -421,7 +421,7 @@ namespace gip.bso.sales
             {
                 if (CurrentInvoice == null)
                     return null;
-                return CurrentInvoice.InvoicePos_Invoice.OrderBy(c => c.Sequence);
+                return CurrentInvoice.InvoicePos_Invoice.Where(c => c.EntityState != System.Data.EntityState.Deleted).OrderBy(c => c.Sequence);
             }
         }
 
@@ -1434,8 +1434,12 @@ namespace gip.bso.sales
                     Messages.Msg(msg);
                     return;
                 }
+                else
+                    CurrentInvoice.InvoicePos_Invoice.Remove(CurrentInvoicePos);
                 CurrentInvoice.RenumberSequence(1);
                 OnPropertyChanged("InvoicePosList");
+                SelectedInvoicePos = CurrentInvoice.InvoicePos_Invoice.FirstOrDefault();
+                CurrentInvoicePos = SelectedInvoicePos;
             }
             PostExecute("DeleteInvoicePos");
         }
@@ -1665,16 +1669,16 @@ namespace gip.bso.sales
             {
                 ReportDocument doc = reportEngine as ReportDocument;
                 if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null
-                                                                                 && (c.ACClassDesign.ACIdentifier == "InvoiceDe") || c.ACClassDesign.ACIdentifier == "InvoiceEn" || c.ACClassDesign.ACIdentifier == "InvoiceHr"))
+                                                                                 && (c.ACClassDesign.ACIdentifier.EndsWith("De")) || c.ACClassDesign.ACIdentifier.EndsWith("En") || c.ACClassDesign.ACIdentifier.EndsWith("Hr")))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
                     gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
                     string langCode = "de";
                     if (design != null)
                     {
-                        if (design.ACIdentifier == "InvoiceHr")
+                        if (design.ACIdentifier.EndsWith("Hr"))
                             langCode = "hr";
-                        if (design.ACIdentifier == "InvoiceEn")
+                        if (design.ACIdentifier.EndsWith("En"))
                             langCode = "en";
                     }
                     BuildInvoicePosData(langCode);
@@ -1695,9 +1699,13 @@ namespace gip.bso.sales
         private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
         {
             InvoicePos pos = e.ParentDataRow as InvoicePos;
-            if (e.FlowDocObj != null && e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge")
+            if (e.FlowDocObj != null 
+                && (e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge"
+                || e.FlowDocObj.VBContent == "CurrentInvoice\\NotIsReverseCharge"))
             {
-                if (CurrentInvoice != null && !CurrentInvoice.IsReverseCharge)
+                if (    CurrentInvoice != null 
+                    &&  (  (!CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge")
+                        || (CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\NotIsReverseCharge")))
                 {
                     var inlineCell = e.FlowDocObj as InlineContextValue;
                     if (inlineCell != null)

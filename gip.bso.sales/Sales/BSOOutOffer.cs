@@ -1160,16 +1160,16 @@ namespace gip.bso.sales
             {
                 ReportDocument doc = reportEngine as ReportDocument;
                 if (doc != null && doc.ReportData != null && doc.ReportData.Any(c => c.ACClassDesign != null
-                                                                                 && (c.ACClassDesign.ACIdentifier == "OfferDe") || c.ACClassDesign.ACIdentifier == "OfferEn" || c.ACClassDesign.ACIdentifier == "OfferHr"))
+                                                                                 && (c.ACClassDesign.ACIdentifier.EndsWith("De")) || c.ACClassDesign.ACIdentifier.EndsWith("En") || c.ACClassDesign.ACIdentifier.EndsWith("Hr")))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
                     gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
                     string langCode = "de";
                     if (design != null)
                     {
-                        if (design.ACIdentifier == "OfferHr")
+                        if (design.ACIdentifier.EndsWith("Hr"))
                             langCode = "hr";
-                        if (design.ACIdentifier == "OfferEn")
+                        if (design.ACIdentifier.EndsWith("En"))
                             langCode = "en";
                     }
                     BuildOutOfferPosData(langCode);

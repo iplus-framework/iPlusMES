@@ -2062,21 +2062,17 @@ namespace gip.bso.sales
                 if (
                     doc != null
                     && doc.ReportData != null
-                    && doc.ReportData.Any(c =>
-                                                c.ACClassDesign != null
-                                                && (
-                                                        c.ACClassDesign.ACIdentifier == "OutOrderDe")
-                                                        || c.ACClassDesign.ACIdentifier == "OutOrderEn"
-                                                        || c.ACClassDesign.ACIdentifier == "OutOrderHr"))
+                    && doc.ReportData.Any(c =>    c.ACClassDesign != null
+                                               && (c.ACClassDesign.ACIdentifier.EndsWith("De")) || c.ACClassDesign.ACIdentifier.EndsWith("En") || c.ACClassDesign.ACIdentifier.EndsWith("Hr")))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
                     gip.core.datamodel.ACClassDesign design = doc.ReportData.Select(c => c.ACClassDesign).FirstOrDefault();
                     string langCode = "de";
                     if (design != null)
                     {
-                        if (design.ACIdentifier == "OutOrderHr")
+                        if (design.ACIdentifier.EndsWith("Hr"))
                             langCode = "hr";
-                        if (design.ACIdentifier == "OutOrderEn")
+                        if (design.ACIdentifier.EndsWith("En"))
                             langCode = "en";
                     }
                     BuildOutOrderPosData(langCode);
@@ -2142,7 +2138,15 @@ namespace gip.bso.sales
                 return;
             if (Messages.Question(this, "Question50060", Global.MsgResult.Yes, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.Yes)
             {
-                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder);
+                DateTime invoiceDate = DateTime.Now;
+                object[] valueList = new object[] { DateTime.Now };
+                string[] captionList = new string[] { "Date" };
+                object[] resultList = Messages.InputBoxValues("Invoice-Date", valueList, captionList);
+
+                if (resultList != null)
+                    invoiceDate = (DateTime) resultList[0];
+
+                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder, invoiceDate);
                 if (msg != null)
                     Messages.Msg(msg);
             }

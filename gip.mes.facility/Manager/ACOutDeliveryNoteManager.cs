@@ -744,7 +744,7 @@ namespace gip.mes.facility
         }
 
         [ACMethodInfo("", "en{'NewInvoiceFromOutOrder'}de{'NewInvoiceFromOutOrder'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public Msg NewInvoiceFromOutOrder(DatabaseApp databaseApp, OutOrder outOrder)
+        public Msg NewInvoiceFromOutOrder(DatabaseApp databaseApp, OutOrder outOrder, DateTime? invoiceDate = null)
         {
             Msg msg = null;
             if (!PreExecute("NewInvoiceFromOutOrder"))
@@ -759,6 +759,8 @@ namespace gip.mes.facility
             }
             try
             {
+                if (!invoiceDate.HasValue)
+                    invoiceDate = DateTime.Now;
                 msg = ValidateCurrencyAndExchangeRate(outOrder);
                 if (msg != null)
                     return msg;
@@ -767,7 +769,7 @@ namespace gip.mes.facility
                 invoice.OutOrder = outOrder;
                 invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
                 invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
-                invoice.InvoiceDate = DateTime.Now;
+                invoice.InvoiceDate = invoiceDate.Value;
                 invoice.CustomerCompany = outOrder.CustomerCompany;
                 invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
                 invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
@@ -1161,7 +1163,8 @@ namespace gip.mes.facility
         private List<MDCountrySalesTax> GetTaxOverviewList(string langCode, IOutOrder outOrder, List<IOutOrderPos> positions)
         {
             List<MDCountrySalesTax> mDCountrySalesTaxes = new List<MDCountrySalesTax>();
-            string vatFormat = Root.Environment.TranslateMessageLC(this, "Info50066", langCode);
+            string vatFormat = "{0} %";
+            //string vatFormat = Root.Environment.TranslateMessageLC(this, "Info50066", langCode);
             //string vatFormat = "VAT with {0} %";
             //if (billingcompanyAddress?.MDCountry?.MDCountryName == "DE")
             //    vatFormat = "MwSt. mit {0} %";
