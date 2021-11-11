@@ -105,6 +105,7 @@
     <Compile Include="EntityMD\MDInvoiceType.cs" />
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
+    <Compile Include="EntityMD\MDPickingType.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
@@ -485,9 +486,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-11-08_12-51_ihrastinski.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-08_12-51_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-10_13-16_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

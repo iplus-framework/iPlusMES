@@ -14,6 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(6, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(7, VisitorVoucher.ClassName, "en{'Visitor Voucher'}de{'Besucherbeleg'}", Const.ContextDatabase + "\\" + VisitorVoucher.ClassName, "", true)]
     [ACPropertyEntity(8, gip.core.datamodel.ACClassMethod.ClassName, "en{'Workflow'}de{'Workflow'}", Const.ContextDatabase + "\\" + gip.core.datamodel.ACClassMethod.ClassName, "", true)]
+    [ACPropertyEntity(9, MDPickingType.ClassName, "en{'Picking type'}de{'Kommissionierung Typ'}", Const.ContextDatabase + "\\" + MDPickingType.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -38,7 +39,7 @@ namespace gip.mes.datamodel
             Picking entity = new Picking();
             entity.PickingID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.PickingType = GlobalApp.PickingType.Receipt;
+            entity.MDPickingType = MDPickingType.s_cQry_Default(dbApp).FirstOrDefault();
             entity.PickingState = GlobalApp.PickingState.New;
             entity.PickingNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
@@ -113,11 +114,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return (GlobalApp.PickingType)PickingTypeIndex;
-            }
-            set
-            {
-                PickingTypeIndex = (Int16)value;
+                return (GlobalApp.PickingType)MDPickingType.MDPickingTypeIndex;
             }
         }
 

@@ -1265,7 +1265,7 @@ namespace gip.bso.logistics
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
             CurrentPicking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
-            CurrentPicking.PickingType = GlobalApp.PickingType.Receipt;
+            CurrentPicking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
             DatabaseApp.Picking.AddObject(CurrentPicking);
             ACState = Const.SMNew;
             PostExecute("New");
