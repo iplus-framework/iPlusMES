@@ -1453,8 +1453,6 @@ namespace gip.bso.manufacturing
             ACValue acValue = pwNode.ACUrlCommand("WeighingComponentsInfo\\ValueT") as ACValue;
             Dictionary<string, string> valueList = acValue?.Value as Dictionary<string, string>;
 
-
-
             if (valueList != null && valueList.Any())
             {
                 List<WeighingMaterial> weihgingMaterials = new List<WeighingMaterial>();
