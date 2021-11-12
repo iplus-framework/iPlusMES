@@ -1156,7 +1156,6 @@ namespace gip.mes.datamodel
 #else
         [DataContract]
 #endif
-
         public enum PickingType : short
         {
             Receipt = 0,
@@ -1164,6 +1163,7 @@ namespace gip.mes.datamodel
             Production = 2,
             ReceiptVehicle = 3,
             IssueVehicle = 4,
+            AutomaticRelocation = 10
         }
 
 #if NETFRAMEWORK

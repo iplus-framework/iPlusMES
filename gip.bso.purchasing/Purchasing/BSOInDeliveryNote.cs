@@ -990,7 +990,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.PickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle || c.Picking.PickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
+                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.PickingType == GlobalApp.PickingType.ReceiptVehicle || c.Picking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
                                                           && c.InOrderPos != null
                                                           && !c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
                                              .Select(c => c.InOrderPos.InOrderPos1_ParentInOrderPos)

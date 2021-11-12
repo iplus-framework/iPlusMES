@@ -453,7 +453,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledNewPicking()) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
             var picking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
-            picking.PickingType = GlobalApp.PickingType.Receipt;
+            picking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
             DatabaseApp.Picking.AddObject(picking);
             ACSaveChanges();
             PickingList.Add(picking);
