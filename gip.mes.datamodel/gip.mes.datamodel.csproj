@@ -492,6 +492,9 @@
     <None Include="DbScripts\iPlusMES\dbsync_2021-11-10_13-16_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2021-11-11_11-46_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
