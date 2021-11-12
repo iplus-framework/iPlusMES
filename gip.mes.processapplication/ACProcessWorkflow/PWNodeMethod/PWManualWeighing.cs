@@ -2311,6 +2311,17 @@ namespace gip.mes.processapplication
         {
             Msg msg = null;
 
+            if (((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
+                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
+                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
+            {
+                UnSubscribeToProjectWorkCycle();
+                // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
+                if (CurrentACState == ACStateEnum.SMRunning)
+                    CurrentACState = ACStateEnum.SMCompleted;
+                return StartNextCompResult.Done;
+            }
+
             if (module == null)
                 return StartNextCompResult.CycleWait;
 

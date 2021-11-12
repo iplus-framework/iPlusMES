@@ -445,6 +445,26 @@ namespace gip.bso.manufacturing
             }
         }
 
+        [ACPropertyInfo(691)]
+        public string AbortQuestion
+        {
+            get
+            {
+                return Root.Environment.TranslateMessage(this, "Question50043");
+            }
+        }
+
+        public enum AbortModeEnum : short
+        {
+            Cancel = 0,
+            AbortComponent = 10,
+            AbortComponentSwitchToEmptyingMode = 20,
+            SwitchToEmptyingMode = 30
+        }
+
+        private AbortModeEnum _AbortMode;
+
+
         #endregion
 
         #region Properties => Components and Facility/FacilityCharge selection
@@ -958,18 +978,16 @@ namespace gip.bso.manufacturing
 
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
-            //if (componentPWNode == null)
-            //{
-            //    Messages.Error(this, "ComponentPWNode is null!");
-            //    return;
-            //}
-
             if (componentPWNode != null)
             {
                 //Question50043: Do you want to abort the current weighing?
                 // Möchten Sie die aktuelle Verwiegung abbrechen?
-                if (Messages.YesNoCancel(this, "Question50043", Global.MsgResult.No) == Global.MsgResult.Yes)
+                _AbortMode = AbortModeEnum.Cancel;
+                ShowDialog(this, "AbortDialog");
+
+                if (_AbortMode == AbortModeEnum.AbortComponent)
                 {
+                    ShowSelectFacilityLotInfo = false;
                     //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
                     // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
                     if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
@@ -978,7 +996,28 @@ namespace gip.bso.manufacturing
                         return;
                     }
                     componentPWNode?.ACUrlCommand("!Abort", false);
+
+                }
+                else if (_AbortMode == AbortModeEnum.AbortComponentSwitchToEmptyingMode)
+                {
                     ShowSelectFacilityLotInfo = false;
+                    //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
+                    // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
+
+                    Global.MsgResult msgResult = Messages.Question(this, "Question50049");
+
+                    ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
+
+                    if (msgResult == Global.MsgResult.Yes)
+                    {
+                        componentPWNode?.ACUrlCommand("!Abort", true);
+                        return;
+                    }
+                    componentPWNode?.ACUrlCommand("!Abort", false);
+                }
+                else if (_AbortMode == AbortModeEnum.SwitchToEmptyingMode)
+                {
+                    ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
                 }
             }
             else
@@ -991,6 +1030,28 @@ namespace gip.bso.manufacturing
         {
             return true; //ComponentPWNode != null;
         }
+
+        [ACMethodInfo("", "en{'Abort component'}de{'Komponente abbrechen'}", 695)]
+        public void AbortComponent()
+        {
+            _AbortMode = AbortModeEnum.AbortComponent;
+            CloseTopDialog();
+        }
+
+        [ACMethodInfo("", "en{'Abort component, switch to emptying mode'}de{'Komponente abbrechen, Leerfahrmodus aktivieren'}", 695)]
+        public void AbortComponentEmptyingMode()
+        {
+            _AbortMode = AbortModeEnum.AbortComponentSwitchToEmptyingMode;
+            CloseTopDialog();
+        }
+
+        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695)]
+        public void SwitchEmptyingMode()
+        {
+            _AbortMode = AbortModeEnum.SwitchToEmptyingMode;
+            CloseTopDialog();
+        }
+
 
         [ACMethodInfo("", "en{'Apply charge/lot'}de{'Charge/Los anwenden'}", 607)]
         public virtual void ApplyLot()
