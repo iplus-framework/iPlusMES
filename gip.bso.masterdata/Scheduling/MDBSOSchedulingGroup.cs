@@ -2,7 +2,6 @@
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
-using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
@@ -28,6 +27,7 @@ namespace gip.bso.masterdata.Scheduling
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             //DatabaseMode = DatabaseModes.OwnDB;
+            _ProcessWFClassName = new ACPropertyConfigValue<string>(this, "ProcessWFClassName", "PWNodeProcessWorkflowVB"); // PWNodeProcessWorkflowVB.PWClassName
         }
 
         /// <summary>
@@ -57,6 +57,23 @@ namespace gip.bso.masterdata.Scheduling
         #endregion
 
         #region BSO->ACProperty
+
+        #region Config
+        private ACPropertyConfigValue<string> _ProcessWFClassName;
+        [ACPropertyConfig("ProcessWFClassName")]
+        public string ProcessWFClassName
+        {
+            get
+            {
+                return _ProcessWFClassName.ValueT;
+            }
+            set
+            {
+                _ProcessWFClassName.ValueT = value;
+            }
+        }
+        #endregion
+
 
         #region 1.1 MDSchedulingGroup
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -234,8 +251,8 @@ namespace gip.bso.masterdata.Scheduling
                      && c.RefPAACClassID.HasValue
                      && c.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
                      && c.RefPAACClassMethod.PWACClass != null
-                     && (c.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
-                         || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
+                     && (c.RefPAACClassMethod.PWACClass.ACIdentifier == ProcessWFClassName
+                         || c.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == ProcessWFClassName)
                      && !string.IsNullOrEmpty(c.Comment)
                      && !assignedWorkflowNodeIds.Contains(c.ACClassWFID));
                 }

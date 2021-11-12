@@ -187,8 +187,6 @@ namespace gip.mes.processapplication
                         }
                     }
                 }
-
-                return true;
             }
         }
 

@@ -224,10 +224,6 @@
       <Project>{89D489D6-8881-4E43-A760-48051FAC6C41}</Project>
       <Name>gip.mes.manager</Name>
     </ProjectReference>
-    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
-      <Project>{D1320FB8-333D-4072-880D-BD5137933D2F}</Project>
-      <Name>gip.mes.processapplication</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

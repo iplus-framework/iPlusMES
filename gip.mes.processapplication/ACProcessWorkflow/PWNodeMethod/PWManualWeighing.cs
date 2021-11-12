@@ -556,7 +556,8 @@ namespace gip.mes.processapplication
                 Dictionary<string, string> weighingComponentsInfo = null;
                 using (ACMonitor.Lock(_65050_WeighingCompLock))
                 {
-                    weighingComponentsInfo = WeighingComponents.ToDictionary(c => c.PLPosRelation.ToString(), c => c.WeighState.ToString());
+                    if (WeighingComponents != null)
+                        weighingComponentsInfo = WeighingComponents.ToDictionary(c => c.PLPosRelation.ToString(), c => c.WeighState.ToString());
                 }
 
                 return new ACValue("WM", weighingComponentsInfo);
