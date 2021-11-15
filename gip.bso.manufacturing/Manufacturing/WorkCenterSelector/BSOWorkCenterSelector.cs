@@ -38,6 +38,7 @@ namespace gip.bso.manufacturing
 
             _MainSyncContext = SynchronizationContext.Current;
             _BSOWorkCenterSelectorRules = new ACPropertyConfigValue<string>(this, "BSOWorkCenterSelectorRules", "");
+            _OnOpenSetLastSelectedWorkCenterItem = new ACPropertyConfigValue<bool>(this, "OnOpenSetLastSelectedWorkCenterItem", true);
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
@@ -51,6 +52,8 @@ namespace gip.bso.manufacturing
         public override bool ACPostInit()
         {
             BuildWorkCenterItems();
+
+            SelectWorkCenterItem();
 
             Communications wcfManager = ACRoot.SRoot.GetChildComponent("Communications") as Communications;
             if (wcfManager != null && wcfManager.WCFClientManager != null)
@@ -198,6 +201,13 @@ namespace gip.bso.manufacturing
                 CurrentWorkCenterItem = value;
                 AccessPrimary.Selected = value;
                 OnPropertyChanged("SelectedWorkCenterItem");
+
+                string lastSelected = GetLastSelectedWorkCenterItem();
+                string moduleACUrl = "";
+                if (value != null && value.ProcessModule != null)
+                    moduleACUrl = value.ProcessModule.GetACUrl();
+                if (lastSelected != moduleACUrl)
+                    SetSelectedWorkCenterItemConfig(value);
             }
         }
 
@@ -366,6 +376,18 @@ namespace gip.bso.manufacturing
             set
             {
                 _BSOWorkCenterSelectorRules.ValueT = value;
+                OnPropertyChanged("BSOWorkCenterSelectorRules");
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _OnOpenSetLastSelectedWorkCenterItem;
+        [ACPropertyConfig("en{'Work center rules'}de{'Work center rules'}")]
+        public bool OnOpenSetLastSelectedWorkCenterItem
+        {
+            get => _OnOpenSetLastSelectedWorkCenterItem.ValueT;
+            set
+            {
+                _OnOpenSetLastSelectedWorkCenterItem.ValueT = value;
                 OnPropertyChanged("BSOWorkCenterSelectorRules");
             }
         }
@@ -678,6 +700,38 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        public IACConfig GetLastSelectedWorkCenterItemConfig()
+        {
+            var configs = ACType.GetConfigByKeyACUrl(Root.Environment.User.GetACUrl());
+            IACConfig config = configs.FirstOrDefault();
+            return config;
+        }
+
+        public string GetLastSelectedWorkCenterItem()
+        {
+
+            IACConfig config = GetLastSelectedWorkCenterItemConfig();
+            return config != null ?
+                (config.Value != null ? config.Value.ToString() : "") : "";
+        }
+
+        public void SetSelectedWorkCenterItemConfig(WorkCenterItem item)
+        {
+            IACConfig config = GetLastSelectedWorkCenterItemConfig();
+            if (config == null && item != null)
+            {
+                config = ACType.ValueTypeACClass.NewACConfig(null, ACType.ValueTypeACClass.Database.GetACType(typeof(string)));
+                config.KeyACUrl = Root.Environment.User.GetACUrl();
+            }
+            if (item != null && item.ProcessModule != null)
+                config.Value = item.ProcessModule.GetACUrl();
+            else if (config != null)
+                (config as VBEntityObject).DeleteACObject(Database, false);
+            Msg msg = DatabaseApp.ContextIPlus.ACSaveChanges();
+            if (msg != null)
+                Messages.Msg(msg);
+        }
 
         #endregion
 
@@ -1034,7 +1088,26 @@ namespace gip.bso.manufacturing
             }
 
             AccessPrimary.ToNavList(workCenterItems.OrderBy(c => c.SortIndex).ThenBy(c => c.ACCaption));
-            SelectedWorkCenterItem = WorkCenterItems.FirstOrDefault();
+        }
+
+        public virtual void SelectWorkCenterItem()
+        {
+            WorkCenterItem selectedItem = WorkCenterItems.FirstOrDefault();
+
+            if (OnOpenSetLastSelectedWorkCenterItem)
+            {
+                string workCenterItem = GetLastSelectedWorkCenterItem();
+                if (!string.IsNullOrEmpty(workCenterItem))
+                {
+                    WorkCenterItem lastItem = WorkCenterItems.FirstOrDefault(c => c.ProcessModule != null && c.ProcessModule.GetACUrl() == workCenterItem);
+                    if (lastItem != null)
+                    {
+                        selectedItem = lastItem;
+                    }
+                }
+            }
+
+            SelectedWorkCenterItem = selectedItem;
         }
 
         public virtual ACComposition[] OnAddFunctionBSOs(core.datamodel.ACClass pafACClass, ACComposition[] bsos)
