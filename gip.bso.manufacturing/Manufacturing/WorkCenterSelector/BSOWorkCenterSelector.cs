@@ -808,6 +808,42 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Svae and Undo
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        public void Save()
+        {
+            OnSave();
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledSave()
+        {
+            return OnIsEnabledSave();
+        }
+
+        /// <summary>
+        /// Undoes the save.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        public void UndoSave()
+        {
+            OnUndoSave();
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled undo save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
+        }
+        #endregion
+
+        #region Public Methods
         private void _ClientManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ConnectionQuality")
@@ -1232,6 +1268,8 @@ namespace gip.bso.manufacturing
         {
             return SelectedExtraDisTarget != null;
         }
+        #endregion
+
 
         #region Methods => FunctionMonitor
 
@@ -1456,12 +1494,25 @@ namespace gip.bso.manufacturing
                 case "SwitchPWGroupToEmptyingMode":
                     SwitchPWGroupToEmptyingMode();
                     return true;
+                case "Save":
+                    Save();
+                    return true;
+                case "IsEnabledSave":
+                    result = IsEnabledSave();
+                    return true;
+                case "UndoSave":
+                    UndoSave();
+                    return true;
+                case "IsEnabledUndoSave":
+                    result = IsEnabledUndoSave();
+                    return true;
             }
 
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
+
 
         #region Precompiled Queries
 
