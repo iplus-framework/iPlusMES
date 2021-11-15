@@ -201,13 +201,6 @@ namespace gip.bso.manufacturing
                 CurrentWorkCenterItem = value;
                 AccessPrimary.Selected = value;
                 OnPropertyChanged("SelectedWorkCenterItem");
-
-                string lastSelected = GetLastSelectedWorkCenterItem();
-                string moduleACUrl = "";
-                if (value != null && value.ProcessModule != null)
-                    moduleACUrl = value.ProcessModule.GetACUrl();
-                if (lastSelected != moduleACUrl)
-                    SetSelectedWorkCenterItemConfig(value);
             }
         }
 
@@ -240,6 +233,14 @@ namespace gip.bso.manufacturing
                 }
 
                 OnPropertyChanged("CurrentWorkCenterItem");
+
+
+                string lastSelected = GetLastSelectedWorkCenterItem();
+                string moduleACUrl = "";
+                if (value != null && value.ProcessModule != null)
+                    moduleACUrl = value.ProcessModule.GetACUrl();
+                if (lastSelected != moduleACUrl)
+                    SetSelectedWorkCenterItemConfig(value);
             }
         }
 
@@ -701,37 +702,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        public IACConfig GetLastSelectedWorkCenterItemConfig()
-        {
-            var configs = ACType.GetConfigByKeyACUrl(Root.Environment.User.GetACUrl());
-            IACConfig config = configs.FirstOrDefault();
-            return config;
-        }
-
-        public string GetLastSelectedWorkCenterItem()
-        {
-
-            IACConfig config = GetLastSelectedWorkCenterItemConfig();
-            return config != null ?
-                (config.Value != null ? config.Value.ToString() : "") : "";
-        }
-
-        public void SetSelectedWorkCenterItemConfig(WorkCenterItem item)
-        {
-            IACConfig config = GetLastSelectedWorkCenterItemConfig();
-            if (config == null && item != null)
-            {
-                config = ACType.ValueTypeACClass.NewACConfig(null, ACType.ValueTypeACClass.Database.GetACType(typeof(string)));
-                config.KeyACUrl = Root.Environment.User.GetACUrl();
-            }
-            if (item != null && item.ProcessModule != null)
-                config.Value = item.ProcessModule.GetACUrl();
-            else if (config != null)
-                (config as VBEntityObject).DeleteACObject(Database, false);
-            Msg msg = DatabaseApp.ContextIPlus.ACSaveChanges();
-            if (msg != null)
-                Messages.Msg(msg);
-        }
+       
 
         #endregion
 
@@ -1343,6 +1314,46 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+        #region Methods => LastSelectedWorkCenterItem
+
+        public IACConfig GetLastSelectedWorkCenterItemConfig()
+        {
+            if (ACType == null)
+                return null;
+
+            var configs = ACType.GetConfigByKeyACUrl(Root.Environment.User.GetACUrl());
+            IACConfig config = configs.FirstOrDefault();
+            return config;
+        }
+
+        public string GetLastSelectedWorkCenterItem()
+        {
+            IACConfig config = GetLastSelectedWorkCenterItemConfig();
+            return config != null ?
+                (config.Value != null ? config.Value.ToString() : "") : "";
+        }
+
+        public void SetSelectedWorkCenterItemConfig(WorkCenterItem item)
+        {
+            if (ACType == null)
+                return;
+
+            IACConfig config = GetLastSelectedWorkCenterItemConfig();
+            if (config == null && item != null)
+            {
+                config = ACType.ValueTypeACClass.NewACConfig(null, ACType.ValueTypeACClass.Database.GetACType(typeof(string)));
+                config.KeyACUrl = Root.Environment.User.GetACUrl();
+            }
+            if (item != null && item.ProcessModule != null)
+                config.Value = item.ProcessModule.GetACUrl();
+            else if (config != null)
+                (config as VBEntityObject).DeleteACObject(Database, false);
+            Msg msg = DatabaseApp.ContextIPlus.ACSaveChanges();
+            if (msg != null)
+                Messages.Msg(msg);
+        }
+
+        #endregion
 
         #region Methods => FunctionMonitor
 
