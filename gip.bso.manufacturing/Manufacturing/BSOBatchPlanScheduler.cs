@@ -3715,21 +3715,20 @@ namespace gip.bso.manufacturing
         private void SetBSOBatchPlan_BatchParents(vd.ACClassWF vbACClassWF, vd.ProdOrderPartslist prodOrderPartslist)
         {
             core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(DatabaseApp.ContextIPlus);
-            LocalBSOBatchPlan.CurrentACClassWF = aCClassWF;
-            LocalBSOBatchPlan.VBCurrentACClassWF = vbACClassWF;
             if (prodOrderPartslist != null)
             {
                 LocalBSOBatchPlan.ExternProdOrderPartslist = prodOrderPartslist;
                 LocalBSOBatchPlan.MandatoryConfigStores = LocalBSOBatchPlan
                     .GetCurrentConfigStores(
-                    LocalBSOBatchPlan.CurrentACClassWF,
-                    LocalBSOBatchPlan.VBCurrentACClassWF,
+                    aCClassWF,
+                    vbACClassWF,
                     LocalBSOBatchPlan.CurrentProdOrderPartslist.Partslist.MaterialWFID,
                     LocalBSOBatchPlan.CurrentProdOrderPartslist.Partslist,
                     LocalBSOBatchPlan.CurrentProdOrderPartslist
                     );
             }
-
+            LocalBSOBatchPlan.CurrentACClassWF = aCClassWF;
+            LocalBSOBatchPlan.VBCurrentACClassWF = vbACClassWF;
         }
 
         private void LoadGeneratedBatchInCurrentLine(vd.ProdOrderBatchPlan batchPlan, double targetQuantityUOM)
