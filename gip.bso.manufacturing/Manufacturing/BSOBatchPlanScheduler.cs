@@ -3168,6 +3168,9 @@ namespace gip.bso.manufacturing
                 {
                     Msg tmpMsg = new Msg(this, eMsgLevel.Error, GetACUrl(), "CheckProductionUnits", 3119, "Error50440", SelectedWizardSchedulerPartslist.TargetQuantityUOM, SelectedWizardSchedulerPartslist.ProductionUnits);
                     tmpMsg.Message = String.Format("Batch Suggestion #{0}: {1}", item.Nr, tmpMsg.Message);
+                    
+                    if(msg == null)
+                        msg = new MsgWithDetails();
                     msg.AddDetailMessage(msg);
                 }
             }
