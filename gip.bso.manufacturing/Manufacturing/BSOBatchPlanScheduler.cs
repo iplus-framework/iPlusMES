@@ -2853,6 +2853,17 @@ namespace gip.bso.manufacturing
                         msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "WizardForward()", 2880, "Error50472");
                         WizardPhaseErrorMessage = msg.Message;
                     }
+
+                    if (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.ProductionUnits != null && SelectedWizardSchedulerPartslist.ProductionUnits.Value > 0)
+                    {
+                        Msg msgCheckProdUnit = CheckProductionUnits();
+                        if (msgCheckProdUnit != null)
+                        {
+                            SendMessage(msgCheckProdUnit);
+                            Root.Messages.Msg(msgCheckProdUnit);
+                            msg = msgCheckProdUnit;
+                        }
+                    }
                     break;
             }
             return msg;
@@ -2928,13 +2939,7 @@ namespace gip.bso.manufacturing
                             BatchPlanSuggestion = LoadExistingBatchSuggestion(prodOrderPartslistPos);
                         }
                         else
-                        {
-                            Msg checkProdUnit = CheckProductionUnits();
-                            if (checkProdUnit == null)
-                                BatchPlanSuggestion = LoadNewBatchSuggestion(SelectedWizardSchedulerPartslist);
-                            else
-                                SendMessage(checkProdUnit);
-                        }
+                            BatchPlanSuggestion = LoadNewBatchSuggestion(SelectedWizardSchedulerPartslist);
                         if (BatchPlanSuggestion == null || BatchPlanSuggestion.ItemsList == null || !BatchPlanSuggestion.ItemsList.Any())
                         {
                             // Error50392
@@ -3153,17 +3158,20 @@ namespace gip.bso.manufacturing
                 SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
         }
 
-        private Msg CheckProductionUnits()
+        private MsgWithDetails CheckProductionUnits()
         {
-            Msg msg = null;
-            if (SelectedWizardSchedulerPartslist.ProductionUnits != null && SelectedWizardSchedulerPartslist.ProductionUnits.Value > 0)
+            MsgWithDetails msg = null;
+            foreach(var item in BatchPlanSuggestion.ItemsList)
             {
-                double rest = SelectedWizardSchedulerPartslist.TargetQuantityUOM % SelectedWizardSchedulerPartslist.ProductionUnits.Value;
+                double rest = item.TotalBatchSize % SelectedWizardSchedulerPartslist.ProductionUnits.Value;
                 if (rest > 0)
                 {
-                    msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "CheckProductionUnits", 3119, "Error50440", SelectedWizardSchedulerPartslist.TargetQuantityUOM, SelectedWizardSchedulerPartslist.ProductionUnits);
+                    Msg tmpMsg = new Msg(this, eMsgLevel.Error, GetACUrl(), "CheckProductionUnits", 3119, "Error50440", SelectedWizardSchedulerPartslist.TargetQuantityUOM, SelectedWizardSchedulerPartslist.ProductionUnits);
+                    tmpMsg.Message = String.Format("Batch Suggestion #{0}: {1}", item.Nr, tmpMsg.Message);
+                    msg.AddDetailMessage(msg);
                 }
             }
+           
             return msg;
         }
 
