@@ -1523,7 +1523,9 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return AllWizardSchedulerPartslistList.Where(c => !c.IsSolved || IsWizardExistingBatch).ToList();
+                bool allSolved = !AllWizardSchedulerPartslistList.Any(c => !c.IsSolved);
+                return AllWizardSchedulerPartslistList
+                    .Where(c => !c.IsSolved || allSolved).ToList();
             }
         }
 
@@ -2228,6 +2230,7 @@ namespace gip.bso.manufacturing
                 return;
             ClearMessages();
             ClearAndResetChildBSOLists(SelectedScheduleForPWNode.MDSchedulingGroup);
+            SelectedProdOrderBatchPlan = null;
             WizardPhase = NewScheduledBatchWizardPhaseEnum.SelectMaterial;
             WizardForwardAction(WizardPhase);
             IsWizard = true;
@@ -2665,7 +2668,7 @@ namespace gip.bso.manufacturing
                 WizardPhase > NewScheduledBatchWizardPhaseEnum.SelectMaterial
                 &&
                 (
-                    !IsWizardExistingBatch
+                    (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID == null)
                     || WizardPhase > NewScheduledBatchWizardPhaseEnum.PartslistForDefinition
                 )
                 && WizardPhase < NewScheduledBatchWizardPhaseEnum.DefineTargets;
@@ -2692,7 +2695,8 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                if (WizardSchedulerPartslistList.Any())
+                bool forSolving = WizardSchedulerPartslistList.Any(c => c.ProdOrderPartslistID == null && !c.IsSolved);
+                if (forSolving)
                 {
                     if (DatabaseApp.IsChanged)
                     {
@@ -2723,7 +2727,7 @@ namespace gip.bso.manufacturing
                             !wizardSchedulerPartslist.IsSolved
                             ||
                                 (
-                                    IsWizardExistingBatch
+                                    SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID != null
                                     && wizardSchedulerPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
                                 )
                         ))
@@ -2757,8 +2761,8 @@ namespace gip.bso.manufacturing
             try
             {
                 ClearMessages();
+                SelectedProdOrderBatchPlan = batchPlan;
                 WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
-                IsWizardExistingBatch = true;
                 IsWizard = true;
                 WizardForwardAction(WizardPhase);
 
@@ -2768,15 +2772,12 @@ namespace gip.bso.manufacturing
             }
             catch (Exception ex)
             {
-                IsWizardExistingBatch = false;
                 IsWizard = false;
                 throw ex;
             }
 
             OnPropertyChanged("CurrentLayout");
         }
-
-        public bool IsWizardExistingBatch { get; set; }
 
         #endregion
 
@@ -2807,7 +2808,7 @@ namespace gip.bso.manufacturing
                     isEnabled = IsEnabledFactoryBatch();
                     break;
                 case NewScheduledBatchWizardPhaseEnum.PartslistForDefinition:
-                    isEnabled = (!SelectedWizardSchedulerPartslist.IsSolved || IsWizardExistingBatch) && SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup != null;
+                    isEnabled = SelectedWizardSchedulerPartslist != null && (!SelectedWizardSchedulerPartslist.IsSolved || SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID != null) && SelectedWizardSchedulerPartslist.SelectedMDSchedulingGroup != null;
                     break;
                 case NewScheduledBatchWizardPhaseEnum.DefineBatch:
                     isEnabled = BatchPlanSuggestion != null
@@ -2901,7 +2902,12 @@ namespace gip.bso.manufacturing
                     case NewScheduledBatchWizardPhaseEnum.PartslistForDefinition:
                         if (WizardSolvedTasks.Contains(NewScheduledBatchWizardPhaseEnum.PartslistForDefinition))
                             return true;
-                        if (IsWizardExistingBatch)
+                        if (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID != null)
+                        {
+                            LoadExistingWizardSchedulerPartslistList();
+                            LoadMissingWizardSchedulerPartslistList();
+                        }
+                        else if (SelectedProdOrderBatchPlan != null)
                             LoadExistingWizardSchedulerPartslistList();
                         else
                             LoadNewWizardSchedulerPartslistList();
@@ -2916,7 +2922,7 @@ namespace gip.bso.manufacturing
                         WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.PartslistForDefinition);
                         break;
                     case NewScheduledBatchWizardPhaseEnum.DefineBatch:
-                        if (IsWizardExistingBatch)
+                        if (SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID != null)
                         {
                             ProdOrderPartslistPos prodOrderPartslistPos = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == SelectedWizardSchedulerPartslist.ProdOrderPartslistPosID);
                             BatchPlanSuggestion = LoadExistingBatchSuggestion(prodOrderPartslistPos);
@@ -2984,9 +2990,7 @@ namespace gip.bso.manufacturing
                     && x.Item.IsEnabled)
                 .OrderByDescending(x => x.TreeVersion)
                 .ToList();
-
             int sn = 0;
-
             List<WizardSchedulerPartslist> wizardSchedulerPartslists = new List<WizardSchedulerPartslist>();
             foreach (ExpandResult expand in treeResult)
             {
@@ -3104,10 +3108,32 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public void LoadMissingWizardSchedulerPartslistList()
+        {
+            List<WizardSchedulerPartslist> expandedItems = LoadWizardSchedulerPartslistList(rootPartslistExpand);
+            int nr = 0;
+            foreach (WizardSchedulerPartslist item in expandedItems)
+            {
+                WizardSchedulerPartslist existingItem = WizardSchedulerPartslistList.Where(c => c.PartslistID == item.PartslistID).FirstOrDefault();
+                if (existingItem == null)
+                {
+                    item.ProgramNo = SelectedWizardSchedulerPartslist.ProgramNo;
+                    AddWizardSchedulerPartslistList(item, nr);
+                }
+                else
+                    existingItem.Sn = nr;
+                ++nr;
+            }
+        }
+
         private void LoadExistingWizardSchedulerPartslistList()
         {
             AllWizardSchedulerPartslistList = new List<WizardSchedulerPartslist>();
-            List<ProdOrderPartslist> partslists = SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
+            List<ProdOrderPartslist> partslists = null;
+            if (SelectedWizardSchedulerPartslist != null)
+                partslists = DatabaseApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == SelectedWizardSchedulerPartslist.ProdOrderPartslistID).Select(c => c.ProdOrder).SelectMany(c => c.ProdOrderPartslist_ProdOrder).OrderBy(c => c.Sequence).ToList();
+            else
+                partslists = SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
             foreach (ProdOrderPartslist partslist in partslists)
             {
                 List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(partslist.Partslist);
@@ -3119,10 +3145,12 @@ namespace gip.bso.manufacturing
                 ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(partslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
                 item.ProdOrderPartslistPosID = finalMix.ProdOrderPartslistPosID;
                 AddWizardSchedulerPartslistList(item);
-                if (SelectedProdOrderBatchPlan.ProdOrderPartslistID == partslist.ProdOrderPartslistID)
+                if (SelectedProdOrderBatchPlan != null && SelectedProdOrderBatchPlan.ProdOrderPartslistID == partslist.ProdOrderPartslistID)
                     SelectedWizardSchedulerPartslist = item;
             }
             DefaultWizardSchedulerPartslist = AllWizardSchedulerPartslistList.LastOrDefault();
+            if (SelectedWizardSchedulerPartslist == null)
+                SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
         }
 
         private Msg CheckProductionUnits()
@@ -3287,7 +3315,6 @@ namespace gip.bso.manufacturing
             TargetQuantityUOM = 0;
             TargetQuantity = 0;
             WizardSolvedTasks.Clear();
-            IsWizardExistingBatch = false;
             ClearMessages();
         }
 
