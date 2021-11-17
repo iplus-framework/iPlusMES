@@ -2923,11 +2923,11 @@ namespace gip.bso.manufacturing
                         }
                         else
                         {
-                            Msg checkProdUnit = CheckProductionUnits();
-                            if (checkProdUnit == null)
+                            //Msg checkProdUnit = CheckProductionUnits();
+                            //if (checkProdUnit == null)
                                 BatchPlanSuggestion = LoadNewBatchSuggestion(SelectedWizardSchedulerPartslist);
-                            else
-                                SendMessage(checkProdUnit);
+                            //else
+                                //SendMessage(checkProdUnit);
                         }
                         if (BatchPlanSuggestion == null || BatchPlanSuggestion.ItemsList == null || !BatchPlanSuggestion.ItemsList.Any())
                         {
