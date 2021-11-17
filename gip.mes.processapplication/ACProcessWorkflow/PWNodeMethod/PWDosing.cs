@@ -467,7 +467,7 @@ namespace gip.mes.processapplication
 
         #endregion
 
-        #region Production
+        #region Configuration
         private ACMethod _MyConfiguration;
         public ACMethod MyConfiguration
         {
@@ -1687,9 +1687,6 @@ namespace gip.mes.processapplication
         }
         #endregion
 
-
-        #region Configuration
-        #endregion
 
 
         #region Alarmhandling
