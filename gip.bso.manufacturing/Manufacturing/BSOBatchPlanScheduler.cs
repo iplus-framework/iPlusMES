@@ -2530,6 +2530,7 @@ namespace gip.bso.manufacturing
             DefaultWizardSchedulerPartslist.MDProdOrderState = SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState;
             vd.ACClassWF tempACClassWFItem = DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
             ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(SelectedProdOrderPartslist.ProdOrderPartslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
+            TargetQuantityUOM = SelectedProdOrderPartslist.TargetQuantityUOM;
             DefaultWizardSchedulerPartslist.ProdOrderPartslistPosID = finalMix.ProdOrderPartslistPosID;
             try
             {
@@ -2666,7 +2667,8 @@ namespace gip.bso.manufacturing
                 (
                     !IsWizardExistingBatch
                     || WizardPhase > NewScheduledBatchWizardPhaseEnum.PartslistForDefinition
-                );
+                )
+                && WizardPhase < NewScheduledBatchWizardPhaseEnum.DefineTargets;
         }
 
         [ACMethodInfo("Wizard", "en{'Forward'}de{'Weiter'}", 509)]
