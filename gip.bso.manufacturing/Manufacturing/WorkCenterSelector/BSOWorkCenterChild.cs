@@ -167,13 +167,13 @@ namespace gip.bso.manufacturing
 
         #region Methods => Start workflow picking
 
-        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod)
+        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, bool sourceFacilityValidation = true)
         {
             bool wfRunsBatches = false;
             ACComponent appManager = null;
             Route validRoute = null;
 
-            if (!PrepareStartWorkflow(CurrentBookParamRelocation, acClassMethod, out wfRunsBatches, out appManager, out validRoute, workflow))
+            if (!PrepareStartWorkflow(CurrentBookParamRelocation, acClassMethod, out wfRunsBatches, out appManager, out validRoute, workflow, sourceFacilityValidation))
             {
                 ClearBookingData();
                 return false;
@@ -257,7 +257,7 @@ namespace gip.bso.manufacturing
 
 
         protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager,
-                                                    out Route validRoute, core.datamodel.ACClassWF workflow)
+                                                    out Route validRoute, core.datamodel.ACClassWF workflow, bool sourceFacilityValidation = true)
         {
             string pwClassNameOfRoot = GetPWClassNameOfRoot(forBooking);
             wfRunsBatches = false;
@@ -266,15 +266,19 @@ namespace gip.bso.manufacturing
 
             Msg msg = null;
 
-            if (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
-                || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
+            if ((sourceFacilityValidation && (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue))
+                || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue
+                || (!sourceFacilityValidation && forBooking.OutwardMaterial == null))
                 return false;
 
-            msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
-            if (msg != null)
+            if (sourceFacilityValidation)
             {
-                Messages.Msg(msg);
-                return false;
+                msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    return false;
+                }
             }
 
             if (workflow == null || workflow.ACClassMethod == null)

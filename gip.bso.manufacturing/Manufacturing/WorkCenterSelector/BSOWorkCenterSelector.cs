@@ -1217,10 +1217,14 @@ namespace gip.bso.manufacturing
                 _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
                 var inputList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
                                                     .Where(c => c.SourceProdOrderPartslistPos != null
+                                                            && c.TopParentPartslistPosRelation != null
+                                                            && c.TargetProdOrderPartslistPos != null
+                                                            && c.TargetProdOrderPartslistPos.TopParentPartslistPos != null
                                                             && c.MDProdOrderPartslistPosState != null
                                                             && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
                                                             && c.TargetQuantityUOM > 0.00001)
-                                                    .OrderBy(p => p.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex);
+                                                    .OrderBy(p => p.TargetProdOrderPartslistPos.TopParentPartslistPos.Sequence)
+                                                    .ThenBy(s => s.TopParentPartslistPosRelation.Sequence);
 
                 List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
                 foreach(var relation in inputList)
