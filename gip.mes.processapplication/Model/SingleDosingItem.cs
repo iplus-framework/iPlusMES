@@ -105,6 +105,11 @@ namespace gip.mes.processapplication
 
         }
 
+        public SingleDosingItems(IEnumerable<SingleDosingItem> collection) : base (collection)
+        {
+
+        }
+
         [DataMember]
         public Msg Error
         {
