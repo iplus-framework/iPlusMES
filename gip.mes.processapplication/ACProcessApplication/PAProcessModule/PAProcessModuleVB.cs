@@ -150,7 +150,7 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 9999)]
-        public virtual SingleDosingItems GetDosableComponents()
+        public virtual SingleDosingItems GetDosableComponents(bool withFacilityCombination = true)
         {
             using (Database db = new gip.core.datamodel.Database())
             {
@@ -186,7 +186,12 @@ namespace gip.mes.processapplication
                     if (silo == null || string.IsNullOrEmpty(silo.Facility?.ValueT?.ValueT?.FacilityNo) || string.IsNullOrEmpty(silo.MaterialNo?.ValueT))
                         continue;
 
-                    result.Add(new SingleDosingItem() { FacilityNo = silo.Facility.ValueT.ValueT.FacilityNo, MaterialName = silo.MaterialName?.ValueT, MaterialNo = silo.MaterialNo.ValueT });
+                    if (!withFacilityCombination && result.Any(c => c.MaterialNo == silo.MaterialNo.ValueT))
+                        continue;
+
+                    result.Add(new SingleDosingItem() {  FacilityNo = withFacilityCombination ? silo.Facility.ValueT.ValueT.FacilityNo : "", 
+                                                         MaterialName = silo.MaterialName?.ValueT, 
+                                                         MaterialNo = silo.MaterialNo.ValueT });
                 }
 
                 return result;

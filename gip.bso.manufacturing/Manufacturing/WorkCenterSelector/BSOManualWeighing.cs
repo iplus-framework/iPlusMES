@@ -2300,7 +2300,7 @@ namespace gip.bso.manufacturing
 
             _ACPickingManager = ACRefToPickingManager();
 
-            var result = currentProcessModule.ACUrlCommand("!GetDosableComponents") as SingleDosingItems;
+            var result = currentProcessModule.ACUrlCommand("!GetDosableComponents", false) as SingleDosingItems;
             if (result == null)
             {
                 //Error50433: Can not get dosable components for single dosing.
@@ -2316,6 +2316,8 @@ namespace gip.bso.manufacturing
 
             ClearBookingData();
 
+            result = OnFilterSingleDosingItems(result);
+
             result.ForEach(c => c.MaterialIconDesign = DefaultMaterialIcon);
 
             SingleDosingItemList = result;
@@ -2325,6 +2327,11 @@ namespace gip.bso.manufacturing
         public bool IsEnabledShowSingleDosingDialog()
         {
             return !IsCurrentProcessModuleNull;
+        }
+
+        public virtual SingleDosingItems OnFilterSingleDosingItems(IEnumerable<SingleDosingItem> items)
+        {
+            return new SingleDosingItems(items.OrderBy(c => c.MaterialName != null ? c.MaterialName : ""));
         }
 
         [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661)]
@@ -2364,14 +2371,14 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            vd.Facility outwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == SelectedSingleDosingItem.FacilityNo);
+            //vd.Facility outwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == SelectedSingleDosingItem.FacilityNo);
 
-            if (outwardFacility == null)
-            {
-                //Error50435: Can not find any outward facility with FacilityNo: {0}
-                Messages.Error(this, "Error50435",false, SelectedSingleDosingItem.FacilityNo);
-                return;
-            }
+            //if (outwardFacility == null)
+            //{
+            //    //Error50435: Can not find any outward facility with FacilityNo: {0}
+            //    Messages.Error(this, "Error50435",false, SelectedSingleDosingItem.FacilityNo);
+            //    return;
+            //}
 
             vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
             if (material == null)
@@ -2407,11 +2414,12 @@ namespace gip.bso.manufacturing
             var acClassMethod = workflow.ACClassMethod;
 
             CurrentBookParamRelocation.InwardFacility = inwardFacility;
-            CurrentBookParamRelocation.OutwardFacility = outwardFacility;
+            //CurrentBookParamRelocation.OutwardFacility = outwardFacility;
+            CurrentBookParamRelocation.OutwardMaterial = material;
             CurrentBookParamRelocation.InwardQuantity = SingleDosTargetQuantity;
             CurrentBookParamRelocation.OutwardQuantity = SingleDosTargetQuantity;
 
-            RunWorkflow(workflow, acClassMethod);
+            RunWorkflow(workflow, acClassMethod, false);
 
             SingleDosTargetQuantity = 0;
             SelectedSingleDosTargetStorage = null;

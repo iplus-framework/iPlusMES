@@ -651,8 +651,9 @@ namespace gip.bso.manufacturing
                         !c.NotAvailable
                         && c.MaterialID == materialID
                        )
+                    .Select(c => c.StockQuantityUOM)
                     .DefaultIfEmpty()
-                    .Sum(c => c.StockQuantityUOM);
+                    .Sum(c => c);
                 preparedMaterial.AvailableQuantityUOM = availableQuantity;
 
                 double pickingPosQuantityUOM =
@@ -661,8 +662,9 @@ namespace gip.bso.manufacturing
                     .Where(c => c.PickingStateIndex < (short)GlobalApp.PickingState.Finished)
                     .SelectMany(c => c.PickingPos_Picking)
                     .Where(c => c.PickingMaterialID == materialID && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x=>posIDs.Contains(x.ProdorderPartslistPosID)))
+                    .Select(c => c.PickingQuantityUOM ?? 0)
                     .DefaultIfEmpty()
-                    .Sum(c => c.PickingQuantityUOM ?? 0);
+                    .Sum(c => c);
 
                 preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM;
 
