@@ -83,12 +83,12 @@ namespace gip.mes.facility
             {
                 ACProdOrderManager aCProdOrderManager = ACProdOrderManager.GetServiceInstance(this);
                 List<ProdOrderBatchPlan> batchPlans = aCProdOrderManager.GetProductionLinieBatchPlans(
-                    databaseApp, 
-                    mdSchedulingGroupID, 
-                    GlobalApp.BatchPlanState.Created, 
-                    GlobalApp.BatchPlanState.Paused, 
-                    null, 
-                    null, 
+                    databaseApp,
+                    mdSchedulingGroupID,
+                    GlobalApp.BatchPlanState.Created,
+                    GlobalApp.BatchPlanState.Paused,
+                    null,
+                    null,
                     null,
                     null).ToList();
                 if (isBackward)
@@ -100,7 +100,6 @@ namespace gip.mes.facility
                 {
                     string testPartslistNo = batchPlan.ProdOrderPartslist.Partslist.PartslistNo;
                     SchedulingDurationAVG duration = GetBPDuration(databaseApp, mdSchedulingGroupID, batchPlan.ProdOrderPartslist.PartslistID ?? Guid.Empty, batchPlan.BatchTargetCount, batchPlan.BatchSize);
-
                     if ((duration.DurationSecAVG ?? 0) == 0)
                     {
                         IACConfig defaultDurationSecAVGConfig = GetConfig("DurationSecAVG",
@@ -128,23 +127,27 @@ namespace gip.mes.facility
                     bool durationIsValid = duration.DurationSecAVG > 0;
                     if (!durationIsValid)
                     {
+                        gip.core.datamodel.ACClassMethod mth = batchPlan.ProdOrderPartslist.Partslist.GetDefaultProgramACClassMethod();
                         Msg msgInvalidDuration = new Msg(this, eMsgLevel.Error, ClassName, "Scheduling", 168, "Error50351",
-                            batchPlan.Sequence,
                             batchPlan.ProdOrderPartslist.ProdOrder.ProgramNo,
+                            batchPlan.Sequence,
                             batchPlan.ProdOrderPartslistPos.Material.MaterialNo,
-                            batchPlan.ProdOrderPartslistPos.Material.MaterialName1);
+                            batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+
+                            batchPlan.ProdOrderPartslist.Partslist.PartslistNo,
+                            batchPlan.ProdOrderPartslist.Partslist.PartslistName,
+                            mth.ACIdentifier);
                         message.AddDetailMessage(msgInvalidDuration);
                     }
                     if (firstBatchPlan == null)
                     {
                         firstBatchPlan = batchPlan;
-                        if (durationIsValid)
-                            if (isBackward)
-                                batchPlan.CalculatedEndDate = beginTime;
-                            else
-                                batchPlan.CalculatedStartDate = beginTime;
+                        if (isBackward)
+                            batchPlan.CalculatedEndDate = beginTime;
+                        else
+                            batchPlan.CalculatedStartDate = beginTime;
                     }
-                    else if (durationIsValid)
+                    else
                     {
                         if (isBackward)
                             batchPlan.CalculatedEndDate = prevBatchPlan.CalculatedStartDate.Value;
@@ -158,11 +161,14 @@ namespace gip.mes.facility
                             else
                                 batchPlan.CalculatedStartDate = batchPlan.CalculatedStartDate.Value.AddSeconds(-duration.StartOffsetSecAVG.Value);
                     }
+                    double durationValue = 0;
                     if (durationIsValid)
-                        if (isBackward)
-                            batchPlan.CalculatedStartDate = batchPlan.CalculatedEndDate.Value.AddSeconds(-duration.DurationSecAVG.Value);
-                        else
-                            batchPlan.CalculatedEndDate = batchPlan.CalculatedStartDate.Value.AddSeconds(duration.DurationSecAVG.Value);
+                        durationValue = duration.DurationSecAVG.Value;
+                    if (isBackward)
+                        batchPlan.CalculatedStartDate = batchPlan.CalculatedEndDate.Value.AddSeconds(-durationValue);
+                    else
+                        batchPlan.CalculatedEndDate = batchPlan.CalculatedStartDate.Value.AddSeconds(durationValue);
+
                     prevBatchPlan = batchPlan;
                     batchPlan.UpdateName = updateName;
                     batchPlan.UpdateDate = DateTime.Now;
@@ -471,9 +477,9 @@ namespace gip.mes.facility
         {
             IACConfig config = null;
             var configStores = GetCurrentConfigStores(currentACClassWF, vbCurrentACClassWF, materialWFID, partslist, prodOrderPartslist);
-            foreach(var configStore in configStores)
+            foreach (var configStore in configStores)
             {
-                foreach(var item in configStore.ConfigurationEntries)
+                foreach (var item in configStore.ConfigurationEntries)
                 {
                     if (item.ConfigACUrl.EndsWith(propertyName))
                     {
