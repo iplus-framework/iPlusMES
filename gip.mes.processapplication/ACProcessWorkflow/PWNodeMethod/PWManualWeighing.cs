@@ -127,6 +127,8 @@ namespace gip.mes.processapplication
         #region Const
 
         public const string MNCompleteWeighing = "CompleteWeighing";
+        public const string MNInterdischargingStart = "InterdischargingStart";
+        public const string MNCompleteInterdischarging = "CompleteInterdischarging";
         public const string MaterialConfigLastUsedLotKeyACUrl = "ManWeighLastUsedLot";
 
         #endregion
@@ -228,6 +230,20 @@ namespace gip.mes.processapplication
                 }
                 return null;
             }
+        }
+
+        [ACPropertyBindingTarget(IsPersistable = true)]
+        public IACContainerTNet<double> InterdischargingScaleActualWeight
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyBindingTarget(IsPersistable = true)]
+        public IACContainerTNet<string> InterdischargingScaleActualValue
+        {
+            get;
+            set;
         }
 
         #region Properties => Managers
@@ -1047,6 +1063,12 @@ namespace gip.mes.processapplication
             {
                 WeighingComponents = null;
             }
+
+            using (ACMonitor.Lock(_65025_MemberCompLock))
+            {
+                InterdischargingScaleActualValue.ValueT = null;
+            }    
+
             base.SMCompleted();
         }
 
@@ -1074,6 +1096,11 @@ namespace gip.mes.processapplication
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _IsBinChangeActivated = false;
+            }
+
+            using (ACMonitor.Lock(_65025_MemberCompLock))
+            {
+                InterdischargingScaleActualValue.ValueT = null;
             }
 
             UnSubscribeToProjectWorkCycle();
@@ -3000,13 +3027,72 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACMethodInfo("","",999)]
+        [ACMethodInfo("","",9999)]
         public bool IsBinChangeLoopNodeAvailable()
         {
             if (PWPointOut == null || PWPointOut.ConnectionList == null || !PWPointOut.ConnectionList.Any())
                 return false;
 
             return PWPointOut.ConnectionList.Any(c => c.ValueT is PWBinChangeLoop);
+        }
+
+        [ACMethodInfo("", "", 9999)]
+        public double? InterdischargingStart()
+        {
+            string returnValue = null;
+
+            using (ACMonitor.Lock(_65025_MemberCompLock))
+            {
+                returnValue = InterdischargingScaleActualValue.ValueT;
+            }
+
+            double parsedValue = 0;
+            if (!string.IsNullOrEmpty(returnValue) && double.TryParse(returnValue, out parsedValue))
+            {
+                return parsedValue;
+            }
+
+            PAFManualWeighing manWeigh = CurrentExecutingFunction<PAFManualWeighing>();
+            if (manWeigh != null)
+            {
+                var scale = manWeigh.CurrentScaleForWeighing;
+                if (scale != null)
+                {
+                    returnValue = scale.ActualValue.ValueT.ToString();
+                    double actualWeight = scale.ActualWeight.ValueT;
+                    using(ACMonitor.Lock(_65025_MemberCompLock))
+                    {
+                        InterdischargingScaleActualValue.ValueT = returnValue;
+                        InterdischargingScaleActualWeight.ValueT = actualWeight;
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(returnValue) && double.TryParse(returnValue, out parsedValue))
+            {
+                return parsedValue;
+            }
+
+            return null;
+        }
+
+        [ACMethodInfo("", "", 9999)]
+        public void CompleteInterdischarging()
+        {
+            double compQuantity = 0;
+            using (ACMonitor.Lock(_65025_MemberCompLock))
+            {
+                compQuantity = InterdischargingScaleActualWeight.ValueT;
+            }
+
+            CompleteWeighing(compQuantity, true);
+
+            using (ACMonitor.Lock(_65025_MemberCompLock))
+            {
+                InterdischargingScaleActualValue.ValueT = null;
+            }
+
+            TareScale();
         }
 
         #endregion

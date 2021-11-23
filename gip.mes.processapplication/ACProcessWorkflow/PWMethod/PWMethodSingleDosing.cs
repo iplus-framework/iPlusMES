@@ -35,6 +35,8 @@ namespace gip.mes.processapplication
             return base.Start(acMethod);
         }
 
+        public new const string PWClassName = "PWMethodSingleDosing";
+
         public Guid? SelectedSingleDosingACClassWFID
         {
             get

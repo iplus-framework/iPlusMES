@@ -122,6 +122,7 @@ namespace gip.bso.manufacturing
         private IACContainerT<string> _OrderInfo;
         private IACContainerT<WeighingComponentInfo> _WeighingComponentInfo;
         private IACContainerT<double> _ScaleActualWeight;
+        private IACContainerT<double> _ScaleActualValue;
 
         #endregion
 
@@ -445,21 +446,34 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(691)]
-        public string AbortQuestion
+        private double? _InInterdischargingQ = null;
+
+        public double? InInterdischargingQ
         {
-            get
+            get => _InInterdischargingQ;
+            set
             {
-                return Root.Environment.TranslateMessage(this, "Question50043");
+                _InInterdischargingQ = value;
+                OnPropertyChanged("InInterdischargingQ");
+                InterdischargingCompleteQ = _InInterdischargingQ.HasValue ? _InInterdischargingQ / 2 : _InInterdischargingQ;
             }
         }
+
+        public virtual double? InterdischargingCompleteQ
+        {
+            get;
+            set;
+        }
+
+        private bool _IsEnabledCompleteInterdischarging = false;
 
         public enum AbortModeEnum : short
         {
             Cancel = 0,
             AbortComponent = 10,
             AbortComponentSwitchToEmptyingMode = 20,
-            SwitchToEmptyingMode = 30
+            SwitchToEmptyingMode = 30,
+            Interdischarging = 40
         }
 
         private AbortModeEnum _AbortMode;
@@ -789,14 +803,12 @@ namespace gip.bso.manufacturing
 
             var messagesToAck = MessagesList.Where(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton).ToList();
 
-            bool isCompExceedsMaxScaleWeight = MaxScaleWeight.HasValue && TargetWeight > MaxScaleWeight;
-
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
-            if (messagesToAck.Count > 1 || (messagesToAck.Any() && (ScaleBckgrState == ScaleBackgroundState.InTolerance || isCompExceedsMaxScaleWeight)) 
+            if (messagesToAck.Count > 1 || (messagesToAck.Any() && (ScaleBckgrState == ScaleBackgroundState.InTolerance)) 
                                         || messagesToAck.Any(x => x.MessageLevel == eMsgLevel.Question))
             {
-                if (ScaleBckgrState == ScaleBackgroundState.InTolerance || isCompExceedsMaxScaleWeight)
+                if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
                 {
                     string text = Root.Environment.TranslateText(this, "txtAckWeighComp");
                     if (string.IsNullOrEmpty(text))
@@ -818,14 +830,14 @@ namespace gip.bso.manufacturing
                     messageToAck.AcknowledgeMsg();
                 else if (componentPWNode != null)
                 {
-                    if (isCompExceedsMaxScaleWeight && ScaleBckgrState != ScaleBackgroundState.InTolerance)
+                    if (ScaleBckgrState != ScaleBackgroundState.InTolerance)
                     {
                         //Question50072 : Are you sure that you want acknowledge current component?
                         if (Messages.Question(this, "Question50072") != Global.MsgResult.Yes)
                             return;
                     }
 
-                    componentPWNode.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, ScaleActualWeight, ScaleBckgrState != ScaleBackgroundState.InTolerance);
+                    componentPWNode.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, ScaleActualWeight, false);
                 }
             }
         }
@@ -980,10 +992,10 @@ namespace gip.bso.manufacturing
 
             if (componentPWNode != null)
             {
-                //Question50043: Do you want to abort the current weighing?
-                // Möchten Sie die aktuelle Verwiegung abbrechen?
+                InterdischargeStart(componentPWNode, true);
+
                 _AbortMode = AbortModeEnum.Cancel;
-                ShowDialog(this, "AbortDialog");
+                ShowDialog(this, "AbortDialog", "", false, Global.ControlModes.Hidden, Global.ControlModes.Hidden);
 
                 if (_AbortMode == AbortModeEnum.AbortComponent)
                 {
@@ -1030,28 +1042,6 @@ namespace gip.bso.manufacturing
         {
             return true; //ComponentPWNode != null;
         }
-
-        [ACMethodInfo("", "en{'Abort component'}de{'Komponente abbrechen'}", 695)]
-        public void AbortComponent()
-        {
-            _AbortMode = AbortModeEnum.AbortComponent;
-            CloseTopDialog();
-        }
-
-        [ACMethodInfo("", "en{'Abort component, switch to emptying mode'}de{'Komponente abbrechen, Leerfahrmodus aktivieren'}", 695)]
-        public void AbortComponentEmptyingMode()
-        {
-            _AbortMode = AbortModeEnum.AbortComponentSwitchToEmptyingMode;
-            CloseTopDialog();
-        }
-
-        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695)]
-        public void SwitchEmptyingMode()
-        {
-            _AbortMode = AbortModeEnum.SwitchToEmptyingMode;
-            CloseTopDialog();
-        }
-
 
         [ACMethodInfo("", "en{'Apply charge/lot'}de{'Charge/Los anwenden'}", 607)]
         public virtual void ApplyLot()
@@ -1273,15 +1263,21 @@ namespace gip.bso.manufacturing
             }
 
             MaxScaleWeight = null;
-            var maxWeightProp = scale.GetPropertyNet("MaxScaleWeight") as IACContainerTNet<double>;
-            if (maxWeightProp != null && maxWeightProp.ValueT > 0.0001)
+            var actValProp = scale.GetPropertyNet("ActualValue") as IACContainerTNet<double>;
+            if (actValProp == null)
             {
-                MaxScaleWeight = maxWeightProp.ValueT;
+                //Error50292: Initialization error: The scale component doesn't have the property {0}.
+                // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
+                Messages.Error(this, "Error50292", false, "ActualValue");
+                return;
             }
+
+            _ScaleActualValue = actValProp;
 
             _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
             (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged += ActWeightProp_PropertyChanged;
             ScaleRealWeight = _ScaleActualWeight.ValueT;
+
 
             if (CurrentPAFManualWeighing != null && scale != null )
             {
@@ -1702,6 +1698,12 @@ namespace gip.bso.manufacturing
                 (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged -= ActWeightProp_PropertyChanged;
                 _ScaleActualWeight = null;
             }
+            if (_ScaleActualValue != null)
+            {
+                (_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
+                _ScaleActualValue = null;
+            }
+
         }
 
         #endregion
@@ -2274,6 +2276,13 @@ namespace gip.bso.manufacturing
                 }
             }
 
+            if (!IsRoutingServiceAvailable)
+            {
+                //Error50430: The routing service is unavailable.
+                Messages.Error(this, "Error50430");
+                return;
+            }
+
             RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, currentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
                                                                     RouteDirections.Forwards, null, null, null, 0, true, true);
 
@@ -2388,6 +2397,13 @@ namespace gip.bso.manufacturing
                 return;
             }
 
+            MsgWithDetails msg = ValidateSingleDosingStart(currentProcessModule);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+
             var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.PWMethodNodeConfigKeyACUrl);
 
             if (wfConfigs == null || !wfConfigs.Any())
@@ -2419,7 +2435,9 @@ namespace gip.bso.manufacturing
             CurrentBookParamRelocation.InwardQuantity = SingleDosTargetQuantity;
             CurrentBookParamRelocation.OutwardQuantity = SingleDosTargetQuantity;
 
-            RunWorkflow(workflow, acClassMethod, false);
+            ACComponent processModule = CurrentProcessModule;
+
+            RunWorkflow(workflow, acClassMethod, processModule, false);
 
             SingleDosTargetQuantity = 0;
             SelectedSingleDosTargetStorage = null;
@@ -2430,6 +2448,32 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSingleDosingStart()
         {
             return SelectedSingleDosingItem != null && SingleDosTargetQuantity > 0.0001;
+        }
+
+        public virtual MsgWithDetails ValidateSingleDosingStart(ACComponent currentProcessModule)
+        {
+            if (currentProcessModule != null)
+            {
+                ACClass componentClass = currentProcessModule.ComponentClass?.FromIPlusContext<ACClass>(DatabaseApp.ContextIPlus);
+                if (componentClass == null)
+                    return null;
+
+                double maxWeight = 0;
+                ACClassProperty maxWeightProp = componentClass.GetProperty(PAProcessModule.PropNameMaxWeightCapacity);
+                if (maxWeightProp != null && maxWeightProp.Value != null && maxWeightProp.Value is string)
+                    maxWeight = (double)ACConvert.ChangeType(maxWeightProp.Value as string, typeof(double), true, DatabaseApp.ContextIPlus);
+
+                maxWeight = maxWeight - (maxWeight * 0.2);
+
+                if (SingleDosTargetQuantity > maxWeight)
+                {
+                    //Error50487:The dosing quantity is {0} kg but the maximum dosing qunatity is {1} kg.
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ValidateStart", 2469, "Error50487", SingleDosTargetQuantity, Math.Round(maxWeight,2));
+                    return new MsgWithDetails(new Msg[]{ msg });
+                }
+            }
+
+            return null;
         }
 
         #endregion
@@ -2476,7 +2520,143 @@ namespace gip.bso.manufacturing
             return result;
         }
 
-        #endregion 
+        #region Methods => AbortDialog
+
+        [ACMethodInfo("", "en{'Yes -> Abort'}de{'Ja -> Abbrechen'}", 695)]
+        public void AbortComponent()
+        {
+            _AbortMode = AbortModeEnum.AbortComponent;
+            InInterdischargingQ = null;
+            _IsEnabledCompleteInterdischarging = false;
+            CloseTopDialog();
+        }
+
+        [ACMethodInfo("", "en{'Abort and emptying mode'}de{'Abbrechen und Leerfahren'}", 695)]
+        public void AbortComponentEmptyingMode()
+        {
+            _AbortMode = AbortModeEnum.AbortComponentSwitchToEmptyingMode;
+            InInterdischargingQ = null;
+            _IsEnabledCompleteInterdischarging = false;
+            CloseTopDialog();
+        }
+
+        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695)]
+        public void SwitchEmptyingMode()
+        {
+            _AbortMode = AbortModeEnum.SwitchToEmptyingMode;
+            CloseTopDialog();
+        }
+
+        [ACMethodInfo("", "en{'Close'}de{'Schließen'}", 696)]
+        public void CloseAbortDialog()
+        {
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledCloseAbortDialog()
+        {
+            return InInterdischargingQ.HasValue ? false : true;
+        }
+
+        [ACMethodInfo("", "en{'Interdischarge'}de{'Interdischarge'}", 696)]
+        public void Interdischarge()
+        {
+            IACComponentPWNode currentPWNode = ComponentPWNodeLocked;
+            InterdischargeStart(currentPWNode, false);
+        }
+
+        private void InterdischargeStart(IACComponentPWNode currentPWNode, bool onlyCheck)
+        {
+            _AbortMode = AbortModeEnum.Interdischarging;
+
+            if (currentPWNode != null)
+            {
+                double? storedActualValue = null;
+                if (onlyCheck)
+                {
+                    double parsedValue = 0;
+                    string storedValue = currentPWNode.ACUrlCommand("InterdischargingScaleActualValue") as string;
+                    if (!string.IsNullOrEmpty(storedValue) && double.TryParse(storedValue, out parsedValue))
+                    {
+                        storedActualValue = parsedValue;
+                    }
+                }
+                else
+                {
+                    storedActualValue = currentPWNode.ExecuteMethod("InterdischargingStart") as double?;
+                }
+
+                if (!storedActualValue.HasValue)
+                {
+                    //Error
+                    return;
+                }
+
+                InInterdischargingQ = storedActualValue;
+
+                _IsEnabledCompleteInterdischarging = true;
+                if (_ScaleActualValue != null)
+                {
+                    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
+                    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
+
+                    _IsEnabledCompleteInterdischarging = false;
+
+                    VerifyIsActualQLower(_ScaleActualValue.ValueT);
+                }
+            }
+        }
+
+        private void ScaleActualValue_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT && InInterdischargingQ.HasValue)
+            {
+                IACContainerTNet<double> propVal = sender as IACContainerTNet<double>;
+                if (propVal != null)
+                {
+                    VerifyIsActualQLower(propVal.ValueT);
+                }
+            }
+        }
+
+        private void VerifyIsActualQLower(double actualValue)
+        {
+            if (actualValue <= InterdischargingCompleteQ)
+            {
+                _IsEnabledCompleteInterdischarging = true;
+                if (_ScaleActualValue != null)
+                    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
+            }
+        }
+
+        public bool IsEnabledInterdischarge()
+        {
+            return InInterdischargingQ.HasValue ? false : true;
+        }
+
+        [ACMethodInfo("", "en{'Interdischarging complete'}de{'Interdischarging complete'}", 696)]
+        public void CompleteInterdischarging()
+        {
+            IACComponentPWNode currentPWNode = CurrentComponentPWNode;
+
+            if (currentPWNode != null)
+            {
+                currentPWNode.ExecuteMethod(PWManualWeighing.MNCompleteInterdischarging);
+            }
+
+            InInterdischargingQ = null;
+            _IsEnabledCompleteInterdischarging = false;
+            CloseAbortDialog();
+        }
+
+        public bool IsEnabledCompleteInterdischarging()
+        {
+            return _IsEnabledCompleteInterdischarging;
+        }
+
+        #endregion
+
+        #endregion
 
         #region Handle execute helper
 
@@ -2577,6 +2757,35 @@ namespace gip.bso.manufacturing
                 case "IsEnabledSingleDosingStart":
                     result = IsEnabledSingleDosingStart();
                     return true;
+
+                case "AbortComponent":
+                    AbortComponent();
+                    return true;
+                case "AbortComponentEmptyingMode":
+                    AbortComponentEmptyingMode();
+                    return true;
+                case "SwitchEmptyingMode":
+                    SwitchEmptyingMode();
+                    return true;
+                case "CloseAbortDialog":
+                    CloseAbortDialog();
+                    return true;
+                case "IsEnabledCloseAbortDialog":
+                    result = IsEnabledCloseAbortDialog();
+                    return true;
+                case "Interdischarge":
+                    Interdischarge();
+                    return true;
+                case "IsEnabledInterdischarge":
+                    result = IsEnabledInterdischarge();
+                    return true;
+                case "CompleteInterdischarging":
+                    CompleteInterdischarging();
+                    return true;
+                case "IsEnabledCompleteInterdischarging":
+                    result = IsEnabledCompleteInterdischarging();
+                    return true;
+
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }

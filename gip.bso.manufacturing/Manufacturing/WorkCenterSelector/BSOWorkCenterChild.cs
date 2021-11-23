@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -130,11 +131,6 @@ namespace gip.bso.manufacturing
 
         #region Methods
 
-        public virtual void OnHandleOrderInfoChanged(string orderInfo, string pwGroupACUrl, ACComponent pwGroup)
-        {
-
-        }
-
         public virtual void Activate(ACComponent selectedProcessModule)
         {
             CurrentProcessModule = selectedProcessModule;
@@ -167,11 +163,36 @@ namespace gip.bso.manufacturing
 
         #region Methods => Start workflow picking
 
-        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, bool sourceFacilityValidation = true)
+        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true)
         {
             bool wfRunsBatches = false;
             ACComponent appManager = null;
             Route validRoute = null;
+
+            if (processModule == null)
+                return false;
+
+            string orderInfo = processModule.ACUrlCommand("OrderInfo") as string;
+
+            if (!string.IsNullOrEmpty(orderInfo))
+            {
+                //Question50075: The process module is occupied with order {0}. Are you sure that you want continue?
+                if (Messages.Question(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
+                {
+                    return false;
+                }
+            }
+            
+            string orderReservationInfo = processModule.ACUrlCommand("OrderReservationInfo") as string;
+            if (!string.IsNullOrEmpty(orderReservationInfo))
+            {
+                //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
+                if (Messages.Question(this, "Question50076", 
+                    Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
+                {
+                    return false;
+                }
+            }
 
             if (!PrepareStartWorkflow(CurrentBookParamRelocation, acClassMethod, out wfRunsBatches, out appManager, out validRoute, workflow, sourceFacilityValidation))
             {
@@ -216,6 +237,8 @@ namespace gip.bso.manufacturing
                 ClearBookingData();
                 return false;
             }
+
+            processModule.ACUrlCommand("OrderReservationInfo", picking.PickingNo);
 
             return StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID);
         }
