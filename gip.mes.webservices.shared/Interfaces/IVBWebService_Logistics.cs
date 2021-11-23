@@ -14,6 +14,14 @@ namespace gip.mes.webservices
     {
 #if NETFRAMEWORK
         [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriPickingTypes, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<MDPickingType>> GetPickingTypes();
+#elif NETSTANDARD
+        Task<WSResponse<List<MDPickingType>>> GetPickingTypesAsync();
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UriPicking, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<List<Picking>> GetPickings();
 #elif NETSTANDARD

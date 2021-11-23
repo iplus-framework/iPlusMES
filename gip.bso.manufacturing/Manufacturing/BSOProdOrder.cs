@@ -1270,6 +1270,7 @@ namespace gip.bso.manufacturing
                     SearchIntermediate();
                     SearchBatch();
 
+
                     this.LoadProcessWorkflows();
                     LoadMaterialWorkflows();
                     OnPropertyChanged("SelectedProdOrderPartslist");
@@ -1806,7 +1807,82 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region ProdOrderPartslist -> Change with Partlist Quantities [ChangeViaPartslist]
+
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "ChangeViaPartslistPosTargetQuantityUOM", "en{'Original target quantity according to BOM'}de{'Ursprüngliche Sollmenge laut Stückliste'}")]
+        public double ChangeViaPartslistPosTargetQuantityUOM
+        {
+            get
+            {
+                if (SelectedProdOrderPartslistPos == null || SelectedProdOrderPartslistPos.BasedOnPartslistPos == null)
+                    return 0;
+                return SelectedProdOrderPartslistPos.BasedOnPartslistPos.TargetQuantityUOM;
+            }
+        }
+
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "ChangeViaPartslistPlTargetQuantityUOM", "en{'BOM reference size'}de{'Stücklistenbezugsgröße'}")]
+        public double ChangeViaPartslistPlTargetQuantityUOM
+        {
+            get
+            {
+                if (SelectedProdOrderPartslistPos == null)
+                    return 0;
+                return SelectedProdOrderPartslistPos.ProdOrderPartslist.Partslist.TargetQuantityUOM;
+            }
+        }
+
+        private double _ChangeViaPartslistNewTargetQuantityUOM;
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "ChangeViaPartslistNewQuantityUOM", "en{'New target quantity according to BOM'}de{'Neue Sollmenge laut Stückliste'}")]
+        public double ChangeViaPartslistNewTargetQuantityUOM
+        {
+            get
+            {
+                return _ChangeViaPartslistNewTargetQuantityUOM;
+            }
+            set
+            {
+                if (_ChangeViaPartslistNewTargetQuantityUOM != value)
+                {
+                    _ChangeViaPartslistNewTargetQuantityUOM = value;
+                    OnPropertyChanged("ChangeViaPartslistNewTargetQuantityUOM");
+                    OnPropertyChanged("ChangeViaPartslistNewOrderTargetQuantityUOM");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "ChangeViaPartslistNewOrderQuantityUOM", "en{'New target quantity in order'}de{'Neue Sollmenge im Auftrag:'}")]
+        public double ChangeViaPartslistNewOrderTargetQuantityUOM
+        {
+            get
+            {
+                if (SelectedProdOrderPartslistPos.ProdOrderPartslist.Partslist.TargetQuantityUOM == 0)
+                    return 0;
+                double factorOrder = SelectedProdOrderPartslistPos.ProdOrderPartslist.TargetQuantity / SelectedProdOrderPartslistPos.ProdOrderPartslist.Partslist.TargetQuantityUOM;
+                return ChangeViaPartslistNewTargetQuantityUOM * factorOrder;
+            }
+        }
+
+        #endregion
+
         #region ProdOrderPartslistPos -> Methods
+
+        #region ProdOrderPartslistPos -> Methods -> Manipulate
 
         [ACMethodInteraction(ProdOrderPartslistPos.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void NewProdOrderPartslistPos()
@@ -1915,6 +1991,8 @@ namespace gip.bso.manufacturing
             return false;
         }
 
+        #endregion
+
         #region ProdOrderPartslistPos -> Methods -> IsEnabled
         public bool IsEnabledNewProdOrderPartslistPos()
         {
@@ -1926,6 +2004,66 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderPartslistPos != null;
         }
         #endregion
+
+        #region ProdOrderPartslistPos -> Methods -> Change with Partlist Quantities [ChangeViaPartslist]
+
+        /// <summary>
+        /// ChangeViaPartslistDlg
+        /// </summary>
+        [ACMethodInfo("ChangeViaPartslistDlg", "en{'Change target quantity according to BOM'}de{'Sollmenge entsprechend Stückliste ändern'}", 999)]
+        public void ChangeViaPartslistDlg()
+        {
+            if (!IsEnabledChangeViaPartslistDlg())
+                return;
+            ShowDialog(this, "ChangeViaPartslistDlg");
+        }
+
+        /// <summary>
+        /// IsEnabledChangeViaPartslistDlg
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled new SubPropertyName]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledChangeViaPartslistDlg()
+        {
+            if (SelectedProdOrderPartslistPos != null)
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// ChangeViaPartslistDlg
+        /// </summary>
+        [ACMethodInfo("ChangeViaPartslistOk", "en{'Ok'}de{'Ok'}", 999)]
+        public void ChangeViaPartslistOk()
+        {
+            if (!IsEnabledChangeViaPartslistOk())
+                return;
+            SelectedProdOrderPartslistPos.TargetQuantityUOM = ChangeViaPartslistNewOrderTargetQuantityUOM;
+            CloseTopDialog();
+            OnPropertyChanged("SelectedProdOrderPartslistPos");
+            OnPropertyChanged("SelectedProdOrderPartslistPos\\TargetQuantityUOM");
+        }
+
+        /// <summary>
+        /// IsEnabledChangeViaPartslistDlg
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled new SubPropertyName]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledChangeViaPartslistOk()
+        {
+            return ChangeViaPartslistNewOrderTargetQuantityUOM > 0;
+        }
+
+
+        /// <summary>
+        /// ChangeViaPartslistDlg
+        /// </summary>
+        [ACMethodInfo("ChangeViaPartslistCancel", "en{'Cancel'}de{'Abbrechen'}", 999)]
+        public void ChangeViaPartslistCancel()
+        {
+            CloseTopDialog();
+        }
+
+        #endregion
+
 
         #endregion
 
@@ -1966,6 +2104,14 @@ namespace gip.bso.manufacturing
                 .ToList();
 
                 _ProdOrderPartslistPosList = baseItems.Union(localItems).ToList();
+                if (_ProdOrderPartslistPosList != null && _ProdOrderPartslistPosList.Any())
+                {
+                    foreach (var outwardRootPosItem in _ProdOrderPartslistPosList)
+                    {
+                        outwardRootPosItem.PropertyChanged -= OutwardRootPosItem_PropertyChanged;
+                        outwardRootPosItem.PropertyChanged += OutwardRootPosItem_PropertyChanged;
+                    }
+                }
             }
             if (_ProdOrderPartslistPosList == null)
                 SelectedProdOrderPartslistPos = null;
@@ -1978,6 +2124,20 @@ namespace gip.bso.manufacturing
             }
 
             OnPropertyChanged("ProdOrderPartslistPosList");
+        }
+
+        private void OutwardRootPosItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "TargetQuantityUOM")
+            {
+                ProdOrderPartslistPos outwardRootPosItem = sender as ProdOrderPartslistPos;
+                if (outwardRootPosItem.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any()
+                    && outwardRootPosItem.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count() == 1)
+                {
+                    ProdOrderPartslistPosRelation relation = outwardRootPosItem.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FirstOrDefault();
+                    relation.TargetQuantityUOM = outwardRootPosItem.TargetQuantityUOM;
+                }
+            }
         }
         #endregion
 
@@ -3634,8 +3794,8 @@ namespace gip.bso.manufacturing
             else
                 filterItem.SearchWord = orderNo;
 
-            if(planningMRID != null)
-                SelectedFilterPlanningMR = FilterPlanningMRList.FirstOrDefault(c=>c.PlanningMRID == planningMRID);
+            if (planningMRID != null)
+                SelectedFilterPlanningMR = FilterPlanningMRList.FirstOrDefault(c => c.PlanningMRID == planningMRID);
 
             this.Search();
             if (CurrentProdOrder != null && ProdOrderPartslistList != null && prodOrderPartslistID != Guid.Empty)
@@ -3792,9 +3952,9 @@ namespace gip.bso.manufacturing
                 {
                     facilityPreBooking = DatabaseApp.FacilityPreBooking.FirstOrDefault(c => c.FacilityPreBookingID == entry.EntityID);
                 }
-                else if(entry.EntityName == PlanningMR.ClassName)
+                else if (entry.EntityName == PlanningMR.ClassName)
                 {
-                    planningMR =   DatabaseApp.PlanningMR.FirstOrDefault(c=>c.PlanningMRID == entry.EntityID);
+                    planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == entry.EntityID);
                 }
             }
 
@@ -3808,7 +3968,7 @@ namespace gip.bso.manufacturing
             Guid? facilityBookingID = null;
             Guid? facilityPreBookingID = null;
             Guid? planningMRID = null;
-            if(planningMR != null)
+            if (planningMR != null)
                 planningMRID = planningMR.PlanningMRID;
 
             if (facilityBooking != null)

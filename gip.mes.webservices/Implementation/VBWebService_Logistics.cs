@@ -13,6 +13,33 @@ namespace gip.mes.webservices
 {
     public partial class VBWebService
     {
+        public virtual WSResponse<List<MDPickingType>> GetPickingTypes()
+        {
+            List<MDPickingType> result = null;
+            try
+            {
+                using (var dbApp = new DatabaseApp())
+                {
+                    result = ConvertToWSPickingType(dbApp.MDPickingType.AsQueryable()).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<List<MDPickingType>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            return new WSResponse<List<MDPickingType>>(result);
+        }
+
+        protected IEnumerable<MDPickingType> ConvertToWSPickingType(IQueryable<gip.mes.datamodel.MDPickingType> query)
+        {
+            return query.AsEnumerable().Select(c => new MDPickingType()
+            {
+                MDPickingTypeID = c.MDPickingTypeID,
+                MDPickingTypeTrans = c.MDNameTrans
+            });
+        }
+        
+
 
         public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_GetPicking =
         CompiledQuery.Compile<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>>(

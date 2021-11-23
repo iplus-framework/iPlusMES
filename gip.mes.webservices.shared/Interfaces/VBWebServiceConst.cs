@@ -42,6 +42,7 @@ namespace gip.mes.webservices
 
         #region Logistics
 
+        public const string UriPickingTypes = "PickingTypes";
         public const string UriPicking = "Pickings";
         public const string UriPickingID = "Pickings/{pickingID}";
         public const string UriPickingID_F = "Pickings/{0}";

@@ -835,7 +835,7 @@ namespace gip.bso.manufacturing
         }
 
         private DateTime? _FilterEndTime;
-        [ACPropertyInfo(526, "FilterEndTime", "en{'To'}de{'Zum'}")]
+        [ACPropertyInfo(526, "FilterEndTime", "en{'To'}de{'Bis'}")]
         public DateTime? FilterEndTime
         {
             get
@@ -852,26 +852,57 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search) -> FilterConnectedLine [PAScheduleForPWNode]
 
-        private bool _FilterIsCompleted;
-        [ACPropertyInfo(527, "FilterIncludeInProduction", "en{'Completed'}de{'Erledigt'}")]
-        public bool FilterIsCompleted
+
+        #region FilterConnectedLine
+        private PAScheduleForPWNode _SelectedFilterConnectedLine;
+        /// <summary>
+        /// Selected property for PAScheduleForPWNode
+        /// </summary>
+        /// <value>The selected FilterConnectedLine</value>
+        [ACPropertySelected(9999, "FilterConnectedLine", "en{'Connected with'}de{'Verbinden mit'}")]
+        public PAScheduleForPWNode SelectedFilterConnectedLine
         {
             get
             {
-                return _FilterIsCompleted;
+                return _SelectedFilterConnectedLine;
             }
             set
             {
-                if (_FilterIsCompleted != value)
+                if (_SelectedFilterConnectedLine != value)
                 {
-                    _FilterIsCompleted = value;
-                    OnPropertyChanged("FilterIsCompleted");
-                    OnPropertyChanged("FilterStartTime");
-                    OnPropertyChanged("FilterEndTime");
+                    _SelectedFilterConnectedLine = value;
+                    OnPropertyChanged("SelectedFilterConnectedLine");
                 }
             }
         }
+
+
+        private List<PAScheduleForPWNode> _FilterConnectedLineList;
+        /// <summary>
+        /// List property for PAScheduleForPWNode
+        /// </summary>
+        /// <value>The FilterConnectedLine list</value>
+        [ACPropertyList(9999, "FilterConnectedLine")]
+        public List<PAScheduleForPWNode> FilterConnectedLineList
+        {
+            get
+            {
+                if (_FilterConnectedLineList == null)
+                    _FilterConnectedLineList = LoadFilterConnectedLineList();
+                return _FilterConnectedLineList;
+            }
+        }
+
+        private List<PAScheduleForPWNode> LoadFilterConnectedLineList()
+        {
+            return ScheduleForPWNodeList.ToList();
+        }
+        #endregion
+
+
+        #endregion
 
         #endregion
 
@@ -947,11 +978,6 @@ namespace gip.bso.manufacturing
             vd.GlobalApp.BatchPlanState startState = GlobalApp.BatchPlanState.Created;
             vd.GlobalApp.BatchPlanState endState = GlobalApp.BatchPlanState.Paused;
             MDProdOrderState.ProdOrderStates? minProdOrderState = null;
-            if (FilterIsCompleted)
-            {
-                endState = GlobalApp.BatchPlanState.Completed;
-                minProdOrderState = MDProdOrderState.ProdOrderStates.ProdFinished;
-            }
             ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans = null;
             try
             {
@@ -967,6 +993,24 @@ namespace gip.bso.manufacturing
                         FilterEndTime,
                         minProdOrderState,
                         FilterPlanningMR?.PlanningMRID);
+
+                // Filter list if SelectedFilterConnectedLine is selected: Only batch they have connection via ProdOrder with other line
+                if (SelectedFilterConnectedLine != null)
+                {
+                    var includedProductionOrders =
+                    ProdOrderManager
+                   .GetProductionLinieBatchPlans(
+                       DatabaseApp,
+                       SelectedFilterConnectedLine.MDSchedulingGroupID,
+                       startState,
+                       endState,
+                       FilterStartTime,
+                       FilterEndTime,
+                       minProdOrderState,
+                       FilterPlanningMR?.PlanningMRID)
+                   .Select(c => c.ProdOrderPartslist.ProdOrderID);
+                    prodOrderBatchPlans = new ObservableCollection<ProdOrderBatchPlan>(prodOrderBatchPlans.Where(c => includedProductionOrders.Contains(c.ProdOrderPartslist.ProdOrderID)));
+                }
             }
             finally
             {
@@ -1062,6 +1106,75 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties -> (Tab)ProdOrder
+        #region Properties -> (Tab)ProdOrder -> Filter
+
+        private DateTime? _FilterOrderStartTime;
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterOrderStartTime", "en{'From'}de{'Von'}")]
+        public DateTime? FilterOrderStartTime
+        {
+            get
+            {
+                return _FilterOrderStartTime;
+            }
+            set
+            {
+                if (_FilterOrderStartTime != value)
+                {
+                    _FilterOrderStartTime = value;
+                    OnPropertyChanged("FilterOrderStartTime");
+                }
+            }
+        }
+
+        private DateTime? _FilterOrderEndTime;
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterOrderEndTime", "en{'To'}de{'Bis'}")]
+        public DateTime? FilterOrderEndTime
+        {
+            get
+            {
+                return _FilterOrderEndTime;
+            }
+            set
+            {
+                if (_FilterOrderEndTime != value)
+                {
+                    _FilterOrderEndTime = value;
+                    OnPropertyChanged("FilterOrderEndTime");
+                }
+            }
+        }
+
+        private bool? _FilterOrderIsCompleted;
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterOrderIsCompleted", "en{'Completed'}de{'Erledigt'}")]
+        public bool? FilterOrderIsCompleted
+        {
+            get
+            {
+                return _FilterOrderIsCompleted;
+            }
+            set
+            {
+                if (_FilterOrderIsCompleted != value)
+                {
+                    _FilterOrderIsCompleted = value;
+                    OnPropertyChanged("FilterOrderIsCompleted");
+                }
+            }
+        }
+
+        #endregion
 
         #region Properties -> (Tab)ProdOrder -> ProdOrderPartslist
 
@@ -1099,19 +1212,33 @@ namespace gip.bso.manufacturing
             if (SelectedScheduleForPWNode == null)
                 return new List<ProdOrderPartslistPlanWrapper>();
 
+            MDProdOrderState.ProdOrderStates? minProdOrderState = null;
+            MDProdOrderState.ProdOrderStates? maxProdOrderState = null;
+            if (FilterOrderIsCompleted != null)
+            {
+                if (FilterOrderIsCompleted.Value)
+                    minProdOrderState = MDProdOrderState.ProdOrderStates.ProdFinished;
+                else
+                    maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
+            }
+
             ObjectQuery<ProdOrderPartslistPlanWrapper> batchQuery =
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
                     (short)MDProdOrderState.ProdOrderStates.InProduction,
-                    FilterPlanningMR?.PlanningMRID) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+                    FilterPlanningMR?.PlanningMRID,
+                    FilterOrderStartTime,
+                    FilterOrderEndTime,
+                    (short?)minProdOrderState,
+                    (short?)maxProdOrderState) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return batchQuery.ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, short, Guid?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, short, Guid?, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, toOrderState, planningMRID) => ctx.ProdOrderPartslist
+        protected static readonly Func<DatabaseApp, Guid, short, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, short, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, toOrderState, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) => ctx.ProdOrderPartslist
                                                         .Include("MDProdOrderState")
                                                         .Include("ProdOrder")
                                                         .Include("Partslist")
@@ -1124,6 +1251,19 @@ namespace gip.bso.manufacturing
                                                              && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
                                                                  || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                                                                 )
+                                                             && (minProdOrderState == null || c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                                                             && (maxProdOrderState == null || c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState)
+                                                             && (
+                                                                    filterStartTime == null
+                                                                 || (c.ProdOrderBatchPlan_ProdOrderPartslist.Any(x => (x.ScheduledStartDate ?? x.UpdateDate) >= filterStartTime) && minProdOrderState == null)
+                                                                 || (c.UpdateDate >= filterStartTime && minProdOrderState != null)
+                                                                )
+                                                             && (
+                                                                    filterEndTime == null
+                                                                 || c.ProdOrderBatchPlan_ProdOrderPartslist.Any(x => x.ScheduledEndDate != null && x.ScheduledEndDate < filterEndTime)
+                                                                 || c.ProdOrderBatchPlan_ProdOrderPartslist.Any(x => x.CalculatedEndDate != null && x.CalculatedEndDate < filterEndTime)
+                                                                )
+
                                                              && c
                                                                  .Partslist
                                                                  .PartslistACClassMethod_Partslist
@@ -2157,35 +2297,39 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method ResetFilterStartTime
         /// </summary>
-        [ACMethodInfo("ResetFilterStartTime", "en{'Reset'}de{'Zurücksetzen'}", 700)]
+        [ACMethodInfo("ResetFilterStartTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 700)]
         public void ResetFilterStartTime()
         {
             if (!IsEnabledResetFilterStartTime())
                 return;
-            FilterStartTime = null;
+            FilterStartTime = FilterStartTime == null ? (DateTime?)DateTime.Now : null;
         }
 
         public bool IsEnabledResetFilterStartTime()
         {
-            return FilterStartTime != null;
+            return true;
         }
 
         /// <summary>
         /// Method ResetFilterEndTime
         /// </summary>
-        [ACMethodInfo("ResetFilterEndTime", "en{'Reset'}de{'Zurücksetzen'}", 701)]
+        [ACMethodInfo("ResetFilterEndTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 701)]
         public void ResetFilterEndTime()
         {
             if (!IsEnabledResetFilterEndTime())
                 return;
-            FilterEndTime = null;
+            if (FilterEndTime != null)
+                FilterEndTime = null;
+            else if (FilterStartTime != null)
+                FilterEndTime = FilterStartTime.Value.AddDays(1);
+            else
+                FilterEndTime = null;
         }
 
         public bool IsEnabledResetFilterEndTime()
         {
-            return FilterEndTime != null;
+            return true;
         }
-
 
 
         #endregion
@@ -2209,14 +2353,11 @@ namespace gip.bso.manufacturing
                 SelectedScheduleForPWNode != null
                 &&
                 (
-                    !FilterIsCompleted
-                    || (
-                            FilterStartTime != null
-                            && FilterEndTime != null
-                            && (FilterEndTime.Value - FilterStartTime).Value.TotalDays > 0
-                            && (FilterEndTime.Value - FilterStartTime).Value.TotalDays <= Const_MaxFilterDaySpan)
+                    FilterStartTime != null
+                    && FilterEndTime != null
+                    && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > 0
+                    && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
                 );
-
         }
 
         [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New)]
@@ -2515,6 +2656,67 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)ProdOrder
 
+        #region Methods -> (Tab)ProdOrder -> Filter
+
+        /// <summary>
+        /// Source Property: SearchOrders
+        /// </summary>
+        [ACMethodInfo("SearchOrders", "en{'Search'}de{'Suchen'}", 999)]
+        public void SearchOrders()
+        {
+            if (!IsEnabledSearchOrders())
+                return;
+            ProdOrderPartslistList = GetProdOrderPartslistList();
+        }
+
+        public bool IsEnabledSearchOrders()
+        {
+            return
+                FilterOrderStartTime != null
+                && FilterOrderEndTime != null
+                && (FilterOrderEndTime.Value - FilterOrderStartTime.Value).TotalDays > 0
+                && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan;
+        }
+
+        /// <summary>
+        /// Source Property: ResetFilterOrderStartTime
+        /// </summary>
+        [ACMethodInfo("ResetFilterOrderStartTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 999)]
+        public void ResetFilterOrderStartTime()
+        {
+            if (!IsEnabledResetFilterOrderStartTime())
+                return;
+            FilterOrderStartTime = FilterOrderStartTime == null ? (DateTime?)DateTime.Now : null;
+        }
+
+        public bool IsEnabledResetFilterOrderStartTime()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Source Property: ResetFilterOrderEndTime
+        /// </summary>
+        [ACMethodInfo("ResetFilterOrderEndTime", "en{'Set / Reset'}de{'Setzen / Zurücksetzen'}", 999)]
+        public void ResetFilterOrderEndTime()
+        {
+            if (!IsEnabledResetFilterOrderEndTime())
+                return;
+            if (FilterOrderStartTime != null)
+                FilterOrderEndTime = FilterOrderEndTime == null ? (DateTime?)FilterOrderStartTime.Value.AddDays(1) : null;
+            else
+                FilterOrderEndTime = null;
+        }
+
+        public bool IsEnabledResetFilterOrderEndTime()
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region Methods -> (Tab)ProdOrder -> Manipulate Batch Plan
+
         [ACMethodCommand("New", "en{'Add Batchplan'}de{'Batchplan Hinzufügen'}", 504)]
         public void AddBatchPlan()
         {
@@ -2642,6 +2844,8 @@ namespace gip.bso.manufacturing
         {
             return ProdOrderPartslistList != null && ProdOrderPartslistList.Any(c => c.IsSelected);
         }
+
+        #endregion
 
         #endregion
 
@@ -2925,9 +3129,9 @@ namespace gip.bso.manufacturing
                         {
                             //Msg checkProdUnit = CheckProductionUnits();
                             //if (checkProdUnit == null)
-                                BatchPlanSuggestion = LoadNewBatchSuggestion(SelectedWizardSchedulerPartslist);
+                            BatchPlanSuggestion = LoadNewBatchSuggestion(SelectedWizardSchedulerPartslist);
                             //else
-                                //SendMessage(checkProdUnit);
+                            //SendMessage(checkProdUnit);
                         }
                         if (BatchPlanSuggestion == null || BatchPlanSuggestion.ItemsList == null || !BatchPlanSuggestion.ItemsList.Any())
                         {
@@ -3304,12 +3508,6 @@ namespace gip.bso.manufacturing
             vd.GlobalApp.BatchPlanState startState = GlobalApp.BatchPlanState.Created;
             vd.GlobalApp.BatchPlanState endState = GlobalApp.BatchPlanState.Paused;
             MDProdOrderState.ProdOrderStates? prodOrderState = null;
-            if (FilterIsCompleted)
-            {
-                endState = GlobalApp.BatchPlanState.Completed;
-                prodOrderState = MDProdOrderState.ProdOrderStates.InProduction;
-            }
-
             ObservableCollection<vd.ProdOrderBatchPlan> prodOrderBatchPlans =
                 ProdOrderManager
                 .GetProductionLinieBatchPlans(
@@ -3426,30 +3624,24 @@ namespace gip.bso.manufacturing
                     case "FilterStartTime":
                         result = Global.ControlModes.Enabled;
                         bool filterStartTimeIsRequired =
-                            FilterIsCompleted
-                            && (
-                                    FilterStartTime == null
+                           FilterStartTime == null
                                     || (
                                             FilterStartTime != null
                                             && FilterEndTime != null
                                             && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
-                                        )
-                                );
+                                        );
                         if (filterStartTimeIsRequired)
                             result = Global.ControlModes.EnabledWrong;
                         break;
                     case "FilterEndTime":
                         result = Global.ControlModes.Enabled;
                         bool filterEndTimeIsRequired =
-                            FilterIsCompleted
-                            && (
-                                    FilterEndTime == null
+                            FilterEndTime == null
                                     || (
                                             FilterStartTime != null
                                             && FilterEndTime != null
                                             && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
-                                        )
-                                );
+                                        );
                         if (filterEndTimeIsRequired)
                             result = Global.ControlModes.EnabledWrong;
                         break;
@@ -3860,15 +4052,20 @@ namespace gip.bso.manufacturing
                 if (resultMsg == null || resultMsg.IsSucceded())
                     LoadProdOrderBatchPlanList();
 
-                if (resultMsg != null && resultMsg is MsgWithDetails)
+                if (resultMsg != null)
                 {
-                    MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
-                    if (msgWithDetails.MsgDetails.Any())
-                        foreach (Msg detailMsg in msgWithDetails.MsgDetails)
-                            SendMessage(detailMsg);
+                    if (resultMsg is MsgWithDetails)
+                    {
+                        MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
+                        if (msgWithDetails.MsgDetails.Any())
+                            foreach (Msg detailMsg in msgWithDetails.MsgDetails)
+                                SendMessage(detailMsg);
+                    }
+                    else
+                        SendMessage(resultMsg);
+                    Root.Messages.Msg(resultMsg);
                 }
-                else if (resultMsg != null)
-                    SendMessage(resultMsg);
+
             }
         }
 
