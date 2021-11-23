@@ -176,8 +176,8 @@ namespace gip.bso.manufacturing
 
             if (!string.IsNullOrEmpty(orderInfo))
             {
-                //Question50075: The process module is occupied with order {0}. Do you want try again later?
-                if (Messages.Question(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) == Global.MsgResult.Yes)
+                //Question50075: The process module is occupied with order {0}. Are you sure that you want continue?
+                if (Messages.Question(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
                 {
                     return false;
                 }
@@ -186,9 +186,9 @@ namespace gip.bso.manufacturing
             string orderReservationInfo = processModule.ACUrlCommand("OrderReservationInfo") as string;
             if (!string.IsNullOrEmpty(orderReservationInfo))
             {
-                //Question50076: The process module is reserved for order {0}. Do you want try again later?
+                //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
                 if (Messages.Question(this, "Question50076", 
-                    Global.MsgResult.Yes, false, orderReservationInfo) == Global.MsgResult.Yes)
+                    Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
                 {
                     return false;
                 }
