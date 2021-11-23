@@ -51,6 +51,9 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(9999, "", "", "", false, true)]
         public IACContainerTNet<ACRef<DeliveryNotePos>> CurrentDeliveryNotePos { get; set; }
 
+        //
+        [ACPropertyBindingSource(303, "Info", "en{'Reservation-Info'}de{'Reservierungsinformation'}", "", false, false)]
+        public IACContainerTNet<string> OrderReservationInfo { get; set; }
 
         public virtual bool IsOccupied
         {
@@ -195,6 +198,16 @@ namespace gip.mes.processapplication
                 }
 
                 return result;
+            }
+        }
+
+        public override void RefreshOrderInfo()
+        {
+            base.RefreshOrderInfo();
+
+            if (!string.IsNullOrEmpty(OrderInfo.ValueT))
+            {
+                OrderReservationInfo.ValueT = null;
             }
         }
 
