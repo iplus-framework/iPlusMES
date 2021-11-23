@@ -1152,7 +1152,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private bool? _FilterOrderIsCompleted;
+        private bool? _FilterOrderIsCompleted = false;
         /// <summary>
         /// Selected property for 
         /// </summary>
@@ -1226,7 +1226,6 @@ namespace gip.bso.manufacturing
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
-                    (short)MDProdOrderState.ProdOrderStates.InProduction,
                     FilterPlanningMR?.PlanningMRID,
                     FilterOrderStartTime,
                     FilterOrderEndTime,
@@ -1236,9 +1235,9 @@ namespace gip.bso.manufacturing
             return batchQuery.ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, short, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, short, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, toOrderState, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) => ctx.ProdOrderPartslist
+        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) => ctx.ProdOrderPartslist
                                                         .Include("MDProdOrderState")
                                                         .Include("ProdOrder")
                                                         .Include("Partslist")
@@ -1246,22 +1245,21 @@ namespace gip.bso.manufacturing
                                                         .Include("Partslist.Material.BaseMDUnit")
                                                         .Include("Partslist.Material.MaterialUnit_Material")
                                                         .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
-                                                        .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
-                                                             && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= toOrderState
+                                                        .Where(c=>
+                                                             (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
+                                                             && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
                                                              && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
                                                                  || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                                                                 )
-                                                             && (minProdOrderState == null || c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
-                                                             && (maxProdOrderState == null || c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState)
                                                              && (
                                                                     filterStartTime == null
-                                                                 || (c.ProdOrderBatchPlan_ProdOrderPartslist.Any(x => (x.ScheduledStartDate ?? x.UpdateDate) >= filterStartTime) && minProdOrderState == null)
-                                                                 || (c.UpdateDate >= filterStartTime && minProdOrderState != null)
+                                                                    ||
+                                                                    c.InsertDate >= filterStartTime
                                                                 )
                                                              && (
                                                                     filterEndTime == null
-                                                                 || c.ProdOrderBatchPlan_ProdOrderPartslist.Any(x => x.ScheduledEndDate != null && x.ScheduledEndDate < filterEndTime)
-                                                                 || c.ProdOrderBatchPlan_ProdOrderPartslist.Any(x => x.CalculatedEndDate != null && x.CalculatedEndDate < filterEndTime)
+                                                                    ||
+                                                                    c.InsertDate < filterEndTime
                                                                 )
 
                                                              && c
@@ -2353,11 +2351,15 @@ namespace gip.bso.manufacturing
                 SelectedScheduleForPWNode != null
                 &&
                 (
-                    FilterStartTime != null
-                    && FilterEndTime != null
-                    && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > 0
-                    && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
-                );
+                    SelectedFilterConnectedLine != null
+                    ||
+                    (
+                        FilterStartTime != null
+                        && FilterEndTime != null
+                        && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > 0
+                        && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
+                    )
+                 );
         }
 
         [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New)]
@@ -2672,10 +2674,14 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSearchOrders()
         {
             return
-                FilterOrderStartTime != null
-                && FilterOrderEndTime != null
-                && (FilterOrderEndTime.Value - FilterOrderStartTime.Value).TotalDays > 0
-                && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan;
+                (FilterOrderStartTime == null && FilterOrderEndTime == null && !(FilterOrderIsCompleted ?? true))
+                ||
+                (
+                    FilterOrderStartTime != null
+                    && FilterOrderEndTime != null
+                    && (FilterOrderEndTime.Value - FilterOrderStartTime.Value).TotalDays > 0
+                    && (FilterOrderEndTime.Value - FilterOrderStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
+                );
         }
 
         /// <summary>
