@@ -2526,6 +2526,8 @@ namespace gip.bso.manufacturing
         public void AbortComponent()
         {
             _AbortMode = AbortModeEnum.AbortComponent;
+            InInterdischargingQ = null;
+            _IsEnabledCompleteInterdischarging = false;
             CloseTopDialog();
         }
 
@@ -2533,6 +2535,8 @@ namespace gip.bso.manufacturing
         public void AbortComponentEmptyingMode()
         {
             _AbortMode = AbortModeEnum.AbortComponentSwitchToEmptyingMode;
+            InInterdischargingQ = null;
+            _IsEnabledCompleteInterdischarging = false;
             CloseTopDialog();
         }
 
