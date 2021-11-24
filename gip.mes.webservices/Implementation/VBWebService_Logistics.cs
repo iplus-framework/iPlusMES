@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using gip.core.autocomponent;
 using System.Data.Objects;
 using gip.mes.facility;
+using gip.core.webservices;
 
 namespace gip.mes.webservices
 {
@@ -127,6 +128,92 @@ namespace gip.mes.webservices
             }
             return new WSResponse<List<Picking>>(result);
         }
+
+
+        public WSResponse<List<Picking>> SearchPickings(string pType, string fromFacility, string toFacility, string fromDate, string toDate)
+        {
+            GlobalApp.PickingType pickingType;
+            short? pTypeIndex = null;
+            if (pType != CoreWebServiceConst.EmptyParam && Enum.TryParse<GlobalApp.PickingType>(pType, out pickingType))
+            {
+                pTypeIndex = (short)pickingType;
+            }
+
+            Guid fromFacilityID = Guid.Empty;
+            if (fromFacility != CoreWebServiceConst.EmptyParam)
+            {
+                Guid.TryParse(fromFacility, out fromFacilityID);
+            }
+
+            Guid toFacilityID = Guid.Empty;
+            if (toFacility != CoreWebServiceConst.EmptyParam)
+            {
+                Guid.TryParse(toFacility, out toFacilityID);
+            }
+
+            DateTime? fromDT = null;
+            if (fromDate != CoreWebServiceConst.EmptyParam)
+            {
+                DateTime temp;
+                if (DateTime.TryParse(fromDate, out temp))
+                {
+                    fromDT = temp;
+                }
+            }
+
+            DateTime? toDT = null;
+            if (toDate != CoreWebServiceConst.EmptyParam)
+            {
+                DateTime temp;
+                if (DateTime.TryParse(toDate, out temp))
+                {
+                    toDT = temp;
+                }
+            }
+
+            List<Picking> result;
+            try
+            {
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    result = ConvertToWSPicking(s_cQry_SearchPicking(dbApp, pTypeIndex, fromFacilityID, toFacilityID, fromDT, toDT)).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<List<Picking>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+
+            return new WSResponse<List<Picking>>(result);
+        }
+
+        public static readonly Func<DatabaseApp, short?, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_SearchPicking =
+        CompiledQuery.Compile<DatabaseApp, short?, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>>(
+            (dbApp, pType, fromFacility, toFacility, fromDate, toDate) =>
+                dbApp.Picking
+                        .Include("PickingPos_Picking")
+                        .Include("PickingPos_Picking.FromFacility")
+                        .Include("PickingPos_Picking.ToFacility")
+                        .Include("PickingPos_Picking.InOrderPos")
+                        .Include("PickingPos_Picking.InOrderPos.Material")
+                        .Include("PickingPos_Picking.InOrderPos.MDUnit")
+                        .Include("PickingPos_Picking.OutOrderPos")
+                        .Include("PickingPos_Picking.OutOrderPos.Material")
+                        .Include("PickingPos_Picking.OutOrderPos.MDUnit")
+                        //.Include("PickingPos_Picking.ProdOrderPartslistPos")
+                        //.Include("PickingPos_Picking.ProdOrderPartslistPos.Material")
+                        //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDUnit")
+                        .Include("PickingPos_Picking.PickingMaterial")
+                        .Include("PickingPos_Picking.PickingMaterial.BaseMDUnit")
+                        .Where(c =>    (pType == null || c.MDPickingType.MDPickingTypeIndex == pType)
+                                    && (fromFacility == Guid.Empty || c.PickingPos_Picking.Any(x => x.FromFacilityID == fromFacility || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == fromFacility))
+                                    && (toFacility == Guid.Empty || c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == fromFacility))
+                                    && (fromDate == null || c.DeliveryDateFrom >= fromDate)
+                                    && (toDate == null || c.DeliveryDateFrom >= toDate)
+                                    && (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess)
+                                    && c.PickingPos_Picking.Any(p => p.MDDelivPosLoadState.MDDelivPosLoadStateIndex <= (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                              )
+        ));
 
 
         public WSResponse<Picking> GetPicking(string pickingID)

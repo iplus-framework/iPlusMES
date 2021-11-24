@@ -44,6 +44,8 @@ namespace gip.mes.webservices
 
         public const string UriPickingTypes = "PickingTypes";
         public const string UriPicking = "Pickings";
+        public const string UriSearchPicking = "SPickings/{pType}/{fromFacility}/{toFacility}/{fromDate}/{toDate}";
+        public const string UriSearchPickingF = "SPickings/{0}/{1}/{2}/{3}/{4}";
         public const string UriPickingID = "Pickings/{pickingID}";
         public const string UriPickingID_F = "Pickings/{0}";
         public const string UriPickingPosID = "PickingPos/{pickingPosID}";
