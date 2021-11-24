@@ -1195,12 +1195,15 @@ namespace gip.mes.facility
                                             && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
-                                                 || ((c.ScheduledStartDate ?? c.UpdateDate) >= filterStartTime && minProdOrderState == null)
-                                                 || (c.UpdateDate >= filterStartTime && minProdOrderState != null)
+                                                 || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
+                                                 || (c.CalculatedStartDate != null && c.CalculatedStartDate >= filterEndTime)
+                                                 || (c.UpdateDate >= filterStartTime)
                                                 )
                                             && (filterEndTime == null
                                                  || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
-                                                 || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime))
+                                                 || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime)
+                                                 || (c.UpdateDate <= filterEndTime)
+                                                )
                                              && (
                                                     (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
                                                     || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))

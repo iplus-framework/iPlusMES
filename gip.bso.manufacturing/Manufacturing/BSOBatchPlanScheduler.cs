@@ -24,6 +24,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoForwardScheduling = @"DoForwardScheduling";
         public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
         public const int Const_MaxFilterDaySpan = 10;
+        public const int Const_MaxResultSize = 500;
         #endregion
 
         #region Configuration
@@ -890,14 +891,21 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_FilterConnectedLineList == null)
+                {
                     _FilterConnectedLineList = LoadFilterConnectedLineList();
+                    if (_FilterConnectedLineList != null)
+                        SelectedFilterConnectedLine = _FilterConnectedLineList.FirstOrDefault();
+                }
                 return _FilterConnectedLineList;
             }
         }
 
         private List<PAScheduleForPWNode> LoadFilterConnectedLineList()
         {
-            return ScheduleForPWNodeList.ToList();
+            List<PAScheduleForPWNode> list = ScheduleForPWNodeList.ToList();
+            PAScheduleForPWNode emptyNode = new PAScheduleForPWNode() { MDSchedulingGroup = new MDSchedulingGroup() { MDSchedulingGroupName = "-" } };
+            list.Insert(0, emptyNode);
+            return list;
         }
         #endregion
 
@@ -995,7 +1003,7 @@ namespace gip.bso.manufacturing
                         FilterPlanningMR?.PlanningMRID);
 
                 // Filter list if SelectedFilterConnectedLine is selected: Only batch they have connection via ProdOrder with other line
-                if (SelectedFilterConnectedLine != null)
+                if (SelectedFilterConnectedLine != null && SelectedFilterConnectedLine.MDSchedulingGroupID != Guid.Empty)
                 {
                     var includedProductionOrders =
                     ProdOrderManager
@@ -1232,7 +1240,7 @@ namespace gip.bso.manufacturing
                     (short?)minProdOrderState,
                     (short?)maxProdOrderState) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            return batchQuery.ToList();
+            return batchQuery.Take(Const_MaxResultSize).ToList();
         }
 
         protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
@@ -1245,7 +1253,7 @@ namespace gip.bso.manufacturing
                                                         .Include("Partslist.Material.BaseMDUnit")
                                                         .Include("Partslist.Material.MaterialUnit_Material")
                                                         .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
-                                                        .Where(c=>
+                                                        .Where(c =>
                                                              (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
                                                              && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
                                                              && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
@@ -2680,7 +2688,6 @@ namespace gip.bso.manufacturing
                     FilterOrderStartTime != null
                     && FilterOrderEndTime != null
                     && (FilterOrderEndTime.Value - FilterOrderStartTime.Value).TotalDays > 0
-                    && (FilterOrderEndTime.Value - FilterOrderStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
                 );
         }
 

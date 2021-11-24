@@ -127,7 +127,8 @@ namespace gip.mes.facility
                     bool durationIsValid = duration.DurationSecAVG > 0;
                     if (!durationIsValid)
                     {
-                        gip.core.datamodel.ACClassMethod mth = batchPlan.ProdOrderPartslist.Partslist.GetDefaultProgramACClassMethod();
+                        var method = batchPlan.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                        gip.mes.datamodel.ACClassMethod mth = databaseApp.ACClassMethod.FirstOrDefault(c => c.ACClassMethodID == method.MaterialWFACClassMethod.ACClassMethodID);
                         Msg msgInvalidDuration = new Msg(this, eMsgLevel.Error, ClassName, "Scheduling", 168, "Error50351",
                             batchPlan.ProdOrderPartslist.ProdOrder.ProgramNo,
                             batchPlan.Sequence,
@@ -136,7 +137,7 @@ namespace gip.mes.facility
 
                             batchPlan.ProdOrderPartslist.Partslist.PartslistNo,
                             batchPlan.ProdOrderPartslist.Partslist.PartslistName,
-                            mth.ACIdentifier);
+                            mth!= null ? mth.ACIdentifier : "");
                         message.AddDetailMessage(msgInvalidDuration);
                     }
                     if (firstBatchPlan == null)
