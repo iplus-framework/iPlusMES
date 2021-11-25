@@ -1,9 +1,11 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace gip.bso.manufacturing
 {
@@ -36,10 +38,22 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Not marked (private)
 
-        public Guid? ProdOrderPartslistID { get; set; }
-        public Guid? ProdOrderPartslistPosID { get; set; }
+        public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
-        public Guid PartslistID { get; set; }
+        private Partslist _Partslist;
+        public Partslist Partslist
+        {
+            get
+            {
+                return _Partslist;
+            }
+            set
+            {
+                _Partslist = value;
+                SelectedUnitConvert = UnitConvertList.FirstOrDefault();
+                OnPropertyChanged("Partslist");
+            }
+        }
 
         public GlobalApp.BatchPlanMode? PlanMode { get; set; }
 
@@ -108,8 +122,70 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Quantities
 
+        #region Properties -> Quantities -> MDUnit
+
+        MDUnit _SelectedUnitConvert;
+        [ACPropertySelected(512, "Conversion", "en{'Unit'}de{'Einheit'}")]
+        public MDUnit SelectedUnitConvert
+        {
+            get
+            {
+                return _SelectedUnitConvert;
+            }
+            set
+            {
+                _SelectedUnitConvert = value;
+                OnPropertyChanged("SelectedUnitConvert");
+            }
+        }
+
+
+        [ACPropertyList(513, "Conversion")]
+        public List<MDUnit> UnitConvertList
+        {
+            get
+            {
+                if (Partslist == null)
+                    return null;
+                return Partslist.Material.MDUnitList;
+            }
+        }
+
+        #endregion
+
+        private double _TargetQuantity;
         [ACPropertyInfo(105, "TargetQuantity", "en{'Required quantity'}de{'Bedarfsmenge'}")]
-        public double TargetQuantity { get; set; }
+        public double TargetQuantity
+        {
+            get
+            {
+                return _TargetQuantity;
+            }
+            set
+            {
+                if (_TargetQuantity != value)
+                {
+                    _TargetQuantity = value;
+                    OnPropertyChanged("TargetQuantity");
+                    try
+                    {
+                        if (Partslist != null && Partslist.Material != null)
+                            _TargetQuantityUOM = Partslist.Material.ConvertToBaseQuantity(_TargetQuantity, SelectedUnitConvert);
+                        else
+                            _TargetQuantityUOM = _TargetQuantity;
+                    }
+                    catch (Exception ec)
+                    {
+                        _TargetQuantityUOM = 0;
+                        string msg = ec.Message;
+                        if (ec.InnerException != null && ec.InnerException.Message != null)
+                            msg += " Inner:" + ec.InnerException.Message;
+                        ACRoot.SRoot.Messages.LogException(this.ToString(), "TargetQuantity", msg);
+                    }
+                    OnPropertyChanged("TargetQuantityUOM");
+                }
+            }
+        }
 
 
         private double _TargetQuantityUOM;
@@ -130,6 +206,22 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged("TargetQuantityUOM");
                     OnPropertyChanged("NewTargetQuantityUOM");
                     quantityInChange = false;
+                    try
+                    {
+                        if (Partslist != null && Partslist.Material != null)
+                            _TargetQuantity = Partslist.Material.ConvertFromBaseQuantity(_TargetQuantityUOM, SelectedUnitConvert);
+                        else
+                            _TargetQuantity = _TargetQuantityUOM;
+                    }
+                    catch (Exception ec)
+                    {
+                        _TargetQuantityUOM = 0;
+                        string msg = ec.Message;
+                        if (ec.InnerException != null && ec.InnerException.Message != null)
+                            msg += " Inner:" + ec.InnerException.Message;
+                        ACRoot.SRoot.Messages.LogException(this.ToString(), "TargetQuantityUOM", msg);
+                    }
+                    OnPropertyChanged("TargetQuantity");
                 }
             }
         }
@@ -216,14 +308,121 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Batch
 
+        #region Properties -> Batch -> BatchSizes
+
+        private double _BatchSizeMin;
         [ACPropertyInfo(999, "BatchSizeMin", "en{'Min. Batchsize'}de{'Min. Batchgröße'}")]
-        public double BatchSizeMin { get; set; }
+        public double BatchSizeMin
+        {
+            get
+            {
+                return _BatchSizeMin;
+            }
+            set
+            {
+                if (_BatchSizeMin != value)
+                {
+                    _BatchSizeMin = value;
+                    OnPropertyChanged("BatchSizeMin");
+                }
+
+            }
+        }
+
+        private double _BatchSizeMinUOM;
+        [ACPropertyInfo(999, "BatchSizeMinUOM", "en{'Min. Batchsize (UOM)'}de{'Min. Batchgröße (BOM)'}")]
+        public double BatchSizeMinUOM
+        {
+            get
+            {
+                return _BatchSizeMinUOM;
+            }
+            set
+            {
+                if (_BatchSizeMinUOM != value)
+                {
+                    _BatchSizeMinUOM = value;
+                    OnPropertyChanged("BatchSizeMinUOM");
+                }
+
+            }
+        }
+
+        private double _BatchSizeMax;
 
         [ACPropertyInfo(999, "BatchSizeMax", "en{'Max. Batchsize'}de{'Max. Batchgröße'}")]
-        public double BatchSizeMax { get; set; }
+        public double BatchSizeMax
+        {
+            get
+            {
+                return _BatchSizeMax;
+            }
+            set
+            {
+                if (_BatchSizeMax != value)
+                {
+                    _BatchSizeMax = value;
+                    OnPropertyChanged("BatchSizeMax");
+                }
+            }
+        }
 
+        private double _BatchSizeMaxUOM;
+
+        [ACPropertyInfo(999, "BatchSizeMaxUOM", "en{'Max. Batchsize UOM'}de{'Max. Batchgröße (BOM)'}")]
+        public double BatchSizeMaxUOM
+        {
+            get
+            {
+                return _BatchSizeMaxUOM;
+            }
+            set
+            {
+                if (_BatchSizeMaxUOM != value)
+                {
+                    _BatchSizeMaxUOM = value;
+                    OnPropertyChanged("BatchSizeMaxUOM");
+                }
+            }
+        }
+
+        private double _BatchSizeStandard;
         [ACPropertyInfo(999, "BatchSizeStandard", "en{'Standard Batchsize'}de{'Standard Batchgröße'}")]
-        public double BatchSizeStandard { get; set; }
+        public double BatchSizeStandard
+        {
+            get
+            {
+                return _BatchSizeStandard;
+            }
+            set
+            {
+                if (_BatchSizeStandard != value)
+                {
+                    _BatchSizeStandard = value;
+                    OnPropertyChanged("BatchSizeStandard");
+                }
+            }
+        }
+
+        private double _BatchSizeStandardUOM;
+        [ACPropertyInfo(999, "BatchSizeStandardUOM", "en{'Standard Batchsize (UOM)'}de{'Standard Batchgröße (BOM)'}")]
+        public double BatchSizeStandardUOM
+        {
+            get
+            {
+                return _BatchSizeStandardUOM;
+            }
+            set
+            {
+                if (_BatchSizeStandardUOM != value)
+                {
+                    _BatchSizeStandardUOM = value;
+                    OnPropertyChanged("BatchSizeStandardUOM");
+                }
+            }
+        }
+
+        #endregion
 
 
         [ACPropertyInfo(999, "PlanModeName", "en{'Batch planning mode'}de{'Batch Planmodus'}")]
@@ -246,8 +445,8 @@ namespace gip.bso.manufacturing
         public bool IsEqualPartslist(WizardSchedulerPartslist second)
         {
             return
-                (ProdOrderPartslistID != null && second.ProdOrderPartslistID != null && ProdOrderPartslistID == second.ProdOrderPartslistID)
-                || (PartslistID == second.PartslistID);
+                (ProdOrderPartslistPos != null && second.ProdOrderPartslistPos != null && ProdOrderPartslistPos == second.ProdOrderPartslistPos)
+                || (Partslist == second.Partslist);
         }
 
         public void OnPropertyChanged(string propertyName)
