@@ -137,38 +137,38 @@ namespace gip.mes.facility
 
                             batchPlan.ProdOrderPartslist.Partslist.PartslistNo,
                             batchPlan.ProdOrderPartslist.Partslist.PartslistName,
-                            mth!= null ? mth.ACIdentifier : "");
+                            mth != null ? mth.ACIdentifier : "");
                         message.AddDetailMessage(msgInvalidDuration);
                     }
                     if (firstBatchPlan == null)
                     {
                         firstBatchPlan = batchPlan;
                         if (isBackward)
-                            batchPlan.CalculatedEndDate = beginTime;
+                            batchPlan.ScheduledEndDate = beginTime;
                         else
-                            batchPlan.CalculatedStartDate = beginTime;
+                            batchPlan.ScheduledStartDate = beginTime;
                     }
                     else
                     {
                         if (isBackward)
-                            batchPlan.CalculatedEndDate = prevBatchPlan.CalculatedStartDate.Value;
+                            batchPlan.ScheduledEndDate = prevBatchPlan.ScheduledStartDate.Value;
                         else
-                            batchPlan.CalculatedStartDate = prevBatchPlan.CalculatedEndDate.Value;
+                            batchPlan.ScheduledStartDate = prevBatchPlan.ScheduledEndDate.Value;
 
 
                         if (duration.StartOffsetSecAVG != null)
                             if (isBackward)
-                                batchPlan.CalculatedEndDate = batchPlan.CalculatedEndDate.Value.AddSeconds(duration.StartOffsetSecAVG.Value);
+                                batchPlan.ScheduledEndDate = batchPlan.ScheduledEndDate.Value.AddSeconds(duration.StartOffsetSecAVG.Value);
                             else
-                                batchPlan.CalculatedStartDate = batchPlan.CalculatedStartDate.Value.AddSeconds(-duration.StartOffsetSecAVG.Value);
+                                batchPlan.ScheduledStartDate = batchPlan.ScheduledStartDate.Value.AddSeconds(-duration.StartOffsetSecAVG.Value);
                     }
                     double durationValue = 0;
                     if (durationIsValid)
                         durationValue = duration.DurationSecAVG.Value;
                     if (isBackward)
-                        batchPlan.CalculatedStartDate = batchPlan.CalculatedEndDate.Value.AddSeconds(-durationValue);
+                        batchPlan.ScheduledStartDate = batchPlan.ScheduledEndDate.Value.AddSeconds(-durationValue);
                     else
-                        batchPlan.CalculatedEndDate = batchPlan.CalculatedStartDate.Value.AddSeconds(durationValue);
+                        batchPlan.ScheduledEndDate = batchPlan.ScheduledStartDate.Value.AddSeconds(durationValue);
 
                     prevBatchPlan = batchPlan;
                     batchPlan.UpdateName = updateName;
