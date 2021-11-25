@@ -1134,6 +1134,7 @@ namespace gip.bso.manufacturing
                 {
                     _FilterOrderStartTime = value;
                     OnPropertyChanged("FilterOrderStartTime");
+                    OnPropertyChanged("FilterOrderEndTime");
                 }
             }
         }
@@ -1155,6 +1156,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderEndTime != value)
                 {
                     _FilterOrderEndTime = value;
+                    OnPropertyChanged("FilterOrderStartTime");
                     OnPropertyChanged("FilterOrderEndTime");
                 }
             }
@@ -1178,6 +1180,8 @@ namespace gip.bso.manufacturing
                 {
                     _FilterOrderIsCompleted = value;
                     OnPropertyChanged("FilterOrderIsCompleted");
+                    OnPropertyChanged("FilterOrderStartTime");
+                    OnPropertyChanged("FilterOrderEndTime");
                 }
             }
         }
@@ -3656,6 +3660,22 @@ namespace gip.bso.manufacturing
                                             && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > Const_MaxFilterDaySpan
                                         );
                         if (filterEndTimeIsRequired)
+                            result = Global.ControlModes.EnabledWrong;
+                        break;
+                    case "FilterOrderStartTime":
+                        result = Global.ControlModes.Enabled;
+                        bool filterOrderStartTimeIsEnabled =
+                           !(FilterOrderIsCompleted ?? true)
+                           || (FilterOrderStartTime != null && FilterOrderEndTime != null);
+                        if (!filterOrderStartTimeIsEnabled)
+                            result = Global.ControlModes.EnabledWrong;
+                        break;
+                    case "FilterOrderEndTime":
+                        result = Global.ControlModes.Enabled;
+                        bool filterOrderEndTimeIsEnabled =
+                             !(FilterOrderIsCompleted ?? true)
+                           || (FilterOrderStartTime != null && FilterOrderEndTime != null);
+                        if (!filterOrderEndTimeIsEnabled)
                             result = Global.ControlModes.EnabledWrong;
                         break;
 
