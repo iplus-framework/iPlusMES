@@ -1163,7 +1163,12 @@ namespace gip.mes.datamodel
             Production = 2,
             ReceiptVehicle = 3,
             IssueVehicle = 4,
-            AutomaticRelocation = 10
+            AutomaticRelocation = 10,
+            InternalRelocation = 15,
+            UnplannedReceipt = 20,
+            ReturnReceipt = 25,
+            Retail = 30,
+            InternalIssue = 35
         }
 
 #if NETFRAMEWORK

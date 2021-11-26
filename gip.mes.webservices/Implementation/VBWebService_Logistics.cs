@@ -9,6 +9,7 @@ using gip.core.autocomponent;
 using System.Data.Objects;
 using gip.mes.facility;
 using gip.core.webservices;
+using System.Globalization;
 
 namespace gip.mes.webservices
 {
@@ -132,11 +133,10 @@ namespace gip.mes.webservices
 
         public WSResponse<List<Picking>> SearchPickings(string pType, string fromFacility, string toFacility, string fromDate, string toDate)
         {
-            GlobalApp.PickingType pickingType;
-            short? pTypeIndex = null;
-            if (pType != CoreWebServiceConst.EmptyParam && Enum.TryParse<GlobalApp.PickingType>(pType, out pickingType))
+            Guid mdPickingType = Guid.Empty;
+            if (pType != CoreWebServiceConst.EmptyParam)
             {
-                pTypeIndex = (short)pickingType;
+                Guid.TryParse(pType, out mdPickingType);
             }
 
             Guid fromFacilityID = Guid.Empty;
@@ -155,7 +155,7 @@ namespace gip.mes.webservices
             if (fromDate != CoreWebServiceConst.EmptyParam)
             {
                 DateTime temp;
-                if (DateTime.TryParse(fromDate, out temp))
+                if (DateTime.TryParseExact(fromDate, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out temp))
                 {
                     fromDT = temp;
                 }
@@ -165,7 +165,7 @@ namespace gip.mes.webservices
             if (toDate != CoreWebServiceConst.EmptyParam)
             {
                 DateTime temp;
-                if (DateTime.TryParse(toDate, out temp))
+                if (DateTime.TryParseExact(toDate, "o", CultureInfo.InvariantCulture, DateTimeStyles.None, out temp))
                 {
                     toDT = temp;
                 }
@@ -176,7 +176,7 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(s_cQry_SearchPicking(dbApp, pTypeIndex, fromFacilityID, toFacilityID, fromDT, toDT)).ToList();
+                    result = ConvertToWSPicking(s_cQry_SearchPicking(dbApp, mdPickingType, fromFacilityID, toFacilityID, fromDT, toDT)).ToList();
                 }
             }
             catch (Exception e)
@@ -187,8 +187,8 @@ namespace gip.mes.webservices
             return new WSResponse<List<Picking>>(result);
         }
 
-        public static readonly Func<DatabaseApp, short?, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_SearchPicking =
-        CompiledQuery.Compile<DatabaseApp, short?, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_SearchPicking =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid, DateTime?, DateTime?, IQueryable<gip.mes.datamodel.Picking>>(
             (dbApp, pType, fromFacility, toFacility, fromDate, toDate) =>
                 dbApp.Picking
                         .Include("PickingPos_Picking")
@@ -205,13 +205,13 @@ namespace gip.mes.webservices
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDUnit")
                         .Include("PickingPos_Picking.PickingMaterial")
                         .Include("PickingPos_Picking.PickingMaterial.BaseMDUnit")
-                        .Where(c =>    (pType == null || c.MDPickingType.MDPickingTypeIndex == pType)
-                                    && (fromFacility == Guid.Empty || c.PickingPos_Picking.Any(x => x.FromFacilityID == fromFacility || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == fromFacility))
-                                    && (toFacility == Guid.Empty || c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == fromFacility))
+                        .Where(c =>    (pType == Guid.Empty || c.MDPickingTypeID == pType)
+                                    && ((fromFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.FromFacilityID == fromFacility || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == fromFacility))))
+                                    && ((toFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.ToFacility.ParentFacilityID.HasValue && x.ToFacility.ParentFacilityID == toFacility))))
                                     && (fromDate == null || c.DeliveryDateFrom >= fromDate)
-                                    && (toDate == null || c.DeliveryDateFrom >= toDate)
+                                    && (toDate == null || c.DeliveryDateTo <= toDate)
                                     && (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess)
-                                    && c.PickingPos_Picking.Any(p => p.MDDelivPosLoadState.MDDelivPosLoadStateIndex <= (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                    && (c.PickingPos_Picking.Any(p => p.MDDelivPosLoadState.MDDelivPosLoadStateIndex <= (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)))
                               )
         ));
 
