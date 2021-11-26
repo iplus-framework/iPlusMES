@@ -10,7 +10,7 @@ namespace gip.bso.manufacturing
     public class BatchPlanSuggestion : INotifyPropertyChanged
     {
         #region DI
-        public WizardSchedulerPartslist WizardSchedulerPartslist { get; set; }  
+        public WizardSchedulerPartslist WizardSchedulerPartslist { get; set; }
         #endregion
 
         #region ctor's
@@ -23,10 +23,13 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties
-        
 
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
         private double _TotalSize;
-        [ACPropertyInfo(100, "TotalBatchSize", "en{'Total Size'}de{'Gesamtgröße'}")]
+        [ACPropertySelected(100, "TotalSize", "en{'Total Size'}de{'Gesamtgröße'}")]
         public double TotalSize
         {
             get
@@ -39,18 +42,44 @@ namespace gip.bso.manufacturing
                 {
                     _TotalSize = value;
                     OnPropertyChanged("TotalSize");
-                    OnPropertyChanged("BatchSuggestionSum");
-                    OnPropertyChanged("Difference");
+
+                    _TotalSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_TotalSize, true);
+                    OnPropertyChanged("TotalSizeUOM");
                 }
             }
         }
 
-        private double _RestQuantityTolerance;
+
+        private double _TotalSizeUOM;
+        [ACPropertyInfo(101, "TotalSizeUOM", "en{'Total Size (UOM)'}de{'Gesamtgröße (BOM)'}")]
+        public double TotalSizeUOM
+        {
+            get
+            {
+                return _TotalSizeUOM;
+            }
+            set
+            {
+                if (_TotalSizeUOM != value)
+                {
+                    _TotalSizeUOM = value;
+                    OnPropertyChanged("BatchSuggestionSumUOM");
+                    OnPropertyChanged("DifferenceUOM");
+
+                    _TotalSize = WizardSchedulerPartslist.ConvertQuantity(_TotalSizeUOM, false);
+                    OnPropertyChanged("TotalSize");
+                    OnPropertyChanged("BatchSuggestionSum");
+                    OnPropertyChanged("Difference");
+
+                }
+            }
+        }
+
         /// <summary>
-        /// Doc  MaximalRestQuantity
+        /// Source Property: 
         /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(200, "MaximalRestQuantity", "en{'Diff tolerance'}de{'Differenztoleranz'}")]
+        private double _RestQuantityTolerance;
+        [ACPropertySelected(200, "RestQuantityTolerance", "en{'Diff tolerance'}de{'Differenztoleranz'}")]
         public double RestQuantityTolerance
         {
             get
@@ -62,7 +91,36 @@ namespace gip.bso.manufacturing
                 if (_RestQuantityTolerance != value)
                 {
                     _RestQuantityTolerance = value;
-                    OnPropertyChanged("MaximalRestQuantity");
+                    OnPropertyChanged("RestQuantityTolerance");
+
+                    _RestQuantityToleranceUOM = WizardSchedulerPartslist.ConvertQuantity(_RestQuantityTolerance, true);
+                    OnPropertyChanged("RestQuantityToleranceUOM");
+                }
+            }
+        }
+
+
+        private double _RestQuantityToleranceUOM;
+        /// <summary>
+        /// Doc  MaximalRestQuantity
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(201, "RestQuantityToleranceUOM", "en{'Diff tolerance (UOM)'}de{'Differenztoleranz (BOM)'}")]
+        public double RestQuantityToleranceUOM
+        {
+            get
+            {
+                return _RestQuantityToleranceUOM;
+            }
+            set
+            {
+                if (_RestQuantityToleranceUOM != value)
+                {
+                    _RestQuantityToleranceUOM = value;
+                    OnPropertyChanged("RestQuantityToleranceUOM");
+
+                    _RestQuantityTolerance = WizardSchedulerPartslist.ConvertQuantity(_RestQuantityToleranceUOM, false);
+                    OnPropertyChanged("RestQuantityTolerance");
                 }
             }
         }
@@ -71,7 +129,7 @@ namespace gip.bso.manufacturing
         /// Doc  BatchSuggestionSum
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(201, "BatchSuggestionSum", "en{'Sum'}de{'Sum'}")]
+        [ACPropertyInfo(300, "BatchSuggestionSum", "en{'Sum'}de{'Sum'}")]
         public double? BatchSuggestionSum
         {
             get
@@ -80,14 +138,24 @@ namespace gip.bso.manufacturing
                     return null;
                 return ItemsList.Select(c => c.TotalBatchSize).DefaultIfEmpty().Sum(c => c);
             }
-
         }
 
         /// <summary>
-        /// Doc  Difference
+        /// Doc  BatchSuggestionSum
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(202, "Difference", "en{'Diff'}de{'Diff'}")]
+        [ACPropertyInfo(301, "BatchSuggestionSumUOM", "en{'Sum (UOM)'}de{'Sum (BOM)'}")]
+        public double? BatchSuggestionSumUOM
+        {
+            get
+            {
+                if (ItemsList == null || !ItemsList.Any())
+                    return null;
+                return ItemsList.Select(c => c.TotalBatchSizeUOM).DefaultIfEmpty().Sum(c => c);
+            }
+        }
+
+        [ACPropertyInfo(400, "Difference", "en{'Diff'}de{'Diff'}")]
         public double Difference
         {
             get
@@ -96,8 +164,21 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(106, "RestNotUsedQuantity", "en{'Not used quantity'}de{'Unbenutzte Restmenge'}")]
-        public double RestNotUsedQuantity { get; set; }
+        /// <summary>
+        /// Doc  Difference
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(401, "DifferenceUOM", "en{'Diff (UOM)'}de{'Diff (BOM)'}")]
+        public double DifferenceUOM
+        {
+            get
+            {
+                return TotalSizeUOM - BatchSuggestionSumUOM ?? 0;
+            }
+        }
+
+        [ACPropertyInfo(106, "RestNotUsedQuantityUOM", "en{'Not used quantity (UOM)'}de{'Unbenutzte Restmenge (BOM)'}")]
+        public double RestNotUsedQuantityUOM { get; set; }
 
         #region Items
         private BatchPlanSuggestionItem _SelectedItems;
@@ -168,7 +249,7 @@ namespace gip.bso.manufacturing
             if (ItemsList == null || ItemsList.Any(c => c.BatchTargetCount == 0))
                 return false;
             double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSizeUOM);
-            return (sumSize - TotalSize) < RestQuantityTolerance;
+            return (sumSize - TotalSizeUOM) < RestQuantityToleranceUOM;
         }
 
         #endregion
@@ -185,7 +266,7 @@ namespace gip.bso.manufacturing
 
         public override string ToString()
         {
-            return string.Format(@"{0} / {1}", TotalSize, RestNotUsedQuantity);
+            return string.Format(@"{0} / {1}", TotalSizeUOM, RestNotUsedQuantityUOM);
         }
     }
 }

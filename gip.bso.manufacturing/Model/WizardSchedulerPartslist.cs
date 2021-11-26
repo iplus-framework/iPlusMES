@@ -60,7 +60,6 @@ namespace gip.bso.manufacturing
             set
             {
                 _Partslist = value;
-                SelectedUnitConvert = UnitConvertList.FirstOrDefault();
                 OnPropertyChanged("Partslist");
             }
         }
@@ -170,14 +169,14 @@ namespace gip.bso.manufacturing
             {
                 if (Partslist == null)
                     return null;
-                return Partslist.Material.MDUnitList;
+                return Partslist.Material.MaterialUnit_Material.Select(c=>c.ToMDUnit).ToList();
             }
         }
 
         #endregion
 
         private double _TargetQuantity;
-        [ACPropertyInfo(105, "TargetQuantity", "en{'Required quantity'}de{'Bedarfsmenge'}")]
+        [ACPropertyInfo(105, "TargetQuantity", "en{'Quantity'}de{'Menge'}")]
         public double TargetQuantity
         {
             get
@@ -198,7 +197,7 @@ namespace gip.bso.manufacturing
 
 
         private double _TargetQuantityUOM;
-        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Quantity'}de{'Menge'}")]
+        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Quantity (UOM)'}de{'Menge (BOM)'}")]
         public double TargetQuantityUOM
         {
             get
@@ -296,15 +295,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Properties -> MDUnit
-
-        [ACPropertyInfo(107, "MDUnit", "en{'MDUnit'}de{'MDUnit'}")]
-        public MDUnit MDUnit { get; set; }
-
-        [ACPropertyInfo(999, "BaseMDUnit", "en{'BaseMDUnit'}de{'BaseMDUnit'}")]
-        public MDUnit BaseMDUnit { get; set; }
-
-        #endregion
 
         #region Properties -> Batch
 
@@ -489,7 +479,7 @@ namespace gip.bso.manufacturing
                 string msg = ec.Message;
                 if (ec.InnerException != null && ec.InnerException.Message != null)
                     msg += " Inner:" + ec.InnerException.Message;
-                ACRoot.SRoot.Messages.LogException(this.ToString(), propertyName, msg);
+                ACRoot.SRoot.Messages.LogException(this.ToString(), "ConvertQuantity", msg);
             }
             return toQuantity;
         }
@@ -497,8 +487,8 @@ namespace gip.bso.manufacturing
         public void LoadExistingBatchSuggestion()
         {
             BatchPlanSuggestion = new BatchPlanSuggestion(this);
-            BatchPlanSuggestion.RestQuantityTolerance = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
-            BatchPlanSuggestion.TotalSize = TargetQuantityUOM;
+            BatchPlanSuggestion.RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
+            BatchPlanSuggestion.TotalSizeUOM = TargetQuantityUOM;
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
             {
@@ -527,9 +517,8 @@ namespace gip.bso.manufacturing
             {
                 BatchPlanSuggestion = new BatchPlanSuggestion(this)
                 {
-                    RestQuantityTolerance = (ProdOrderManager.TolRemainingCallQ / 100) *
-                    (MDUnit != null ? TargetQuantity : NewTargetQuantityUOM),
-                    TotalSize = MDUnit != null ? TargetQuantity : NewTargetQuantityUOM,
+                    RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * NewTargetQuantityUOM,
+                    TotalSizeUOM = NewTargetQuantityUOM,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
                 BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(

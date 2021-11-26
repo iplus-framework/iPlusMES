@@ -147,7 +147,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private double _TotalBatchSize;
-        [ACPropertySelected(999, "TotalBatchSize", "en{'TODO:TotalBatchSize'}de{'TODO:TotalBatchSize'}")]
+        [ACPropertySelected(999, "TotalBatchSize", "en{'Total Size'}de{'Gesamtgröße'}")]
         public double TotalBatchSize
         {
             get
@@ -160,6 +160,7 @@ namespace gip.bso.manufacturing
                 {
                     _TotalBatchSize = value;
                     OnPropertyChanged("TotalBatchSize");
+                    TotalBatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_TotalBatchSize, false);
                 }
             }
         }
@@ -199,6 +200,9 @@ namespace gip.bso.manufacturing
                         OnPropertyChanged("BatchSize");
                     }
                     _LastChanged = Field.TotalBatchSizeUOM;
+
+                    _TotalBatchSize = WizardSchedulerPartslist.ConvertQuantity(_TotalBatchSizeUOM, false);
+                    OnPropertyChanged("TotalBatchSize");
                 }
             }
         }

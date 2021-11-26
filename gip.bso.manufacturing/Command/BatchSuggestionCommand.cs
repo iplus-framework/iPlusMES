@@ -10,16 +10,16 @@ namespace gip.bso.manufacturing
         public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, double toleranceQuantity)
         {
             wizardSchedulerPartslist.BatchPlanSuggestion = new BatchPlanSuggestion(wizardSchedulerPartslist);
-            wizardSchedulerPartslist.BatchPlanSuggestion.RestQuantityTolerance = toleranceQuantity;
-            wizardSchedulerPartslist.BatchPlanSuggestion.TotalSize = wizardSchedulerPartslist.NewTargetQuantityUOM;
+            wizardSchedulerPartslist.BatchPlanSuggestion.RestQuantityToleranceUOM = toleranceQuantity;
+            wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM = wizardSchedulerPartslist.NewTargetQuantityUOM;
             wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
             
 
-            if (wizardSchedulerPartslist.BatchPlanSuggestion.TotalSize > 0)
+            if (wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM > 0)
             {
 
-                double rest = wizardSchedulerPartslist.BatchPlanSuggestion.TotalSize;
+                double rest = wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM;
                 int nr = 1;
                 switch (mode)
                 {
@@ -50,7 +50,7 @@ namespace gip.bso.manufacturing
                     default:
                         break;
                 }
-                wizardSchedulerPartslist.BatchPlanSuggestion.RestNotUsedQuantity = rest;
+                wizardSchedulerPartslist.BatchPlanSuggestion.RestNotUsedQuantityUOM = rest;
             }
         }
 
