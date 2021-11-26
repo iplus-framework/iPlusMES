@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,19 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region ctor's
-        public WizardSchedulerPartslist()
-        {
+        #region DI
 
+        public DatabaseApp DatabaseApp { get; private set; }
+        public ACProdOrderManager ProdOrderManager { get; private set; }
+
+        #endregion
+
+
+        #region ctor's
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager)
+        {
+            DatabaseApp = databaseApp;
+            ProdOrderManager = prodOrderManager;
         }
         #endregion
 
@@ -62,7 +72,20 @@ namespace gip.bso.manufacturing
         public int? DurationSecAVG { get; set; }
         public int? StartOffsetSecAVG { get; set; }
 
-
+        private BatchPlanSuggestion _BatchPlanSuggestion;
+        [ACPropertyInfo(518, "BatchPlanSuggestion")]
+        public BatchPlanSuggestion BatchPlanSuggestion
+        {
+            get
+            {
+                return _BatchPlanSuggestion;
+            }
+            set
+            {
+                _BatchPlanSuggestion = value;
+                OnPropertyChanged("BatchPlanSuggestion");
+            }
+        }
         #endregion
 
         #region Properties -> Other (marked)
@@ -167,21 +190,7 @@ namespace gip.bso.manufacturing
                 {
                     _TargetQuantity = value;
                     OnPropertyChanged("TargetQuantity");
-                    try
-                    {
-                        if (Partslist != null && Partslist.Material != null)
-                            _TargetQuantityUOM = Partslist.Material.ConvertToBaseQuantity(_TargetQuantity, SelectedUnitConvert);
-                        else
-                            _TargetQuantityUOM = _TargetQuantity;
-                    }
-                    catch (Exception ec)
-                    {
-                        _TargetQuantityUOM = 0;
-                        string msg = ec.Message;
-                        if (ec.InnerException != null && ec.InnerException.Message != null)
-                            msg += " Inner:" + ec.InnerException.Message;
-                        ACRoot.SRoot.Messages.LogException(this.ToString(), "TargetQuantity", msg);
-                    }
+                    _TargetQuantityUOM = ConvertQuantity(_TargetQuantity, toBaseQuantity: true);
                     OnPropertyChanged("TargetQuantityUOM");
                 }
             }
@@ -206,24 +215,15 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged("TargetQuantityUOM");
                     OnPropertyChanged("NewTargetQuantityUOM");
                     quantityInChange = false;
-                    try
-                    {
-                        if (Partslist != null && Partslist.Material != null)
-                            _TargetQuantity = Partslist.Material.ConvertFromBaseQuantity(_TargetQuantityUOM, SelectedUnitConvert);
-                        else
-                            _TargetQuantity = _TargetQuantityUOM;
-                    }
-                    catch (Exception ec)
-                    {
-                        _TargetQuantityUOM = 0;
-                        string msg = ec.Message;
-                        if (ec.InnerException != null && ec.InnerException.Message != null)
-                            msg += " Inner:" + ec.InnerException.Message;
-                        ACRoot.SRoot.Messages.LogException(this.ToString(), "TargetQuantityUOM", msg);
-                    }
+                    _TargetQuantity = ConvertQuantity(_TargetQuantityUOM, toBaseQuantity: false);
                     OnPropertyChanged("TargetQuantity");
                 }
             }
+        }
+
+        public void test(ref double targetQ)
+        {
+            targetQ = 0;
         }
 
         private bool quantityInChange;
@@ -324,6 +324,8 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeMin = value;
                     OnPropertyChanged("BatchSizeMin");
+                    _BatchSizeMinUOM = ConvertQuantity(_BatchSizeMin, toBaseQuantity: true);
+                    OnPropertyChanged("BatchSizeMinUOM");
                 }
 
             }
@@ -343,8 +345,9 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeMinUOM = value;
                     OnPropertyChanged("BatchSizeMinUOM");
+                    _BatchSizeMin = ConvertQuantity(_BatchSizeMinUOM, toBaseQuantity: false);
+                    OnPropertyChanged("BatchSizeMin");
                 }
-
             }
         }
 
@@ -363,6 +366,8 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeMax = value;
                     OnPropertyChanged("BatchSizeMax");
+                    _BatchSizeMaxUOM = ConvertQuantity(_BatchSizeMax, toBaseQuantity: true);
+                    OnPropertyChanged("BatchSizeMaxUOM");
                 }
             }
         }
@@ -382,6 +387,8 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeMaxUOM = value;
                     OnPropertyChanged("BatchSizeMaxUOM");
+                    _BatchSizeMax = ConvertQuantity(_BatchSizeMaxUOM, toBaseQuantity: false);
+                    OnPropertyChanged("BatchSizeMax");
                 }
             }
         }
@@ -400,6 +407,8 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeStandard = value;
                     OnPropertyChanged("BatchSizeStandard");
+                    _BatchSizeStandardUOM = ConvertQuantity(_BatchSizeStandard, toBaseQuantity: true);
+                    OnPropertyChanged("BatchSizeStandardUOM");
                 }
             }
         }
@@ -418,6 +427,8 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeStandardUOM = value;
                     OnPropertyChanged("BatchSizeStandardUOM");
+                    _BatchSizeStandard = ConvertQuantity(_BatchSizeStandardUOM, toBaseQuantity: false);
+                    OnPropertyChanged("BatchSizeStandard");
                 }
             }
         }
@@ -457,6 +468,123 @@ namespace gip.bso.manufacturing
         public override string ToString()
         {
             return string.Format(@"ProgramNo: {0}, PartslistNo: {1}, IsSolved:{2}, TargetQuantityUOM: {3}", ProgramNo, PartslistNo, IsSolved, TargetQuantityUOM);
+        }
+
+        public double ConvertQuantity(double sourceQuantity, bool toBaseQuantity)
+        {
+            double toQuantity = 0;
+            try
+            {
+                if (Partslist != null && Partslist.Material != null)
+                    if (toBaseQuantity)
+                        toQuantity = Partslist.Material.ConvertToBaseQuantity(sourceQuantity, SelectedUnitConvert);
+                    else
+                        toQuantity = Partslist.Material.ConvertFromBaseQuantity(sourceQuantity, SelectedUnitConvert);
+                else
+                    toQuantity = _TargetQuantity;
+            }
+            catch (Exception ec)
+            {
+                toQuantity = 0;
+                string msg = ec.Message;
+                if (ec.InnerException != null && ec.InnerException.Message != null)
+                    msg += " Inner:" + ec.InnerException.Message;
+                ACRoot.SRoot.Messages.LogException(this.ToString(), propertyName, msg);
+            }
+            return toQuantity;
+        }
+
+        public void LoadExistingBatchSuggestion()
+        {
+            BatchPlanSuggestion = new BatchPlanSuggestion(this);
+            BatchPlanSuggestion.RestQuantityTolerance = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
+            BatchPlanSuggestion.TotalSize = TargetQuantityUOM;
+            int nr = 0;
+            foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
+            {
+                nr++;
+                BatchPlanSuggestionItem item = new BatchPlanSuggestionItem(this, nr, batchPlan.BatchSize, batchPlan.BatchTargetCount, batchPlan.TotalSize);
+                item.ProdOrderBatchPlan = batchPlan;
+                item.ExpectedBatchEndTime = batchPlan.ScheduledEndDate;
+                item.IsEditable =
+                    (
+                        ProdOrderPartslistPos == null ||
+                        (ProdOrderPartslistPos.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished &&
+                        ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished)
+                    )
+                    &&
+                    !(batchPlan.PlanState >= GlobalApp.BatchPlanState.Completed);
+                item.IsInProduction =
+                    batchPlan.PlanState >= GlobalApp.BatchPlanState.ReadyToStart
+                    && batchPlan.PlanState <= GlobalApp.BatchPlanState.Paused;
+                BatchPlanSuggestion.AddItem(item);
+            }
+        }
+
+        public void LoadNewBatchSuggestion(BatchSuggestionCommandModeEnum? suggestionMode)
+        {
+            if (PlanMode != null && PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+            {
+                BatchPlanSuggestion = new BatchPlanSuggestion(this)
+                {
+                    RestQuantityTolerance = (ProdOrderManager.TolRemainingCallQ / 100) *
+                    (MDUnit != null ? TargetQuantity : NewTargetQuantityUOM),
+                    TotalSize = MDUnit != null ? TargetQuantity : NewTargetQuantityUOM,
+                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
+                };
+                BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(
+                    this,
+                    1,
+                    NewTargetQuantityUOM,
+                    1,
+                    NewTargetQuantityUOM
+                    )
+                { IsEditable = true });
+            }
+            else
+            {
+                BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, suggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
+            }
+            if (
+              BatchPlanSuggestion.ItemsList != null
+              && BatchPlanSuggestion.ItemsList.Any()
+              && OffsetToEndTime != null)
+                LoadSuggestionItemExpectedBatchEndTime();
+        }
+
+        public void LoadSuggestionItemExpectedBatchEndTime()
+        {
+            double totalMinutes = 0;
+            if (OffsetToEndTime.Value.TotalMinutes > 0)
+                totalMinutes = OffsetToEndTime.Value.TotalMinutes;
+            else
+            {
+                TimeSpan? calculatedDuration = GetExpectedBatchEndTime();
+                if (calculatedDuration != null)
+                    totalMinutes = calculatedDuration.Value.TotalMinutes;
+            }
+
+            DateTime tempTime = DateTime.Now;
+            if (totalMinutes > 0)
+            {
+                foreach (var item in BatchPlanSuggestion.ItemsList)
+                {
+                    if (item.ExpectedBatchEndTime != null)
+                        tempTime = item.ExpectedBatchEndTime.Value;
+                    else
+                    {
+                        tempTime = tempTime.AddMinutes(OffsetToEndTime.Value.TotalMinutes);
+                        item.ExpectedBatchEndTime = tempTime;
+                    }
+                }
+            }
+        }
+
+        private TimeSpan? GetExpectedBatchEndTime()
+        {
+            gip.mes.datamodel.ACClassWF vbACClassWF = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
+            var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(vbACClassWF, Partslist.MaterialWFID);
+            return ProdOrderManager.GetCalculatedBatchPlanDuration(DatabaseApp, materialWFConnection.MaterialWFACClassMethodID, vbACClassWF.ACClassWFID);
         }
 
         #endregion

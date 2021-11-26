@@ -9,16 +9,21 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'BatchPlanSuggestion'}de{'BatchPlanSuggestion'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class BatchPlanSuggestion : INotifyPropertyChanged
     {
+        #region DI
+        public WizardSchedulerPartslist WizardSchedulerPartslist { get; set; }  
+        #endregion
+
         #region ctor's
 
-        public BatchPlanSuggestion()
+        public BatchPlanSuggestion(WizardSchedulerPartslist wizardSchedulerPartslist)
         {
+            WizardSchedulerPartslist = wizardSchedulerPartslist;
         }
 
         #endregion
 
         #region Properties
-        public ProdOrderPartslistPos Intermediate { get; set; }
+        
 
         private double _TotalSize;
         [ACPropertyInfo(100, "TotalBatchSize", "en{'Total Size'}de{'Gesamtgröße'}")]
@@ -34,7 +39,6 @@ namespace gip.bso.manufacturing
                 {
                     _TotalSize = value;
                     OnPropertyChanged("TotalSize");
-
                     OnPropertyChanged("BatchSuggestionSum");
                     OnPropertyChanged("Difference");
                 }
@@ -163,7 +167,7 @@ namespace gip.bso.manufacturing
         {
             if (ItemsList == null || ItemsList.Any(c => c.BatchTargetCount == 0))
                 return false;
-            double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSize);
+            double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSizeUOM);
             return (sumSize - TotalSize) < RestQuantityTolerance;
         }
 
