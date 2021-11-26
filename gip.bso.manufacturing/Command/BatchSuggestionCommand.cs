@@ -9,17 +9,17 @@ namespace gip.bso.manufacturing
         #region ctor's
         public BatchSuggestionCommand(WizardSchedulerPartslist wizardSchedulerPartslist, BatchSuggestionCommandModeEnum mode, double toleranceQuantity)
         {
-            BatchPlanSuggestion = new BatchPlanSuggestion();
-            BatchPlanSuggestion.RestQuantityTolerance = toleranceQuantity;
-            BatchPlanSuggestion.TotalSize = wizardSchedulerPartslist.NewTargetQuantityUOM;
-            BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
+            wizardSchedulerPartslist.BatchPlanSuggestion = new BatchPlanSuggestion(wizardSchedulerPartslist);
+            wizardSchedulerPartslist.BatchPlanSuggestion.RestQuantityToleranceUOM = toleranceQuantity;
+            wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM = wizardSchedulerPartslist.NewTargetQuantityUOM;
+            wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
             
 
-            if (BatchPlanSuggestion.TotalSize > 0)
+            if (wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM > 0)
             {
 
-                double rest = BatchPlanSuggestion.TotalSize;
+                double rest = wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM;
                 int nr = 1;
                 switch (mode)
                 {
@@ -27,9 +27,9 @@ namespace gip.bso.manufacturing
                         KeepStandardBatchSizeAndDivideRest suggestion1 = null;
                         do
                         {
-                            suggestion1 = new KeepStandardBatchSizeAndDivideRest(nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
+                            suggestion1 = new KeepStandardBatchSizeAndDivideRest(wizardSchedulerPartslist, nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
                             if (suggestion1.Suggestion != null)
-                                BatchPlanSuggestion.AddItem(suggestion1.Suggestion);
+                                wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion1.Suggestion);
                             rest = suggestion1.Rest;
                             nr++;
                         }
@@ -39,9 +39,9 @@ namespace gip.bso.manufacturing
                         KeepEqualBatchSizes suggestion2 = null;
                         do
                         {
-                            suggestion2 = new KeepEqualBatchSizes(nr, rest, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
+                            suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
                             if (suggestion2.Suggestion != null)
-                                BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
+                                wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
                             rest = suggestion2.Rest;
                             nr++;
                         }
@@ -50,12 +50,11 @@ namespace gip.bso.manufacturing
                     default:
                         break;
                 }
-                BatchPlanSuggestion.RestNotUsedQuantity = rest;
+                wizardSchedulerPartslist.BatchPlanSuggestion.RestNotUsedQuantityUOM = rest;
             }
         }
 
         #endregion
 
-        public BatchPlanSuggestion BatchPlanSuggestion { get; private set; }
     }
 }

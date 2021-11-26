@@ -1,4 +1,5 @@
-﻿using System;
+﻿using gip.mes.datamodel;
+using System;
 
 namespace gip.bso.manufacturing
 {
@@ -6,7 +7,7 @@ namespace gip.bso.manufacturing
     {
 
         #region ctor's
-        public KeepStandardBatchSizeAndDivideRest(int nr, double totalSize, int batchCount, double standardBatchSize, double minBatchSize, double maxBatchSize)
+        public KeepStandardBatchSizeAndDivideRest(WizardSchedulerPartslist wizardSchedulerPartslist, int nr, double totalSize, int batchCount, double standardBatchSize, double minBatchSize, double maxBatchSize)
         {
             int calcBatchCount = 0;
             double calcBatchSize = 0;
@@ -51,7 +52,7 @@ namespace gip.bso.manufacturing
             }
 
             if (calcBatchCount > Double.Epsilon && calcBatchSize > Double.Epsilon)
-                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
+                Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
           
             Rest = rest;
         }
