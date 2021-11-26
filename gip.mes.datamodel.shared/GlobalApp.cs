@@ -1165,10 +1165,10 @@ namespace gip.mes.datamodel
             IssueVehicle = 4,
             AutomaticRelocation = 10,
             InternalRelocation = 15,
-            UnplannedReceipt = 20,
-            ReturnReceipt = 25,
-            Retail = 30,
-            InternalIssue = 35
+            //UnplannedReceipt = 20,
+            //ReturnReceipt = 25,
+            //Retail = 30,
+            //InternalIssue = 35
         }
 
 #if NETFRAMEWORK
