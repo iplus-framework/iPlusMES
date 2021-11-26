@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Aleksandar\gipSoft\Source\iPlusV4\trunk\iPlusMES\gip.mes.datamodel\iPlusMESV4.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Devel\gipSoft\iPlus\iPlusV4\trunk\iPlusMES\gip.mes.datamodel\iPlusMESV4.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.
