@@ -862,7 +862,7 @@ namespace gip.bso.manufacturing
         /// Selected property for PAScheduleForPWNode
         /// </summary>
         /// <value>The selected FilterConnectedLine</value>
-        [ACPropertySelected(9999, "FilterConnectedLine", "en{'Connected with'}de{'Verbinden mit'}")]
+        [ACPropertySelected(9999, "FilterConnectedLine", "en{'Show only related orders from production line'}de{'Nur verbundene Aufträge aus Produktionslinie anzeigen'}")]
         public PAScheduleForPWNode SelectedFilterConnectedLine
         {
             get
