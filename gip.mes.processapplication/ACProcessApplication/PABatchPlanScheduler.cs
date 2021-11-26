@@ -226,14 +226,14 @@ namespace gip.mes.processapplication
                         {
                             IQueryable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
                             DateTime dateTimeIfNull = DateTime.Now.AddDays(1);
-                            startableBatchPlans = readyBatchPlans.Where(c => (c.ScheduledStartDate != null ? c.ScheduledStartDate : (c.CalculatedStartDate ?? dateTimeIfNull)) <= DateTime.Now).ToList();
+                            startableBatchPlans = readyBatchPlans.Where(c => (c.ScheduledStartDate ?? dateTimeIfNull) <= DateTime.Now).ToList();
                         }
                         else
                         {
                             if (instancesOfThisSchedule.Any())
                             {
                                 // If there are any active nodes, that are not completed, than next Batchplans must wait
-                                if (instancesOfThisSchedule.Where(c =>    (c.CurrentACState >= ACStateEnum.SMRunning && c.CurrentACState < ACStateEnum.SMCompleted)
+                                if (instancesOfThisSchedule.Where(c => (c.CurrentACState >= ACStateEnum.SMRunning && c.CurrentACState < ACStateEnum.SMCompleted)
                                                                        || (c.CurrentACState == ACStateEnum.SMStarting && c.IterationCount.ValueT <= 0 && !c.SkipWaitingNodes))
                                                             .Any())
                                     continue;
@@ -277,7 +277,7 @@ namespace gip.mes.processapplication
                                 nextBatchPlan = readyBatchPlans.FirstOrDefault();
                                 // If Scheduled date not reached, then wait
                                 if (startMode == GlobalApp.BatchPlanStartModeEnum.AutoTimeAndSequential
-                                    && !((nextBatchPlan.ScheduledStartDate != null ? (nextBatchPlan.ScheduledStartDate ?? DateTime.Now) : (nextBatchPlan.CalculatedStartDate ?? DateTime.Now)) <= DateTime.Now)
+                                    && !((nextBatchPlan.ScheduledStartDate ?? DateTime.Now) <= DateTime.Now)
                                     )
                                     continue;
                             }
@@ -310,7 +310,7 @@ namespace gip.mes.processapplication
                                     {
                                         activeInstanceForBatchplan.Resume();
                                     }
-                                    else if (  activeInstanceForBatchplan.CurrentACState == ACStateEnum.SMStarting
+                                    else if (activeInstanceForBatchplan.CurrentACState == ACStateEnum.SMStarting
                                             && activeInstanceForBatchplan.IsInPlanningWaitNotElapsed)
                                     {
                                         activeInstanceForBatchplan.ResetPlanningWait();
@@ -481,7 +481,7 @@ namespace gip.mes.processapplication
             return list;
         }
 
-        
+
 
         #endregion
 
@@ -516,7 +516,7 @@ namespace gip.mes.processapplication
 
         #endregion
 
-        
+
     }
 
 

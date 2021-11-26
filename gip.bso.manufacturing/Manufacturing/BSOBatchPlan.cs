@@ -830,9 +830,9 @@ namespace gip.bso.manufacturing
             }
 
             // select first if only one is present
-            if (   PreselectFirstFacilityReservation 
-                && (   (SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
-                    || (    (SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Unchanged || SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Modified)
+            if (PreselectFirstFacilityReservation
+                && ((SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
+                    || ((SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Unchanged || SelectedBatchPlanForIntermediate.EntityState == System.Data.EntityState.Modified)
                             && reservationCollection.Count() == 1
                             && !reservationCollection.Any(c => c.IsChecked))))
                 reservationCollection[0].IsChecked = true;
@@ -1208,33 +1208,22 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("GetCalculatedDates", "en{'Calculate production time'}de{'Produktionsdauer berechnen'}", 200)]
         public void GetCalculatedDates()
         {
-            if (!PreExecute("GetCalculatedDates")) return;
-            BatchPlanCalculatedDatesClear(SelectedBatchPlanForIntermediate);
             TimeSpan? batchPlanDuration = GetConfigBatchPlanDuration(SelectedBatchPlanForIntermediate);
             if (batchPlanDuration == null)
                 batchPlanDuration = GetCalculatedBatchPlanDuration(SelectedBatchPlanForIntermediate);
             if (batchPlanDuration != null)
-                BatchPlanCalculatedDatesWrite(SelectedBatchPlanForIntermediate, batchPlanDuration.Value);
-            SelectedBatchPlanForIntermediate.OnEntityPropertyChanged("CalculatedStartDate");
-            SelectedBatchPlanForIntermediate.OnEntityPropertyChanged("CalculatedEndDate");
-            PostExecute("GetCalculatedDates");
+            {
+                if (SelectedBatchPlanForIntermediate.ScheduledStartDate != null)
+                    SelectedBatchPlanForIntermediate.ScheduledEndDate = SelectedBatchPlanForIntermediate.ScheduledStartDate.Value.Add(batchPlanDuration.Value);
+                else if (SelectedBatchPlanForIntermediate.ScheduledEndDate != null)
+                    SelectedBatchPlanForIntermediate.ScheduledStartDate = SelectedBatchPlanForIntermediate.ScheduledEndDate.Value.Add(-batchPlanDuration.Value);
+            }
+            SelectedBatchPlanForIntermediate.OnEntityPropertyChanged("ScheduledStartDate");
+            SelectedBatchPlanForIntermediate.OnEntityPropertyChanged("ScheduledEndDate");
         }
 
         #region BatchPlan calculated dates
 
-        private void BatchPlanCalculatedDatesClear(ProdOrderBatchPlan batchPlan)
-        {
-            batchPlan.CalculatedStartDate = null;
-            batchPlan.CalculatedEndDate = null;
-        }
-
-        private void BatchPlanCalculatedDatesWrite(ProdOrderBatchPlan batchPlan, TimeSpan batchPlanDuration)
-        {
-            if (batchPlan.ScheduledStartDate != null)
-                batchPlan.CalculatedEndDate = batchPlan.ScheduledStartDate.Value.Add(batchPlanDuration);
-            else if (batchPlan.ScheduledEndDate != null)
-                batchPlan.CalculatedStartDate = batchPlan.ScheduledEndDate.Value.Add(-batchPlanDuration);
-        }
         private TimeSpan? GetConfigBatchPlanDuration(ProdOrderBatchPlan batchPlan)
         {
             return null;
