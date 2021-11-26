@@ -465,7 +465,7 @@ namespace gip.bso.manufacturing
             double toQuantity = 0;
             try
             {
-                if (Partslist != null && Partslist.Material != null)
+                if (Partslist != null && Partslist.Material != null && SelectedUnitConvert != null)
                     if (toBaseQuantity)
                         toQuantity = Partslist.Material.ConvertToBaseQuantity(sourceQuantity, SelectedUnitConvert);
                     else
@@ -515,18 +515,21 @@ namespace gip.bso.manufacturing
         {
             if (PlanMode != null && PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
             {
+                double targetQuantity = TargetQuantityUOM;
+                if(NewTargetQuantityUOM > 0)
+                    targetQuantity = NewTargetQuantityUOM;
                 BatchPlanSuggestion = new BatchPlanSuggestion(this)
                 {
-                    RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * NewTargetQuantityUOM,
-                    TotalSizeUOM = NewTargetQuantityUOM,
+                    RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * targetQuantity,
+                    TotalSizeUOM = targetQuantity,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
                 BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(
                     this,
                     1,
-                    NewTargetQuantityUOM,
+                    targetQuantity,
                     1,
-                    NewTargetQuantityUOM
+                    targetQuantity
                     )
                 { IsEditable = true });
             }

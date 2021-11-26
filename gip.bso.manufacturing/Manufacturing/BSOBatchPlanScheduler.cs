@@ -1689,7 +1689,8 @@ namespace gip.bso.manufacturing
             if (SelectedWizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Any())
                 nr = SelectedWizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Max(c => c.Nr);
             nr++;
-            BatchPlanSuggestionItem newItem = new BatchPlanSuggestionItem(SelectedWizardSchedulerPartslist, nr, 0, 0, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM) { IsEditable = true };
+            BatchPlanSuggestionItem newItem = new BatchPlanSuggestionItem(SelectedWizardSchedulerPartslist, nr, 0, 0, 
+                SelectedWizardSchedulerPartslist.NewTargetQuantityUOM  > 0 ? SelectedWizardSchedulerPartslist.NewTargetQuantityUOM: SelectedWizardSchedulerPartslist.TargetQuantityUOM) { IsEditable = true };
             SelectedWizardSchedulerPartslist.BatchPlanSuggestion.AddItem(newItem);
             SelectedWizardSchedulerPartslist.BatchPlanSuggestion.SelectedItems = newItem;
             if (SelectedWizardSchedulerPartslist.OffsetToEndTime != null)
@@ -3235,34 +3236,6 @@ namespace gip.bso.manufacturing
             return msg;
         }
 
-
-        private void LoadSuggestionItemExpectedBatchEndTime(WizardSchedulerPartslist wizardSchedulerPartslist, BatchPlanSuggestion suggestion)
-        {
-            double totalMinutes = 0;
-            if (wizardSchedulerPartslist.OffsetToEndTime.Value.TotalMinutes > 0)
-                totalMinutes = wizardSchedulerPartslist.OffsetToEndTime.Value.TotalMinutes;
-            else
-            {
-                TimeSpan? calculatedDuration = GetExpectedBatchEndTime(wizardSchedulerPartslist);
-                if (calculatedDuration != null)
-                    totalMinutes = calculatedDuration.Value.TotalMinutes;
-            }
-
-            DateTime tempTime = DateTime.Now;
-            if (totalMinutes > 0)
-            {
-                foreach (var item in suggestion.ItemsList)
-                {
-                    if (item.ExpectedBatchEndTime != null)
-                        tempTime = item.ExpectedBatchEndTime.Value;
-                    else
-                    {
-                        tempTime = tempTime.AddMinutes(wizardSchedulerPartslist.OffsetToEndTime.Value.TotalMinutes);
-                        item.ExpectedBatchEndTime = tempTime;
-                    }
-                }
-            }
-        }
 
         public void WizardDefineDefaultPartslist(MDSchedulingGroup schedulingGroup, Partslist partslist, double targetQuantity)
         {
