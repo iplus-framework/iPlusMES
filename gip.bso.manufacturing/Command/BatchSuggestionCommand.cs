@@ -12,6 +12,9 @@ namespace gip.bso.manufacturing
             wizardSchedulerPartslist.BatchPlanSuggestion = new BatchPlanSuggestion(wizardSchedulerPartslist);
             wizardSchedulerPartslist.BatchPlanSuggestion.RestQuantityToleranceUOM = toleranceQuantity;
             wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM = wizardSchedulerPartslist.NewTargetQuantityUOM;
+            if(wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM <= double.Epsilon)
+                wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM= wizardSchedulerPartslist.TargetQuantityUOM;
+
             wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
             
