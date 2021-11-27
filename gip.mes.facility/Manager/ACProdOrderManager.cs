@@ -1196,12 +1196,10 @@ namespace gip.mes.facility
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
                                                  || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
-                                                 || (c.CalculatedStartDate != null && c.CalculatedStartDate >= filterEndTime)
                                                  || (c.UpdateDate >= filterStartTime)
                                                 )
                                             && (filterEndTime == null
                                                  || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
-                                                 || (c.CalculatedEndDate != null && c.CalculatedEndDate < filterEndTime)
                                                  || (c.UpdateDate <= filterEndTime)
                                                 )
                                              && (

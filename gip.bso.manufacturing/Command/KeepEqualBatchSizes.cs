@@ -1,11 +1,12 @@
-﻿using System;
+﻿using gip.mes.datamodel;
+using System;
 
 namespace gip.bso.manufacturing
 {
     public class KeepEqualBatchSizes
     {
         #region ctor's
-        public KeepEqualBatchSizes(int nr, double totalSize, double standardBatchSize, double minBatchSize, double maxBatchSize)
+        public KeepEqualBatchSizes(WizardSchedulerPartslist wizardSchedulerPartslist, int nr, double totalSize, double standardBatchSize, double minBatchSize, double maxBatchSize)
         {
             int calcBatchCount = 0;
             double calcBatchSize = 0;
@@ -51,7 +52,7 @@ namespace gip.bso.manufacturing
             }
 
             if (calcBatchSize > 0 && calcBatchCount > 0)
-                Suggestion = new BatchPlanSuggestionItem(nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
+                Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
             Rest = rest;
         }
         #endregion
