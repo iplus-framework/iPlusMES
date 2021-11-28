@@ -18,62 +18,24 @@ namespace gip.bso.manufacturing
         public BatchPlanSuggestion(WizardSchedulerPartslist wizardSchedulerPartslist)
         {
             WizardSchedulerPartslist = wizardSchedulerPartslist;
+            WizardSchedulerPartslist.PropertyChanged += WizardSchedulerPartslist_PropertyChanged;
+        }
+
+        private void WizardSchedulerPartslist_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == "TargetQuantityUOM")
+            {
+                OnPropertyChanged("BatchSuggestionSumUOM");
+                OnPropertyChanged("DifferenceUOM");
+
+                OnPropertyChanged("BatchSuggestionSum");
+                OnPropertyChanged("Difference");
+            }
         }
 
         #endregion
 
         #region Properties
-
-
-        /// <summary>
-        /// Source Property: 
-        /// </summary>
-        private double _TotalSize;
-        [ACPropertySelected(100, "TotalSize", "en{'Total Size'}de{'Gesamtgröße'}")]
-        public double TotalSize
-        {
-            get
-            {
-                return _TotalSize;
-            }
-            set
-            {
-                if (_TotalSize != value)
-                {
-                    _TotalSize = value;
-                    OnPropertyChanged("TotalSize");
-
-                    _TotalSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_TotalSize, true);
-                    OnPropertyChanged("TotalSizeUOM");
-                }
-            }
-        }
-
-
-        private double _TotalSizeUOM;
-        [ACPropertyInfo(101, "TotalSizeUOM", "en{'Total Size (UOM)'}de{'Gesamtgröße (BOM)'}")]
-        public double TotalSizeUOM
-        {
-            get
-            {
-                return _TotalSizeUOM;
-            }
-            set
-            {
-                if (_TotalSizeUOM != value)
-                {
-                    _TotalSizeUOM = value;
-                    OnPropertyChanged("BatchSuggestionSumUOM");
-                    OnPropertyChanged("DifferenceUOM");
-
-                    _TotalSize = WizardSchedulerPartslist.ConvertQuantity(_TotalSizeUOM, false);
-                    OnPropertyChanged("TotalSize");
-                    OnPropertyChanged("BatchSuggestionSum");
-                    OnPropertyChanged("Difference");
-
-                }
-            }
-        }
 
         /// <summary>
         /// Source Property: 
@@ -98,7 +60,6 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-
 
         private double _RestQuantityToleranceUOM;
         /// <summary>
@@ -160,7 +121,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return TotalSize - BatchSuggestionSum ?? 0;
+                return WizardSchedulerPartslist.TargetQuantity - BatchSuggestionSum ?? 0;
             }
         }
 
@@ -173,7 +134,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return TotalSizeUOM - BatchSuggestionSumUOM ?? 0;
+                return WizardSchedulerPartslist.GetTargetQuantityUOM() - BatchSuggestionSumUOM ?? 0;
             }
         }
 
@@ -249,7 +210,7 @@ namespace gip.bso.manufacturing
             if (ItemsList == null || ItemsList.Any(c => c.BatchTargetCount == 0))
                 return false;
             double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSizeUOM);
-            return (sumSize - TotalSizeUOM) < RestQuantityToleranceUOM;
+            return (sumSize - WizardSchedulerPartslist.GetTargetQuantityUOM()) < RestQuantityToleranceUOM;
         }
 
         #endregion
@@ -266,7 +227,7 @@ namespace gip.bso.manufacturing
 
         public override string ToString()
         {
-            return string.Format(@"{0} / {1}", TotalSizeUOM, RestNotUsedQuantityUOM);
+            return string.Format(@"{0} / {1}", WizardSchedulerPartslist.GetTargetQuantityUOM(), RestNotUsedQuantityUOM);
         }
     }
 }

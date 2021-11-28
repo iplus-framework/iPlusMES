@@ -169,7 +169,7 @@ namespace gip.bso.manufacturing
             {
                 if (Partslist == null)
                     return null;
-                return Partslist.Material.MaterialUnit_Material.Select(c=>c.ToMDUnit).ToList();
+                return Partslist.Material.MaterialUnit_Material.Select(c => c.ToMDUnit).ToList();
             }
         }
 
@@ -442,6 +442,11 @@ namespace gip.bso.manufacturing
 
         #region Methods
 
+        public double GetTargetQuantityUOM()
+        {
+            return NewTargetQuantityUOM > 0 ? NewTargetQuantityUOM : TargetQuantityUOM;
+        }
+
 
         public bool IsEqualPartslist(WizardSchedulerPartslist second)
         {
@@ -471,7 +476,7 @@ namespace gip.bso.manufacturing
                     else
                         toQuantity = Partslist.Material.ConvertFromBaseQuantity(sourceQuantity, SelectedUnitConvert);
                 else
-                    toQuantity = _TargetQuantity;
+                    toQuantity = sourceQuantity;
             }
             catch (Exception ec)
             {
@@ -488,7 +493,6 @@ namespace gip.bso.manufacturing
         {
             BatchPlanSuggestion = new BatchPlanSuggestion(this);
             BatchPlanSuggestion.RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
-            BatchPlanSuggestion.TotalSizeUOM = TargetQuantityUOM;
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
             {
@@ -516,12 +520,11 @@ namespace gip.bso.manufacturing
             if (PlanMode != null && PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
             {
                 double targetQuantity = TargetQuantityUOM;
-                if(NewTargetQuantityUOM > 0)
+                if (NewTargetQuantityUOM > 0)
                     targetQuantity = NewTargetQuantityUOM;
                 BatchPlanSuggestion = new BatchPlanSuggestion(this)
                 {
                     RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * targetQuantity,
-                    TotalSizeUOM = targetQuantity,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
                 BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(

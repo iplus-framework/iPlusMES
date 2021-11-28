@@ -11,18 +11,13 @@ namespace gip.bso.manufacturing
         {
             wizardSchedulerPartslist.BatchPlanSuggestion = new BatchPlanSuggestion(wizardSchedulerPartslist);
             wizardSchedulerPartslist.BatchPlanSuggestion.RestQuantityToleranceUOM = toleranceQuantity;
-            wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM = wizardSchedulerPartslist.NewTargetQuantityUOM;
-            if(wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM <= double.Epsilon)
-                wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM= wizardSchedulerPartslist.TargetQuantityUOM;
 
             wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
-            
-
-            if (wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM > 0)
+            if (wizardSchedulerPartslist.GetTargetQuantityUOM() > 0)
             {
 
-                double rest = wizardSchedulerPartslist.BatchPlanSuggestion.TotalSizeUOM;
+                double rest = wizardSchedulerPartslist.GetTargetQuantityUOM();
                 int nr = 1;
                 switch (mode)
                 {
