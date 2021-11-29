@@ -66,7 +66,7 @@ namespace gip.bso.manufacturing
         /// Doc  MaximalRestQuantity
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(201, "RestQuantityToleranceUOM", "en{'Diff tolerance (UOM)'}de{'Differenztoleranz (BOM)'}")]
+        [ACPropertyInfo(201, "RestQuantityToleranceUOM", "en{'Diff tolerance (UOM)'}de{'Differenztoleranz (BME)'}")]
         public double RestQuantityToleranceUOM
         {
             get
@@ -105,7 +105,7 @@ namespace gip.bso.manufacturing
         /// Doc  BatchSuggestionSum
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(301, "BatchSuggestionSumUOM", "en{'Sum (UOM)'}de{'Sum (BOM)'}")]
+        [ACPropertyInfo(301, "BatchSuggestionSumUOM", "en{'Sum (UOM)'}de{'Sum (BME)'}")]
         public double? BatchSuggestionSumUOM
         {
             get
@@ -129,7 +129,7 @@ namespace gip.bso.manufacturing
         /// Doc  Difference
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(401, "DifferenceUOM", "en{'Diff (UOM)'}de{'Diff (BOM)'}")]
+        [ACPropertyInfo(401, "DifferenceUOM", "en{'Diff (UOM)'}de{'Diff (BME)'}")]
         public double DifferenceUOM
         {
             get
@@ -138,7 +138,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(106, "RestNotUsedQuantityUOM", "en{'Not used quantity (UOM)'}de{'Unbenutzte Restmenge (BOM)'}")]
+        [ACPropertyInfo(106, "RestNotUsedQuantityUOM", "en{'Not used quantity (UOM)'}de{'Unbenutzte Restmenge (BME)'}")]
         public double RestNotUsedQuantityUOM { get; set; }
 
         #region Items
@@ -183,6 +183,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ItemsList = value;
+                OnPropertyChanged("ItemsList");
             }
         }
 
@@ -193,6 +194,8 @@ namespace gip.bso.manufacturing
             item.PropertyChanged += Item_PropertyChanged;
             OnPropertyChanged("BatchSuggestionSum");
             OnPropertyChanged("Difference");
+            OnPropertyChanged("BatchSuggestionSumUOM");
+            OnPropertyChanged("DifferenceUOM");
         }
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -202,6 +205,12 @@ namespace gip.bso.manufacturing
             {
                 OnPropertyChanged("BatchSuggestionSum");
                 OnPropertyChanged("Difference");
+            }
+            properties = new string[] { "BatchTargetCount", "TotalBatchSizeUOM", "BatchSizeUOM" };
+            if (properties.Contains(e.PropertyName))
+            {
+                OnPropertyChanged("BatchSuggestionSumUOM");
+                OnPropertyChanged("DifferenceUOM");
             }
         }
 

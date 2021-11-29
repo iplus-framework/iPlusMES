@@ -51,6 +51,7 @@ namespace gip.bso.manufacturing
         public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
         private Partslist _Partslist;
+        [ACPropertyInfo(519, "BatchPlanSuggestion" , "en{'BOM'}de{'Stückliste.'}")]
         public Partslist Partslist
         {
             get
@@ -156,20 +157,35 @@ namespace gip.bso.manufacturing
             }
             set
             {
+                MDUnit prevValue = _SelectedUnitConvert;
                 _SelectedUnitConvert = value;
-                OnPropertyChanged("SelectedUnitConvert");
+                if (_SelectedUnitConvert != prevValue)
+                {
+                    OnPropertyChanged("SelectedUnitConvert");
+                    RecalcLimitsFromUOM();
+                    RecalcDependantUOMFields(true);
+                }
             }
         }
 
 
         [ACPropertyList(513, "Conversion")]
-        public List<MDUnit> UnitConvertList
+        public IEnumerable<MDUnit> UnitConvertList
         {
             get
             {
-                if (Partslist == null)
+                if (Partslist == null || Partslist.Material == null)
                     return null;
-                return Partslist.Material.MaterialUnit_Material.Select(c => c.ToMDUnit).ToList();
+                return Partslist.Material.MaterialUnit_Material.OrderBy(c => c.Multiplier).Select(c => c.ToMDUnit).ToArray();
+            }
+        }
+
+        public void SelectFirstConversionUnit()
+        {
+            var unitList = UnitConvertList;
+            if (unitList != null)
+            {
+                SelectedUnitConvert = unitList.FirstOrDefault();
             }
         }
 
@@ -189,15 +205,14 @@ namespace gip.bso.manufacturing
                 {
                     _TargetQuantity = value;
                     OnPropertyChanged("TargetQuantity");
-                    _TargetQuantityUOM = ConvertQuantity(_TargetQuantity, toBaseQuantity: true);
-                    OnPropertyChanged("TargetQuantityUOM");
+                    RecalcDependantUOMFields(false);
                 }
             }
         }
 
 
         private double _TargetQuantityUOM;
-        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Quantity (UOM)'}de{'Menge (BOM)'}")]
+        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Quantity (UOM)'}de{'Menge (BME)'}")]
         public double TargetQuantityUOM
         {
             get
@@ -214,16 +229,11 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged("TargetQuantityUOM");
                     OnPropertyChanged("NewTargetQuantityUOM");
                     quantityInChange = false;
-                    _TargetQuantity = ConvertQuantity(_TargetQuantityUOM, toBaseQuantity: false);
-                    OnPropertyChanged("TargetQuantity");
+                    RecalcDependantUOMFields(true);
                 }
             }
         }
 
-        public void test(ref double targetQ)
-        {
-            targetQ = 0;
-        }
 
         private bool quantityInChange;
         public double _NewTargetQuantityUOM;
@@ -231,7 +241,7 @@ namespace gip.bso.manufacturing
         /// Doc  NewTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'New quantity'}de{'Menge Neu'}")]
+        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'New (UOM) quantity'}de{'Neu (BME) Menge'}")]
         public double NewTargetQuantityUOM
         {
             get
@@ -243,11 +253,20 @@ namespace gip.bso.manufacturing
                 if (_NewTargetQuantityUOM != value && !quantityInChange)
                 {
                     quantityInChange = true;
-                    _NewTargetQuantityUOM = value;
-                    OnPropertyChanged("NewTargetQuantityUOM");
+                    ChangeNewTargetQuantityUOM(value, true);
                     quantityInChange = false;
                 }
             }
+        }
+
+        public void ChangeNewTargetQuantityUOM(double value, bool raisePropChanged)
+        {
+            _NewTargetQuantityUOM = value;
+            if (raisePropChanged)
+                OnPropertyChanged("NewTargetQuantityUOM");
+            _NewTargetQuantity = ConvertQuantity(value, false);
+            if (raisePropChanged)
+                OnPropertyChanged("NewTargetQuantity");
         }
 
         public double? _NewSyncTargetQuantityUOM;
@@ -255,7 +274,7 @@ namespace gip.bso.manufacturing
         /// Doc  NewSyncTargetQuantityUOM
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'New sync. quantity'}de{'Menge Neu Sync.'}")]
+        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'New (UOM) sync. quntity'}de{'Neu (BME) sync. Menge'}")]
         public double? NewSyncTargetQuantityUOM
         {
             get
@@ -267,12 +286,59 @@ namespace gip.bso.manufacturing
                 if (_NewSyncTargetQuantityUOM != value && !quantityInChange)
                 {
                     quantityInChange = true;
-                    _NewSyncTargetQuantityUOM = value;
-                    OnPropertyChanged("NewSyncTargetQuantityUOM");
+                    ChangeNewSyncTargetQuantityUOM(value, true);
                     quantityInChange = false;
                 }
             }
         }
+
+        public void ChangeNewSyncTargetQuantityUOM(double? value, bool raisePropChanged)
+        {
+            _NewSyncTargetQuantityUOM = value;
+            if (raisePropChanged)
+                OnPropertyChanged("NewSyncTargetQuantityUOM");
+            _NewSyncTargetQuantity = ConvertQuantity(value.HasValue ? value.Value : 0.0, false);
+            if (raisePropChanged)
+                OnPropertyChanged("NewSyncTargetQuantity");
+        }
+
+
+        public double _NewTargetQuantity;
+        [ACPropertyInfo(999, "NewTargetQuantityUOM", "en{'New quantity'}de{'Neu Menge'}")]
+        public double NewTargetQuantity
+        {
+            get
+            {
+                return _NewTargetQuantity;
+            }
+            set
+            {
+                if (_NewTargetQuantity != value)
+                    NewTargetQuantity = ConvertQuantity(value, true);
+            }
+        }
+
+        public double? _NewSyncTargetQuantity;
+        /// <summary>
+        /// Doc  NewSyncTargetQuantityUOM
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "NewSyncTargetQuantityUOM", "en{'New sync. quantity'}de{'Neu sync. Menge'}")]
+        public double? NewSyncTargetQuantity
+        {
+            get
+            {
+                if (SelectedUnitConvert == null && _NewSyncTargetQuantity.HasValue)
+                    _NewSyncTargetQuantity = null;
+                return _NewSyncTargetQuantity;
+            }
+            set
+            {
+                if (_NewSyncTargetQuantity != value)
+                    NewSyncTargetQuantityUOM = ConvertQuantity(value.HasValue ? value.Value : 0.0, true);
+            }
+        }
+
 
         public double? _ProductionUnits;
         [ACPropertyInfo(999, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}")]
@@ -308,21 +374,10 @@ namespace gip.bso.manufacturing
             {
                 return _BatchSizeMin;
             }
-            set
-            {
-                if (_BatchSizeMin != value)
-                {
-                    _BatchSizeMin = value;
-                    OnPropertyChanged("BatchSizeMin");
-                    _BatchSizeMinUOM = ConvertQuantity(_BatchSizeMin, toBaseQuantity: true);
-                    OnPropertyChanged("BatchSizeMinUOM");
-                }
-
-            }
         }
 
         private double _BatchSizeMinUOM;
-        [ACPropertyInfo(999, "BatchSizeMinUOM", "en{'Min. Batchsize (UOM)'}de{'Min. Batchgröße (BOM)'}")]
+        [ACPropertyInfo(999, "BatchSizeMinUOM", "en{'Min. Batchsize (UOM)'}de{'Min. Batchgröße (BME)'}")]
         public double BatchSizeMinUOM
         {
             get
@@ -335,8 +390,6 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeMinUOM = value;
                     OnPropertyChanged("BatchSizeMinUOM");
-                    _BatchSizeMin = ConvertQuantity(_BatchSizeMinUOM, toBaseQuantity: false);
-                    OnPropertyChanged("BatchSizeMin");
                 }
             }
         }
@@ -349,16 +402,6 @@ namespace gip.bso.manufacturing
             get
             {
                 return _BatchSizeMax;
-            }
-            set
-            {
-                if (_BatchSizeMax != value)
-                {
-                    _BatchSizeMax = value;
-                    OnPropertyChanged("BatchSizeMax");
-                    _BatchSizeMaxUOM = ConvertQuantity(_BatchSizeMax, toBaseQuantity: true);
-                    OnPropertyChanged("BatchSizeMaxUOM");
-                }
             }
         }
 
@@ -377,8 +420,6 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeMaxUOM = value;
                     OnPropertyChanged("BatchSizeMaxUOM");
-                    _BatchSizeMax = ConvertQuantity(_BatchSizeMaxUOM, toBaseQuantity: false);
-                    OnPropertyChanged("BatchSizeMax");
                 }
             }
         }
@@ -391,20 +432,10 @@ namespace gip.bso.manufacturing
             {
                 return _BatchSizeStandard;
             }
-            set
-            {
-                if (_BatchSizeStandard != value)
-                {
-                    _BatchSizeStandard = value;
-                    OnPropertyChanged("BatchSizeStandard");
-                    _BatchSizeStandardUOM = ConvertQuantity(_BatchSizeStandard, toBaseQuantity: true);
-                    OnPropertyChanged("BatchSizeStandardUOM");
-                }
-            }
         }
 
         private double _BatchSizeStandardUOM;
-        [ACPropertyInfo(999, "BatchSizeStandardUOM", "en{'Standard Batchsize (UOM)'}de{'Standard Batchgröße (BOM)'}")]
+        [ACPropertyInfo(999, "BatchSizeStandardUOM", "en{'Standard Batchsize (UOM)'}de{'Standard Batchgröße (BME)'}")]
         public double BatchSizeStandardUOM
         {
             get
@@ -417,8 +448,6 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSizeStandardUOM = value;
                     OnPropertyChanged("BatchSizeStandardUOM");
-                    _BatchSizeStandard = ConvertQuantity(_BatchSizeStandardUOM, toBaseQuantity: false);
-                    OnPropertyChanged("BatchSizeStandard");
                 }
             }
         }
@@ -471,12 +500,19 @@ namespace gip.bso.manufacturing
             try
             {
                 if (Partslist != null && Partslist.Material != null && SelectedUnitConvert != null)
+                {
                     if (toBaseQuantity)
                         toQuantity = Partslist.Material.ConvertToBaseQuantity(sourceQuantity, SelectedUnitConvert);
                     else
                         toQuantity = Partslist.Material.ConvertFromBaseQuantity(sourceQuantity, SelectedUnitConvert);
+                }
                 else
-                    toQuantity = sourceQuantity;
+                {
+                    if (toBaseQuantity)
+                        toQuantity = sourceQuantity;
+                    else
+                        toQuantity = 0.0;
+                }
             }
             catch (Exception ec)
             {
@@ -488,6 +524,35 @@ namespace gip.bso.manufacturing
             }
             return toQuantity;
         }
+
+        protected void RecalcDependantUOMFields(bool uomFieldChanged)
+        {
+            if (uomFieldChanged)
+            {
+                _TargetQuantity = ConvertQuantity(_TargetQuantityUOM, toBaseQuantity: false);
+                OnPropertyChanged("TargetQuantity");
+                _NewTargetQuantity = _TargetQuantity;
+                OnPropertyChanged("NewTargetQuantity");
+            }
+            else
+            {
+                _TargetQuantityUOM = ConvertQuantity(_TargetQuantity, toBaseQuantity: true);
+                OnPropertyChanged("TargetQuantityUOM");
+                _NewTargetQuantityUOM = _TargetQuantityUOM;
+                OnPropertyChanged("NewTargetQuantityUOM");
+            }
+        }
+
+        protected void RecalcLimitsFromUOM()
+        {
+            _BatchSizeMin = ConvertQuantity(_BatchSizeMinUOM, toBaseQuantity: false);
+            OnPropertyChanged("BatchSizeMin");
+            _BatchSizeMax = ConvertQuantity(_BatchSizeMaxUOM, toBaseQuantity: false);
+            OnPropertyChanged("BatchSizeMax");
+            _BatchSizeStandard = ConvertQuantity(_BatchSizeStandardUOM, toBaseQuantity: false);
+            OnPropertyChanged("BatchSizeStandard");
+        }
+
 
         public void LoadExistingBatchSuggestion()
         {
