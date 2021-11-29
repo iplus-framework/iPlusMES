@@ -1695,6 +1695,10 @@ namespace gip.bso.manufacturing
             SelectedWizardSchedulerPartslist.BatchPlanSuggestion.SelectedItems = newItem;
             if (SelectedWizardSchedulerPartslist.OffsetToEndTime != null)
                 SelectedWizardSchedulerPartslist.LoadSuggestionItemExpectedBatchEndTime();
+
+            var tmpItem  = SelectedWizardSchedulerPartslist;
+            _SelectedWizardSchedulerPartslist = null;
+            SelectedWizardSchedulerPartslist = tmpItem;
             OnPropertyChanged("SelectedWizardSchedulerPartslist\\BatchPlanSuggestion\\ItemsList");
         }
 
