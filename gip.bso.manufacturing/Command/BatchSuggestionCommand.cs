@@ -14,10 +14,9 @@ namespace gip.bso.manufacturing
 
             wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
 
-            if (wizardSchedulerPartslist.GetTargetQuantityUOM() > 0)
+            double rest = wizardSchedulerPartslist.GetTargetQuantityUOM();
+            if (rest > 0.0001)
             {
-
-                double rest = wizardSchedulerPartslist.GetTargetQuantityUOM();
                 int nr = 1;
                 switch (mode)
                 {
@@ -25,7 +24,7 @@ namespace gip.bso.manufacturing
                         KeepStandardBatchSizeAndDivideRest suggestion1 = null;
                         do
                         {
-                            suggestion1 = new KeepStandardBatchSizeAndDivideRest(wizardSchedulerPartslist, nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
+                            suggestion1 = new KeepStandardBatchSizeAndDivideRest(wizardSchedulerPartslist, nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
                             if (suggestion1.Suggestion != null)
                                 wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion1.Suggestion);
                             rest = suggestion1.Rest;
@@ -37,7 +36,7 @@ namespace gip.bso.manufacturing
                         KeepEqualBatchSizes suggestion2 = null;
                         do
                         {
-                            suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandard, wizardSchedulerPartslist.BatchSizeMin, wizardSchedulerPartslist.BatchSizeMax);
+                            suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
                             if (suggestion2.Suggestion != null)
                                 wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
                             rest = suggestion2.Rest;

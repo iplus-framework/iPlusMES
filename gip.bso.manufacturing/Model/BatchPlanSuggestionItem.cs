@@ -17,8 +17,10 @@ namespace gip.bso.manufacturing
             WizardSchedulerPartslist = wizardSchedulerPartslist;
             Nr = nr;
             _BatchSizeUOM = batchSize;
+            _BatchSize = wizardSchedulerPartslist.ConvertQuantity(batchSize, false);
             _BatchTargetCount = batchTargetCount;
             _TotalBatchSizeUOM = totalBatchSize;
+            _TotalBatchSize = wizardSchedulerPartslist.ConvertQuantity(totalBatchSize, false);
             if (totalBatchSize > double.Epsilon && _BatchTargetCount > 0)
             {
                 _PrevChanged = Field.BatchTargetCountUOM;
@@ -70,11 +72,15 @@ namespace gip.bso.manufacturing
                             _BatchSizeUOM = _TotalBatchSizeUOM / _BatchTargetCount;
                         else
                             _BatchSizeUOM = 0;
+                        OnPropertyChanged("BatchSizeUOM");
+                        _BatchSize = WizardSchedulerPartslist.ConvertQuantity(_BatchSizeUOM, false);
                         OnPropertyChanged("BatchSize");
                     }
                     else if (_PrevChanged == Field.BatchSizeUOM)
                     {
                         _TotalBatchSizeUOM = _BatchSizeUOM * _BatchTargetCount;
+                        OnPropertyChanged("TotalBatchSizeUOM");
+                        _TotalBatchSize = _BatchSize * _BatchTargetCount;
                         OnPropertyChanged("TotalBatchSize");
                     }
                     _LastChanged = Field.BatchTargetCountUOM;
@@ -96,18 +102,14 @@ namespace gip.bso.manufacturing
             set
             {
                 if (_BatchSize != value)
-                {
-                    _BatchSize = value;
-                    OnPropertyChanged("BatchSize");
-                    BatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_BatchSize, true);
-                }
+                    BatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(value, true);
             }
         }
 
 
 
         double _BatchSizeUOM;
-        [ACPropertyInfo(300, "BatchSizeUOM", "en{'Batch Size (UOM)'}de{'Batchgröße (BOM)'}")]
+        [ACPropertyInfo(300, "BatchSizeUOM", "en{'Batch Size (UOM)'}de{'Batchgröße (BME)'}")]
         public double BatchSizeUOM
         {
             get
@@ -118,6 +120,9 @@ namespace gip.bso.manufacturing
             {
                 if (SetProperty(ref _BatchSizeUOM, value))
                 {
+                    _BatchSize = WizardSchedulerPartslist.ConvertQuantity(_BatchSizeUOM, false);
+                    OnPropertyChanged("BatchSize");
+
                     if (_LastChanged != Field.BatchSizeUOM)
                         _PrevChanged = _LastChanged;
                     if (_PrevChanged == Field.TotalBatchSizeUOM)
@@ -133,12 +138,11 @@ namespace gip.bso.manufacturing
                     else if (_PrevChanged == Field.BatchTargetCountUOM)
                     {
                         _TotalBatchSizeUOM = _BatchSizeUOM * _BatchTargetCount;
+                        OnPropertyChanged("TotalBatchSizeUOM");
+                        _TotalBatchSize = _BatchSize * _BatchTargetCount;
                         OnPropertyChanged("TotalBatchSize");
                     }
                     _LastChanged = Field.BatchSizeUOM;
-
-                    _BatchSize = WizardSchedulerPartslist.ConvertQuantity(_BatchSizeUOM, false);
-                    OnPropertyChanged("BatchSize");
                 }
             }
         }
@@ -157,18 +161,14 @@ namespace gip.bso.manufacturing
             set
             {
                 if (_TotalBatchSize != value)
-                {
-                    _TotalBatchSize = value;
-                    OnPropertyChanged("TotalBatchSize");
-                    TotalBatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_TotalBatchSize, false);
-                }
+                    TotalBatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(value, true);
             }
         }
 
 
 
         double _TotalBatchSizeUOM;
-        [ACPropertyInfo(400, "TotalBatchSizeUOM", "en{'Total Size (UOM)'}de{'Gesamtgröße (BOM)'}")]
+        [ACPropertyInfo(400, "TotalBatchSizeUOM", "en{'Total Size (UOM)'}de{'Gesamtgröße (BME)'}")]
         public double TotalBatchSizeUOM
         {
             get
@@ -179,6 +179,8 @@ namespace gip.bso.manufacturing
             {
                 if (SetProperty(ref _TotalBatchSizeUOM, value))
                 {
+                    _TotalBatchSize = WizardSchedulerPartslist.ConvertQuantity(_TotalBatchSizeUOM, false);
+                    OnPropertyChanged("TotalBatchSize");
                     if (_LastChanged != Field.TotalBatchSizeUOM)
                         _PrevChanged = _LastChanged;
                     if (_PrevChanged == Field.BatchSizeUOM)
@@ -194,15 +196,20 @@ namespace gip.bso.manufacturing
                     else if (_PrevChanged == Field.BatchTargetCountUOM)
                     {
                         if (_TotalBatchSizeUOM > double.Epsilon && _BatchTargetCount > 0)
+                        {
                             _BatchSizeUOM = _TotalBatchSizeUOM / _BatchTargetCount;
+                            _BatchSize = _TotalBatchSize / _BatchTargetCount;
+                        }
                         else
+                        {
                             _BatchSizeUOM = 0;
+                            _BatchSize = 0;
+                        }
+                        OnPropertyChanged("BatchSizeUOM");
                         OnPropertyChanged("BatchSize");
                     }
                     _LastChanged = Field.TotalBatchSizeUOM;
 
-                    _TotalBatchSize = WizardSchedulerPartslist.ConvertQuantity(_TotalBatchSizeUOM, false);
-                    OnPropertyChanged("TotalBatchSize");
                 }
             }
         }
