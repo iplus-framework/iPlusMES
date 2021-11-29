@@ -99,7 +99,7 @@ namespace gip.bso.manufacturing
                 {
                     _BatchSize = value;
                     OnPropertyChanged("BatchSize");
-                    BatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_BatchSize, false);
+                    BatchSizeUOM = WizardSchedulerPartslist.ConvertQuantity(_BatchSize, true);
                 }
             }
         }

@@ -2074,7 +2074,6 @@ namespace gip.bso.manufacturing
                new BatchPlanSuggestion(wizardSchedulerPartslist)
                {
                    RestQuantityToleranceUOM = totalSize * (ProdOrderManager.TolRemainingCallQ / 100),
-                   TotalSizeUOM = totalSize,
                    RestNotUsedQuantityUOM = 0,
                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
                    {
@@ -2096,7 +2095,6 @@ namespace gip.bso.manufacturing
                 new BatchPlanSuggestion(wizardSchedulerPartslist)
                 {
                     RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * moveQuantity,
-                    TotalSizeUOM = moveQuantity,
                     RestNotUsedQuantityUOM = 0,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                     {
