@@ -3637,6 +3637,7 @@
 					<Property Name="ProductionUnits" Type="float" />
 					<Property Name="XMLComment" Type="text" />
 					<Property Name="LastFormulaChange" Type="datetime" Nullable="false" />
+					<Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
 				</EntityType>
 				<EntityType Name="PartslistACClassMethod">
 					<Key>
@@ -33516,6 +33517,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 					<Property Name="ProductionUnits" Type="Double" />
 					<Property Name="XMLComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
 					<Property Name="LastFormulaChange" Type="DateTime" Nullable="false" Precision="3" />
+					<Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
 					<NavigationProperty Name="DemandOrderPos_Partslist" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_PartsListID" FromRole="Partslist" ToRole="DemandOrderPos" />
 					<NavigationProperty Name="FacilityBooking_InwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_InwardPartslistID" FromRole="Partslist" ToRole="FacilityBooking" />
 					<NavigationProperty Name="FacilityBooking_OutwardPartslist" Relationship="iPlusMESV4_Model.FK_FacilityBooking_OutwardPartsListID" FromRole="Partslist" ToRole="FacilityBooking" />
@@ -39658,6 +39660,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 								<ScalarProperty Name="PartslistName" ColumnName="PartslistName" />
 								<ScalarProperty Name="PartslistNo" ColumnName="PartslistNo" />
 								<ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
+								<ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
