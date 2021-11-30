@@ -46,5 +46,16 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+
+        public override string ToString()
+        {
+            if (!string.IsNullOrEmpty(FacilityName))
+                return FacilityName;
+
+            if (!string.IsNullOrEmpty(FacilityNo))
+                return FacilityNo;
+
+            return base.ToString();
+        }
     }
 }
