@@ -31,7 +31,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(21, MaterialWF.ClassName, "en{'Material Workflow'}de{'Material Workflow'}", Const.ContextDatabase + "\\" + MaterialWF.ClassName, "", true)]
     [ACPropertyEntity(22, "IsProductionUnit", "en{'Production Unit'}de{'Produktionseinheit'}", "", "", true)]
     [ACPropertyEntity(23, "IsStandard", "en{'Standard'}de{'Standard'}", "", "", true)]
-    [ACPropertyEntity(24, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}", "", "", true)]
+    [ACPropertyEntity(24, "ProductionUnits", "en{'Units of production (UOM)'}de{'Produktionseinheiten (BME)'}", "", "", true)]
     [ACPropertyEntity(25, "XMLComment", ConstApp.XMLComment, "", "", true)]
     [ACPropertyEntity(26, "LastFormulaChange", "en{'Last formula change'}de{'Letzte Formeländerung'}", "", "", true)]
     [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]

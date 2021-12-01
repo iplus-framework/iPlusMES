@@ -1650,15 +1650,15 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterBatchplanSuggestionMode != value)
                 {
                     _SelectedFilterBatchplanSuggestionMode = value;
-                    OnPropertyChanged("SelectedFilterBatchplanSuggestionMode");
                 }
                 if (SelectedWizardSchedulerPartslist != null)
                 {
                     if (_SelectedFilterBatchplanSuggestionMode != null)
-                        SelectedWizardSchedulerPartslist.BatchSuggestionMode = (BatchSuggestionCommandModeEnum)SelectedFilterBatchplanSuggestionMode.Value;
+                        SelectedWizardSchedulerPartslist.BatchSuggestionMode = (BatchSuggestionCommandModeEnum)_SelectedFilterBatchplanSuggestionMode.Value;
                     else
                         SelectedWizardSchedulerPartslist.BatchSuggestionMode = null;
                 }
+                OnPropertyChanged("SelectedFilterBatchplanSuggestionMode");
             }
         }
 
@@ -2264,19 +2264,14 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSearch()
         {
-            return
-                SelectedScheduleForPWNode != null
-                &&
-                (
-                    SelectedFilterConnectedLine != null
-                    ||
-                    (
-                        FilterStartTime != null
-                        && FilterEndTime != null
-                        && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > 0
-                        && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
-                    )
-                 );
+            return        SelectedScheduleForPWNode != null
+                   &&  (   SelectedFilterConnectedLine != null
+                        || (   FilterStartTime != null
+                            && FilterEndTime != null
+                            && (FilterEndTime.Value - FilterStartTime.Value).TotalDays > 0
+                            && (FilterEndTime.Value - FilterStartTime.Value).TotalDays <= Const_MaxFilterDaySpan
+                           )
+                       );
         }
 
         [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New)]
@@ -3133,7 +3128,7 @@ namespace gip.bso.manufacturing
             }
             item.MDSchedulingGroupList = schedulingGroups;
             item.SelectedMDSchedulingGroup = item.MDSchedulingGroupList.FirstOrDefault();
-            item.ProductionUnits = partslist.ProductionUnits;
+            item.ProductionUnitsUOM = partslist.ProductionUnits;
             return item;
         }
 
@@ -3249,12 +3244,12 @@ namespace gip.bso.manufacturing
         private Msg CheckProductionUnits()
         {
             Msg msg = null;
-            if (SelectedWizardSchedulerPartslist.ProductionUnits != null && SelectedWizardSchedulerPartslist.ProductionUnits.Value > 0)
+            if (SelectedWizardSchedulerPartslist.ProductionUnitsUOM.HasValue && SelectedWizardSchedulerPartslist.ProductionUnitsUOM.Value > 0)
             {
-                double rest = SelectedWizardSchedulerPartslist.TargetQuantityUOM % SelectedWizardSchedulerPartslist.ProductionUnits.Value;
+                double rest = SelectedWizardSchedulerPartslist.TargetQuantityUOM % SelectedWizardSchedulerPartslist.ProductionUnitsUOM.Value;
                 if (rest > 0)
                 {
-                    msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "CheckProductionUnits", 3119, "Error50440", SelectedWizardSchedulerPartslist.TargetQuantityUOM, SelectedWizardSchedulerPartslist.ProductionUnits);
+                    msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "CheckProductionUnits", 3119, "Error50440", SelectedWizardSchedulerPartslist.TargetQuantityUOM, SelectedWizardSchedulerPartslist.ProductionUnitsUOM);
                 }
             }
             return msg;
@@ -3684,9 +3679,9 @@ namespace gip.bso.manufacturing
 
         private void WriteBatchPlanQuantities(BatchPlanSuggestionItem suggestionItem, ProdOrderBatchPlan batchPlan)
         {
+            batchPlan.TotalSize = suggestionItem.TotalBatchSizeUOM;
             batchPlan.BatchSize = suggestionItem.BatchSizeUOM;
             batchPlan.BatchTargetCount = suggestionItem.BatchTargetCount;
-            batchPlan.TotalSize = suggestionItem.TotalBatchSize;
         }
 
         private bool UpdateBatchPlans(WizardSchedulerPartslist wizardSchedulerPartslist)

@@ -389,6 +389,15 @@ namespace gip.bso.masterdata
 
                 LoadProcessWorkflows();
                 LoadMaterialWorkflows();
+
+                OnPropertyChanged("ProdUnitMDUnitList");
+                if (   CurrentPartslist != null
+                    && CurrentPartslist.Material != null
+                    && CurrentPartslist.ProductionUnits.HasValue
+                    && CurrentPartslist.Material.MaterialUnit_Material.Any())
+                    CurrentProdMDUnit = CurrentPartslist.Material.MaterialUnit_Material.FirstOrDefault().ToMDUnit;
+                else
+                    CurrentProdMDUnit = null;
             }
             SelectedMaterialWF = null;
         }
@@ -489,7 +498,8 @@ namespace gip.bso.masterdata
                         .Include(c => c.Material)
                         .Include(c => c.Material.BaseMDUnit)
                         .Include(c => c.MaterialWF)
-                        .Include(c => c.Material.MDUnitList)
+                        .Include("Material.MaterialUnit_Material")
+                        //.Include(c => c.Material.MDUnitList)
                         .Include(c => c.PartslistPos_Partslist)
                         .Include(c => c.MDUnit)
                         .Include(x => x.PartslistPos_Partslist)
@@ -1726,6 +1736,68 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region ProductionUnit
+
+        #region MDUnit for Production Units
+        [ACPropertyList(500, "ProdUnitsMD")]
+        public IEnumerable<MDUnit> ProdUnitMDUnitList
+        {
+            get
+            {
+                if (CurrentPartslist == null || CurrentPartslist.Material == null)
+                    return null;
+                return CurrentPartslist.Material.MDUnitList.OrderBy(x => x.MDUnitName);
+            }
+        }
+
+        MDUnit _CurrentProdMDUnit;
+        [ACPropertyCurrent(501, "ProdUnitsMD")]
+        public MDUnit CurrentProdMDUnit
+        {
+            get
+            {
+                return _CurrentProdMDUnit;
+            }
+            set
+            {
+                _CurrentProdMDUnit = value;
+                OnPropertyChanged("CurrentProdMDUnit");
+                OnPropertyChanged("ProductionUnits");
+            }
+        }
+
+        #endregion
+
+
+        [ACPropertySelected(502, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}")]
+        public double? ProductionUnits
+        {
+            get
+            {
+                if (   CurrentPartslist == null 
+                    || !CurrentPartslist.ProductionUnits.HasValue 
+                    || CurrentProdMDUnit == null)
+                    return null;
+                if (ProdUnitMDUnitList == null || !ProdUnitMDUnitList.Contains(CurrentProdMDUnit))
+                    return null;
+                return CurrentPartslist.Material.ConvertFromBaseQuantity(CurrentPartslist.ProductionUnits.Value, CurrentProdMDUnit);
+            }
+            set
+            {
+                if (   CurrentPartslist == null
+                    || CurrentProdMDUnit == null)
+                    return;
+                if (ProdUnitMDUnitList == null || !ProdUnitMDUnitList.Contains(CurrentProdMDUnit))
+                    return;
+                if (value.HasValue)
+                    CurrentPartslist.ProductionUnits = CurrentPartslist.Material.ConvertToBaseQuantity(value.Value, CurrentProdMDUnit);
+                else
+                    CurrentPartslist.ProductionUnits = null;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region InputMaterials
@@ -1886,11 +1958,14 @@ namespace gip.bso.masterdata
                         OnPropertyChanged("CurrentPartslist");
                     }
                     break;
-                    //case "MDUnitID":
-                    //    {
-                    //        CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertToBaseQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.MDUnit);
-                    //    }
-                    //    break;
+                //case "MDUnitID":
+                //    {
+                //        CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertToBaseQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.MDUnit);
+                //    }
+                //    break;
+                case "ProductionUnits":
+                    OnPropertyChanged("ProductionUnits");
+                    break;
             }
         }
 

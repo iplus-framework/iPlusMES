@@ -365,6 +365,8 @@ namespace gip.mes.datamodel
                 {
                     this.TotalSize = 0;
                 }
+                OnPropertyChanged("TotalSizeAltUOM");
+                OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -400,6 +402,8 @@ namespace gip.mes.datamodel
                 {
                     this.TotalSize = 0;
                 }
+                OnPropertyChanged("TotalSizeAltUOM");
+                OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -428,6 +432,8 @@ namespace gip.mes.datamodel
             try
             {
                 this.TotalSize = this.BatchTargetCount * this.BatchSize;
+                OnPropertyChanged("TotalSizeAltUOM");
+                OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -471,6 +477,8 @@ namespace gip.mes.datamodel
                         this.TotalSize = 0;
                     }
                 }
+                OnPropertyChanged("TotalSizeAltUOM");
+                OnPropertyChanged("BatchSizeAltUOM");
             }
             catch (Exception ec)
             {
@@ -659,6 +667,56 @@ namespace gip.mes.datamodel
                         || (PlanMode == GlobalApp.BatchPlanMode.UseFromTo && (BatchNoFrom <= 0 || BatchNoTo <= 0 || BatchSize <= 0.001))
                         || (PlanMode == GlobalApp.BatchPlanMode.UseTotalSize && (TotalSize <= 0.001)));
             }
+        }
+
+        [ACPropertyInfo(17, "", "en{'Batch-S. UOM alt.'}de{'Batchgr. ME alt.'}")]
+        public double? BatchSizeAltUOM
+        {
+            get
+            {
+                return ConvertFromBaseUnit(BatchSize);
+            }
+        }
+
+        [ACPropertyInfo(18, "", "en{'Total-S. UOM alt.'}de{'Gesamtgr. ME alt.'}")]
+        public double? TotalSizeAltUOM
+        {
+            get
+            {
+                return ConvertFromBaseUnit(TotalSize);
+            }
+        }
+
+        public MaterialUnit FirstAltMatUnit
+        {
+            get
+            {
+                if (ProdOrderPartslist == null
+                    || ProdOrderPartslist.Partslist == null
+                    || ProdOrderPartslist.Partslist.Material == null)
+                    return null;
+                return ProdOrderPartslist.Partslist.Material.MaterialUnit_Material.FirstOrDefault();
+            }
+        }
+
+        [ACPropertyInfo(19, "", "en{'UOM alt.'}de{'ME Alt.'}")]
+        public MDUnit FirstAltUOM
+        {
+            get
+            {
+                var altMatUnit = FirstAltMatUnit;
+                if (altMatUnit != null)
+                    return altMatUnit.ToMDUnit;
+                return null;
+            }
+        }
+
+        public double? ConvertFromBaseUnit(double value)
+        {
+            var altMatUnit = FirstAltMatUnit;
+            if (altMatUnit == null)
+                return null;
+            return altMatUnit.FromBaseToUnit(value);
         }
 
         #endregion

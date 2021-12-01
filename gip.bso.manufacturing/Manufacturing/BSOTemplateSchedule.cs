@@ -323,7 +323,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledGeneratePlan())
                 return;
             // Info50075.
-            if (Root.Root.Messages.Question(this, "Info50075", Global.MsgResult.No, false) == Global.MsgResult.Yes)
+            if (Root.Messages.Question(this, "Info50075", Global.MsgResult.No, false) == Global.MsgResult.Yes)
             {
                 List<ProdOrderPartslist> prodOrderPartslistsChanged =
                     SelectedPlanningMR
@@ -363,6 +363,12 @@ namespace gip.bso.manufacturing
             List<ProdOrder> generated = new List<ProdOrder>();
             try
             {
+                List<SchedulingMaxBPOrder> maxSchedulerOrders = null;
+                using (DatabaseApp freshDb = new DatabaseApp())
+                {
+                    maxSchedulerOrders = ProdOrderManager.GetMaxScheduledOrder(DatabaseApp, null);
+                }
+
                 List<Guid> mdSchedulingGroupIDs = new List<Guid>();
                 foreach (var sourceProdOrder in prodOrders)
                 {
@@ -379,7 +385,7 @@ namespace gip.bso.manufacturing
                         if (!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
                             mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
 
-                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null);
+                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null, maxSchedulerOrders);
                     generated.Add(targetProdOrder);
                 }
 
@@ -387,10 +393,10 @@ namespace gip.bso.manufacturing
                 if (msgWithDetails == null)
                 {
                     string[] generatedNos = generated.Select(c => c.ProgramNo).OrderBy(c => c).ToArray();
-                    Root.Root.Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
+                    Root.Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
                 }
                 else
-                    Root.Root.Messages.Msg(msgWithDetails);
+                    Root.Messages.Msg(msgWithDetails);
 
                 foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
                     BSOBatchPlanScheduler_Child.Value.RefreshServerState(mdSchedulingGroupID);
@@ -398,7 +404,7 @@ namespace gip.bso.manufacturing
             catch (Exception ec)
             {
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
-                Root.Root.Messages.Msg(msg);
+                Root.Messages.Msg(msg);
             }
         }
 
@@ -490,7 +496,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Root.Root.Messages.Info(this, "Info50074");
+                Root.Messages.Info(this, "Info50074");
             }
         }
 

@@ -10,50 +10,71 @@ namespace gip.bso.manufacturing
         {
             int calcBatchCount = 0;
             double calcBatchSize = 0;
-            double rest = 0;
+            Rest = 0;
 
-            double calcMaxBatchSize = 0;
+            if (totalSize <= Double.Epsilon)
+                return;
 
-
-            if (totalSize > Double.Epsilon)
+            if ((Math.Abs(standardBatchSize) <= Double.Epsilon
+                    && Math.Abs(maxBatchSize) <= Double.Epsilon)
+                || (Math.Abs(minBatchSize) > Double.Epsilon
+                    && totalSize < minBatchSize))
             {
-                if ((Math.Abs(standardBatchSize) <= Double.Epsilon
-                      && Math.Abs(maxBatchSize) <= Double.Epsilon
-                      && Math.Abs(minBatchSize) <= Double.Epsilon)
-                   || totalSize < minBatchSize)
-                {
-                    // do nothing
-                }
-                else if (standardBatchSize > Double.Epsilon
-                         && Math.Abs(maxBatchSize) <= Double.Epsilon
-                         && Math.Abs(minBatchSize) <= Double.Epsilon)
-                {
-                    calcMaxBatchSize = standardBatchSize;
-                }
-                else if (maxBatchSize > Double.Epsilon)
-                {
-                    calcMaxBatchSize = maxBatchSize;
-                }
-
-                while (true)
-                {
-                    calcBatchCount++;
-                    double tmpBatchSize = (int)totalSize / calcBatchCount;
-                    if (tmpBatchSize < minBatchSize)
-                    {
-                        calcBatchCount--;
-                        break;
-                    }
-                    calcBatchSize = tmpBatchSize;
-                    if(calcBatchSize <= standardBatchSize)
-                        break;
-                }
-                rest = totalSize - calcBatchCount * calcBatchSize;
+                return;
             }
 
-            if (calcBatchSize > 0 && calcBatchCount > 0)
+            if (Math.Abs(maxBatchSize) <= Double.Epsilon)
+                maxBatchSize = standardBatchSize;
+            else if (Math.Abs(standardBatchSize) <= Double.Epsilon)
+                standardBatchSize = maxBatchSize;
+            //standardBatchSize = wizardSchedulerPartslist.CorrectQuantityWithProductionUnits(standardBatchSize);
+
+            if (minBatchSize > standardBatchSize)
+                minBatchSize = standardBatchSize - 0.00001;
+
+
+            for (int i=0; i < 10000; i++)
+            {
+                calcBatchCount++;
+                double tmpBatchSize = totalSize / calcBatchCount;
+                tmpBatchSize = wizardSchedulerPartslist.CorrectQuantityWithProductionUnits(tmpBatchSize);
+                if (Math.Abs(minBatchSize) > Double.Epsilon && tmpBatchSize < minBatchSize)
+                {
+                    calcBatchCount--;
+                    break;
+                }
+                if (tmpBatchSize > maxBatchSize)
+                    continue;
+                calcBatchSize = tmpBatchSize;
+                break;
+            }
+            Rest = totalSize - (calcBatchCount * calcBatchSize);
+            if (Rest > 0.00001)
+            {
+                if (Math.Abs(minBatchSize) > Double.Epsilon && Rest < minBatchSize)
+                    Rest = minBatchSize;
+                Rest = wizardSchedulerPartslist.CorrectQuantityWithProductionUnits(Rest);
+            }
+
+            //while (true)
+            //{
+            //    calcBatchCount++;
+            //    double tmpBatchSize = (int)totalSize / calcBatchCount;
+            //    if (tmpBatchSize < minBatchSize)
+            //    {
+            //        calcBatchCount--;
+            //        break;
+            //    }
+            //    calcBatchSize = tmpBatchSize;
+            //    if (calcBatchSize <= standardBatchSize)
+            //        break;
+            //}
+            //rest = totalSize - calcBatchCount * calcBatchSize;
+
+            if (calcBatchSize > Double.Epsilon && calcBatchCount > 0)
+            {
                 Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
-            Rest = rest;
+            }
         }
         #endregion
 

@@ -18,6 +18,7 @@ namespace gip.bso.manufacturing
             if (rest > 0.0001)
             {
                 int nr = 1;
+                int i = 0;
                 switch (mode)
                 {
                     case BatchSuggestionCommandModeEnum.KeepStandardBatchSizeAndDivideRest:
@@ -25,24 +26,40 @@ namespace gip.bso.manufacturing
                         do
                         {
                             suggestion1 = new KeepStandardBatchSizeAndDivideRest(wizardSchedulerPartslist, nr, rest, 0, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
-                            if (suggestion1.Suggestion != null)
-                                wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion1.Suggestion);
-                            rest = suggestion1.Rest;
-                            nr++;
+                            if (suggestion1 != null)
+                            {
+                                if (suggestion1.Suggestion != null)
+                                {
+                                    wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion1.Suggestion);
+                                    nr++;
+                                }
+                                rest = suggestion1.Rest;
+                            }
+                            else
+                                rest = 0.0;
+                            i++;
                         }
-                        while (suggestion1 != null && suggestion1.Suggestion != null && rest > double.Epsilon);
+                        while (rest > double.Epsilon && i < 10);
                         break;
                     case BatchSuggestionCommandModeEnum.KeepEqualBatchSizes:
                         KeepEqualBatchSizes suggestion2 = null;
                         do
                         {
                             suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
-                            if (suggestion2.Suggestion != null)
-                                wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
-                            rest = suggestion2.Rest;
-                            nr++;
+                            if (suggestion2 != null)
+                            {
+                                if (suggestion2.Suggestion != null)
+                                {
+                                    wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
+                                    nr++;
+                                }
+                                rest = suggestion2.Rest;
+                            }
+                            else
+                                rest = 0.0;
+                            i++;
                         }
-                        while (suggestion2 != null && suggestion2.Suggestion != null && rest > 0);
+                        while (rest > double.Epsilon && i < 10);
                         break;
                     default:
                         break;

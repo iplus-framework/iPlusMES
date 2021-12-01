@@ -1189,6 +1189,10 @@ namespace gip.mes.facility
                                     .Include("ProdOrderPartslist.MDProdOrderState")
                                     .Include("ProdOrderPartslist.ProdOrder")
                                     .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
+                                    .Include("ProdOrderPartslist.Partslist")
+                                    .Include("ProdOrderPartslist.Partslist.Material")
+                                    .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                                    .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
@@ -1208,6 +1212,7 @@ namespace gip.mes.facility
                                                 )
                                           )
                                     .OrderBy(c => c.ScheduledOrder ?? 0)
+                                    .ThenBy(c => c.InsertDate)
         );
 
 
@@ -1762,7 +1767,7 @@ namespace gip.mes.facility
 
         #region ProdOrder -> Clone ProdOrder
 
-        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo)
+        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
             ProdOrder targetProdOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
@@ -1770,20 +1775,21 @@ namespace gip.mes.facility
             targetProdOrder.MDProdOrderState = sourceProdOrder.MDProdOrderState;
             targetProdOrder.CPartnerCompany = sourceProdOrder.CPartnerCompany;
 
-            List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, planningMRNo);
+            if (maxSchedulerOrders == null)
+                maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, planningMRNo);
 
             Dictionary<Guid, Guid> connectionOldNewItems = new Dictionary<Guid, Guid>();
 
             List<ProdOrderPartslist> originalPartslists = sourceProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
             foreach (ProdOrderPartslist originalPartslist in originalPartslists)
-                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, ref maxSchedulerOrders, ref connectionOldNewItems);
+                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, maxSchedulerOrders, connectionOldNewItems);
 
             return targetProdOrder;
         }
 
         public ProdOrderPartslist ClonePartslist(DatabaseApp databaseApp, ProdOrderPartslist sourcePartslist, ProdOrder targetProdOrder,
-            ref List<SchedulingMaxBPOrder> maxSchedulerOrders,
-            ref Dictionary<Guid, Guid> connectionOldNewItems)
+            List<SchedulingMaxBPOrder> maxSchedulerOrders,
+            Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderPartslist targetPartslist = ProdOrderPartslist.NewACObject(databaseApp, targetProdOrder);
             connectionOldNewItems.Add(sourcePartslist.ProdOrderPartslistID, targetPartslist.ProdOrderPartslistID);
@@ -1804,26 +1810,24 @@ namespace gip.mes.facility
             targetPartslist.VBiACProgram = sourcePartslist.VBiACProgram;
             targetPartslist.ExternProdOrderNo = sourcePartslist.ExternProdOrderNo;
 
-
-
             List<ProdOrderBatchPlan> sourcebatchPlans = sourcePartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
             foreach (ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
-                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, ref maxSchedulerOrders, ref connectionOldNewItems);
+                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, maxSchedulerOrders, connectionOldNewItems);
 
             List<ProdOrderBatch> sourceBatches = sourcePartslist.ProdOrderBatch_ProdOrderPartslist.ToList();
             foreach (ProdOrderBatch sourceBatch in sourceBatches)
-                CloneBatch(databaseApp, sourceBatch, targetPartslist, ref connectionOldNewItems);
+                CloneBatch(databaseApp, sourceBatch, targetPartslist, connectionOldNewItems);
 
             List<ProdOrderPartslistPos> components = sourcePartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToList();
             foreach (ProdOrderPartslistPos sourcePos in components)
-                CloneProdPos(databaseApp, sourcePos, targetPartslist, false, ref connectionOldNewItems);
+                CloneProdPos(databaseApp, sourcePos, targetPartslist, false, connectionOldNewItems);
 
             List<ProdOrderPartslistPos> mixures = sourcePartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern).ToList();
             foreach (ProdOrderPartslistPos sourcePos in mixures)
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.ProdOrderPartslistPosID);
                 if (pair.Key == Guid.Empty)
-                    CloneProdPos(databaseApp, sourcePos, targetPartslist, true, ref connectionOldNewItems);
+                    CloneProdPos(databaseApp, sourcePos, targetPartslist, true, connectionOldNewItems);
             }
 
             // fix batchplans 
@@ -1841,8 +1845,8 @@ namespace gip.mes.facility
         }
 
         public ProdOrderBatchPlan CloneBatchPlan(DatabaseApp databaseApp, ProdOrderBatchPlan sourceBatchPlan, ProdOrderPartslist targetPartslist,
-            ref List<SchedulingMaxBPOrder> maxSchedulerOrders,
-            ref Dictionary<Guid, Guid> connectionOldNewItems)
+            List<SchedulingMaxBPOrder> maxSchedulerOrders,
+            Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderBatchPlan targetBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, targetPartslist);
             targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(targetBatchPlan);
@@ -1868,9 +1872,8 @@ namespace gip.mes.facility
                 .SelectMany(c => c.WFs)
                 .Where(c => c.ACClassWF.ACClassWFID == targetBatchPlan.VBiACClassWF.ACClassWFID)
                 .FirstOrDefault();
-            ++schedulingMaxOrder.MaxScheduledOrder;
-            targetBatchPlan.ScheduledOrder = schedulingMaxOrder.MaxScheduledOrder;
-
+            //schedulingMaxOrder.MaxScheduledOrder++;
+            targetBatchPlan.ScheduledOrder = schedulingMaxOrder.MaxScheduledOrder + sourceBatchPlan.ScheduledOrder;
             targetBatchPlan.ScheduledStartDate = sourceBatchPlan.ScheduledStartDate;
             targetBatchPlan.ScheduledEndDate = sourceBatchPlan.ScheduledEndDate;
             targetBatchPlan.CalculatedStartDate = sourceBatchPlan.CalculatedStartDate;
@@ -1885,14 +1888,14 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> facilityReservationPair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceFacilityReservation.FacilityReservationID);
                 if (facilityReservationPair.Key == Guid.Empty)
-                    CloneFacilityReservation(databaseApp, sourceFacilityReservation, targetBatchPlan, ref connectionOldNewItems);
+                    CloneFacilityReservation(databaseApp, sourceFacilityReservation, targetBatchPlan, connectionOldNewItems);
 
             }
 
             return targetBatchPlan;
         }
 
-        public ProdOrderBatch CloneBatch(DatabaseApp databaseApp, ProdOrderBatch sourceBatch, ProdOrderPartslist targetPartslist, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderBatch CloneBatch(DatabaseApp databaseApp, ProdOrderBatch sourceBatch, ProdOrderPartslist targetPartslist, Dictionary<Guid, Guid> connectionOldNewItems)
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrderBatch), ProdOrderBatch.NoColumnName, ProdOrderBatch.FormatNewNo, this);
             ProdOrderBatch targetBatch = ProdOrderBatch.NewACObject(databaseApp, targetPartslist, secondaryKey);
@@ -1914,7 +1917,7 @@ namespace gip.mes.facility
             return targetBatch;
         }
 
-        public ProdOrderPartslistPos CloneProdPos(DatabaseApp databaseApp, ProdOrderPartslistPos sourcePos, ProdOrderPartslist targetPartslist, bool searchRelated, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderPartslistPos CloneProdPos(DatabaseApp databaseApp, ProdOrderPartslistPos sourcePos, ProdOrderPartslist targetPartslist, bool searchRelated, Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderPartslistPos targetPos = ProdOrderPartslistPos.NewACObject(databaseApp, targetPartslist);
             targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Add(targetPos);
@@ -1977,7 +1980,7 @@ namespace gip.mes.facility
                     {
                         KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == childPos.ProdOrderPartslistPosID);
                         if (pair.Key == Guid.Empty)
-                            CloneProdPos(databaseApp, childPos, targetPartslist, true, ref connectionOldNewItems);
+                            CloneProdPos(databaseApp, childPos, targetPartslist, true, connectionOldNewItems);
                     }
                 }
 
@@ -1994,11 +1997,11 @@ namespace gip.mes.facility
                     }
                     else
                     {
-                        nextSourcePos = CloneProdPos(databaseApp, sourceRelation.SourceProdOrderPartslistPos, targetPartslist, true, ref connectionOldNewItems);
+                        nextSourcePos = CloneProdPos(databaseApp, sourceRelation.SourceProdOrderPartslistPos, targetPartslist, true, connectionOldNewItems);
                     }
                     KeyValuePair<Guid, Guid> pairRelation = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRelation.ProdOrderPartslistPosRelationID);
                     if (pairRelation.Key == Guid.Empty)
-                        CloneProdRelation(databaseApp, sourceRelation, targetPos, nextSourcePos, ref connectionOldNewItems);
+                        CloneProdRelation(databaseApp, sourceRelation, targetPos, nextSourcePos, connectionOldNewItems);
                 }
             }
 
@@ -2006,7 +2009,7 @@ namespace gip.mes.facility
             return targetPos;
         }
 
-        private FacilityReservation CloneFacilityReservation(DatabaseApp databaseApp, FacilityReservation sourceReservation, ProdOrderBatchPlan targetBatchPlan, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        private FacilityReservation CloneFacilityReservation(DatabaseApp databaseApp, FacilityReservation sourceReservation, ProdOrderBatchPlan targetBatchPlan, Dictionary<Guid, Guid> connectionOldNewItems)
         {
             string secondaryKey = ACRoot.SRoot.NoManager.GetNewNo(databaseApp, typeof(FacilityReservation), FacilityReservation.NoColumnName, FacilityReservation.FormatNewNo, null);
             FacilityReservation targetReservation = FacilityReservation.NewACObject(databaseApp, targetBatchPlan, secondaryKey);
@@ -2026,7 +2029,7 @@ namespace gip.mes.facility
             return targetReservation;
         }
 
-        public ProdOrderPartslistPosRelation CloneProdRelation(DatabaseApp databaseApp, ProdOrderPartslistPosRelation sourceRel, ProdOrderPartslistPos targetPos, ProdOrderPartslistPos nextSourcePos, ref Dictionary<Guid, Guid> connectionOldNewItems)
+        public ProdOrderPartslistPosRelation CloneProdRelation(DatabaseApp databaseApp, ProdOrderPartslistPosRelation sourceRel, ProdOrderPartslistPos targetPos, ProdOrderPartslistPos nextSourcePos, Dictionary<Guid, Guid> connectionOldNewItems)
         {
             ProdOrderPartslistPosRelation targetRel = ProdOrderPartslistPosRelation.NewACObject(databaseApp, null);
             targetPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(targetRel);
