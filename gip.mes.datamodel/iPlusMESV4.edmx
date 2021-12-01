@@ -3254,6 +3254,7 @@
 					<Property Name="InsertDate" Type="datetime" Nullable="false" />
 					<Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
 					<Property Name="UpdateDate" Type="datetime" Nullable="false" />
+					<Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
 				</EntityType>
 				<EntityType Name="MDUnitConversion">
 					<Key>
@@ -23049,6 +23050,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 					<Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
 					<Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
 					<Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+					<Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
 					<NavigationProperty Name="CompanyMaterial_MDUnit" Relationship="iPlusMESV4_Model.FK_CompanyMaterial_MDUnitID" FromRole="MDUnit" ToRole="CompanyMaterial" />
 					<NavigationProperty Name="FacilityCharge_MDUnit" Relationship="iPlusMESV4_Model.FK_FacilityCharge_MDUnitID" FromRole="MDUnit" ToRole="FacilityCharge" />
 					<NavigationProperty Name="InRequestPos_MDUnit" Relationship="iPlusMESV4_Model.FK_InRequestPos_MDUnitID" FromRole="MDUnit" ToRole="InRequestPos" />
@@ -37446,6 +37448,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 								<ScalarProperty Name="SymbolTrans" ColumnName="SymbolTrans" />
 								<ScalarProperty Name="MDUnitNameTrans" ColumnName="MDUnitNameTrans" />
 								<ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+								<ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>

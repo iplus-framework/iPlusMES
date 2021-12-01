@@ -653,7 +653,8 @@ namespace gip.bso.sales
         {
             get
             {
-                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.PickingType == GlobalApp.PickingType.IssueVehicle || c.Picking.PickingType == GlobalApp.PickingType.Issue)
+                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle 
+                                                            || c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue)
                                                           && c.OutOrderPos != null
                                                           && !c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any())
                                              .Select(c => c.OutOrderPos.OutOrderPos1_ParentOutOrderPos)

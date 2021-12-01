@@ -271,6 +271,10 @@
 
         public const string Search = "en{'Search'}de{'Suchen'}";
 
+
+        public const string KeyOfExtSys = "KeyOfExtSys";
+        public const string EntityTranslateKeyOfExtSys = "en{'Key of ext. system'}de{'Schlüssel von ext. System'}";
+
         #endregion
 
 

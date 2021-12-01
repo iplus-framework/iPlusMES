@@ -146,6 +146,7 @@ namespace gip.mes.webservices
             (dbApp, facilityID, term, parentFacilityID, facilityTypeIndex) =>
                 dbApp.Facility
                 .Where(c => (!facilityID.HasValue || c.FacilityID == facilityID)
+                            && (!c.DisabledForMobile)
                             && (term == null || c.FacilityNo.Contains(term) || c.FacilityName.Contains(term))
                             && (!parentFacilityID.HasValue || c.ParentFacilityID == parentFacilityID)
                             && (!facilityTypeIndex.HasValue || c.MDFacilityType.MDFacilityTypeIndex == facilityTypeIndex))

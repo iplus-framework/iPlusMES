@@ -978,7 +978,8 @@ namespace gip.mes.facility
         #region Booking
         public FacilityPreBooking NewFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos, double? actualQuantityUOM = null)
         {
-            bool isInwardBooking = (pickingPos.Picking.PickingType == GlobalApp.PickingType.Receipt || pickingPos.Picking.PickingType == GlobalApp.PickingType.ReceiptVehicle);
+            bool isInwardBooking = (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                                 || pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle);
 
             ACMethodBooking acMethodClone = null;
             FacilityPreBooking facilityPreBooking = null;
@@ -1059,7 +1060,8 @@ namespace gip.mes.facility
 
         public List<FacilityPreBooking> CancelFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos)
         {
-            bool isInwardBooking = (pickingPos.Picking.PickingType == GlobalApp.PickingType.Receipt || pickingPos.Picking.PickingType == GlobalApp.PickingType.ReceiptVehicle);
+            bool isInwardBooking = (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                                ||  pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle);
 
             List<FacilityPreBooking> bookings = new List<FacilityPreBooking>();
             ACMethodBooking acMethodClone = null;

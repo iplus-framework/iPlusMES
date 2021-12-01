@@ -71,6 +71,21 @@ namespace gip.mes.processapplication
 
 
         #region Execute-Helper-Handlers
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+
+            switch (acMethodName)
+            {
+                case "RefreshFacility":
+                    RefreshFacility();
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         public static bool HandleExecuteACMethod_PAMParkingspace(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PAProcessModuleVB(out result, acComponent, acMethodName, acClassMethod, acParameter);

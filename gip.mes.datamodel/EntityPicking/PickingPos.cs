@@ -18,6 +18,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(15, OutOrderPos.ClassName, "en{'Sales Order Pos.'}de{'Verkaufsauftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
     [ACPropertyEntity(16, InOrderPos.ClassName, "en{'Purchase Order Pos.'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
     [ACPropertyEntity(16, MDDelivPosLoadState.ClassName, "en{'Loading State'}de{'Beladungszustand'}", Const.ContextDatabase + "\\" + MDDelivPosLoadState.ClassName, "", true)]
+    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

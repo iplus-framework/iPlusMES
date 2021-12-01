@@ -42,6 +42,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, OutOrder.ClassName, "en{'Sales Order'}de{'Auftrag'}", Const.ContextDatabase + "\\" + OutOrder.ClassName, "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
+    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
