@@ -91,7 +91,7 @@ namespace gip.mes.facility
                 foreach (InOrderPos inOrderPos3Level in inOrderPos2Level.InOrderPos_ParentInOrderPos)
                 {
                     inOrderPos3Level.PickingPos_InOrderPos.AutoLoad(dbApp);
-                    IEnumerable<Picking> pickingList = inOrderPos3Level.PickingPos_InOrderPos.Where(c => c.Picking.PickingType == GlobalApp.PickingType.ReceiptVehicle
+                    IEnumerable<Picking> pickingList = inOrderPos3Level.PickingPos_InOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle
                                                                                                       && (c.Picking.VisitorVoucher == null || c.Picking.VisitorVoucher != currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
                     foreach (Picking picking in pickingList)
@@ -111,7 +111,7 @@ namespace gip.mes.facility
                 foreach (OutOrderPos outOrderPos3Level in outOrderPos2Level.OutOrderPos_ParentOutOrderPos)
                 {
                     outOrderPos3Level.PickingPos_OutOrderPos.AutoLoad(dbApp);
-                    IEnumerable<Picking> pickingList = outOrderPos3Level.PickingPos_OutOrderPos.Where(c => c.Picking.PickingType == GlobalApp.PickingType.IssueVehicle
+                    IEnumerable<Picking> pickingList = outOrderPos3Level.PickingPos_OutOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle
                                                                                                       && (c.Picking.VisitorVoucher == null || c.Picking.VisitorVoucher != currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
                     foreach (Picking picking in pickingList)
@@ -157,7 +157,7 @@ namespace gip.mes.facility
                 foreach (InOrderPos inOrderPos3Level in inOrderPos2Level.InOrderPos_ParentInOrderPos)
                 {
                     inOrderPos3Level.PickingPos_InOrderPos.AutoLoad(dbApp);
-                    IEnumerable<Picking> pickingList = inOrderPos3Level.PickingPos_InOrderPos.Where(c => c.Picking.PickingType == GlobalApp.PickingType.ReceiptVehicle
+                    IEnumerable<Picking> pickingList = inOrderPos3Level.PickingPos_InOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle
                                                                                                       && (c.Picking.VisitorVoucher != null && c.Picking.VisitorVoucher == currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
                     foreach (Picking picking in pickingList)
@@ -177,7 +177,7 @@ namespace gip.mes.facility
                 foreach (OutOrderPos outOrderPos3Level in outOrderPos2Level.OutOrderPos_ParentOutOrderPos)
                 {
                     outOrderPos3Level.PickingPos_OutOrderPos.AutoLoad(dbApp);
-                    IEnumerable<Picking> pickingList = outOrderPos3Level.PickingPos_OutOrderPos.Where(c => c.Picking.PickingType == GlobalApp.PickingType.IssueVehicle
+                    IEnumerable<Picking> pickingList = outOrderPos3Level.PickingPos_OutOrderPos.Where(c => c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle
                                                                                                       && (c.Picking.VisitorVoucher != null && c.Picking.VisitorVoucher == currentVisitorVoucher))
                                                                                                       .Select(c => c.Picking).Distinct();
                     foreach (Picking picking in pickingList)
@@ -313,7 +313,7 @@ namespace gip.mes.facility
                 AssignTourplan(currentVisitorVoucher, currentPicking.Tourplan, dbApp);
             }
             // Wareneingang
-            else if (currentPicking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
+            else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
             {
                 currentPicking.PickingPos_Picking.AutoLoad(dbApp);
                 if (currentPicking.PickingPos_Picking.Any())
@@ -394,7 +394,7 @@ namespace gip.mes.facility
                 }
             }
             // Warenausgang
-            else if (currentPicking.PickingType == GlobalApp.PickingType.IssueVehicle)
+            else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
             {
                 if (currentPicking.EntityState != System.Data.EntityState.Added)
                     currentPicking.PickingPos_Picking.AutoLoad(dbApp);
@@ -512,7 +512,7 @@ namespace gip.mes.facility
                 UnassignTourplan(currentVisitorVoucher, currentPicking.Tourplan, dbApp);
             }
             // Wareneingang
-            else if (currentPicking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
+            else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
             {
                 currentPicking.PickingPos_Picking.AutoLoad(dbApp);
                 if (currentPicking.PickingPos_Picking.Any())
@@ -537,7 +537,7 @@ namespace gip.mes.facility
                     }
                 }
             }
-            else if (currentPicking.PickingType == GlobalApp.PickingType.IssueVehicle)
+            else if (currentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
             {
                 currentPicking.PickingPos_Picking.AutoLoad(dbApp);
                 if (currentPicking.PickingPos_Picking.Any())

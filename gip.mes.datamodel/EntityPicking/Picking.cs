@@ -111,13 +111,13 @@ namespace gip.mes.datamodel
 
         #region others
 
-        public GlobalApp.PickingType PickingType
-        {
-            get
-            {
-                return (GlobalApp.PickingType)MDPickingType.MDPickingTypeIndex;
-            }
-        }
+        //public GlobalApp.PickingType PickingType
+        //{
+        //    get
+        //    {
+        //        return (GlobalApp.PickingType)MDPickingType.MDPickingTypeIndex;
+        //    }
+        //}
 
         public GlobalApp.PickingState PickingState
         {

@@ -423,12 +423,14 @@ namespace gip.bso.logistics
             {
                 if (CurrentPickingPos == null)
                     return null;
-                if ((CurrentPicking.PickingType == GlobalApp.PickingType.Receipt || CurrentPicking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
+                if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                  || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
                     && CurrentPickingPos.InOrderPos != null)
                 {
                     return CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.ToList();
                 }
-                else if ((CurrentPicking.PickingType == GlobalApp.PickingType.Issue || CurrentPicking.PickingType == GlobalApp.PickingType.IssueVehicle)
+                else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                       || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
                     && (CurrentPickingPos.OutOrderPos != null))
                 {
                     return CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.ToList();
@@ -739,7 +741,8 @@ namespace gip.bso.logistics
                     }
                 }
 
-                if (CurrentPickingPos.InOrderPos != null && (CurrentPicking.PickingType == GlobalApp.PickingType.Receipt || CurrentPicking.PickingType == GlobalApp.PickingType.ReceiptVehicle))
+                if (CurrentPickingPos.InOrderPos != null && (CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                                                          || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle))
                 {
                     var queryFromDB = DatabaseApp.FacilityLot.Where(c => c.Material != null && c.MaterialID == CurrentPickingPos.InOrderPos.MaterialID);
                     if (bookableFacilityLots == null)
@@ -751,7 +754,8 @@ namespace gip.bso.logistics
                             bookableFacilityLots = query3.ToList();
                     }
                 }
-                else if (CurrentPickingPos.OutOrderPos != null && (CurrentPicking.PickingType == GlobalApp.PickingType.Issue || CurrentPicking.PickingType == GlobalApp.PickingType.IssueVehicle))
+                else if (CurrentPickingPos.OutOrderPos != null && (CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                                                                || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
                 {
                     var queryFromDB = DatabaseApp.FacilityLot.Where(c => c.Material != null && c.MaterialID == CurrentPickingPos.OutOrderPos.MaterialID);
                     if (bookableFacilityLots == null)
@@ -811,12 +815,14 @@ namespace gip.bso.logistics
             {
                 if (CurrentPickingPos == null || CurrentPicking == null)
                     return null;
-                if ((CurrentPicking.PickingType == GlobalApp.PickingType.Receipt || CurrentPicking.PickingType == GlobalApp.PickingType.ReceiptVehicle) && CurrentPickingPos.InOrderPos != null)
+                if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                  || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle) && CurrentPickingPos.InOrderPos != null)
                 {
                     CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoRefresh(this.DatabaseApp);
                     return CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
-                else if ((CurrentPicking.PickingType == GlobalApp.PickingType.Issue || CurrentPicking.PickingType == GlobalApp.PickingType.IssueVehicle) && CurrentPickingPos.OutOrderPos != null)
+                else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                       || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle) && CurrentPickingPos.OutOrderPos != null)
                 {
                     CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoRefresh(this.DatabaseApp);
                     return CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
@@ -1621,8 +1627,11 @@ namespace gip.bso.logistics
             }
             else
             {
-                if (CurrentPickingPos.FromFacility == null || CurrentPickingPos.ToFacility == null)
+                if (CurrentPicking.MDPickingType.MDPickingTypeIndex != (short)GlobalApp.PickingType.AutomaticRelocation
+                    && (CurrentPickingPos.FromFacility == null || CurrentPickingPos.ToFacility == null))
+                {
                     return false;
+                }
             }
             return true;
         }
