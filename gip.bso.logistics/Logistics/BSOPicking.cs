@@ -1627,8 +1627,7 @@ namespace gip.bso.logistics
             }
             else
             {
-                if (CurrentPicking.MDPickingType.MDPickingTypeIndex != (short)GlobalApp.PickingType.AutomaticRelocation
-                    && (CurrentPickingPos.FromFacility == null || CurrentPickingPos.ToFacility == null))
+                if (CurrentPickingPos.FromFacility == null || CurrentPickingPos.ToFacility == null)
                 {
                     return false;
                 }
