@@ -134,12 +134,53 @@ namespace gip.bso.manufacturing
                 {
                     _SelectedMDSchedulingGroup = value;
                     OnPropertyChanged("SelectedMDSchedulingGroup");
+                    _WFNodeMES = null;
+                    _WFNode = null;
+                    OnPropertyChanged("WFNodeMES");
+                    OnPropertyChanged("WFNode");
                 }
             }
         }
 
         [ACPropertyList(110, "MDSchedulingGroup", "en{'List'}de{'List'}")]
         public List<MDSchedulingGroup> MDSchedulingGroupList { get; set; }
+
+        gip.mes.datamodel.ACClassWF _WFNodeMES;
+        public gip.mes.datamodel.ACClassWF WFNodeMES
+        {
+            get
+            {
+                if (_WFNodeMES != null)
+                    return _WFNodeMES;
+                if (   this.Partslist == null
+                    || SelectedMDSchedulingGroup == null)
+                    return null;
+                PartslistACClassMethod method = this.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                _WFNodeMES =
+                    DatabaseApp
+                    .MDSchedulingGroup
+                    .Where(c => c.MDSchedulingGroupID == SelectedMDSchedulingGroup.MDSchedulingGroupID)
+                    .SelectMany(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
+                    .Where(c => c.VBiACClassWF.ACClassMethodID == method.MaterialWFACClassMethod.ACClassMethodID)
+                    .Select(c => c.VBiACClassWF)
+                    .FirstOrDefault();
+                return _WFNodeMES;
+            }
+        }
+
+        gip.core.datamodel.ACClassWF _WFNode;
+        public gip.core.datamodel.ACClassWF WFNode
+        {
+            get
+            {
+                if (_WFNode != null)
+                    return _WFNode;
+                if (WFNodeMES == null)
+                    return null;
+                _WFNode = WFNodeMES.FromIPlusContext<gip.core.datamodel.ACClassWF>(DatabaseApp.ContextIPlus);
+                return _WFNode;
+            }
+        }
 
         #endregion
 
@@ -591,6 +632,9 @@ namespace gip.bso.manufacturing
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
             {
+                if (   this.WFNodeMES == null 
+                    || batchPlan.VBiACClassWFID != this.WFNodeMES.ACClassWFID)
+                    continue;
                 nr++;
                 BatchPlanSuggestionItem item = new BatchPlanSuggestionItem(this, nr, batchPlan.BatchSize, batchPlan.BatchTargetCount, batchPlan.TotalSize);
                 item.ProdOrderBatchPlan = batchPlan;
@@ -672,7 +716,7 @@ namespace gip.bso.manufacturing
 
         private TimeSpan? GetExpectedBatchEndTime()
         {
-            gip.mes.datamodel.ACClassWF vbACClassWF = SelectedMDSchedulingGroup.MDSchedulingGroupWF_MDSchedulingGroup.Select(c => c.VBiACClassWF).FirstOrDefault();
+            gip.mes.datamodel.ACClassWF vbACClassWF = WFNodeMES;
             var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(vbACClassWF, Partslist.MaterialWFID);
             return ProdOrderManager.GetCalculatedBatchPlanDuration(DatabaseApp, materialWFConnection.MaterialWFACClassMethodID, vbACClassWF.ACClassWFID);
         }
