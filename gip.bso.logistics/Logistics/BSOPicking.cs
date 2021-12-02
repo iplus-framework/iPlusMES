@@ -1627,7 +1627,7 @@ namespace gip.bso.logistics
             }
             else
             {
-                if (CurrentPickingPos.FromFacility == null || CurrentPickingPos.ToFacility == null)
+                if (CurrentPickingPos.FromFacility == null && CurrentPickingPos.ToFacility == null)
                 {
                     return false;
                 }
