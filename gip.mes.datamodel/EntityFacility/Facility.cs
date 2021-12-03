@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Data.Objects;
 
 namespace gip.mes.datamodel
 {
@@ -829,5 +830,58 @@ namespace gip.mes.datamodel
             }
         }
         #endregion
+
+        /// <summary>
+        /// Check if is facility located under given facility. Check max 5 levels up.
+        /// </summary>
+        /// <param name="parentFacility"></param>
+        /// <returns></returns>
+        public bool IsLocatedIn(Guid parentFacilityID)
+        {
+            return           this.FacilityID == parentFacilityID
+
+                      || (   this.ParentFacilityID.HasValue && this.ParentFacilityID == parentFacilityID) //1. Level
+
+                      || (   this.Facility1_ParentFacility != null                                         //2. Level
+                          && this.Facility1_ParentFacility.ParentFacilityID.HasValue
+                          && this.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+
+                      || (   this.Facility1_ParentFacility != null
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility != null                //3.Level
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+
+                      || (   this.Facility1_ParentFacility != null
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility != null
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null //4.Level
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+
+                      || (   this.Facility1_ParentFacility != null
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility != null
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null //5.Level
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
+                          && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID);
+
+        }
+
+        //public static readonly Func<DatabaseApp, Facility, Guid, bool> s_cQry_IsLocatedIn =
+        //    CompiledQuery.Compile<DatabaseApp, Facility, Guid, bool>((ctx, facility, parentFacilityID) => 
+        //                  facility.FacilityID == parentFacilityID
+        //              || (facility.ParentFacilityID.HasValue && facility.ParentFacilityID == parentFacilityID) //1. Level
+        //              || (   facility.Facility1_ParentFacility != null                                         //2. Level
+        //                  && facility.Facility1_ParentFacility.ParentFacilityID.HasValue 
+        //                  && facility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+        //              || (   facility.Facility1_ParentFacility.Facility1_ParentFacility != null                //3.Level
+        //                  && facility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
+        //                  && facility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+        //              || (   facility.Facility1_ParentFacility.Facility1_ParentFacility != null                //4.Level
+        //                  && facility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
+        //                  && facility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+        //              || (   facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null //5.Level
+        //                  && facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
+        //                  && facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
+        //              );
     }
 }
