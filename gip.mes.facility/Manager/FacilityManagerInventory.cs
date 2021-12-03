@@ -117,6 +117,12 @@ namespace gip.mes.facility
                                 aCMethodBooking.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(databaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
                                 aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
                                 aCMethodBooking.InwardQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
+                                if (   facilityInventoryPos.FacilityCharge.MDUnit != null 
+                                    && facilityInventoryPos.FacilityCharge.Material.BaseMDUnit != facilityInventoryPos.FacilityCharge.MDUnit)
+                                {
+                                    aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.FacilityCharge.Material.ConvertQuantity(aCMethodBooking.InwardTargetQuantity.Value, facilityInventoryPos.FacilityCharge.Material.BaseMDUnit, facilityInventoryPos.FacilityCharge.MDUnit);
+                                    aCMethodBooking.InwardQuantity = aCMethodBooking.InwardTargetQuantity;
+                                }
                             }
 
                             aCMethodBooking.InwardFacilityCharge = facilityInventoryPos.FacilityCharge;
