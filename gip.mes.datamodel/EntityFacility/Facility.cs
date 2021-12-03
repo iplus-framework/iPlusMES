@@ -829,6 +829,20 @@ namespace gip.mes.datamodel
                 return MaxWeightCapacity;
             }
         }
+
+        public Facility GetFirstParentOfType(MDFacilityType.FacilityTypes type)
+        {
+            Facility parent = this;
+            while (parent != null)
+            {
+                if (parent.MDFacilityType == null)
+                    return null;
+                if (parent.MDFacilityType.FacilityType == type)
+                    return parent;
+                parent = parent.Facility1_ParentFacility;
+            }
+            return null;
+        }
         #endregion
 
         /// <summary>

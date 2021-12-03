@@ -1119,8 +1119,8 @@ namespace gip.mes.datamodel
         public static readonly Func<DatabaseApp, string, IQueryable<MDPickingType>> s_cQry_GetMDPickingType =
         CompiledQuery.Compile<DatabaseApp, string, IQueryable<MDPickingType>>(
             (ctx, key) => from c in ctx.MDPickingType
-                            where c.MDKey == key
-                            select c
+                          where c.MDKey == key
+                          select c
         );
 
         public static readonly Func<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>> s_cQry_GetMDDelivPosLoadState =
