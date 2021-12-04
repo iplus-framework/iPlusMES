@@ -517,10 +517,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DbScripts\iPlusMES\dbsync_2021-12-04_08-29_aagincic.sql">
+    <None Include="DbScripts\iPlusMES\dbsync_2021-12-04_12-54_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="DbScripts\iPlusMES\dbsync_2021-11-30_16-52_ihrastinski.sql">
+    <Content Include="DbScripts\iPlusMES\dbsync_2021-12-04_09-52_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
