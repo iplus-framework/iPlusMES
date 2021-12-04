@@ -1594,6 +1594,7 @@ namespace gip.bso.logistics
             if (!PreExecute("NewFacilityPreBooking"))
                 return;
             CurrentFacilityPreBooking = PickingManager.NewFacilityPreBooking(ACFacilityManager, DatabaseApp, CurrentPickingPos);
+            TryUseExistingLotInNewPrebooking();
             OnPropertyChanged("CurrentACMethodBooking");
             OnPropertyChanged("CurrentACMethodBookingLayout");
             OnPropertyChanged("FacilityPreBookingList");
@@ -1633,6 +1634,78 @@ namespace gip.bso.logistics
                 }
             }
             return true;
+        }
+
+        private void TryUseExistingLotInNewPrebooking()
+        {
+            ACMethodBooking currentMethodBooking = CurrentFacilityPreBooking?.ACMethodBooking as ACMethodBooking;
+
+            if (currentMethodBooking != null && CurrentPickingPos != null)
+            {
+                FacilityLot existingFacilityLot = null;
+                FacilityPreBooking[] existingPrebookings = new FacilityPreBooking[] { }; 
+               
+                if (CurrentPickingPos.InOrderPos != null)
+                {
+                    existingPrebookings = CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.Where(c => c != CurrentFacilityPreBooking).ToArray();
+                }
+                else if (CurrentPickingPos.OutOrderPos != null)
+                {
+                    existingPrebookings = CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.Where(c => c != CurrentFacilityPreBooking).ToArray();
+                }
+                else
+                {
+                    existingPrebookings = CurrentPickingPos.FacilityPreBooking_PickingPos.Where(c => c != CurrentFacilityPreBooking).ToArray();
+                }
+                
+                foreach (FacilityPreBooking preBook in existingPrebookings)
+                {
+                    ACMethodBooking methodBooking = preBook.ACMethodBooking as ACMethodBooking;
+                    if (methodBooking == null || methodBooking.BookingType != currentMethodBooking.BookingType)
+                        continue;
+
+                    existingFacilityLot = methodBooking.InwardFacilityLot;
+                    if (existingFacilityLot != null)
+                        break;
+                }
+
+                if (existingFacilityLot != null)
+                {
+                    currentMethodBooking.InwardFacilityLot = existingFacilityLot;
+                    return;
+                }
+
+
+                FacilityBooking[] existingBookings = new FacilityBooking[] { };
+                if (CurrentPickingPos.InOrderPos != null)
+                {
+                    existingBookings = CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.ToArray();
+                }
+                else if (CurrentPickingPos.OutOrderPos != null)
+                {
+                    existingBookings = CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.ToArray();
+                }
+                else
+                {
+                    existingBookings = CurrentPickingPos.FacilityBooking_PickingPos.ToArray();
+                }
+
+                foreach (FacilityBooking book in existingBookings)
+                {
+                    if (book.FacilityBookingTypeIndex != (short)currentMethodBooking.BookingType)
+                        continue;
+
+                    FacilityBookingCharge fbc = book.FacilityBookingCharge_FacilityBooking.FirstOrDefault();
+                    existingFacilityLot = fbc.InwardFacilityLot;
+                    if (existingFacilityLot != null)
+                        break;
+                }
+
+                if (existingFacilityLot != null)
+                {
+                    currentMethodBooking.InwardFacilityLot = existingFacilityLot;
+                }
+            }
         }
 
         [ACMethodInteraction("FacilityPreBooking", "en{'Cancel Posting'}de{'Buchung abbrechen'}", (short)MISort.Cancel, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
