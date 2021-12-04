@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Transactions;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel

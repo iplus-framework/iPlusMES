@@ -10,6 +10,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, "ProgramNo", "en{'Order Number'}de{'Auftragsnummer'}", "", "", true)]
     [ACPropertyEntity(3, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName, "", true)]
     [ACPropertyEntity(4, "CPartnerCompany", "en{'Contractual Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
+    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
