@@ -28,6 +28,13 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "PT")]
+        public MDPickingType PickingType
+        {
+            get;
+            set;
+        }
+
         [IgnoreDataMember]
         IEnumerable<PickingPos> _PickingPos_Picking;
         [DataMember(Name = "ixPos")]
