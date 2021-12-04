@@ -21,7 +21,8 @@ namespace gip.mes.webservices
             get; set;
         }
 
-        public string MDUnitName
+        [IgnoreDataMember]
+        public string MDPickingTypeName
         {
             get
             {

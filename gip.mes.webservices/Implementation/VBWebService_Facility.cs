@@ -850,84 +850,150 @@ namespace gip.mes.webservices
             {
                 try
                 {
+                    datamodel.PickingPos pickingPos = bpParam.PickingPosID.HasValue ? dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == bpParam.PickingPosID.Value) : null;
+                    facility.ACMethodBooking preBookingMethod = null;
+                    FacilityPreBooking preBooking = null;
+                    if (pickingPos != null)
+                    {
+                        preBooking = pickingPos.FacilityPreBooking_PickingPos.FirstOrDefault();
+                        if (pickingPos.FacilityPreBooking_PickingPos.Count > 1)
+                        {
+                            preBooking = null;
+                            //TODO: warning message
+                        }
+                        
+                        if (preBooking == null && pickingPos.InOrderPos != null)
+                        {
+                            preBooking = pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.FirstOrDefault();
+                            if (pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.Count > 1)
+                            {
+                                preBooking = null;
+                                //TODO: warning message
+                            }
+                        }
+
+                        if (preBooking == null && pickingPos.OutOrderPos != null)
+                        {
+                            preBooking = pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.FirstOrDefault();
+                            if (pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.Count > 1)
+                            {
+                                preBooking = null;
+                                //TODO: warning message
+                            }
+                        }
+
+                        if (preBooking != null)
+                        {
+                            preBookingMethod = preBooking.ACMethodBooking as facility.ACMethodBooking;
+                        }
+                    }
+
+                    
                     facility.ACMethodBooking acParam = facManager.ACUrlACTypeSignature("!" + bpParam.VirtualMethodName, gip.core.datamodel.Database.GlobalDatabase) as facility.ACMethodBooking;
-                    //acParam = acParam.Clone() as ACMethodBooking;
-                    acParam.ShiftBookingReverse = bpParam.ShiftBookingReverse;
-                    //acParam.BookingType = bpParam.BookingType;
-                    acParam.DontAllowNegativeStock = bpParam.DontAllowNegativeStock;
-                    acParam.IgnoreManagement = bpParam.IgnoreManagement;
-                    acParam.QuantityIsAbsolute = bpParam.QuantityIsAbsolute;
-                    if (bpParam.BalancingModeIndex.HasValue)
-                        acParam.MDBalancingMode = dbApp.MDBalancingMode.Where(c => c.MDBalancingModeIndex == bpParam.BalancingModeIndex).FirstOrDefault();
-                    if (bpParam.ZeroStockStateIndex.HasValue)
-                        acParam.MDZeroStockState = dbApp.MDZeroStockState.Where(c => c.MDZeroStockStateIndex == bpParam.ZeroStockStateIndex).FirstOrDefault();
-                    if (bpParam.ReleaseStateIndex.HasValue)
-                        acParam.MDReleaseState = dbApp.MDReleaseState.Where(c => c.MDReleaseStateIndex == bpParam.ReleaseStateIndex).FirstOrDefault();
-                    if (bpParam.ReservationModeIndex.HasValue)
-                        acParam.MDReservationMode = dbApp.MDReservationMode.Where(c => c.MDReservationModeIndex == bpParam.ReservationModeIndex).FirstOrDefault();
-                    if (bpParam.MovementReasonIndex.HasValue)
-                        acParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonIndex == bpParam.MovementReasonIndex).FirstOrDefault();
-                    acParam.IgnoreIsEnabled = bpParam.IgnoreIsEnabled;
-                    acParam.SetCompleted = bpParam.SetCompleted;
 
-                    if (bpParam.InwardMaterialID.HasValue)
-                        acParam.InwardMaterial = dbApp.Material.Where(c => c.MaterialID == bpParam.InwardMaterialID.Value).FirstOrDefault();
-                    if (bpParam.InwardFacilityID.HasValue)
-                        acParam.InwardFacility = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityID.Value).FirstOrDefault();
-                    if (bpParam.InwardFacilityLotID.HasValue)
-                        acParam.InwardFacilityLot = dbApp.FacilityLot.Where(c => c.FacilityLotID == bpParam.InwardFacilityLotID.Value).FirstOrDefault();
-                    if (bpParam.InwardFacilityChargeID.HasValue)
-                        acParam.InwardFacilityCharge = dbApp.FacilityCharge.Where(c => c.FacilityChargeID == bpParam.InwardFacilityChargeID.Value).FirstOrDefault();
-                    if (bpParam.InwardFacilityLocationID.HasValue)
-                        acParam.InwardFacilityLocation = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityLocationID.Value).FirstOrDefault();
-                    if (bpParam.InwardPartslistID.HasValue)
-                        acParam.InwardPartslist = dbApp.Partslist.Where(c => c.PartslistID == bpParam.InwardPartslistID.Value).FirstOrDefault();
-                    if (bpParam.InwardCompanyMaterialID.HasValue)
-                        acParam.InwardCompanyMaterial = dbApp.CompanyMaterial.Where(c => c.CompanyMaterialID == bpParam.InwardCompanyMaterialID.Value).FirstOrDefault();
-                    acParam.InwardSplitNo = bpParam.InwardSplitNo;
-                    acParam.InwardQuantity = bpParam.InwardQuantity;
-                    acParam.InwardTargetQuantity = bpParam.InwardTargetQuantity;
+                    if (preBookingMethod != null)
+                    {
+                        acParam = preBookingMethod;
+                        if (bpParam.InwardFacilityID.HasValue)
+                        {
+                            acParam.InwardFacility = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityID.Value).FirstOrDefault();
 
-                    if (bpParam.OutwardMaterialID.HasValue)
-                        acParam.OutwardMaterial = dbApp.Material.Where(c => c.MaterialID == bpParam.OutwardMaterialID.Value).FirstOrDefault();
-                    if (bpParam.OutwardFacilityID.HasValue)
-                        acParam.OutwardFacility = dbApp.Facility.Where(c => c.FacilityID == bpParam.OutwardFacilityID.Value).FirstOrDefault();
-                    if (bpParam.OutwardFacilityLotID.HasValue)
-                        acParam.OutwardFacilityLot = dbApp.FacilityLot.Where(c => c.FacilityLotID == bpParam.OutwardFacilityLotID.Value).FirstOrDefault();
-                    if (bpParam.OutwardFacilityChargeID.HasValue)
-                        acParam.OutwardFacilityCharge = dbApp.FacilityCharge.Where(c => c.FacilityChargeID == bpParam.OutwardFacilityChargeID.Value).FirstOrDefault();
-                    if (bpParam.OutwardFacilityLocationID.HasValue)
-                        acParam.OutwardFacilityLocation = dbApp.Facility.Where(c => c.FacilityID == bpParam.OutwardFacilityLocationID.Value).FirstOrDefault();
-                    if (bpParam.OutwardPartslistID.HasValue)
-                        acParam.OutwardPartslist = dbApp.Partslist.Where(c => c.PartslistID == bpParam.OutwardPartslistID.Value).FirstOrDefault();
-                    if (bpParam.OutwardCompanyMaterialID.HasValue)
-                        acParam.OutwardCompanyMaterial = dbApp.CompanyMaterial.Where(c => c.CompanyMaterialID == bpParam.OutwardCompanyMaterialID.Value).FirstOrDefault();
-                    acParam.OutwardSplitNo = bpParam.OutwardSplitNo;
-                    acParam.OutwardQuantity = bpParam.OutwardQuantity;
-                    acParam.OutwardTargetQuantity = bpParam.OutwardTargetQuantity;
+                            if (pickingPos != null && pickingPos.ToFacilityID.HasValue 
+                                                   && (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
+                                                    || pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle))
+                            {
+                                bool isInTargetFacility = acParam.InwardFacility.IsLocatedIn(pickingPos.ToFacilityID.Value);
+                                if (!isInTargetFacility)
+                                {
+                                    return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "The scanned or selected facility is not located under "+ pickingPos.ToFacility.ToString()));
+                                }
+                            }
+                        }
 
-                    if (bpParam.MDUnitID.HasValue)
-                        acParam.MDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == bpParam.MDUnitID.Value).FirstOrDefault();
-                    if (bpParam.InOrderPosID.HasValue)
-                        acParam.InOrderPos = dbApp.InOrderPos.Where(c => c.InOrderPosID == bpParam.InOrderPosID.Value).FirstOrDefault();
-                    if (bpParam.OutOrderPosID.HasValue)
-                        acParam.OutOrderPos = dbApp.OutOrderPos.Where(c => c.OutOrderPosID == bpParam.OutOrderPosID.Value).FirstOrDefault();
-                    if (bpParam.PartslistPosID.HasValue)
-                        acParam.PartslistPos = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == bpParam.PartslistPosID.Value).FirstOrDefault();
-                    if (bpParam.PartslistPosRelationID.HasValue)
-                        acParam.PartslistPosRelation = dbApp.ProdOrderPartslistPosRelation.Where(c => c.ProdOrderPartslistPosRelationID == bpParam.PartslistPosRelationID.Value).FirstOrDefault();
-                    if (bpParam.ProdOrderPartslistPosFacilityLotID.HasValue)
-                        acParam.ProdOrderPartslistPosFacilityLot = dbApp.ProdOrderPartslistPosFacilityLot.Where(c => c.ProdOrderPartslistPosFacilityLotID == bpParam.ProdOrderPartslistPosFacilityLotID.Value).FirstOrDefault();
-                    if (bpParam.PickingPosID.HasValue)
-                        acParam.PickingPos = dbApp.PickingPos.Where(c => c.PickingPosID == bpParam.PickingPosID.Value).FirstOrDefault();
+                        acParam.OutwardQuantity = bpParam.OutwardQuantity;
+                        acParam.InwardQuantity = bpParam.InwardQuantity;
+                        acParam.PickingPos = pickingPos;
+                    }
+                    else
+                    {
+                        //acParam = acParam.Clone() as ACMethodBooking;
+                        acParam.ShiftBookingReverse = bpParam.ShiftBookingReverse;
+                        //acParam.BookingType = bpParam.BookingType;
+                        acParam.DontAllowNegativeStock = bpParam.DontAllowNegativeStock;
+                        acParam.IgnoreManagement = bpParam.IgnoreManagement;
+                        acParam.QuantityIsAbsolute = bpParam.QuantityIsAbsolute;
+                        if (bpParam.BalancingModeIndex.HasValue)
+                            acParam.MDBalancingMode = dbApp.MDBalancingMode.Where(c => c.MDBalancingModeIndex == bpParam.BalancingModeIndex).FirstOrDefault();
+                        if (bpParam.ZeroStockStateIndex.HasValue)
+                            acParam.MDZeroStockState = dbApp.MDZeroStockState.Where(c => c.MDZeroStockStateIndex == bpParam.ZeroStockStateIndex).FirstOrDefault();
+                        if (bpParam.ReleaseStateIndex.HasValue)
+                            acParam.MDReleaseState = dbApp.MDReleaseState.Where(c => c.MDReleaseStateIndex == bpParam.ReleaseStateIndex).FirstOrDefault();
+                        if (bpParam.ReservationModeIndex.HasValue)
+                            acParam.MDReservationMode = dbApp.MDReservationMode.Where(c => c.MDReservationModeIndex == bpParam.ReservationModeIndex).FirstOrDefault();
+                        if (bpParam.MovementReasonIndex.HasValue)
+                            acParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonIndex == bpParam.MovementReasonIndex).FirstOrDefault();
+                        acParam.IgnoreIsEnabled = bpParam.IgnoreIsEnabled;
+                        acParam.SetCompleted = bpParam.SetCompleted;
 
-                    acParam.StorageDate = bpParam.StorageDate;
-                    acParam.ProductionDate = bpParam.ProductionDate;
-                    acParam.ExpirationDate = bpParam.ExpirationDate;
-                    acParam.MinimumDurability = bpParam.MinimumDurability;
-                    acParam.Comment = bpParam.Comment;
-                    acParam.RecipeOrFactoryInfo = bpParam.RecipeOrFactoryInfo;
-                    acParam.PropertyACUrl = bpParam.PropertyACUrl;
+                        if (bpParam.InwardMaterialID.HasValue)
+                            acParam.InwardMaterial = dbApp.Material.Where(c => c.MaterialID == bpParam.InwardMaterialID.Value).FirstOrDefault();
+                        if (bpParam.InwardFacilityID.HasValue)
+                            acParam.InwardFacility = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityID.Value).FirstOrDefault();
+                        if (bpParam.InwardFacilityLotID.HasValue)
+                            acParam.InwardFacilityLot = dbApp.FacilityLot.Where(c => c.FacilityLotID == bpParam.InwardFacilityLotID.Value).FirstOrDefault();
+                        if (bpParam.InwardFacilityChargeID.HasValue)
+                            acParam.InwardFacilityCharge = dbApp.FacilityCharge.Where(c => c.FacilityChargeID == bpParam.InwardFacilityChargeID.Value).FirstOrDefault();
+                        if (bpParam.InwardFacilityLocationID.HasValue)
+                            acParam.InwardFacilityLocation = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityLocationID.Value).FirstOrDefault();
+                        if (bpParam.InwardPartslistID.HasValue)
+                            acParam.InwardPartslist = dbApp.Partslist.Where(c => c.PartslistID == bpParam.InwardPartslistID.Value).FirstOrDefault();
+                        if (bpParam.InwardCompanyMaterialID.HasValue)
+                            acParam.InwardCompanyMaterial = dbApp.CompanyMaterial.Where(c => c.CompanyMaterialID == bpParam.InwardCompanyMaterialID.Value).FirstOrDefault();
+                        acParam.InwardSplitNo = bpParam.InwardSplitNo;
+                        acParam.InwardQuantity = bpParam.InwardQuantity;
+                        acParam.InwardTargetQuantity = bpParam.InwardTargetQuantity;
+
+                        if (bpParam.OutwardMaterialID.HasValue)
+                            acParam.OutwardMaterial = dbApp.Material.Where(c => c.MaterialID == bpParam.OutwardMaterialID.Value).FirstOrDefault();
+                        if (bpParam.OutwardFacilityID.HasValue)
+                            acParam.OutwardFacility = dbApp.Facility.Where(c => c.FacilityID == bpParam.OutwardFacilityID.Value).FirstOrDefault();
+                        if (bpParam.OutwardFacilityLotID.HasValue)
+                            acParam.OutwardFacilityLot = dbApp.FacilityLot.Where(c => c.FacilityLotID == bpParam.OutwardFacilityLotID.Value).FirstOrDefault();
+                        if (bpParam.OutwardFacilityChargeID.HasValue)
+                            acParam.OutwardFacilityCharge = dbApp.FacilityCharge.Where(c => c.FacilityChargeID == bpParam.OutwardFacilityChargeID.Value).FirstOrDefault();
+                        if (bpParam.OutwardFacilityLocationID.HasValue)
+                            acParam.OutwardFacilityLocation = dbApp.Facility.Where(c => c.FacilityID == bpParam.OutwardFacilityLocationID.Value).FirstOrDefault();
+                        if (bpParam.OutwardPartslistID.HasValue)
+                            acParam.OutwardPartslist = dbApp.Partslist.Where(c => c.PartslistID == bpParam.OutwardPartslistID.Value).FirstOrDefault();
+                        if (bpParam.OutwardCompanyMaterialID.HasValue)
+                            acParam.OutwardCompanyMaterial = dbApp.CompanyMaterial.Where(c => c.CompanyMaterialID == bpParam.OutwardCompanyMaterialID.Value).FirstOrDefault();
+                        acParam.OutwardSplitNo = bpParam.OutwardSplitNo;
+                        acParam.OutwardQuantity = bpParam.OutwardQuantity;
+                        acParam.OutwardTargetQuantity = bpParam.OutwardTargetQuantity;
+
+                        if (bpParam.MDUnitID.HasValue)
+                            acParam.MDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == bpParam.MDUnitID.Value).FirstOrDefault();
+                        if (bpParam.InOrderPosID.HasValue)
+                            acParam.InOrderPos = dbApp.InOrderPos.Where(c => c.InOrderPosID == bpParam.InOrderPosID.Value).FirstOrDefault();
+                        if (bpParam.OutOrderPosID.HasValue)
+                            acParam.OutOrderPos = dbApp.OutOrderPos.Where(c => c.OutOrderPosID == bpParam.OutOrderPosID.Value).FirstOrDefault();
+                        if (bpParam.PartslistPosID.HasValue)
+                            acParam.PartslistPos = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == bpParam.PartslistPosID.Value).FirstOrDefault();
+                        if (bpParam.PartslistPosRelationID.HasValue)
+                            acParam.PartslistPosRelation = dbApp.ProdOrderPartslistPosRelation.Where(c => c.ProdOrderPartslistPosRelationID == bpParam.PartslistPosRelationID.Value).FirstOrDefault();
+                        if (bpParam.ProdOrderPartslistPosFacilityLotID.HasValue)
+                            acParam.ProdOrderPartslistPosFacilityLot = dbApp.ProdOrderPartslistPosFacilityLot.Where(c => c.ProdOrderPartslistPosFacilityLotID == bpParam.ProdOrderPartslistPosFacilityLotID.Value).FirstOrDefault();
+                        if (bpParam.PickingPosID.HasValue)
+                            acParam.PickingPos = dbApp.PickingPos.Where(c => c.PickingPosID == bpParam.PickingPosID.Value).FirstOrDefault();
+
+                        acParam.StorageDate = bpParam.StorageDate;
+                        acParam.ProductionDate = bpParam.ProductionDate;
+                        acParam.ExpirationDate = bpParam.ExpirationDate;
+                        acParam.MinimumDurability = bpParam.MinimumDurability;
+                        acParam.Comment = bpParam.Comment;
+                        acParam.RecipeOrFactoryInfo = bpParam.RecipeOrFactoryInfo;
+                        acParam.PropertyACUrl = bpParam.PropertyACUrl;
+                    }
 
                     var resultBooking = facManager.BookFacility(acParam, dbApp);
                     if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
@@ -939,9 +1005,31 @@ namespace gip.mes.webservices
                     }
                     else
                     {
+
+
                         if (acParam.PickingPos != null)
                         {
                             acParam.PickingPos.RecalcActualQuantity();
+                            if (acParam.PickingPos.InOrderPos != null)
+                            {
+                                acParam.PickingPos.InOrderPos.RecalcActualQuantity();
+                            }
+                            else if (acParam.PickingPos.OutOrderPos != null)
+                            {
+                                acParam.PickingPos.OutOrderPos.RecalcActualQuantity();
+                            }
+
+                            if (preBookingMethod != null && preBooking != null && acParam.ValidMessage.IsSucceded())
+                            {
+                                double quantity = pickingPos.RemainingDosingQuantityUOM;
+                                if (quantity >= 0)
+                                {
+                                    preBooking.DeleteACObject(dbApp, true);
+                                    pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                                    dbApp.ACSaveChanges();
+                                }
+                            }
+
                             dbApp.ACSaveChanges();
                         }
                         else if (acParam.PartslistPos != null)
@@ -965,6 +1053,27 @@ namespace gip.mes.webservices
             }
             return new WSResponse<MsgWithDetails>(null);
         }
+
+        private void CompleteBookFacilityPicking(DatabaseApp dbApp, datamodel.PickingPos pickingPos, facility.ACMethodBooking acParam, facility.ACMethodBooking preBookingMethod,
+                                                 FacilityPreBooking preBooking)
+        {
+            bool isCompleted = pickingPos.RemainingDosingQuantityUOM >= 0;
+            bool isCancellation = acParam.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || acParam.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
+
+            acParam.PickingPos.RecalcActualQuantity();
+
+            if (preBookingMethod != null && preBooking != null && acParam.ValidMessage.IsSucceded())
+            {
+                if (isCompleted)
+                {
+                    preBooking.DeleteACObject(dbApp, true);
+                    pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                }
+            }
+
+            dbApp.ACSaveChanges();
+        }
+
         #endregion
 
         #region Inventory

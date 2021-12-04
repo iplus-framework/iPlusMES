@@ -74,15 +74,21 @@ namespace gip.mes.webservices
                 PickingID = c.PickingID,
                 PickingNo = c.PickingNo,
                 DeliveryDateFrom = c.DeliveryDateFrom,
+                PickingType = new MDPickingType()
+                {
+                    MDPickingTypeID = c.MDPickingType.MDPickingTypeID,
+                    MDPickingTypeTrans = c.MDPickingType.MDNameTrans
+                },
                 PickingPos_Picking = c.PickingPos_Picking
                         .ToArray()
-                        .Where(d => d.PickingMaterialID.HasValue && d.ToFacilityID.HasValue && d.FromFacilityID.HasValue)
+                        .Where(d => d.Material != null && (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue))
                         .Select(d => new PickingPos()
                         {
                             PickingPosID = d.PickingPosID,
                             LineNumber = d.LineNumber,
                             Material = new gip.mes.webservices.Material()
                             {
+
                                 MaterialID = d.Material.MaterialID,
                                 MaterialNo = d.Material.MaterialNo,
                                 MaterialName1 = d.Material.MaterialName1
@@ -354,9 +360,9 @@ namespace gip.mes.webservices
         }
 
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
-            CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
-            (ctx, pickingPosID) =>
+        public static readonly Func<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
+            CompiledQuery.Compile<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
+            (ctx, pickingPos) =>
                 ctx
                 .FacilityBookingCharge
                 // Booking Include
@@ -380,7 +386,9 @@ namespace gip.mes.webservices
                 .Include("OutwardFacilityCharge.FacilityLot")
 
                 // Where cause
-                .Where(fbc => fbc.PickingPosID == pickingPosID)
+                .Where(fbc => (fbc.PickingPosID == pickingPos.PickingPosID)
+                            || (pickingPos.InOrderPosID.HasValue && fbc.InOrderPosID == pickingPos.InOrderPosID)
+                            || (pickingPos.OutOrderPosID.HasValue && fbc.OutOrderPosID == pickingPos.OutOrderPosID))
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .GroupBy(c => c.FacilityBooking.FacilityBookingNo)
                 .OrderBy(c => c.Key)
@@ -409,8 +417,14 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
+                    datamodel.PickingPos pPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == guid);
+                    if (pPos == null)
+                    {
+                        return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "The picking position with ID: can not found in the database."));
+                    }
+
                     Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = 
-                        facManager.ConvertGroupedBookingsToOverviewDictionary(s_cQry_FBC_ByPickingPos(dbApp, guid));
+                        facManager.ConvertGroupedBookingsToOverviewDictionary(s_cQry_FBC_ByPickingPos(dbApp, pPos));
                     result.Postings = fbList.Keys.ToList();
                     result.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
                 }
