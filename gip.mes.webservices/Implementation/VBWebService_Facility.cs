@@ -898,16 +898,16 @@ namespace gip.mes.webservices
                         {
                             acParam.InwardFacility = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityID.Value).FirstOrDefault();
 
-                            if (pickingPos != null && pickingPos.ToFacilityID.HasValue 
-                                                   && (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
-                                                    || pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle))
-                            {
-                                bool isInTargetFacility = acParam.InwardFacility.IsLocatedIn(pickingPos.ToFacilityID.Value);
-                                if (!isInTargetFacility)
-                                {
-                                    return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "The scanned or selected facility is not located under "+ pickingPos.ToFacility.ToString()));
-                                }
-                            }
+                            //if (pickingPos != null && pickingPos.ToFacilityID.HasValue 
+                            //                       && (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
+                            //                        || pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle))
+                            //{
+                            //    bool isInTargetFacility = acParam.InwardFacility.IsLocatedIn(pickingPos.ToFacilityID.Value);
+                            //    if (!isInTargetFacility)
+                            //    {
+                            //        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "The scanned or selected facility is not located under "+ pickingPos.ToFacility.ToString()));
+                            //    }
+                            //}
                         }
 
                         acParam.OutwardQuantity = bpParam.OutwardQuantity;
