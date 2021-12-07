@@ -117,10 +117,12 @@ namespace gip.mes.datamodel
             }
 
             InOrder inOrder = InOrder;
-            if (inOrder.InOrderPos_InOrder.IsLoaded)
-                inOrder.InOrderPos_InOrder.Remove(this);
+            if (inOrder != null)
+                if (inOrder.InOrderPos_InOrder.IsLoaded)
+                    inOrder.InOrderPos_InOrder.Remove(this);
             database.DeleteObject(this);
-            InOrderPos.RenumberSequence(inOrder, sequence);
+            if (inOrder != null)
+                InOrderPos.RenumberSequence(inOrder, sequence);
             return null;
         }
 

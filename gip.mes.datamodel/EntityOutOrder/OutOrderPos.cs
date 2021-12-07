@@ -146,10 +146,12 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             OutOrder outOrder = OutOrder;
-            if (outOrder.OutOrderPos_OutOrder.IsLoaded)
-                outOrder.OutOrderPos_OutOrder.Remove(this);
+            if (outOrder != null)
+                if (outOrder.OutOrderPos_OutOrder.IsLoaded)
+                    outOrder.OutOrderPos_OutOrder.Remove(this);
             database.DeleteObject(this);
-            OutOrderPos.RenumberSequence(outOrder, sequence);
+            if (outOrder != null)
+                OutOrderPos.RenumberSequence(outOrder, sequence);
             return null;
         }
 

@@ -1224,8 +1224,8 @@ namespace gip.bso.logistics
                         .Include("PickingPos_Picking.OutOrderPos.FacilityBooking_OutOrderPos")
                         .Include("PickingPos_Picking.InOrderPos")
                         .Include("PickingPos_Picking.InOrderPos.FacilityBooking_InOrderPos")
-                        .Include("PickingPos_Picking.ProdOrderPartslistPos")
-                        .Include("PickingPos_Picking.ProdOrderPartslistPos.MDProdOrderPartslistPosState")
+                        //.Include("PickingPos_Picking.ProdOrderPartslistPos")
+                        //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDProdOrderPartslistPosState")
                         .Include(c => c.VisitorVoucher)
                         .Where(c => c.PickingID == SelectedPicking.PickingID));
 
