@@ -421,7 +421,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (CurrentPickingPos == null)
+                if (CurrentPickingPos == null || CurrentPicking.MDPickingType == null)
                     return null;
                 if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
                   || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
