@@ -390,11 +390,11 @@ namespace gip.bso.logistics
             }
             set
             {
-                if (_CurrentFacilityPreBooking != null && _CurrentFacilityPreBooking.ACMethodBooking != null)
-                    _CurrentFacilityPreBooking.ACMethodBooking.PropertyChanged -= ACMethodBooking_PropertyChanged;
-
                 if (_CurrentFacilityPreBooking != value)
                 {
+                    if (_CurrentFacilityPreBooking != null && _CurrentFacilityPreBooking.ACMethodBooking != null)
+                        _CurrentFacilityPreBooking.ACMethodBooking.PropertyChanged -= ACMethodBooking_PropertyChanged;
+
                     _CurrentFacilityPreBooking = value;
                     OnPropertyChanged("CurrentFacilityPreBooking");
                     OnPropertyChanged("CurrentACMethodBooking");
@@ -1848,9 +1848,12 @@ namespace gip.bso.logistics
                     }
                     else
                     {
-                        MDInOrderPosState state = DatabaseApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
-                        if (state != null)
-                            CurrentPickingPos.InOrderPos.MDInOrderPosState = state;
+                        if (CurrentPickingPos.DiffQuantityUOM >= 0)
+                        {
+                            MDInOrderPosState state = DatabaseApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
+                            if (state != null)
+                                CurrentPickingPos.InOrderPos.MDInOrderPosState = state;
+                        }
                     }
                 }
                 else if (CurrentPickingPos.OutOrderPos != null)
@@ -1867,9 +1870,12 @@ namespace gip.bso.logistics
                     }
                     else
                     {
-                        MDOutOrderPosState state = DatabaseApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
-                        if (state != null)
-                            CurrentPickingPos.OutOrderPos.MDOutOrderPosState = state;
+                        if (CurrentPickingPos.DiffQuantityUOM >= 0)
+                        {
+                            MDOutOrderPosState state = DatabaseApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
+                            if (state != null)
+                                CurrentPickingPos.OutOrderPos.MDOutOrderPosState = state;
+                        }
                     }
                 }
                 else
