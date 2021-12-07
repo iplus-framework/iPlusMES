@@ -679,6 +679,25 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(26, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        public double DifferenceQuantity
+        {
+            get
+            {
+                return ActualQuantity - TargetQuantity;
+            }
+        }
+
+        [ACPropertyInfo(27, "", "en{'Difference Quantity (UOM)'}de{'Differenzmenge (BME)'}")]
+        public double DifferenceQuantityUOM
+        {
+            get
+            {
+                return ActualQuantityUOM - TargetQuantityUOM;
+            }
+        }
+
+
         public OutOrderPos TopParentOutOrderPos
         {
             get
