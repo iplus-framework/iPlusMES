@@ -83,8 +83,9 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             Picking inPicking = Picking;
-            if (inPicking.PickingPos_Picking.IsLoaded)
-                inPicking.PickingPos_Picking.Remove(this);
+            if (inPicking != null)
+                if (inPicking.PickingPos_Picking.IsLoaded)
+                    inPicking.PickingPos_Picking.Remove(this);
             database.DeleteObject(this);
             if (inPicking != null)
                 PickingPos.RenumberSequence(inPicking, sequence);
@@ -281,7 +282,7 @@ namespace gip.mes.datamodel
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.ActualQuantityUOM;
                 else if (this.PickingPosProdOrderPartslistPos_PickingPos.Any())
-                    return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c=>c.ProdorderPartslistPos.ActualQuantityUOM);
+                    return this.PickingPosProdOrderPartslistPos_PickingPos.Sum(c => c.ProdorderPartslistPos.ActualQuantityUOM);
                 else if (PickingActualUOM.HasValue)
                     return PickingActualUOM.Value;
                 return 0;
