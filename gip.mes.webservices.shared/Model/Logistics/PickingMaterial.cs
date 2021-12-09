@@ -1,0 +1,40 @@
+﻿using gip.core.datamodel;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace gip.mes.webservices
+{
+    public class PickingMaterial : EntityBase
+    {
+        public Material Material
+        {
+            get;
+            set;
+        }
+
+        public IEnumerable<PickingPos> PickingItems
+        {
+            get;
+            set;
+        }
+
+        public double TotalQuantity
+        {
+            get;
+            set;
+        }
+
+        public double ActualQuantity
+        {
+            get;
+            set;
+        }
+
+        public MDUnit MDUnit
+        {
+            get;
+            set;
+        }
+    }
+}

@@ -20,6 +20,12 @@ namespace gip.mes.facility
         [DataMember(Name = "FBCNo")]
         public string FacilityBookingChargeNo { get; set; }
 
+        [DataMember(Name = "IFCID")]
+        public Guid? InwardFacilityChargeID { get; set; }
+
+        [DataMember(Name = "OFCID")]
+        public Guid? OutwardFacilityChargeID { get; set; }
+
 #if NETFRAMEWORK
         [ACPropertyInfo(9999, "InwardFacilityChargeExternLotNo", ConstApp.ExternLotNo)]
 #endif

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using gip.core.datamodel;
+using System;
 using System.Runtime.Serialization;
 
 namespace gip.mes.webservices
 {
     [DataContract(Name = "cPP")]
-    public class PickingPos
+    public class PickingPos : EntityBase
     {
         [DataMember(Name = "ID")]
         public Guid PickingPosID
@@ -70,6 +71,25 @@ namespace gip.mes.webservices
         public string Comment
         {
             get; set;
+        }
+
+
+        private double _PostingQuantity;
+        [DataMember(Name = "PQ")]
+        public double PostingQuantity
+        {
+            get => _PostingQuantity;
+            set
+            {
+                SetProperty<double>(ref _PostingQuantity, value);
+            }
+        }
+
+        [IgnoreDataMember]
+        public Picking Picking
+        {
+            get;
+            set;
         }
     }
 }

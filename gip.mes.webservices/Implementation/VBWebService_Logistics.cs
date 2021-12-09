@@ -386,7 +386,7 @@ namespace gip.mes.webservices
                 .Include("OutwardFacilityCharge.FacilityLot")
 
                 // Where cause
-                .Where(fbc => (fbc.PickingPosID == pickingPos.PickingPosID)
+                .Where(fbc => (fbc.PickingPosID == pickingPos.PickingPosID || fbc.FacilityBooking.PickingPosID == pickingPos.PickingPosID)
                             || (pickingPos.InOrderPosID.HasValue && fbc.InOrderPosID == pickingPos.InOrderPosID)
                             || (pickingPos.OutOrderPosID.HasValue && fbc.OutOrderPosID == pickingPos.OutOrderPosID))
                 .OrderBy(c => c.FacilityBookingChargeNo)

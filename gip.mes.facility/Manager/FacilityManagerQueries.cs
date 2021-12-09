@@ -175,12 +175,15 @@ namespace gip.mes.facility
                                     OutwardMaterialName = fbc.OutwardMaterial != null ? fbc.OutwardMaterial.MaterialName1 : "",
                                     OutwardFacilityNo = fbc.OutwardFacility != null ? fbc.OutwardFacility.FacilityNo : "",
                                     OutwardFacilityName = fbc.OutwardFacility != null ? fbc.OutwardFacility.FacilityName : "",
+                                    OutwardFacilityChargeID = fbc.OutwardFacilityChargeID,
 
                                     InwardQuantityUOM = fbc.InwardQuantity,
                                     InwardMaterialNo = fbc.InwardMaterial != null ? fbc.InwardMaterial.MaterialNo : "",
                                     InwardMaterialName = fbc.InwardMaterial != null ? fbc.InwardMaterial.MaterialName1 : "",
                                     InwardFacilityNo = fbc.InwardFacility != null ? fbc.InwardFacility.FacilityNo : "",
                                     InwardFacilityName = fbc.InwardFacility != null ? fbc.InwardFacility.FacilityName : "",
+                                    InwardFacilityChargeID = fbc.InwardFacilityChargeID,
+
                                     FacilityBookingTypeIndex = fbc.FacilityBookingTypeIndex,
                                     MDMovementReasonName = fbc.MDMovementReason != null ? fbc.MDMovementReason.MDMovementReasonName : "",
                                     Comment = fbc.Comment,
