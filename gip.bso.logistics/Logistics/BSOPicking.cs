@@ -536,9 +536,15 @@ namespace gip.bso.logistics
                 gip.core.datamodel.ACClassDesign acClassDesign = null;
                 if (ACType != null)
                 {
-                    if ((CurrentACMethodBooking != null) && (CurrentACMethodBooking.InOrderPos != null))
+                    if ((CurrentACMethodBooking != null) 
+                        && (   CurrentACMethodBooking.InOrderPos != null 
+                            || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
+                            || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel))
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingInward");
-                    else if ((CurrentACMethodBooking != null) && (CurrentACMethodBooking.OutOrderPos != null))
+                    else if ((CurrentACMethodBooking != null) 
+                        && (CurrentACMethodBooking.OutOrderPos != null
+                        || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosOutwardMovement
+                        || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel))
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingOutward");
                     else
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingRelocation");
@@ -1950,7 +1956,7 @@ namespace gip.bso.logistics
                 childBSO = StartComponent("FacilityLotDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentPickingPos.InOrderPos.Material);
+            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentPickingPos.Material);
             dlgResult_OnDialogResult(dlgResult);
             childBSO.Stop();
         }
@@ -1980,9 +1986,11 @@ namespace gip.bso.logistics
             // Nur bei Wareneingängen kann Charge ausgewählt werden
             return CurrentACMethodBooking != null
                 && CurrentPickingPos != null
-                && CurrentPickingPos.InOrderPos != null
-                && CurrentPickingPos.InOrderPos.Material != null
-                && CurrentPickingPos.InOrderPos.Material.IsLotManaged;
+                && (   CurrentACMethodBooking.InOrderPos != null
+                    || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
+                    || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel)
+                && CurrentPickingPos.Material != null
+                && CurrentPickingPos.Material.IsLotManaged;
         }
 
         #endregion
