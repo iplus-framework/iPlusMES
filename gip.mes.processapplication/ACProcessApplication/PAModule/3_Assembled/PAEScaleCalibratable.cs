@@ -2,18 +2,47 @@
 using gip.core.processapplication;
 using vd = gip.mes.datamodel;
 using System;
+using gip.core.autocomponent;
 
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Scale calibratable'}de{'Waage alibi)'}", Global.ACKinds.TPAModule, Global.ACStorableTypes.Required, false, true)]
     public class PAEScaleCalibratable : PAEScaleGravimetric
     {
+        static PAEScaleCalibratable()
+        {
+            RegisterExecuteHandler(typeof(PAEScaleCalibratable), HandleExecuteACMethod_PAEScaleCalibratable);
+        }
+
         public PAEScaleCalibratable(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
 
         public const string ClassName = "PAEScaleCalibratable";
+
+        #region Handle execute helpers
+        public static bool HandleExecuteACMethod_PAEScaleCalibratable(out object result, IACComponent acComponent, string acMethodName, ACClassMethod acClassMethod, object[] acParameter)
+        {
+            return HandleExecuteACMethod_PAEScaleGravimetric(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case "RegisterAlibiWeight":
+                    RegisterAlibiWeight();
+                    return true;
+                case Const.IsEnabledPrefix + "RegisterAlibiWeight":
+                    result = IsEnabledRegisterAlibiWeight();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+        #endregion
+
 
         [ACPropertyBindingTarget(810, "Read from PLC", "en{'Alibi weight [kg]'}de{'Alibigewicht [kg]'}", "", false, false, RemotePropID = 86)]
         public IACContainerTNet<double> AlibiWeight
@@ -30,30 +59,23 @@ namespace gip.mes.processapplication
         }
 
 
-        [ACMethodInteractionClient("", "en{'Register alibi weight'}de{'Register alibi weight'}", 450, false, "", false)]
-        public static void RegisterAlibiWeight(IACComponent acComponent)
+        [ACMethodInteraction("", "en{'Register alibi weight'}de{'Register alibi weight'}", 450, true)]
+        public void RegisterAlibiWeight()
         {
-            if (acComponent == null || !IsEnabledRegisterAlibiWeight(acComponent))
-                return;
-
-            Msg msg = acComponent.ACUrlCommand("!OnRegisterAlibiWeight", null) as Msg;
-            if(msg != null)
+            Msg msg = OnRegisterAlibiWeight(null);
+            if (msg != null)
             {
                 //TODO: alarm
                 return;
             }
-            acComponent.ExecuteMethod("SaveAlibiWeighing", null);
+            SaveAlibiWeighing(null);
         }
 
-        public static bool IsEnabledRegisterAlibiWeight(IACComponent acComponent)
+        public bool IsEnabledRegisterAlibiWeight()
         {
-            if (acComponent == null)
-                return false;
-
             return true;
         }
 
-        [ACMethodInfo("", "", 999)]
         public virtual Msg OnRegisterAlibiWeight(IACObject parentPos)
         {
             if (!IsEnabledOnRegisterAlibiWeight())
@@ -62,13 +84,11 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        [ACMethodInfo("", "", 999)]
         public virtual bool IsEnabledOnRegisterAlibiWeight()
         {
             return true;
         }
 
-        [ACMethodInfo("", "", 999)]
         public virtual Guid? SaveAlibiWeighing(IACObject parentPos)
         {
             Msg msg = null;
