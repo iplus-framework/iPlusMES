@@ -19,6 +19,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 using gipCoreData = gip.core.datamodel;
 
@@ -128,6 +129,7 @@ namespace gip.bso.logistics
             }
             if (_AccessPrimary != null)
             {
+                _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
                 _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
@@ -177,6 +179,7 @@ namespace gip.bso.logistics
                     }
 
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Picking>("Picking", this);
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
 
                     bool rebuildACQueryDef = false;
                     short filterDelivType = (short)GlobalApp.PickingType.Receipt;
@@ -208,6 +211,18 @@ namespace gip.bso.logistics
                 return _AccessPrimary;
             }
         }
+
+        protected IQueryable<Picking> _AccessPrimary_NavSearchExecuting(IQueryable<Picking> result)
+        {
+            ObjectQuery<Picking> query = result as ObjectQuery<Picking>;
+            if (query != null)
+            {
+                query.Include(c => c.VisitorVoucher).Include(c => c.MDPickingType);
+            }
+
+            return query;
+        }
+
 
         /// <summary>
         /// Gets or sets the current delivery note.
@@ -1237,6 +1252,7 @@ namespace gip.bso.logistics
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos")
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDProdOrderPartslistPosState")
                         .Include(c => c.VisitorVoucher)
+                        .Include(c => c.MDPickingType)
                         .Where(c => c.PickingID == SelectedPicking.PickingID));
 
             _InLoad = false;
