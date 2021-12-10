@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IVBWebService_Sales.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\VBWebServiceConst.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\ACMethodBooking.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\ACMethodBookingList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityChargeStateEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventoryPos.cs" />

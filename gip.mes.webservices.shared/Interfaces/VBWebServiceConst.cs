@@ -143,6 +143,7 @@ namespace gip.mes.webservices
         public const string UriFacilityLocation_Bookings_F = "FacilityLocation/Bookings/{0}/from/{1}/to/{2}";
 
         public const string UriBookFacility = "BookFacility";
+        public const string UriBookFacilities = "BookFacilities";
 
         #endregion
 

@@ -186,6 +186,14 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<MsgWithDetails>> BookFacilityAsync(ACMethodBooking bpParam);
 #endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriBookFacilities, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<MsgWithDetails> BookFacilities(ACMethodBookingList bpParam);
+#elif NETSTANDARD
+        Task<WSResponse<MsgWithDetails>> BookFacilitiesAsync(ACMethodBookingList bpParams);
+#endif
         #endregion
 
         #region Inventory

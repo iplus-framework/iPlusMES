@@ -73,9 +73,9 @@ namespace gip.mes.webservices
             get; set;
         }
 
-
+        [IgnoreDataMember]
         private double _PostingQuantity;
-        [DataMember(Name = "PQ")]
+        [IgnoreDataMember]
         public double PostingQuantity
         {
             get => _PostingQuantity;
