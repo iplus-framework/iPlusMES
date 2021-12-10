@@ -2180,7 +2180,7 @@ namespace gip.bso.facility
             switch (command)
             {
                 case BGWorkerMehtod_DoNewInventory:
-                    e.Result = ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName, DoNewInventoryProgressCallback);
+                    e.Result = ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName, null, DoNewInventoryProgressCallback);
                     break;
                 case BGWorkerMehtod_DoInventoryClosing:
                     e.Result = ACFacilityManager.InventoryClosing(SelectedFacilityInventory.FacilityInventoryNo, DoInventoryClosingProgressCallback);
