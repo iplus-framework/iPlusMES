@@ -477,7 +477,7 @@ namespace gip.bso.logistics
                         return _CurrentACMethodBookingDummy;
                     if (this.PickingManager == null)
                         return null;
-                    ACMethodBooking acMethodClone = this.PickingManager.BookParamInwardMovementClone(this.ACFacilityManager, this.DatabaseApp);
+                    ACMethodBooking acMethodClone = this.PickingManager.BookParamInOrderPosInwardMovementClone(this.ACFacilityManager, this.DatabaseApp);
                     if (acMethodClone != null)
                         _CurrentACMethodBookingDummy = acMethodClone.Clone() as ACMethodBooking;
                     return _CurrentACMethodBookingDummy;
@@ -539,12 +539,16 @@ namespace gip.bso.logistics
                     if ((CurrentACMethodBooking != null) 
                         && (   CurrentACMethodBooking.InOrderPos != null 
                             || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
-                            || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel))
+                            || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel
+                            || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingInward
+                            ))
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingInward");
                     else if ((CurrentACMethodBooking != null) 
                         && (CurrentACMethodBooking.OutOrderPos != null
                         || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosOutwardMovement
-                        || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel))
+                        || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel
+                        || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingOutward
+                        ))
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingOutward");
                     else
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingRelocation");
@@ -927,7 +931,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return PickingManager.BookParamInwardMovementClone(ACFacilityManager, this.DatabaseApp);
+                return PickingManager.BookParamInOrderPosInwardMovementClone(ACFacilityManager, this.DatabaseApp);
             }
         }
 
@@ -935,7 +939,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return PickingManager.BookParamOutwardMovementClone(ACFacilityManager, this.DatabaseApp);
+                return PickingManager.BookParamOutOrderPosOutwardMovementClone(ACFacilityManager, this.DatabaseApp);
             }
         }
 
@@ -1914,7 +1918,8 @@ namespace gip.bso.logistics
         {
             if (CurrentACMethodBooking == null)
                 return;
-            if (CurrentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement || CurrentACMethodBooking.BookingType > GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility)
+            if (   CurrentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement 
+                || CurrentACMethodBooking.BookingType > GlobalApp.FacilityBookingType.PickingOutwardCancel)
             {
                 if (CurrentACMethodBooking.InwardQuantity.HasValue && !CurrentACMethodBooking.OutwardQuantity.HasValue)
                     CurrentACMethodBooking.OutwardQuantity = CurrentACMethodBooking.InwardQuantity;
@@ -1988,7 +1993,8 @@ namespace gip.bso.logistics
                 && CurrentPickingPos != null
                 && (   CurrentACMethodBooking.InOrderPos != null
                     || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
-                    || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel)
+                    || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel
+                    || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingInward)
                 && CurrentPickingPos.Material != null
                 && CurrentPickingPos.Material.IsLotManaged;
         }
