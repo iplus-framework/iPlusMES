@@ -103,24 +103,24 @@ namespace gip.mes.facility
             }
         }
 
-        ACMethodBooking _BookParamInwardMovementClone;
-        public ACMethodBooking BookParamInwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
+        ACMethodBooking _BookParamInOrderPosInwardMovementClone;
+        public ACMethodBooking BookParamInOrderPosInwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
         {
-            if (_BookParamInwardMovementClone != null)
-                return _BookParamInwardMovementClone;
-            _BookParamInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InOrderPosInwardMovement.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-            _BookParamInwardMovementClone.Database = dbApp;
-            return _BookParamInwardMovementClone;
+            if (_BookParamInOrderPosInwardMovementClone != null)
+                return _BookParamInOrderPosInwardMovementClone;
+            _BookParamInOrderPosInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InOrderPosInwardMovement.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInOrderPosInwardMovementClone.Database = dbApp;
+            return _BookParamInOrderPosInwardMovementClone;
         }
 
-        ACMethodBooking _BookParamOutwardMovementClone;
-        public ACMethodBooking BookParamOutwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
+        ACMethodBooking _BookParamOutOrderPosOutwardMovementClone;
+        public ACMethodBooking BookParamOutOrderPosOutwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
         {
-            if (_BookParamOutwardMovementClone != null)
-                return _BookParamOutwardMovementClone;
-            _BookParamOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_OutOrderPosOutwardMovement.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-            _BookParamOutwardMovementClone.Database = dbApp;
-            return _BookParamOutwardMovementClone;
+            if (_BookParamOutOrderPosOutwardMovementClone != null)
+                return _BookParamOutOrderPosOutwardMovementClone;
+            _BookParamOutOrderPosOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_OutOrderPosOutwardMovement.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutOrderPosOutwardMovementClone.Database = dbApp;
+            return _BookParamOutOrderPosOutwardMovementClone;
         }
 
         ACMethodBooking _BookParamInCancelClone;
@@ -148,10 +148,31 @@ namespace gip.mes.facility
         {
             if (_BookParamRelocationMovementClone != null)
                 return _BookParamRelocationMovementClone;
-            _BookParamRelocationMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Relocation_Facility_BulkMaterial.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamRelocationMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingRelocation.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             _BookParamRelocationMovementClone.Database = dbApp;
             return _BookParamRelocationMovementClone;
         }
+
+        ACMethodBooking _BookParamPickingInwardMovementClone;
+        public ACMethodBooking BookParamPickingInwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamPickingInwardMovementClone != null)
+                return _BookParamPickingInwardMovementClone;
+            _BookParamPickingInwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamPickingInwardMovementClone.Database = dbApp;
+            return _BookParamPickingInwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamPickingOutwardMovementClone;
+        public ACMethodBooking BookParamPickingOutwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamPickingOutwardMovementClone != null)
+                return _BookParamPickingOutwardMovementClone;
+            _BookParamPickingOutwardMovementClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamPickingOutwardMovementClone.Database = dbApp;
+            return _BookParamPickingOutwardMovementClone;
+        }
+
 
         public enum PostingTypeEnum
         {
@@ -1031,12 +1052,18 @@ namespace gip.mes.facility
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
             if (postingType == PostingTypeEnum.Inward)
             {
-                acMethodClone = BookParamInwardMovementClone(facilityManager, dbApp);
+                if (businessEntity is PickingPos)
+                    acMethodClone = BookParamPickingInwardMovementClone(facilityManager, dbApp);
+                else
+                    acMethodClone = BookParamInOrderPosInwardMovementClone(facilityManager, dbApp);
                 facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, businessEntity, secondaryKey);
             }
             else if (postingType == PostingTypeEnum.Outward)
             {
-                acMethodClone = BookParamOutwardMovementClone(facilityManager, dbApp);
+                if (businessEntity is PickingPos)
+                    acMethodClone = BookParamPickingOutwardMovementClone(facilityManager, dbApp);
+                else
+                    acMethodClone = BookParamOutOrderPosOutwardMovementClone(facilityManager, dbApp);
                 facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, businessEntity, secondaryKey);
             }
             else

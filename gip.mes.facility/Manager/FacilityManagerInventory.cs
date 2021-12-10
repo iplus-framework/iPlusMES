@@ -22,7 +22,7 @@ namespace gip.mes.facility
             return Root.NoManager.GetNewNo(Database, typeof(FacilityInventory), FacilityInventory.NoColumnName, FacilityInventory.FormatNewNo, this);
         }
 
-        public MsgWithDetails InventoryGenerate(string facilityInventoryNo, string facilityInventoryName, Action<int, int> progressCallback)
+        public MsgWithDetails InventoryGenerate(string facilityInventoryNo, string facilityInventoryName, string facilityNo, Action<int, int> progressCallback)
         {
             MsgWithDetails msgWithDetails = null;
 
@@ -34,7 +34,10 @@ namespace gip.mes.facility
                 List<FacilityCharge> facilityCharges =
                     databaseApp
                     .FacilityCharge
-                    .Where(c => !c.NotAvailable)
+                    .Where(c => 
+                            !c.NotAvailable
+                            && (facilityNo == null || c.Facility.FacilityNo == facilityNo)
+                    )
                     // TODO: @aagincic remove limit
                     // .Take(10)
                     .OrderBy(c => c.FacilityLot.LotNo)

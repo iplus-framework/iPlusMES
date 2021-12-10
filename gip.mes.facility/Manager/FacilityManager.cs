@@ -203,6 +203,12 @@ namespace gip.mes.facility
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_ProdOrderPosOutwardCancel, GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel));
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_ProdOrderPosOutwardOnEmptyingFacility, GlobalApp.FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility));
 
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_PickingInward, GlobalApp.FacilityBookingType.PickingInward));
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_PickingInwardCancel, GlobalApp.FacilityBookingType.PickingInwardCancel));
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_PickingOutward, GlobalApp.FacilityBookingType.PickingOutward));
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualMovementOrderPosMethod(GlobalApp.FBT_PickingOutwardCancel, GlobalApp.FacilityBookingType.PickingOutwardCancel));
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualRelocationBulkMaterialMethod(GlobalApp.FBT_PickingRelocation, GlobalApp.FacilityBookingType.PickingRelocation));
+
             #endregion
         }
 
@@ -641,15 +647,20 @@ namespace gip.mes.facility
             TMP.ParameterValueList.Add(new ACValue("ShiftBookingReverse", typeof(bool), false, Global.ParamOption.Optional));
             TMP.ParameterValueList.Add(new ACValue(MDMovementReason.ClassName, typeof(MDMovementReason), null, Global.ParamOption.Optional));
 
+            if (BookingType == GlobalApp.FacilityBookingType.PickingRelocation)
+                TMP.ParameterValueList.Add(new ACValue(PickingPos.ClassName, typeof(PickingPos), null, Global.ParamOption.Required));
+
             TMP.ParameterValueList.Add(new ACValue("InwardMaterial", typeof(Material), null, Global.ParamOption.Optional));
             TMP.ParameterValueList.Add(new ACValue("InwardFacility", typeof(Facility), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardFacilityLot", typeof(FacilityLot), null, Global.ParamOption.Optional));
             TMP.ParameterValueList.Add(new ACValue("InwardStackBookingModel", typeof(core.datamodel.ACClass), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("InwardFacilityCharge", typeof(FacilityCharge), null, Global.ParamOption.Optional));
 
             TMP.ParameterValueList.Add(new ACValue("OutwardMaterial", typeof(Material), null, Global.ParamOption.Optional));
             TMP.ParameterValueList.Add(new ACValue("OutwardFacility", typeof(Facility), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("OutwardFacilityLot", typeof(FacilityLot), null, Global.ParamOption.Optional));
             TMP.ParameterValueList.Add(new ACValue("OutwardStackBookingModel", typeof(core.datamodel.ACClass), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("OutwardFacilityCharge", typeof(FacilityCharge), null, Global.ParamOption.Optional));
 
             TMP.ParameterValueList.Add(new ACValue("InwardQuantity", typeof(Nullable<double>), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardTargetQuantity", typeof(Nullable<double>), null, Global.ParamOption.Optional));
@@ -908,6 +919,19 @@ namespace gip.mes.facility
                     TMP.ParameterValueList.Add(new ACValue("ProdOrderPartslistPosFacilityLot", typeof(ProdOrderPartslistPosFacilityLot), null, Global.ParamOption.Optional));
                     break;
 
+                case GlobalApp.FacilityBookingType.PickingInward:
+                case GlobalApp.FacilityBookingType.PickingInwardCancel:
+                    TMP.ParameterValueList.Add(new ACValue(PickingPos.ClassName, typeof(PickingPos), null, Global.ParamOption.Required));
+                    Prefix = "In";
+                    break;
+
+                case GlobalApp.FacilityBookingType.PickingOutward:
+                case GlobalApp.FacilityBookingType.PickingOutwardCancel:
+                    TMP.ParameterValueList.Add(new ACValue(PickingPos.ClassName, typeof(PickingPos), null, Global.ParamOption.Required));
+                    Prefix = "Out";
+                    break;
+
+
                 default:
                     throw new ArgumentException("Virtual movement identifier doesn't start with 'In' or 'Out'.", "AcIdentifier");
             }
@@ -955,6 +979,7 @@ namespace gip.mes.facility
         }
 
         #endregion
+
         #endregion
 
         #region Temp added - should be arranged into file on appropriate place

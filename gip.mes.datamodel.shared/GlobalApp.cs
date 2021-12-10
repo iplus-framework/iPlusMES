@@ -504,8 +504,13 @@ namespace gip.mes.datamodel
             ProdOrderPosOutward = 51,              // Warenausgang für Auftragsposition (Bestand-, Reservierter Bestand+)
             ProdOrderPosOutwardCancel = 52,              // Warenausgang für Auftragsposition (Bestand-, Reservierter Bestand+)
             ProdOrderPosOutwardOnEmptyingFacility = 53,   // // Warenausgang für Auftragsposition (Bestand-, Reservierter Bestand+)
-            //ProdOrderInwardActivate = 16,               // Aktivierung einer geplanten Herstellmenge (Reservierter Bestand+)
-            //ProdOrderOutwardActivate = 16,              // Aktivierung eines geplanten Materialabgangs (Reservierter Bestand-)
+                                                          //ProdOrderInwardActivate = 16,               // Aktivierung einer geplanten Herstellmenge (Reservierter Bestand+)
+                                                          //ProdOrderOutwardActivate = 16,              // Aktivierung eines geplanten Materialabgangs (Reservierter Bestand-)
+            PickingInward = 60,
+            PickingOutward = 61,
+            PickingInwardCancel = 65,
+            PickingOutwardCancel = 66,
+            PickingRelocation = 67,
 
             ChangeStorageUnit = 111,                    // Lagereinheiten ändern
 
@@ -571,6 +576,12 @@ namespace gip.mes.datamodel
         public const string FBT_ProdOrderPosOutward = "ProdOrderPosOutward";
         public const string FBT_ProdOrderPosOutwardCancel = "ProdOrderPosOutwardCancel";
         public const string FBT_ProdOrderPosOutwardOnEmptyingFacility = "ProdOrderPosOutwardOnEmptyingFacility";
+        public const string FBT_PickingInward = "PickingInward";
+        public const string FBT_PickingOutward = "PickingOutward";
+        public const string FBT_PickingInwardCancel = "PickingInwardCancel";
+        public const string FBT_PickingOutwardCancel = "PickingOutwardCancel";
+        public const string FBT_PickingRelocation = "PickingRelocation";
+
 
 #if NETFRAMEWORK
         static ACValueItemList _FacilityBookingTypeList = null;
@@ -640,6 +651,13 @@ namespace gip.mes.datamodel
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosOutward, "en{'Consumption of production (Stock-, Reserved Stock-)'}de{'Verbrauch von Produktion (Bestand-, Reservierter Bestand-)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosOutwardCancel, "en{'Cancellation of production consumption (Stock+)'}de{'Stornierung Produktionsverbrauch (Bestand+)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ProdOrderPosOutwardOnEmptyingFacility, "en{'Consumption of production on emptying facility (Stock-, Reserved Stock-)'}de{'Verbrauch von Produktion an Entleerungseinrichtung (Bestand-, Reservierter Bestand-)'}");
+
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.PickingInward, "en{'Inward from picking order (Stock+)'}de{'Lagerzugang von Kommissionierauftrag (Bestand+)'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.PickingInwardCancel, "en{'Inward-Cancellation of picking order (Stock-)'}de{'Stornierung Zugang Kommissionierauftrag (Bestand-)'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.PickingOutward, "en{'Outward from picking order (Stock-)'}de{'Lagerabgang von Kommissionierauftrag (Bestand-)'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.PickingOutwardCancel, "en{'Outward-Cancellation of picking order (Stock-)'}de{'Stornierung Abgang Kommissionierauftrag (Bestand-)'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.PickingRelocation, "en{'Relocation via picking order'}de{'Umlagerung via Kommissionierauftrag'}");
+
                 }
                 return GlobalApp._FacilityBookingTypeList;
             }
