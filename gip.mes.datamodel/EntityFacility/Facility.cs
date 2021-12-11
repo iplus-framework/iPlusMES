@@ -69,6 +69,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(35, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
+    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(9999, "PostingBehaviourIndex", "en{'Posting Behaviour Index'}de{'Verhaltensindex posten'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -855,8 +857,17 @@ namespace gip.mes.datamodel
         {
             get
             {
-                // TODO Sasa: return PostingBehaviourIndex
-                return PostingBehaviourEnum.None;
+                if (PostingBehaviourIndex == null)
+                    return PostingBehaviourEnum.None;
+                else
+                    return (PostingBehaviourEnum)PostingBehaviourIndex.Value;
+            }
+            set
+            {
+                if (value == PostingBehaviourEnum.None)
+                    PostingBehaviourIndex = null;
+                else
+                    PostingBehaviourIndex = (short)value;
             }
         }
         #endregion
@@ -868,26 +879,26 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public bool IsLocatedIn(Guid parentFacilityID)
         {
-            return           this.FacilityID == parentFacilityID
+            return this.FacilityID == parentFacilityID
 
-                      || (   this.ParentFacilityID.HasValue && this.ParentFacilityID == parentFacilityID) //1. Level
+                      || (this.ParentFacilityID.HasValue && this.ParentFacilityID == parentFacilityID) //1. Level
 
-                      || (   this.Facility1_ParentFacility != null                                         //2. Level
+                      || (this.Facility1_ParentFacility != null                                         //2. Level
                           && this.Facility1_ParentFacility.ParentFacilityID.HasValue
                           && this.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
 
-                      || (   this.Facility1_ParentFacility != null
+                      || (this.Facility1_ParentFacility != null
                           && this.Facility1_ParentFacility.Facility1_ParentFacility != null                //3.Level
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
 
-                      || (   this.Facility1_ParentFacility != null
+                      || (this.Facility1_ParentFacility != null
                           && this.Facility1_ParentFacility.Facility1_ParentFacility != null
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null //4.Level
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID)
 
-                      || (   this.Facility1_ParentFacility != null
+                      || (this.Facility1_ParentFacility != null
                           && this.Facility1_ParentFacility.Facility1_ParentFacility != null
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null //5.Level
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility != null
