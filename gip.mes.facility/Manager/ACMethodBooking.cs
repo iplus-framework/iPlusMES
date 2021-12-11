@@ -3419,7 +3419,10 @@ namespace gip.mes.facility
             }
             if (InwardFacilityCharge != null)
             {
-                if ((InwardFacility != null) || (InwardFacilityLocation != null) || (InwardFacilityLot != null) || (InwardMaterial != null))
+                if (   (InwardFacility != null && InwardFacility.FacilityID != InwardFacilityCharge.FacilityID) 
+                    || (InwardFacilityLocation != null && InwardFacilityLocation != InwardFacilityCharge.Facility.GetFirstParentOfType(MDFacilityType.FacilityTypes.StorageLocation)) 
+                    || (InwardFacilityLot != null && InwardFacilityLot.FacilityLotID != InwardFacilityCharge.FacilityLotID) 
+                    || (InwardMaterial != null && InwardMaterial.MaterialID != InwardFacilityCharge.MaterialID))
                 {
                     AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00111"));
                     return false;

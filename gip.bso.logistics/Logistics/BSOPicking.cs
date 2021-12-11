@@ -476,6 +476,7 @@ namespace gip.bso.logistics
                 CurrentFacilityPreBooking = value;
                 OnPropertyChanged("BookingFacilityList");
                 OnPropertyChanged("OutwardFacilityChargeList");
+                OnPropertyChanged("InwardFacilityChargeList");
                 OnPropertyChanged("BookableFacilityLots");
             }
         }
@@ -536,6 +537,18 @@ namespace gip.bso.logistics
                         CurrentACMethodBooking.OnEntityPropertyChanged("OutwardFacilityLot");
                     }
                 }
+                else if (e.PropertyName == "InwardFacility")
+                {
+                    _UpdatingControlModeBooking = true;
+                    OnPropertyChanged("InwardFacilityChargeList");
+                    OnPropertyChanged("BookableFacilityLots");
+                    if (CurrentACMethodBooking != null)
+                    {
+                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacility");
+                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacilityCharge");
+                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacilityLot");
+                    }
+                }
             }
             finally
             {
@@ -592,6 +605,7 @@ namespace gip.bso.logistics
                 RefreshFilterFacilityAccess(AccessBookingFacility, value);
                 OnPropertyChanged("BookingFacilityList");
                 OnPropertyChanged("OutwardFacilityChargeList");
+                OnPropertyChanged("InwardFacilityChargeList");
                 OnPropertyChanged("BookableFacilityLots");
             }
         }
@@ -608,6 +622,18 @@ namespace gip.bso.logistics
             }
         }
 
+
+        [ACPropertyList(612, "InwardFacilityCharge")]
+        public IEnumerable<FacilityCharge> InwardFacilityChargeList
+        {
+            get
+            {
+                if (CurrentACMethodBooking == null || CurrentACMethodBooking.InwardFacility == null || CurrentPickingPos.Material == null)
+                    return null;
+                return CurrentACMethodBooking.InwardFacility.FacilityCharge_Facility
+                    .Where(x => x.MaterialID == CurrentPickingPos.Material.MaterialID && !x.NotAvailable).OrderByDescending(x => x.InsertDate);
+            }
+        }
 
         ACAccessNav<Facility> _AccessBookingFacility;
         [ACPropertyAccess(613, "BookingFacility")]
