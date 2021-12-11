@@ -855,7 +855,8 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return PostingBehaviourEnum.ZeroStockOnRelocation;
+                // TODO Sasa: return PostingBehaviourIndex
+                return PostingBehaviourEnum.None;
             }
         }
         #endregion
