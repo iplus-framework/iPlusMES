@@ -543,6 +543,41 @@ namespace gip.mes.facility
                     // else Zweig kann nie eintreten
                 }
                 #endregion
+
+                // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
+                if (BP.ParamsAdjusted.PostingBehaviour == PostingBehaviourEnum.ZeroStockOnRelocation)
+                {
+                    List<FacilityCharge> quantsForZeroBooking = new List<FacilityCharge>();
+                    if (BP.FacilityBookings != null)
+                    {
+                        foreach (ACMethodBooking booking in BP.FacilityBookings.ToArray())
+                        {
+                            foreach (var postings in booking.CreatedPostings)
+                            {
+                                if (postings.InwardFacilityCharge != null && !postings.InwardFacilityCharge.NotAvailable)
+                                {
+                                    if (!quantsForZeroBooking.Contains(postings.InwardFacilityCharge))
+                                        quantsForZeroBooking.Add(postings.InwardFacilityCharge);
+                                }
+                            }
+                        }
+                    }
+                    foreach (FacilityCharge fc in quantsForZeroBooking)
+                    {
+                        ACMethodBooking method = NewBookParamZeroStock(BP, fc);
+                        method.FacilityBooking = BP.FacilityBooking;
+                        Global.ACMethodResultState bookingSubResult = BookingOn_FacilityCharge(method);
+                        if ((bookingSubResult == Global.ACMethodResultState.Failed) || (bookingSubResult == Global.ACMethodResultState.Notpossible))
+                        {
+                            BP.Merge(method.ValidMessage);
+                            return bookingSubResult;
+                        }
+                        else
+                        {
+                            BP.FacilityBookings.Add(method);
+                        }
+                    }
+                }
             }
             else if (BP.IsCallForMatching)
             {
@@ -569,7 +604,7 @@ namespace gip.mes.facility
         private Global.ACMethodResultState BookingOn_FacilityCharge(ACMethodBooking BP)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
-            FacilityBooking FB = NewFacilityBooking(BP);
+            FacilityBooking FB = BP.FacilityBooking != null ? BP.FacilityBooking : NewFacilityBooking(BP);
             ///     Pseudo-Code:        
             // Falls Umlagerungsbuchung von FacilityCharge nach FacilityCharge
             // FacitlityBookingType.Relocation_FacilityCharge:
@@ -1687,7 +1722,7 @@ namespace gip.mes.facility
                 return Global.ACMethodResultState.Notpossible;
             }
 
-            FacilityBooking FB = NewFacilityBooking(BP);
+            FacilityBooking FB = BP.FacilityBooking != null ? BP.FacilityBooking : NewFacilityBooking(BP);
 
             // Umbuchung auf eine andere Materialnummer
             if (BP.OutwardFacility != null && BP.InwardMaterial != null && BP.BookingType == GlobalApp.FacilityBookingType.Reassign_Facility_BulkMaterial)
@@ -2555,6 +2590,33 @@ namespace gip.mes.facility
                 return _BookParamOutwardMovementClone.Clone() as ACMethodBooking;
             }
         }
+
+        public ACMethodBooking NewBookParamZeroStock(ACMethodBooking BP, FacilityCharge fcToBookZero)
+        {
+            ACMethodBooking method = GetBookParamNotAvailableClone();
+            method.InwardFacilityCharge = fcToBookZero;
+            method.Database = BP.DatabaseApp;
+            method.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(BP.DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+            method.CheckAndAdjustPropertiesForBooking(BP.DatabaseApp);
+            return method;
+        }
+
+        ACMethodBooking _BookParamNotAvailableClone;
+        public ACMethodBooking GetBookParamNotAvailableClone()
+        {
+            using (ACMonitor.Lock(_40010_ValueLock))
+            {
+                if (_BookParamNotAvailableClone != null)
+                    return _BookParamNotAvailableClone.Clone() as ACMethodBooking;
+            }
+            var clone = ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            using (ACMonitor.Lock(_40010_ValueLock))
+            {
+                _BookParamNotAvailableClone = clone;
+                return _BookParamNotAvailableClone.Clone() as ACMethodBooking;
+            }
+        }
+
 
         #endregion
     }

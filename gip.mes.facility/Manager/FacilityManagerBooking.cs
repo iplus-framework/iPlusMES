@@ -1031,6 +1031,15 @@ namespace gip.mes.facility
             if (FBC.InwardFacilityCharge == null)
                 return Global.ACMethodResultState.Failed;
 
+            // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
+            if (   (   FBC.InwardFacilityCharge.EntityState == System.Data.EntityState.Added
+                    || Math.Abs(FBC.InwardFacilityCharge.StockQuantityUOM - 0) < Double.Epsilon)
+                && BP.ParamsAdjusted.MDReleaseState == null
+                && BP.ParamsAdjusted.PostingBehaviour == PostingBehaviourEnum.BlockOnRelocation)
+            {
+                BP.ParamsAdjusted.MDReleaseState = MDReleaseState.DefaultMDReleaseState(BP.DatabaseApp, MDReleaseState.ReleaseStates.Locked);
+            }
+
             if (Math.Abs(FBC.InwardQuantityUOM - 0) > Double.Epsilon)
             {
                 FBC.InwardFacilityCharge.StockQuantityUOM += FBC.InwardQuantityUOM;
