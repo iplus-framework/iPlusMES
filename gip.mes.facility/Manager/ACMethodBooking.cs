@@ -1933,6 +1933,32 @@ namespace gip.mes.facility
             }
         }
 
+        public PostingBehaviourEnum PostingBehaviour
+        {
+            get
+            {
+                if (!(BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge
+                        || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_Facility
+                        || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_FacilityLocation
+                        || BookingType == GlobalApp.FacilityBookingType.Relocation_Facility_BulkMaterial
+                        || BookingType == GlobalApp.FacilityBookingType.PickingRelocation))
+                    return PostingBehaviourEnum.None;
+
+                if (InwardFacility == null)
+                    return PostingBehaviourEnum.None;
+                else
+                {
+                    var facility2Check = InwardFacility;
+                    while (facility2Check != null)
+                    {
+                        if (facility2Check.PostingBehaviour > PostingBehaviourEnum.None)
+                            return facility2Check.PostingBehaviour;
+                        facility2Check = facility2Check.Facility1_ParentFacility;
+                    }
+                }
+                return PostingBehaviourEnum.None;
+            }
+        }
 
         /// <summary>
         /// Falls kein ZeroStockState oder ReleaseState gesetzt, dann ist Buchung immer mengenbezogen
@@ -4970,6 +4996,23 @@ namespace gip.mes.facility
             set
             {
                 _FacilityBookings = value;
+            }
+        }
+
+        [IgnoreDataMember]
+        private List<FacilityBookingCharge> _CreatedPostings;
+        [IgnoreDataMember]
+        public List<FacilityBookingCharge> CreatedPostings
+        {
+            get
+            {
+                if (_CreatedPostings == null)
+                    _CreatedPostings = new List<FacilityBookingCharge>();
+                return _CreatedPostings;
+            }
+            set
+            {
+                _CreatedPostings = value;
             }
         }
 

@@ -23,6 +23,13 @@ namespace gip.mes.datamodel
         ScaleWithStock = 0x4
     }
 
+    public enum PostingBehaviourEnum : short
+    {
+        None = 0,
+        BlockOnRelocation = 1,
+        ZeroStockOnRelocation = 2
+    }
+
     // Facility (Lagerplatz)
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Facility, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "FacilityNo", ConstApp.Number, "", "", true, MinLength = 1)]
@@ -842,6 +849,14 @@ namespace gip.mes.datamodel
                 parent = parent.Facility1_ParentFacility;
             }
             return null;
+        }
+
+        public PostingBehaviourEnum PostingBehaviour
+        {
+            get
+            {
+                return PostingBehaviourEnum.ZeroStockOnRelocation;
+            }
         }
         #endregion
 

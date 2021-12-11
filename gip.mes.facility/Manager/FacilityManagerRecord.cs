@@ -199,6 +199,8 @@ namespace gip.mes.facility
                 FBC.RecipeOrFactoryInfo = BP.ParamsAdjusted.RecipeOrFactoryInfo;
             }
 
+            BP.CreatedPostings.Add(FBC);
+
             return FBC;
         }
 
