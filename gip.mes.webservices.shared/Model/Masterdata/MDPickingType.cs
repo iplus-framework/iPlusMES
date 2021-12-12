@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -13,6 +14,13 @@ namespace gip.mes.webservices
         public Guid MDPickingTypeID
         {
             get; set;
+        }
+
+        [DataMember]
+        public string MDKey
+        {
+            get;
+            set;
         }
 
         [DataMember(Name = "MDPTT")]

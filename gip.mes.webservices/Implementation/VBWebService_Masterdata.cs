@@ -233,7 +233,7 @@ namespace gip.mes.webservices
                 short tmpIndex = 0;
                 if (!short.TryParse(type, out tmpIndex))
                     return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "type is invalid"));
-                Type typeofFacType = typeof(MDFacilityType.FacilityTypes);
+                Type typeofFacType = typeof(FacilityTypesEnum);
                 if (!Enum.IsDefined(typeofFacType, tmpIndex))
                     return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "type is invalid"));
                 facilityTypeIndex = tmpIndex;
