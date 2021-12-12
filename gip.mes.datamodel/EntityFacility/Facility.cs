@@ -23,12 +23,6 @@ namespace gip.mes.datamodel
         ScaleWithStock = 0x4
     }
 
-    public enum PostingBehaviourEnum : short
-    {
-        None = 0,
-        BlockOnRelocation = 1,
-        ZeroStockOnRelocation = 2
-    }
 
     // Facility (Lagerplatz)
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Facility, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
