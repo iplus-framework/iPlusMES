@@ -839,7 +839,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        public Facility GetFirstParentOfType(MDFacilityType.FacilityTypes type)
+        public Facility GetFirstParentOfType(FacilityTypesEnum type)
         {
             Facility parent = this;
             while (parent != null)
