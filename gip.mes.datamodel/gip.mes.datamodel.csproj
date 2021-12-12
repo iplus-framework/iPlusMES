@@ -112,7 +112,6 @@
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
-    <Compile Include="Enums\FacilityTypesEnum.cs" />
     <Compile Include="Enums\PostingBehaviourEnum.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
     <Compile Include="TandT\StartItemTypeComparer.cs" />
@@ -519,9 +518,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DbScripts\iPlusMES\dbsync_2021-12-12_09-33_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2021-12-11_18-04_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

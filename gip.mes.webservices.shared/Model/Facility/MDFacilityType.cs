@@ -2,20 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using gip.mes.datamodel;
 
 namespace gip.mes.webservices
 {
-    public enum FacilityTypesEnum : short
-    {
-        StorageLocation = 1000, // Lagerort
-        StorageBin = 1100, // Lagerplatz
-        StorageBinContainer = 1110, // Behältnis: Tank/Silo/Zelle/Waagenbehältnis
-        PreparationBin = 1120,
-        Vehicle = 2000, // Fahrzeug
-        VehicleContainer = 2100, // Fahrzeug: Stellplatz/Kammer/Öffnung
-    }
-
-
     [DataContract(Name = "cMDFT")]
     public class MDFacilityType
     {
