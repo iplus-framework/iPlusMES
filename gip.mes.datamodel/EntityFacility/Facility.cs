@@ -23,6 +23,13 @@ namespace gip.mes.datamodel
         ScaleWithStock = 0x4
     }
 
+    public enum PostingBehaviourEnum : short
+    {
+        None = 0,
+        BlockOnRelocation = 1,
+        ZeroStockOnRelocation = 2
+    }
+
     // Facility (Lagerplatz)
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Facility, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "FacilityNo", ConstApp.Number, "", "", true, MinLength = 1)]
@@ -59,11 +66,11 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(33, "OptStockQuantity", ConstApp.OptStockQuantity, "", "", true)]
     [ACPropertyEntity(34, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(35, "DisabledForMobile", "en{'Disabled for mobile application'}de{'Deaktiviert für mobile Anwendung'}")]
-    [ACPropertyEntity(36, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
-    [ACPropertyEntity(37, "PostingBehaviourIndex", "en{'Posting behaviour'}de{'Buchungsverhalten'}", typeof(PostingBehaviourEnum), Const.ContextDatabase + "\\PostingBehaviourEnumList", "", true)]
+    [ACPropertyEntity(35, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
     [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(9999, "PostingBehaviourIndex", "en{'Posting Behaviour Index'}de{'Verhaltensindex posten'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -832,7 +839,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        public Facility GetFirstParentOfType(FacilityTypesEnum type)
+        public Facility GetFirstParentOfType(MDFacilityType.FacilityTypes type)
         {
             Facility parent = this;
             while (parent != null)
@@ -850,17 +857,11 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (PostingBehaviourIndex == null)
-                    return PostingBehaviourEnum.DoNothing;
-                else
-                    return (PostingBehaviourEnum)PostingBehaviourIndex.Value;
+                return (PostingBehaviourEnum)PostingBehaviourIndex;
             }
             set
             {
-                if (value == PostingBehaviourEnum.DoNothing)
-                    PostingBehaviourIndex = null;
-                else
-                    PostingBehaviourIndex = (short)value;
+                PostingBehaviourIndex = (int)value;
             }
         }
         #endregion

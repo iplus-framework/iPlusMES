@@ -1041,7 +1041,7 @@
 					<Property Name="OrderPostingOnEmptying" Type="bit" Nullable="false" />
 					<Property Name="DisabledForMobile" Type="bit" Nullable="false" />
 					<Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
-					<Property Name="PostingBehaviourIndex" Type="smallint" />
+					<Property Name="PostingBehaviourIndex" Type="int" Nullable="false" />
 				</EntityType>
 				<EntityType Name="FacilityBooking">
 					<Key>
@@ -34143,7 +34143,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 					<Property Name="OrderPostingOnEmptying" Type="Boolean" Nullable="false" />
 					<Property Name="DisabledForMobile" Type="Boolean" Nullable="false" />
 					<Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-					<Property Name="PostingBehaviourIndex" Type="Int16" />
+					<Property Name="PostingBehaviourIndex" Type="Int32" Nullable="false" />
 					<NavigationProperty Name="VBiFacilityACClass" Relationship="iPlusMESV4_Model.FK_Facility_FacilityACClassID" FromRole="Facility" ToRole="ACClass" />
 					<NavigationProperty Name="VBiStackCalculatorACClass" Relationship="iPlusMESV4_Model.FK_Facility_StackCalculatorACClassID" FromRole="Facility" ToRole="ACClass" />
 					<NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Facility" ToRole="Company" />
