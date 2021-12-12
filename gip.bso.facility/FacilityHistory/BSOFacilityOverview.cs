@@ -141,7 +141,7 @@ namespace gip.bso.facility
                     new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
                     new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
-                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)MDFacilityType.FacilityTypes.StorageBinContainer).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageBinContainer).ToString(), true),
                     new ACFilterItem(Global.FilterTypes.filter, StorageBinFilterPropertyName, Global.LogicalOperators.equal, Global.Operators.and, "", true)
                 };
             }
@@ -267,7 +267,7 @@ namespace gip.bso.facility
             get
             {
                 if (_StorageLocationList == null)
-                    _StorageLocationList = DatabaseApp.Facility.Where(x => x.ParentFacilityID == null && x.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageLocation).OrderBy(x => x.FacilityNo).ToList();
+                    _StorageLocationList = DatabaseApp.Facility.Where(x => x.ParentFacilityID == null && x.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageLocation).OrderBy(x => x.FacilityNo).ToList();
                 return _StorageLocationList;
             }
         }

@@ -1942,21 +1942,21 @@ namespace gip.mes.facility
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_FacilityLocation
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_Facility_BulkMaterial
                         || BookingType == GlobalApp.FacilityBookingType.PickingRelocation))
-                    return PostingBehaviourEnum.None;
+                    return PostingBehaviourEnum.DoNothing;
 
                 if (InwardFacility == null)
-                    return PostingBehaviourEnum.None;
+                    return PostingBehaviourEnum.DoNothing;
                 else
                 {
                     var facility2Check = InwardFacility;
                     while (facility2Check != null)
                     {
-                        if (facility2Check.PostingBehaviour > PostingBehaviourEnum.None)
+                        if (facility2Check.PostingBehaviour > PostingBehaviourEnum.DoNothing)
                             return facility2Check.PostingBehaviour;
                         facility2Check = facility2Check.Facility1_ParentFacility;
                     }
                 }
-                return PostingBehaviourEnum.None;
+                return PostingBehaviourEnum.DoNothing;
             }
         }
 
@@ -2769,7 +2769,7 @@ namespace gip.mes.facility
             {
                 if (ParamsAdjusted.OutwardFacility != null
                     && ParamsAdjusted.OutwardFacility.MDFacilityType != null
-                    && ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
+                    && ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.OutwardFacility.Material != null
                     && ((ParamsAdjusted.OutwardMaterial == null)
                                 || (ParamsAdjusted.OutwardMaterial == ParamsAdjusted.OutwardFacility.Material)
@@ -2779,7 +2779,7 @@ namespace gip.mes.facility
                 }
                 if (ParamsAdjusted.InwardFacility != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType != null
-                    && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
+                    && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.InwardFacility.Material != null
                     && ((ParamsAdjusted.InwardMaterial == null)
                                 || (ParamsAdjusted.InwardMaterial == ParamsAdjusted.InwardFacility.Material)
@@ -2847,7 +2847,7 @@ namespace gip.mes.facility
             {
                 if (ParamsAdjusted.OutwardFacility != null
                     && ParamsAdjusted.OutwardFacility.MDFacilityType != null
-                    && ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
+                    && ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.OutwardFacility.Material == null
                     && ParamsAdjusted.OutwardFacility.FacilityCharge_Facility.Any())
                 {
@@ -2855,7 +2855,7 @@ namespace gip.mes.facility
                 }
                 if (ParamsAdjusted.InwardFacility != null
                     && ParamsAdjusted.InwardFacility.MDFacilityType != null
-                    && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
+                    && ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
                     && ParamsAdjusted.InwardFacility.Material == null
                     && ParamsAdjusted.InwardFacility.FacilityCharge_Facility.Any())
                 {
@@ -3011,17 +3011,17 @@ namespace gip.mes.facility
                 {
                     // Lagerplatztypen müssen auf beiden Seiten gleich sein
                     if (    ParamsAdjusted.OutwardFacility.MDFacilityType != ParamsAdjusted.InwardFacility.MDFacilityType
-                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin 
-                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
+                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBin 
+                        &&  ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                     {
                         AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00060"));
                         return false;
                     }
 
-                    if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     {
                         Material checkMaterial = ParamsAdjusted.OutwardMaterial;
-                        if (ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                        if (ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                             checkMaterial = ParamsAdjusted.OutwardFacility.Material;
 
                         // Überprüfe ob Material auf Quelle und Ziel gleich sind
@@ -3075,8 +3075,8 @@ namespace gip.mes.facility
             if (   ParamsAdjusted.OutwardFacility != null
                 && ParamsAdjusted.OutwardFacility.MDFacilityType != null)
             { 
-                if (    ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
-                    && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin))
+                if (    ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
+                    && (ParamsAdjusted.InwardFacility == null || ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBin))
                 {
                     // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
                     if (ParamsAdjusted.IsPhysicalBooking
@@ -3109,7 +3109,7 @@ namespace gip.mes.facility
            if (    ParamsAdjusted.InwardFacility != null
                 && ParamsAdjusted.InwardFacility.MDFacilityType != null)
             {
-                if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                if (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
                     // Check ob Zellenbelegung mit übergebenen Material übereinstimmt
                     if (ParamsAdjusted.IsPhysicalBooking
@@ -3446,7 +3446,7 @@ namespace gip.mes.facility
             if (InwardFacilityCharge != null)
             {
                 if (   (InwardFacility != null && InwardFacility.FacilityID != InwardFacilityCharge.FacilityID) 
-                    || (InwardFacilityLocation != null && InwardFacilityLocation != InwardFacilityCharge.Facility.GetFirstParentOfType(MDFacilityType.FacilityTypes.StorageLocation)) 
+                    || (InwardFacilityLocation != null && InwardFacilityLocation != InwardFacilityCharge.Facility.GetFirstParentOfType(FacilityTypesEnum.StorageLocation)) 
                     || (InwardFacilityLot != null && InwardFacilityLot.FacilityLotID != InwardFacilityCharge.FacilityLotID) 
                     || (InwardMaterial != null && InwardMaterial.MaterialID != InwardFacilityCharge.MaterialID))
                 {
@@ -3621,7 +3621,7 @@ namespace gip.mes.facility
 
                     // Check Belegung
                     if ((ParamsAdjusted.InwardFacility.MDFacilityType != null)
-                        && (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer))
+                        && (ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                     {
                         // Überprüfe Materialunterschied zwischen FacilityCharge und Facility
                         if ((OutwardFacilityCharge.Material != null) && (ParamsAdjusted.InwardFacility.Material != null)
@@ -3696,7 +3696,7 @@ namespace gip.mes.facility
 
                     // Check Belegung
                     if ((InwardFacilityLocation.Facility1_IncomingFacility.MDFacilityType != null)
-                        && (InwardFacilityLocation.Facility1_IncomingFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer))
+                        && (InwardFacilityLocation.Facility1_IncomingFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                     {
                         // Überprüfe Materialunterschied zwischen FacilityCharge und Standard-Einlagerpatz von Lagerort
                         if ((OutwardFacilityCharge.Material != null) && (InwardFacilityLocation.Facility1_IncomingFacility.Material != null)
@@ -4185,7 +4185,7 @@ namespace gip.mes.facility
                 }
                 if (MDZeroStockState.ZeroStockState > MDZeroStockState.ZeroStockStates.Off) // Reset wurde bereits vorher abgefangen
                 {
-                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
                     {
                         AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00017"));
                         return false;
@@ -4195,7 +4195,7 @@ namespace gip.mes.facility
                 {
                     if (IsLotManaged && OutwardFacilityLot == null
                         && (!OutwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any()
-                            || OutwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
+                            || OutwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                         )
                     {
                         AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error50049"));
@@ -4212,7 +4212,7 @@ namespace gip.mes.facility
                 }
                 if (MDZeroStockState.ZeroStockState > MDZeroStockState.ZeroStockStates.Off) // Reset wurde bereits vorher abgefangen
                 {
-                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
                     {
                         AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00017"));
                         return false;
@@ -4222,7 +4222,7 @@ namespace gip.mes.facility
                 {
                     if (IsLotManaged && InwardFacilityLot == null
                         && (!InwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any()
-                            || InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
+                            || InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                         )
                     {
                         AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error50049"));
@@ -4235,7 +4235,7 @@ namespace gip.mes.facility
             if ((OutwardFacility != null) && (InwardFacility != null))
             {
                 if (InwardFacility.MDFacilityType.MDFacilityTypeIndex != OutwardFacility.MDFacilityType.MDFacilityTypeIndex
-                    && InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBin)
+                    && InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBin)
                 {
                     AddBookingMessage(eResultCodes.ProhibitedBooking,
                             Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00019",
@@ -4249,7 +4249,7 @@ namespace gip.mes.facility
             {
                 if ((OutwardMaterial == null) && (OutwardFacilityLot == null))
                 {
-                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                     {
                         if (OutwardFacility.Material == null)
                         {
@@ -4263,7 +4263,7 @@ namespace gip.mes.facility
             {
                 if ((InwardMaterial == null) && (InwardFacilityLot == null))
                 {
-                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                     {
                         if (InwardFacility.Material == null)
                         {
@@ -4690,7 +4690,7 @@ namespace gip.mes.facility
             {
                 if (MDZeroStockState.ZeroStockState > MDZeroStockState.ZeroStockStates.Off) // Reset wurde bereits vorher abgefangen
                 {
-                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
                     {
                         AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00017"));
                         return false;
@@ -4698,7 +4698,7 @@ namespace gip.mes.facility
                 }
                 if (OutwardMaterial == null)
                 {
-                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((OutwardFacility.MDFacilityType != null) && (OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                     {
                         if (OutwardFacility.Material == null)
                         {
@@ -4712,7 +4712,7 @@ namespace gip.mes.facility
             {
                 if (MDZeroStockState.ZeroStockState > MDZeroStockState.ZeroStockStates.Off) // Reset wurde bereits vorher abgefangen
                 {
-                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
                     {
                         AddBookingMessage(eResultCodes.WrongParameterCombinations, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00017"));
                         return false;
@@ -4720,7 +4720,7 @@ namespace gip.mes.facility
                 }
                 if (InwardMaterial == null)
                 {
-                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer))
+                    if ((InwardFacility.MDFacilityType != null) && (InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer))
                     {
                         if (InwardFacility.Material == null)
                         {

@@ -5,6 +5,17 @@ using System.Runtime.Serialization;
 
 namespace gip.mes.webservices
 {
+    public enum FacilityTypesEnum : short
+    {
+        StorageLocation = 1000, // Lagerort
+        StorageBin = 1100, // Lagerplatz
+        StorageBinContainer = 1110, // Behältnis: Tank/Silo/Zelle/Waagenbehältnis
+        PreparationBin = 1120,
+        Vehicle = 2000, // Fahrzeug
+        VehicleContainer = 2100, // Fahrzeug: Stellplatz/Kammer/Öffnung
+    }
+
+
     [DataContract(Name = "cMDFT")]
     public class MDFacilityType
     {
@@ -35,22 +46,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
-        public enum FacilityTypes : short
-        {
-            StorageLocation = 1000, // Lagerort
-            StorageBin = 1100, // Lagerplatz
-            StorageBinContainer = 1110, // Behältnis: Tank/Silo/Zelle/Waagenbehältnis
-            PreparationBin = 1120,
-            Vehicle = 2000, // Fahrzeug
-            VehicleContainer = 2100, // Fahrzeug: Stellplatz/Kammer/Öffnung
-        }
-
         [IgnoreDataMember]
-        public FacilityTypes FacilityType
+        public FacilityTypesEnum FacilityType
         {
             get
             {
-                return (FacilityTypes)MDFacilityTypeIndex;
+                return (FacilityTypesEnum)MDFacilityTypeIndex;
             }
             set
             {

@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
-    [ACPropertyEntity(3, "MDFacilityTypeIndex", ConstApp.ESFacilityType, typeof(MDFacilityType.FacilityTypes), "", "", true, MinValue = (short)MDFacilityType.FacilityTypes.StorageBinContainer)]
+    [ACPropertyEntity(3, "MDFacilityTypeIndex", ConstApp.ESFacilityType, typeof(FacilityTypesEnum), Const.ContextDatabase + "\\FacilityTypesList", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -28,7 +28,7 @@ namespace gip.mes.datamodel
             MDFacilityType entity = new MDFacilityType();
             entity.MDFacilityTypeID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.FacilityType = FacilityTypes.StorageBinContainer;
+            entity.FacilityType = FacilityTypesEnum.StorageBinContainer;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
@@ -50,7 +50,7 @@ namespace gip.mes.datamodel
             {
                 MDFacilityType defaultObj = s_cQry_Default(dbApp).FirstOrDefault();
                 if (defaultObj == null)
-                    defaultObj = s_cQry_Index(dbApp, (short)FacilityTypes.StorageLocation).FirstOrDefault();
+                    defaultObj = s_cQry_Index(dbApp, (short)FacilityTypesEnum.StorageLocation).FirstOrDefault();
                 return defaultObj;
             }
             catch (Exception ec)
@@ -117,7 +117,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return MDFacilityTypeIndex != (short)MDFacilityType.FacilityTypes.StorageBin;
+                return MDFacilityTypeIndex != (short)FacilityTypesEnum.StorageBin;
             }
         }
 #endregion
@@ -138,51 +138,51 @@ namespace gip.mes.datamodel
                 ACProperties.Refresh();
         }
 
-#endregion
+        #endregion
 
-#region enums
-        /// <summary>
-        /// Enum für das Feld VBUnitTypeIndex
-        /// </summary>
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'FacilityTypes'}de{'FacilityTypes'}", Global.ACKinds.TACEnum)]
-        public enum FacilityTypes : short
-        {
-            /// <summary>
-            /// Location, store, hall
-            /// </summary>
-            StorageLocation = 1000,
+        #region enums
+        //        /// <summary>
+        //        /// Enum für das Feld VBUnitTypeIndex
+        //        /// </summary>
+        //        [ACClassInfo(Const.PackName_VarioSystem, "en{'FacilityTypes'}de{'FacilityTypes'}", Global.ACKinds.TACEnum)]
+        //        public enum FacilityTypes : short
+        //        {
+        //            /// <summary>
+        //            /// Location, store, hall
+        //            /// </summary>
+        //            StorageLocation = 1000,
 
-            /// <summary>
-            /// Storage place, bin (Lagerplatz)
-            /// </summary>
-            StorageBin = 1100,
-            
-            /// <summary>
-            /// Silo or Tank
-            /// </summary>
-            StorageBinContainer = 1110, 
+        //            /// <summary>
+        //            /// Storage place, bin (Lagerplatz)
+        //            /// </summary>
+        //            StorageBin = 1100,
 
-            /// <summary>
-            /// Bin for prepration of imermediate material
-            /// </summary>
-            PreparationBin = 1120,
+        //            /// <summary>
+        //            /// Silo or Tank
+        //            /// </summary>
+        //            StorageBinContainer = 1110, 
 
-            /// <summary>
-            /// Vehilce
-            /// </summary>
-            Vehicle = 2000,
+        //            /// <summary>
+        //            /// Bin for prepration of imermediate material
+        //            /// </summary>
+        //            PreparationBin = 1120,
 
-            /// <summary>
-            /// Silo, Chamber of a Vehicle
-            /// </summary>
-            VehicleContainer = 2100,
-        }
+        //            /// <summary>
+        //            /// Vehilce
+        //            /// </summary>
+        //            Vehicle = 2000,
 
-        public FacilityTypes FacilityType
+        //            /// <summary>
+        //            /// Silo, Chamber of a Vehicle
+        //            /// </summary>
+        //            VehicleContainer = 2100,
+        //        }
+
+        public FacilityTypesEnum FacilityType
         {
             get
             {
-                return (FacilityTypes)MDFacilityTypeIndex;
+                return (FacilityTypesEnum)MDFacilityTypeIndex;
             }
             set
             {
@@ -191,25 +191,25 @@ namespace gip.mes.datamodel
             }
         }
 
-        static ACValueItemList _FacilityTypesList = null;
+        //        static ACValueItemList _FacilityTypesList = null;
 
-        public static ACValueItemList FacilityTypesList
-        {
-            get
-            {
-                if (_FacilityTypesList == null)
-                {
-                    _FacilityTypesList = new ACValueItemList("FacilityTypes");
-                    _FacilityTypesList.AddEntry(FacilityTypes.StorageLocation, "en{'Storage Location'}de{'Lagerort'}");
-                    _FacilityTypesList.AddEntry(FacilityTypes.StorageBin, "en{'Storage Bin'}de{'Lagerplatz'}");
-                    _FacilityTypesList.AddEntry(FacilityTypes.StorageBinContainer, "en{'Tank/Silo/Cell/Scale Container'}de{'Tank/Silo/Zelle/Waage-Behältnis'}");
-                    _FacilityTypesList.AddEntry(FacilityTypes.Vehicle, "en{'Vehicle'}de{'Fahrzeug'}");
-                    _FacilityTypesList.AddEntry(FacilityTypes.VehicleContainer, "en{'Vehicle Container'}de{'Fahrzeugbehältnis'}");
-                }
-                return _FacilityTypesList;
-            }
-        }
-#endregion
-       
+        //        public static ACValueItemList FacilityTypesList
+        //        {
+        //            get
+        //            {
+        //                if (_FacilityTypesList == null)
+        //                {
+        //                    _FacilityTypesList = new ACValueItemList("FacilityTypes");
+        //                    _FacilityTypesList.AddEntry(FacilityTypes.StorageLocation, "en{'Storage Location'}de{'Lagerort'}");
+        //                    _FacilityTypesList.AddEntry(FacilityTypes.StorageBin, "en{'Storage Bin'}de{'Lagerplatz'}");
+        //                    _FacilityTypesList.AddEntry(FacilityTypes.StorageBinContainer, "en{'Tank/Silo/Cell/Scale Container'}de{'Tank/Silo/Zelle/Waage-Behältnis'}");
+        //                    _FacilityTypesList.AddEntry(FacilityTypes.Vehicle, "en{'Vehicle'}de{'Fahrzeug'}");
+        //                    _FacilityTypesList.AddEntry(FacilityTypes.VehicleContainer, "en{'Vehicle Container'}de{'Fahrzeugbehältnis'}");
+        //                }
+        //                return _FacilityTypesList;
+        //            }
+        //        }
+        #endregion
+
     }
 }

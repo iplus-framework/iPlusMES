@@ -1398,7 +1398,7 @@ namespace gip.mes.facility
             if (BP.InwardFacility != null)
             {
                 // Wenn Silo
-                if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
                     // Wenn keine Belegung vorgegeben
                     if (BP.ParamsAdjusted.InwardFacility.Material == null)
@@ -1554,7 +1554,7 @@ namespace gip.mes.facility
             if (BP.OutwardFacility != null)
             {
                 // Wenn Silo
-                if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
                     // Wenn keine Belegung vorgegeben
                     if (BP.ParamsAdjusted.OutwardFacility.Material == null)
@@ -1838,7 +1838,7 @@ namespace gip.mes.facility
                         StackItemList stackItemListInOut;
                         MsgBooking msgBookingInOut;
                         // Booking always on ChargeSubList, depends on parameter which were passed over ACMethodBooking
-                        //if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                        //if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         //{
                         //    // Übergebe komplette Liste mit Schichten an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
                         //    bookingResult = StackCalculatorInward.CalculateInOut(true,
@@ -1934,7 +1934,7 @@ namespace gip.mes.facility
                         StackItemList stackItemListInOut;
                         MsgBooking msgBookingInOut;
                         // Booking always on ChargeSubList, depends on parameter which were passed over ACMethodBooking
-                        //if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                        //if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         //{
                         //    // Übergebe komplette Liste mit Schichten an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
                         //    bookingResult = StackCalculatorOutward.CalculateInOut(false,
@@ -2082,7 +2082,7 @@ namespace gip.mes.facility
 
                     StackItemList stackItemListInOut;
                     MsgBooking msgBookingInOut;
-                    if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     {
                         // Übergebe komplette Liste mit Schichten an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
                         bookingResult = BP.StackCalculatorOutward(this).CalculateInOut(false,
@@ -2114,7 +2114,7 @@ namespace gip.mes.facility
 
                     StackItemList stackItemListRelocation;
                     MsgBooking msgBookingRelocation;
-                    if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     {
                         // Übergebe komplette Liste mit Schichten an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
                         bookingResult = BP.StackCalculatorInward(this).CalculateRelocation(BP.ParamsAdjusted.ShiftBookingReverse,

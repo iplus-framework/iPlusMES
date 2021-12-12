@@ -335,7 +335,7 @@ namespace gip.mes.processapplication
                     if (resultReleaseState == MDReleaseState.ReleaseStates.Locked)
                         destinationSilo.OutwardEnabled = false;
                     if (destinationSilo.MDFacilityType != null
-                        && destinationSilo.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                        && destinationSilo.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         destinationSilo.Material = dnPos.Material;
                     db.ACSaveChanges();
                 }
@@ -721,7 +721,7 @@ namespace gip.mes.processapplication
                     intakeBin.Scale.StoredTareWeight.ValueT = intakeBin.Scale.ActualWeight.ValueT;
                 if (!destinationSilo.MaterialID.HasValue
                     && destinationSilo.MDFacilityType != null
-                    && destinationSilo.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    && destinationSilo.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     destinationSilo.Material = dnPos.Material;
                 if (actualQuantity > 0)
                 {

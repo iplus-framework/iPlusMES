@@ -647,7 +647,7 @@ namespace gip.mes.facility
                 // Merke dass auf Silo gebucht worden ist, weil evtl. eine Reorganistation danach stattfinden muss
                 if ((BP.ParamsAdjusted.InwardFacility.MDFacilityType != null) && (BP.ParamsAdjusted.IsLotManaged))
                 {
-                    if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     {
                         if (!BP.InwardCellsWithLotManagedBookings.Contains(FBC.InwardFacility))
                             BP.InwardCellsWithLotManagedBookings.Add(FBC.InwardFacility);
@@ -732,7 +732,7 @@ namespace gip.mes.facility
                 // Merke dass auf Silo gebucht worden ist, weil evtl. eine Reorganistation danach stattfinden muss
                 if ((BP.ParamsAdjusted.OutwardFacility.MDFacilityType != null) && (BP.ParamsAdjusted.IsLotManaged))
                 {
-                    if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     {
                         if (!BP.OutwardCellsWithLotManagedBookings.Contains(FBC.OutwardFacility))
                             BP.OutwardCellsWithLotManagedBookings.Add(FBC.OutwardFacility);
@@ -1436,7 +1436,7 @@ namespace gip.mes.facility
             if (facility.MDFacilityType == null)
                 return Global.ACMethodResultState.Succeeded;
 
-            if (facility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
+            if (facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                 return Global.ACMethodResultState.Succeeded;
 
             // Falls Belegung zurückgesetzt werden soll, dann dürfen keine Chargen auf dem Lagerplatz vorhanden sein

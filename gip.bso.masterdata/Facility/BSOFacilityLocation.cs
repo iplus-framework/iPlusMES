@@ -107,7 +107,7 @@ namespace gip.bso.masterdata
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "StorageLocation", ACType.ACIdentifier);
                     bool rebuildACQueryDef = false;
-                    short fcTypeLocation = (short)MDFacilityType.FacilityTypes.StorageLocation;
+                    short fcTypeLocation = (short)FacilityTypesEnum.StorageLocation;
                     if (navACQueryDefinition.ACFilterColumns.Count <= 0)
                     {
                         rebuildACQueryDef = true;
@@ -378,7 +378,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New")) return;
             CurrentStorageLocation = Facility.NewACObject(DatabaseApp, null);
-            CurrentStorageLocation.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageLocation).FirstOrDefault();
+            CurrentStorageLocation.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageLocation).FirstOrDefault();
             if (CurrentStorageLocation.MDFacilityType != null)
                 DatabaseApp.Facility.AddObject(CurrentStorageLocation);
             _AccessPrimary.NavList.Add(CurrentStorageLocation);
@@ -472,7 +472,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("NewStorageBin")) return;
             CurrentStorageBin = Facility.NewACObject(DatabaseApp, CurrentStorageLocation);
-            CurrentStorageBin.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).FirstOrDefault();
+            CurrentStorageBin.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).FirstOrDefault();
             OnPropertyChanged("StorageBinList");
             PostExecute("NewStorageBin");
 

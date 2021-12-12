@@ -1756,9 +1756,9 @@ namespace gip.mes.processapplication
                                 {
                                     specialDest = dbApp.Facility.Where(c => c.ParentFacilityID.HasValue
                                         && c.ParentFacilityID == outwardFacility.ParentFacilityID
-                                        && c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).FirstOrDefault();
+                                        && c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).FirstOrDefault();
                                 }
-                                if (specialDest != null && specialDest.MDFacilityType != null && specialDest.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin)
+                                if (specialDest != null && specialDest.MDFacilityType != null && specialDest.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin)
                                 {
                                     var queryDoneOutwardBookings = dbApp.FacilityBookingCharge.Where(c => c.ProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelationID == dosingPosRelation.ProdOrderPartslistPosRelationID).ToArray();
                                     foreach (FacilityBookingCharge fbc in queryDoneOutwardBookings)

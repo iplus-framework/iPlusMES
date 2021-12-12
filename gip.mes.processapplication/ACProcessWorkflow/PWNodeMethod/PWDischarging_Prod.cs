@@ -210,7 +210,7 @@ namespace gip.mes.processapplication
                                 nextDestination.ReservationState = GlobalApp.ReservationState.Active;
                                 // Falls Zielsilo nicht belegt
                                 if (nextDestination.Facility != null
-                                    && nextDestination.Facility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                                    && nextDestination.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                                 {
                                     if (!nextDestination.Facility.MaterialID.HasValue)
                                         nextDestination.Facility.Material = batchPlan.ProdOrderPartslistPos.BookingMaterial;
@@ -1075,7 +1075,7 @@ namespace gip.mes.processapplication
                         plannedSilo.ReservationState = GlobalApp.ReservationState.Active;
                         // Falls Zielsilo nicht belegt
                         if (plannedSilo.Facility != null 
-                            && plannedSilo.Facility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                            && plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         {
                             if (!plannedSilo.Facility.MaterialID.HasValue)
                                 plannedSilo.Facility.Material = currentBatchPos.BookingMaterial;

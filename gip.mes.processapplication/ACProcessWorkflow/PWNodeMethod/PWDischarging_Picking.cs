@@ -246,7 +246,7 @@ namespace gip.mes.processapplication
             if (isLastDischarging 
                 && pickingPos.ToFacility.Material == null 
                 && pickingPos.ToFacility.MDFacilityType != null
-                && pickingPos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
                 pickingPos.ToFacility.Material = pickingPos.Material;
                 dbApp.ACSaveChanges();
@@ -561,7 +561,7 @@ namespace gip.mes.processapplication
             if (isLastDischarging 
                 && pickingPos.ToFacility.Material == null
                 && pickingPos.ToFacility.MDFacilityType != null
-                && pickingPos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
                 pickingPos.ToFacility.Material = pickingPos.Material;
                 dbApp.ACSaveChanges();
@@ -640,7 +640,7 @@ namespace gip.mes.processapplication
                     if (isLastDischarging 
                         && pickingPos.ToFacility.Material == null
                         && pickingPos.ToFacility.MDFacilityType != null
-                        && pickingPos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                        && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         pickingPos.ToFacility.Material = pickingPos.Material;
                     MsgWithDetails msg2 = dbApp.ACSaveChanges();
                     if (msg2 != null)

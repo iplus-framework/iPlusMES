@@ -90,8 +90,8 @@ namespace gip.mes.facility
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
-                                                                           && ( (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                                              ||(!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                                           && ( (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                                              ||(!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (   (!onlyContainer 
                                                                                     && (   (pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                                         || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -168,8 +168,8 @@ namespace gip.mes.facility
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
-                                                                           && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                                              || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                                           && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                                              || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (  (!onlyContainer
                                                                                     && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                                         || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -256,8 +256,8 @@ namespace gip.mes.facility
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
-                                                      && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                          || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                      && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                          || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (   (!onlyContainer
                                                                 && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -326,8 +326,8 @@ namespace gip.mes.facility
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
-                                                      && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                          || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                      && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                          || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                       && (( !onlyContainer
                                                             && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                 || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -410,8 +410,8 @@ namespace gip.mes.facility
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                             .Include("Facility.FacilityStock_Facility")
                                                                             .Where(c => c.NotAvailable == false
-                                                                                       && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                                                          || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                                                       && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                                                          || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                                        && (   (!onlyContainer
                                                                                                 && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -488,8 +488,8 @@ namespace gip.mes.facility
             (ctx, pos, filterTimeOlderThan, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                                     .Include("Facility.FacilityStock_Facility")
                                                                     .Where(c => c.NotAvailable == false
-                                                                           && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                                              || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                                           && (  (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                                              || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                            && (   (!onlyContainer
                                                                                     && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                                         || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -579,8 +579,8 @@ namespace gip.mes.facility
                                                                             && pos.MaterialID.HasValue
                                                                             && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
                                                                             && c.InwardFacilityID.HasValue 
-                                                                            && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                                                || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                                            && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                                                || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                             && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
                                                                             && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
                                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
@@ -663,8 +663,8 @@ namespace gip.mes.facility
                                                                     .Include("InwardFacility.FacilityStock_Facility")
                                                                     .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
                                                                             && c.InwardFacilityID.HasValue
-                                                                            && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                                                || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                                            && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                                                || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                                           && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
                                                                           && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
                                                                                || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
@@ -744,8 +744,8 @@ namespace gip.mes.facility
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
-                                                        && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                        && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && (    (!onlyContainer
                                                                 && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -814,8 +814,8 @@ namespace gip.mes.facility
             (ctx, pos, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
-                                                        && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                        && (   (onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && (    (!onlyContainer
                                                                 && ((pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.Material.ProductionMaterialID)
                                                                     || (!pos.Material.ProductionMaterialID.HasValue && c.MaterialID == pos.MaterialID)))
@@ -892,8 +892,8 @@ namespace gip.mes.facility
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == pos.SourceProdOrderPartslistID
                                                     && c.InwardFacilityID.HasValue
-                                                    && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                        || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                    && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                        || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                      && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
                                                      && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
                                                           || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
@@ -965,8 +965,8 @@ namespace gip.mes.facility
                                                 .Include("InwardFacility.FacilityStock_Facility")
                                                 .Where(c => c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == pos.ProdOrderPartslistPosID
                                                     && c.InwardFacilityID.HasValue
-                                                    && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                        || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                    && (   (onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                        || (!onlyContainer && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.InwardFacility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                      && c.InwardFacilityChargeID.HasValue && c.InwardFacilityCharge.NotAvailable == false
                                                      && ((pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.Material.ProductionMaterialID)
                                                           || (!pos.Material.ProductionMaterialID.HasValue && c.InwardFacilityCharge.MaterialID == pos.MaterialID))
@@ -1163,7 +1163,7 @@ namespace gip.mes.facility
                 possibleSilos = facilityQuery.FoundSilos
                                 .ToList()
                                 .Distinct()
-                                .Where(c =>   (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                .Where(c =>   (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
                                            || (!c.QryHasBlockedQuants.Any()) )
                                 .ToList();
             }
@@ -1214,7 +1214,7 @@ namespace gip.mes.facility
                         possibleSilos = facilityQuery.FoundSilos
                                         .ToList()
                                         .Distinct()
-                                        .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                        .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
                                                    || (!c.QryHasBlockedQuants.Any()))
                                         .ToList();
                     }
@@ -1271,7 +1271,7 @@ namespace gip.mes.facility
                         possibleSilos = facilityQuery.FoundSilos
                                         .ToList()
                                         .Distinct()
-                                        .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                        .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
                                                    || (!c.QryHasBlockedQuants.Any()))
                                         .ToList();
                     }
@@ -1320,7 +1320,7 @@ namespace gip.mes.facility
                         possibleSilos = facilityQuery.FoundSilos
                                         .ToList()
                                         .Distinct()
-                                        .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                        .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
                                                    || (!c.QryHasBlockedQuants.Any()))
                                         .ToList();
                     }

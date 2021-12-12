@@ -336,7 +336,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = from c in BP.DatabaseApp.Facility where c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer select c;
+                    var query = from c in BP.DatabaseApp.Facility where c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer select c;
                     if (query != null)
                         InitProgressSubRange(BP, query.Count());
                     foreach (var facility in query)
@@ -362,7 +362,7 @@ namespace gip.mes.facility
         protected virtual Global.ACMethodResultState DoMatchingFacilityStock(ACMethodBooking BP, FacilityBooking FB, Facility facility)
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
-            if (facility == null || facility.MDFacilityType == null || facility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
+            if (facility == null || facility.MDFacilityType == null || facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                 return bookingResult;
             var query = facility.FacilityCharge_Facility.Where(c => c.NotAvailable == false);
             if (facility.CurrentFacilityStock == null && !query.Any() && !CreateStockOnFacilityMatching)
@@ -847,7 +847,7 @@ namespace gip.mes.facility
 
         protected virtual Global.ACMethodResultState ClosingDayOnFacility(ACMethodBooking BP, FacilityStock facilityStock, History history, int dayClosingDays)
         {
-            if (facilityStock.Facility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer)
+            if (facilityStock.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
             {
                 return Global.ACMethodResultState.Succeeded;
             }

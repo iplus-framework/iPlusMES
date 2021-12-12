@@ -225,7 +225,7 @@ namespace gip.bso.facility
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
                 // MDFacilityTypeIndex
-                ACFilterItem facilityTypeFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)MDFacilityType.FacilityTypes.StorageLocation).ToString(), true);
+                ACFilterItem facilityTypeFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageLocation).ToString(), true);
                 aCFilterItems.Add(facilityTypeFilter);
 
                 return aCFilterItems;
@@ -335,7 +335,7 @@ namespace gip.bso.facility
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
                 // MDFacilityTypeIndex
-                ACFilterItem facilityTypeFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)MDFacilityType.FacilityTypes.StorageBin).ToString(), true);
+                ACFilterItem facilityTypeFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageBin).ToString(), true);
                 aCFilterItems.Add(facilityTypeFilter);
 
                 // Parent facility

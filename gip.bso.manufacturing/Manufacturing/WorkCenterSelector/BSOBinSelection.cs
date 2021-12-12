@@ -224,7 +224,7 @@ namespace gip.bso.manufacturing
                 List<BinSelectionItem> binSelectionList =
                     dbApp
                     .Facility
-                    .Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)vb.MDFacilityType.FacilityTypes.PreparationBin)
+                    .Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)vb.FacilityTypesEnum.PreparationBin)
                    .OrderBy(c => c.FacilityNo)
                    .AsEnumerable()
                    .Select(c => new BinSelectionItem()

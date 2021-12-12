@@ -979,7 +979,7 @@ namespace gip.mes.processapplication
             if (plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled)
             {
-                if (plannedSilo.Facility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
                     // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
@@ -1031,7 +1031,7 @@ namespace gip.mes.processapplication
             if (plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled)
             {
-                if (plannedSilo.Facility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                 {
                     // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen

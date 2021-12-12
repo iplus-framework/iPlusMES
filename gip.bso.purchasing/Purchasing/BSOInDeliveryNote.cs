@@ -1169,8 +1169,8 @@ namespace gip.bso.purchasing
             if (AccessBookingFacility == null || CurrentFacilityPreBooking == null || FacilityPreBookingList == null || !FacilityPreBookingList.Any())
                 return;
             bool rebuildACQueryDef = false;
-            short fcTypeContainer = (short)MDFacilityType.FacilityTypes.StorageBinContainer;
-            short fcTypeBin = (short)MDFacilityType.FacilityTypes.StorageBin;
+            short fcTypeContainer = (short)FacilityTypesEnum.StorageBinContainer;
+            short fcTypeBin = (short)FacilityTypesEnum.StorageBin;
             if (AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Count <= 0)
             {
                 rebuildACQueryDef = true;

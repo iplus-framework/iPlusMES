@@ -442,8 +442,8 @@ namespace gip.bso.manufacturing
             if (AccessInBookingFacility == null || SelectedInwardFacilityPreBooking == null || InwardFacilityPreBookingList == null || !InwardFacilityPreBookingList.Any())
                 return;
             bool rebuildACQueryDef = false;
-            short fcTypeContainer = (short)MDFacilityType.FacilityTypes.StorageBinContainer;
-            short fcTypeBin = (short)MDFacilityType.FacilityTypes.StorageBin;
+            short fcTypeContainer = (short)FacilityTypesEnum.StorageBinContainer;
+            short fcTypeBin = (short)FacilityTypesEnum.StorageBin;
             if (AccessInBookingFacility.NavACQueryDefinition.ACFilterColumns.Count <= 0)
             {
                 rebuildACQueryDef = true;

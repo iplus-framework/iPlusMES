@@ -636,9 +636,9 @@ namespace gip.bso.manufacturing
             if (AccessOutBookingFacility == null || SelectedOutwardFacilityPreBooking == null || OutwardFacilityPreBookingList == null || !OutwardFacilityPreBookingList.Any())
                 return;
             bool rebuildACQueryDef = false;
-            short fcTypeContainer = (short)MDFacilityType.FacilityTypes.StorageBinContainer;
-            short fcTypeBin = (short)MDFacilityType.FacilityTypes.StorageBin;
-            short fcTypePrepBin = (short)MDFacilityType.FacilityTypes.PreparationBin;
+            short fcTypeContainer = (short)FacilityTypesEnum.StorageBinContainer;
+            short fcTypeBin = (short)FacilityTypesEnum.StorageBin;
+            short fcTypePrepBin = (short)FacilityTypesEnum.PreparationBin;
 
             if (AccessOutBookingFacility.NavACQueryDefinition.ACFilterColumns.Count <= 0)
             {

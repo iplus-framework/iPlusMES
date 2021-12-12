@@ -112,6 +112,8 @@
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
+    <Compile Include="Enums\FacilityTypesEnum.cs" />
+    <Compile Include="Enums\PostingBehaviourEnum.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
     <Compile Include="TandT\StartItemTypeComparer.cs" />
     <Compile Include="TrackingCommon\TrackingEngineList.cs" />

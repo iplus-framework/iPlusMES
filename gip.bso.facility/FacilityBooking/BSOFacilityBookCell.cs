@@ -378,8 +378,8 @@ namespace gip.bso.facility
             if (AccessBookingFacility == null || CurrentFacility == null)
                 return;
             bool rebuildACQueryDef = false;
-            short fcTypeContainer = (short)MDFacilityType.FacilityTypes.StorageBinContainer;
-            short fcTypeBin = (short)MDFacilityType.FacilityTypes.StorageBin;
+            short fcTypeContainer = (short)FacilityTypesEnum.StorageBinContainer;
+            short fcTypeBin = (short)FacilityTypesEnum.StorageBin;
             if (AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Count <= 0)
             {
                 rebuildACQueryDef = true;
@@ -470,7 +470,7 @@ namespace gip.bso.facility
                     new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
                     new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
-                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((Int16)(int)MDFacilityType.FacilityTypes.StorageBinContainer).ToString(), true)
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((Int16)(int)FacilityTypesEnum.StorageBinContainer).ToString(), true)
                 };
             }
         }

@@ -1640,8 +1640,8 @@ namespace gip.mes.facility
             }
 
             if (validationBehaviour == PARole.ValidationBehaviour.Strict
-                && pos.FromFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer
-                && pos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                && pos.FromFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer
+                && pos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
                 if (!pos.FromFacility.MaterialID.HasValue)
                 {
@@ -1770,7 +1770,7 @@ namespace gip.mes.facility
                 return;
             }
 
-            if (pos.ToFacility.MDFacilityType.FacilityType != MDFacilityType.FacilityTypes.StorageBinContainer && !pos.PickingMaterialID.HasValue)
+            if (pos.ToFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer && !pos.PickingMaterialID.HasValue)
             {
                 msg = new Msg
                 {
@@ -1784,7 +1784,7 @@ namespace gip.mes.facility
             }
 
             if (validationBehaviour == PARole.ValidationBehaviour.Strict
-                    && pos.ToFacility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                    && pos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
                 if (!pos.ToFacility.MaterialID.HasValue && pos.PickingMaterialID.HasValue)
                 {
@@ -1990,7 +1990,7 @@ namespace gip.mes.facility
                 possibleSilos = facilityQuery.FoundSilos
                                 .ToList()
                                 .Distinct()
-                                .Where(c => (c.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBin && c.QryHasFreeQuants.Any())
+                                .Where(c => (c.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBin && c.QryHasFreeQuants.Any())
                                            || (!c.QryHasBlockedQuants.Any()))
                                 .ToList();
             }
@@ -2065,8 +2065,8 @@ namespace gip.mes.facility
             (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
-                                                        && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                        && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
                                                                 && ((material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID)
                                                                     || (!material.ProductionMaterialID.HasValue && c.MaterialID == material.MaterialID)))
@@ -2090,8 +2090,8 @@ namespace gip.mes.facility
             (ctx, material, checkOutwardEnabled, filterTimeOlderThan, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Where(c => c.NotAvailable == false
-                                                        && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBinContainer)
-                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)MDFacilityType.FacilityTypes.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)MDFacilityType.FacilityTypes.PreparationBin))
+                                                        && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+                                                            || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
                                                                 && ((material.ProductionMaterialID.HasValue && c.MaterialID == material.ProductionMaterialID)
                                                                     || (!material.ProductionMaterialID.HasValue && c.MaterialID == material.MaterialID)))

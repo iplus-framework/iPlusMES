@@ -1944,7 +1944,7 @@ namespace gip.mes.processapplication
 
             if (!IncludeContainerStores)
             {
-                routableFacilities = routableFacilities.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.StorageBin).ToList();
+                routableFacilities = routableFacilities.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBin).ToList();
             }
 
             return routableFacilities;

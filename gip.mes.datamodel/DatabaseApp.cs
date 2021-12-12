@@ -684,12 +684,22 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        ACValueItemList _FacilityTypesEnumList = null;
         [ACPropertyInfo(9999)]
-        public IEnumerable<ACValueItem> FacilityTypesList
+        public ACValueItemList FacilityTypesList
         {
             get
             {
-                return gip.mes.datamodel.MDFacilityType.FacilityTypesList;
+                if (_FacilityTypesEnumList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(FacilityTypesEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _FacilityTypesEnumList = enumClass.ACValueListForEnum;
+                    else
+                        _FacilityTypesEnumList = new ACValueListFacilityTypesEnum();
+                }
+                return _FacilityTypesEnumList;
             }
         }
 
@@ -981,6 +991,24 @@ namespace gip.mes.datamodel
             }
         }
 
+        ACValueItemList _PostingBehaviourEnumList = null;
+        [ACPropertyInfo(9999)]
+        public ACValueItemList PostingBehaviourEnumList
+        {
+            get
+            {
+                if (_PostingBehaviourEnumList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PostingBehaviourEnum));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _PostingBehaviourEnumList = enumClass.ACValueListForEnum;
+                    else
+                        _PostingBehaviourEnumList = new ACValueListPostingBehaviourEnum();
+                }
+                return _PostingBehaviourEnumList;            
+            }
+        }
+
         /// <summary>
         /// Liste aller Adressen, die eine Factory sind und dem eigenen Unternehmen angehören
         /// </summary>
@@ -995,6 +1023,7 @@ namespace gip.mes.datamodel
                 }
             }
         }
+
 
         [ACPropertyInfo(9999)]
         public IQueryable<MDUnit> MDUnitList

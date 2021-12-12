@@ -168,7 +168,7 @@ namespace gip2006.variobatch.processapplication
 
         public static MDFacilityType GetFacilityTypeVehicle(DatabaseApp dbApp)
         {
-            return dbApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.Vehicle).FirstOrDefault();
+            return dbApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.Vehicle).FirstOrDefault();
         }
     }
 
@@ -311,7 +311,7 @@ namespace gip2006.variobatch.processapplication
 
         public static MDFacilityType GetFacilityTypeVehicleContainer(DatabaseApp dbApp)
         {
-            return dbApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.VehicleContainer).FirstOrDefault();
+            return dbApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.VehicleContainer).FirstOrDefault();
         }
     }
 

@@ -72,7 +72,7 @@ namespace gip.mes.processapplication
             Facility facility = databaseApp.Facility.FirstOrDefault(c => c.FacilityID == itemNoID);
             if (facility != null)
             {
-                if (facility.MDFacilityType.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.PreparationBin)
+                if (facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.PreparationBin)
                 {
                     msg = CheckFacilityInwardBooking(intermediatePartPos, facility, behavior);
                     if (msg == null)
@@ -86,7 +86,7 @@ namespace gip.mes.processapplication
                     }
                 }
                 else
-                    msg = FactoryErrorMessage(DischargingItemValidationErrors.FacilityNotBinTypePreparation, facility.FacilityNo, MDFacilityType.FacilityTypes.PreparationBin);
+                    msg = FactoryErrorMessage(DischargingItemValidationErrors.FacilityNotBinTypePreparation, facility.FacilityNo, FacilityTypesEnum.PreparationBin);
             }
             else
                 // missing facilit

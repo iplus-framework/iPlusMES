@@ -231,7 +231,7 @@ namespace gip.mes.datamodel
                     {
                         if (facility.MDFacilityType != null)
                         {
-                            if (facility.MDFacilityType.FacilityType == MDFacilityType.FacilityTypes.StorageBinContainer)
+                            if (facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                             {
                                 if (facility.MDUnit != null)
                                     this.MDUnit = facility.MDUnit;

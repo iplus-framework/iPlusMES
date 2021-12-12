@@ -387,7 +387,7 @@ namespace gip.bso.logistics
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Facility", ACType.ACIdentifier);
                     bool rebuildACQueryDef = false;
-                    short vehicle = (short)MDFacilityType.FacilityTypes.Vehicle;
+                    short vehicle = (short)FacilityTypesEnum.Vehicle;
                     if (navACQueryDefinition.ACFilterColumns.Count <= 0)
                     {
                         rebuildACQueryDef = true;

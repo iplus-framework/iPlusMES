@@ -103,7 +103,7 @@ namespace gip.bso.masterdata
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     bool rebuildACQueryDef = false;
-                    short fcTypeLocation = (short)MDFacilityType.FacilityTypes.Vehicle;
+                    short fcTypeLocation = (short)FacilityTypesEnum.Vehicle;
                     if (navACQueryDefinition.ACFilterColumns.Count <= 0)
                     {
                         rebuildACQueryDef = true;
@@ -384,7 +384,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("New"))
                 return;
-            MDFacilityType facilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.Vehicle).FirstOrDefault();
+            MDFacilityType facilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.Vehicle).FirstOrDefault();
             if (facilityType == null)
                 return;
             Facility vehicle = Facility.NewACObject(DatabaseApp, null);
@@ -498,7 +498,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("NewVehicleContainer")) return;
             CurrentVehicleContainer = Facility.NewACObject(DatabaseApp, CurrentVehicle);
-            CurrentVehicleContainer.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)MDFacilityType.FacilityTypes.VehicleContainer).FirstOrDefault();
+            CurrentVehicleContainer.MDFacilityType = DatabaseApp.MDFacilityType.Where(c => c.MDFacilityTypeIndex == (short)FacilityTypesEnum.VehicleContainer).FirstOrDefault();
             CurrentVehicleContainer.MDFacilityVehicleType = CurrentVehicle.MDFacilityVehicleType;
             CurrentVehicleContainer.InwardEnabled = true;
             CurrentVehicleContainer.OutwardEnabled = true;
