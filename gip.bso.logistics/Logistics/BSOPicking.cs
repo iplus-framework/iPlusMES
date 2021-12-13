@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Objects;
 using System.Linq;
+using static gip.core.datamodel.Global;
 using gipCoreData = gip.core.datamodel;
 
 namespace gip.bso.logistics
@@ -150,6 +151,326 @@ namespace gip.bso.logistics
 
         #region BSO->ACProperty
 
+        #region Picking -> Filter
+
+
+        #region Picking -> Filter -> Default filters
+        public List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem acFilterPickingNo = new ACFilterItem(Global.FilterTypes.filter, "PickingNo", Global.LogicalOperators.contains, Global.Operators.and, null, true);
+                aCFilterItems.Add(acFilterPickingNo);
+
+                ACFilterItem acFilterPickingIndex = new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, null, true);
+                aCFilterItems.Add(acFilterPickingIndex);
+
+                ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
+                aCFilterItems.Add(phOpen);
+
+                ACFilterItem acFilterDeliveryDateFrom = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.greaterThanOrEqual, Operators.and, "", true, true);
+                aCFilterItems.Add(acFilterDeliveryDateFrom);
+
+                ACFilterItem acFilterDeliveryDateTo = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.lessThan, Operators.and, "", true, true);
+                aCFilterItems.Add(acFilterDeliveryDateTo);
+
+                ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
+                aCFilterItems.Add(phClose);
+
+                ACFilterItem acFilterPickingStateIndex = new ACFilterItem(FilterTypes.filter, "PickingStateIndex", LogicalOperators.equal, Operators.and, "", true);
+                aCFilterItems.Add(acFilterPickingStateIndex);
+
+                return aCFilterItems;
+            }
+        }
+
+        private List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortPickingNo = new ACSortItem("PickingNo", SortDirections.descending, true);
+                acSortItems.Add(acSortPickingNo);
+
+                return acSortItems;
+            }
+        }
+
+        #endregion
+
+        #region Picking -> Filter -> Properties
+
+        public bool InFilterChange { get; set; }
+
+        #region Picking -> Filter -> Properties -> FilterPickingTypeIndex
+
+
+        [ACPropertyInfo(300, "FilterPickingPickingNo", "en{'Picking-No.'}de{'Kommissions-Nr.'}")]
+        public string FilterPickingPickingNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("PickingNo");
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("PickingNo");
+                if (tmp != value)
+                {
+                    InFilterChange = true;
+
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("PickingNo", value);
+                    OnPropertyChanged("FilterPickingPickingNo");
+
+                    InFilterChange = false;
+                }
+            }
+        }
+
+        [ACPropertyInfo(301, "FilterDateFrom", "en{'From'}de{'Von'}")]
+        public DateTime? FilterDateFrom
+        {
+            get
+            {
+                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
+                if (filterItems.Length == 2)
+                {
+                    if (string.IsNullOrEmpty(filterItems[0].SearchWord))
+                        return null;
+                    else
+                        return DateTime.Parse(filterItems[0].SearchWord);
+                }
+                else
+                    return null;
+            }
+            set
+            {
+                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
+                if (filterItems.Length == 2)
+                {
+                    ACFilterItem filterDateFrom = filterItems[0];
+                    DateTime? currentValue = null;
+                    if (!string.IsNullOrEmpty(filterDateFrom.SearchWord))
+                        currentValue = DateTime.Parse(filterDateFrom.SearchWord);
+                    if (currentValue != value)
+                    {
+                        InFilterChange = true;
+
+                        if (value == null)
+                            filterDateFrom.SearchWord = null;
+                        else
+                            filterDateFrom.SearchWord = value.Value.ToString("dd.MM.yyyy HH:mm:ss");
+                        OnPropertyChanged("FilterDateFrom");
+                       
+                        InFilterChange = false;
+                    }
+                }
+            }
+        }
+
+        [ACPropertyInfo(302, "FilterDateTo", "en{'to'}de{'bis'}")]
+        public DateTime? FilterDateTo
+        {
+            get
+            {
+                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
+                if (filterItems.Length == 2)
+                {
+                    if (string.IsNullOrEmpty(filterItems[1].SearchWord))
+                        return null;
+                    else
+                        return DateTime.Parse(filterItems[1].SearchWord);
+                }
+                else
+                    return null;
+            }
+            set
+            {
+                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
+                if (filterItems.Length == 2)
+                {
+                    ACFilterItem filterDateTo = filterItems[1];
+                    DateTime? currentValue = null;
+                    if (!string.IsNullOrEmpty(filterDateTo.SearchWord))
+                        currentValue = DateTime.Parse(filterDateTo.SearchWord);
+                    if (currentValue != value)
+                    {
+                        InFilterChange = true;
+
+                        if (value == null)
+                            filterDateTo.SearchWord = null;
+                        else
+                            filterDateTo.SearchWord = value.Value.ToString("dd.MM.yyyy HH:mm:ss");
+                        OnPropertyChanged("FilterDateTo");
+
+                        InFilterChange = false;
+                    }
+                }
+            }
+        }
+
+
+        #region Picking -> Filter -> Properties -> FilterPickingTypeIndex -> FilterMDPickingType
+        private MDPickingType _SelectedFilterMDPickingType;
+        /// <summary>
+        /// Selected property for MDPickingType
+        /// </summary>
+        /// <value>The selected FilterMDPickingType</value>
+        [ACPropertySelected(303, "FilterMDPickingType", "en{'Picking Type'}de{'Kommissioniertyp'}")]
+        public MDPickingType SelectedFilterMDPickingType
+        {
+            get
+            {
+                return _SelectedFilterMDPickingType;
+            }
+            set
+            {
+                if (_SelectedFilterMDPickingType != value)
+                {
+                    _SelectedFilterMDPickingType = value;
+                    OnPropertyChanged("SelectedFilterMDPickingType");
+
+                    short? filterPickingTypeIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingTypeIndex");
+                    short? newPickingTypeIndex = null;
+                    if (value != null)
+                        newPickingTypeIndex = value.MDPickingTypeIndex;
+                    if (newPickingTypeIndex != filterPickingTypeIndex)
+                    {
+                        InFilterChange = true;
+
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue<short?>("PickingTypeIndex", newPickingTypeIndex);
+                        OnPropertyChanged("SelectedFilterMDPickingType");
+
+                        InFilterChange = false;
+                    }
+                }
+            }
+        }
+
+
+        private List<MDPickingType> _FilterMDPickingTypeList;
+        /// <summary>
+        /// List property for MDPickingType
+        /// </summary>
+        /// <value>The FilterMDPickingType list</value>
+        [ACPropertyList(304, "FilterMDPickingType")]
+        public List<MDPickingType> FilterMDPickingTypeList
+        {
+            get
+            {
+                if (_FilterMDPickingTypeList == null)
+                    _FilterMDPickingTypeList = LoadFilterMDPickingTypeList();
+                short? filterPickingTypeIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingTypeIndex");
+                if (filterPickingTypeIndex != null)
+                    SelectedFilterMDPickingType = FilterMDPickingTypeList.FirstOrDefault(c => c.MDPickingTypeIndex == (short)filterPickingTypeIndex.Value);
+                return _FilterMDPickingTypeList;
+            }
+        }
+
+        private List<MDPickingType> LoadFilterMDPickingTypeList()
+        {
+            return DatabaseApp.MDPickingType.OrderBy(c => c.SortIndex).ToList();
+
+        }
+        #endregion
+
+
+        #region FilterPickingState
+        private ACValueItem _SelectedFilterPickingState;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected FilterPickingState</value>
+        [ACPropertySelected(305, "FilterPickingState", "en{'Picking Status'}de{'Status'}")]
+        public ACValueItem SelectedFilterPickingState
+        {
+            get
+            {
+                return _SelectedFilterPickingState;
+            }
+            set
+            {
+                if (_SelectedFilterPickingState != value)
+                {
+                    _SelectedFilterPickingState = value;
+                    OnPropertyChanged("SelectedFilterPickingState");
+
+                    short? filterPickingStateIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingStateIndex");
+                    short? newPickingStateIndex = null;
+                    if (value != null)
+                        newPickingStateIndex = (short)(value.Value);
+                    if (newPickingStateIndex != filterPickingStateIndex)
+                    {
+                        InFilterChange = true;
+
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue<short?>("PickingStateIndex", newPickingStateIndex);
+                        OnPropertyChanged("SelectedFilterPickingState");
+
+                        InFilterChange = false;
+                    }
+                }
+            }
+        }
+
+        private List<ACValueItem> _FilterPickingStateList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The FilterPickingState list</value>
+        [ACPropertyList(306, "FilterPickingState")]
+        public List<ACValueItem> FilterPickingStateList
+        {
+            get
+            {
+                if (_FilterPickingStateList == null)
+                    _FilterPickingStateList = LoadFilterPickingStateList();
+                short? filterPickingStateIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingStateIndex");
+                if (filterPickingStateIndex != null)
+                {
+                    SelectedFilterPickingState = FilterPickingStateList.FirstOrDefault(c => (short)c.Value == (short)filterPickingStateIndex.Value);
+                }
+                return _FilterPickingStateList;
+            }
+        }
+
+        private List<ACValueItem> LoadFilterPickingStateList()
+        {
+            return GlobalApp.PickingStateList.ToList();
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        /// <summary>
+        /// Source Property: FilterClear
+        /// </summary>
+        [ACMethodInfo("FilterClear", "en{'Clear'}de{'Löschen'}", 307)]
+        public void FilterClear()
+        {
+            if (!IsEnabledFilterClear())
+                return;
+
+            FilterPickingPickingNo = null;
+            FilterDateFrom = null;
+            FilterDateTo = null;
+            SelectedFilterMDPickingType = null;
+            SelectedFilterPickingState = null;
+        }
+
+        public bool IsEnabledFilterClear()
+        {
+            return true;
+        }
+
+
+        #endregion
+
         #region Picking
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         /// <summary>
@@ -171,44 +492,70 @@ namespace gip.bso.logistics
 
                     if (navACQueryDefinition != null)
                     {
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "PickingNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
+
+                        foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
+                            aCFilterItem.PropertyChanged += ACFilterItem_PropertyChanged;
                     }
 
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Picking>("Picking", this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
 
-                    bool rebuildACQueryDef = false;
-                    short filterDelivType = (short)GlobalApp.PickingType.Receipt;
-                    if (navACQueryDefinition.ACFilterColumns.Count <= 0)
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "PickingTypeIndex")
-                            {
-                                if (filterItem.SearchWord == filterDelivType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
-                                    countFoundCorrect++;
-                            }
-                        }
-                        if (countFoundCorrect < 1)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        RebuildAccessPrimary();
-                        navACQueryDefinition.SaveConfig(true);
-                    }
+                    //bool rebuildACQueryDef = false;
+                    //short filterDelivType = (short)GlobalApp.PickingType.Receipt;
+                    //if (navACQueryDefinition.ACFilterColumns.Count <= 0)
+                    //{
+                    //    rebuildACQueryDef = true;
+                    //}
+                    //else
+                    //{
+                    //    int countFoundCorrect = 0;
+                    //    foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
+                    //    {
+                    //        if (filterItem.PropertyName == "PickingTypeIndex")
+                    //        {
+                    //            if (filterItem.SearchWord == filterDelivType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
+                    //                countFoundCorrect++;
+                    //        }
+                    //    }
+                    //    if (countFoundCorrect < 1)
+                    //        rebuildACQueryDef = true;
+                    //}
+                    //if (rebuildACQueryDef)
+                    //{
+                    //    RebuildAccessPrimary();
+                    //    navACQueryDefinition.SaveConfig(true);
+                    //}
 
                 }
                 return _AccessPrimary;
+            }
+        }
+
+        private void ACFilterItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ACFilterItem aCFilterItem = sender as ACFilterItem;
+            if (e.PropertyName == "SearchWord" && !InFilterChange)
+            {
+                switch(aCFilterItem.PropertyName)
+                {
+                    case "PickingNo":
+                        OnPropertyChanged("FilterPickingPickingNo");
+                        break;
+                    case "DeliveryDateFrom":
+                        OnPropertyChanged("FilterDateFrom");
+                        OnPropertyChanged("FilterDateTo");
+                        break;
+                    case "PickingTypeIndex":
+                        OnPropertyChanged("SelectedFilterMDPickingType");
+                        break;
+                    case "PickingStateIndex":
+                        OnPropertyChanged("SelectedFilterPickingState");
+                        break;
+                }
             }
         }
 
@@ -438,13 +785,13 @@ namespace gip.bso.logistics
             {
                 if (CurrentPickingPos == null || CurrentPicking.MDPickingType == null)
                     return null;
-                if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                   || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
                     && CurrentPickingPos.InOrderPos != null)
                 {
                     return CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.ToList();
                 }
-                else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
                        || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
                     && (CurrentPickingPos.OutOrderPos != null))
                 {
@@ -564,14 +911,14 @@ namespace gip.bso.logistics
                 gip.core.datamodel.ACClassDesign acClassDesign = null;
                 if (ACType != null)
                 {
-                    if ((CurrentACMethodBooking != null) 
-                        && (   CurrentACMethodBooking.InOrderPos != null 
+                    if ((CurrentACMethodBooking != null)
+                        && (CurrentACMethodBooking.InOrderPos != null
                             || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
                             || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel
                             || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingInward
                             ))
                         acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, "BookingInward");
-                    else if ((CurrentACMethodBooking != null) 
+                    else if ((CurrentACMethodBooking != null)
                         && (CurrentACMethodBooking.OutOrderPos != null
                         || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosOutwardMovement
                         || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel
@@ -792,7 +1139,7 @@ namespace gip.bso.logistics
                     }
                 }
 
-                if (CurrentPickingPos.InOrderPos != null && (CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                if (CurrentPickingPos.InOrderPos != null && (CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                                                           || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle))
                 {
                     var queryFromDB = DatabaseApp.FacilityLot.Where(c => c.Material != null && c.MaterialID == CurrentPickingPos.InOrderPos.MaterialID);
@@ -805,7 +1152,7 @@ namespace gip.bso.logistics
                             bookableFacilityLots = query3.ToList();
                     }
                 }
-                else if (CurrentPickingPos.OutOrderPos != null && (CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                else if (CurrentPickingPos.OutOrderPos != null && (CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
                                                                 || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
                 {
                     var queryFromDB = DatabaseApp.FacilityLot.Where(c => c.Material != null && c.MaterialID == CurrentPickingPos.OutOrderPos.MaterialID);
@@ -866,13 +1213,13 @@ namespace gip.bso.logistics
             {
                 if (CurrentPickingPos == null || CurrentPicking == null)
                     return null;
-                if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                   || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle) && CurrentPickingPos.InOrderPos != null)
                 {
                     CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoRefresh(this.DatabaseApp);
                     return CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
-                else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue 
+                else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
                        || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle) && CurrentPickingPos.OutOrderPos != null)
                 {
                     CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoRefresh(this.DatabaseApp);
@@ -1098,8 +1445,8 @@ namespace gip.bso.logistics
                     }
                 case "CurrentPickingPos\\PickingQuantityUOM":
                 case "CurrentPickingPos\\PickingMaterial":
-                    if (    CurrentPickingPos == null 
-                        || CurrentPickingPos.InOrderPosID.HasValue 
+                    if (CurrentPickingPos == null
+                        || CurrentPickingPos.InOrderPosID.HasValue
                         || CurrentPickingPos.OutOrderPosID.HasValue
                         || CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any())
                         return Global.ControlModes.Disabled;
@@ -1655,7 +2002,7 @@ namespace gip.bso.logistics
 
         public bool IsEnabledNewFacilityPreBooking()
         {
-            if (CurrentPickingPos == null )
+            if (CurrentPickingPos == null)
                 //|| (CurrentPickingPos.InOrderPos == null && CurrentPickingPos.OutOrderPos == null && !CurrentPickingPos.PickingPosProdOrderPartslistPos_PickingPos.Any()))
                 return false;
             if (CurrentPickingPos.InOrderPos != null
@@ -1695,8 +2042,8 @@ namespace gip.bso.logistics
             if (currentMethodBooking != null && CurrentPickingPos != null)
             {
                 FacilityLot existingFacilityLot = null;
-                FacilityPreBooking[] existingPrebookings = new FacilityPreBooking[] { }; 
-               
+                FacilityPreBooking[] existingPrebookings = new FacilityPreBooking[] { };
+
                 if (CurrentPickingPos.InOrderPos != null)
                 {
                     existingPrebookings = CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.Where(c => c != CurrentFacilityPreBooking).ToArray();
@@ -1709,7 +2056,7 @@ namespace gip.bso.logistics
                 {
                     existingPrebookings = CurrentPickingPos.FacilityPreBooking_PickingPos.Where(c => c != CurrentFacilityPreBooking).ToArray();
                 }
-                
+
                 foreach (FacilityPreBooking preBook in existingPrebookings)
                 {
                     ACMethodBooking methodBooking = preBook.ACMethodBooking as ACMethodBooking;
@@ -1960,7 +2307,7 @@ namespace gip.bso.logistics
         {
             if (CurrentACMethodBooking == null)
                 return;
-            if (   CurrentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement 
+            if (CurrentACMethodBooking.BookingType < GlobalApp.FacilityBookingType.InOrderPosInwardMovement
                 || CurrentACMethodBooking.BookingType > GlobalApp.FacilityBookingType.PickingOutwardCancel)
             {
                 if (CurrentACMethodBooking.InwardQuantity.HasValue && !CurrentACMethodBooking.OutwardQuantity.HasValue)
@@ -2033,7 +2380,7 @@ namespace gip.bso.logistics
             // Nur bei Wareneingängen kann Charge ausgewählt werden
             return CurrentACMethodBooking != null
                 && CurrentPickingPos != null
-                && (   CurrentACMethodBooking.InOrderPos != null
+                && (CurrentACMethodBooking.InOrderPos != null
                     || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
                     || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel
                     || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingInward)
