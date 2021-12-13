@@ -161,7 +161,7 @@ namespace gip.bso.logistics
             {
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
-                ACFilterItem acFilterPickingNo = new ACFilterItem(Global.FilterTypes.filter, "PickingNo", Global.LogicalOperators.contains, Global.Operators.and, null, true);
+                ACFilterItem acFilterPickingNo = new ACFilterItem(Global.FilterTypes.filter, "PickingNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
                 aCFilterItems.Add(acFilterPickingNo);
 
                 ACFilterItem acFilterPickingIndex = new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, null, true);
@@ -170,10 +170,10 @@ namespace gip.bso.logistics
                 ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
                 aCFilterItems.Add(phOpen);
 
-                ACFilterItem acFilterDeliveryDateFrom = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.greaterThanOrEqual, Operators.and, "", true, true);
+                ACFilterItem acFilterDeliveryDateFrom = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.greaterThanOrEqual, Operators.and, "", true, false);
                 aCFilterItems.Add(acFilterDeliveryDateFrom);
 
-                ACFilterItem acFilterDeliveryDateTo = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.lessThan, Operators.and, "", true, true);
+                ACFilterItem acFilterDeliveryDateTo = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.lessThan, Operators.and, "", true, false);
                 aCFilterItems.Add(acFilterDeliveryDateTo);
 
                 ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
