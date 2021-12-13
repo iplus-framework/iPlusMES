@@ -76,6 +76,9 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(FacilityInventory facilityInventory, int sequence)
         {
+            if (   facilityInventory == null
+                || !facilityInventory.FacilityInventoryPos_FacilityInventory.Any())
+                return;
             var elements = from c in facilityInventory.FacilityInventoryPos_FacilityInventory
                            where c.Sequence > sequence && c.Sequence != 0
                            orderby c.Sequence

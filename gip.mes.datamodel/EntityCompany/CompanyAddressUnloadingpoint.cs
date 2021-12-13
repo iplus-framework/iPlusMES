@@ -83,6 +83,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(CompanyAddress address, int sequence) 
         {
+            if (   address == null
+                || !address.CompanyAddressUnloadingpoint_CompanyAddress.Any())
+                return;
+
             var elements = from c in address.CompanyAddressUnloadingpoint_CompanyAddress where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

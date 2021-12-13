@@ -92,6 +92,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(DeliveryNote inDeliveryNote, int sequence)
         {
+            if (   inDeliveryNote == null
+                || !inDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
+                return;
+
             var elements = from c in inDeliveryNote.DeliveryNotePos_DeliveryNote where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

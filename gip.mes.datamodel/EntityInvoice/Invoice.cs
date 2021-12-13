@@ -293,6 +293,9 @@ namespace gip.mes.datamodel
         /// </summary>
         public void RenumberSequence(int sequence)
         {
+            if (!InvoicePos_Invoice.Any())
+                return;
+
             var elements = InvoicePos_Invoice.AsEnumerable().Where(c => c.EntityState != System.Data.EntityState.Deleted && c.Sequence >= sequence).OrderBy(c => c.Sequence);
             foreach (var element in elements)
             {

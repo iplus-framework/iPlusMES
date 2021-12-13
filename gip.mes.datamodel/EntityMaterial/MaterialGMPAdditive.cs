@@ -82,6 +82,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(Material material, int sequence)
         {
+            if (material == null
+                || !material.MaterialGMPAdditive_Material.Any())
+                return;
+
             var elements = from c in material.MaterialGMPAdditive_Material where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

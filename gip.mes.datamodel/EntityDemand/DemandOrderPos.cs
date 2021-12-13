@@ -103,6 +103,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(DemandOrder demandOrder, int sequence)
         {
+            if (demandOrder == null
+                || !demandOrder.DemandOrderPos_DemandOrder.Any())
+                return;
+
             var elements = from c in demandOrder.DemandOrderPos_DemandOrder where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

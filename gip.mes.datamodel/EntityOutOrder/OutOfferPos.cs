@@ -115,17 +115,23 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer ist nach dem Löschen aufzurufen
         /// </summary>
-        public static void RenumberSequence(OutOffer OutOffer, int sequence, OutOfferPos groupPos = null)
+        public static void RenumberSequence(OutOffer outOffer, int sequence, OutOfferPos groupPos = null)
         {
+            if (outOffer == null
+                || !outOffer.OutOfferPos_OutOffer.Any())
+                return;
+
             IEnumerable<OutOfferPos> elements = null;
 
             if (groupPos != null)
             {
+                if (!groupPos.OutOfferPos_GroupOutOfferPos.Any())
+                    return;
                 elements = groupPos.OutOfferPos_GroupOutOfferPos.Where(c => c.Sequence > sequence).ToList();
             }
             else
             {
-                elements = OutOffer.OutOfferPos_OutOffer.Where(c => c.Sequence > sequence).ToList();
+                elements = outOffer.OutOfferPos_OutOffer.Where(c => c.Sequence > sequence).ToList();
             }
 
             int sequenceCount = sequence;

@@ -160,6 +160,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(OutOrder outOrder, int sequence)
         {
+            if (outOrder == null
+                || !outOrder.OutOrderPos_OutOrder.Any())
+                return;
+
             var elements = from c in outOrder.OutOrderPos_OutOrder where c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

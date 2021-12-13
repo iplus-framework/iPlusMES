@@ -97,6 +97,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(Picking inPicking, int sequence)
         {
+            if (inPicking == null
+                || !inPicking.PickingPos_Picking.Any())
+                return;
+
             var elements = from c in inPicking.PickingPos_Picking where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

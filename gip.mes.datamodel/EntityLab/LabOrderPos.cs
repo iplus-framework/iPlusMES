@@ -85,6 +85,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(LabOrder labReport, int sequence)
         {
+            if (labReport == null
+                || !labReport.LabOrderPos_LabOrder.Any())
+                return;
+
             var elements = from c in labReport.LabOrderPos_LabOrder where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

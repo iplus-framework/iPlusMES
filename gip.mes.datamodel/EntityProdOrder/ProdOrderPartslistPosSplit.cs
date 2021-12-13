@@ -82,6 +82,10 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(ProdOrderPartslistPos outOrderPos, int sequence)
         {
+            if (outOrderPos == null
+                || !outOrderPos.ProdOrderPartslistPosSplit_ProdOrderPartslistPos.Any())
+                return;
+
             var elements = from c in outOrderPos.ProdOrderPartslistPosSplit_ProdOrderPartslistPos where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)

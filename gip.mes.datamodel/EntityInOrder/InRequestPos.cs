@@ -95,9 +95,13 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer ist nach dem Löschen aufzurufen
         /// </summary>
-        public static void RenumberSequence(InRequest InRequest, int sequence)
+        public static void RenumberSequence(InRequest inRequest, int sequence)
         {
-            var elements = from c in InRequest.InRequestPos_InRequest where c.Sequence > sequence orderby c.Sequence select c;
+            if (inRequest == null
+                || !inRequest.InRequestPos_InRequest.Any())
+                return;
+
+            var elements = from c in inRequest.InRequestPos_InRequest where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

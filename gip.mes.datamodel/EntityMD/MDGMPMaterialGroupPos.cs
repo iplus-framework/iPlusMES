@@ -84,9 +84,13 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Handling von Sequencenummer ist nach dem Löschen aufzurufen
         /// </summary>
-        public static void RenumberSequence(MDGMPMaterialGroup MDGMPMaterialGroup, int sequence)
+        public static void RenumberSequence(MDGMPMaterialGroup mdGMPMaterialGroup, int sequence)
         {
-            var elements = from c in MDGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup where c.Sequence > sequence orderby c.Sequence select c;
+            if (mdGMPMaterialGroup == null
+                || !mdGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup.Any())
+                return;
+
+            var elements = from c in mdGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup where c.Sequence > sequence orderby c.Sequence select c;
             int sequenceCount = sequence;
             foreach (var element in elements)
             {
