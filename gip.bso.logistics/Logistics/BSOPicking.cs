@@ -181,7 +181,7 @@ namespace gip.bso.logistics
 
                 ACFilterItem acFilterPickingStateIndex = new ACFilterItem(FilterTypes.filter, "PickingStateIndex", LogicalOperators.equal, Operators.and, "", true);
                 aCFilterItems.Add(acFilterPickingStateIndex);
-                
+
                 return aCFilterItems;
             }
         }
@@ -264,7 +264,7 @@ namespace gip.bso.logistics
                         else
                             filterDateFrom.SearchWord = value.Value.ToString("dd.MM.yyyy HH:mm:ss");
                         OnPropertyChanged("FilterDateFrom");
-                       
+
                         InFilterChange = false;
                     }
                 }
@@ -504,32 +504,6 @@ namespace gip.bso.logistics
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Picking>("Picking", this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
 
-                    //bool rebuildACQueryDef = false;
-                    //short filterDelivType = (short)GlobalApp.PickingType.Receipt;
-                    //if (navACQueryDefinition.ACFilterColumns.Count <= 0)
-                    //{
-                    //    rebuildACQueryDef = true;
-                    //}
-                    //else
-                    //{
-                    //    int countFoundCorrect = 0;
-                    //    foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                    //    {
-                    //        if (filterItem.PropertyName == "PickingTypeIndex")
-                    //        {
-                    //            if (filterItem.SearchWord == filterDelivType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.greaterThanOrEqual)
-                    //                countFoundCorrect++;
-                    //        }
-                    //    }
-                    //    if (countFoundCorrect < 1)
-                    //        rebuildACQueryDef = true;
-                    //}
-                    //if (rebuildACQueryDef)
-                    //{
-                    //    RebuildAccessPrimary();
-                    //    navACQueryDefinition.SaveConfig(true);
-                    //}
-
                 }
                 return _AccessPrimary;
             }
@@ -540,7 +514,7 @@ namespace gip.bso.logistics
             ACFilterItem aCFilterItem = sender as ACFilterItem;
             if (e.PropertyName == "SearchWord" && !InFilterChange)
             {
-                switch(aCFilterItem.PropertyName)
+                switch (aCFilterItem.PropertyName)
                 {
                     case "PickingNo":
                         OnPropertyChanged("FilterPickingPickingNo");
@@ -742,6 +716,8 @@ namespace gip.bso.logistics
         #endregion
 
         #region FacilityPreBooking
+
+        #region FacilityPreBooking -> PreBooking
         FacilityPreBooking _CurrentFacilityPreBooking;
         [ACPropertyCurrent(607, "FacilityPreBooking")]
         public FacilityPreBooking CurrentFacilityPreBooking
@@ -1184,6 +1160,74 @@ namespace gip.bso.logistics
                 return bookableFacilityLots;
             }
         }
+
+        #endregion
+
+        #region  FacilityPreBooking -> Available quants
+
+        private bool IsInward;
+        private Material QuantDialogMaterial;
+
+
+        private FacilityCharge _SelectedPreBookingAvailableQuants;
+        /// <summary>
+        /// Selected property for FacilityCharge
+        /// </summary>
+        /// <value>The selected PreBookingAvailableQuants</value>
+        [ACPropertySelected(500, "PropertyGroupName", "en{'TODO: PreBookingAvailableQuants'}de{'TODO: PreBookingAvailableQuants'}")]
+        public FacilityCharge SelectedPreBookingAvailableQuants
+        {
+            get
+            {
+                return _SelectedPreBookingAvailableQuants;
+            }
+            set
+            {
+                if (_SelectedPreBookingAvailableQuants != value)
+                {
+                    _SelectedPreBookingAvailableQuants = value;
+                    OnPropertyChanged("SelectedPreBookingAvailableQuants");
+                }
+            }
+        }
+
+
+        private List<FacilityCharge> _PreBookingAvailableQuantsList;
+        /// <summary>
+        /// List property for FacilityCharge
+        /// </summary>
+        /// <value>The PreBookingAvailableQuants list</value>
+        [ACPropertyList(501, "PropertyGroupName")]
+        public List<FacilityCharge> PreBookingAvailableQuantsList
+        {
+            get
+            {
+                if (_PreBookingAvailableQuantsList == null)
+                    _PreBookingAvailableQuantsList = LoadPreBookingAvailableQuantsList();
+                return _PreBookingAvailableQuantsList;
+            }
+        }
+
+        private List<FacilityCharge> LoadPreBookingAvailableQuantsList()
+        {
+            return
+                QuantDialogMaterial
+                .FacilityCharge_Material
+                .Where(c => !c.NotAvailable)
+                .OrderBy(c => c.ExpirationDate)
+                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .ToList();
+        }
+
+        private void LoadPreBookingAvailableQuants()
+        {
+            _PreBookingAvailableQuantsList = null;
+            OnPropertyChanged("PreBookingAvailableQuantsList");
+        }
+
+
+        #endregion
+
         #endregion
 
         #region FacilityBooking
@@ -1985,6 +2029,9 @@ namespace gip.bso.logistics
         #endregion
 
         #region FacilityPreBooking
+
+        #region FacilityPreBooking ->  PreBooking
+
         [ACMethodInteraction("FacilityPreBooking", "en{'New Posting'}de{'Neue Buchung'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
         public void NewFacilityPreBooking()
         {
@@ -2387,6 +2434,136 @@ namespace gip.bso.logistics
                 && CurrentPickingPos.Material != null
                 && CurrentPickingPos.Material.IsLotManaged;
         }
+
+        #endregion
+
+        #region FacilityPreBooking -> Available quants
+
+        /// <summary>
+        /// Source Property: ShowDlgAvailableQuants
+        /// </summary>
+        [ACMethodInfo("ShowDlgInwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
+        public void ShowDlgInwardAvailableQuants()
+        {
+            if (!IsEnabledShowDlgInwardAvailableQuants())
+                return;
+            IsInward = true;
+            QuantDialogMaterial = GetPreBookingInwardMaterial();
+            _PreBookingAvailableQuantsList = null;
+            ShowDialog(this, "DlgAvailableQuants");
+        }
+
+        public bool IsEnabledShowDlgInwardAvailableQuants()
+        {
+            return CurrentACMethodBooking != null && GetPreBookingInwardMaterial() != null;
+        }
+
+        [ACMethodInfo("ShowDlgOutwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
+        public void ShowDlgOutwardAvailableQuants()
+        {
+            if (!IsEnabledShowDlgOutwardAvailableQuants())
+                return;
+            IsInward = false;
+            QuantDialogMaterial = GetPreBookingOutwardMaterial();
+            _PreBookingAvailableQuantsList = null;
+            ShowDialog(this, "DlgAvailableQuants");
+        }
+
+        public bool IsEnabledShowDlgOutwardAvailableQuants()
+        {
+            return CurrentACMethodBooking != null && GetPreBookingOutwardMaterial() != null;
+        }
+
+        // DlgAvailableQuantsOk
+        /// <summary>
+        /// Source Property: DlgAvailableQuantsOk
+        /// </summary>
+        [ACMethodInfo("DlgAvailableQuantsOk", "en{'Ok'}de{'Ok'}", 999)]
+        public void DlgAvailableQuantsOk()
+        {
+            if (!IsEnabledDlgAvailableQuantsOk())
+                return;
+            if (IsInward)
+            {
+                CurrentACMethodBooking.InwardFacilityCharge = SelectedPreBookingAvailableQuants;
+                CurrentACMethodBooking.InwardFacility = SelectedPreBookingAvailableQuants.Facility;
+                CurrentACMethodBooking.InwardMaterial = null;
+                CurrentACMethodBooking.InwardFacilityLot = null;
+            }
+            else
+            {
+                CurrentACMethodBooking.OutwardFacilityCharge = SelectedPreBookingAvailableQuants;
+                CurrentACMethodBooking.OutwardFacility = SelectedPreBookingAvailableQuants.Facility;
+                CurrentACMethodBooking.OutwardMaterial = null;
+                CurrentACMethodBooking.OutwardFacilityLot = null;
+            }
+            OnPropertyChanged("CurrentACMethodBooking");
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgAvailableQuantsOk()
+        {
+            return SelectedPreBookingAvailableQuants != null;
+        }
+
+        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999)]
+        public void DlgAvailableQuantsCancel()
+        {
+            CloseTopDialog();
+        }
+
+
+        private Material GetPreBookingOutwardMaterial()
+        {
+            Material material = null;
+            if (CurrentACMethodBooking != null)
+            {
+                if (CurrentACMethodBooking.OutwardMaterial != null)
+                {
+                    material = CurrentACMethodBooking.OutwardMaterial;
+                }
+                else if (CurrentACMethodBooking.OutwardFacilityCharge != null)
+                {
+                    material = CurrentACMethodBooking.OutwardFacilityCharge.Material;
+                }
+                else if (CurrentACMethodBooking.OutwardFacilityLot != null)
+                {
+                    material = CurrentACMethodBooking.OutwardFacilityLot.Material;
+                }
+                else if(CurrentACMethodBooking.PickingPos != null)
+                {
+                    material = CurrentACMethodBooking.PickingPos.Material;
+                }
+            }
+            return material;
+        }
+
+        private Material GetPreBookingInwardMaterial()
+        {
+            Material material = null;
+            if (CurrentACMethodBooking != null)
+            {
+                if (CurrentACMethodBooking.InwardMaterial != null)
+                {
+                    material = CurrentACMethodBooking.InwardMaterial;
+                }
+                else if (CurrentACMethodBooking.InwardFacilityCharge != null)
+                {
+                    material = CurrentACMethodBooking.InwardFacilityCharge.Material;
+                }
+                else if (CurrentACMethodBooking.InwardFacilityLot != null)
+                {
+                    material = CurrentACMethodBooking.InwardFacilityLot.Material;
+                }
+                else if (CurrentACMethodBooking.PickingPos != null)
+                {
+                    material = CurrentACMethodBooking.PickingPos.Material;
+                }
+            }
+            return material;
+        }
+
+        #endregion
 
         #endregion
 
