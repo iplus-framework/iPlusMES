@@ -427,21 +427,25 @@ namespace gip.bso.facility
             {
                 if (AccessPrimary == null)
                     return;
-                if (CurrentFacilityCharge != null)
-                    CurrentFacilityCharge.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
-
-                AccessPrimary.CurrentNavObject = value;
-
-                if (value != null)
+                if(AccessPrimary.CurrentNavObject != value)
                 {
-                    value.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
-                    value.PropertyChanged += CurrentFacilityCharge_PropertyChanged;
+                    if (CurrentFacilityCharge != null)
+                        CurrentFacilityCharge.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
+
+                    AccessPrimary.CurrentNavObject = value;
+
+                    if (value != null)
+                    {
+                        value.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;
+                        value.PropertyChanged += CurrentFacilityCharge_PropertyChanged;
+                    }
+
+                    OnPropertyChanged_CurrentFacilityCharge();
+                    OnPropertyChanged("CurrentFacilityCharge");
+                    OnPropertyChanged("ContractualPartnerList");
+                    RefreshFilterFacilityLotAccess();
+                    ClearBookingData();
                 }
-                OnPropertyChanged_CurrentFacilityCharge();
-                OnPropertyChanged("CurrentFacilityCharge");
-                OnPropertyChanged("ContractualPartnerList");
-                RefreshFilterFacilityLotAccess();
-                ClearBookingData();
             }
         }
 
@@ -456,8 +460,13 @@ namespace gip.bso.facility
                 OnPropertyChanged("StorageUnitTestList");
                 OnPropertyChanged("ContractualPartnerList");
                 RefreshFilterFacilityLotAccess();
+                OnPropertyChanged("CurrentFacilityCharge");
             }
             if (e.PropertyName == "FacilityLotID")
+            {
+                OnPropertyChanged("CurrentFacilityCharge");
+            }
+            if (e.PropertyName == "FacilityID")
             {
                 OnPropertyChanged("CurrentFacilityCharge");
             }
@@ -560,7 +569,7 @@ namespace gip.bso.facility
                     return null;
                 if (CurrentFacilityCharge.Material == null)
                     return null;
-                return CurrentFacilityCharge.Material.MDUnitList;
+                return CurrentFacilityCharge.Material.MaterialUnitList;
             }
         }
 

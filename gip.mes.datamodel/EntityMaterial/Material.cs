@@ -244,6 +244,40 @@ namespace gip.mes.datamodel
         #endregion
 
         #region UnitCalculation
+
+        /// <summary>
+        /// Gibt eine Liste von Mengeneneinheiten zurück in denen das Material im Lager verwaltet werden darf
+        /// </summary>
+        List<MDUnit> _MaterialUnitList = null;
+        /// <summary>
+        /// Gets the MU quantity unit list.
+        /// </summary>
+        /// <value>The MU quantity unit list.</value>
+        [ACPropertyInfo(9999, "", "en{'Mat. Unit'}de{'Mat. Einheiten'}")]
+        public List<MDUnit> MaterialUnitList
+        {
+            get
+            {
+                if (this.BaseMDUnit == null)
+                    return null;
+                if (_MaterialUnitList == null)
+                {
+                    _MaterialUnitList = new List<MDUnit>();
+                    _MaterialUnitList.Insert(0, this.BaseMDUnit);
+
+                    // Materialbezogene Einheiten
+                    foreach (var materialUnit in this.MaterialUnit_Material)
+                    {
+                        if (!_MaterialUnitList.Contains(materialUnit.ToMDUnit))
+                        {
+                            _MaterialUnitList.Add(materialUnit.ToMDUnit);
+                        }
+                    }
+                }
+                return _MaterialUnitList;
+            }
+        }
+
         /// <summary>
         /// Gibt eine Liste von Mengeneneinheiten zurück in denen das Material im Lager verwaltet werden darf
         /// </summary>
@@ -262,16 +296,7 @@ namespace gip.mes.datamodel
                 if (_MDUnitList == null)
                 {
                     _MDUnitList = new List<MDUnit>();
-                    _MDUnitList.Insert(0, this.BaseMDUnit);
-
-                    // Materialbezogene Einheiten
-                    foreach (var materialUnit in this.MaterialUnit_Material)
-                    {
-                        if (!_MDUnitList.Contains(materialUnit.ToMDUnit))
-                        {
-                            _MDUnitList.Add(materialUnit.ToMDUnit);
-                        }
-                    }
+                    _MDUnitList.AddRange(MaterialUnitList);
 
                     // Umrechenbare Einheiten
                     foreach (var mdUnit in this.BaseMDUnit.ConvertableUnits)
@@ -282,7 +307,6 @@ namespace gip.mes.datamodel
                         }
                     }
                 }
-
                 return _MDUnitList;
             }
         }
