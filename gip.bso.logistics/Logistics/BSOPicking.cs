@@ -164,7 +164,7 @@ namespace gip.bso.logistics
                 ACFilterItem acFilterPickingNo = new ACFilterItem(Global.FilterTypes.filter, "PickingNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
                 aCFilterItems.Add(acFilterPickingNo);
 
-                ACFilterItem acFilterPickingIndex = new ACFilterItem(Global.FilterTypes.filter, "PickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, null, true);
+                ACFilterItem acFilterPickingIndex = new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, null, true);
                 aCFilterItems.Add(acFilterPickingIndex);
 
                 ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
@@ -181,7 +181,7 @@ namespace gip.bso.logistics
 
                 ACFilterItem acFilterPickingStateIndex = new ACFilterItem(FilterTypes.filter, "PickingStateIndex", LogicalOperators.equal, Operators.and, "", true);
                 aCFilterItems.Add(acFilterPickingStateIndex);
-
+                
                 return aCFilterItems;
             }
         }
@@ -333,7 +333,7 @@ namespace gip.bso.logistics
                     _SelectedFilterMDPickingType = value;
                     OnPropertyChanged("SelectedFilterMDPickingType");
 
-                    short? filterPickingTypeIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingTypeIndex");
+                    short? filterPickingTypeIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("MDPickingType\\MDPickingTypeIndex");
                     short? newPickingTypeIndex = null;
                     if (value != null)
                         newPickingTypeIndex = value.MDPickingTypeIndex;
@@ -341,7 +341,7 @@ namespace gip.bso.logistics
                     {
                         InFilterChange = true;
 
-                        AccessPrimary.NavACQueryDefinition.SetSearchValue<short?>("PickingTypeIndex", newPickingTypeIndex);
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue<short?>("MDPickingType\\MDPickingTypeIndex", newPickingTypeIndex);
                         OnPropertyChanged("SelectedFilterMDPickingType");
 
                         InFilterChange = false;
