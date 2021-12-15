@@ -817,7 +817,9 @@ namespace gip.mes.processapplication
                                     if (bookingParam.ValidMessage.IsSucceded())
                                     {
                                         facilityPreBooking.DeleteACObject(dbApp, true);
-                                        pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
+                                        if (PickingManager != null)
+                                            PickingManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false); 
+                                        //pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
                                         //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
                                         //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
                                     }

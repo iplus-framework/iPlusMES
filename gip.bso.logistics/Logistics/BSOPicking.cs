@@ -2279,56 +2279,7 @@ namespace gip.bso.logistics
 
                 DeleteFacilityPreBooking();
                 OnPropertyChanged("FacilityBookingList");
-
-                if (CurrentPickingPos.InOrderPos != null)
-                {
-                    CurrentPickingPos.InOrderPos.TopParentInOrderPos.RecalcActualQuantity();
-                    if (isCancellation)
-                    {
-                        MDInOrderPosState state = DatabaseApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Cancelled).FirstOrDefault();
-                        if (state != null)
-                            CurrentPickingPos.InOrderPos.MDInOrderPosState = state;
-                        CurrentPickingPos.InOrderPos.TopParentInOrderPos.CalledUpQuantity -= CurrentPickingPos.InOrderPos.TargetQuantity;
-                        CurrentPickingPos.InOrderPos.TargetQuantity = 0;
-                        CurrentPickingPos.InOrderPos.TargetQuantityUOM = 0;
-                    }
-                    else
-                    {
-                        if (CurrentPickingPos.DiffQuantityUOM >= 0)
-                        {
-                            MDInOrderPosState state = DatabaseApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
-                            if (state != null)
-                                CurrentPickingPos.InOrderPos.MDInOrderPosState = state;
-                        }
-                    }
-                }
-                else if (CurrentPickingPos.OutOrderPos != null)
-                {
-                    CurrentPickingPos.OutOrderPos.TopParentOutOrderPos.RecalcActualQuantity();
-                    if (isCancellation)
-                    {
-                        MDOutOrderPosState state = DatabaseApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Cancelled).FirstOrDefault();
-                        if (state != null)
-                            CurrentPickingPos.OutOrderPos.MDOutOrderPosState = state;
-                        CurrentPickingPos.OutOrderPos.TopParentOutOrderPos.CalledUpQuantity -= CurrentPickingPos.OutOrderPos.TargetQuantity;
-                        CurrentPickingPos.OutOrderPos.TargetQuantity = 0;
-                        CurrentPickingPos.OutOrderPos.TargetQuantityUOM = 0;
-                    }
-                    else
-                    {
-                        if (CurrentPickingPos.DiffQuantityUOM >= 0)
-                        {
-                            MDOutOrderPosState state = DatabaseApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
-                            if (state != null)
-                                CurrentPickingPos.OutOrderPos.MDOutOrderPosState = state;
-                        }
-                    }
-                }
-                else
-                {
-                    CurrentPickingPos.IncreasePickingActualUOM(changedQuantity);
-                    CurrentPickingPos.RecalcActualQuantity();
-                }
+                PickingManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, isCancellation, true);
                 Save();
             }
             PostExecute("BookCurrentACMethodBooking");

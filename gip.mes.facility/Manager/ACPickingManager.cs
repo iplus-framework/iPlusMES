@@ -1005,7 +1005,7 @@ namespace gip.mes.facility
         #endregion
 
         #region Booking
-        protected virtual PostingTypeEnum DeterminePostingType(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos)
+        protected virtual PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, PickingPos pickingPos)
         {
             PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
             if (pickingPos.InOrderPos != null)
@@ -1015,16 +1015,16 @@ namespace gip.mes.facility
             else if (pickingPos.OutOrderPos != null)
             {
                 postingTypeEnum = PostingTypeEnum.Outward;
-                if (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle)
+                if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.IssueVehicle)
                     postingTypeEnum = PostingTypeEnum.Relocation;
             }
             else
             {
                 postingTypeEnum = PostingTypeEnum.Relocation;
-                if (    pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
-                     || pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
+                if (    pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Receipt
+                     || pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.ReceiptVehicle)
                     postingTypeEnum = PostingTypeEnum.Inward;
-                else if (pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue)
+                else if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Issue)
                          //|| pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
                     postingTypeEnum = PostingTypeEnum.Outward;
             }
@@ -1034,7 +1034,7 @@ namespace gip.mes.facility
         public FacilityPreBooking NewFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos, double? actualQuantityUOM = null, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
         {
             if (postingType == PostingTypeEnum.NotDefined)
-                postingType = DeterminePostingType(facilityManager, dbApp, pickingPos);
+                postingType = DeterminePostingType(dbApp, pickingPos);
             IACObject businessEntity = pickingPos;
             if (pickingPos.InOrderPos != null)
             {
@@ -1116,7 +1116,15 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.RemainingDosingQuantityUOM;
+                    if (actualQuantityUOM.HasValue)
+                        quantityUOM = actualQuantityUOM.Value;
+                    else
+                    {
+                        //if (pickingPos.TargetQuantity >= 0.0001)
+                            quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        //else
+                        //    quantityUOM = pickingPos.DiffQuantityUOM;
+                    }
                     acMethodBooking.InwardQuantity = quantityUOM;
                     acMethodBooking.InwardFacility = pickingPos.ToFacility;
                     acMethodBooking.PickingPos = pickingPos;
@@ -1162,7 +1170,15 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.RemainingDosingQuantityUOM;
+                    if (actualQuantityUOM.HasValue)
+                        quantityUOM = actualQuantityUOM.Value;
+                    else
+                    {
+                        //if (pickingPos.TargetQuantity >= 0.0001)
+                            quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        //else
+                        //    quantityUOM = pickingPos.DiffQuantityUOM;
+                    }
                     acMethodBooking.OutwardQuantity = quantityUOM;
                     acMethodBooking.OutwardFacility = pickingPos.FromFacility;
                     if (pickingPos.FromFacility != null && pickingPos.FromFacility.Material != null)
@@ -1217,7 +1233,15 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.RemainingDosingQuantityUOM;
+                    if (actualQuantityUOM.HasValue)
+                        quantityUOM = actualQuantityUOM.Value;
+                    else
+                    {
+                        //if (pickingPos.TargetQuantity >= 0.0001)
+                            quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        //else
+                        //    quantityUOM = pickingPos.DiffQuantityUOM;
+                    }
                     acMethodBooking.InwardQuantity = quantityUOM;
                     acMethodBooking.InwardFacility = pickingPos.ToFacility;
                     acMethodBooking.OutwardQuantity = quantityUOM;
@@ -1236,7 +1260,7 @@ namespace gip.mes.facility
         public List<FacilityPreBooking> CancelFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
         {
             if (postingType == PostingTypeEnum.NotDefined)
-                postingType = DeterminePostingType(facilityManager, dbApp, pickingPos);
+                postingType = DeterminePostingType(dbApp, pickingPos);
 
             List<FacilityPreBooking> bookings = new List<FacilityPreBooking>();
             ACMethodBooking acMethodClone = null;
@@ -1466,6 +1490,80 @@ namespace gip.mes.facility
             }
             return result;
         }
+
+        public virtual void RecalcAfterPosting(DatabaseApp dbApp, PickingPos pickingPos, double postedQuantityUOM, bool isCancellation, bool autoSetState = false, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
+        {
+            if (postingType == PostingTypeEnum.NotDefined)
+                postingType = DeterminePostingType(dbApp, pickingPos);
+            if (pickingPos.InOrderPos != null)
+            {
+                pickingPos.InOrderPos.TopParentInOrderPos.RecalcActualQuantity();
+                if (isCancellation)
+                {
+                    MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Cancelled).FirstOrDefault();
+                    if (state != null)
+                        pickingPos.InOrderPos.MDInOrderPosState = state;
+                    pickingPos.InOrderPos.TopParentInOrderPos.CalledUpQuantity -= pickingPos.InOrderPos.TargetQuantity;
+                    pickingPos.InOrderPos.TargetQuantity = 0;
+                    pickingPos.InOrderPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    if (   autoSetState 
+                        && (   (pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                            || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
+                    {
+                        MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
+                        if (state != null)
+                            pickingPos.InOrderPos.MDInOrderPosState = state;
+                    }
+                }
+            }
+            else if (pickingPos.OutOrderPos != null)
+            {
+                pickingPos.OutOrderPos.TopParentOutOrderPos.RecalcActualQuantity();
+                if (isCancellation)
+                {
+                    MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Cancelled).FirstOrDefault();
+                    if (state != null)
+                        pickingPos.OutOrderPos.MDOutOrderPosState = state;
+                    pickingPos.OutOrderPos.TopParentOutOrderPos.CalledUpQuantity -= pickingPos.OutOrderPos.TargetQuantity;
+                    pickingPos.OutOrderPos.TargetQuantity = 0;
+                    pickingPos.OutOrderPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    if (autoSetState
+                        && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                            || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
+                    {
+                        MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
+                        if (state != null)
+                            pickingPos.OutOrderPos.MDOutOrderPosState = state;
+                    }
+                }
+            }
+            else
+            {
+                pickingPos.IncreasePickingActualUOM(postedQuantityUOM);
+                pickingPos.RecalcActualQuantity();
+
+                if (autoSetState
+                    && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                        || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
+                {
+                    MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
+                    if (state != null)
+                        pickingPos.OutOrderPos.MDOutOrderPosState = state;
+                }
+            }
+            pickingPos.OnEntityPropertyChanged("ActualQuantity");
+            pickingPos.OnEntityPropertyChanged("ActualQuantityUOM");
+            pickingPos.OnEntityPropertyChanged("DiffQuantityUOM");
+            pickingPos.OnEntityPropertyChanged("PickingDiffQuantityUOM");
+        }
+
+
 
         public MsgWithDetails CreateNewPicking(ACMethodBooking relocationBooking, gip.core.datamodel.ACClassMethod aCClassMethod, DatabaseApp dbApp, Database dbIPlus, bool setReadyToLoad, out Picking picking)
         {

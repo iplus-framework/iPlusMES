@@ -99,6 +99,19 @@ namespace gip.mes.datamodel
 
         #region Additional
 
+        public GlobalApp.PickingType PickingType
+        {
+            get
+            {
+                return (GlobalApp.PickingType) MDPickingTypeIndex;
+            }
+            set
+            {
+                MDPickingTypeIndex = (short)value;
+                OnPropertyChanged("PickingType");
+            }
+        }
+
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
         public String MDPickingTypeName
         {

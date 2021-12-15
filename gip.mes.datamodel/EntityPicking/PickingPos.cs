@@ -325,6 +325,63 @@ namespace gip.mes.datamodel
             }
         }
 
+        public void RecalcAfterPosting(DatabaseApp dbApp, double postedQuantityUOM, bool isCancellation, bool autoSetState = false)
+        {
+            if (InOrderPos != null)
+            {
+                InOrderPos.TopParentInOrderPos.RecalcActualQuantity();
+                if (isCancellation)
+                {
+                    MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Cancelled).FirstOrDefault();
+                    if (state != null)
+                        InOrderPos.MDInOrderPosState = state;
+                    InOrderPos.TopParentInOrderPos.CalledUpQuantity -= InOrderPos.TargetQuantity;
+                    InOrderPos.TargetQuantity = 0;
+                    InOrderPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    if (autoSetState && DiffQuantityUOM >= 0)
+                    {
+                        MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
+                        if (state != null)
+                            InOrderPos.MDInOrderPosState = state;
+                    }
+                }
+            }
+            else if (OutOrderPos != null)
+            {
+                OutOrderPos.TopParentOutOrderPos.RecalcActualQuantity();
+                if (isCancellation)
+                {
+                    MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Cancelled).FirstOrDefault();
+                    if (state != null)
+                        OutOrderPos.MDOutOrderPosState = state;
+                    OutOrderPos.TopParentOutOrderPos.CalledUpQuantity -= OutOrderPos.TargetQuantity;
+                    OutOrderPos.TargetQuantity = 0;
+                    OutOrderPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    if (autoSetState && DiffQuantityUOM >= 0)
+                    {
+                        MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
+                        if (state != null)
+                            OutOrderPos.MDOutOrderPosState = state;
+                    }
+                }
+            }
+            else
+            {
+                IncreasePickingActualUOM(postedQuantityUOM);
+                RecalcActualQuantity();
+            }
+            OnPropertyChanged("ActualQuantity");
+            OnPropertyChanged("ActualQuantityUOM");
+            OnPropertyChanged("DiffQuantityUOM");
+            OnPropertyChanged("PickingDiffQuantityUOM");
+        }
+
         public void IncreasePickingActualUOM(double quantityUOM, bool autoRefresh = false)
         {
             PickingActualUOM2(quantityUOM, autoRefresh, 0);
