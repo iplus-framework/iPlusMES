@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)BarcodeSequenceBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FacilityTypesEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalApp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PostingBehaviourEnum.cs" />
   </ItemGroup>
 </Project>
