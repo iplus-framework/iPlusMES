@@ -182,6 +182,7 @@ namespace gip.mes.facility
                                     InwardMaterialName = fbc.InwardMaterial != null ? fbc.InwardMaterial.MaterialName1 : "",
                                     InwardFacilityNo = fbc.InwardFacility != null ? fbc.InwardFacility.FacilityNo : "",
                                     InwardFacilityName = fbc.InwardFacility != null ? fbc.InwardFacility.FacilityName : "",
+                                    InwardFacilityPostingBehaviour = fbc.InwardFacility != null ? fbc.InwardFacility.PostingBehaviourIndex : (short)0,
                                     InwardFacilityChargeID = fbc.InwardFacilityChargeID,
 
                                     FacilityBookingTypeIndex = fbc.FacilityBookingTypeIndex,

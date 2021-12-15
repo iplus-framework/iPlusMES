@@ -928,7 +928,6 @@ namespace gip.mes.webservices
 
                     acParam.OutwardQuantity = bpParam.OutwardQuantity;
                     acParam.InwardQuantity = bpParam.InwardQuantity;
-                    acParam.PickingPos = pickingPos;
                 }
                 else
                 {
@@ -1009,6 +1008,13 @@ namespace gip.mes.webservices
                     acParam.Comment = bpParam.Comment;
                     acParam.RecipeOrFactoryInfo = bpParam.RecipeOrFactoryInfo;
                     acParam.PropertyACUrl = bpParam.PropertyACUrl;
+                }
+
+                if (pickingPos != null)
+                {
+                    acParam.PickingPos = pickingPos;
+                    acParam.InOrderPos = pickingPos.InOrderPos;
+                    acParam.OutOrderPos = pickingPos.OutOrderPos;
                 }
 
                 var resultBooking = facManager.BookFacility(acParam, dbApp);

@@ -77,6 +77,7 @@ namespace gip.mes.webservices
                 PickingType = new MDPickingType()
                 {
                     MDPickingTypeID = c.MDPickingType.MDPickingTypeID,
+                    MDKey = c.MDPickingType.MDKey,
                     MDPickingTypeTrans = c.MDPickingType.MDNameTrans
                 },
                 PickingPos_Picking = c.PickingPos_Picking

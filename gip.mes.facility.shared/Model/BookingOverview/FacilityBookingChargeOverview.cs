@@ -38,5 +38,12 @@ namespace gip.mes.facility
         [DataMember(Name = "IFCFDt")]
         public DateTime? InwardFacilityChargeFillingDate { get; set; }
 
+        [DataMember(Name = "IFPB")]
+        public short InwardFacilityPostingBehaviour
+        {
+            get;
+            set;
+        }
+
     }
 }
