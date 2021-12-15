@@ -863,6 +863,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrEmpty(bpParam.VirtualMethodName))
                 return new MsgWithDetails("VirtualMethodName is empty", null, eMsgLevel.Error, "VBWebService", "Book", 1063);
 
+            MsgWithDetails msgWithDetails = null;
             try
             {
                 datamodel.PickingPos pickingPos = bpParam.PickingPosID.HasValue ? dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == bpParam.PickingPosID.Value) : null;
@@ -1016,7 +1017,7 @@ namespace gip.mes.webservices
                     if (myServiceHost != null)
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "BookFacility(10)", acParam.ValidMessage.InnerMessage);
                     dbApp.ACUndoChanges();
-                    MsgWithDetails msgWithDetails = acParam.ValidMessage;
+                    msgWithDetails = acParam.ValidMessage;
                     if (msgWithDetails != null)
                         msgWithDetails.AddDetailMessage(new Msg(eMsgLevel.Exception, acParam.ValidMessage.InnerMessage));
 
@@ -1024,42 +1025,53 @@ namespace gip.mes.webservices
                 }
                 else
                 {
-
-
                     if (acParam.PickingPos != null)
                     {
-                        acParam.PickingPos.RecalcActualQuantity();
-                        if (acParam.PickingPos.InOrderPos != null)
+                        ACPickingManager pickingManager = ACPickingManager.GetServiceInstance(myServiceHost);
+                        if (pickingManager != null)
                         {
-                            acParam.PickingPos.InOrderPos.RecalcActualQuantity();
+                            double postedQuantity = 0;
+                            if (acParam.OutwardQuantity.HasValue)
+                                postedQuantity = acParam.OutwardQuantity.Value;
+                            else if (acParam.InwardQuantity.HasValue)
+                                postedQuantity = acParam.InwardQuantity.Value;
+                            pickingManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
                         }
-                        else if (acParam.PickingPos.OutOrderPos != null)
-                        {
-                            acParam.PickingPos.OutOrderPos.RecalcActualQuantity();
-                        }
+                        //else
+                        //{
+                        //    acParam.PickingPos.RecalcActualQuantity();
+                        //    if (acParam.PickingPos.InOrderPos != null)
+                        //    {
+                        //        acParam.PickingPos.InOrderPos.RecalcActualQuantity();
+                        //    }
+                        //    else if (acParam.PickingPos.OutOrderPos != null)
+                        //    {
+                        //        acParam.PickingPos.OutOrderPos.RecalcActualQuantity();
+                        //    }
 
-                        if (preBookingMethod != null && preBooking != null && acParam.ValidMessage.IsSucceded())
-                        {
-                            double quantity = pickingPos.RemainingDosingQuantityUOM;
-                            if (quantity >= 0)
-                            {
-                                preBooking.DeleteACObject(dbApp, true);
-                                pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
-                                dbApp.ACSaveChanges();
-                            }
-                        }
+                        //    if (preBookingMethod != null && preBooking != null && acParam.ValidMessage.IsSucceded())
+                        //    {
+                        //        double quantity = pickingPos.RemainingDosingQuantityUOM;
+                        //        if (quantity >= 0)
+                        //        {
+                        //            preBooking.DeleteACObject(dbApp, true);
+                        //            pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                        //            dbApp.ACSaveChanges();
+                        //        }
+                        //    }
+                        //}
 
-                        dbApp.ACSaveChanges();
+                        msgWithDetails = dbApp.ACSaveChangesWithRetry();
                     }
                     else if (acParam.PartslistPos != null)
                     {
                         acParam.PartslistPos.RecalcActualQuantity();
-                        dbApp.ACSaveChanges();
+                        msgWithDetails = dbApp.ACSaveChangesWithRetry();
                     }
                     else if (acParam.PartslistPosRelation != null)
                     {
                         acParam.PartslistPosRelation.RecalcActualQuantity();
-                        dbApp.ACSaveChanges();
+                        msgWithDetails = dbApp.ACSaveChangesWithRetry();
                     }
                 }
             }
@@ -1067,11 +1079,11 @@ namespace gip.mes.webservices
             {
                 if (myServiceHost != null)
                     myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLocationBookings(10)", e);
-                MsgWithDetails msgWithDetails = new MsgWithDetails();
+                msgWithDetails = new MsgWithDetails();
                 msgWithDetails.AddDetailMessage(new Msg(eMsgLevel.Exception, e.Message));
                 return msgWithDetails;
             }
-            return null;
+            return msgWithDetails;
         }
 
         private void CompleteBookFacilityPicking(DatabaseApp dbApp, datamodel.PickingPos pickingPos, facility.ACMethodBooking acParam, facility.ACMethodBooking preBookingMethod,

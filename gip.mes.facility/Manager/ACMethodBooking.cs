@@ -2541,7 +2541,7 @@ namespace gip.mes.facility
             else if (material != null && material.MDFacilityManagementType != null && material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
                 AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50011"));
             else if (this.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
-                && this.InwardFacilityLot == null
+                && (this.InwardFacilityLot == null && this.InwardFacilityCharge == null)
                 && this.IsLotManaged)
             {
                 AddBookingMessage(eResultCodes.DependingParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error50049"));
