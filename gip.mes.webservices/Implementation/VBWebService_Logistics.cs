@@ -80,6 +80,13 @@ namespace gip.mes.webservices
                     MDKey = c.MDPickingType.MDKey,
                     MDPickingTypeTrans = c.MDPickingType.MDNameTrans
                 },
+                DeliveryCompanyAddress = new CompanyAddress()
+                {
+                    CompanyAddressID = c.DeliveryCompanyAddress != null ? c.DeliveryCompanyAddress.CompanyAddressID : Guid.Empty,
+                    Name1 = c.DeliveryCompanyAddress != null ? c.DeliveryCompanyAddress.Name1 : "",
+                    Street = c.DeliveryCompanyAddress != null ? c.DeliveryCompanyAddress.Street : "",
+                    PostCode = c.DeliveryCompanyAddress != null ? c.DeliveryCompanyAddress.Postcode : ""
+                },
                 PickingPos_Picking = c.PickingPos_Picking
                         .ToArray()
                         .Where(d => d.Material != null && (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue))

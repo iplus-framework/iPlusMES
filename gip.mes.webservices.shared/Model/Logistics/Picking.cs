@@ -35,6 +35,13 @@ namespace gip.mes.webservices
             set;
         }
 
+        [DataMember(Name = "DCA")]
+        public CompanyAddress DeliveryCompanyAddress
+        {
+            get;
+            set;
+        }
+
         [IgnoreDataMember]
         IEnumerable<PickingPos> _PickingPos_Picking;
         [DataMember(Name = "ixPos")]
