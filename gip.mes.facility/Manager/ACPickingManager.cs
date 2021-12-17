@@ -1005,6 +1005,7 @@ namespace gip.mes.facility
         #endregion
 
         #region Booking
+
         protected virtual PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, PickingPos pickingPos)
         {
             PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
@@ -1563,8 +1564,6 @@ namespace gip.mes.facility
             pickingPos.OnEntityPropertyChanged("PickingDiffQuantityUOM");
         }
 
-
-
         public MsgWithDetails CreateNewPicking(ACMethodBooking relocationBooking, gip.core.datamodel.ACClassMethod aCClassMethod, DatabaseApp dbApp, Database dbIPlus, bool setReadyToLoad, out Picking picking)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
@@ -1612,6 +1611,7 @@ namespace gip.mes.facility
             msgWithDetails = dbApp.ACSaveChanges();
             return msgWithDetails;
         }
+        
         #endregion
 
         #region Validation
@@ -1979,6 +1979,28 @@ namespace gip.mes.facility
         //    }
         //}
         #endregion
+
+        #endregion
+
+        #region Picking
+
+        public MsgWithDetails FinishOrder(DatabaseApp dbApp, Picking picking, bool force = false)
+        {
+            if (dbApp == null)
+            {
+
+            }
+            
+            if (picking == null)
+            {
+
+            }
+
+
+
+
+            return null;
+        }
 
         #endregion
 
