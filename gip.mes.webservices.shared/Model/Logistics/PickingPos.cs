@@ -91,5 +91,16 @@ namespace gip.mes.webservices
             get;
             set;
         }
+
+        public void OnActualQuantityChanged()
+        {
+            OnPropertyChanged("ActualQuantity");
+            OnPropertyChanged("ActualQuantityUOM");
+        }
+
+        public void CalculateDefaultPostingQuantity()
+        {
+            PostingQuantity = TargetQuantity - ActualQuantity;
+        }
     }
 }
