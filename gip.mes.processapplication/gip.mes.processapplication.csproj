@@ -104,7 +104,7 @@
     <Compile Include="Manager\DischargingItemManager.cs" />
     <Compile Include="Manager\DischargingItemNoValidator.cs" />
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
-    <Compile Include="Manager\PAOrderInfoManagerMES.cs" />
+    <Compile Include="Manager\ACPrintManagerMES.cs" />
     <Compile Include="Model\DosingRestInfo.cs" />
     <Compile Include="Model\EndPListMode.cs" />
     <Compile Include="Model\StartNextStageMode.cs" />
