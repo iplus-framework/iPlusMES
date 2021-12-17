@@ -919,6 +919,8 @@ namespace gip.bso.facility
         /// <returns><c>true</c> if [is enabled inward facility charge movement]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledInwardFacilityChargeMovement()
         {
+            if (CurrentBookParamInwardMovement == null)
+                return false;
             bool bRetVal = CurrentBookParamInwardMovement.IsEnabled();
             UpdateBSOMsg();
             return bRetVal;
@@ -1787,11 +1789,11 @@ namespace gip.bso.facility
 
         #region IACPrintPrepare
 
-        public override Msg SetOrderInfo(PAOrderInfo wfOrderInfo)
+        public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
         {
-            if (wfOrderInfo != null)
+            if (paOrderInfo != null)
             {
-                PAOrderInfoEntry entry = wfOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
+                PAOrderInfoEntry entry = paOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).FirstOrDefault();
                 CurrentFacilityCharge =
                     DatabaseApp
                     .FacilityCharge
@@ -1804,17 +1806,9 @@ namespace gip.bso.facility
             return new Msg() { MessageLevel = eMsgLevel.Error, Message = "" };
         }
 
-        public override Msg PrintViaOrderInfo(string designName, string printerName, short numberOfCopies)
+        protected override IEnumerable<core.datamodel.ACClassDesign> OnGetDefaultPrintDesigns(string printerName, PAOrderInfo paOrderInfo = null)
         {
-            Msg msg = null;
-            gip.core.datamodel.ACClassDesign design = GetDesign(designName);
-            if (design == null)
-            {
-                Messages.Error(this, string.Format(@"The {0} report is missing!", designName));
-                return new Msg();
-            }
-            msg = PrintDesign(design, printerName, numberOfCopies, false);
-            return msg;
+            return base.OnGetDefaultPrintDesigns(printerName, paOrderInfo);
         }
         #endregion
 
