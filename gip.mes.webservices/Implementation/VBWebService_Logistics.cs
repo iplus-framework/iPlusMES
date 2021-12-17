@@ -40,7 +40,7 @@ namespace gip.mes.webservices
                 MDPickingTypeTrans = c.MDNameTrans
             });
         }
-        
+
 
 
         public static readonly Func<DatabaseApp, Guid?, IQueryable<gip.mes.datamodel.Picking>> s_cQry_GetPicking =
@@ -139,7 +139,7 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                return new WSResponse<List<Picking>>(null, new Msg( eMsgLevel.Exception, e.Message) );
+                return new WSResponse<List<Picking>>(null, new Msg(eMsgLevel.Exception, e.Message));
             }
             return new WSResponse<List<Picking>>(result);
         }
@@ -219,7 +219,7 @@ namespace gip.mes.webservices
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDUnit")
                         .Include("PickingPos_Picking.PickingMaterial")
                         .Include("PickingPos_Picking.PickingMaterial.BaseMDUnit")
-                        .Where(c =>    (pType == Guid.Empty || c.MDPickingTypeID == pType)
+                        .Where(c => (pType == Guid.Empty || c.MDPickingTypeID == pType)
                                     && ((fromFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.FromFacilityID == fromFacility || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == fromFacility))))
                                     && ((toFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.ToFacility.ParentFacilityID.HasValue && x.ToFacility.ParentFacilityID == toFacility))))
                                     && (fromDate == null || c.DeliveryDateFrom >= fromDate)
@@ -266,7 +266,7 @@ namespace gip.mes.webservices
             if (item == null || item.PickingID == Guid.Empty)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "item is null"));
             try
-            { 
+            {
                 using (var dbApp = new DatabaseApp())
                 {
                     var query = dbApp.Picking.Where(c => c.PickingID == item.PickingID).FirstOrDefault();
@@ -303,7 +303,7 @@ namespace gip.mes.webservices
                         .Include("PickingMaterial")
                         .Include("PickingMaterial.BaseMDUnit")
                         .Where(c => c.PickingPosID == pickingPosID)
-                        
+
         );
 
         protected IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query)
@@ -431,7 +431,7 @@ namespace gip.mes.webservices
                         return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "The picking position with ID: can not found in the database."));
                     }
 
-                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = 
+                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList =
                         facManager.ConvertGroupedBookingsToOverviewDictionary(s_cQry_FBC_ByPickingPos(dbApp, pPos));
                     result.Postings = fbList.Keys.ToList();
                     result.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
@@ -442,6 +442,41 @@ namespace gip.mes.webservices
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
             }
             return new WSResponse<PostingOverview>(result);
+        }
+
+
+        public WSResponse<PickingPosList> GetPickingPosByMaterial(PickingPosList pickingPos)
+        {
+            if (pickingPos == null || !pickingPos.Any())
+            {
+                return new WSResponse<PickingPosList>(null, new Msg(eMsgLevel.Exception, "pickingPos is null or empty!"));
+            }
+
+            PickingPosList result;
+
+            try
+            {
+                using(DatabaseApp dbApp = new DatabaseApp())
+                {
+                    Guid[] pickIDs = pickingPos.Select(c => c.PickingPosID).ToArray();
+                    result = new PickingPosList(ConvertToWSPickingPosOnlyActQuantity(dbApp.PickingPos.Where(c => pickIDs.Contains(c.PickingPosID))));
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<PickingPosList>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            return new WSResponse<PickingPosList>(result);
+        }
+
+        protected IEnumerable<PickingPos> ConvertToWSPickingPosOnlyActQuantity(IQueryable<gip.mes.datamodel.PickingPos> query)
+        {
+            return query.AsEnumerable().Select(d => new PickingPos()
+            {
+                PickingPosID = d.PickingPosID,
+                ActualQuantity = d.ActualQuantity,
+                ActualQuantityUOM = d.ActualQuantityUOM,
+            }).ToArray();
         }
 
     }

@@ -86,5 +86,13 @@ namespace gip.mes.webservices
         Task<WSResponse<PostingOverview>> GetPickingPosPostingsAsync(string pickingPosID);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriPickingPos_Material, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<PickingPosList> GetPickingPosByMaterial(PickingPosList pickingPos);
+#elif NETSTANDARD
+        Task<WSResponse<PickingPosList>> GetPickingPosByMaterialAsync(PickingPosList pickingPos);
+#endif
+
     }
 }

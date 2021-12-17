@@ -52,6 +52,8 @@ namespace gip.mes.webservices
         public const string UriPickingPosID_F = "PickingPos/{0}";
         public const string UriPickingPos_Postings = "PickingPos/Postings/{pickingPosID}";
         public const string UriPickingPos_Postings_F = "PickingPos/Postings/{0}";
+        public const string UriPickingPos_Material = "PickingPosByMaterial";
+
         #endregion
 
 
