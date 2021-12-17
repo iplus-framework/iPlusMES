@@ -256,6 +256,10 @@ namespace gip.bso.purchasing
                                 if (filterItem.SearchWord == filterDelivType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
                                     countFoundCorrect++;
                             }
+                            if (filterItem.PropertyName == "DeliveryNoteNo")
+                            {
+                                rebuildACQueryDef = !filterItem.UsedInGlobalSearch;
+                            }
                         }
                         if (countFoundCorrect < 1)
                             rebuildACQueryDef = true;
@@ -263,7 +267,7 @@ namespace gip.bso.purchasing
                     if (rebuildACQueryDef)
                     {
                         navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true));
+                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true, true));
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, filterDelivType.ToString(), true));
                         navACQueryDefinition.SaveConfig(true);
                     }
@@ -990,7 +994,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt 
+                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                                                             || c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
                                                           && c.InOrderPos != null
                                                           && !c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
@@ -1510,8 +1514,8 @@ namespace gip.bso.purchasing
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("DeliveryNoteList");
             RefreshInOrderPosList();
