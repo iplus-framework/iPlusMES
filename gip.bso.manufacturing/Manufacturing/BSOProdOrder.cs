@@ -3895,6 +3895,7 @@ namespace gip.bso.manufacturing
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
+
             //InShowDialogOrderInfo = true;
             // Falls Produktionsauftrag
             ProdOrderPartslistPosRelation relation = null;

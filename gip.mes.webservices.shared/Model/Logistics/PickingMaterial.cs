@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace gip.mes.webservices
 {
@@ -35,6 +36,14 @@ namespace gip.mes.webservices
         {
             get;
             set;
+        }
+
+        public void RecalculateActualQuantity()
+        {
+            if (PickingItems != null)
+            {
+                ActualQuantity = PickingItems.Sum(c => c.ActualQuantityUOM);
+            }
         }
     }
 }
