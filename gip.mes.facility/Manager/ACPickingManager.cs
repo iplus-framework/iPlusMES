@@ -1537,9 +1537,9 @@ namespace gip.mes.facility
                         && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
                             || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
                     {
-                        MDDelivPosLoadState state = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                        MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
                         if (state != null)
-                            pickingPos.MDDelivPosLoadState = state;
+                            pickingPos.OutOrderPos.MDOutOrderPosState = state;
                     }
                 }
             }
@@ -1552,9 +1552,9 @@ namespace gip.mes.facility
                     && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
                         || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
                 {
-                    MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
+                    MDDelivPosLoadState state = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                     if (state != null)
-                        pickingPos.OutOrderPos.MDOutOrderPosState = state;
+                        pickingPos.MDDelivPosLoadState = state;
                 }
             }
             pickingPos.OnEntityPropertyChanged("ActualQuantity");
