@@ -163,51 +163,39 @@ namespace gip.bso.sales
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "DeliveryNoteNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                     }
-
-                    bool rebuildACQueryDef = false;
-                    short filterDelivType = (short)GlobalApp.DeliveryNoteType.Issue;
-                    if (!navACQueryDefinition.ACFilterColumns.Any())
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "DeliveryNoteTypeIndex")
-                            {
-                                if (filterItem.SearchWord == filterDelivType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
-                                    countFoundCorrect++;
-                            }
-                            if (filterItem.PropertyName == "DeliveryNoteNo")
-                            {
-                                rebuildACQueryDef = !filterItem.UsedInGlobalSearch;
-                            }
-                        }
-                        if (countFoundCorrect < 1)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true, true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, filterDelivType.ToString(), true));
-                        navACQueryDefinition.SaveConfig(true);
-                    }
-
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<DeliveryNote>(DeliveryNote.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
         }
+
+        public List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+                aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true, true));
+                aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)GlobalApp.DeliveryNoteType.Issue).ToString(), true));
+                return aCFilterItems;
+            }
+        }
+
+        private List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+                acSortItems.Add(new ACSortItem("DeliveryNoteNo", Global.SortDirections.descending, true));
+                return acSortItems;
+            }
+        }
+
 
         [ACPropertyCurrent(600, DeliveryNote.ClassName)]
         public DeliveryNote CurrentDeliveryNote
