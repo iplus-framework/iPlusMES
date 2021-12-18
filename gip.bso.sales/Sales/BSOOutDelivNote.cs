@@ -186,6 +186,10 @@ namespace gip.bso.sales
                                 if (filterItem.SearchWord == filterDelivType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
                                     countFoundCorrect++;
                             }
+                            if (filterItem.PropertyName == "DeliveryNoteNo")
+                            {
+                                rebuildACQueryDef = !filterItem.UsedInGlobalSearch;
+                            }
                         }
                         if (countFoundCorrect < 1)
                             rebuildACQueryDef = true;
@@ -193,7 +197,7 @@ namespace gip.bso.sales
                     if (rebuildACQueryDef)
                     {
                         navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true));
+                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true, true));
                         navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, filterDelivType.ToString(), true));
                         navACQueryDefinition.SaveConfig(true);
                     }
@@ -666,7 +670,7 @@ namespace gip.bso.sales
         {
             get
             {
-                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle 
+                var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle
                                                             || c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue)
                                                           && c.OutOrderPos != null
                                                           && !c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any())

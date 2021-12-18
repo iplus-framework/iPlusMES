@@ -41,8 +41,9 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            CurrentFacilityRoot = FacilityTree.LoadFacilityTree(DatabaseApp);
-            CurrentFacility = CurrentFacilityRoot;
+            ACFSItem rootItem = FacilityTree.LoadFacilityTree(DatabaseApp);
+            rootItem.ShowFirst();
+            CurrentFacilityRoot = rootItem;
             return true;
         }
 
@@ -53,7 +54,7 @@ namespace gip.bso.masterdata
 
         public override object Clone()
         {
-            object clonedObject =  base.Clone();
+            object clonedObject = base.Clone();
             BSOFacility clonedBSOFacility = clonedObject as BSOFacility;
             if (CurrentFacility != null && CurrentFacility.ACObject != null)
             {
@@ -107,27 +108,32 @@ namespace gip.bso.masterdata
             {
                 if (_CurrentFacility != value)
                 {
-                    if (_CurrentFacility != null && _CurrentFacility.ACObject != null)
-                        (_CurrentFacility.ACObject as INotifyPropertyChanged).PropertyChanged -= _CurrentFacility_PropertyChanged;
                     _CurrentFacility = value;
-                    if (_CurrentFacility != null && _CurrentFacility.ACObject != null)
-                        (_CurrentFacility.ACObject as INotifyPropertyChanged).PropertyChanged += _CurrentFacility_PropertyChanged;
                     OnPropertyChanged("CurrentFacility");
                     OnPropertyChanged("SelectedFacility");
                 }
             }
         }
 
-        private void _CurrentFacility_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        ChangeInfo _CurrentFacilityRootChangeInfo = null;
+        /// <summary>
+        /// Gets or sets the current project item root change info.
+        /// </summary>
+        /// <value>The current project item root change info.</value>
+        [ACPropertyChangeInfo(404, "Facility")]
+        public ChangeInfo CurrentFacilityRootChangeInfo
         {
-            if (e.PropertyName == "FacilityNo" || e.PropertyName == "FacilityName")
+            get
             {
-                ACFSItem current = CurrentFacility;
-                current.ACCaption = FacilityTree.FacilityACCaption(CurrentFacility.ACObject as Facility);
-                CurrentFacilityRoot = FacilityTree.GetNewRootFacilityACFSItem(Database as gip.core.datamodel.Database, CurrentFacilityRoot.Items);
-                CurrentFacility = current;
+                return _CurrentFacilityRootChangeInfo;
+            }
+            set
+            {
+                _CurrentFacilityRootChangeInfo = value;
+                OnPropertyChanged("CurrentFacilityRootChangeInfo");
             }
         }
+
 
         [ACPropertyInfo(9999, "SelectedFacility")]
         public Facility SelectedFacility
@@ -137,6 +143,55 @@ namespace gip.bso.masterdata
                 if (CurrentFacility != null && CurrentFacility.ACObject != null)
                     return CurrentFacility.ACObject as Facility;
                 return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterFacility;
+        [ACPropertySelected(999, "FilterFacility", "en{'Search'}de{'Suchen'}")]
+        public string FilterFacility
+        {
+            get
+            {
+                return _FilterFacility;
+            }
+            set
+            {
+                if (_FilterFacility != value)
+                {
+                    _FilterFacility = value;
+                    OnPropertyChanged("FilterFacility");
+                    ACFSItem preselectedItem = null;
+                    ACFSItem treeRoot = FacilityTree.LoadFacilityTree(DatabaseApp);
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        Action<ACFSItem, object[]> filterAction = delegate (ACFSItem aCFSItem, object[] args)
+                        {
+                            if(aCFSItem.ACObject == null)
+                                aCFSItem.IsVisible = true;
+                            else
+                            {
+                                aCFSItem.IsVisible = false;
+                                Facility facility = aCFSItem.ACObject as Facility;
+                                if(facility.FacilityNo.ToLower().Contains(value.ToLower()) || facility.FacilityName.ToLower().Contains(value.ToLower()))
+                                {
+                                    aCFSItem.IsVisible = true;
+                                    FacilityTree.SetupCurrentVisible(aCFSItem);
+                                    if(preselectedItem == null)
+                                    {
+                                        preselectedItem = aCFSItem;
+                                    }
+                                }
+                            }
+                        };
+                        treeRoot.CallAction(filterAction);
+                    }
+                    CurrentFacilityRoot = treeRoot;
+                    CurrentFacility = preselectedItem;
+                }
             }
         }
 
@@ -212,26 +267,19 @@ namespace gip.bso.masterdata
                 parentFacility.Facility_ParentFacility.Add(facility);
 
             ACFSItem newFacilityACFSItem = new ACFSItem(null, CurrentFacility.Container, facility, FacilityTree.FacilityACCaption(facility), ResourceTypeEnum.IACObject);
+            newFacilityACFSItem.OnACFSItemChange += FacilityTree.CFSItem_OnACFSItemChange;
             currentFacilityACFSItem.Add(newFacilityACFSItem);
-            ACFSItem tmpItem = newFacilityACFSItem;
-            while (tmpItem != null)
-            {
-                tmpItem.IsVisible = true;
-                if (tmpItem.ParentACObject != null)
-                    tmpItem = tmpItem.ParentACObject as ACFSItem;
-                else
-                    break;
-            }
 
-            CurrentFacilityRoot = FacilityTree.GetNewRootFacilityACFSItem(Database as gip.core.datamodel.Database, CurrentFacilityRoot.Items);
-            CurrentFacility = newFacilityACFSItem;
+            CurrentFacilityRootChangeInfo = new ChangeInfo(currentFacilityACFSItem, newFacilityACFSItem, Const.CmdAddChildData);
+
+            OnPropertyChanged("CurrentFacility");
+            OnPropertyChanged("SelectedFacility");
         }
 
         public virtual bool IsEnabledAddFacility()
         {
             return CurrentFacility != null;
         }
-
 
         [ACMethodInteraction("DeleteFacility", "en{'Delete'}de{'Loschen'}", (short)MISort.Delete, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
         public virtual void DeleteFacility()
@@ -245,10 +293,14 @@ namespace gip.bso.masterdata
             Facility dbFacility = current.ACObject as Facility;
             MsgWithDetails msg = dbFacility.DeleteACObject(DatabaseApp, false);
 
-            CurrentFacilityRoot = FacilityTree.GetNewRootFacilityACFSItem(Database as gip.core.datamodel.Database, CurrentFacilityRoot.Items);
             CurrentFacility = parent;
-        }
 
+            CurrentFacilityRootChangeInfo = new ChangeInfo(null, CurrentFacility, Const.CmdDeleteData);
+
+
+            OnPropertyChanged("CurrentFacility");
+            OnPropertyChanged("SelectedFacility");
+        }
         public virtual bool IsEnabledDeleteFacility()
         {
             return CurrentFacility != null && CurrentFacility.ACObject != null && !CurrentFacility.Items.Any();
