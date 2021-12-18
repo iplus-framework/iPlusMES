@@ -45,6 +45,7 @@ namespace gip.bso.purchasing
     [ACClassInfo(Const.PackName_VarioPurchase, "een{'Purchase Delivery Note'}de{'Lieferschein (Einkauf)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + DeliveryNote.ClassName)]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "InOrderPosOpen", "en{'Open Purchase Order Pos.'}de{'Offene Bestellposition'}", typeof(InOrderPos), InOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "BookingFacility", ConstApp.Facility, typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
+    [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "BookingFacilityLot", ConstApp.Lot, typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
     public class BSOInDeliveryNote : ACBSOvbNav
     {
         #region c´tors
@@ -117,6 +118,8 @@ namespace gip.bso.purchasing
             this._StateCompletelyAssigned = null;
             this._UnSavedAssignedPickingInOrderPos = null;
             this._UnSavedUnAssignedInOrderPos = null;
+            _PreBookingAvailableQuantsList = null;
+            _SelectedPreBookingAvailableQuants = null;
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
             var b = base.ACDeInit(deleteACClassTask);
@@ -140,6 +143,15 @@ namespace gip.bso.purchasing
                 _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
+
+            if (_AccessBookingFacilityLot != null)
+            {
+                _AccessBookingFacilityLot.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
+                _AccessBookingFacilityLot.ACDeInit(false);
+                _AccessBookingFacilityLot = null;
+            }
+
+            _QuantDialogMaterial = null;
             return b;
         }
 
@@ -589,6 +601,8 @@ namespace gip.bso.purchasing
                 if (FacilityPreBookingList != null && FacilityPreBookingList.Any())
                     SelectedFacilityPreBooking = FacilityPreBookingList.First();
                 RefreshFilterFacilityAccess();
+                if (AccessBookingFacilityLot != null)
+                    RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                 OnPropertyChanged("BookingFacilityList");
                 OnPropertyChanged("FacilityBookingList");
             }
@@ -1039,12 +1053,25 @@ namespace gip.bso.purchasing
             }
             set
             {
-                _CurrentFacilityPreBooking = value;
-                OnPropertyChanged("CurrentFacilityPreBooking");
-                OnPropertyChanged("CurrentACMethodBooking");
-                OnPropertyChanged("BookableFacilityLots");
-                RefreshFilterFacilityAccess();
-                OnPropertyChanged("BookingFacilityList");
+                if (_CurrentFacilityPreBooking != value)
+                {
+                    if (_CurrentFacilityPreBooking != null && _CurrentFacilityPreBooking.ACMethodBooking != null)
+                        _CurrentFacilityPreBooking.ACMethodBooking.PropertyChanged -= ACMethodBooking_PropertyChanged;
+
+                    _CurrentFacilityPreBooking = value;
+                    OnPropertyChanged("CurrentFacilityPreBooking");
+                    OnPropertyChanged("CurrentACMethodBooking");
+                    OnPropertyChanged("BookableFacilityLots");
+
+                    RefreshFilterFacilityAccess();
+                    if (AccessBookingFacilityLot != null)
+                        RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
+
+                    if (_CurrentFacilityPreBooking != null && _CurrentFacilityPreBooking.ACMethodBooking != null)
+                        _CurrentFacilityPreBooking.ACMethodBooking.PropertyChanged += ACMethodBooking_PropertyChanged;
+
+                    OnPropertyChanged("BookingFacilityList");
+                }
             }
         }
 
@@ -1076,6 +1103,10 @@ namespace gip.bso.purchasing
                 _SelectedFacilityPreBooking = value;
                 OnPropertyChanged("SelectedFacilityPreBooking");
                 CurrentFacilityPreBooking = value;
+                OnPropertyChanged("BookingFacilityList");
+                OnPropertyChanged("InwardFacilityChargeList");
+                if (AccessBookingFacilityLot != null)
+                    AccessBookingFacilityLot.NavSearch(DatabaseApp);
             }
         }
 
@@ -1098,7 +1129,8 @@ namespace gip.bso.purchasing
                     }
                 }
                 _CurrentACMethodBookingDummy = null;
-                return CurrentFacilityPreBooking.ACMethodBooking as ACMethodBooking;
+
+                return CurrentFacilityPreBooking?.ACMethodBooking as ACMethodBooking;
             }
             set
             {
@@ -1109,6 +1141,33 @@ namespace gip.bso.purchasing
                 OnPropertyChanged("CurrentACMethodBooking");
             }
         }
+
+        bool _UpdatingControlModeBooking = false;
+        private void ACMethodBooking_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (_UpdatingControlModeBooking)
+                return;
+            try
+            {
+                if (e.PropertyName == "InwardFacility")
+                {
+                    _UpdatingControlModeBooking = true;
+                    OnPropertyChanged("InwardFacilityChargeList");
+                    OnPropertyChanged("BookableFacilityLots");
+                    if (CurrentACMethodBooking != null)
+                    {
+                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacility");
+                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacilityCharge");
+                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacilityLot");
+                    }
+                }
+            }
+            finally
+            {
+                _UpdatingControlModeBooking = false;
+            }
+        }
+
 
         private bool _BookingFilterMaterial = true;
         [ACPropertyInfo(628, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}")]
@@ -1124,6 +1183,20 @@ namespace gip.bso.purchasing
                 OnPropertyChanged("BookingFilterMaterial");
                 RefreshFilterFacilityAccess();
                 OnPropertyChanged("BookingFacilityList");
+                OnPropertyChanged("InwardFacilityChargeList");
+            }
+        }
+
+
+        [ACPropertyList(612, "InwardFacilityCharge")]
+        public IEnumerable<FacilityCharge> InwardFacilityChargeList
+        {
+            get
+            {
+                if (CurrentACMethodBooking == null || CurrentACMethodBooking.InwardFacility == null || CurrentDeliveryNotePos.Material == null)
+                    return null;
+                return CurrentACMethodBooking.InwardFacility.FacilityCharge_Facility
+                    .Where(x => x.MaterialID == CurrentDeliveryNotePos.Material.MaterialID && !x.NotAvailable).OrderByDescending(x => x.InsertDate);
             }
         }
 
@@ -1152,6 +1225,43 @@ namespace gip.bso.purchasing
             }
         }
 
+        private List<ACFilterItem> AccessBookingFacilityDefaultFilter_Material
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageBinContainer).ToString(), true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, "", true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true)
+                };
+            }
+        }
+
+        private List<ACFilterItem> AccessBookingFacilityDefaultFilter_StorageBin
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageBin).ToString(), true)
+                };
+            }
+        }
+
+        private List<ACSortItem> AccessBookingFacilityDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("FacilityNo", Global.SortDirections.ascending, true),
+                };
+            }
+        }
+
 
         [ACPropertyList(630, "BookingFacility")]
         public IList<Facility> BookingFacilityList
@@ -1168,99 +1278,195 @@ namespace gip.bso.purchasing
         {
             if (AccessBookingFacility == null || CurrentFacilityPreBooking == null || FacilityPreBookingList == null || !FacilityPreBookingList.Any())
                 return;
-            bool rebuildACQueryDef = false;
-            short fcTypeContainer = (short)FacilityTypesEnum.StorageBinContainer;
-            short fcTypeBin = (short)FacilityTypesEnum.StorageBin;
-            if (AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Count <= 0)
+
+            if (BookingFilterMaterial)
             {
-                rebuildACQueryDef = true;
+                AccessBookingFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_Material, AccessBookingFacilityDefaultSort);
+                var acFilter = AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
+                if (acFilter != null)
+                    acFilter.SearchWord = CurrentDeliveryNotePos.Material.MaterialNo;
+                var acFilter2 = AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo" && c != acFilter).FirstOrDefault();
+                if (acFilter2 != null)
+                    acFilter2.SearchWord = CurrentDeliveryNotePos.Material.Material1_ProductionMaterial != null ? CurrentDeliveryNotePos.Material.Material1_ProductionMaterial.MaterialNo : "";
             }
             else
             {
-                int countFoundCorrect = 0;
-                foreach (ACFilterItem filterItem in AccessBookingFacility.NavACQueryDefinition.ACFilterColumns)
-                {
-                    if (filterItem.FilterType != Global.FilterTypes.filter)
-                        continue;
-                    if (filterItem.PropertyName == "MDFacilityType\\MDFacilityTypeIndex")
-                    {
-                        if ((BookingFilterMaterial && filterItem.SearchWord == fcTypeContainer.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
-                            || (!BookingFilterMaterial && filterItem.SearchWord == fcTypeBin.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal))
-                            countFoundCorrect++;
-                    }
-                    else if (BookingFilterMaterial && filterItem.PropertyName == "Material\\MaterialNo" && CurrentDeliveryNotePos != null && CurrentDeliveryNotePos.Material != null)
-                    {
-                        if (filterItem.SearchWord == CurrentDeliveryNotePos.Material.MaterialNo)
-                            countFoundCorrect++;
-                    }
-                }
-                if (BookingFilterMaterial && countFoundCorrect < 2)
-                    rebuildACQueryDef = true;
-                else if (!BookingFilterMaterial && countFoundCorrect < 1)
-                    rebuildACQueryDef = true;
-            }
-            if (rebuildACQueryDef)
-            {
-                AccessBookingFacility.NavACQueryDefinition.ClearFilter(true);
-                if (BookingFilterMaterial)
-                {
-                    AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, fcTypeContainer.ToString(), true));
-                    if (CurrentDeliveryNotePos != null && CurrentDeliveryNotePos.Material != null)
-                    {
-                        AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, false));
-                        AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, CurrentDeliveryNotePos.Material.MaterialNo, false));
-                        if (CurrentDeliveryNotePos.Material.Material1_ProductionMaterial != null)
-                            AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, CurrentDeliveryNotePos.Material.Material1_ProductionMaterial.MaterialNo, false));
-                        AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, false));
-                    }
-                }
-                else
-                {
-                    AccessBookingFacility.NavACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, fcTypeBin.ToString(), true));
-                }
-                AccessBookingFacility.NavACQueryDefinition.SaveConfig(false);
+                AccessBookingFacility.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityDefaultFilter_StorageBin, AccessBookingFacilityDefaultSort);
             }
             AccessBookingFacility.NavSearch(this.DatabaseApp);
         }
 
 
-        [ACPropertyList(631, "FacilityLots")]
+        [ACPropertyList(618, "FacilityLots")]
         public IEnumerable<FacilityLot> BookableFacilityLots
         {
             get
             {
-                if ((CurrentDeliveryNotePos == null) || (CurrentDeliveryNotePos.InOrderPos == null) || (CurrentACMethodBooking == null))
+                if (AccessBookingFacilityLot == null)
                     return null;
 
-                List<FacilityLot> bookableFacilityLots = null;
-                if (FacilityPreBookingList != null && FacilityPreBookingList.Any())
-                    bookableFacilityLots = FacilityPreBookingList.Where(c => c.InwardFacilityLot != null).Select(c => c.InwardFacilityLot).Distinct().ToList();
+                return AccessBookingFacilityLot.NavList;
+            }
+        }
 
-                if (FacilityBookingList.Any())
+        ACAccessNav<FacilityLot> _AccessBookingFacilityLot;
+        [ACPropertyAccess(613, "FacilityLots")]
+        public ACAccessNav<FacilityLot> AccessBookingFacilityLot
+        {
+            get
+            {
+                if (_AccessBookingFacilityLot == null && ACType != null)
                 {
-                    var query2 = FacilityBookingList.Where(c => c.InwardFacilityLot != null).Select(c => c.InwardFacilityLot).Distinct();
-                    if (bookableFacilityLots == null)
-                        bookableFacilityLots = query2.ToList();
-                    else
-                    {
-                        var query3 = bookableFacilityLots.Union(query2);
-                        if ((query3 != null) && (query3.Any()))
-                            bookableFacilityLots = query3.ToList();
-                    }
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "BookingFacilityLot", ACType.ACIdentifier);
+                    navACQueryDefinition.TakeCount = 20;
+                    _AccessBookingFacilityLot = navACQueryDefinition.NewAccessNav<FacilityLot>("BookingFacilityLot", this);
+                    _AccessBookingFacilityLot.AutoSaveOnNavigation = false;
+                    _AccessBookingFacilityLot.NavSearchExecuted += _AccessBookingFacilityLot_NavSearchExecuted;
+                    RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                 }
-                var queryFromDB = DatabaseApp.FacilityLot.Where(c => c.Material != null && c.MaterialID == CurrentDeliveryNotePos.InOrderPos.MaterialID);
+                return _AccessBookingFacilityLot;
+            }
+        }
+
+        private void _AccessBookingFacilityLot_NavSearchExecuted(object sender, IList<FacilityLot> result)
+        {
+            List<FacilityLot> bookableFacilityLots = null;
+            if (FacilityPreBookingList != null && FacilityPreBookingList.Any())
+                bookableFacilityLots = FacilityPreBookingList.Where(c => c.InwardFacilityLot != null).Select(c => c.InwardFacilityLot).Distinct().ToList();
+
+            if (FacilityBookingList != null && FacilityBookingList.Any())
+            {
+                var query2 = FacilityBookingList.Where(c => c.InwardFacilityLot != null).Select(c => c.InwardFacilityLot).Distinct();
                 if (bookableFacilityLots == null)
-                    bookableFacilityLots = queryFromDB.ToList();
+                    bookableFacilityLots = query2.ToList();
                 else
                 {
-                    var query3 = bookableFacilityLots.Union(queryFromDB);
+                    var query3 = bookableFacilityLots.Union(query2);
                     if ((query3 != null) && (query3.Any()))
                         bookableFacilityLots = query3.ToList();
                 }
-                return bookableFacilityLots;
+            }
+
+            if (bookableFacilityLots != null && bookableFacilityLots.Any())
+            {
+                foreach (var lot in bookableFacilityLots)
+                {
+                    result.Insert(0, lot);
+                }
             }
         }
+
+        private List<ACFilterItem> AccessBookingFacilityLotDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "LotNo", Global.LogicalOperators.equal, Global.Operators.or, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, "", true),
+                };
+            }
+        }
+
+        private List<ACSortItem> AccessBookingFacilityLotDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("LotNo", Global.SortDirections.ascending, true),
+                };
+            }
+        }
+
+
+        private void RefreshFilterFacilityLotAccess(ACAccessNav<FacilityLot> accessNavLot)
+        {
+            if (accessNavLot == null
+                || accessNavLot.NavACQueryDefinition == null
+                || CurrentDeliveryNotePos == null)
+                return;
+            accessNavLot.NavACQueryDefinition.CheckAndReplaceColumnsIfDifferent(AccessBookingFacilityLotDefaultFilter, AccessBookingFacilityLotDefaultSort);
+
+            var acFilter = accessNavLot.NavACQueryDefinition.ACFilterColumns.Where(c => c.ACIdentifier == "Material\\MaterialNo").FirstOrDefault();
+            if (acFilter != null && CurrentDeliveryNotePos.Material != null)
+                acFilter.SearchWord = CurrentDeliveryNotePos.Material.MaterialNo;
+
+            accessNavLot.NavSearch(this.DatabaseApp);
+        }
+
         #endregion
+
+        #region  FacilityPreBooking -> Available quants
+
+        private Material _QuantDialogMaterial;
+
+
+        private FacilityCharge _SelectedPreBookingAvailableQuants;
+        /// <summary>
+        /// Selected property for FacilityCharge
+        /// </summary>
+        /// <value>The selected PreBookingAvailableQuants</value>
+        [ACPropertySelected(500, "PropertyGroupName", "en{'TODO: PreBookingAvailableQuants'}de{'TODO: PreBookingAvailableQuants'}")]
+        public FacilityCharge SelectedPreBookingAvailableQuants
+        {
+            get
+            {
+                return _SelectedPreBookingAvailableQuants;
+            }
+            set
+            {
+                if (_SelectedPreBookingAvailableQuants != value)
+                {
+                    _SelectedPreBookingAvailableQuants = value;
+                    OnPropertyChanged("SelectedPreBookingAvailableQuants");
+                }
+            }
+        }
+
+
+        private List<FacilityCharge> _PreBookingAvailableQuantsList;
+        /// <summary>
+        /// List property for FacilityCharge
+        /// </summary>
+        /// <value>The PreBookingAvailableQuants list</value>
+        [ACPropertyList(501, "PropertyGroupName")]
+        public List<FacilityCharge> PreBookingAvailableQuantsList
+        {
+            get
+            {
+                if (_PreBookingAvailableQuantsList == null)
+                    _PreBookingAvailableQuantsList = LoadPreBookingAvailableQuantsList();
+                return _PreBookingAvailableQuantsList;
+            }
+        }
+
+        private List<FacilityCharge> LoadPreBookingAvailableQuantsList()
+        {
+            if (_QuantDialogMaterial == null)
+                return new List<FacilityCharge>();
+            return
+                DatabaseApp.FacilityCharge
+                .Include(c => c.FacilityLot)
+                .Include(c => c.Material)
+                .Include(c => c.MDUnit)
+                .Include(c => c.Facility)
+                .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
+                .OrderBy(c => c.ExpirationDate)
+                .ThenBy(c => c.FillingDate)
+                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .ToList();
+        }
+
+        private void LoadPreBookingAvailableQuants()
+        {
+            _PreBookingAvailableQuantsList = null;
+            OnPropertyChanged("PreBookingAvailableQuantsList");
+        }
+
+
+        #endregion
+
 
         #region FacilityBooking
         FacilityBooking _CurrentFacilityBooking;
@@ -1434,7 +1640,8 @@ namespace gip.bso.purchasing
                     {
                         if (CurrentACMethodBooking != null && CurrentDeliveryNotePos != null)
                         {
-                            if (!CurrentDeliveryNotePos.InOrderPos.Material.IsLotManaged)
+                            if (   CurrentDeliveryNotePos.Material == null
+                                || !CurrentDeliveryNotePos.Material.IsLotManaged)
                                 return Global.ControlModes.Disabled;
                         }
                         break;
@@ -2222,7 +2429,8 @@ namespace gip.bso.purchasing
                     Save();
                     CurrentACMethodBooking.InwardFacilityLot = result;
                     OnNewCreatedFacilityLot(result);
-                    OnPropertyChanged("BookableFacilityLots");
+                    if (AccessBookingFacilityLot != null)
+                        AccessBookingFacilityLot.NavSearch(DatabaseApp);
                     Save();
                 }
             }
@@ -2241,6 +2449,95 @@ namespace gip.bso.purchasing
         public virtual void OnNewCreatedFacilityLot(FacilityLot lot)
         {
         }
+
+        [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1)]
+        public void ShowFacilityLot()
+        {
+            if (!IsEnabledShowFacilityLot())
+                return;
+            ACComponent childBSO = ACUrlCommand("?FacilityLotDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("FacilityLotDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            string lotNo = null;
+            if (CurrentACMethodBooking.OutwardFacilityLot != null)
+                lotNo = CurrentACMethodBooking.OutwardFacilityLot.LotNo;
+            else if (CurrentACMethodBooking.InwardFacilityLot != null)
+                lotNo = CurrentACMethodBooking.InwardFacilityLot.LotNo;
+            else
+                return;
+            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogOrder", lotNo);
+            childBSO.Stop();
+        }
+
+        public bool IsEnabledShowFacilityLot()
+        {
+            return CurrentACMethodBooking != null
+                    && (CurrentACMethodBooking.InwardFacilityLot != null
+                        || CurrentACMethodBooking.OutwardFacilityLot != null);
+        }
+
+        #region FacilityPreBooking -> Available quants
+
+        /// <summary>
+        /// Source Property: ShowDlgAvailableQuants
+        /// </summary>
+        [ACMethodInfo("ShowDlgInwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
+        public void ShowDlgInwardAvailableQuants()
+        {
+            if (!IsEnabledShowDlgInwardAvailableQuants())
+                return;
+            _QuantDialogMaterial = GetPreBookingInwardMaterial();
+            _PreBookingAvailableQuantsList = null;
+            ShowDialog(this, "DlgAvailableQuants");
+        }
+
+        public bool IsEnabledShowDlgInwardAvailableQuants()
+        {
+            return CurrentACMethodBooking != null && GetPreBookingInwardMaterial() != null;
+        }
+
+        // DlgAvailableQuantsOk
+        /// <summary>
+        /// Source Property: DlgAvailableQuantsOk
+        /// </summary>
+        [ACMethodInfo("DlgAvailableQuantsOk", "en{'Ok'}de{'Ok'}", 999)]
+        public void DlgAvailableQuantsOk()
+        {
+            if (!IsEnabledDlgAvailableQuantsOk())
+                return;
+            CurrentACMethodBooking.InwardFacility = SelectedPreBookingAvailableQuants.Facility;
+            CurrentACMethodBooking.InwardFacilityCharge = SelectedPreBookingAvailableQuants;
+            CurrentACMethodBooking.InwardMaterial = null;
+            CurrentACMethodBooking.InwardFacilityLot = null;
+            OnPropertyChanged("CurrentACMethodBooking");
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgAvailableQuantsOk()
+        {
+            return SelectedPreBookingAvailableQuants != null;
+        }
+
+        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999)]
+        public void DlgAvailableQuantsCancel()
+        {
+            CloseTopDialog();
+        }
+
+
+        private Material GetPreBookingInwardMaterial()
+        {
+            if (CurrentACMethodBooking != null
+                && CurrentDeliveryNotePos != null
+                && CurrentDeliveryNotePos.Material != null)
+                return CurrentDeliveryNotePos.Material;
+            return null;
+        }
+
+        #endregion
+
 
         #endregion
 
@@ -2502,6 +2799,12 @@ namespace gip.bso.purchasing
                 case "IsEnabledNewFacilityLot":
                     result = IsEnabledNewFacilityLot();
                     return true;
+                case "ShowFacilityLot":
+                    ShowFacilityLot();
+                    return true;
+                case "IsEnabledShowFacilityLot":
+                    result = IsEnabledShowFacilityLot();
+                    return true;
                 case "ShowDialogNewDeliveryNote":
                     result = ShowDialogNewDeliveryNote(acParameter.Count() == 1 ? (String)acParameter[0] : "");
                     return true;
@@ -2652,6 +2955,23 @@ namespace gip.bso.purchasing
                 case "ShowDialogOrderInfo":
                     ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
+                case "ShowDlgInwardAvailableQuants":
+                    ShowDlgInwardAvailableQuants();
+                    return true;
+                case "IsEnabledShowDlgInwardAvailableQuants":
+                    result = IsEnabledShowDlgInwardAvailableQuants();
+                    return true;
+                case "DlgAvailableQuantsOk":
+                    DlgAvailableQuantsOk();
+                    return true;
+                case "IsEnabledDlgAvailableQuantsOk":
+                    result = IsEnabledDlgAvailableQuantsOk();
+                    return true;
+                case "DlgAvailableQuantsCancel":
+                    DlgAvailableQuantsCancel();
+                    return true;
+                default:
+                    break;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
