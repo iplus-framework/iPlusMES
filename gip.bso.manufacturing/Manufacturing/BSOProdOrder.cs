@@ -965,10 +965,7 @@ namespace gip.bso.manufacturing
                 return Global.MsgResult.None;
             }
 
-            if (this.ProdOrderManager != null)
-            {
-                this.ProdOrderManager.FinishOrder(this.DatabaseApp, CurrentProdOrder);
-            }
+            OnFinishOrder();
 
             ACSaveChanges();
             OnPropertyChanged("CurrentProdOrder");
@@ -982,6 +979,14 @@ namespace gip.bso.manufacturing
             //if (CurrentProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished)
             //    return false;
             return true;
+        }
+
+        protected virtual void OnFinishOrder()
+        {
+            if (this.ProdOrderManager != null)
+            {
+                this.ProdOrderManager.FinishOrder(this.DatabaseApp, CurrentProdOrder);
+            }
         }
 
         #endregion

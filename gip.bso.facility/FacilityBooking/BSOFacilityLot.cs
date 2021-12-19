@@ -416,8 +416,11 @@ namespace gip.bso.facility
         [ACMethodCommand("Dialog", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
         public void DialogOK()
         {
-            DialogResult.SelectedCommand = eMsgButton.OK;
-            DialogResult.ReturnValue = CurrentFacilityLot;
+            if (DialogResult != null)
+            {
+                DialogResult.SelectedCommand = eMsgButton.OK;
+                DialogResult.ReturnValue = CurrentFacilityLot;
+            }
             CloseTopDialog();
         }
 
@@ -426,6 +429,54 @@ namespace gip.bso.facility
         {
             CloseTopDialog();
         }
+
+        #region Show order dialog
+
+        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(string lotNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "LotNo").FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, "LotNo", Global.LogicalOperators.contains, Global.Operators.and, lotNo, false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = lotNo;
+
+            this.Search();
+            ShowDialog(this, "FacilityLotDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            FacilityLot facilityLot = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == FacilityLot.ClassName)
+                {
+                    facilityLot = this.DatabaseApp.FacilityLot
+                        .Where(c => c.FacilityLotID == entry.EntityID)
+                        .FirstOrDefault();
+                    break;
+                }
+            }
+
+            if (facilityLot == null)
+                return;
+
+            ShowDialogOrder(facilityLot.LotNo);
+        }
+        #endregion
+
 
         #endregion
 
@@ -543,6 +594,12 @@ namespace gip.bso.facility
                     return true;
                 case "ShowDialogNewLot":
                     result = ShowDialogNewLot(acParameter.Count() == 1 ? (string)acParameter[0] : "", acParameter.Count() == 2 ? (Material)acParameter[1] : null);
+                    return true;
+                case "ShowDialogOrder":
+                    ShowDialogOrder((String)acParameter[0]);
+                    return true;
+                case "ShowDialogOrderInfo":
+                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case "DialogOK":
                     DialogOK();
