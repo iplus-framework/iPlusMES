@@ -614,6 +614,32 @@ namespace gip.bso.logistics
                 OnPropertyChanged("SelectedPicking");
             }
         }
+
+        [ACMethodInfo("", "en{'Finish order'}de{'Auftrag beenden'}", 650, true)]
+        public void FinishOrder()
+        {
+            if (PickingManager == null)
+                return;
+
+            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking);
+            if (msg != null)
+            {
+                if (Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
+                {
+                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, true);
+                    if (msg != null)
+                    {
+                        Messages.Msg(msg);
+                    }
+                }
+            }
+        }
+
+        public bool IsEnabledFinishOrder()
+        {
+            return CurrentPicking != null;
+        }
+
         #endregion
 
         #region PickingPos

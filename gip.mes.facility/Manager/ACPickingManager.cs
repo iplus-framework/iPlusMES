@@ -1982,22 +1982,107 @@ namespace gip.mes.facility
 
         #endregion
 
-        #region Picking
+        #region FinishOrder
 
         public MsgWithDetails FinishOrder(DatabaseApp dbApp, Picking picking, bool force = false)
         {
             if (dbApp == null)
             {
-
+                return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "dbApp is null.") });
             }
             
             if (picking == null)
             {
-
+                return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "picking is null.") });
             }
 
+            MsgWithDetails result = new MsgWithDetails();
 
+            MDDelivPosLoadState posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+            MDInOrderPosState inPosState = dbApp.MDInOrderPosState.FirstOrDefault(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed);
+            MDOutOrderPosState outPosState = dbApp.MDOutOrderPosState.FirstOrDefault(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed);
 
+            foreach (PickingPos pPos in picking.PickingPos_Picking)
+            {
+                bool missingQuantity = pPos.DiffQuantityUOM < 0;
+
+                if (pPos.InOrderPos != null)
+                {
+                    bool isCompleted = pPos.InOrderPos.MDInOrderPosState != null
+                                    && pPos.InOrderPos.MDInOrderPosState.InOrderPosState == MDInOrderPosState.InOrderPosStates.Completed;
+
+                    if (!force && missingQuantity && !isCompleted)
+                    {
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("For position {0} {1} difference quantity is {2}", pPos.Material.MaterialNo,
+                                                                                             pPos.Material.MaterialName1, pPos.DiffQuantityUOM)));
+                        continue;
+                    }
+
+                    if (!isCompleted)
+                    {
+                        pPos.InOrderPos.MDInOrderPosState = inPosState;
+                    }
+                }
+                else if (pPos.OutOrderPos != null)
+                {
+                    bool isCompleted = pPos.OutOrderPos.MDOutOrderPosState != null
+                                    && pPos.OutOrderPos.MDOutOrderPosState.OutOrderPosState == MDOutOrderPosState.OutOrderPosStates.Completed;
+
+                    if (!force && missingQuantity && !isCompleted)
+                    {
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("For position {0} {1} difference quantity is {2}", pPos.Material.MaterialNo,
+                                                                                             pPos.Material.MaterialName1, pPos.DiffQuantityUOM)));
+                        continue;
+                    }
+
+                    if (!isCompleted)
+                    {
+                        pPos.OutOrderPos.MDOutOrderPosState = outPosState;
+                    }
+                }
+                else
+                {
+                    bool isCompleted = pPos.MDDelivPosLoadState != null && pPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck;
+
+                    if (!force && missingQuantity && !isCompleted)
+                    {
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("For position {0} {1} difference quantity is {2}", pPos.Material.MaterialNo,
+                                                                                             pPos.Material.MaterialName1, pPos.DiffQuantityUOM)));
+                        continue;
+                    }
+
+                    if (!isCompleted)
+                    {
+                        pPos.MDDelivPosLoadState = posState;
+                    }
+
+                    if (pPos.ToFacility != null && pPos.ToFacility.PostingBehaviour == PostingBehaviourEnum.BlockOnRelocation)
+                    {
+                        foreach (FacilityCharge fc in pPos.FacilityBookingCharge_PickingPos.Select(x => x.InwardFacilityCharge))
+                        {
+                            fc.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbApp, MDReleaseState.ReleaseStates.Free);
+                        }
+                    }
+                }
+            }
+
+            Msg msg = dbApp.ACSaveChanges();
+            if (msg != null)
+                result.AddDetailMessage(msg);
+
+            if (result.MsgDetailsCount > 0 && !force)
+            {
+                return result;
+            }
+
+            picking.PickingStateIndex = (short)GlobalApp.PickingState.Finished;
+
+            msg = dbApp.ACSaveChanges();
+            if (msg != null)
+            {
+                result.AddDetailMessage(msg);
+                return result;
+            }
 
             return null;
         }
