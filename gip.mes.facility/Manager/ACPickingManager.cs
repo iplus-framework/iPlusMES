@@ -1005,6 +1005,7 @@ namespace gip.mes.facility
         #endregion
 
         #region Booking
+
         protected virtual PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, PickingPos pickingPos)
         {
             PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
@@ -1563,8 +1564,6 @@ namespace gip.mes.facility
             pickingPos.OnEntityPropertyChanged("PickingDiffQuantityUOM");
         }
 
-
-
         public MsgWithDetails CreateNewPicking(ACMethodBooking relocationBooking, gip.core.datamodel.ACClassMethod aCClassMethod, DatabaseApp dbApp, Database dbIPlus, bool setReadyToLoad, out Picking picking)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
@@ -1612,6 +1611,7 @@ namespace gip.mes.facility
             msgWithDetails = dbApp.ACSaveChanges();
             return msgWithDetails;
         }
+        
         #endregion
 
         #region Validation
@@ -1979,6 +1979,140 @@ namespace gip.mes.facility
         //    }
         //}
         #endregion
+
+        #endregion
+
+        #region FinishOrder
+
+        public MsgWithDetails FinishOrder(DatabaseApp dbApp, Picking picking, bool skipCheck = false)
+        {
+            if (dbApp == null)
+            {
+                return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "dbApp is null.") });
+            }
+            
+            if (picking == null)
+            {
+                return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "picking is null.") });
+            }
+
+            MsgWithDetails result = null;
+
+            MDDelivPosLoadState posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+            MDInOrderPosState inPosState = dbApp.MDInOrderPosState.FirstOrDefault(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed);
+            MDOutOrderPosState outPosState = dbApp.MDOutOrderPosState.FirstOrDefault(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed);
+
+            foreach (PickingPos pPos in picking.PickingPos_Picking)
+            {
+                bool missingQuantity = pPos.DiffQuantityUOM < 0;
+
+                if (pPos.InOrderPos != null)
+                {
+                    bool isCompleted = pPos.InOrderPos.MDInOrderPosState != null
+                                    && pPos.InOrderPos.MDInOrderPosState.InOrderPosState == MDInOrderPosState.InOrderPosStates.Completed;
+
+                    if (!skipCheck && missingQuantity && !isCompleted)
+                    {
+                        if (result == null)
+                        {
+                            //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                        }
+
+                        //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1, 
+                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
+                        continue;
+                    }
+
+                    if (!isCompleted)
+                    {
+                        pPos.InOrderPos.MDInOrderPosState = inPosState;
+                    }
+                }
+                else if (pPos.OutOrderPos != null)
+                {
+                    bool isCompleted = pPos.OutOrderPos.MDOutOrderPosState != null
+                                    && pPos.OutOrderPos.MDOutOrderPosState.OutOrderPosState == MDOutOrderPosState.OutOrderPosStates.Completed;
+
+                    if (!skipCheck && missingQuantity && !isCompleted)
+                    {
+                        if (result == null)
+                        {
+                            //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                        }
+
+                        //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
+                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
+                        continue;
+                    }
+
+                    if (!isCompleted)
+                    {
+                        pPos.OutOrderPos.MDOutOrderPosState = outPosState;
+                    }
+                }
+                else
+                {
+                    bool isCompleted = pPos.MDDelivPosLoadState != null && pPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck;
+
+                    if (!skipCheck && missingQuantity && !isCompleted)
+                    {
+                        if (result == null)
+                        {
+                            //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                        }
+
+                        //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
+                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
+                        continue;
+                    }
+
+                    if (!isCompleted)
+                    {
+                        pPos.MDDelivPosLoadState = posState;
+                    }
+
+                    if (picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.InternalRelocation)
+                    {
+                        IEnumerable<FacilityCharge> facilityCharges = pPos.FacilityBooking_PickingPos.SelectMany(f => f.FacilityBookingCharge_FacilityBooking)
+                                                                          .Where(x => x.InwardFacility != null
+                                                                                   && x.InwardFacility.PostingBehaviourIndex == (short)PostingBehaviourEnum.BlockOnRelocation)
+                                                                          .Select(c => c.InwardFacilityCharge)
+                                                                          .Where(fc => fc.MDReleaseState.MDReleaseStateIndex != (short)MDReleaseState.ReleaseStates.Free);
+
+                        foreach (FacilityCharge fc in facilityCharges)
+                        {
+                            fc.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbApp, MDReleaseState.ReleaseStates.Free);
+                        }
+                    }
+                }
+            }
+
+            Msg msg = dbApp.ACSaveChanges();
+            if (msg != null)
+                result.AddDetailMessage(msg);
+
+            if (result != null && result.MsgDetailsCount > 0 && !skipCheck)
+            {
+                return result;
+            }
+
+            picking.PickingStateIndex = (short)GlobalApp.PickingState.Finished;
+
+            msg = dbApp.ACSaveChanges();
+            if (msg != null)
+            {
+                result.AddDetailMessage(msg);
+                return result;
+            }
+
+            return null;
+        }
 
         #endregion
 
