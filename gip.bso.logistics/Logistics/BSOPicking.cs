@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.manager;
@@ -165,6 +166,23 @@ namespace gip.bso.logistics
                 clone._SelectedFacilityBooking = this._SelectedFacilityBooking;
             }
             return clone;
+        }
+
+        #endregion
+
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
+            }
         }
 
         #endregion
@@ -739,6 +757,9 @@ namespace gip.bso.logistics
 
         #region FacilityPreBooking
 
+        public FacilitySelectLoctation FacilitySelectLoctation { get; set; }
+
+
         #region FacilityPreBooking -> PreBooking
         FacilityPreBooking _CurrentFacilityPreBooking;
         [ACPropertyCurrent(607, "FacilityPreBooking")]
@@ -977,7 +998,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (CurrentACMethodBooking == null || CurrentACMethodBooking.InwardFacility == null || CurrentPickingPos.Material == null)
+                if (CurrentACMethodBooking == null || CurrentACMethodBooking.InwardFacility == null || CurrentPickingPos == null || CurrentPickingPos.Material == null)
                     return null;
                 return CurrentACMethodBooking.InwardFacility.FacilityCharge_Facility
                     .Where(x => x.MaterialID == CurrentPickingPos.Material.MaterialID && !x.NotAvailable).OrderByDescending(x => x.InsertDate);
@@ -1550,7 +1571,7 @@ namespace gip.bso.logistics
                     {
                         if (CurrentACMethodBooking != null && CurrentPickingPos != null)
                         {
-                            if (   CurrentPickingPos.Material == null 
+                            if (CurrentPickingPos.Material == null
                                 || !CurrentPickingPos.Material.IsLotManaged)
                                 return Global.ControlModes.Disabled;
                         }
@@ -2481,10 +2502,9 @@ namespace gip.bso.logistics
         public bool IsEnabledShowFacilityLot()
         {
             return CurrentACMethodBooking != null
-                    && (   CurrentACMethodBooking.InwardFacilityLot != null 
+                    && (CurrentACMethodBooking.InwardFacilityLot != null
                         || CurrentACMethodBooking.OutwardFacilityLot != null);
         }
-
 
         #endregion
 
@@ -2577,6 +2597,68 @@ namespace gip.bso.logistics
                 return CurrentPickingPos.Material;
             return null;
         }
+
+        #endregion
+
+        #region FacilityPreBooking -> Select Facility
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgInwardFacility()
+        {
+            if (!IsEnabledShowDlgInwardFacility())
+                return;
+            FacilitySelectLoctation = FacilitySelectLoctation.PrebookingInward;
+            ShowDlgFacility(CurrentACMethodBooking.InwardFacility);
+        }
+
+        public bool IsEnabledShowDlgInwardFacility()
+        {
+            return CurrentACMethodBooking != null;
+        }
+
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgOutwardFacility()
+        {
+            if (!IsEnabledShowDlgOutwardFacility())
+                return;
+            FacilitySelectLoctation = FacilitySelectLoctation.PrebookingOutward;
+            ShowDlgFacility(CurrentACMethodBooking.OutwardFacility);
+        }
+
+        public bool IsEnabledShowDlgOutwardFacility()
+        {
+            return CurrentACMethodBooking != null;
+        }
+
+
+        private void ShowDlgFacility(Facility preselectedFacility)
+        {
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(preselectedFacility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                switch (FacilitySelectLoctation)
+                {
+                    case FacilitySelectLoctation.PrebookingInward:
+                        CurrentACMethodBooking.InwardFacility = facility;
+                        break;
+                    case FacilitySelectLoctation.PrebookingOutward:
+                        CurrentACMethodBooking.OutwardFacility = facility;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
 
         #endregion
 
@@ -3017,7 +3099,6 @@ namespace gip.bso.logistics
             ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty);
         }
         #endregion
-
 
         #endregion
 
@@ -3485,5 +3566,13 @@ namespace gip.bso.logistics
         }
 
         #endregion
+
+    }
+
+
+    public enum FacilitySelectLoctation
+    {
+        PrebookingInward,
+        PrebookingOutward
     }
 }

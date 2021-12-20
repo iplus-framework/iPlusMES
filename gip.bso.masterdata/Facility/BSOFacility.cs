@@ -8,7 +8,7 @@ using System.Linq;
 namespace gip.bso.masterdata
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
-    public class BSOFacility : ACBSOvb
+    public class BSOFacility : BSOFacilityExplorer
     {
 
         #region consts
@@ -41,9 +41,6 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            ACFSItem rootItem = FacilityTree.LoadFacilityTree(DatabaseApp);
-            rootItem.ShowFirst();
-            CurrentFacilityRoot = rootItem;
             return true;
         }
 
@@ -66,155 +63,13 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Properties 
-
-        #region FacilityTree
-
-        ACFSItem _CurrentFacilityRoot;
-        ACFSItem _CurrentFacility;
-
-
-        /// <summary>
-        /// Gets or sets the current import project item root.
-        /// </summary>
-        /// <value>The current import project item root.</value>
-        [ACPropertyCurrent(9999, "FacilityRoot")]
-        public ACFSItem CurrentFacilityRoot
-        {
-            get
-            {
-                return _CurrentFacilityRoot;
-            }
-            set
-            {
-                _CurrentFacilityRoot = value;
-                OnPropertyChanged("CurrentFacilityRoot");
-            }
-
-        }
-
-        /// <summary>
-        /// Gets or sets the current import project item.
-        /// </summary>
-        /// <value>The current import project item.</value>
-        [ACPropertyCurrent(9999, "Facility")]
-        public ACFSItem CurrentFacility
-        {
-            get
-            {
-                return _CurrentFacility;
-            }
-            set
-            {
-                if (_CurrentFacility != value)
-                {
-                    _CurrentFacility = value;
-                    OnPropertyChanged("CurrentFacility");
-                    OnPropertyChanged("SelectedFacility");
-                }
-            }
-        }
-
-        ChangeInfo _CurrentFacilityRootChangeInfo = null;
-        /// <summary>
-        /// Gets or sets the current project item root change info.
-        /// </summary>
-        /// <value>The current project item root change info.</value>
-        [ACPropertyChangeInfo(404, "Facility")]
-        public ChangeInfo CurrentFacilityRootChangeInfo
-        {
-            get
-            {
-                return _CurrentFacilityRootChangeInfo;
-            }
-            set
-            {
-                _CurrentFacilityRootChangeInfo = value;
-                OnPropertyChanged("CurrentFacilityRootChangeInfo");
-            }
-        }
-
-
-        [ACPropertyInfo(9999, "SelectedFacility")]
-        public Facility SelectedFacility
-        {
-            get
-            {
-                if (CurrentFacility != null && CurrentFacility.ACObject != null)
-                    return CurrentFacility.ACObject as Facility;
-                return null;
-            }
-        }
-
-
-        /// <summary>
-        /// Source Property: 
-        /// </summary>
-        private string _FilterFacility;
-        [ACPropertySelected(999, "FilterFacility", "en{'Search'}de{'Suchen'}")]
-        public string FilterFacility
-        {
-            get
-            {
-                return _FilterFacility;
-            }
-            set
-            {
-                if (_FilterFacility != value)
-                {
-                    _FilterFacility = value;
-                    OnPropertyChanged("FilterFacility");
-                    ACFSItem preselectedItem = null;
-                    ACFSItem treeRoot = FacilityTree.LoadFacilityTree(DatabaseApp);
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        Action<ACFSItem, object[]> filterAction = delegate (ACFSItem aCFSItem, object[] args)
-                        {
-                            if(aCFSItem.ACObject == null)
-                                aCFSItem.IsVisible = true;
-                            else
-                            {
-                                aCFSItem.IsVisible = false;
-                                Facility facility = aCFSItem.ACObject as Facility;
-                                if(facility.FacilityNo.ToLower().Contains(value.ToLower()) || facility.FacilityName.ToLower().Contains(value.ToLower()))
-                                {
-                                    aCFSItem.IsVisible = true;
-                                    FacilityTree.SetupCurrentVisible(aCFSItem);
-                                    if(preselectedItem == null)
-                                    {
-                                        preselectedItem = aCFSItem;
-                                    }
-                                }
-                            }
-                        };
-                        treeRoot.CallAction(filterAction);
-                    }
-                    CurrentFacilityRoot = treeRoot;
-                    CurrentFacility = preselectedItem;
-                }
-            }
-        }
-
-
-        #endregion
-
-        #endregion
-
         #region Methods
         #region Mehtods ->  BSO -> ACMethod
 
         /// <summary>
-        /// Searches this instance.
-        /// </summary>
-        [ACMethodCommand("StorageLocation", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search()
-        {
-        }
-
-        /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Material.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
             OnSave();
@@ -230,10 +85,9 @@ namespace gip.bso.masterdata
             return OnIsEnabledSave();
         }
 
-
         #region Mehtods ->  BSO -> ACMethod -> Tree operation
 
-        [ACMethodInteraction("AddFacility", "en{'New'}de{'Neu'}", (short)MISort.New, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Facility.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
         public virtual void AddFacility()
         {
             if (!IsEnabledAddFacility()) return;
@@ -281,7 +135,7 @@ namespace gip.bso.masterdata
             return CurrentFacility != null;
         }
 
-        [ACMethodInteraction("DeleteFacility", "en{'Delete'}de{'Loschen'}", (short)MISort.Delete, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Facility.ClassName, "en{'Delete'}de{'Loschen'}", (short)MISort.Delete, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
         public virtual void DeleteFacility()
         {
             if (!IsEnabledDeleteFacility()) return;
@@ -301,11 +155,11 @@ namespace gip.bso.masterdata
             OnPropertyChanged("CurrentFacility");
             OnPropertyChanged("SelectedFacility");
         }
+
         public virtual bool IsEnabledDeleteFacility()
         {
             return CurrentFacility != null && CurrentFacility.ACObject != null && !CurrentFacility.Items.Any();
         }
-
 
         #endregion
 
