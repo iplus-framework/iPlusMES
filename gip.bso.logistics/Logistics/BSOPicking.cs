@@ -652,6 +652,32 @@ namespace gip.bso.logistics
                 OnPropertyChanged("SelectedPicking");
             }
         }
+
+        [ACMethodInfo("", "en{'Finish order'}de{'Auftrag beenden'}", 650, true)]
+        public virtual void FinishOrder()
+        {
+            if (PickingManager == null)
+                return;
+
+            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking);
+            if (msg != null)
+            {
+                if (Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
+                {
+                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, true);
+                    if (msg != null)
+                    {
+                        Messages.Msg(msg);
+                    }
+                }
+            }
+        }
+
+        public virtual bool IsEnabledFinishOrder()
+        {
+            return CurrentPicking != null;
+        }
+
         #endregion
 
         #region PickingPos
@@ -3294,6 +3320,12 @@ namespace gip.bso.logistics
                     return true;
                 case "DlgAvailableQuantsCancel":
                     DlgAvailableQuantsCancel();
+                    return true;
+                case "FinishOrder":
+                    FinishOrder();
+                    return true;
+                case "IsEnabledFinishOrder":
+                    result = IsEnabledFinishOrder();
                     return true;
                 default:
                     break;
