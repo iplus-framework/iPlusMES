@@ -1,4 +1,5 @@
 ﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 #if NETFRAMEWORK
@@ -86,12 +87,29 @@ namespace gip.mes.webservices
         Task<WSResponse<PostingOverview>> GetPickingPosPostingsAsync(string pickingPosID);
 #endif
 
+        //TODO:Replace with GET method
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriPickingPos_Material, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<PickingPosList> GetPickingPosByMaterial(PickingPosList pickingPos);
 #elif NETSTANDARD
         Task<WSResponse<PickingPosList>> GetPickingPosByMaterialAsync(PickingPosList pickingPos);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = VBWebServiceConst.UriPicking_Finish, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<MsgWithDetails> FinishPickingOrder(Guid pickingID);
+#elif NETSTANDARD
+        Task<WSResponse<MsgWithDetails>> FinishPickingOrderAsync(Guid pickingID);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = VBWebServiceConst.UriPicking_FinishWithoutCheck, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<MsgWithDetails> FinishPickingOrderWithoutCheck(Guid pickingID);
+#elif NETSTANDARD
+        Task<WSResponse<MsgWithDetails>> FinishPickingOrderWithoutCheckAsync(Guid pickingID);
 #endif
 
     }

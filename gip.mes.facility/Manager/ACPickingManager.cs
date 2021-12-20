@@ -1984,7 +1984,7 @@ namespace gip.mes.facility
 
         #region FinishOrder
 
-        public MsgWithDetails FinishOrder(DatabaseApp dbApp, Picking picking, bool force = false)
+        public MsgWithDetails FinishOrder(DatabaseApp dbApp, Picking picking, bool skipCheck = false)
         {
             if (dbApp == null)
             {
@@ -1996,7 +1996,7 @@ namespace gip.mes.facility
                 return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "picking is null.") });
             }
 
-            MsgWithDetails result = new MsgWithDetails();
+            MsgWithDetails result = null;
 
             MDDelivPosLoadState posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
             MDInOrderPosState inPosState = dbApp.MDInOrderPosState.FirstOrDefault(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed);
@@ -2011,10 +2011,17 @@ namespace gip.mes.facility
                     bool isCompleted = pPos.InOrderPos.MDInOrderPosState != null
                                     && pPos.InOrderPos.MDInOrderPosState.InOrderPosState == MDInOrderPosState.InOrderPosStates.Completed;
 
-                    if (!force && missingQuantity && !isCompleted)
+                    if (!skipCheck && missingQuantity && !isCompleted)
                     {
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("For position {0} {1} difference quantity is {2}", pPos.Material.MaterialNo,
-                                                                                             pPos.Material.MaterialName1, pPos.DiffQuantityUOM)));
+                        if (result == null)
+                        {
+                            //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                        }
+
+                        //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1, 
+                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
                         continue;
                     }
 
@@ -2028,10 +2035,17 @@ namespace gip.mes.facility
                     bool isCompleted = pPos.OutOrderPos.MDOutOrderPosState != null
                                     && pPos.OutOrderPos.MDOutOrderPosState.OutOrderPosState == MDOutOrderPosState.OutOrderPosStates.Completed;
 
-                    if (!force && missingQuantity && !isCompleted)
+                    if (!skipCheck && missingQuantity && !isCompleted)
                     {
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("For position {0} {1} difference quantity is {2}", pPos.Material.MaterialNo,
-                                                                                             pPos.Material.MaterialName1, pPos.DiffQuantityUOM)));
+                        if (result == null)
+                        {
+                            //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                        }
+
+                        //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
+                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
                         continue;
                     }
 
@@ -2044,10 +2058,17 @@ namespace gip.mes.facility
                 {
                     bool isCompleted = pPos.MDDelivPosLoadState != null && pPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck;
 
-                    if (!force && missingQuantity && !isCompleted)
+                    if (!skipCheck && missingQuantity && !isCompleted)
                     {
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("For position {0} {1} difference quantity is {2}", pPos.Material.MaterialNo,
-                                                                                             pPos.Material.MaterialName1, pPos.DiffQuantityUOM)));
+                        if (result == null)
+                        {
+                            //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                        }
+
+                        //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
+                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
                         continue;
                     }
 
@@ -2056,9 +2077,15 @@ namespace gip.mes.facility
                         pPos.MDDelivPosLoadState = posState;
                     }
 
-                    if (pPos.ToFacility != null && pPos.ToFacility.PostingBehaviour == PostingBehaviourEnum.BlockOnRelocation)
+                    if (picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.InternalRelocation)
                     {
-                        foreach (FacilityCharge fc in pPos.FacilityBookingCharge_PickingPos.Select(x => x.InwardFacilityCharge))
+                        IEnumerable<FacilityCharge> facilityCharges = pPos.FacilityBooking_PickingPos.SelectMany(f => f.FacilityBookingCharge_FacilityBooking)
+                                                                          .Where(x => x.InwardFacility != null
+                                                                                   && x.InwardFacility.PostingBehaviourIndex == (short)PostingBehaviourEnum.BlockOnRelocation)
+                                                                          .Select(c => c.InwardFacilityCharge)
+                                                                          .Where(fc => fc.MDReleaseState.MDReleaseStateIndex != (short)MDReleaseState.ReleaseStates.Free);
+
+                        foreach (FacilityCharge fc in facilityCharges)
                         {
                             fc.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbApp, MDReleaseState.ReleaseStates.Free);
                         }
@@ -2070,7 +2097,7 @@ namespace gip.mes.facility
             if (msg != null)
                 result.AddDetailMessage(msg);
 
-            if (result.MsgDetailsCount > 0 && !force)
+            if (result != null && result.MsgDetailsCount > 0 && !skipCheck)
             {
                 return result;
             }

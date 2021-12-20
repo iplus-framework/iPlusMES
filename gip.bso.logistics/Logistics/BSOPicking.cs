@@ -636,7 +636,7 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInfo("", "en{'Finish order'}de{'Auftrag beenden'}", 650, true)]
-        public void FinishOrder()
+        public virtual void FinishOrder()
         {
             if (PickingManager == null)
                 return;
@@ -655,7 +655,7 @@ namespace gip.bso.logistics
             }
         }
 
-        public bool IsEnabledFinishOrder()
+        public virtual bool IsEnabledFinishOrder()
         {
             return CurrentPicking != null;
         }
@@ -3239,6 +3239,12 @@ namespace gip.bso.logistics
                     return true;
                 case "DlgAvailableQuantsCancel":
                     DlgAvailableQuantsCancel();
+                    return true;
+                case "FinishOrder":
+                    FinishOrder();
+                    return true;
+                case "IsEnabledFinishOrder":
+                    result = IsEnabledFinishOrder();
                     return true;
                 default:
                     break;

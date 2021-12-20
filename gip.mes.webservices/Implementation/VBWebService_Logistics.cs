@@ -62,8 +62,7 @@ namespace gip.mes.webservices
                         .Include("PickingPos_Picking.PickingMaterial")
                         .Include("PickingPos_Picking.PickingMaterial.BaseMDUnit")
                         .Where(c => (!pickingID.HasValue || c.PickingID == pickingID)
-                                    && (pickingID.HasValue || (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess)
-                                    && c.PickingPos_Picking.Any(p => p.MDDelivPosLoadState.MDDelivPosLoadStateIndex <= (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                    && (pickingID.HasValue || (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess))
                               )
         );
 
@@ -224,8 +223,7 @@ namespace gip.mes.webservices
                                     && ((toFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.ToFacility.ParentFacilityID.HasValue && x.ToFacility.ParentFacilityID == toFacility))))
                                     && (fromDate == null || c.DeliveryDateFrom >= fromDate)
                                     && (toDate == null || c.DeliveryDateTo <= toDate)
-                                    && (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess)
-                                    && (c.PickingPos_Picking.Any(p => p.MDDelivPosLoadState.MDDelivPosLoadStateIndex <= (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive)))
+                                    && (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess))
                               )
         ));
 
@@ -479,5 +477,76 @@ namespace gip.mes.webservices
             }).ToArray();
         }
 
+        public WSResponse<MsgWithDetails> FinishPickingOrder(Guid pickingID)
+        {
+            if (pickingID == Guid.Empty)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "pickingID is empty."));
+            }
+
+            MsgWithDetails result = null;
+
+            try
+            {
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    datamodel.Picking picking = dbApp.Picking.FirstOrDefault(c => c.PickingID == pickingID);
+                    if (picking == null)
+                    {
+                        //TODO: message
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
+                    }
+
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+                    if (pickingManger == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+
+                    result = pickingManger.FinishOrder(dbApp, picking, false);
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+
+            return new WSResponse<MsgWithDetails>(result);
+        }
+
+        public WSResponse<MsgWithDetails> FinishPickingOrderWithoutCheck(Guid pickingID)
+        {
+            if (pickingID == Guid.Empty)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "pickingID is empty."));
+            }
+
+            MsgWithDetails result = null;
+
+            try 
+            {
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    datamodel.Picking picking = dbApp.Picking.FirstOrDefault(c => c.PickingID == pickingID);
+                    if (picking == null)
+                    {
+                        //TODO: message
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
+                    }
+
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+                    if (pickingManger == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+
+                    result = pickingManger.FinishOrder(dbApp, picking, true);
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+
+            return new WSResponse<MsgWithDetails>(result);
+        }
     }
 }
