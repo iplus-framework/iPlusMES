@@ -6,10 +6,9 @@ using System.Linq;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Printing settings'}de{'Druckeinstellungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
-    public class BSOPrintMES : BSOPrint
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Printer settings MES'}de{'Drucker-Einstellungen MES'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    public class BSOPrinterSettingsMES : BSOPrinterSettings
     {
-
         #region const
         #endregion
 
@@ -22,7 +21,7 @@ namespace gip.bso.masterdata
         /// <param name="parentACObject">The parentACObject parameter.</param>
         /// <param name="parameter">The parameters in the ACValueList.</param>
         /// <param name="acIdentifier">The acIdentifier parameter.</param>
-        public BSOPrintMES(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
+        public BSOPrinterSettingsMES(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
             // 

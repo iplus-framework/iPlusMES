@@ -108,7 +108,7 @@
   <ItemGroup>
     <Compile Include="Facility\BSOFacility.cs" />
     <Compile Include="Facility\BSOFacilityExplorer.cs" />
-    <Compile Include="Facility\BSOPrintMES.cs" />
+    <Compile Include="Facility\BSOPrinterSettingsMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
     <Compile Include="Logistics\MDBSOPickingType.cs" />
@@ -328,9 +328,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-12-12 15-00_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-12-15 08-37_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-12-17 15-08_aagincic.zip">
