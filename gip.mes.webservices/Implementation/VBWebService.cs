@@ -92,11 +92,19 @@ namespace gip.mes.webservices
             if (printEntity.Sequence == null || !printEntity.Sequence.Any())
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "No elements in Barcode Entity sequence!"));
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-            ACPrintManager printManager = ACPrintManager.GetServiceInstance(myServiceHost) as ACPrintManager;
+            ACPrintManager printManager = ACPrintManager.GetServiceInstance(myServiceHost);
             if(printManager == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PrintManager instance is null!"));
             PAOrderInfo pAOrderInfo = GetPAOrderInfo(printEntity.Sequence.ToArray());
             Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount) as Msg;
+            if (msg != null && msg.MessageLevel != eMsgLevel.Info)
+            {
+                myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault; 
+                if (myServiceHost.IsAlarmActive(myServiceHost.IsServiceAlarm, msg.Message) == null)
+                    myServiceHost.Messages.LogMessageMsg(msg);
+                myServiceHost.OnNewAlarmOccurred(myServiceHost.IsServiceAlarm, msg, true);
+            }
+
             return new WSResponse<bool>(msg == null) { Message = msg };
         }
 

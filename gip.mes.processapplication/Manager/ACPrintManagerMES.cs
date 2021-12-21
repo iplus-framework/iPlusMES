@@ -51,7 +51,8 @@ namespace gip.mes.processapplication
                 if (aCClassID != null)
                     aCClass = database.ACClass.FirstOrDefault();
             }
-
+            if (configuredPrinters == null || !configuredPrinters.Any())
+                return null;
 
             if (facilityID != null)
                 printerInfo = GetPrinterInfoFromFacility(facilityID, configuredPrinters);
@@ -65,6 +66,8 @@ namespace gip.mes.processapplication
             using (DatabaseApp databaseApp = new DatabaseApp())
             {
                 Facility facility = databaseApp.Facility.FirstOrDefault(c => c.FacilityID == facilityID);
+                if (facility == null)
+                    return null;
                 return GetPrinterInfoFromFacility(facility, configuredPrinters);
             }
         }
