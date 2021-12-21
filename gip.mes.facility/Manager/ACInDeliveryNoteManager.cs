@@ -486,7 +486,7 @@ namespace gip.mes.facility
         }
         #endregion
 
-
+        #region PreBooking
         public FacilityPreBooking NewFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, DeliveryNotePos deliveryNotePos)
         {
             ACMethodBooking acMethodClone = BookParamInwardMovementClone(facilityManager, dbApp);
@@ -589,6 +589,32 @@ namespace gip.mes.facility
             }
             return result;
         }
+
+        #endregion
+
+        #region Complete Delivery Note
+
+        public MsgWithDetails CompleteInDeliveryNote(DatabaseApp dbApp, DeliveryNote deliveryNote)
+        {
+            InOrder inOrder = deliveryNote.DeliveryNotePos_DeliveryNote.Select(c => c.InOrderPos.InOrder).FirstOrDefault();
+            CompleteInDeliveryNote(dbApp, deliveryNote, inOrder);
+            return dbApp.ACSaveChanges();
+        }
+
+        public void CompleteInDeliveryNote(DatabaseApp dbApp, DeliveryNote deliveryNote, InOrder inOrder)
+        {
+            deliveryNote.MDDelivNoteState = dbApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
+            InOrderPos[] lines = inOrder.InOrderPos_InOrder.ToArray();
+            FacilityPreBooking[] preBookings = lines.SelectMany(c => c.FacilityPreBooking_InOrderPos).ToArray();
+            foreach (FacilityPreBooking preBooking in preBookings)
+                preBooking.DeleteACObject(dbApp, false);
+            MDInOrderPosState completedState = s_cQry_InOrderCompleted(dbApp).FirstOrDefault();
+            foreach (InOrderPos line in lines)
+                line.MDInOrderPosState = completedState;
+            inOrder.MDInOrderState = dbApp.MDInOrderState.FirstOrDefault(c => c.MDInOrderStateIndex == (short)MDInOrderState.InOrderStates.Completed);
+        }
+
+        #endregion
 
         #endregion
 

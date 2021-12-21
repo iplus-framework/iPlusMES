@@ -1022,11 +1022,11 @@ namespace gip.mes.facility
             else
             {
                 postingTypeEnum = PostingTypeEnum.Relocation;
-                if (    pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Receipt
+                if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Receipt
                      || pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.ReceiptVehicle)
                     postingTypeEnum = PostingTypeEnum.Inward;
                 else if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Issue)
-                         //|| pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
+                    //|| pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
                     postingTypeEnum = PostingTypeEnum.Outward;
             }
             return postingTypeEnum;
@@ -1122,7 +1122,7 @@ namespace gip.mes.facility
                     else
                     {
                         //if (pickingPos.TargetQuantity >= 0.0001)
-                            quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        quantityUOM = pickingPos.DiffQuantityUOM * -1;
                         //else
                         //    quantityUOM = pickingPos.DiffQuantityUOM;
                     }
@@ -1176,7 +1176,7 @@ namespace gip.mes.facility
                     else
                     {
                         //if (pickingPos.TargetQuantity >= 0.0001)
-                            quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        quantityUOM = pickingPos.DiffQuantityUOM * -1;
                         //else
                         //    quantityUOM = pickingPos.DiffQuantityUOM;
                     }
@@ -1239,7 +1239,7 @@ namespace gip.mes.facility
                     else
                     {
                         //if (pickingPos.TargetQuantity >= 0.0001)
-                            quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        quantityUOM = pickingPos.DiffQuantityUOM * -1;
                         //else
                         //    quantityUOM = pickingPos.DiffQuantityUOM;
                     }
@@ -1373,7 +1373,7 @@ namespace gip.mes.facility
                     else
                         acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
 
-                    if (   postingType == PostingTypeEnum.Relocation
+                    if (postingType == PostingTypeEnum.Relocation
                         && Math.Abs(previousBooking.InwardQuantity - 0) > Double.Epsilon)
                     {
                         acMethodBooking.InwardQuantity = previousBooking.InwardQuantity * -1;
@@ -1510,8 +1510,8 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    if (   autoSetState 
-                        && (   (pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                    if (autoSetState
+                        && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
                             || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
                     {
                         MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
@@ -1611,7 +1611,7 @@ namespace gip.mes.facility
             msgWithDetails = dbApp.ACSaveChanges();
             return msgWithDetails;
         }
-        
+
         #endregion
 
         #region Validation
@@ -1984,13 +1984,22 @@ namespace gip.mes.facility
 
         #region FinishOrder
 
-        public MsgWithDetails FinishOrder(DatabaseApp dbApp, Picking picking, bool skipCheck = false)
+        public MsgWithDetails FinishOrder(
+            DatabaseApp dbApp, Picking picking,
+            ACInDeliveryNoteManager inDeliveryNoteManager, ACOutDeliveryNoteManager outDeliveryNoteManager,
+            out DeliveryNote deliveryNote,
+            out InOrder inOrder,
+            out OutOrder outOrder,
+        bool skipCheck = false)
         {
+            deliveryNote = null;
+            inOrder = null;
+            outOrder = null;
             if (dbApp == null)
             {
                 return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "dbApp is null.") });
             }
-            
+
             if (picking == null)
             {
                 return new MsgWithDetails(new Msg[] { new Msg(eMsgLevel.Error, "picking is null.") });
@@ -2020,7 +2029,7 @@ namespace gip.mes.facility
                         }
 
                         //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1, 
+                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
                                                                                                          Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
                         continue;
                     }
@@ -2104,6 +2113,19 @@ namespace gip.mes.facility
 
             picking.PickingStateIndex = (short)GlobalApp.PickingState.Finished;
 
+            // Close related documents
+            if (HasRelatedDocuments(picking, out deliveryNote, out inOrder, out outOrder))
+            {
+                if (inOrder != null)
+                {
+                    inDeliveryNoteManager.CompleteInDeliveryNote(dbApp, deliveryNote, inOrder);
+                }
+                else if (outOrder != null)
+                {
+                    outDeliveryNoteManager.CompleteOutDeliveryNote(dbApp, deliveryNote, outOrder);
+                }
+            }
+
             msg = dbApp.ACSaveChanges();
             if (msg != null)
             {
@@ -2114,6 +2136,37 @@ namespace gip.mes.facility
             return null;
         }
 
+        public bool HasRelatedDocuments(Picking picking, out DeliveryNote deliveryNote, out InOrder inOrder, out OutOrder outOrder)
+        {
+            bool isRelated = false;
+            deliveryNote = null;
+            inOrder = null;
+            outOrder = null;
+
+            // Search InOrder
+            IEnumerable<InOrder> queryInOrder = picking.PickingPos_Picking.Where(c => c.InOrderPos != null).Select(c => c.InOrderPos).Select(c => c.InOrder).Distinct();
+            if (queryInOrder.Any() && queryInOrder.Count() == 1)
+            {
+                inOrder = queryInOrder.FirstOrDefault();
+                if (inOrder.InOrderNo == picking.PickingNo)
+                    isRelated = true;
+
+                deliveryNote = inOrder.InOrderPos_InOrder.SelectMany(c => c.DeliveryNotePos_InOrderPos).Select(c => c.DeliveryNote).FirstOrDefault();
+            }
+
+            // Search OutOrder
+            IEnumerable<OutOrder> queryOutOrder = picking.PickingPos_Picking.Where(c => c.OutOrderPos != null).Select(c => c.OutOrderPos).Select(c => c.OutOrder).Distinct();
+            if (queryOutOrder.Any() && queryOutOrder.Count() == 1)
+            {
+                outOrder = queryOutOrder.FirstOrDefault();
+                if (outOrder.OutOrderNo == picking.PickingNo)
+                    isRelated = true;
+
+                deliveryNote = outOrder.OutOrderPos_OutOrder.SelectMany(c => c.DeliveryNotePos_OutOrderPos).Select(c => c.DeliveryNote).FirstOrDefault();
+            }
+
+            return isRelated;
+        }
         #endregion
 
         #endregion

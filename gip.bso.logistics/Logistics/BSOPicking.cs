@@ -61,6 +61,14 @@ namespace gip.bso.logistics
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _InDeliveryNoteManager = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_InDeliveryNoteManager == null)
+                throw new Exception("InDeliveryNoteManager not configured");
+
+            _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_OutDeliveryNoteManager == null)
+                throw new Exception("InDeliveryNoteManager not configured");
+
             _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
             if (_PickingManager == null)
                 throw new Exception("PickingManager not configured");
@@ -75,8 +83,17 @@ namespace gip.bso.logistics
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+            if (_PickingManager != null)
+                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
             _PickingManager = null;
+
+            if (_InDeliveryNoteManager != null)
+                ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
+            _InDeliveryNoteManager = null;
+
+            if (_OutDeliveryNoteManager != null)
+                ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
+            _OutDeliveryNoteManager = null;
 
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
@@ -659,12 +676,15 @@ namespace gip.bso.logistics
             if (PickingManager == null)
                 return;
 
-            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking);
+            DeliveryNote deliveryNote = null;
+            InOrder inOrder = null;
+            OutOrder outOrder = null;
+            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, out deliveryNote, out inOrder, out outOrder);
             if (msg != null)
             {
                 if (Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
                 {
-                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, true);
+                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, out deliveryNote, out inOrder, out outOrder, true);
                     if (msg != null)
                     {
                         Messages.Msg(msg);
@@ -1452,6 +1472,29 @@ namespace gip.bso.logistics
         #endregion
 
         #region Local Properties
+
+        protected ACRef<ACInDeliveryNoteManager> _InDeliveryNoteManager = null;
+        public ACInDeliveryNoteManager InDeliveryNoteManager
+        {
+            get
+            {
+                if (_InDeliveryNoteManager == null)
+                    return null;
+                return _InDeliveryNoteManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACOutDeliveryNoteManager> _OutDeliveryNoteManager = null;
+        public ACOutDeliveryNoteManager OutDeliveryNoteManager
+        {
+            get
+            {
+                if (_OutDeliveryNoteManager == null)
+                    return null;
+                return _OutDeliveryNoteManager.ValueT;
+            }
+        }
+
         protected ACRef<ACPickingManager> _PickingManager = null;
         protected ACPickingManager PickingManager
         {

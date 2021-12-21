@@ -873,6 +873,30 @@ namespace gip.mes.facility
 
         #endregion
 
+        #region Complete Delivery Note
+
+        public MsgWithDetails CompleteOutDeliveryNote(DatabaseApp dbApp, DeliveryNote deliveryNote)
+        {
+            OutOrder outOrder = deliveryNote.DeliveryNotePos_DeliveryNote.Select(c => c.OutOrderPos.OutOrder).FirstOrDefault();
+            CompleteOutDeliveryNote(dbApp, deliveryNote, outOrder);
+            return dbApp.ACSaveChanges();
+        }
+
+        public void CompleteOutDeliveryNote(DatabaseApp dbApp, DeliveryNote deliveryNote, OutOrder outOrder)
+        {
+            deliveryNote.MDDelivNoteState = dbApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
+            OutOrderPos[] lines = outOrder.OutOrderPos_OutOrder.ToArray();
+            FacilityPreBooking[] preBookings = lines.SelectMany(c => c.FacilityPreBooking_OutOrderPos).ToArray();
+            foreach (FacilityPreBooking preBooking in preBookings)
+                preBooking.DeleteACObject(dbApp, false);
+            MDOutOrderPosState completedState = s_cQry_OutOrderCompleted(dbApp).FirstOrDefault();
+            foreach (OutOrderPos line in lines)
+                line.MDOutOrderPosState = completedState;
+            outOrder.MDOutOrderState = dbApp.MDOutOrderState.FirstOrDefault(c => c.MDOutOrderStateIndex == (short)MDOutOrderState.OutOrderStates.Completed);
+        }
+
+        #endregion
+
         #region Invoice -> IOutOrder & IOutOrderPosBSO
 
         [ACMethodInfo("", "en{'HanldeIOrderPosPropertyChange'}de{'HanldeIOrderPosPropertyChange'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
