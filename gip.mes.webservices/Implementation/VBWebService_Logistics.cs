@@ -454,7 +454,7 @@ namespace gip.mes.webservices
 
             try
             {
-                using(DatabaseApp dbApp = new DatabaseApp())
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
                     Guid[] pickIDs = pickingPos.Select(c => c.PickingPosID).ToArray();
                     result = new PickingPosList(ConvertToWSPickingPosOnlyActQuantity(dbApp.PickingPos.Where(c => pickIDs.Contains(c.PickingPosID))));
@@ -498,11 +498,17 @@ namespace gip.mes.webservices
                     }
 
                     PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
+                    ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
                     if (pickingManger == null)
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
 
-                    result = pickingManger.FinishOrder(dbApp, picking, false);
+
+                    DeliveryNote deliveryNote = null;
+                    InOrder inOrder = null;
+                    OutOrder outOrder = null;
+                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, out deliveryNote, out inOrder, out outOrder, false);
                 }
             }
             catch (Exception e)
@@ -522,7 +528,7 @@ namespace gip.mes.webservices
 
             MsgWithDetails result = null;
 
-            try 
+            try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
@@ -534,11 +540,16 @@ namespace gip.mes.webservices
                     }
 
                     PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
+                    ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
                     if (pickingManger == null)
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
 
-                    result = pickingManger.FinishOrder(dbApp, picking, true);
+                    DeliveryNote deliveryNote = null;
+                    InOrder inOrder = null;
+                    OutOrder outOrder = null;
+                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, out deliveryNote, out inOrder, out outOrder, true);
                 }
             }
             catch (Exception e)
