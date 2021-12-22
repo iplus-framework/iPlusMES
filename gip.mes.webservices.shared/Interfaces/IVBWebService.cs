@@ -34,6 +34,10 @@ namespace gip.mes.webservices
         Task<WSResponse<BarcodeSequence>> InvokeBarcodeSequenceAsync(BarcodeSequence sequence);
 #endif
 
+        #endregion
+
+        #region Print & PrintSettings
+
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriPrint, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -41,6 +45,31 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<bool>> Print(PrintEntity printEntity);
 #endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriGetAssignedPrinter, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<string> GetAssignedPrinter();
+#elif NETSTANDARD
+        Task<WSResponse<string>> GetAssignedPrinterAsync();
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriGetScannedPrinter, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<string> GetScannedPrinter(string printerID);
+#elif NETSTANDARD
+        Task<WSResponse<string>> GetScannedPrinterAsync(string printerID);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriAssignPrinter, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<bool> AssignPrinter(string printerID);
+#elif NETSTANDARD
+        Task<WSResponse<bool>> AssignPrinterAsync(string printerID);
+#endif
+
         #endregion
     }
 }

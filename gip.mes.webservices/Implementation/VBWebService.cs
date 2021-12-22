@@ -148,5 +148,20 @@ namespace gip.mes.webservices
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityInventory), typeof(webservices.FacilityInventory)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.FacilityInventoryPos), typeof(webservices.FacilityInventoryPos)));
         }
+
+        public WSResponse<string> GetAssignedPrinter()
+        {
+            throw new NotImplementedException();
+        }
+
+        public WSResponse<string> GetScannedPrinter(string printerID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public WSResponse<bool> AssignPrinter(string printerID)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -14,6 +14,10 @@ namespace gip.mes.webservices
         public const string UriBarcodeSequence = "BarcodeSequence";
 
         public const string UriPrint="Print";
+        public const string UriGetAssignedPrinter = "GetPrinter";
+        public const string UriGetScannedPrinter = "GetScannedPrinter/{printerID}";
+        public const string UriGetScannedPrinter_F = "GetScannedPrinter/{0}";
+        public const string UriAssignPrinter = "AssignPrinter";
 
         #endregion
 
