@@ -147,6 +147,10 @@ namespace gip.bso.masterdata
         public override void LoadConfiguredPrinters()
         {
             ConfiguredPrinterList = ACPrintManager.GetConfiguredPrinters(Database as gip.core.datamodel.Database, PrintManager.ComponentClass.ACClassID, false);
+            foreach (PrinterInfo pInfo in ConfiguredPrinterList)
+            {
+                pInfo.Attach(Db);
+            }
         }
 
 
@@ -159,8 +163,8 @@ namespace gip.bso.masterdata
         public override void SetPrinterTarget(PrinterInfo printerInfo)
         {
             if(SelectedMachine != null)
-            printerInfo.MachineACUrl = SelectedMachine.ACUrlComponent;
-            else
+                printerInfo.MachineACUrl = SelectedMachine.ACUrlComponent;
+            else if (SelectedFacility != null)
             {
                 printerInfo.FacilityID = SelectedFacility.FacilityID;
                 printerInfo.FacilityNo = SelectedFacility.FacilityNo;
@@ -170,7 +174,7 @@ namespace gip.bso.masterdata
         public override bool IsEnabledAddPrinter()
         {
             return
-                 (SelectedMachine != null || SelectedFacility != null)
+                 (SelectedMachine != null || SelectedFacility != null || SelectedVBUser != null)
                 && (SelectedWindowsPrinter != null || SelectedPrintServer != null)
                 && !ConfiguredPrinterList.Any(c =>
                     (
