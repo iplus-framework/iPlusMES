@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Runtime.Serialization;
 
@@ -71,6 +72,25 @@ namespace gip.mes.webservices
         public string Comment
         {
             get; set;
+        }
+
+        [DataMember(Name = "PTi")]
+        public short PostingTypeIndex
+        {
+            get; set;
+        }
+
+        [IgnoreDataMember]
+        public PostingTypeEnum PostingType
+        {
+            get
+            {
+                return (PostingTypeEnum)PostingTypeIndex;
+            }
+            set
+            {
+                PostingTypeIndex = (Int16)value;
+            }
         }
 
         [IgnoreDataMember]

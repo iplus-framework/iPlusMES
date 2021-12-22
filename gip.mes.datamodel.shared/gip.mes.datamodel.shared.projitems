@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BarcodeSequenceBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PostingTypeEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FacilityTypesEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PostingBehaviourEnum.cs" />

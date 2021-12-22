@@ -174,14 +174,6 @@ namespace gip.mes.facility
         }
 
 
-        public enum PostingTypeEnum
-        {
-            NotDefined,
-            Inward,
-            Outward,
-            Relocation
-        }
-
         #endregion
 
         #region static Methods
@@ -1006,7 +998,7 @@ namespace gip.mes.facility
 
         #region Booking
 
-        protected virtual PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, PickingPos pickingPos)
+        public virtual PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, PickingPos pickingPos, Picking picking)
         {
             PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
             if (pickingPos.InOrderPos != null)
@@ -1016,17 +1008,17 @@ namespace gip.mes.facility
             else if (pickingPos.OutOrderPos != null)
             {
                 postingTypeEnum = PostingTypeEnum.Outward;
-                if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.IssueVehicle)
+                if (picking.PickingType == GlobalApp.PickingType.IssueVehicle)
                     postingTypeEnum = PostingTypeEnum.Relocation;
             }
             else
             {
                 postingTypeEnum = PostingTypeEnum.Relocation;
-                if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Receipt
-                     || pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.ReceiptVehicle)
+                if (picking.PickingType == GlobalApp.PickingType.Receipt
+                     || picking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
                     postingTypeEnum = PostingTypeEnum.Inward;
-                else if (pickingPos.Picking.MDPickingType.PickingType == GlobalApp.PickingType.Issue)
-                    //|| pickingPos.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
+                else if (picking.PickingType == GlobalApp.PickingType.Issue)
+                    //|| picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
                     postingTypeEnum = PostingTypeEnum.Outward;
             }
             return postingTypeEnum;
@@ -1035,7 +1027,7 @@ namespace gip.mes.facility
         public FacilityPreBooking NewFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos, double? actualQuantityUOM = null, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
         {
             if (postingType == PostingTypeEnum.NotDefined)
-                postingType = DeterminePostingType(dbApp, pickingPos);
+                postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
             IACObject businessEntity = pickingPos;
             if (pickingPos.InOrderPos != null)
             {
@@ -1258,10 +1250,73 @@ namespace gip.mes.facility
             return facilityPreBooking;
         }
 
+        public void InitBookingParamsFromTemplate(ACMethodBooking acMethodBooking, PickingPos pickingPos, FacilityPreBooking ignorePreBooking = null)
+        {
+            if (   acMethodBooking == null
+                || pickingPos == null)
+                return;
+
+            if (!InitLotFromPreBooking(acMethodBooking, pickingPos, ignorePreBooking))
+            {
+                InitLotFromPostings(acMethodBooking, pickingPos);
+            }
+        }
+
+        private bool InitLotFromPreBooking(ACMethodBooking acMethodBooking, PickingPos pickingPos, FacilityPreBooking ignorePreBooking = null)
+        {
+            if (acMethodBooking == null
+                || pickingPos == null)
+                return false;
+            if (acMethodBooking.InwardFacilityLot != null)
+                return true;
+
+            FacilityLot existingFacilityLot = null;
+            FacilityPreBooking[] existingPrebookings = new FacilityPreBooking[] { };
+
+            if (pickingPos.InOrderPos != null)
+                existingPrebookings = pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.Where(c => ignorePreBooking == null || c != ignorePreBooking).ToArray();
+            else if (pickingPos.OutOrderPos != null)
+                existingPrebookings = pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.Where(c => ignorePreBooking == null || c != ignorePreBooking).ToArray();
+            else
+                existingPrebookings = pickingPos.FacilityPreBooking_PickingPos.Where(c => ignorePreBooking == null || c != ignorePreBooking).ToArray();
+
+            foreach (FacilityPreBooking preBook in existingPrebookings)
+            {
+                ACMethodBooking methodBooking = preBook.ACMethodBooking as ACMethodBooking;
+                if (methodBooking == null || methodBooking.BookingType != acMethodBooking.BookingType)
+                    continue;
+
+                existingFacilityLot = methodBooking.InwardFacilityLot;
+                if (existingFacilityLot != null)
+                    break;
+            }
+
+            if (existingFacilityLot != null)
+                acMethodBooking.InwardFacilityLot = existingFacilityLot;
+            return acMethodBooking.InwardFacilityLot != null;
+        }
+
+        private bool InitLotFromPostings(ACMethodBooking acMethodBooking, PickingPos pickingPos)
+        {
+            if (acMethodBooking == null
+                || pickingPos == null)
+                return false;
+            if (acMethodBooking.InwardFacilityLot != null)
+                return true;
+            if (pickingPos.InOrderPos != null)
+                acMethodBooking.InwardFacilityLot = pickingPos.InOrderPos.FacilityBookingCharge_InOrderPos.Select(c => c.InwardFacilityLot).FirstOrDefault();
+            else if (pickingPos.OutOrderPos != null)
+                acMethodBooking.InwardFacilityLot = pickingPos.OutOrderPos.FacilityBookingCharge_OutOrderPos.Select(c => c.InwardFacilityLot).FirstOrDefault();
+            else
+                acMethodBooking.InwardFacilityLot = pickingPos.FacilityBookingCharge_PickingPos.Select(c => c.InwardFacilityLot).FirstOrDefault();
+            return acMethodBooking.InwardFacilityLot != null;
+        }
+
+
         public List<FacilityPreBooking> CancelFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, PickingPos pickingPos, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
         {
             if (postingType == PostingTypeEnum.NotDefined)
-                postingType = DeterminePostingType(dbApp, pickingPos);
+                postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
 
             List<FacilityPreBooking> bookings = new List<FacilityPreBooking>();
             ACMethodBooking acMethodClone = null;
@@ -1495,7 +1550,7 @@ namespace gip.mes.facility
         public virtual void RecalcAfterPosting(DatabaseApp dbApp, PickingPos pickingPos, double postedQuantityUOM, bool isCancellation, bool autoSetState = false, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
         {
             if (postingType == PostingTypeEnum.NotDefined)
-                postingType = DeterminePostingType(dbApp, pickingPos);
+                postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
             if (pickingPos.InOrderPos != null)
             {
                 pickingPos.InOrderPos.TopParentInOrderPos.RecalcActualQuantity();

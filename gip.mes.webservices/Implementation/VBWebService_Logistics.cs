@@ -66,9 +66,14 @@ namespace gip.mes.webservices
                               )
         );
 
-        protected IEnumerable<Picking> ConvertToWSPicking(IQueryable<gip.mes.datamodel.Picking> query)
+        protected IEnumerable<Picking> ConvertToWSPicking(DatabaseApp dbApp, IQueryable<gip.mes.datamodel.Picking> query)
         {
-            return query.AsEnumerable().Select(c => new Picking()
+            ACPickingManager pickingManger = null;
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost != null)
+                pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+
+            IEnumerable<Picking> result = query.AsEnumerable().Select(c => new Picking()
             {
                 PickingID = c.PickingID,
                 PickingNo = c.PickingNo,
@@ -77,6 +82,7 @@ namespace gip.mes.webservices
                 {
                     MDPickingTypeID = c.MDPickingType.MDPickingTypeID,
                     MDKey = c.MDPickingType.MDKey,
+                    MDPickingTypeIndex = c.MDPickingType.MDPickingTypeIndex,
                     MDPickingTypeTrans = c.MDPickingType.MDNameTrans
                 },
                 DeliveryCompanyAddress = new CompanyAddress()
@@ -121,9 +127,29 @@ namespace gip.mes.webservices
                             TargetQuantityUOM = d.TargetQuantityUOM,
                             ActualQuantity = d.ActualQuantity,
                             ActualQuantityUOM = d.ActualQuantityUOM,
+                            PostingType = DeterminePostingType(dbApp, pickingManger, d, c),
                             Comment = d.Comment
                         }).ToArray()
             });
+
+            return result;
+        }
+
+        private PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, ACPickingManager pickingManger, gip.mes.datamodel.PickingPos pos, gip.mes.datamodel.Picking picking)
+        {
+            if (pickingManger != null)
+                return pickingManger.DeterminePostingType(dbApp, pos, picking);
+            else
+            {
+                PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
+                if (picking.PickingType == GlobalApp.PickingType.Receipt
+                     || picking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
+                    postingTypeEnum = PostingTypeEnum.Inward;
+                else if (picking.PickingType == GlobalApp.PickingType.Issue)
+                    //|| picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
+                    postingTypeEnum = PostingTypeEnum.Outward;
+                return postingTypeEnum;
+            }
         }
 
         public WSResponse<List<Picking>> GetPickings()
@@ -133,7 +159,7 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(s_cQry_GetPicking(dbApp, null)).ToList();
+                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null)).ToList();
                 }
             }
             catch (Exception e)
@@ -189,7 +215,7 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(s_cQry_SearchPicking(dbApp, mdPickingType, fromFacilityID, toFacilityID, fromDT, toDT)).ToList();
+                    result = ConvertToWSPicking(dbApp, s_cQry_SearchPicking(dbApp, mdPickingType, fromFacilityID, toFacilityID, fromDT, toDT)).ToList();
                 }
             }
             catch (Exception e)
@@ -242,7 +268,7 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(s_cQry_GetPicking(dbApp, guid)).FirstOrDefault();
+                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, guid)).FirstOrDefault();
                 }
             }
             catch (Exception e)

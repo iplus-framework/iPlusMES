@@ -23,6 +23,25 @@ namespace gip.mes.webservices
             set;
         }
 
+        [DataMember(Name = "MDPTi")]
+        public short MDPickingTypeIndex
+        {
+            get; set;
+        }
+
+        [IgnoreDataMember]
+        public GlobalApp.PickingType PickingType
+        {
+            get
+            {
+                return (GlobalApp.PickingType)MDPickingTypeIndex;
+            }
+            set
+            {
+                MDPickingTypeIndex = (Int16)value;
+            }
+        }
+
         [DataMember(Name = "MDPTT")]
         public string MDPickingTypeTrans
         {

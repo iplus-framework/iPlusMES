@@ -904,6 +904,8 @@ namespace gip.mes.webservices
                     }
                 }
 
+                // TODO:  Use ACPickingManager InitBookingParamsFromTemplate
+
 
                 facility.ACMethodBooking acParam = facManager.ACUrlACTypeSignature("!" + bpParam.VirtualMethodName, gip.core.datamodel.Database.GlobalDatabase) as facility.ACMethodBooking;
 
@@ -1017,7 +1019,7 @@ namespace gip.mes.webservices
                     acParam.OutOrderPos = pickingPos.OutOrderPos;
                 }
 
-                var resultBooking = facManager.BookFacility(acParam, dbApp);
+                var resultBooking = facManager.BookFacilityWithRetry(ref acParam, dbApp);
                 if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                 {
                     if (myServiceHost != null)
@@ -1043,30 +1045,6 @@ namespace gip.mes.webservices
                                 postedQuantity = acParam.InwardQuantity.Value;
                             pickingManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
                         }
-                        //else
-                        //{
-                        //    acParam.PickingPos.RecalcActualQuantity();
-                        //    if (acParam.PickingPos.InOrderPos != null)
-                        //    {
-                        //        acParam.PickingPos.InOrderPos.RecalcActualQuantity();
-                        //    }
-                        //    else if (acParam.PickingPos.OutOrderPos != null)
-                        //    {
-                        //        acParam.PickingPos.OutOrderPos.RecalcActualQuantity();
-                        //    }
-
-                        //    if (preBookingMethod != null && preBooking != null && acParam.ValidMessage.IsSucceded())
-                        //    {
-                        //        double quantity = pickingPos.RemainingDosingQuantityUOM;
-                        //        if (quantity >= 0)
-                        //        {
-                        //            preBooking.DeleteACObject(dbApp, true);
-                        //            pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
-                        //            dbApp.ACSaveChanges();
-                        //        }
-                        //    }
-                        //}
-
                         msgWithDetails = dbApp.ACSaveChangesWithRetry();
                     }
                     else if (acParam.PartslistPos != null)
