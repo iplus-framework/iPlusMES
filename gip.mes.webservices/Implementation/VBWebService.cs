@@ -151,15 +151,98 @@ namespace gip.mes.webservices
 
         public WSResponse<string> GetAssignedPrinter()
         {
-            throw new NotImplementedException();
+            WSResponse<string> response = new WSResponse<string>();
+
+            try
+            {
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                Guid? currentSessionID = WSRestAuthorizationManager.CurrentSessionID;
+                if (currentSessionID.HasValue && myServiceHost != null)
+                {
+                    VBUserRights userRights = myServiceHost.GetRightsForSession(currentSessionID.Value);
+                    if (userRights != null)
+                    {
+                        using (Database db = new Database())
+                        {
+                            core.datamodel.VBUser user = db.VBUser.FirstOrDefault(c => c.VBUserName == userRights.UserName);
+                            if (user != null)
+                            {
+                                ACPrintManager printManager = ACPrintManager.GetServiceInstance(myServiceHost);
+                                if (printManager != null)
+                                {
+                                    var configuredPrinters = ACPrintManager.GetConfiguredPrinters(db, printManager.ComponentClass.ACClassID, false);
+                                    PrinterInfo info = configuredPrinters.FirstOrDefault(c => c.VBUserID == user.VBUserID);
+                                    if (info != null)
+                                    {
+                                        if (string.IsNullOrEmpty(info.PrinterName))
+                                            response.Data = info.PrinterACUrl;
+                                        else
+                                            response.Data = info.PrinterName;
+                                    }
+                                }
+                                else
+                                {
+                                    response.Message = new Msg(eMsgLevel.Error, "printManager is null.");
+                                }
+                            }
+                            else
+                            {
+                                response.Message = new Msg(eMsgLevel.Error, "myServiceHost or currentSessionID is null.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        response.Message = new Msg(eMsgLevel.Error, "userRights for session cannot be found.");
+                    }
+                }
+                else
+                {
+                    response.Message = new Msg(eMsgLevel.Error, "myServiceHost or currentSessionID is null.");
+                }
+            }
+            catch (Exception e)
+            {
+                response.Message = new Msg(eMsgLevel.Exception, e.Message);
+            }
+            return response;
         }
 
         public WSResponse<string> GetScannedPrinter(string printerID)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(printerID))
+            {
+                return new WSResponse<string>(new Msg(eMsgLevel.Error, "parameter printerID is empty!"));
+            }
+
+            WSResponse<string> response = new WSResponse<string>();
+
+            try
+            {
+                List<PrinterInfo> windowsPrinters = ACPrintManager.GetWindowsPrinters();
+                if (windowsPrinters != null)
+                {
+                    PrinterInfo pInfo = windowsPrinters.FirstOrDefault(c => c.PrinterName == printerID);
+                    if (pInfo != null)
+                    {
+                        response.Data = pInfo.PrinterName;
+                    }
+                    else
+                    {
+                        //TODO: translation
+                        response.Message = new Msg(eMsgLevel.Error, "Scanned printer cannot be found!");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                response.Message = new Msg(eMsgLevel.Exception, e.Message);
+            }
+
+            return response;
         }
 
-        public WSResponse<bool> AssignPrinter(string printerID)
+        public WSResponse<string> AssignPrinter(string printerID)
         {
             throw new NotImplementedException();
         }

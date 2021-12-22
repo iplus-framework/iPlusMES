@@ -65,9 +65,9 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriAssignPrinter, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> AssignPrinter(string printerID);
+        WSResponse<string> AssignPrinter(string printerID);
 #elif NETSTANDARD
-        Task<WSResponse<bool>> AssignPrinterAsync(string printerID);
+        Task<WSResponse<string>> AssignPrinterAsync(string printerID);
 #endif
 
         #endregion
