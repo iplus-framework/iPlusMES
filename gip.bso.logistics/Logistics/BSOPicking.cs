@@ -219,7 +219,7 @@ namespace gip.bso.logistics
                 ACFilterItem acFilterPickingNo = new ACFilterItem(Global.FilterTypes.filter, "PickingNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
                 aCFilterItems.Add(acFilterPickingNo);
 
-                ACFilterItem acFilterPickingIndex = new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDPickingTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, null, true);
+                ACFilterItem acFilterPickingIndex = new ACFilterItem(Global.FilterTypes.filter, "MDPickingType\\MDKey", Global.LogicalOperators.equal, Global.Operators.and, null, true);
                 aCFilterItems.Add(acFilterPickingIndex);
 
                 ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
@@ -388,15 +388,15 @@ namespace gip.bso.logistics
                     _SelectedFilterMDPickingType = value;
                     OnPropertyChanged("SelectedFilterMDPickingType");
 
-                    short? filterPickingTypeIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("MDPickingType\\MDPickingTypeIndex");
-                    short? newPickingTypeIndex = null;
+                    string filterPickingKey = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("MDPickingType\\MDKey");
+                    string newPickingKey = null;
                     if (value != null)
-                        newPickingTypeIndex = value.MDPickingTypeIndex;
-                    if (newPickingTypeIndex != filterPickingTypeIndex)
+                        newPickingKey = value.MDKey;
+                    if (newPickingKey != filterPickingKey)
                     {
                         InFilterChange = true;
 
-                        AccessPrimary.NavACQueryDefinition.SetSearchValue<short?>("MDPickingType\\MDPickingTypeIndex", newPickingTypeIndex);
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("MDPickingType\\MDKey", newPickingKey);
                         OnPropertyChanged("SelectedFilterMDPickingType");
 
                         InFilterChange = false;
@@ -679,12 +679,12 @@ namespace gip.bso.logistics
             DeliveryNote deliveryNote = null;
             InOrder inOrder = null;
             OutOrder outOrder = null;
-            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, out deliveryNote, out inOrder, out outOrder);
+            MsgWithDetails msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager, out deliveryNote, out inOrder, out outOrder);
             if (msg != null)
             {
                 if (Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
                 {
-                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, out deliveryNote, out inOrder, out outOrder, true);
+                    msg = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager, out deliveryNote, out inOrder, out outOrder, true);
                     if (msg != null)
                     {
                         Messages.Msg(msg);

@@ -252,7 +252,7 @@ namespace gip.mes.facility
         /// Call BookFacility method with more retries
         /// </summary>
         [ACMethodInfo("BookFacilityWithRetry", "en{'BookFacilityWithRetry'}de{'BookFacilityWithRetry'}", 9999)]
-        public ACMethodEventArgs BookFacilityWithRetry(ref ACMethodBooking bookingParam, DatabaseApp dbApp, bool retryIfNotPossible = true)
+        public ACMethodEventArgs BookFacilityWithRetry(ref ACMethodBooking bookingParam, DatabaseApp dbApp, bool retryIfNotPossible = false)
         {
             ACMethodEventArgs bookingResult = null;
             ACMethodBooking bookingParamClone = bookingParam.Clone() as ACMethodBooking;

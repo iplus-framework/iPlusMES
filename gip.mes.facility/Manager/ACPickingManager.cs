@@ -2041,7 +2041,7 @@ namespace gip.mes.facility
 
         public MsgWithDetails FinishOrder(
             DatabaseApp dbApp, Picking picking,
-            ACInDeliveryNoteManager inDeliveryNoteManager, ACOutDeliveryNoteManager outDeliveryNoteManager,
+            ACInDeliveryNoteManager inDeliveryNoteManager, ACOutDeliveryNoteManager outDeliveryNoteManager, FacilityManager facilityManager,
             out DeliveryNote deliveryNote,
             out InOrder inOrder,
             out OutOrder outOrder,
@@ -2187,8 +2187,14 @@ namespace gip.mes.facility
                 result.AddDetailMessage(msg);
                 return result;
             }
+            else
+                OnOrderFinished(dbApp, picking, facilityManager);
 
             return null;
+        }
+
+        public virtual void OnOrderFinished(DatabaseApp dbApp, Picking picking, FacilityManager facilityManager)
+        {
         }
 
         public bool HasRelatedDocuments(Picking picking, out DeliveryNote deliveryNote, out InOrder inOrder, out OutOrder outOrder)

@@ -1250,7 +1250,7 @@ namespace gip.mes.datamodel
                     GlobalApp._PickingStateList = new ACValueItemList("PickingStateIndex");
                     GlobalApp._PickingStateList.AddEntry((short)PickingState.New, "en{'New'}de{'Neu'}");
                     GlobalApp._PickingStateList.AddEntry((short)PickingState.InProcess, "en{'In process'}de{'In Bearbeitung'}");
-                    GlobalApp._PickingStateList.AddEntry((short)PickingState.Finished, "en{'Finshed'}de{'Fertiggestellt'}");
+                    GlobalApp._PickingStateList.AddEntry((short)PickingState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
                     GlobalApp._PickingStateList.AddEntry((short)PickingState.Cancelled, "en{'Cancelled'}de{'Storniert'}");
                 }
                 return GlobalApp._PickingStateList;
@@ -1427,7 +1427,7 @@ namespace gip.mes.datamodel
                     GlobalApp._ReservationStateList = new ACValueItemList("ReservationStateIndex");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.New, "en{'New'}de{'Neu'}");
                     GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Active, "en{'Active'}de{'Aktiv'}");
-                    GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Finished, "en{'Finshed'}de{'Fertiggestellt'}");
+                    GlobalApp._ReservationStateList.AddEntry((short)ReservationState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
                 }
                 return GlobalApp._ReservationStateList;
             }
