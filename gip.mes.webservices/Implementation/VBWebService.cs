@@ -244,7 +244,129 @@ namespace gip.mes.webservices
 
         public WSResponse<string> AssignPrinter(string printerID)
         {
-            throw new NotImplementedException();
+            WSResponse<string> response = new WSResponse<string>();
+
+            if (string.IsNullOrEmpty(printerID))
+            {
+                response.Message = new Msg(eMsgLevel.Error, "Parameter printerID is null.");
+                return response;
+            }
+
+            try
+            {
+                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                Guid? currentSessionID = WSRestAuthorizationManager.CurrentSessionID;
+                if (currentSessionID.HasValue && myServiceHost != null)
+                {
+                    VBUserRights userRights = myServiceHost.GetRightsForSession(currentSessionID.Value);
+                    if (userRights != null)
+                    {
+                        using (Database db = new Database())
+                        {
+                            Guid printerACClassID;
+                            core.datamodel.ACClass printerACClass = null;
+                            if (Guid.TryParse(printerID, out printerACClassID))
+                            {
+                                printerACClass = db.ACClass.FirstOrDefault(c => c.ACClassID == printerACClassID);
+                                if (printerACClass == null)
+                                {
+                                    response.Message = new Msg(eMsgLevel.Error, "ACClass for scanned printer cannot be found!");
+                                    return response;
+                                }
+                            }
+
+                            core.datamodel.VBUser user = db.VBUser.FirstOrDefault(c => c.VBUserName == userRights.UserName);
+                            if (user != null)
+                            {
+                                ACPrintManager printManager = ACPrintManager.GetServiceInstance(myServiceHost);
+                                if (printManager != null)
+                                {
+                                    var configuredPrinters = ACPrintManager.GetConfiguredPrinters(db, printManager.ComponentClass.ACClassID, false);
+                                    PrinterInfo info = configuredPrinters.FirstOrDefault(c => c.VBUserID == user.VBUserID);
+
+                                    if (info != null)
+                                    {
+                                        if (info.PrinterName == printerID || (printerACClass != null && info.PrinterACUrl == printerACClass.ACUrlComponent))
+                                        {
+                                            if (printerACClass != null)
+                                                response.Data = printerACClass.ACUrlComponent;
+                                            else
+                                                response.Data = printerID;
+                                        }
+                                        else
+                                        {
+                                            Msg msg = printManager.UnAssignPrinter(db, info);
+                                            if (msg == null)
+                                            {
+                                                string printer = printerID;
+
+                                                PrinterInfo printerInfo = new PrinterInfo();
+                                                printerInfo.VBUserID = user.VBUserID;
+
+                                                if (printerACClass != null)
+                                                {
+                                                    printer = printerACClass.ACUrlComponent;
+                                                    printerInfo.PrinterACUrl = printer;
+                                                }
+                                                else
+                                                    printerInfo.PrinterName = printer;
+
+                                                msg = printManager.AssignPrinter(db, printerInfo);
+                                                response.Message = msg;
+                                                response.Data = printer;
+                                            }
+                                            else
+                                            {
+                                                response.Message = msg;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        string printer = printerID;
+
+                                        PrinterInfo printerInfo = new PrinterInfo();
+                                        printerInfo.VBUserID = user.VBUserID;
+
+                                        if (printerACClass != null)
+                                        {
+                                            printer = printerACClass.ACUrlComponent;
+                                            printerInfo.PrinterACUrl = printer;
+                                        }
+                                        else
+                                            printerInfo.PrinterName = printer;
+
+                                        Msg msg = printManager.AssignPrinter(db, printerInfo);
+                                        response.Message = msg;
+                                        response.Data = printer;
+                                    }
+                                }
+                                else
+                                {
+                                    response.Message = new Msg(eMsgLevel.Error, "printManager is null.");
+                                }
+                            }
+                            else
+                            {
+                                response.Message = new Msg(eMsgLevel.Error, "myServiceHost or currentSessionID is null.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        response.Message = new Msg(eMsgLevel.Error, "userRights for session cannot be found.");
+                    }
+                }
+                else
+                {
+                    response.Message = new Msg(eMsgLevel.Error, "myServiceHost or currentSessionID is null.");
+                }
+            }
+            catch (Exception e)
+            {
+                response.Message = new Msg(eMsgLevel.Exception, e.Message);
+            }
+            return response;
         }
     }
 }
