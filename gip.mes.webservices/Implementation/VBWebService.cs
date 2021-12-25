@@ -96,7 +96,19 @@ namespace gip.mes.webservices
             if(printManager == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PrintManager instance is null!"));
             PAOrderInfo pAOrderInfo = GetPAOrderInfo(printEntity.Sequence.ToArray());
-            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount) as Msg;
+
+            string vbUserName = null;
+            Guid? currentSessionID = WSRestAuthorizationManager.CurrentSessionID;
+            if (currentSessionID.HasValue && myServiceHost != null)
+            {
+                VBUserRights userRights = myServiceHost.GetRightsForSession(currentSessionID.Value);
+                if (userRights != null)
+                {
+                    vbUserName = userRights.UserName;
+                }
+            }
+
+            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount, vbUserName) as Msg;
             if (msg != null && msg.MessageLevel != eMsgLevel.Info)
             {
                 myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault; 

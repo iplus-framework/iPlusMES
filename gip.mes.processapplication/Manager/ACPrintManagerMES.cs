@@ -27,7 +27,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Methods
-        protected override PrinterInfo OnGetPrinterInfo(PAOrderInfo pAOrderInfo)
+        protected override PrinterInfo OnGetPrinterInfo(PAOrderInfo pAOrderInfo, string vbUserName)
         {
             Guid? facilityID = null;
             Guid? aCClassID = null;
@@ -48,6 +48,18 @@ namespace gip.mes.processapplication
             using (Database database = new core.datamodel.Database())
             {
                 configuredPrinters = ACPrintManager.GetConfiguredPrinters(database, ComponentClass.ACClassID, false);
+
+                if (!string.IsNullOrEmpty(vbUserName))
+                {
+                    core.datamodel.VBUser vbUser = database.VBUser.FirstOrDefault(c => c.VBUserName == vbUserName);
+                    if (vbUser != null)
+                    {
+                        PrinterInfo printerForUser = configuredPrinters.FirstOrDefault(c => c.VBUserID == vbUser.VBUserID);
+                        if (printerForUser != null)
+                            return printerForUser;
+                    }
+                }
+
                 if (aCClassID != null)
                     aCClass = database.ACClass.FirstOrDefault();
             }
