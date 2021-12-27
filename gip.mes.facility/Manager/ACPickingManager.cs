@@ -2157,6 +2157,16 @@ namespace gip.mes.facility
                             fc.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbApp, MDReleaseState.ReleaseStates.Free);
                         }
                     }
+
+                    if (pPos.FacilityPreBooking_PickingPos.Any())
+                    {
+                        FacilityPreBooking[] preBookings = pPos.FacilityPreBooking_PickingPos.ToArray();
+                        foreach (FacilityPreBooking facilityPreBooking in preBookings)
+                        {
+                            pPos.FacilityPreBooking_PickingPos.Remove(facilityPreBooking);
+                            facilityPreBooking.DeleteACObject(dbApp, false);
+                        }
+                    }
                 }
             }
 
