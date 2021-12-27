@@ -741,6 +741,19 @@ namespace gip.bso.logistics
             set
             {
                 _CurrentPickingPos = value;
+                if(_CurrentPickingPos != null)
+                {
+                    if(_CurrentPickingPos.InOrderPos != null)
+                    {
+                        _CurrentPickingPos.InOrderPos.AutoRefresh();
+                        _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoRefresh();
+                    }
+                    else if(_CurrentPickingPos.OutOrderPos != null)
+                    {
+                        _CurrentPickingPos.OutOrderPos.AutoRefresh();
+                        _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoRefresh();
+                    }
+                }
                 OnPropertyChanged("CurrentPickingPos");
                 OnPropertyChanged("FacilityPreBookingList");
                 OnPropertyChanged("FacilityBookingList");
@@ -1823,8 +1836,10 @@ namespace gip.bso.logistics
                         .Include(c => c.PickingPos_Picking)
                         .Include("PickingPos_Picking.OutOrderPos")
                         .Include("PickingPos_Picking.OutOrderPos.FacilityBooking_OutOrderPos")
+                        .Include("PickingPos_Picking.OutOrderPos.FacilityPreBooking_OutOrderPos")
                         .Include("PickingPos_Picking.InOrderPos")
                         .Include("PickingPos_Picking.InOrderPos.FacilityBooking_InOrderPos")
+                        .Include("PickingPos_Picking.InOrderPos.FacilityPreBooking_InOrderPos")
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos")
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDProdOrderPartslistPosState")
                         .Include(c => c.VisitorVoucher)
@@ -1837,6 +1852,8 @@ namespace gip.bso.logistics
                 CurrentPicking.ACProperties.Refresh();
                 if (CurrentPicking.VisitorVoucher != null)
                     CurrentPicking.VisitorVoucher.ACProperties.Refresh();
+
+                CurrentPicking.PickingPos_Picking.AutoRefresh(RefreshMode.StoreWins);
             }
             PostExecute("Load");
             OnPropertyChanged("PickingPosList");
