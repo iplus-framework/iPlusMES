@@ -31,37 +31,41 @@ namespace gip.mes.processapplication
         {
             Guid? facilityID = null;
             Guid? aCClassID = null;
-            if (pAOrderInfo.Entities.Any(c => c.EntityName == Facility.ClassName))
-                facilityID = pAOrderInfo.Entities.Where(c => c.EntityName == Facility.ClassName).Select(c => c.EntityID).FirstOrDefault();
-            else if (pAOrderInfo.Entities.Any(c => c.EntityName == FacilityCharge.ClassName))
-            {
-                Guid facilityChargeID = pAOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).Select(c => c.EntityID).FirstOrDefault();
-                FacilityCharge facilityCharge = (Database as gip.mes.datamodel.DatabaseApp).FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
-                facilityID = facilityCharge.FacilityID;
-            }
-            else if (pAOrderInfo.Entities.Any(c => c.EntityName == gip.core.datamodel.ACClass.ClassName))
-                aCClassID = pAOrderInfo.Entities.Where(c => c.EntityName == gip.core.datamodel.ACClass.ClassName).Select(c => c.EntityID).FirstOrDefault();
 
             PrinterInfo printerInfo = null;
             gip.core.datamodel.ACClass aCClass = null;
             List<PrinterInfo> configuredPrinters = null;
             using (Database database = new core.datamodel.Database())
             {
-                configuredPrinters = ACPrintManager.GetConfiguredPrinters(database, ComponentClass.ACClassID, false);
-
-                if (!string.IsNullOrEmpty(vbUserName))
+                using (DatabaseApp dbApp = new DatabaseApp(database))
                 {
-                    core.datamodel.VBUser vbUser = database.VBUser.FirstOrDefault(c => c.VBUserName == vbUserName);
-                    if (vbUser != null)
+                    if (pAOrderInfo.Entities.Any(c => c.EntityName == Facility.ClassName))
+                        facilityID = pAOrderInfo.Entities.Where(c => c.EntityName == Facility.ClassName).Select(c => c.EntityID).FirstOrDefault();
+                    else if (pAOrderInfo.Entities.Any(c => c.EntityName == FacilityCharge.ClassName))
                     {
-                        PrinterInfo printerForUser = configuredPrinters.FirstOrDefault(c => c.VBUserID == vbUser.VBUserID);
-                        if (printerForUser != null)
-                            return printerForUser;
+                        Guid facilityChargeID = pAOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).Select(c => c.EntityID).FirstOrDefault();
+                        FacilityCharge facilityCharge = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                        facilityID = facilityCharge.FacilityID;
                     }
-                }
+                    else if (pAOrderInfo.Entities.Any(c => c.EntityName == gip.core.datamodel.ACClass.ClassName))
+                        aCClassID = pAOrderInfo.Entities.Where(c => c.EntityName == gip.core.datamodel.ACClass.ClassName).Select(c => c.EntityID).FirstOrDefault();
 
-                if (aCClassID != null)
-                    aCClass = database.ACClass.FirstOrDefault();
+                    configuredPrinters = ACPrintManager.GetConfiguredPrinters(database, ComponentClass.ACClassID, false);
+
+                    if (!string.IsNullOrEmpty(vbUserName))
+                    {
+                        core.datamodel.VBUser vbUser = database.VBUser.FirstOrDefault(c => c.VBUserName == vbUserName);
+                        if (vbUser != null)
+                        {
+                            PrinterInfo printerForUser = configuredPrinters.FirstOrDefault(c => c.VBUserID == vbUser.VBUserID);
+                            if (printerForUser != null)
+                                return printerForUser;
+                        }
+                    }
+
+                    if (aCClassID != null)
+                        aCClass = database.ACClass.FirstOrDefault(c => c.ACClassID == aCClassID);
+                }
             }
             if (configuredPrinters == null || !configuredPrinters.Any())
                 return null;

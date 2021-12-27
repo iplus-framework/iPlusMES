@@ -2080,12 +2080,13 @@ namespace gip.mes.facility
                         if (result == null)
                         {
                             //Question50077: The following lines are unprocessed or actual quantity is insufficient. Do you want still finish order?
-                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder(10)", 2018, "Question50077");
+                            result = new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "FinishOrder", 2018, "Question50077");
                         }
 
                         //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
-                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
+                        Msg warrMsgMatIssQuant = new Msg(this, eMsgLevel.Warning, this.ACIdentifier, "FinishOrder", 2087, "Warning50043",
+                            pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol);
+                        result.AddDetailMessage(warrMsgMatIssQuant);
                         continue;
                     }
 
@@ -2108,8 +2109,9 @@ namespace gip.mes.facility
                         }
 
                         //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
-                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
+                        Msg warrMsgMatIssQuant = new Msg(this, eMsgLevel.Warning, this.ACIdentifier, "FinishOrder", 2113, "Warning50043",
+                            pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1, Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol);
+                        result.AddDetailMessage(warrMsgMatIssQuant);
                         continue;
                     }
 
@@ -2131,8 +2133,9 @@ namespace gip.mes.facility
                         }
 
                         //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
-                        result.AddDetailMessage(new Msg(eMsgLevel.Warning, string.Format("Warning50043", pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,
-                                                                                                         Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol)));
+                        Msg warrMsgMatIssQuant = new Msg(this, eMsgLevel.Warning, this.ACIdentifier, "FinishOrder", 2113, "Warning50043",
+                            pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1, Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol);
+                        result.AddDetailMessage(warrMsgMatIssQuant);
                         continue;
                     }
 
