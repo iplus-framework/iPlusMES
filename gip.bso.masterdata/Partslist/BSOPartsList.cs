@@ -505,9 +505,15 @@ namespace gip.bso.masterdata
                         .Include(x => x.PartslistPos_Partslist)
                         .Where(c => c.PartslistID == SelectedPartslist.PartslistID));
             if (requery && CurrentPartslist != null)
+            {
+                CurrentPartslist.PartslistPos_Partslist.AutoLoad();
+                CurrentPartslist.PartslistPos_Partslist.AutoRefresh();
                 foreach (var item in CurrentPartslist.PartslistPos_Partslist)
                     item.PartslistPosRelation_TargetPartslistPos.AutoLoad(this.DatabaseApp);
+            }
+                
             PostExecute("Load");
+            OnPropertyChanged("PartslistPosList");
             OnPropertyChanged("MaterialWFList");
             IsLoadDisabled = false;
         }
