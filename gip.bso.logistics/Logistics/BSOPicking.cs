@@ -740,33 +740,41 @@ namespace gip.bso.logistics
             }
             set
             {
-                _CurrentPickingPos = value;
-                if(_CurrentPickingPos != null)
+                if(_CurrentPickingPos != value)
                 {
-                    if(_CurrentPickingPos.InOrderPos != null)
+                    _CurrentPickingPos = value;
+                    if (_CurrentPickingPos != null)
                     {
-                        _CurrentPickingPos.InOrderPos.AutoRefresh();
-                        _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoRefresh();
+                        _CurrentPickingPos.AutoRefresh();
+                        if (_CurrentPickingPos.InOrderPos != null)
+                        {
+                            _CurrentPickingPos.InOrderPos.AutoRefresh();
+                            _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad();
+                            _CurrentPickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoRefresh();
+                        }
+                        else if (_CurrentPickingPos.OutOrderPos != null)
+                        {
+                            _CurrentPickingPos.OutOrderPos.AutoRefresh();
+                            _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad();
+                            _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoRefresh();
+                        }
+                        _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoLoad();
+                        _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoRefresh();
                     }
-                    else if(_CurrentPickingPos.OutOrderPos != null)
-                    {
-                        _CurrentPickingPos.OutOrderPos.AutoRefresh();
-                        _CurrentPickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoRefresh();
-                    }
+                    OnPropertyChanged("CurrentPickingPos");
+                    OnPropertyChanged("FacilityPreBookingList");
+                    OnPropertyChanged("FacilityBookingList");
+                    if (FacilityPreBookingList != null && FacilityPreBookingList.Any())
+                        SelectedFacilityPreBooking = FacilityPreBookingList.First();
+                    else
+                        SelectedFacilityPreBooking = null;
+                    RefreshFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
+                    RefreshFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
+                    if (AccessBookingFacilityLot != null)
+                        RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
+                    OnPropertyChanged("BookingFacilityList");
+                    OnPropertyChanged("BookingFacilityListTarget");
                 }
-                OnPropertyChanged("CurrentPickingPos");
-                OnPropertyChanged("FacilityPreBookingList");
-                OnPropertyChanged("FacilityBookingList");
-                if (FacilityPreBookingList != null && FacilityPreBookingList.Any())
-                    SelectedFacilityPreBooking = FacilityPreBookingList.First();
-                else
-                    SelectedFacilityPreBooking = null;
-                RefreshFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
-                RefreshFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
-                if (AccessBookingFacilityLot != null)
-                    RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
-                OnPropertyChanged("BookingFacilityList");
-                OnPropertyChanged("BookingFacilityListTarget");
             }
         }
 
@@ -1859,6 +1867,7 @@ namespace gip.bso.logistics
             OnPropertyChanged("PickingPosList");
             if (PickingPosList != null && PickingPosList.Any())
             {
+                _CurrentPickingPos = null;
                 CurrentPickingPos = PickingPosList.FirstOrDefault();
                 SelectedPickingPos = CurrentPickingPos;
             }
