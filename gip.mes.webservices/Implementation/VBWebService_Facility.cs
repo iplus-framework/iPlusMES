@@ -57,7 +57,8 @@ namespace gip.mes.webservices
                     MDUnit = new gip.mes.webservices.MDUnit()
                     {
                         MDUnitID = c.MDUnitID,
-                        MDUnitNameTrans = c.MDUnit.MDUnitNameTrans
+                        MDUnitNameTrans = c.MDUnit.MDUnitNameTrans,
+                        SymbolTrans = c.MDUnit.SymbolTrans
                     },
                     MDReleaseState = new gip.mes.webservices.MDReleaseState()
                     {
@@ -235,14 +236,16 @@ namespace gip.mes.webservices
                 {
                     FacilityID = c.FacilityID,
                     FacilityName = c.Facility.FacilityName,
-                    FacilityNo = c.Facility.FacilityNo
+                    FacilityNo = c.Facility.FacilityNo,
+                    ParentFacilityID = c.Facility.ParentFacilityID
                 },
                 SplitNo = c.SplitNo,
                 StockQuantity = c.StockQuantity,
                 MDUnit = new gip.mes.webservices.MDUnit()
                 {
                     MDUnitID = c.MDUnitID,
-                    MDUnitNameTrans = c.MDUnit.MDUnitNameTrans
+                    MDUnitNameTrans = c.MDUnit.MDUnitNameTrans,
+                    SymbolTrans = c.MDUnit.SymbolTrans
                 },
                 MDReleaseState = new gip.mes.webservices.MDReleaseState()
                 {
@@ -557,7 +560,7 @@ namespace gip.mes.webservices
                 {
                     MaterialSumOverview overview = new MaterialSumOverview();
                     overview.MaterialStock = s_cQry_GetMaterialStock(dbApp, guid).FirstOrDefault();
-                    gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(dbApp, guid, false).ToArray();
+                    gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(dbApp, guid, false).OrderBy(c => c.InsertDate).ToArray();
                     overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });
                     overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter());
                     overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });

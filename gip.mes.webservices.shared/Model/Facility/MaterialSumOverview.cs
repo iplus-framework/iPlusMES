@@ -16,11 +16,12 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using gip.mes.facility;
+using gip.core.datamodel;
 
 namespace gip.mes.webservices
 {
     [DataContract(Name = "cMSO")]
-    public class MaterialSumOverview
+    public class MaterialSumOverview : EntityBase
     {
         [DataMember(Name = "xMS")]
         public MaterialStock MaterialStock { get; set; }
@@ -36,5 +37,10 @@ namespace gip.mes.webservices
 
         [DataMember(Name = "ixFC")]
         public IEnumerable<FacilityCharge> FacilityCharges { get; set; }
+
+        public void OnFacilityChargesChanged()
+        {
+            OnPropertyChanged("FacilityCharges");
+        }
     }
 }
