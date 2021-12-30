@@ -339,6 +339,9 @@
     <None Include="VBControlScripts\2021-12-22 08-37_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="VBControlScripts\2021-12-30 08-56_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
