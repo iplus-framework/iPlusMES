@@ -701,6 +701,29 @@ namespace gip.mes.facility
             }
         }
 
+        [ACPropertyInfo(9999, "", "en{'Prevent broadcast to remote store'}de{'Verhindere Benachrichtigung an entfernten Lagerort'}")]
+        public bool PreventSendToRemoteStore
+        {
+            get
+            {
+                ACValue acValue = ParameterValueList.GetACValue("PreventSendToRemoteStore");
+                if (acValue == null)
+                    return false;
+                return (bool)acValue.Value;
+            }
+            set
+            {
+                ACValue acValue = ParameterValueList.GetACValue("PreventSendToRemoteStore");
+                if (acValue == null)
+                {
+                    acValue = new ACValue("PreventSendToRemoteStore", typeof(bool), value, Global.ParamOption.Optional);
+                    ParameterValueList.Add(acValue);
+                }
+                acValue.Value = value;
+            }
+        }
+
+
         #region Material und Lagerplatz
 
         #region Entitäten die sich auf die ZUGANGsfelder (INward) auswirken

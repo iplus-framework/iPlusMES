@@ -32,7 +32,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            silo.RefreshFacility();
+            silo.RefreshFacility(false, null);
 
             ZeroTol = 10;
             if (silo.Facility.ValueT != null && silo.Facility.ValueT.ValueT != null)

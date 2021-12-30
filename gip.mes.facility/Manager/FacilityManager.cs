@@ -411,6 +411,30 @@ namespace gip.mes.facility
 
         protected virtual void PostFacilityBookingSaved(ACMethodBooking acMethodBooking)
         {
+            if (acMethodBooking.FacilityBookings != null
+                && acMethodBooking.FacilityBookings.Any())
+            {
+                foreach (FacilityBooking booking in acMethodBooking.FacilityBookings.Where(c => c.FacilityBooking != null)
+                                                                                    .Select(c => c.FacilityBooking)
+                                                                                    .Distinct())
+                {
+                    List<Facility> broadcast = new List<Facility>();
+                    foreach (var fbc in booking.FacilityBookingCharge_FacilityBooking)
+                    {
+                        Facility fcClass = null;
+                        if (fbc.InwardFacility != null && fbc.InwardFacility.FacilityACClass != null)
+                            fcClass = fbc.InwardFacility;
+                        if (fcClass == null && fbc.OutwardFacility != null && fbc.OutwardFacility.FacilityACClass != null)
+                            fcClass = fbc.OutwardFacility;
+                        if (fcClass != null && !broadcast.Contains(fcClass))
+                            broadcast.Add(fcClass);
+                    }
+                    foreach (Facility fcClass in broadcast)
+                    {
+                        fcClass.CallRefreshFacility(acMethodBooking.PreventSendToRemoteStore, booking.FacilityBookingID);
+                    }
+                }
+            }
         }
 
         #region FacilityCharge

@@ -148,7 +148,7 @@ namespace gip.mes.processapplication
 
             //CurrentTransportFunction = null;
 
-            RefreshFacility();
+            RefreshFacility(false, null);
             return result;
         }
         #endregion
@@ -464,7 +464,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case "RefreshFacility":
-                    RefreshFacility();
+                    RefreshFacility((bool)acParameter[0], (Guid?)acParameter[1]);
                     return true;
                 case "RebuildCurrentTransportFunctions":
                     RebuildCurrentTransportFunctions();
@@ -554,7 +554,7 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "en{'Refresh Facility'}de{'Aktualisiere Lagerplatz'}", 400, true)]
-        public virtual void RefreshFacility()
+        public virtual void RefreshFacility(bool preventBroadcast, Guid? fbID)
         {
             if (Facility.ValueT == null || Facility.ValueT.ValueT == null)
                 return;
@@ -589,7 +589,7 @@ namespace gip.mes.processapplication
                     InwardEnabled.ValueT = facilitySilo.InwardEnabled;
                     bool informDosings = OutwardEnabled.ValueT != facilitySilo.OutwardEnabled;
                     OutwardEnabled.ValueT = facilitySilo.OutwardEnabled;
-                    OnRefreshFacility(facilitySilo);
+                    OnRefreshFacility(facilitySilo, preventBroadcast, fbID);
                     if (informDosings && this.Root.Initialized)
                     {
                         IEnumerable<PAFDosing> dosingList = GetActiveDosingsFromThisSilo();
@@ -812,7 +812,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        protected virtual void OnRefreshFacility(Facility facilitySilo)
+        protected virtual void OnRefreshFacility(Facility facilitySilo, bool preventBroadcast, Guid? fbID)
         {
             var propTarget = this.FillLevel as IACPropertyNetTarget;
 

@@ -56,6 +56,7 @@
     <Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
     <Compile Include="Helperclasses\MsgBooking.cs" />
     <Compile Include="Interfaces\IACPickingManager.cs" />
+    <Compile Include="Manager\RemoteFacilityManager.cs" />
     <Compile Include="Manager\ACNoProviderInvoice.cs" />
     <Compile Include="Manager\ACInDeliveryNoteManager.cs" />
     <Compile Include="Manager\ACLabOrderManager.cs" />
@@ -122,6 +123,8 @@
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
     <Compile Include="Model\ActualSalesTax.cs" />
     <Compile Include="Model\IssuerResult.cs" />
+    <Compile Include="Model\RemoteStoreConfig.cs" />
+    <Compile Include="Model\RemoteStorePostingData.cs" />
     <Compile Include="Model\SchedulingMaxBPOrder.cs" />
     <Compile Include="Model\PartslistMDSchedulerGroupConnection.cs" />
     <Compile Include="Model\SchedulingBatchPlanDuration.cs" />
@@ -319,6 +322,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-12-20 11-26_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2021-12-30 10-46_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

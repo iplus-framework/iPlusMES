@@ -411,47 +411,54 @@ namespace gip.mes.datamodel
         /// <returns>NULL if sucessful otherwise a Message-List</returns>
         public override IList<Msg> EntityCheckModified(string user, IACEntityObjectContext context)
         {
-            base.EntityCheckModified(user, context);
+            var baseResult = base.EntityCheckModified(user, context);
             if (!_ContextEventSubscr)
             {
                 context.ACChangesExecuted += new ACChangesEventHandler(OnContextACChangesExecuted);
                 _ContextEventSubscr = true;
             }
-            return null;
+            return baseResult;
         }
+
+        public const string MN_RefreshFacility = "RefreshFacility";
 
         void OnContextACChangesExecuted(object sender, ACChangesEventArgs e)
         {
             if (e.Succeeded && e.ChangeType == ACChangesEventArgs.ACChangesType.ACSaveChanges)
             {
-                // Aktualisiere Facility-ACComponent
-                gip.core.datamodel.ACClass facilityACClass = FacilityACClass;
-                if (facilityACClass != null)
-                {
-                    string acUrl = facilityACClass.GetACUrlComponent();
-                    if (!String.IsNullOrEmpty(acUrl))
-                    {
-                        ApplicationManager appManager = null;
-                        List<string> parents = ACUrlHelper.ResolveParents(acUrl);
-                        if (parents != null && parents.Any())
-                            appManager = Database.Root.ACUrlCommand(parents.First()) as ApplicationManager;
-
-                        if (appManager != null && appManager.ApplicationQueue != null)
-                        {
-                            appManager.ApplicationQueue.Add(() => { Database.Root.ACUrlCommand(acUrl + "!RefreshFacility"); });
-                        }
-                        else
-                        {
-                            ThreadPool.QueueUserWorkItem((object state) =>
-                            {
-                                Database.Root.ACUrlCommand(acUrl + "!RefreshFacility");
-                            });
-                        }
-                    }
-                }
+                CallRefreshFacility(false, null);
             }
             (sender as IACEntityObjectContext).ACChangesExecuted -= new ACChangesEventHandler(OnContextACChangesExecuted);
             _ContextEventSubscr = false;
+        }
+
+        public void CallRefreshFacility(bool preventBroadcast, Guid? fbID)
+        {
+            // Aktualisiere Facility-ACComponent
+            gip.core.datamodel.ACClass facilityACClass = FacilityACClass;
+            if (facilityACClass != null)
+            {
+                string acUrl = facilityACClass.GetACUrlComponent();
+                if (!String.IsNullOrEmpty(acUrl))
+                {
+                    ApplicationManager appManager = null;
+                    List<string> parents = ACUrlHelper.ResolveParents(acUrl);
+                    if (parents != null && parents.Any())
+                        appManager = Database.Root.ACUrlCommand(parents.First()) as ApplicationManager;
+
+                    if (appManager != null && appManager.ApplicationQueue != null)
+                    {
+                        appManager.ApplicationQueue.Add(() => { Database.Root.ACUrlCommand(acUrl + ACUrlHelper.Delimiter_InvokeMethod + MN_RefreshFacility, false, fbID); });
+                    }
+                    else
+                    {
+                        ThreadPool.QueueUserWorkItem((object state) =>
+                        {
+                            Database.Root.ACUrlCommand(acUrl + ACUrlHelper.Delimiter_InvokeMethod + MN_RefreshFacility, false, fbID);
+                        });
+                    }
+                }
+            }
         }
 
         public FacilityStock GetFacilityStock_InsertIfNotExists(DatabaseApp dbApp)

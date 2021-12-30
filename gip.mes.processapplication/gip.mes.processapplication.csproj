@@ -87,6 +87,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAMIntermediatebin.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMLoadingstation.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMMixer.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMRemoteStore.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMParkingspace.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMPlatformscale.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMSilo.cs" />

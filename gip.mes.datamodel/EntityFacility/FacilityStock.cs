@@ -189,7 +189,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
-        private bool _ContextEventSubscr = false;
+        //private bool _ContextEventSubscr = false;
         /// <summary>
         /// Method for validating values and references in this EF-Object.
         /// Is called from Change-Tracking before changes will be saved for changed entity-objects.
@@ -199,48 +199,24 @@ namespace gip.mes.datamodel
         /// <returns>NULL if sucessful otherwise a Message-List</returns>
         public override IList<Msg> EntityCheckModified(string user, IACEntityObjectContext context)
         {
-            base.EntityCheckModified(user, context);
-            if (!_ContextEventSubscr)
-            {
-                context.ACChangesExecuted += new ACChangesEventHandler(OnContextACChangesExecuted);
-                _ContextEventSubscr = true;
-            }
-            return null;
+            return base.EntityCheckModified(user, context);
+            //if (!_ContextEventSubscr)
+            //{
+            //    context.ACChangesExecuted += new ACChangesEventHandler(OnContextACChangesExecuted);
+            //    _ContextEventSubscr = true;
+            //}
+            //return null;
         }
 
-        void OnContextACChangesExecuted(object sender, ACChangesEventArgs e)
-        {
-            if (e.Succeeded && e.ChangeType == ACChangesEventArgs.ACChangesType.ACSaveChanges)
-            {
-                // Aktualisiere Facility-ACComponent
-                gip.core.datamodel.ACClass facilityACClass = this.Facility.FacilityACClass;
-                if (facilityACClass != null)
-                {
-                    string acUrl = facilityACClass.GetACUrlComponent();
-                    if (!String.IsNullOrEmpty(acUrl))
-                    {
-                        ApplicationManager appManager = null;
-                        List<string> parents = ACUrlHelper.ResolveParents(acUrl);
-                        if (parents != null && parents.Any())
-                            appManager = Database.Root.ACUrlCommand(parents.First()) as ApplicationManager;
-
-                        if (appManager != null && appManager.ApplicationQueue != null)
-                        {
-                            appManager.ApplicationQueue.Add(() => { Database.Root.ACUrlCommand(acUrl + "!RefreshFacility"); });
-                        }
-                        else
-                        {
-                            ThreadPool.QueueUserWorkItem((object state) =>
-                            {
-                                Database.Root.ACUrlCommand(acUrl + "!RefreshFacility");
-                            });
-                        }
-                    }
-                }
-            }
-            (sender as IACEntityObjectContext).ACChangesExecuted -= new ACChangesEventHandler(OnContextACChangesExecuted);
-            _ContextEventSubscr = false;
-        }
+        //void OnContextACChangesExecuted(object sender, ACChangesEventArgs e)
+        //{
+        //    if (e.Succeeded && e.ChangeType == ACChangesEventArgs.ACChangesType.ACSaveChanges)
+        //    {
+        //        this.Facility.CallRefreshFacility(false, null);
+        //    }
+        //    (sender as IACEntityObjectContext).ACChangesExecuted -= new ACChangesEventHandler(OnContextACChangesExecuted);
+        //    _ContextEventSubscr = false;
+        //}
 
         static public string KeyACIdentifier
         {
