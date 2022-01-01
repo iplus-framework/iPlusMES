@@ -39,6 +39,12 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            StopRedirection();
+            return base.ACDeInit(deleteACClassTask);
+        }
+
         #endregion
 
         #region Points
@@ -170,8 +176,10 @@ namespace gip.mes.processapplication
                     {
                         postingData = new RemoteStorePostingData(remoteInstance.Recipient.ACUrl, remoteInstance.Config.FacilityUrlOfRecipient);
                         RemoteStorePostings.Add(postingData);
-                        OnPropertyChanged("RemoteStorePostings"); // Persist
                     }
+                    if (fbID.HasValue)
+                        postingData.FBIds.Add(fbID.Value);
+                    OnPropertyChanged("RemoteStorePostings"); // Persist
                 }
             }
         }

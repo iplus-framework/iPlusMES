@@ -89,8 +89,79 @@ namespace gip.mes.facility
                 using (DatabaseApp dbRemote = new DatabaseApp(remoteConnString))
                 using (DatabaseApp dbLocal = new DatabaseApp())
                 {
-                    Material m1 = dbRemote.Material.FirstOrDefault();
-                    Material m2 = dbLocal.Material.FirstOrDefault();
+                    Database dbIplus = Root.Database as Database;
+                    core.datamodel.ACClass aCClass = dbIplus.GetACTypeByACUrlComp(remoteStorePosting.FacilityUrlOfRecipient);
+                    if (aCClass == null)
+                        return;
+                    Facility localFacility = dbLocal.Facility
+                                                    .Include(c => c.Facility1_ParentFacility)
+                                                    .Where(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == aCClass.ACClassID)
+                                                    .FirstOrDefault();
+                    if (localFacility == null || localFacility.Facility1_ParentFacility == null)
+                        return;
+                    Facility remoteFacility = dbRemote.Facility.Include(c => c.Facility1_ParentFacility)
+                                      .Where(c => c.FacilityNo == localFacility.FacilityNo 
+                                                    && c.Facility1_ParentFacility != null
+                                                    && c.Facility1_ParentFacility.FacilityNo == localFacility.Facility1_ParentFacility.FacilityNo)
+                                     .FirstOrDefault();
+                    if (remoteFacility == null)
+                        return;
+                    //remoteStorePosting.FacilityUrlOfRecipient
+                    List<FacilityCharge> changedRemoteFCs = new List<FacilityCharge>();
+                    List<Picking> changedRemotePickings = new List<Picking>();
+                    foreach (Guid guid in remoteStorePosting.FBIds)
+                    {
+                        var queryRemoteFBCs =
+                            dbRemote.FacilityBookingCharge
+                            .Include(c => c.PickingPos)
+                            .Include(c => c.PickingPos.Picking)
+                            .Include(c => c.InwardFacilityCharge)
+                            .Include(c => c.InwardFacilityCharge.Facility)
+                            .Include(c => c.InwardFacilityCharge.FacilityLot)
+                            .Include(c => c.OutwardFacilityCharge)
+                            .Include(c => c.OutwardFacilityCharge.Facility)
+                            .Include(c => c.OutwardFacilityCharge.FacilityLot)
+                            .Where(c => c.FacilityBookingID == guid);
+                        foreach (var remoteFBC in queryRemoteFBCs)
+                        {
+                            if (remoteFBC.InwardFacilityID.HasValue && remoteFBC.InwardFacilityID.Value == remoteFacility.FacilityID)
+                            {
+                                if (!changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
+                                    changedRemoteFCs.Add(remoteFBC.InwardFacilityCharge);
+                            }
+                            if (remoteFBC.OutwardFacilityID.HasValue && remoteFBC.OutwardFacilityID.Value == remoteFacility.FacilityID)
+                            {
+                                if (!changedRemoteFCs.Contains(remoteFBC.OutwardFacilityCharge))
+                                    changedRemoteFCs.Add(remoteFBC.OutwardFacilityCharge);
+                            }
+                            if (remoteFBC.PickingPos != null)
+                            {
+                                if (!changedRemotePickings.Contains(remoteFBC.PickingPos.Picking))
+                                    changedRemotePickings.Add(remoteFBC.PickingPos.Picking);
+                            }
+                        }
+                    }
+
+                    foreach (FacilityCharge changedRemoteFC in changedRemoteFCs)
+                    {
+                        FacilityCharge localFC = dbLocal.FacilityCharge.Where(c => c.Material.MaterialNo == changedRemoteFC.Material.MaterialNo
+                                                                                && c.FacilityID == localFacility.FacilityID
+                                                                                && (!changedRemoteFC.FacilityLotID.HasValue || c.FacilityLotID == changedRemoteFC.FacilityLotID)
+                                                                                && c.SplitNo == changedRemoteFC.SplitNo)
+                                                                        .FirstOrDefault();
+                        if (localFC == null)
+                        {
+                            // Add New
+                        }
+                        else if (localFC.NotAvailable)
+                        {
+                            // Restore
+                        }
+                        // TODO: Booking to Absolute stock
+                    }
+
+                    //Material m1 = dbRemote.Material.FirstOrDefault();
+                    //Material m2 = dbLocal.Material.FirstOrDefault();
                 }
             }
             catch (Exception e)
