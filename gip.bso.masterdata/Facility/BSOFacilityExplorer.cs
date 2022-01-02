@@ -259,6 +259,14 @@ namespace gip.bso.masterdata
             CloseTopDialog();
         }
 
+        public override object Clone()
+        {
+            BSOFacilityExplorer clone = base.Clone() as BSOFacilityExplorer;
+            if (clone != null)
+                clone.CurrentFacility = CurrentFacility;
+            return clone;
+        }
+
         #endregion
     }
 }
