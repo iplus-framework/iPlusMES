@@ -976,8 +976,8 @@ namespace gip.bso.manufacturing
         {
             if (CurrentProdOrder == null)
                 return false;
-            //if (CurrentProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished)
-            //    return false;
+            if (CurrentProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished)
+                return false;
             return true;
         }
 
