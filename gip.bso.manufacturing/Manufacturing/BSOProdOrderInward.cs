@@ -637,7 +637,7 @@ namespace gip.bso.manufacturing
                 if (SelectedInwardFacilityBooking == null)
                     return null;
                 SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
-                return SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderByDescending(c => c.InsertDate);
+                return SelectedInwardFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo);
             }
         }
 

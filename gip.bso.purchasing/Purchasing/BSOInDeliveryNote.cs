@@ -1516,8 +1516,11 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (SelectedFacilityBooking != null)
-                    return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.ToList();
+                if (CurrentFacilityBooking != null)
+                {
+                    CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
+                    return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo).ToList();
+                }
                 return null;
             }
         }

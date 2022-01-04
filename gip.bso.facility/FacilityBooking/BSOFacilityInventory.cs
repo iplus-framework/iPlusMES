@@ -1442,7 +1442,7 @@ namespace gip.bso.facility
         private List<FacilityBookingCharge> LoadInventoryPosFacilityBookingChargeList()
         {
             if (SelectedInventoryPosFacilityBooking == null) return null;
-            return SelectedInventoryPosFacilityBooking.FacilityBookingCharge_FacilityBooking.ToList();
+            return SelectedInventoryPosFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo).ToList();
         }
 
         #endregion
