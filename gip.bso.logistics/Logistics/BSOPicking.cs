@@ -1467,10 +1467,10 @@ namespace gip.bso.logistics
         {
             get
             {
-                if (SelectedFacilityBooking != null)
+                if (CurrentFacilityBooking != null)
                 {
                     CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.AutoRefresh(this.DatabaseApp);
-                    return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.ToList();
+                    return CurrentFacilityBooking.FacilityBookingCharge_FacilityBooking.OrderBy(c => c.FacilityBookingChargeNo).ToList();
                 }
                 return null;
             }
