@@ -9,7 +9,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory'}de{'Inventur'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "FacilityInventoryNo", "en{'Inventory Nr.'}de{'Inventurno.'}","", "", true)]
     [ACPropertyEntity(2, "FacilityInventoryName", "en{'Inventoryname'}de{'Inventurname'}","", "", true)]
-    [ACPropertyEntity(3, "MDFacilityInventoryState", "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\MDFacilityInventoryStateList", "", true)]
+    [ACPropertyEntity(3, "MDFacilityInventoryState", "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
