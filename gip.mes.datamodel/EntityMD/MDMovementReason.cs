@@ -166,7 +166,8 @@ namespace gip.mes.datamodel
             Inventory = 10, //Inventur
             ConsumptionWithoutBalance = 11, //Verbrauch ohne Bilanz
             ProductionWithoutBalance = 12, //Herstellung ohne Bilanz
-            CorrectionFromERP = 90
+            CorrectionFromERP = 90,
+            Breakage = 100
         }
 
         static ACValueItemList _MovementReasonsList = null;
@@ -193,6 +194,7 @@ namespace gip.mes.datamodel
                     _MovementReasonsList.AddEntry(MovementReasons.Inventory, "en{'Inventory'}de{'Inventur'}");
                     _MovementReasonsList.AddEntry(MovementReasons.ConsumptionWithoutBalance, "en{'Consumption Without Balance'}de{'Verbrauch ohne Bilanz'}");
                     _MovementReasonsList.AddEntry(MovementReasons.ProductionWithoutBalance, "en{'Production Without Balance'}de{'Herstellung ohne Bilanz'}");
+                    _MovementReasonsList.AddEntry(MovementReasons.Breakage, "en{'Breakage'}de{'Ausschuss'}");
                 }
                 return _MovementReasonsList;
             }
