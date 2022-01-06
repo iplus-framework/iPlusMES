@@ -102,7 +102,11 @@ namespace gip.mes.webservices
             if (currentSessionID.HasValue && myServiceHost != null)
             {
                 VBUserRights userRights = myServiceHost.GetRightsForSession(currentSessionID.Value);
-                if (userRights != null)
+                if (userRights == null)
+                {
+                    return new WSResponse<bool>(false, WSResponse<bool>.LoginAgainMessage);
+                }
+                else
                 {
                     vbUserName = userRights.UserName;
                 }
