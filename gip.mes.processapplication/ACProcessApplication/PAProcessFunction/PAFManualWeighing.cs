@@ -757,7 +757,7 @@ namespace gip.mes.processapplication
             if (!CheckIsScaleInTol())
                 return;
 
-            if (!WaitForAcknowledge())
+            if (WaitForAcknowledge())
                 return;
 
             var scale = GetActiveScaleObject();
@@ -847,8 +847,14 @@ namespace gip.mes.processapplication
             double checkQuantity = ManuallyAddedQuantity.ValueT;
 
             var scale = GetActiveScaleObject();
-            if (scale != null && !CheckInToleranceOnlyManuallyAddedQuantity)
-                checkQuantity += scale.ActualWeight.ValueT;
+            if (scale != null)
+            {
+                // If scale is not in stillstand
+                if (scale.NotStandStill.ValueT)
+                    return false;
+                if (!CheckInToleranceOnlyManuallyAddedQuantity)
+                    checkQuantity += scale.ActualWeight.ValueT;
+            }
 
             var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
             double targetQuantity = 0;
@@ -915,21 +921,21 @@ namespace gip.mes.processapplication
 
         protected virtual bool WaitForAcknowledge()
         {
-            bool result = false;
+            bool mustWait = true;
             if (ManualWeighingPW != null && ManualWeighingPW.AutoAcknowledge)
-                result = true;
+                mustWait = false;
             else
-                result = _IsManuallyCompleted;
+                mustWait = !_IsManuallyCompleted;
 
             if (ManualWeighingPW != null)
             {
-                if (!result && ManualWeighingPW.ManualWeihgingNextTask.ValueT != ManualWeighingTaskInfo.WaitForAcknowledge)
+                if (mustWait && ManualWeighingPW.ManualWeihgingNextTask.ValueT != ManualWeighingTaskInfo.WaitForAcknowledge)
                     ManualWeighingPW.ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.WaitForAcknowledge;
-                else if (result && ManualWeighingPW.ManualWeihgingNextTask.ValueT == ManualWeighingTaskInfo.WaitForAcknowledge)
+                else if (!mustWait && ManualWeighingPW.ManualWeihgingNextTask.ValueT == ManualWeighingTaskInfo.WaitForAcknowledge)
                     ManualWeighingPW.ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.None;
             }
 
-            return result;
+            return mustWait;
         }
 
         public override void SMIdle()
