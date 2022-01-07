@@ -17,5 +17,11 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+
+        [DataMember]
+        public bool SkipPrinterCheck
+        {
+            get; set;
+        }
     }
 }
