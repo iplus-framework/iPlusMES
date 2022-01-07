@@ -33,6 +33,14 @@ namespace gip.bso.logistics
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "ProdOrderPartslistPosOpen", "en{'Open Prod. Order Pos.'}de{'Offene Prod.-auftragsposition'}", typeof(ProdOrderPartslistPos), ProdOrderPartslistPos.ClassName, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", "Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "BookingFacility", ConstApp.Facility, typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "BookingFacilityLot", ConstApp.Lot, typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
+    [ACClassConstructorInfo(
+       new object[]
+       {
+            new object[] { "PickingType", Global.ParamOption.Optional, typeof(string) },
+            new object[] { "FromFacility", Global.ParamOption.Optional, typeof(string) },
+            new object[] { "ToFacility", Global.ParamOption.Optional, typeof(string) }
+       }
+   )]
     public partial class BSOPicking : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider
     {
         #region c´tors
@@ -76,6 +84,28 @@ namespace gip.bso.logistics
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
+
+            if (Parameters != null && Parameters.Any())
+            {
+                object pickingTypeOb = Parameters["PickingType"];
+                if (pickingTypeOb != null)
+                {
+                    string pickingType = pickingTypeOb.ToString();
+                    SelectedFilterMDPickingType = FilterMDPickingTypeList.FirstOrDefault(c => c.MDKey == pickingType);
+                }
+                object fromFacilityOb = Parameters["FromFacility"];
+                if(fromFacilityOb != null)
+                {
+                    string fromFacility = fromFacilityOb.ToString();
+                    DefaultFromFacility = DatabaseApp.Facility.FirstOrDefault(c=>c.FacilityNo == fromFacility);
+                }
+                object toFacilityOb = Parameters["ToFacility"];
+                if (toFacilityOb != null)
+                {
+                    string toFacility = toFacilityOb.ToString();
+                    DefaultToFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == toFacility);
+                }
+            }
 
             Search();
             return true;
@@ -498,6 +528,9 @@ namespace gip.bso.logistics
 
         #endregion
 
+        public Facility DefaultFromFacility { get; set; }
+        public Facility DefaultToFacility { get; set; }
+
         #endregion
 
         #endregion
@@ -740,7 +773,7 @@ namespace gip.bso.logistics
             }
             set
             {
-                if(_CurrentPickingPos != value)
+                if (_CurrentPickingPos != value)
                 {
                     _CurrentPickingPos = value;
                     if (_CurrentPickingPos != null)
