@@ -427,7 +427,7 @@ namespace gip.bso.facility
             {
                 if (AccessPrimary == null)
                     return;
-                if(AccessPrimary.CurrentNavObject != value)
+                if (AccessPrimary.CurrentNavObject != value)
                 {
                     if (CurrentFacilityCharge != null)
                         CurrentFacilityCharge.PropertyChanged -= CurrentFacilityCharge_PropertyChanged;

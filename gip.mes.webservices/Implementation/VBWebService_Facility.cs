@@ -1577,7 +1577,7 @@ namespace gip.mes.webservices
             try
             {
                 Guid facilityChargeIDVal = Guid.Empty;
-                if(!Guid.TryParse(facilityChargeID, out facilityChargeIDVal))
+                if (!Guid.TryParse(facilityChargeID, out facilityChargeIDVal))
                     throw new FormatException("facilityChargeID not in valid format !");
                 storageLocationNo = storageLocationNo != CoreWebServiceConst.EmptyParam ? storageLocationNo : "";
                 facilityNo = facilityNo != CoreWebServiceConst.EmptyParam ? facilityNo : "";
