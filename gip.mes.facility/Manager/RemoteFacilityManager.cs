@@ -109,35 +109,71 @@ namespace gip.mes.facility
                     //remoteStorePosting.FacilityUrlOfRecipient
                     List<FacilityCharge> changedRemoteFCs = new List<FacilityCharge>();
                     List<Picking> changedRemotePickings = new List<Picking>();
-                    foreach (Guid guid in remoteStorePosting.FBIds)
+                    foreach (var entry in remoteStorePosting.FBIds)
                     {
-                        var queryRemoteFBCs =
-                            dbRemote.FacilityBookingCharge
-                            .Include(c => c.PickingPos)
-                            .Include(c => c.PickingPos.Picking)
-                            .Include(c => c.InwardFacilityCharge)
-                            .Include(c => c.InwardFacilityCharge.Facility)
-                            .Include(c => c.InwardFacilityCharge.FacilityLot)
-                            .Include(c => c.OutwardFacilityCharge)
-                            .Include(c => c.OutwardFacilityCharge.Facility)
-                            .Include(c => c.OutwardFacilityCharge.FacilityLot)
-                            .Where(c => c.FacilityBookingID == guid);
-                        foreach (var remoteFBC in queryRemoteFBCs)
+                        if (entry.EntityType == FacilityBooking.ClassName)
                         {
-                            if (remoteFBC.InwardFacilityID.HasValue && remoteFBC.InwardFacilityID.Value == remoteFacility.FacilityID)
+                            var queryRemoteFBCs =
+                                dbRemote.FacilityBookingCharge
+                                .Include(c => c.PickingPos)
+                                .Include(c => c.PickingPos.Picking)
+                                .Include(c => c.InwardFacilityCharge)
+                                .Include(c => c.InwardFacilityCharge.Facility)
+                                .Include(c => c.InwardFacilityCharge.FacilityLot)
+                                .Include(c => c.OutwardFacilityCharge)
+                                .Include(c => c.OutwardFacilityCharge.Facility)
+                                .Include(c => c.OutwardFacilityCharge.FacilityLot)
+                                .Where(c => c.FacilityBookingID == entry.KeyId);
+                            foreach (var remoteFBC in queryRemoteFBCs)
                             {
-                                if (!changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
-                                    changedRemoteFCs.Add(remoteFBC.InwardFacilityCharge);
+                                if (remoteFBC.InwardFacilityID.HasValue && remoteFBC.InwardFacilityID.Value == remoteFacility.FacilityID)
+                                {
+                                    if (!changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
+                                        changedRemoteFCs.Add(remoteFBC.InwardFacilityCharge);
+                                }
+                                if (remoteFBC.OutwardFacilityID.HasValue && remoteFBC.OutwardFacilityID.Value == remoteFacility.FacilityID)
+                                {
+                                    if (!changedRemoteFCs.Contains(remoteFBC.OutwardFacilityCharge))
+                                        changedRemoteFCs.Add(remoteFBC.OutwardFacilityCharge);
+                                }
+                                if (remoteFBC.PickingPos != null)
+                                {
+                                    if (!changedRemotePickings.Contains(remoteFBC.PickingPos.Picking))
+                                        changedRemotePickings.Add(remoteFBC.PickingPos.Picking);
+                                }
                             }
-                            if (remoteFBC.OutwardFacilityID.HasValue && remoteFBC.OutwardFacilityID.Value == remoteFacility.FacilityID)
+                        }
+                        else if (entry.EntityType == Picking.ClassName)
+                        {
+                            var remotePicking = dbRemote.Picking.Include(c => c.MDPickingType)
+                                            .Include("PickingPos_Picking")
+                                            .Include("PickingPos_Picking.PickingMaterial")
+                                            .Include("PickingPos_Picking.FromFacility")
+                                            .Include("PickingPos_Picking.ToFacility")
+                                            .Include("PickingPos_Picking.MDDelivPosLoadState")
+                                            .Where(c => c.PickingID == entry.KeyId)
+                                            .FirstOrDefault();
+
+                            if (remotePicking != null)
                             {
-                                if (!changedRemoteFCs.Contains(remoteFBC.OutwardFacilityCharge))
-                                    changedRemoteFCs.Add(remoteFBC.OutwardFacilityCharge);
+                                // All lines deleted => delete Picking
+                                if (!remotePicking.PickingPos_Picking.Any())
+                                    remotePicking = null;
+                                else if (!changedRemotePickings.Contains(remotePicking))
+                                    changedRemotePickings.Add(remotePicking);
                             }
-                            if (remoteFBC.PickingPos != null)
+                            if (remotePicking == null)
                             {
-                                if (!changedRemotePickings.Contains(remoteFBC.PickingPos.Picking))
-                                    changedRemotePickings.Add(remoteFBC.PickingPos.Picking);
+                                // Remote Picking was deleted, delete local Picking
+                                var localPicking = dbLocal.Picking.Include(c => c.MDPickingType)
+                                            .Include("PickingPos_Picking")
+                                            .Include("PickingPos_Picking.PickingMaterial")
+                                            .Include("PickingPos_Picking.FromFacility")
+                                            .Include("PickingPos_Picking.ToFacility")
+                                            .Include("PickingPos_Picking.MDDelivPosLoadState")
+                                            .Where(c => c.PickingID == entry.KeyId)
+                                            .FirstOrDefault();
+                                // TODO: Unassign pos an delete Picking....
                             }
                         }
                     }
@@ -158,6 +194,11 @@ namespace gip.mes.facility
                             // Restore
                         }
                         // TODO: Booking to Absolute stock
+                    }
+
+                    foreach (Picking remotePicking in changedRemotePickings)
+                    {
+                        // TODO:
                     }
 
                     //Material m1 = dbRemote.Material.FirstOrDefault();

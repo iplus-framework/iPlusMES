@@ -434,30 +434,39 @@ namespace gip.mes.datamodel
 
         public void CallRefreshFacility(bool preventBroadcast, Guid? fbID)
         {
+            CallMethodOnInstance(MN_RefreshFacility, preventBroadcast, fbID);
+        }
+
+        public const string MN_SendPicking = "SendPicking";
+        public void CallSendPicking(bool preventBroadcast, Guid? keyID)
+        {
+            CallMethodOnInstance(MN_SendPicking, preventBroadcast, keyID);
+        }
+
+        public void CallMethodOnInstance(string methodName, bool preventBroadcast, Guid? keyID)
+        {
             // Aktualisiere Facility-ACComponent
             gip.core.datamodel.ACClass facilityACClass = FacilityACClass;
-            if (facilityACClass != null)
-            {
-                string acUrl = facilityACClass.GetACUrlComponent();
-                if (!String.IsNullOrEmpty(acUrl))
-                {
-                    ApplicationManager appManager = null;
-                    List<string> parents = ACUrlHelper.ResolveParents(acUrl);
-                    if (parents != null && parents.Any())
-                        appManager = Database.Root.ACUrlCommand(parents.First()) as ApplicationManager;
+            if (facilityACClass == null)
+                return;
+            string acUrl = facilityACClass.GetACUrlComponent();
+            if (String.IsNullOrEmpty(acUrl))
+                return;
+            ApplicationManager appManager = null;
+            List<string> parents = ACUrlHelper.ResolveParents(acUrl);
+            if (parents != null && parents.Any())
+                appManager = Database.Root.ACUrlCommand(parents.First()) as ApplicationManager;
 
-                    if (appManager != null && appManager.ApplicationQueue != null)
-                    {
-                        appManager.ApplicationQueue.Add(() => { Database.Root.ACUrlCommand(acUrl + ACUrlHelper.Delimiter_InvokeMethod + MN_RefreshFacility, false, fbID); });
-                    }
-                    else
-                    {
-                        ThreadPool.QueueUserWorkItem((object state) =>
-                        {
-                            Database.Root.ACUrlCommand(acUrl + ACUrlHelper.Delimiter_InvokeMethod + MN_RefreshFacility, false, fbID);
-                        });
-                    }
-                }
+            if (appManager != null && appManager.ApplicationQueue != null)
+            {
+                appManager.ApplicationQueue.Add(() => { Database.Root.ACUrlCommand(acUrl + ACUrlHelper.Delimiter_InvokeMethod + methodName, preventBroadcast, keyID); });
+            }
+            else
+            {
+                ThreadPool.QueueUserWorkItem((object state) =>
+                {
+                    Database.Root.ACUrlCommand(acUrl + ACUrlHelper.Delimiter_InvokeMethod + methodName, preventBroadcast, keyID);
+                });
             }
         }
 
@@ -638,7 +647,17 @@ namespace gip.mes.datamodel
                 return this.VBiFacilityACClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
         }
 
-
+        public bool IsMirroredOnMoreDatabases
+        {
+            get
+            {
+                if (  !VBiFacilityACClassID.HasValue 
+                    || FacilityACClass == null
+                    || FacilityACClass.ObjectType == null)
+                    return false;
+                return FacilityACClass.ObjectType.FullName.Contains("RemoteStore");
+            }
+        }
 
         private gip.core.datamodel.ACClass _StackCalculatorACClass;
         [ACPropertyInfo(9999, "", "en{'Stack Posting Type'}de{'Stapelbuchungsart'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]

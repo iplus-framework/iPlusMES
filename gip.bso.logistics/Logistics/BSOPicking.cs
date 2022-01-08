@@ -1671,6 +1671,28 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Mirrored-Stores
+        private List<Facility> _MirroredStores;
+        protected void FillMirroredStores(List<Facility> stores)
+        {
+            if (CurrentPicking == null)
+                return;
+            foreach (PickingPos pos in CurrentPicking.PickingPos_Picking)
+            {
+                if (pos.FromFacility != null && pos.FromFacility.IsMirroredOnMoreDatabases && !stores.Contains(pos.FromFacility))
+                    stores.Add(pos.FromFacility);
+                if (pos.ToFacility != null && pos.ToFacility.IsMirroredOnMoreDatabases && !stores.Contains(pos.ToFacility))
+                    stores.Add(pos.ToFacility);
+            }
+        }
+
+        protected void RefreshCurrentMirroredStores()
+        {
+            _MirroredStores = new List<Facility>();
+            FillMirroredStores(_MirroredStores);
+        }
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -1813,6 +1835,36 @@ namespace gip.bso.logistics
             _UnSavedUnAssignedInOrderPos = new List<InOrderPos>();
             _UnSavedUnAssignedOutOrderPos = new List<OutOrderPos>();
             _UnSavedUnAssignedProdOrderPartslistPos = new List<ProdOrderPartslistPos>();
+            if (CurrentPicking != null)
+            {
+                List<Facility> mirroredStores = new List<Facility>();
+                // Deleted
+                if (CurrentPicking.EntityState == System.Data.EntityState.Detached)
+                {
+                    mirroredStores = _MirroredStores;
+                }
+                else
+                {
+                    FillMirroredStores(mirroredStores);
+                    if (_MirroredStores != null && _MirroredStores.Any())
+                    {
+                        foreach (var mirroredStore in _MirroredStores)
+                        {
+                            if (!mirroredStores.Contains(mirroredStore))
+                            {
+                                mirroredStores.Add(mirroredStore);
+                            }
+                        }
+                    }
+                }
+                if (mirroredStores != null && mirroredStores.Any())
+                {
+                    foreach (var mirroredStore in mirroredStores)
+                    {
+                        mirroredStore.CallSendPicking(false, CurrentPicking.PickingID);
+                    }
+                }
+            }
             RefreshInOrderPosList(true);
             RefreshOutOrderPosList(true);
             RefreshProdOrderPartslistPosList(true);
@@ -1881,6 +1933,10 @@ namespace gip.bso.logistics
                         .Include("PickingPos_Picking.InOrderPos")
                         .Include("PickingPos_Picking.InOrderPos.FacilityBooking_InOrderPos")
                         .Include("PickingPos_Picking.InOrderPos.FacilityPreBooking_InOrderPos")
+                        .Include("PickingPos_Picking.ToFacility")
+                        .Include("PickingPos_Picking.FromFacility")
+                        .Include("PickingPos_Picking.PickingMaterial")
+                        .Include("PickingPos_Picking.MDDelivPosLoadState")
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos")
                         //.Include("PickingPos_Picking.ProdOrderPartslistPos.MDProdOrderPartslistPosState")
                         .Include(c => c.VisitorVoucher)
@@ -1895,6 +1951,7 @@ namespace gip.bso.logistics
                     CurrentPicking.VisitorVoucher.ACProperties.Refresh();
 
                 CurrentPicking.PickingPos_Picking.AutoRefresh(RefreshMode.StoreWins);
+                RefreshCurrentMirroredStores();
             }
             PostExecute("Load");
             OnPropertyChanged("PickingPosList");
@@ -1935,6 +1992,7 @@ namespace gip.bso.logistics
             CurrentPicking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
             DatabaseApp.Picking.AddObject(CurrentPicking);
             ACState = Const.SMNew;
+            RefreshCurrentMirroredStores();
             PostExecute("New");
         }
 
@@ -1957,7 +2015,13 @@ namespace gip.bso.logistics
                 return;
             if (AccessPrimary == null)
                 return;
-            Msg msg = CurrentPicking.DeleteACObject(DatabaseApp, true);
+            Msg msg = PickingManager.UnassignAllPickingPos(CurrentPicking, DatabaseApp, true);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                return;
+            }
+            msg = CurrentPicking.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.Msg(msg);

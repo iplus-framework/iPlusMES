@@ -138,11 +138,27 @@ namespace gip.mes.processapplication
                 || !RemoteInstances.Any()
                 || !IsActive.ValueT)
                 return;
-            Facility facility = Facility.ValueT.ValueT;
+            SendToRemoteStore(FacilityBooking.ClassName, fbID);
+        }
+
+        [ACMethodInfo("", "en{'Send Picking order'}de{'Sende Kommissionierauftrag'}", 401, true)]
+        public virtual void SendPicking(bool preventBroadcast, Guid? pickingID)
+        {
+            if (Facility.ValueT == null
+                || Facility.ValueT.ValueT == null
+                || preventBroadcast
+                || !RemoteInstances.Any()
+                || !IsActive.ValueT)
+                return;
+
+            SendToRemoteStore(Picking.ClassName, pickingID);
+        }
+
+        protected virtual void SendToRemoteStore(string entityType, Guid? keyID)
+        {
             var appManager = this.ApplicationManager;
             if (appManager == null)
                 return;
-
             foreach (RemoteInstance remoteInstance in RemoteInstances)
             {
                 RemoteStorePostingData postingData = RemoteStorePostings.Where(c => c.Recipient == remoteInstance.Recipient.ACUrl).FirstOrDefault();
@@ -156,8 +172,8 @@ namespace gip.mes.processapplication
                     else
                     {
                         postingData = new RemoteStorePostingData(remoteInstance.Recipient.ACUrl, remoteInstance.Config.FacilityUrlOfRecipient);
-                        if (fbID.HasValue)
-                            postingData.FBIds.Add(fbID.Value);
+                        if (keyID.HasValue)
+                            postingData.FBIds.Add(new RSPDEntry() { EntityType = entityType, KeyId = keyID.Value });
                     }
                     if (appManager.ApplicationQueue != null)
                     {
@@ -169,7 +185,7 @@ namespace gip.mes.processapplication
                 {
                     if (postingData != null)
                     {
-                        if (!fbID.HasValue)
+                        if (!keyID.HasValue)
                             return;
                     }
                     else
@@ -177,8 +193,8 @@ namespace gip.mes.processapplication
                         postingData = new RemoteStorePostingData(remoteInstance.Recipient.ACUrl, remoteInstance.Config.FacilityUrlOfRecipient);
                         RemoteStorePostings.Add(postingData);
                     }
-                    if (fbID.HasValue)
-                        postingData.FBIds.Add(fbID.Value);
+                    if (keyID.HasValue)
+                        postingData.FBIds.Add(new RSPDEntry() { EntityType = entityType, KeyId = keyID.Value });
                     OnPropertyChanged("RemoteStorePostings"); // Persist
                 }
             }
@@ -288,8 +304,11 @@ namespace gip.mes.processapplication
             {
                 foreach (var remoteInstance in RemoteInstances)
                 {
-                    remoteInstance.Recipient.ValueT.PropertyChanged -= Proxy_PropertyChanged;
-                    remoteInstance.Recipient.Detach();
+                    if (remoteInstance.Recipient.IsAttached)
+                    {
+                        remoteInstance.Recipient.ValueT.PropertyChanged -= Proxy_PropertyChanged;
+                        remoteInstance.Recipient.Detach();
+                    }
                 }
                 _RemoteInstances = new List<RemoteInstance>();
             }
@@ -300,6 +319,7 @@ namespace gip.mes.processapplication
         {
             return RemoteInstances != null && RemoteInstances.Any();
         }
+
         #endregion
 
 
@@ -320,6 +340,9 @@ namespace gip.mes.processapplication
                     return true;
                 case Const.IsEnabledPrefix + "StopRedirection":
                     result = IsEnabledStopRedirection();
+                    return true;
+                case gip.mes.datamodel.Facility.MN_SendPicking:
+                    SendPicking((bool)acParameter[0], (Guid?)acParameter[1]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

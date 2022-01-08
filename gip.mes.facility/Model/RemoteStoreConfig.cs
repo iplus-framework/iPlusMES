@@ -8,7 +8,7 @@ namespace gip.mes.facility
 {
     [DataContract]
     [ACSerializeableInfo]
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'RemoteStoreConfig'}de{'RemoteStoreConfig'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'RemoteStoreConfig'}de{'RemoteStoreConfig'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class RemoteStoreConfig : INotifyPropertyChanged, IACObject
     {
         public RemoteStoreConfig()
