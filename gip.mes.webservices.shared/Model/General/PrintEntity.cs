@@ -19,7 +19,7 @@ namespace gip.mes.webservices
         }
 
         [DataMember]
-        public bool SkipPrinterCheck
+        public int MaxPrintJobsInSpooler
         {
             get; set;
         }

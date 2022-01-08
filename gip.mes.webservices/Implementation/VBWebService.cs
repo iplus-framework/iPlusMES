@@ -112,7 +112,7 @@ namespace gip.mes.webservices
                 }
             }
 
-            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount, vbUserName, printEntity.SkipPrinterCheck) as Msg;
+            Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount, vbUserName, printEntity.MaxPrintJobsInSpooler) as Msg;
             if (msg != null && msg.MessageLevel != eMsgLevel.Info)
             {
                 myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault; 

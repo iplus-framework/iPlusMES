@@ -263,6 +263,7 @@ namespace gip2006.variobatch.processapplication
                             IACPropertyNetTarget newTarget = null;
                             if (BindProperty("Waagen_Stat", scaleGravimetric.ActualWeightExternal as IACPropertyNetTarget, String.Format("W{0:000}_IST", AggrNo.ValueT), out newTarget).HasFlag(PropBindingBindingResult.TargetPropReplaced))
                             {
+                                scaleGravimetric.IsVisibleExtActualWeight.ValueT = true;
                             }
                         }
                     }
