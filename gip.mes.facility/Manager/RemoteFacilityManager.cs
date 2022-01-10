@@ -198,17 +198,27 @@ namespace gip.mes.facility
 
                     foreach (Picking remotePicking in changedRemotePickings)
                     {
-                        // TODO:
+                        if (!IsRemotePickingRequiredHere(acUrlOfCaller, remoteConnString, remoteStorePosting, dbRemote, dbLocal, remotePicking))
+                            continue;
+                        OnHandleRemotePicking(acUrlOfCaller, remoteConnString, remoteStorePosting, dbRemote, dbLocal, remotePicking);
                     }
 
-                    //Material m1 = dbRemote.Material.FirstOrDefault();
-                    //Material m2 = dbLocal.Material.FirstOrDefault();
                 }
             }
             catch (Exception e)
             {
                 Messages.LogException(this.GetACUrl(), "SynchronizeFacility", e);
             }
+        }
+
+        protected virtual bool IsRemotePickingRequiredHere(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting, DatabaseApp dbRemote, DatabaseApp dbLocal, Picking remotePicking)
+        {
+            return true;
+        }
+
+        protected virtual void OnHandleRemotePicking(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting, DatabaseApp dbRemote, DatabaseApp dbLocal, Picking remotePicking)
+        {
+            // TODO:
         }
         #endregion
 
