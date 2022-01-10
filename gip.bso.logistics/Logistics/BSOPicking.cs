@@ -20,6 +20,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Objects;
 using System.Linq;
 using static gip.core.datamodel.Global;
@@ -776,7 +777,7 @@ namespace gip.bso.logistics
                 if (_CurrentPickingPos != value)
                 {
                     _CurrentPickingPos = value;
-                    if (_CurrentPickingPos != null)
+                    if (_CurrentPickingPos != null && _CurrentPickingPos.EntityState != EntityState.Added)
                     {
                         _CurrentPickingPos.AutoRefresh();
                         if (_CurrentPickingPos.InOrderPos != null)
@@ -2293,6 +2294,8 @@ namespace gip.bso.logistics
             if (pickingPos != null)
                 CurrentPicking.PickingPos_Picking.Add(pickingPos);
             OnPropertyChanged("PickingPosList");
+            pickingPos.FromFacility = DefaultFromFacility;
+            pickingPos.ToFacility = DefaultToFacility;
             CurrentPickingPos = pickingPos;
             SelectedPickingPos = pickingPos;
         }
