@@ -260,7 +260,7 @@ namespace gip.bso.logistics
                 ACFilterItem acFilterDeliveryDateFrom = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.greaterThanOrEqual, Operators.and, "", true, false);
                 aCFilterItems.Add(acFilterDeliveryDateFrom);
 
-                ACFilterItem acFilterDeliveryDateTo = new ACFilterItem(FilterTypes.filter, "DeliveryDateFrom", LogicalOperators.lessThan, Operators.and, "", true, false);
+                ACFilterItem acFilterDeliveryDateTo = new ACFilterItem(FilterTypes.filter, "DeliveryDateTo", LogicalOperators.lessThan, Operators.and, "", true, false);
                 aCFilterItems.Add(acFilterDeliveryDateTo);
 
                 ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
@@ -322,48 +322,37 @@ namespace gip.bso.logistics
         {
             get
             {
-                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
-                if (filterItems.Length == 2)
-                {
-                    if (string.IsNullOrEmpty(filterItems[0].SearchWord))
-                        return null;
-                    else
-                    {
-                        DateTime? convValue = null;
-                        try
-                        {
-                            convValue = DateTime.ParseExact(filterItems[0].SearchWord, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
-                        }
-                        catch (Exception e)
-                        {
-                            convValue = DateTime.Parse(filterItems[0].SearchWord);
-                        }
-                        return convValue;
-                    }
-                }
-                else
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("DeliveryDateFrom");
+                if (String.IsNullOrEmpty(tmp))
                     return null;
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<DateTime>("DeliveryDateFrom");
             }
             set
             {
-                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
-                if (filterItems.Length == 2)
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("DeliveryDateFrom", LogicalOperators.greaterThanOrEqual);
+                if (String.IsNullOrEmpty(tmp))
                 {
-                    ACFilterItem filterDateFrom = filterItems[0];
-                    DateTime? currentValue = null;
-                    if (!string.IsNullOrEmpty(filterDateFrom.SearchWord))
-                        currentValue = DateTime.Parse(filterDateFrom.SearchWord);
-                    if (currentValue != value)
+                    if (value.HasValue)
                     {
-                        InFilterChange = true;
-
-                        if (value == null)
-                            filterDateFrom.SearchWord = null;
-                        else
-                            filterDateFrom.SearchWord = value.Value.ToString("o", CultureInfo.InvariantCulture);// value.Value.ToString("dd.MM.yyyy HH:mm:ss");
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual, value.Value);
                         OnPropertyChanged("FilterDateFrom");
-
-                        InFilterChange = false;
+                    }
+                }
+                else
+                {
+                    if (value.HasValue)
+                    {
+                        DateTime tmpdt = AccessInOrderPos.NavACQueryDefinition.GetSearchValue<DateTime>("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual);
+                        if (tmpdt != value)
+                        {
+                            AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual, value.Value);
+                            OnPropertyChanged("FilterDateFrom");
+                        }
+                    }
+                    else
+                    {
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual, "");
+                        OnPropertyChanged("FilterDateFrom");
                     }
                 }
             }
@@ -374,48 +363,37 @@ namespace gip.bso.logistics
         {
             get
             {
-                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
-                if (filterItems.Length == 2)
-                {
-                    if (string.IsNullOrEmpty(filterItems[1].SearchWord))
-                        return null;
-                    else
-                    {
-                        DateTime? convValue = null;
-                        try
-                        {
-                            convValue = DateTime.ParseExact(filterItems[0].SearchWord, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
-                        }
-                        catch (Exception e)
-                        {
-                            convValue = DateTime.Parse(filterItems[0].SearchWord);
-                        }
-                        return convValue;
-                    }
-                }
-                else
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("DeliveryDateTo");
+                if (String.IsNullOrEmpty(tmp))
                     return null;
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<DateTime>("DeliveryDateTo");
             }
             set
             {
-                ACFilterItem[] filterItems = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryDateFrom").ToArray();
-                if (filterItems.Length == 2)
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("DeliveryDateTo", LogicalOperators.lessThan);
+                if (String.IsNullOrEmpty(tmp))
                 {
-                    ACFilterItem filterDateTo = filterItems[1];
-                    DateTime? currentValue = null;
-                    if (!string.IsNullOrEmpty(filterDateTo.SearchWord))
-                        currentValue = DateTime.Parse(filterDateTo.SearchWord);
-                    if (currentValue != value)
+                    if (value.HasValue)
                     {
-                        InFilterChange = true;
-
-                        if (value == null)
-                            filterDateTo.SearchWord = null;
-                        else
-                            filterDateTo.SearchWord = value.Value.ToString("o", CultureInfo.InvariantCulture);
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateTo", Global.LogicalOperators.lessThan, value.Value);
                         OnPropertyChanged("FilterDateTo");
-
-                        InFilterChange = false;
+                    }
+                }
+                else
+                {
+                    if (value.HasValue)
+                    {
+                        DateTime tmpdt = AccessInOrderPos.NavACQueryDefinition.GetSearchValue<DateTime>("DeliveryDateTo", Global.LogicalOperators.lessThan);
+                        if (tmpdt != value)
+                        {
+                            AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateTo", Global.LogicalOperators.lessThan, value.Value);
+                            OnPropertyChanged("FilterDateTo");
+                        }
+                    }
+                    else
+                    {
+                        AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateTo", Global.LogicalOperators.lessThan, "");
+                        OnPropertyChanged("FilterDateTo");
                     }
                 }
             }
