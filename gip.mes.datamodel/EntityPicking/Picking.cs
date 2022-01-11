@@ -8,7 +8,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking Order'}de{'Kommissionierauftrag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPicking")]
     [ACPropertyEntity(1, "PickingNo", "en{'Picking-No.'}de{'Kommissions-Nr.'}", "", "", true)]
     [ACPropertyEntity(2, "PickingTypeIndex", "en{'Picking Type'}de{'Kommissioniertyp'}", typeof(GlobalApp.PickingType), Const.ContextDatabase + "\\PickingTypeList", "", true)]
-    [ACPropertyEntity(3, "PickingStateIndex", "en{'Picking Status'}de{'Status'}", typeof(PickingState), Const.ContextDatabase + "\\PickingStateList", "", true)]
+    [ACPropertyEntity(3, "PickingStateIndex", "en{'Picking Status'}de{'Status'}", typeof(PickingStateEnum), Const.ContextDatabase + "\\PickingStateList", "", true)]
     [ACPropertyEntity(4, "DeliveryDateFrom", "en{'Date from'}de{'Datum von'}", "", "", true)]
     [ACPropertyEntity(5, "DeliveryDateTo", "en{'Date to'}de{'Datum bis'}", "", "", true)]
     [ACPropertyEntity(6, "Comment", ConstApp.Comment, "", "", true)]
@@ -42,7 +42,7 @@ namespace gip.mes.datamodel
             entity.PickingID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.MDPickingType = MDPickingType.s_cQry_Default(dbApp).FirstOrDefault();
-            entity.PickingState = PickingState.New;
+            entity.PickingState = PickingStateEnum.New;
             entity.PickingNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
@@ -120,11 +120,11 @@ namespace gip.mes.datamodel
             }
         }
 
-        public PickingState PickingState
+        public PickingStateEnum PickingState
         {
             get
             {
-                return (PickingState)PickingStateIndex;
+                return (PickingStateEnum)PickingStateIndex;
             }
             set
             {

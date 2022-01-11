@@ -659,7 +659,7 @@ namespace gip.bso.manufacturing
                 double pickingPosQuantityUOM =
                     DatabaseApp
                     .Picking
-                    .Where(c => c.PickingStateIndex < (short)PickingState.Finished)
+                    .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished)
                     .SelectMany(c => c.PickingPos_Picking)
                     .Where(c => c.PickingMaterialID == materialID && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x=>posIDs.Contains(x.ProdorderPartslistPosID)))
                     .Select(c => c.PickingQuantityUOM ?? 0)
@@ -698,7 +698,7 @@ namespace gip.bso.manufacturing
                         .PickingPos
                         .Where(c =>
                                 c.PickingMaterialID == preparedMaterial.MaterialID
-                                && (c.Picking.PickingStateIndex < (short)PickingState.Finished)
+                                && (c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished)
                                 && c.FromFacility.FacilityNo == item.FacilityNo
                                )
                         .Select(c => c.PickingQuantityUOM ?? 0)
@@ -720,7 +720,7 @@ namespace gip.bso.manufacturing
                         .PickingPos
                         .Where(c =>
                                 c.PickingMaterialID == preparedMaterial.MaterialID
-                                && (c.Picking.PickingStateIndex < (short)PickingState.Finished)
+                                && (c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished)
                                ),
                         tmp => tmp.fc.FacilityID,
                         pp => pp.ToFacilityID,
@@ -745,7 +745,7 @@ namespace gip.bso.manufacturing
         {
             _PickingList = DatabaseApp
                 .Picking
-                .Where(c => c.PickingStateIndex < (short)PickingState.Finished)
+                .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished)
                 .OrderByDescending(c => c.InsertDate)
                 .ToList();
             _SelectedPicking = _PickingList.FirstOrDefault();
@@ -764,7 +764,7 @@ namespace gip.bso.manufacturing
             _PickingPosList = DatabaseApp
                .PickingPos
                .Where(c =>
-                    c.Picking.PickingStateIndex < (short)PickingState.Finished
+                    c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished
                     && c.PickingMaterialID == materialID
                     && (ShowAllPickingLines || (pickingID == null || (c.PickingID == (pickingID ?? Guid.Empty))))
                 )
@@ -928,7 +928,7 @@ namespace gip.bso.manufacturing
             {
                 PickingNo = "1006",
                 DeliveryDateFrom = DateTime.Now,
-                PickingState = PickingState.New
+                PickingState = PickingStateEnum.New
             });
             return list;
         }

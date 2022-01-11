@@ -14,7 +14,7 @@ namespace gip.mes.datamodel
     [DataContract]
 #endif
 
-    public enum PickingState : short
+    public enum PickingStateEnum : short
     {
         New = 0,
         InProcess = 1,
@@ -28,10 +28,10 @@ namespace gip.mes.datamodel
     {
         public ACValueListPickingStateEnum() : base("PickingState")
         {
-            AddEntry((short)PickingState.New, "en{'New'}de{'Neu'}");
-            AddEntry((short)PickingState.InProcess, "en{'In process'}de{'In Bearbeitung'}");
-            AddEntry((short)PickingState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
-            AddEntry((short)PickingState.Cancelled, "en{'Cancelled'}de{'Storniert'}");
+            AddEntry((short)PickingStateEnum.New, "en{'New'}de{'Neu'}");
+            AddEntry((short)PickingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
+            AddEntry((short)PickingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
+            AddEntry((short)PickingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
         }
     }
 }

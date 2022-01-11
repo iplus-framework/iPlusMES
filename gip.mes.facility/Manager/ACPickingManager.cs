@@ -2201,7 +2201,7 @@ namespace gip.mes.facility
                 return result;
             }
 
-            picking.PickingStateIndex = (short)PickingState.Finished;
+            picking.PickingStateIndex = (short)PickingStateEnum.Finished;
 
             // Close related documents
             if (HasRelatedDocuments(picking, out deliveryNote, out inOrder, out outOrder))

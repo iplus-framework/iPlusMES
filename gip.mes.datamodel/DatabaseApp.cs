@@ -992,7 +992,7 @@ namespace gip.mes.datamodel
             {
                 if (_PickingStateList == null)
                 {
-                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PickingState));
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(PickingStateEnum));
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _PickingStateList = enumClass.ACValueListForEnum;
                     else
