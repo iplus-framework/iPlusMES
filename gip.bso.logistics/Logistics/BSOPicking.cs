@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
+using System.Globalization;
 using System.Linq;
 using static gip.core.datamodel.Global;
 using gipCoreData = gip.core.datamodel;
@@ -95,10 +96,10 @@ namespace gip.bso.logistics
                     SelectedFilterMDPickingType = FilterMDPickingTypeList.FirstOrDefault(c => c.MDKey == pickingType);
                 }
                 object fromFacilityOb = Parameters["FromFacility"];
-                if(fromFacilityOb != null)
+                if (fromFacilityOb != null)
                 {
                     string fromFacility = fromFacilityOb.ToString();
-                    DefaultFromFacility = DatabaseApp.Facility.FirstOrDefault(c=>c.FacilityNo == fromFacility);
+                    DefaultFromFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == fromFacility);
                 }
                 object toFacilityOb = Parameters["ToFacility"];
                 if (toFacilityOb != null)
@@ -327,7 +328,18 @@ namespace gip.bso.logistics
                     if (string.IsNullOrEmpty(filterItems[0].SearchWord))
                         return null;
                     else
-                        return DateTime.Parse(filterItems[0].SearchWord);
+                    {
+                        DateTime? convValue = null;
+                        try
+                        {
+                            convValue = DateTime.ParseExact(filterItems[0].SearchWord, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
+                        }
+                        catch (Exception e)
+                        {
+                            convValue = DateTime.Parse(filterItems[0].SearchWord);
+                        }
+                        return convValue;
+                    }
                 }
                 else
                     return null;
@@ -348,7 +360,7 @@ namespace gip.bso.logistics
                         if (value == null)
                             filterDateFrom.SearchWord = null;
                         else
-                            filterDateFrom.SearchWord = value.Value.ToString("dd.MM.yyyy HH:mm:ss");
+                            filterDateFrom.SearchWord = value.Value.ToString("o", CultureInfo.InvariantCulture);// value.Value.ToString("dd.MM.yyyy HH:mm:ss");
                         OnPropertyChanged("FilterDateFrom");
 
                         InFilterChange = false;
@@ -368,7 +380,18 @@ namespace gip.bso.logistics
                     if (string.IsNullOrEmpty(filterItems[1].SearchWord))
                         return null;
                     else
-                        return DateTime.Parse(filterItems[1].SearchWord);
+                    {
+                        DateTime? convValue = null;
+                        try
+                        {
+                            convValue = DateTime.ParseExact(filterItems[0].SearchWord, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
+                        }
+                        catch (Exception e)
+                        {
+                            convValue = DateTime.Parse(filterItems[0].SearchWord);
+                        }
+                        return convValue;
+                    }
                 }
                 else
                     return null;
@@ -389,7 +412,7 @@ namespace gip.bso.logistics
                         if (value == null)
                             filterDateTo.SearchWord = null;
                         else
-                            filterDateTo.SearchWord = value.Value.ToString("dd.MM.yyyy HH:mm:ss");
+                            filterDateTo.SearchWord = value.Value.ToString("o", CultureInfo.InvariantCulture);
                         OnPropertyChanged("FilterDateTo");
 
                         InFilterChange = false;
@@ -2485,7 +2508,7 @@ namespace gip.bso.logistics
             {
                 double changedQuantity = 0;
                 FacilityCharge outwardFC = null;
-                
+
                 if (CurrentACMethodBooking != null)
                 {
                     if (CurrentACMethodBooking.OutwardQuantity.HasValue)

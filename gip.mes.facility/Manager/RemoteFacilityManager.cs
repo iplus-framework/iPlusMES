@@ -84,6 +84,8 @@ namespace gip.mes.facility
 
         protected void SynchronizeFacility(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting)
         {
+            ACPickingManager pickingManager = null;
+            FacilityManager facilityManager = null;
             try
             {
                 using (DatabaseApp dbRemote = new DatabaseApp(remoteConnString))
@@ -100,7 +102,7 @@ namespace gip.mes.facility
                     if (localFacility == null || localFacility.Facility1_ParentFacility == null)
                         return;
                     Facility remoteFacility = dbRemote.Facility.Include(c => c.Facility1_ParentFacility)
-                                      .Where(c => c.FacilityNo == localFacility.FacilityNo 
+                                      .Where(c => c.FacilityNo == localFacility.FacilityNo
                                                     && c.Facility1_ParentFacility != null
                                                     && c.Facility1_ParentFacility.FacilityNo == localFacility.Facility1_ParentFacility.FacilityNo)
                                      .FirstOrDefault();
@@ -174,6 +176,14 @@ namespace gip.mes.facility
                                             .Where(c => c.PickingID == entry.KeyId)
                                             .FirstOrDefault();
                                 // TODO: Unassign pos an delete Picking....
+                                if (localPicking != null)
+                                {
+                                    PickingPos[] localPickingLines = localPicking.PickingPos_Picking.ToArray();
+                                    foreach (PickingPos localPickingPos in localPickingLines)
+                                        pickingManager.UnassignPickingPos(localPickingPos, dbLocal);
+
+                                    localPicking.DeleteACObject(dbLocal, false);
+                                }
                             }
                         }
                     }
@@ -188,12 +198,50 @@ namespace gip.mes.facility
                         if (localFC == null)
                         {
                             // Add New
+                            FacilityLot localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.LotNo == changedRemoteFC.FacilityLot.LotNo);
+                            if (localLot == null)
+                            {
+                                localLot = FacilityLot.NewACObject(dbLocal, null, changedRemoteFC.FacilityLot.LotNo);
+                                localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
+                                localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
+                                localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
+                                dbLocal.FacilityLot.AddObject(localLot);
+
+                                localFC = FacilityCharge.NewACObject(dbLocal, localLot);
+                                dbLocal.FacilityCharge.AddObject(localFC);
+                            }
                         }
                         else if (localFC.NotAvailable)
                         {
                             // Restore
+                            // Restore -> Make charge available again
+                            ACMethodBooking bookReleaseStateFree = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ReleaseState_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                            bookReleaseStateFree.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbLocal, MDReleaseState.ReleaseStates.Free);
+                            ACMethodEventArgs resultRelaseFree = facilityManager.BookFacility(bookReleaseStateFree, dbLocal) as ACMethodEventArgs;
+                            if (!bookReleaseStateFree.ValidMessage.IsSucceded() || bookReleaseStateFree.ValidMessage.HasWarnings())
+                                Messages.Msg(bookReleaseStateFree.ValidMessage);
+                            else if (resultRelaseFree.ResultState == Global.ACMethodResultState.Failed || resultRelaseFree.ResultState == Global.ACMethodResultState.Notpossible)
+                            {
+                                if (String.IsNullOrEmpty(resultRelaseFree.ValidMessage.Message))
+                                    resultRelaseFree.ValidMessage.Message = resultRelaseFree.ResultState.ToString();
+                                Messages.Msg(resultRelaseFree.ValidMessage);
+                            }
                         }
                         // TODO: Booking to Absolute stock
+                        ACMethodBooking bookAbsolute = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InwardMovement_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                        bookAbsolute.QuantityIsAbsolute = true;
+                        bookAbsolute.InwardFacilityCharge = localFC;
+                        bookAbsolute.InwardTargetQuantity = changedRemoteFC.AvailableQuantity;
+
+                        ACMethodEventArgs resultAbsolute = facilityManager.BookFacility(bookAbsolute, dbLocal) as ACMethodEventArgs;
+                        if (!bookAbsolute.ValidMessage.IsSucceded() || bookAbsolute.ValidMessage.HasWarnings())
+                            Messages.Msg(bookAbsolute.ValidMessage);
+                        else if (resultAbsolute.ResultState == Global.ACMethodResultState.Failed || resultAbsolute.ResultState == Global.ACMethodResultState.Notpossible)
+                        {
+                            if (String.IsNullOrEmpty(resultAbsolute.ValidMessage.Message))
+                                resultAbsolute.ValidMessage.Message = resultAbsolute.ResultState.ToString();
+                            Messages.Msg(resultAbsolute.ValidMessage);
+                        }
                     }
 
                     foreach (Picking remotePicking in changedRemotePickings)
@@ -201,8 +249,57 @@ namespace gip.mes.facility
                         if (!IsRemotePickingRequiredHere(acUrlOfCaller, remoteConnString, remoteStorePosting, dbRemote, dbLocal, remotePicking))
                             continue;
                         OnHandleRemotePicking(acUrlOfCaller, remoteConnString, remoteStorePosting, dbRemote, dbLocal, remotePicking);
-                    }
+                        Picking localPicking = dbLocal.Picking.FirstOrDefault(c => c.PickingID == remotePicking.PickingID);
+                        if (localPicking == null)
+                        {
+                            // TODO: Check PickingNo - if duplicate with same PickingNo and different KeyOfExtSys exist ?? 
+                            localPicking = Picking.NewACObject(dbLocal, null, remotePicking.PickingNo);
+                            localPicking.PickingID = remotePicking.PickingID;
+                            localPicking.KeyOfExtSys = remotePicking.KeyOfExtSys;
+                            dbLocal.Picking.AddObject(localPicking);
+                        }
 
+                        localPicking.MDPickingType = dbLocal.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == remotePicking.MDPickingType.MDPickingTypeIndex);
+                        localPicking.DeliveryDateFrom = remotePicking.DeliveryDateFrom;
+                        CompanyAddress companyAddress = dbLocal.CompanyAddress.FirstOrDefault(c => c.Company.KeyOfExtSys == remotePicking.DeliveryCompanyAddress.Company.KeyOfExtSys);
+                        remotePicking.DeliveryCompanyAddress = companyAddress;
+                        localPicking.PickingStateIndex = remotePicking.PickingStateIndex;
+
+                        // updating pos
+                        Guid[] remotePosIDs = remotePicking.PickingPos_Picking.Select(c => c.PickingPosID).ToArray();
+                        Guid[] localPosIDs = localPicking.PickingPos_Picking.Select(c => c.PickingPosID).ToArray();
+
+
+                        Guid[] localPosIDsForDelete = localPosIDs.Where(c => !remotePosIDs.Contains(c)).ToArray();
+                        foreach (Guid posID in localPosIDsForDelete)
+                        {
+                            PickingPos posForDelete = localPicking.PickingPos_Picking.Where(c => c.PickingPosID == posID).FirstOrDefault();
+                            localPicking.PickingPos_Picking.Remove(posForDelete);
+                            posForDelete.DeleteACObject(dbLocal, false);
+                        }
+
+                        foreach (Guid posID in remotePosIDs)
+                        {
+                            PickingPos remotePos = remotePicking.PickingPos_Picking.FirstOrDefault(c => c.PickingPosID == posID);
+                            PickingPos localPos = localPicking.PickingPos_Picking.FirstOrDefault(c => c.PickingPosID == posID);
+                            if (localPos == null)
+                            {
+                                localPos = PickingPos.NewACObject(dbLocal, localPicking);
+                                localPicking.PickingPos_Picking.Add(localPos);
+                            }
+                            localPos.PickingMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialNo == remotePos.PickingMaterial.MaterialNo);
+                            localPos.PickingQuantityUOM = remotePos.PickingQuantityUOM;
+                            localPos.Sequence = remotePos.Sequence;
+                            if (remotePos.FromFacility != null)
+                                localPos.FromFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.FromFacility.FacilityNo);
+                            else
+                                localPos.FromFacility = null;
+                            if (remotePos.ToFacility != null)
+                                localPos.ToFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.ToFacility.FacilityNo);
+                            else
+                                localPos.ToFacility = null;
+                        }
+                    }
                 }
             }
             catch (Exception e)
