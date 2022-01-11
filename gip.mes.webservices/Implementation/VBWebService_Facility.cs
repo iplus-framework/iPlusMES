@@ -1001,6 +1001,16 @@ namespace gip.mes.webservices
                             postedQuantity = acParam.InwardQuantity.Value;
                         pickingManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
                         msgWithDetails = dbApp.ACSaveChangesWithRetry();
+
+                        if (msgWithDetails == null)
+                        {
+                            datamodel.FacilityCharge outwardFC = acParam.OutwardFacilityCharge;
+                            if (outwardFC != null)
+                            {
+                                msgWithDetails = pickingManager.IsQuantStockConsumed(outwardFC, dbApp);
+                                return msgWithDetails;
+                            }
+                        }
                     }
                     else if (acParam.PartslistPos != null)
                     {
@@ -1065,9 +1075,13 @@ namespace gip.mes.webservices
                     MsgWithDetails msg = Book(bpParam, dbApp, facManager, myServiceHost);
                     if (msg != null)
                     {
+                        Msg message = new Msg(msg.MessageLevel, msg.Message) { MessageButton = msg.MessageButton };
+                        msgWithDetails.AddDetailMessage(message);
+
                         foreach (Msg m in msg.MsgDetails)
                         {
-                            msgWithDetails.AddDetailMessage(m);
+                            message = new Msg(m.MessageLevel, m.Message);
+                            msgWithDetails.AddDetailMessage(message);
                         }
                     }
                 }

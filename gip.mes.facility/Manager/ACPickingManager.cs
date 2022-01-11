@@ -173,6 +173,17 @@ namespace gip.mes.facility
             return _BookParamPickingOutwardMovementClone;
         }
 
+        private ACMethodBooking _BookParamZeroStockFacilityChargeClone;
+        public ACMethodBooking BookParamZeroStockFacilityChargeClone(ACComponent facilityManager, DatabaseApp dbApp)
+        {
+            if (_BookParamZeroStockFacilityChargeClone != null)
+                return _BookParamZeroStockFacilityChargeClone;
+
+            _BookParamZeroStockFacilityChargeClone = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamZeroStockFacilityChargeClone.Database = dbApp;
+
+            return _BookParamZeroStockFacilityChargeClone;
+        }
 
         #endregion
 
@@ -1665,6 +1676,17 @@ namespace gip.mes.facility
                 pickingPos.MDDelivPosLoadState = MDDelivPosLoadState.DefaultMDDelivPosLoadState(dbApp);
             msgWithDetails = dbApp.ACSaveChanges();
             return msgWithDetails;
+        }
+
+        public MsgWithDetails IsQuantStockConsumed(FacilityCharge fc, DatabaseApp dbApp)
+        {
+            if (fc != null && fc.StockQuantity <= 0.00001)
+            {
+                //Question50079 :The quant stock is negative. Is quant spent?
+                return new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "IsQauntStockConsumed", 1647, "Question50079", eMsgButton.YesNo);
+            }
+
+            return null;
         }
 
         #endregion

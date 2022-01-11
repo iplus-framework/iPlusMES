@@ -2484,18 +2484,51 @@ namespace gip.bso.logistics
             else
             {
                 double changedQuantity = 0;
+                FacilityCharge outwardFC = null;
+                
                 if (CurrentACMethodBooking != null)
                 {
                     if (CurrentACMethodBooking.OutwardQuantity.HasValue)
                         changedQuantity = CurrentACMethodBooking.OutwardQuantity.Value;
                     else if (CurrentACMethodBooking.InwardQuantity.HasValue)
                         changedQuantity = CurrentACMethodBooking.InwardQuantity.Value;
+
+                    outwardFC = CurrentACMethodBooking.OutwardFacilityCharge;
                 }
 
                 DeleteFacilityPreBooking();
                 OnPropertyChanged("FacilityBookingList");
                 PickingManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, isCancellation, true);
                 Save();
+
+                Msg msg = PickingManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
+                if (msg != null)
+                {
+                    if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                    {
+                        if (ACFacilityManager == null)
+                            return;
+
+                        ACMethodBooking fbtZeroBooking = PickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, DatabaseApp);
+                        ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
+
+                        fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
+                        fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                        ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, DatabaseApp);
+                        if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                        {
+                            //return fbtZeroBooking.ValidMessage;
+                        }
+                        else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+                        {
+                            if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                                result.ValidMessage.Message = result.ResultState.ToString();
+
+                            //return result.ValidMessage;
+                        }
+                    }
+                }
             }
             PostExecute("BookCurrentACMethodBooking");
         }

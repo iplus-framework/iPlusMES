@@ -163,6 +163,24 @@ namespace gip.bso.masterdata
 
         #endregion
 
+
+        //[ACMethodInteraction("", "en{'Print labels for child facilites'}de{'Print labels for child facilites'}", 800, true)]
+        //public void PrintLabelsForChildFacilities()
+        //{
+        //    var items = CurrentFacility.VisibleItemsT;
+
+        //    foreach(var item in items)
+        //    {
+
+        //    }
+        //}
+
+        //public bool IsEnabledPrintLabelsForChildFacilities()
+        //{
+        //    return CurrentFacility != null;
+        //}
+
+
         #endregion
 
         #endregion
