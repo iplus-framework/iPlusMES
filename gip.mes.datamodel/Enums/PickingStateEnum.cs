@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Picking state'}de{'Buchungsverhalten'}", Global.ACKinds.TACEnumACValueList)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking state'}de{'Zustand der Kommissionierung'}", Global.ACKinds.TACEnumACValueList)]
     public class ACValueListPickingStateEnum : ACValueItemList
     {
         public ACValueListPickingStateEnum() : base("PickingState")
