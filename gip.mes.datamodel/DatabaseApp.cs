@@ -657,12 +657,23 @@ namespace gip.mes.datamodel
             }
         }
 
+        private IEnumerable<ACValueItem> _MovementReasonsList;
+
         [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> MovementReasonsList
         {
             get
             {
-                return gip.mes.datamodel.MDMovementReason.MovementReasonsList;
+
+                if (_MovementReasonsList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(MDMovementReason));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _MovementReasonsList = enumClass.ACValueListForEnum;
+                    else
+                        _MovementReasonsList = new ACValueListPickingStateEnum();
+                }
+                return _MovementReasonsList;
             }
         }
 
@@ -1014,7 +1025,7 @@ namespace gip.mes.datamodel
                     else
                         _PostingBehaviourEnumList = new ACValueListPostingBehaviourEnum();
                 }
-                return _PostingBehaviourEnumList;            
+                return _PostingBehaviourEnumList;
             }
         }
 
@@ -1026,7 +1037,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                using (ACMonitor.Lock(QueryLock_1X000)) 
+                using (ACMonitor.Lock(QueryLock_1X000))
                 {
                     return this.CompanyAddress.Where(c => c.IsFactory && c.Company.IsOwnCompany);
                 }

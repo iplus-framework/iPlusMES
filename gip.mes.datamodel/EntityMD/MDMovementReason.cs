@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
-    [ACPropertyEntity(4, "MDMovementReasonIndex", ConstApp.ESMovementReason, typeof(MDMovementReason.MovementReasons), Const.ContextDatabase + "\\MovementReasonsList", "", true, MinValue = (short)MovementReasons.Adjustment)]
+    [ACPropertyEntity(4, "MDMovementReasonIndex", ConstApp.ESMovementReason, typeof(MovementReasonsEnum), Const.ContextDatabase + "\\MovementReasonsList", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDMovementReasonID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
-            entity.MovementReason = MovementReasons.Adjustment;
+            entity.MovementReason = MovementReasonsEnum.Adjustment;
             entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
             return entity;
         }
@@ -50,7 +50,7 @@ namespace gip.mes.datamodel
             {
                 MDMovementReason defaultObj = s_cQry_Default(dbApp).FirstOrDefault();
                 if (defaultObj == null)
-                    defaultObj = s_cQry_Index(dbApp, (short)MovementReasons.Adjustment).FirstOrDefault();
+                    defaultObj = s_cQry_Index(dbApp, (short)MovementReasonsEnum.Adjustment).FirstOrDefault();
                 return defaultObj;
             }
             catch (Exception ec)
@@ -135,11 +135,11 @@ namespace gip.mes.datamodel
         #endregion
 
         #region enums
-        public MovementReasons MovementReason
+        public MovementReasonsEnum MovementReason
         {
             get
             {
-                return (MovementReasons)MDMovementReasonIndex;
+                return (MovementReasonsEnum)MDMovementReasonIndex;
             }
             set
             {
@@ -148,57 +148,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        /// <summary>
-        /// Enum für das Feld MDMovementReasonIndex
-        /// </summary>
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'MovementReasons'}de{'MovementReasons'}", Global.ACKinds.TACEnum)]
-        public enum MovementReasons : short
-        {
-            Adjustment = 1, //Korrektur
-            ZeroStock = 2, //Nullbestand
-            Enabling = 3, //Freigabe
-            Blocking = 4, //Sperrung            
-            Consumption = 5, //Verbrauch
-            Production = 6, //Herstellung
-            GoodsReceipt = 7, //Wareneingang
-            GoodsIssue = 8, //Warenausgang           
-            Relocation = 9, //Warenumlagerung
-            Inventory = 10, //Inventur
-            ConsumptionWithoutBalance = 11, //Verbrauch ohne Bilanz
-            ProductionWithoutBalance = 12, //Herstellung ohne Bilanz
-            CorrectionFromERP = 90,
-            Reject = 100
-        }
-
-        static ACValueItemList _MovementReasonsList = null;
-
-        /// <summary>
-        /// Gibt eine Liste mit Übersetzungen an die GUI zurück
-        /// </summary>
-        public static ACValueItemList MovementReasonsList
-        {
-            get
-            {
-                if (_MovementReasonsList == null)
-                {
-                    _MovementReasonsList = new ACValueItemList("MovementReasons");
-                    _MovementReasonsList.AddEntry(MovementReasons.Adjustment, "en{'Adjustment'}de{'Korrektur'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.ZeroStock, "en{'Zero Stock'}de{'Nullbestand'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Enabling, "en{'Enabling'}de{'Freigabe'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Blocking, "en{'Blocking'}de{'Sperrung'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Consumption, "en{'Consumption'}de{'Verbrauch'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Production, "en{'Production'}de{'Herstellung'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.GoodsReceipt, "en{'Goods Receipt'}de{'Wareneingang'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.GoodsIssue, "en{'Goods Issue'}de{'Warenausgang'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Relocation, "en{'Relocation'}de{'Umlagerung'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Inventory, "en{'Inventory'}de{'Inventur'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.ConsumptionWithoutBalance, "en{'Consumption Without Balance'}de{'Verbrauch ohne Bilanz'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.ProductionWithoutBalance, "en{'Production Without Balance'}de{'Herstellung ohne Bilanz'}");
-                    _MovementReasonsList.AddEntry(MovementReasons.Reject, "en{'Reject'}de{'Ausschuss'}");
-                }
-                return _MovementReasonsList;
-            }
-        }
         #endregion
 
     }

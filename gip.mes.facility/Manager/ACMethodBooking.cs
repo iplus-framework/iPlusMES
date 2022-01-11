@@ -2990,7 +2990,7 @@ namespace gip.mes.facility
                     && (ParamsAdjusted.OutwardFacility.OutwardEnabled == false && !ParamsAdjusted.IgnoreIsEnabled)
                     && (MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.Off)
                     && (ParamsAdjusted.MDMovementReason == null
-                        || ParamsAdjusted.MDMovementReason.MovementReason != datamodel.MDMovementReason.MovementReasons.Inventory)) // Keine Nullbestandsbuchung
+                        || ParamsAdjusted.MDMovementReason.MovementReason != MovementReasonsEnum.Inventory)) // Keine Nullbestandsbuchung
                 {
                     AddBookingMessage(eResultCodes.ProhibitedBooking,
                             Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00025",
@@ -3016,7 +3016,7 @@ namespace gip.mes.facility
                     && (ParamsAdjusted.InwardFacility.InwardEnabled == false && !ParamsAdjusted.IgnoreIsEnabled)
                     && (MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.Off)
                     && (ParamsAdjusted.MDMovementReason == null
-                        || ParamsAdjusted.MDMovementReason.MovementReason != datamodel.MDMovementReason.MovementReasons.Inventory)) // Keine Nullbestandsbuchung
+                        || ParamsAdjusted.MDMovementReason.MovementReason != MovementReasonsEnum.Inventory)) // Keine Nullbestandsbuchung
                 {
                     AddBookingMessage(eResultCodes.ProhibitedBooking,
                             Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00024",

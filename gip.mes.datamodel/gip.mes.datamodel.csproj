@@ -112,6 +112,7 @@
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
+    <Compile Include="Enums\MovementReasonsEnum.cs" />
     <Compile Include="Enums\PickingStateEnum.cs" />
     <Compile Include="Enums\PostingBehaviourEnum.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
