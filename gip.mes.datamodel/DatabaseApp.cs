@@ -671,7 +671,7 @@ namespace gip.mes.datamodel
                     if (enumClass != null && enumClass.ACValueListForEnum != null)
                         _MovementReasonsList = enumClass.ACValueListForEnum;
                     else
-                        _MovementReasonsList = new ACValueListPickingStateEnum();
+                        _MovementReasonsList = new ACValueListMovementReasonsEnum();
                 }
                 return _MovementReasonsList;
             }
