@@ -752,7 +752,7 @@ namespace gip.bso.logistics
 
         public virtual bool IsEnabledFinishOrder()
         {
-            return CurrentPicking != null && CurrentPicking.PickingStateIndex < (short)GlobalApp.PickingState.Finished;
+            return CurrentPicking != null && CurrentPicking.PickingStateIndex < (short)PickingState.Finished;
         }
 
         #endregion
@@ -2133,9 +2133,9 @@ namespace gip.bso.logistics
             }
 
             if (countCancelled == countAssigned
-                && CurrentPicking.PickingState != GlobalApp.PickingState.Cancelled)
+                && CurrentPicking.PickingState != PickingState.Cancelled)
             {
-                CurrentPicking.PickingState = GlobalApp.PickingState.Cancelled;
+                CurrentPicking.PickingState = PickingState.Cancelled;
                 Save();
             }
 
@@ -2149,7 +2149,7 @@ namespace gip.bso.logistics
         {
             if (CurrentPicking == null)
                 return false;
-            if (CurrentPicking.PickingState == GlobalApp.PickingState.Cancelled)
+            if (CurrentPicking.PickingState == PickingState.Cancelled)
                 return false;
             if (!PickingPosList.Any())
                 return false;
@@ -3143,7 +3143,7 @@ namespace gip.bso.logistics
         {
             if (this.CurrentPicking == null
                 || CurrentPicking.ACClassMethod == null
-                || this.CurrentPicking.PickingState >= GlobalApp.PickingState.InProcess
+                || this.CurrentPicking.PickingState >= PickingState.InProcess
                 || PickingPosList == null
                 || !PickingPosList.Any()
                 || PickingManager == null)
