@@ -480,7 +480,7 @@ namespace gip.mes.facility
                 }
             }
 
-            currentPicking.PickingState = PickingState.InProcess;
+            currentPicking.PickingState = PickingStateEnum.InProcess;
             currentPicking.VisitorVoucher = currentVisitorVoucher;
 
             PostExecute("AssignPicking");
@@ -563,7 +563,7 @@ namespace gip.mes.facility
                 }
             }
 
-            currentPicking.PickingState = PickingState.New;
+            currentPicking.PickingState = PickingStateEnum.New;
             currentPicking.VisitorVoucher = null;
 
             PostExecute("UnassignPicking");
