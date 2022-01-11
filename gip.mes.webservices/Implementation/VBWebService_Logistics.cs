@@ -62,7 +62,7 @@ namespace gip.mes.webservices
                         .Include("PickingPos_Picking.PickingMaterial")
                         .Include("PickingPos_Picking.PickingMaterial.BaseMDUnit")
                         .Where(c => (!pickingID.HasValue || c.PickingID == pickingID)
-                                    && (pickingID.HasValue || (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess))
+                                    && (pickingID.HasValue || (c.PickingStateIndex == (short)PickingState.New || c.PickingStateIndex == (short)PickingState.InProcess))
                               )
         );
 
@@ -249,7 +249,7 @@ namespace gip.mes.webservices
                                     && ((toFacility == Guid.Empty || (c.PickingPos_Picking.Any(x => x.ToFacilityID == toFacility || (x.ToFacility.ParentFacilityID.HasValue && x.ToFacility.ParentFacilityID == toFacility))))
                                     && (fromDate == null || c.DeliveryDateFrom >= fromDate)
                                     && (toDate == null || c.DeliveryDateTo <= toDate)
-                                    && (c.PickingStateIndex == (short)GlobalApp.PickingState.New || c.PickingStateIndex == (short)GlobalApp.PickingState.InProcess))
+                                    && (c.PickingStateIndex == (short)PickingState.New || c.PickingStateIndex == (short)PickingState.InProcess))
                               )
         ));
 
