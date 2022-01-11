@@ -973,12 +973,21 @@ namespace gip.mes.datamodel
             }
         }
 
+        private ACValueItemList _PickingStateList;
         [ACPropertyInfo(9999)]
-        public IEnumerable<ACValueItem> PickingStateList
+        public ACValueItemList PickingStateList
         {
             get
             {
-                return GlobalApp.PickingStateList;
+                if (_PickingStateList == null)
+                {
+                    gip.core.datamodel.ACClass enumClass = Database.GlobalDatabase.GetACType(typeof(GlobalApp.PickingState));
+                    if (enumClass != null && enumClass.ACValueListForEnum != null)
+                        _PickingStateList = enumClass.ACValueListForEnum;
+                    else
+                        _PickingStateList = new ACValueListPickingStateEnum();
+                }
+                return _PickingStateList;
             }
         }
 

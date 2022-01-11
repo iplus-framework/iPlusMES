@@ -524,7 +524,7 @@ namespace gip.bso.logistics
 
         private List<ACValueItem> LoadFilterPickingStateList()
         {
-            return GlobalApp.PickingStateList.ToList();
+            return DatabaseApp.PickingStateList;
         }
 
         #endregion

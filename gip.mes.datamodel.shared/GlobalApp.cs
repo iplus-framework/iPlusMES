@@ -1221,7 +1221,7 @@ namespace gip.mes.datamodel
         /// </summary>
 #if NETFRAMEWORK
         [ACSerializeableInfo]
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'Picking state'}de{'Kommissionsstatus'}", Global.ACKinds.TACEnum)]
+        [ACClassInfo(Const.PackName_VarioSystem, "en{'Picking state'}de{'Kommissionsstatus'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.datamodel.ACValueListPickingStateEnum")]
 #else
         [DataContract]
 #endif
@@ -1234,29 +1234,29 @@ namespace gip.mes.datamodel
             Cancelled = 3,
         }
 
-#if NETFRAMEWORK
-        static ACValueItemList _PickingStateList = null;
-        /// <summary>
-        /// Gibt eine Liste aller Enums zurück, damit die Gui
-        /// damit arbeiten kann.
-        /// </summary>
-        static public ACValueItemList PickingStateList
-        {
-            get
-            {
-                if (GlobalApp._PickingStateList == null)
-                {
+//#if NETFRAMEWORK
+//        static ACValueItemList _PickingStateList = null;
+//        /// <summary>
+//        /// Gibt eine Liste aller Enums zurück, damit die Gui
+//        /// damit arbeiten kann.
+//        /// </summary>
+//        static public ACValueItemList PickingStateList
+//        {
+//            get
+//            {
+//                if (GlobalApp._PickingStateList == null)
+//                {
 
-                    GlobalApp._PickingStateList = new ACValueItemList("PickingStateIndex");
-                    GlobalApp._PickingStateList.AddEntry((short)PickingState.New, "en{'New'}de{'Neu'}");
-                    GlobalApp._PickingStateList.AddEntry((short)PickingState.InProcess, "en{'In process'}de{'In Bearbeitung'}");
-                    GlobalApp._PickingStateList.AddEntry((short)PickingState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
-                    GlobalApp._PickingStateList.AddEntry((short)PickingState.Cancelled, "en{'Cancelled'}de{'Storniert'}");
-                }
-                return GlobalApp._PickingStateList;
-            }
-        }
-#endif
+//                    GlobalApp._PickingStateList = new ACValueItemList("PickingStateIndex");
+//                    GlobalApp._PickingStateList.AddEntry((short)PickingState.New, "en{'New'}de{'Neu'}");
+//                    GlobalApp._PickingStateList.AddEntry((short)PickingState.InProcess, "en{'In process'}de{'In Bearbeitung'}");
+//                    GlobalApp._PickingStateList.AddEntry((short)PickingState.Finished, "en{'Finished'}de{'Fertiggestellt'}");
+//                    GlobalApp._PickingStateList.AddEntry((short)PickingState.Cancelled, "en{'Cancelled'}de{'Storniert'}");
+//                }
+//                return GlobalApp._PickingStateList;
+//            }
+//        }
+//#endif
         #endregion
 
         #region BatchPlanMode
