@@ -24,7 +24,7 @@ namespace gip.mes.datamodel
             if (parentACObject != null)
                 if (parentACObject is MDSchedulingGroup)
                     entity.MDSchedulingGroup = (parentACObject as MDSchedulingGroup);
-            entity.SetInsertAndUpdateInfo(Database.Initials, db);
+            entity.SetInsertAndUpdateInfo(db.UserName, db);
             return entity;
         }
 

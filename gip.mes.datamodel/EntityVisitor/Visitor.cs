@@ -45,7 +45,7 @@ namespace gip.mes.datamodel
             {
                 entity.VisitedCompany = parentACObject as Company;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

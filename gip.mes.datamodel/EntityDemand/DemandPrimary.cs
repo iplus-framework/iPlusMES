@@ -28,7 +28,7 @@ namespace gip.mes.datamodel
             entity.DemandPrimaryID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.DemandPrimaryNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

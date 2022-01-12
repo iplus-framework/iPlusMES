@@ -516,6 +516,9 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
+                    var subResponse = SetDatabaseUserName<MsgWithDetails>(dbApp);
+                    if (subResponse != null)
+                        return subResponse;
                     datamodel.Picking picking = dbApp.Picking.FirstOrDefault(c => c.PickingID == pickingID);
                     if (picking == null)
                     {
@@ -559,6 +562,9 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
+                    var subResponse = SetDatabaseUserName<MsgWithDetails>(dbApp);
+                    if (subResponse != null)
+                        return subResponse;
                     datamodel.Picking picking = dbApp.Picking.FirstOrDefault(c => c.PickingID == pickingID);
                     if (picking == null)
                     {

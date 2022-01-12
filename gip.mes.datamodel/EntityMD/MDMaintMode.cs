@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDMaintModeID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.MaintMode = MaintModes.TimeOnly;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

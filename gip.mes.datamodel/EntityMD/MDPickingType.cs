@@ -32,7 +32,7 @@ namespace gip.mes.datamodel
             entity.MDPickingTypeID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.MDPickingTypeIndex = (short)GlobalApp.PickingType.AutomaticRelocation;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

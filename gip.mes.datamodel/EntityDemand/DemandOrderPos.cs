@@ -71,7 +71,7 @@ namespace gip.mes.datamodel
                 }
                 entity.DemandOrder = demandOrder;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

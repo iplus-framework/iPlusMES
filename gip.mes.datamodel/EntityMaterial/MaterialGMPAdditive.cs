@@ -51,7 +51,7 @@ namespace gip.mes.datamodel
 
                 entity.Material = material;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

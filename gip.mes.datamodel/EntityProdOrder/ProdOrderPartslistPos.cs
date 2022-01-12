@@ -62,7 +62,7 @@ namespace gip.mes.datamodel
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.InwardPartIntern;
                 parentPos.ProdOrderPartslistPos_ParentProdOrderPartslistPos.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

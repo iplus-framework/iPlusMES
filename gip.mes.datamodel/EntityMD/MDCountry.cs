@@ -36,7 +36,7 @@ namespace gip.mes.datamodel
             entity.MDCountryID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

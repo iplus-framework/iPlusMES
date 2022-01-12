@@ -60,7 +60,7 @@ namespace gip.mes.datamodel
             entity.DeliveryDate = DateTime.Now;
             entity.MDTourplanState = MDTourplanState.DefaultMDTourplanState(dbApp);
             entity.MDTour = dbApp.MDTour.First();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

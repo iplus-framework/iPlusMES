@@ -52,7 +52,7 @@ namespace gip.mes.datamodel
             entity.MDCountry = MDCountry.DefaultMDCountry(dbApp);
             entity.MDCountryLand = MDCountryLand.DefaultMDCountryLand(dbApp);
             entity.MDDelivType = MDDelivType.DefaultMDDelivType(dbApp);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -112,7 +112,7 @@ namespace gip.mes.datamodel
             entity.IsIntermediate = false;
             entity.ZeroBookingTolerance = 0;
             entity.SpecHeatCapacity = 0;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -41,7 +41,7 @@ namespace gip.mes.datamodel
             //entity.Rounding = 0;
             //entity.IsQuantityUnit = true;
             entity.SortIndex = System.Convert.ToInt16(dbApp.MDUnit.Count() + 1);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

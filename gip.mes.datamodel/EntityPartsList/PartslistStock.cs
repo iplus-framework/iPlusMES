@@ -78,7 +78,7 @@ namespace gip.mes.datamodel
             {
                 entity.Partslist = parentACObject as Partslist;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDTransportModeID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.TransportMode = TransportModes.Truck;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

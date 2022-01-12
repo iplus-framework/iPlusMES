@@ -84,7 +84,7 @@ namespace gip.mes.datamodel
             entity.MDInOrderPosState = MDInOrderPosState.DefaultMDInOrderPosState(dbApp);
 
             entity.MDDelivPosState = MDDelivPosState.DefaultMDDelivPosState(dbApp);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

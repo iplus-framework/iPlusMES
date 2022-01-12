@@ -384,5 +384,27 @@ namespace gip.mes.webservices
             }
             return response;
         }
+
+        protected WSResponse<T> SetDatabaseUserName<T>(DatabaseApp dbApp)
+        {
+            if (dbApp == null)
+                return null;
+            var userRights = InvokingUser;
+            if (userRights == null)
+                return new WSResponse<T>(default(T), WSResponse<MsgWithDetails>.LoginAgainMessage);
+            dbApp.UserName = userRights.Initials;
+            return null;
+        }
+
+        protected WSResponse<T> SetDatabaseUserName<T>(DatabaseApp dbApp, PAJsonServiceHostVB myServiceHost)
+        {
+            if (dbApp == null || myServiceHost == null)
+                return null;
+            VBUserRights userRights = GetInvokingUser(myServiceHost);
+            if (userRights == null)
+                return new WSResponse<T>(default(T), WSResponse<MsgWithDetails>.LoginAgainMessage);
+            dbApp.UserName = userRights.Initials;
+            return null;
+        }
     }
 }

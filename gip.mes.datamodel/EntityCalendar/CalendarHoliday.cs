@@ -34,7 +34,7 @@ namespace gip.mes.datamodel
                 Calendar calendar = parentACObject as Calendar;
                 entity.Calendar = calendar;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

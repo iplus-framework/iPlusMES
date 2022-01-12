@@ -35,7 +35,7 @@ namespace gip.mes.datamodel
                 entity.MDCountry = parentACObject as MDCountry;
             }
             entity.DateFrom = DateTime.Now;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

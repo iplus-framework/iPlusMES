@@ -39,7 +39,7 @@ namespace gip.mes.datamodel
             entity.MDDemandOrderState = MDDemandOrderState.DefaultMDDemandOrderState(dbApp);
             entity.DemandOrderNo = secondaryKey;
             entity.DemandOrderName = "<TODO>";
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

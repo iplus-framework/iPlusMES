@@ -43,7 +43,7 @@ namespace gip.mes.datamodel
             {
                 entity.InOrder = parentACObject as InOrder;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -50,7 +50,7 @@ namespace gip.mes.datamodel
                     entity.Sequence = 1;
                 entity.InOrderPos = inOrderPos;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

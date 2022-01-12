@@ -25,7 +25,7 @@ namespace gip.mes.datamodel
                 Label label = parentACObject as Label;
                 labelTrans.Label = label;
             }
-            labelTrans.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            labelTrans.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return labelTrans;
         }
 

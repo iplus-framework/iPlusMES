@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
                 material.MaterialCalculation_Material.Add(entity);
                 entity.MaterialCalculationNo = secondaryKey;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

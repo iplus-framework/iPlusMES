@@ -62,7 +62,7 @@ namespace gip.mes.datamodel
                 parentProdOrderPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(entity);
                 parentProdOrderPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

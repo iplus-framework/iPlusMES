@@ -28,7 +28,7 @@ namespace gip.mes.datamodel
             MDSchedulingGroup entity = new MDSchedulingGroup();
             entity.MDSchedulingGroupID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, db);
+            entity.SetInsertAndUpdateInfo(db.UserName, db);
             return entity;
         }
 

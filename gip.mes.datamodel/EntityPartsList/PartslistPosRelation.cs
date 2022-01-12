@@ -31,7 +31,7 @@ namespace gip.mes.datamodel
             if (parentACObject != null)
                 entity.TargetPartslistPos = parentACObject as PartslistPos;
 
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

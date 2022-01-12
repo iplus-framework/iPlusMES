@@ -34,7 +34,7 @@ namespace gip.mes.datamodel
             Calendar entity = new Calendar();
             entity.CalendarID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

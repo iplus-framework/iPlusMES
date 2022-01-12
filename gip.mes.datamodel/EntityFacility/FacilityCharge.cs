@@ -83,7 +83,7 @@ namespace gip.mes.datamodel
                 Partslist Partslist = parentACObject as Partslist;
                 entity.CloneFrom(dbApp, null, null, null, Partslist, true);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

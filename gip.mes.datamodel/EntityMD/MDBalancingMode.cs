@@ -30,7 +30,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
             entity.MDBalancingModeIndex = (Int16)BalancingModes.InwardOn_OutwardOn;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

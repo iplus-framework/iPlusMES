@@ -47,7 +47,7 @@ namespace gip.mes.datamodel
                 invoice.InvoicePos_Invoice.Add(entity);
             }
             entity.XMLDesign = Invoice.Const_XMLDesign;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

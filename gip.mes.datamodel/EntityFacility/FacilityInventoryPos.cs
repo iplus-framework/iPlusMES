@@ -44,7 +44,7 @@ namespace gip.mes.datamodel
                 else
                     entity.Sequence = 1;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -40,7 +40,7 @@ namespace gip.mes.datamodel
                 entity.OutOrderPos = parentACObject as OutOrderPos;
             }
             entity.OutOrderPosUtilizationNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

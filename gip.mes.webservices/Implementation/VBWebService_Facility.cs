@@ -853,7 +853,10 @@ namespace gip.mes.webservices
 
             using (var dbApp = new DatabaseApp())
             {
-                 msg = Book(bpParam, dbApp, facManager, myServiceHost);
+                var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
+                if (response != null)
+                    return response;
+                msg = Book(bpParam, dbApp, facManager, myServiceHost);
             }
             return new WSResponse<MsgWithDetails>(msg);
         }
@@ -1069,7 +1072,9 @@ namespace gip.mes.webservices
 
             using (DatabaseApp dbApp = new DatabaseApp())
             {
-
+                var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
+                if (response != null)
+                    return response;
                 foreach (ACMethodBooking bpParam in bpParams)
                 {
                     MsgWithDetails msg = Book(bpParam, dbApp, facManager, myServiceHost);
@@ -1276,6 +1281,9 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    var subResponse = SetDatabaseUserName<bool>(databaseApp);
+                    if (subResponse != null)
+                        return subResponse;
                     mes.datamodel.MDFacilityInventoryState inProgressState = databaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)mes.datamodel.MDFacilityInventoryState.FacilityInventoryStates.InProgress);
                     mes.datamodel.FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryNo);
 
@@ -1312,6 +1320,9 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    var subResponse = SetDatabaseUserName<bool>(databaseApp);
+                    if (subResponse != null)
+                        return subResponse;
                     mes.datamodel.MDFacilityInventoryState finishedState = databaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)mes.datamodel.MDFacilityInventoryState.FacilityInventoryStates.Finished);
                     mes.datamodel.FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryNo);
 
@@ -1514,6 +1525,10 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    var subResponse = SetDatabaseUserName<bool>(databaseApp);
+                    if (subResponse != null)
+                        return subResponse;
+
                     mes.datamodel.FacilityInventoryPos dbFacilityInventoryPos =
                         databaseApp
                         .FacilityInventoryPos
@@ -1665,6 +1680,9 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    var subResponse = SetDatabaseUserName<FacilityInventoryPos>(databaseApp);
+                    if (subResponse != null)
+                        return subResponse;
                     gip.mes.datamodel.FacilityCharge facilityCharge = databaseApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == new Guid(facilityChargeID));
                     if (facilityCharge != null)
                     {

@@ -30,7 +30,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
             entity.DemandOrderState = DemandOrderStates.Proposal;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

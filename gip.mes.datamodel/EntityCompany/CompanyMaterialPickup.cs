@@ -41,7 +41,7 @@ namespace gip.mes.datamodel
                 entity.InOrderPos = InOrderPos;
                 InOrderPos.CompanyMaterialPickup_InOrderPos.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

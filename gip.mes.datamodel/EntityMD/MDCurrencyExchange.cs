@@ -26,7 +26,7 @@ namespace gip.mes.datamodel
                 entity.MDCurrency = parentACObject as MDCurrency;
             }
             entity.ExchangeRate = 1;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

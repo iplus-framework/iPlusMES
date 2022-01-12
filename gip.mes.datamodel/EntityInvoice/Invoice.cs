@@ -66,7 +66,7 @@ namespace gip.mes.datamodel
 
             entity.InvoiceNo = secondaryKey;
             entity.InvoiceDate = DateTime.Now;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
 
             entity.XMLDesignStart = Const_XMLDesign;
             entity.XMLDesignEnd = Const_XMLDesign;

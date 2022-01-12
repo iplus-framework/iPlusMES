@@ -32,7 +32,7 @@ namespace gip.mes.datamodel
             entity.BalanceDate = DateTime.Now;
             entity.TimePeriod = GlobalApp.TimePeriods.Day;
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

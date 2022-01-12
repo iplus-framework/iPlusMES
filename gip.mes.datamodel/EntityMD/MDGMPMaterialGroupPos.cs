@@ -55,7 +55,7 @@ namespace gip.mes.datamodel
                 entity.MDGMPMaterialGroup = mdGMPMaterialGroup;
             }
 
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 
