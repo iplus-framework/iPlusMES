@@ -44,7 +44,7 @@ namespace gip.mes.datamodel
 
             entity.TimeFrom = TimeSpan.FromHours(8);
             entity.TimeTo = TimeSpan.FromHours(16);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

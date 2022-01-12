@@ -113,7 +113,7 @@ namespace gip.mes.datamodel
                 entity.Material = material;
                 entity.Material.MaterialStock_Material.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
         #endregion

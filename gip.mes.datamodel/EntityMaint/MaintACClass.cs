@@ -27,7 +27,7 @@ namespace gip.mes.datamodel
             entity.MaintACClassID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             dbApp.MaintACClass.AddObject(entity);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

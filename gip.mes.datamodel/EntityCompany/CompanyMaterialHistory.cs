@@ -47,7 +47,7 @@ namespace gip.mes.datamodel
                 entity.History = history;
                 history.CompanyMaterialHistory_History.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

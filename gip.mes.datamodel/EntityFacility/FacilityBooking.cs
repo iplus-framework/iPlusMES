@@ -87,7 +87,7 @@ namespace gip.mes.datamodel
             //entity.MDQuantityUnit = MDUnit.DefaultMDQuantityUnit(database);
             entity.FacilityBookingNo = secondaryKey;
             entity.MaterialProcessState = GlobalApp.MaterialProcessState.New;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

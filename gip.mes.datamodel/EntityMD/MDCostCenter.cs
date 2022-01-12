@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
             MDCostCenter entity = new MDCostCenter();
             entity.MDCostCenterID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

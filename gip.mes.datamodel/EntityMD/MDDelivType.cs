@@ -30,7 +30,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
             entity.DelivType = DelivTypes.Supplier;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

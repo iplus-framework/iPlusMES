@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDMaintOrderStateID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.MaintOrderState = MaintOrderStates.MaintenanceNeeded;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

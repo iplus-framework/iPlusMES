@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
             entity.MaterialWFRelationID = Guid.NewGuid();
             if (parentACObject is MaterialWF)
                 entity.MaterialWF = parentACObject as MaterialWF;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

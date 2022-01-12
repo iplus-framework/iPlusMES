@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             if (parentACObject != null && parentACObject is PlanningMR)
                 entity.PlanningMR = parentACObject as PlanningMR;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

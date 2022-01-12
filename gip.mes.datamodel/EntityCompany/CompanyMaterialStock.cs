@@ -117,7 +117,7 @@ namespace gip.mes.datamodel
                 entity.CompanyMaterial = material;
                 entity.CompanyMaterial.CompanyMaterialStock_CompanyMaterial.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

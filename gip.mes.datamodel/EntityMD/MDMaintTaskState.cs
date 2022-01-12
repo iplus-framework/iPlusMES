@@ -21,7 +21,7 @@ namespace gip.mes.datamodel
             var entity = new MDMaintTaskState();
             entity.MDMaintTaskStateID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

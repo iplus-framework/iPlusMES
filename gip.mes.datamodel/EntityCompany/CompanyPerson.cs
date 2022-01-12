@@ -41,7 +41,7 @@ namespace gip.mes.datamodel
                 entity.Company = parentACObject as Company;
             }
             entity.CompanyPersonNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

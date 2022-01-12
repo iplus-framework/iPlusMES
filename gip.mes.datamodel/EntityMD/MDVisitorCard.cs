@@ -27,7 +27,7 @@ namespace gip.mes.datamodel
             entity.MDVisitorCardID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.MDVisitorCardState = MDVisitorCardState.DefaultMDVisitorCardState(dbApp);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

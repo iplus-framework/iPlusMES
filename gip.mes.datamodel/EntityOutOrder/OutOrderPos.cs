@@ -119,7 +119,7 @@ namespace gip.mes.datamodel
             entity.MDTourplanPosState = MDTourplanPosState.DefaultMDTourplanPosState(dbApp);
             entity.MDDelivPosState = MDDelivPosState.DefaultMDDelivPosState(dbApp);
             entity.TargetDeliveryDate = DateTime.Now;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

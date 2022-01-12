@@ -43,7 +43,7 @@ namespace gip.mes.datamodel
             {
                 entity.InRequest = parentACObject as InRequest;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

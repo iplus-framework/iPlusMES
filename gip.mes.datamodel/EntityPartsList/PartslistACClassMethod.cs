@@ -34,7 +34,7 @@ namespace gip.mes.datamodel
             if (parentACObject != null && parentACObject is Partslist)
                 entity.Partslist = parentACObject as Partslist;
             entity.UsedInPhase = Phase.Default;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

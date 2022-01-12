@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDFacilityVehicleTypeID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.FacilityVehicleType = FacilityVehicleTypes.CalibrationVehicle;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

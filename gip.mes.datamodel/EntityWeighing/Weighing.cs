@@ -41,7 +41,7 @@ namespace gip.mes.datamodel
             if (lOPos != null)
                 entity.LabOrderPosID = lOPos.LabOrderPosID;
 
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

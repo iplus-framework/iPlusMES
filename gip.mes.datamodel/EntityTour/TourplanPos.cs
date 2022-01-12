@@ -35,7 +35,7 @@ namespace gip.mes.datamodel
                 entity.Tourplan = parentACObject as Tourplan;
             entity.MDTourplanPosState = MDTourplanPosState.DefaultMDTourplanPosState(dbApp);
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -31,7 +31,7 @@ namespace gip.mes.datamodel
             entity.ProdOrderID = Guid.NewGuid();
             entity.MDProdOrderState = MDProdOrderState.DefaultMDProdOrderState(dbApp);
             entity.ProgramNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

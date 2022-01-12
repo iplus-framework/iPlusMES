@@ -58,7 +58,7 @@ namespace gip.mes.datamodel
                 entity.PickingPos = parentACObject as PickingPos;
                 entity.PickingPos.FacilityPreBooking_PickingPos.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

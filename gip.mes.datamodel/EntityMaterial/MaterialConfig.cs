@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
             {
                 entity.Material = parentACObject as Material;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

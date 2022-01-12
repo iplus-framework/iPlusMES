@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDTourplanStateID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.TourplanState = TourplanStates.NewCreated;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

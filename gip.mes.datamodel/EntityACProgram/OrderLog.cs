@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
                 return null;
             OrderLog entity = new OrderLog();
             entity.VBiACProgramLogID = acProgramLog.ACProgramLogID;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

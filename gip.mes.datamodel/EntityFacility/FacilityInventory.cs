@@ -34,7 +34,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.FacilityInventoryNo = secondaryKey;
             entity.MDFacilityInventoryState = MDFacilityInventoryState.DefaultMDFacilityInventoryState(dbApp);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

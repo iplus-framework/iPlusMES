@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDVisitorVoucherStateID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.VisitorVoucherState = VisitorVoucherStates.New;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

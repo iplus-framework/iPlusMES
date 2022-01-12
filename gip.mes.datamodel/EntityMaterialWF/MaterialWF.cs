@@ -40,7 +40,7 @@ namespace gip.mes.datamodel
             entity.MaterialWFID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.MaterialWFNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

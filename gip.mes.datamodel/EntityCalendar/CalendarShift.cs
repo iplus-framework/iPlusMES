@@ -42,7 +42,7 @@ namespace gip.mes.datamodel
                 entity.Calendar = calendar;
             }
 
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

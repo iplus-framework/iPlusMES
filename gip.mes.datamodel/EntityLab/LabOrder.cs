@@ -60,7 +60,7 @@ namespace gip.mes.datamodel
                 entity.MDLabOrderState = MDLabOrderState.DefaultMDLabOrderState(dbApp);
             }
             entity.LabOrderNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

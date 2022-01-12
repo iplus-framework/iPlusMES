@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDFacilityTypeID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.FacilityType = FacilityTypesEnum.StorageBinContainer;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

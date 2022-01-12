@@ -30,7 +30,7 @@ namespace gip.mes.datamodel
             if (parentObject is MaintACClass)
                 entity.MaintACClass = ((MaintACClass)parentObject);
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

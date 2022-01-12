@@ -120,7 +120,7 @@ namespace gip.mes.datamodel
                 entity.Facility = facility;
                 entity.Facility.FacilityStock_Facility.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

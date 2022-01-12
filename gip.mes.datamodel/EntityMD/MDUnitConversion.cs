@@ -25,7 +25,7 @@ namespace gip.mes.datamodel
             {
                 entity.MDUnit = parentACObject as MDUnit;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

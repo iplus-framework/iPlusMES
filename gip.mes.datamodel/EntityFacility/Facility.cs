@@ -90,7 +90,7 @@ namespace gip.mes.datamodel
             //entity.MDUnit = MDUnit.DefaultMDWeightUnit(database);
             // AClass darf Facility-Entität nicht kennen
             //ACClass.NewACObjectForFacility(database, entity);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

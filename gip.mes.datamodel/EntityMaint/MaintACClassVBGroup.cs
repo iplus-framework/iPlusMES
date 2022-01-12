@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             var entity = new MaintACClassVBGroup();
             entity.MaintACClassVBGroupID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

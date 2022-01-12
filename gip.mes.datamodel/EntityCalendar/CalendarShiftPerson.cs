@@ -39,7 +39,7 @@ namespace gip.mes.datamodel
                 CalendarShift calendarShift = parentACObject as CalendarShift;
                 entity.CalendarShift = calendarShift;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

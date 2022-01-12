@@ -31,7 +31,7 @@ namespace gip.mes.datamodel
             MaterialWFACClassMethod entity = new MaterialWFACClassMethod();
             entity.MaterialWFACClassMethodID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             entity.IsDefault = false;
             return entity;
         }

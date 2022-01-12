@@ -25,7 +25,7 @@ namespace gip.mes.datamodel
                     label.Name = ((Material)parentACObject).MaterialName1;
                 }
             }
-            label.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            label.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return label;
         }
 

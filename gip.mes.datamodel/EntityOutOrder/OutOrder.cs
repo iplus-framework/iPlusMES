@@ -67,7 +67,7 @@ namespace gip.mes.datamodel
             entity.OutOrderNo = secondaryKey;
             entity.TargetDeliveryDate = DateTime.Now;
             entity.MDCurrencyID = null;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -42,7 +42,7 @@ namespace gip.mes.datamodel
             entity.FacilityLotID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.LotNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

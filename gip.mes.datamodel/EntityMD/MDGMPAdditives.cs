@@ -32,7 +32,7 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.MDProcessErrorAction = MDProcessErrorAction.DefaultMDProcessErrorAction(dbApp);
             //entity.MDQuantityUnit = MDUnit.DefaultMDQuantityUnit(database);
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

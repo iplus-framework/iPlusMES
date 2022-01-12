@@ -44,7 +44,7 @@ namespace gip.mes.datamodel
             entity.MDPickingType = MDPickingType.s_cQry_Default(dbApp).FirstOrDefault();
             entity.PickingState = PickingStateEnum.New;
             entity.PickingNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

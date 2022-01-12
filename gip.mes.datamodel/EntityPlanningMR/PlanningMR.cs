@@ -46,7 +46,7 @@ namespace gip.mes.datamodel
             entity.PlanningMRID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.PlanningMRNo = secondaryKey;
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

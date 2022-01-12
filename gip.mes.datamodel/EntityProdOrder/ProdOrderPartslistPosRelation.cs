@@ -40,7 +40,7 @@ namespace gip.mes.datamodel
                     entity.CopyFromParent(parentACObject as ProdOrderPartslistPosRelation);
                 }
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -91,7 +91,7 @@ namespace gip.mes.datamodel
                 entity.FacilityBooking = faciliyBooking;
                 faciliyBooking.FacilityBookingCharge_FacilityBooking.Add(entity);
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

@@ -32,7 +32,7 @@ namespace gip.mes.datamodel
             Rating entity = new Rating();
             entity.RatingID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 

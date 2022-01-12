@@ -51,7 +51,7 @@ namespace gip.mes.datamodel
                     entity.Sequence = 1;
                 entity.ProdOrderPartslistPos = outOrderPos;
             }
-            entity.SetInsertAndUpdateInfo(Database.Initials, dbApp);
+            entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
 
