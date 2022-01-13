@@ -208,20 +208,27 @@ namespace gip.mes.processapplication
             // Resend persisted messages after reconnection
             if (e.PropertyName == "ConnectionState" && proxy.ConnectionState >= ACObjectConnectionState.Connected)
             {
-                ResendData(proxy);
+                var appManager = this.ApplicationManager;
+                if (appManager != null && appManager.ApplicationQueue != null)
+                {
+                    appManager.ApplicationQueue.Add(() => { ResendData(proxy); });
+                }
             }
         }
 
         private void ResendUnsent()
         {
-            foreach (RemoteStorePostingData postingData in RemoteStorePostings)
+            foreach (RemoteStorePostingData postingData in RemoteStorePostings.ToArray())
             {
                 RemoteInstance remoteInstance = RemoteInstances.Where(c => c.Recipient.ACUrl == postingData.Recipient).FirstOrDefault();
-                if (remoteInstance.Recipient.ValueT.ConnectionState >= ACObjectConnectionState.Connected)
+                if (remoteInstance != null && remoteInstance.Recipient.ValueT.ConnectionState >= ACObjectConnectionState.Connected)
                 {
                     ResendData(remoteInstance.Recipient.ValueT as ACComponentProxy, postingData);
                 }
+                else
+                    break;
             }
+            OnPropertyChanged("RemoteStorePostings"); // Persist
         }
 
         private void ResendData(ACComponentProxy proxy)
@@ -229,7 +236,10 @@ namespace gip.mes.processapplication
             string acUrlOfProxy = proxy.GetACUrl();
             RemoteStorePostingData postingData = RemoteStorePostings.Where(c => c.Recipient == acUrlOfProxy).FirstOrDefault();
             if (postingData != null)
+            { 
                 ResendData(proxy, postingData);
+                OnPropertyChanged("RemoteStorePostings"); // Persist
+            }
         }
 
         private void ResendData(ACComponentProxy proxy, RemoteStorePostingData postingData)
@@ -242,7 +252,6 @@ namespace gip.mes.processapplication
 
             string acUrlOfProxy = proxy.GetACUrl();
             RemoteStorePostings.Remove(postingData);
-            OnPropertyChanged("RemoteStorePostings"); // Persist
             if (appManager.ApplicationQueue != null)
             {
                 appManager.ApplicationQueue.Add(() => { proxy.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + gip.mes.datamodel.Facility.MN_RefreshFacility, this.GetACUrl(), postingData); });

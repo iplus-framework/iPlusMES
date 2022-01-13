@@ -291,11 +291,11 @@ namespace gip.mes.facility
                             localPos.PickingQuantityUOM = remotePos.PickingQuantityUOM;
                             localPos.Sequence = remotePos.Sequence;
                             if (remotePos.FromFacility != null)
-                                localPos.FromFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.FromFacility.FacilityNo);
+                                localPos.FromFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.ToFacility.FacilityNo);
                             else
                                 localPos.FromFacility = null;
                             if (remotePos.ToFacility != null)
-                                localPos.ToFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.ToFacility.FacilityNo);
+                                localPos.ToFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.FromFacility.FacilityNo);
                             else
                                 localPos.ToFacility = null;
                         }
