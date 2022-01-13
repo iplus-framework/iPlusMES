@@ -330,7 +330,7 @@ namespace gip.mes.webservices
 
         );
 
-        protected IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query)
+        protected IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, ACPickingManager pickingManager)
         {
             return query.AsEnumerable().Select(d => new PickingPos()
             {
@@ -363,6 +363,7 @@ namespace gip.mes.webservices
                 TargetQuantityUOM = d.TargetQuantityUOM,
                 ActualQuantity = d.ActualQuantity,
                 ActualQuantityUOM = d.ActualQuantityUOM,
+                PostingType = DeterminePostingType(dbApp, pickingManager, d, d.Picking),
                 Comment = d.Comment
             }).ToArray();
         }
@@ -376,12 +377,17 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(pickingPosID, out guid))
                 return new WSResponse<PickingPos>(null, new Msg(eMsgLevel.Error, "pickingPosID is invalid"));
 
+            ACPickingManager pickingManager = null;
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost != null)
+                pickingManager = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+
             PickingPos result = null;
             try
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPickingPos(s_cQry_GetPickingPos(dbApp, guid)).FirstOrDefault();
+                    result = ConvertToWSPickingPos(s_cQry_GetPickingPos(dbApp, guid), dbApp, pickingManager).FirstOrDefault();
                 }
             }
             catch (Exception e)
