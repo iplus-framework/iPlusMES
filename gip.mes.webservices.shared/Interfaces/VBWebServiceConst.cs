@@ -111,6 +111,9 @@ namespace gip.mes.webservices
         public const string UriFacilityCharge_Bookings = "FacilityCharges/Bookings/{facilityChargeID}/from/{dateFrom}/to/{dateTo}";
         public const string UriFacilityCharge_Bookings_F = "FacilityCharges/Bookings/{0}/from/{1}/to/{2}";
 
+        public const string UriFacilityChargeFacilityMaterialLot = "FacilityChargeByFacilityMaterialLot/facility/{facilityID}/material/{materialID}/lot/{facilityLotID}/split/{splitNo}";
+        public const string UriFacilityChargeFacilityMaterialLot_F = "FacilityChargeByFacilityMaterialLot/facility/{0}/material/{1}/lot/{2}/split/{3}";
+
 
         public const string UriFacilityLot = "FacilityLots";
 

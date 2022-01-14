@@ -75,6 +75,64 @@ namespace gip.mes.webservices
              )
         );
 
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid, int, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
+                CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid, int, IQueryable<FacilityCharge>>(
+                    (dbApp, facilityID, materialID, facilityLotID, splitNo) =>
+                        dbApp.FacilityCharge
+                        .Include(gip.mes.datamodel.Material.ClassName)
+                        .Include(gip.mes.datamodel.FacilityLot.ClassName)
+                        .Include(gip.mes.datamodel.Facility.ClassName)
+                        .Include(gip.mes.datamodel.MDUnit.ClassName)
+                        .Include(gip.mes.datamodel.MDReleaseState.ClassName)
+                        .Where(c => c.FacilityID == facilityID && c.MaterialID == materialID && c.FacilityLotID == facilityLotID && c.SplitNo == splitNo)
+                        .Select(c => new gip.mes.webservices.FacilityCharge()
+                        {
+                            FacilityChargeID = c.FacilityChargeID,
+                            Material = new gip.mes.webservices.Material()
+                            {
+                                MaterialID = c.MaterialID,
+                                MaterialNo = c.Material.MaterialNo,
+                                MaterialName1 = c.Material.MaterialName1
+                            },
+                            FacilityLot = new gip.mes.webservices.FacilityLot()
+                            {
+                                FacilityLotID = c.FacilityLotID.HasValue ? c.FacilityLotID.Value : Guid.Empty,
+                                LotNo = c.FacilityLot != null ? c.FacilityLot.LotNo : "",
+                                Comment = c.FacilityLot != null ? c.FacilityLot.Comment : "",
+                                FillingDate = c.FacilityLot != null ? c.FacilityLot.FillingDate : null,
+                                ExpirationDate = c.FacilityLot != null ? c.FacilityLot.ExpirationDate : null,
+                                ProductionDate = c.FacilityLot != null ? c.FacilityLot.ProductionDate : null,
+                                StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0
+                            },
+                            Facility = new gip.mes.webservices.Facility()
+                            {
+                                FacilityID = c.FacilityID,
+                                FacilityName = c.Facility.FacilityName,
+                                FacilityNo = c.Facility.FacilityNo
+                            },
+                            SplitNo = c.SplitNo,
+                            StockQuantity = c.StockQuantity,
+                            MDUnit = new gip.mes.webservices.MDUnit()
+                            {
+                                MDUnitID = c.MDUnitID,
+                                MDUnitNameTrans = c.MDUnit.MDUnitNameTrans,
+                                SymbolTrans = c.MDUnit.SymbolTrans
+                            },
+                            MDReleaseState = new gip.mes.webservices.MDReleaseState()
+                            {
+                                MDReleaseStateID = c.MDReleaseStateID.HasValue ? c.MDReleaseStateID.Value : Guid.Empty,
+                                MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : ""
+                            },
+                            FillingDate = c.FillingDate,
+                            StorageLife = c.StorageLife,
+                            ProductionDate = c.ProductionDate,
+                            ExpirationDate = c.ExpirationDate,
+                            Comment = c.Comment,
+                            NotAvailable = c.NotAvailable
+                        }
+                        )
+                );
+
 
         public WSResponse<List<FacilityCharge>> GetFacilityCharges()
         {
@@ -197,6 +255,55 @@ namespace gip.mes.webservices
                     if (myServiceHost != null)
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityChargeBookings(10)", e);
                     return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+            }
+        }
+
+        public WSResponse<FacilityCharge> GetFacilityChargeFromFacilityMaterialLot(string facilityID, string materialID, string facilityLotID, string splitNo)
+        {
+            if (string.IsNullOrEmpty(facilityID))
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityID is empty"));
+
+            Guid facilityGuidID;
+            if (!Guid.TryParse(facilityID, out facilityGuidID))
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityID is invalid"));
+
+
+            if (string.IsNullOrEmpty(materialID))
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "materialID is empty"));
+
+            Guid materialGuidID;
+            if (!Guid.TryParse(materialID, out materialGuidID))
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "materialID is invalid"));
+
+
+
+            if (string.IsNullOrEmpty(facilityLotID))
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityLotID is empty"));
+
+            Guid facilityLotGuidID;
+            if (!Guid.TryParse(facilityLotID, out facilityLotGuidID))
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityLotID is invalid"));
+
+            int splitNoParsed = 0;
+            if (!int.TryParse(splitNo, out splitNoParsed))
+            {
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "splitNo is invalid"));
+            }
+
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID, facilityLotGuidID, splitNoParsed).FirstOrDefault());
+                }
+                catch (Exception e)
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    if (myServiceHost != null)
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharge(10)", e);
+                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
         }

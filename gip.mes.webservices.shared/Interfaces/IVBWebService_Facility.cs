@@ -33,6 +33,14 @@ namespace gip.mes.webservices
         Task<WSResponse<FacilityCharge>> GetFacilityChargeAsync(string facilityChargeID);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriFacilityChargeFacilityMaterialLot, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<FacilityCharge> GetFacilityChargeFromFacilityMaterialLot(string facilityID, string materialID, string facilityLotID, string splitNo);
+#elif NETSTANDARD
+        Task<WSResponse<FacilityCharge>> GetFacilityChargeFromFacilityMaterialLotAsync(string facilityID, string materialID, string facilityLotID, string splitNo);
+#endif
+
 
 #if NETFRAMEWORK
         [OperationContract]
