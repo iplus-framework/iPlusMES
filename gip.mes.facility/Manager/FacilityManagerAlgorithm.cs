@@ -656,8 +656,21 @@ namespace gip.mes.facility
                 FacilityCharge inwardFacilityCharge = null;
                 // Umlagerungbuchung auf ein Silo/Tank... 
                 // FacitlityBookingType.Relocation_FacilityCharge_Facility:
-                if (BP.InwardFacility != null)
+                if (BP.ParamsAdjusted.InwardFacility != null)
                 {
+                    int splitNo = BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo;
+                    if (BP.BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge)
+                    {
+                        if (BP.InwardSplitNo.HasValue && BP.OutwardFacilityCharge.SplitNo != BP.InwardSplitNo.Value)
+                            splitNo = BP.InwardSplitNo.Value;
+                        else
+                        {
+                            splitNo = BP.DatabaseApp.FacilityCharge.Where(c => c.FacilityLotID == BP.OutwardFacilityCharge.FacilityLotID).Max(c => c.SplitNo);
+                            splitNo++;
+                        }
+                        BP.InwardQuantity = BP.OutwardQuantity;
+                        BP.ParamsAdjusted.InwardQuantity = BP.OutwardQuantity;
+                    }
                     // Für Umlagerungen kann OutwardFacility oder OutwardFacilityLocation anstatt OutwardFacilityCharge gesetzt sein -> Neuanlage auf Ziellagerplatz
                     // Gibt es eine FacilityCharge von derselben FacilityLot und Split-Nummer?
                     FacilityChargeList facilityChargeList = null;
@@ -671,7 +684,7 @@ namespace gip.mes.facility
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
                                                                             && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                            && (c.SplitNo == BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo)
+                                                                            && (c.SplitNo == splitNo)
                                                                         select c);
                         }
                         else
@@ -682,12 +695,12 @@ namespace gip.mes.facility
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
                                                                             //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
                                                                             && (c.Partslist == null)
-                                                                            && (c.SplitNo == BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo)
+                                                                            && (c.SplitNo == splitNo)
                                                                         select c);
                         }
                     }
                     // Falls ja, dann buche darauf
-                    if (facilityChargeList.Count > 0)
+                    if (facilityChargeList.Any())
                     {
                         inwardFacilityCharge = facilityChargeList.First();
                         // Falls kein Rücksetzen erlaubt und neue Charge angelegt werden muss
@@ -719,7 +732,7 @@ namespace gip.mes.facility
                                                                         select c);
                         }
                         // Falls ja, dann mache daraus eine nicht anonyme (Was passiert mit Chargenverfolgung?) und buche
-                        if (facilityChargeList.Count > 0)
+                        if (facilityChargeList.Any())
                         {
                             inwardFacilityCharge = facilityChargeList.First();
                             if (inwardFacilityCharge.NotAvailable && !BP.IsAutoResetNotAvailable)
@@ -728,7 +741,7 @@ namespace gip.mes.facility
                             {
                                 if (BP.IsLotManaged)
                                     inwardFacilityCharge.FacilityLot = BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot;
-                                inwardFacilityCharge.SplitNo = BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo;
+                                inwardFacilityCharge.SplitNo = splitNo;
                             }
                         }
                         // Sonst, lege eine neue an und buche
@@ -744,6 +757,7 @@ namespace gip.mes.facility
                             // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
                             inwardFacilityCharge.FillingDate = DateTime.Now;
                             inwardFacilityCharge.FacilityChargeSortNo = inwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                            inwardFacilityCharge.SplitNo = splitNo;
                         }
                     }
 

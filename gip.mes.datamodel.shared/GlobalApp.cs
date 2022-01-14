@@ -407,6 +407,9 @@ namespace gip.mes.datamodel
             // Freigabe und Sperrung auf Lagercharge entsprechend ReleaseState
             ReleaseState_FacilityCharge = 107,
 
+            // Split a Quant
+            Split_FacilityCharge = 108,
+
             // Lagerzugang auf ein Silo/Tank/Container von chargen- und nicht chargengeführtem losem Material (Ungeplant) (Bestand+)
             InwardMovement_Facility_BulkMaterial = 201,
 
@@ -530,6 +533,7 @@ namespace gip.mes.datamodel
         public const string FBT_Relocation_FacilityCharge_FacilityLocation = "Relocation_FacilityCharge_FacilityLocation";
         public const string FBT_ZeroStock_FacilityCharge = "ZeroStock_FacilityCharge";
         public const string FBT_ReleaseState_FacilityCharge = "ReleaseState_FacilityCharge";
+        public const string FBT_Split_FacilityCharge = "Split_FacilityCharge";
         public const string FBT_InwardMovement_Facility_BulkMaterial = "InwardMovement_Facility_BulkMaterial";
         public const string FBT_OutwardMovement_Facility_BulkMaterial = "OutwardMovement_Facility_BulkMaterial";
         public const string FBT_Relocation_Facility_BulkMaterial = "Relocation_Facility_BulkMaterial";
@@ -604,6 +608,7 @@ namespace gip.mes.datamodel
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Relocation_FacilityCharge_FacilityLocation, "en{'Relocation quant - Facility Location'}de{'Umlagerung von eines Quants auf einen Lagerort (Ungeplant)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ZeroStock_FacilityCharge, "en{'Zero Stock on quant'}de{'Nullbestandsbuchung auf Quant'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ReleaseState_FacilityCharge, "en{'Release State on quant'}de{'Freigabe und Sperrung eines Quants'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Split_FacilityCharge, "en{'Split quant'}de{'Splitten eines Quants'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.InwardMovement_Facility_BulkMaterial, "en{'Inward Movement Facility Bulk Material'}de{'Lagerzugang auf ein Silo/Tank/Container von chargen- und nicht chargengeführtem losem Material (Ungeplant) (Bestand+)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.OutwardMovement_Facility_BulkMaterial, "en{'Outward Movement Facility Bulk Material'}de{'Lagerabgang von einen Silo/Tank/Container von chargen- und nicht chargengeführtem losem Material (Ungeplant) (Bestand-)'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Relocation_Facility_BulkMaterial, "en{'Relocation Facility Bulk Material'}de{'Umlagerung zwischen zwei Silos/Tanks/Container von chargen- und nicht chargengeführtem losem Material (Ungeplant)'}");

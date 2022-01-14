@@ -127,6 +127,7 @@ namespace gip.mes.facility
 
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualStateFacilityChargeMethod(GlobalApp.FBT_ZeroStock_FacilityCharge, GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge));
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualStateFacilityChargeMethod(GlobalApp.FBT_ReleaseState_FacilityCharge, GlobalApp.FacilityBookingType.ReleaseState_FacilityCharge));
+            ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualSplitFacilityChargeMethod(GlobalApp.FBT_Split_FacilityCharge, GlobalApp.FacilityBookingType.Split_FacilityCharge));
 
             ACMethod.RegisterVirtualMethod(typeof(FacilityManager), "BookFacility", CreateVirtualReassignFacilityChargeMethod(GlobalApp.FBT_Reassign_FacilityCharge, GlobalApp.FacilityBookingType.Reassign_FacilityCharge));
 
@@ -579,6 +580,35 @@ namespace gip.mes.facility
                 TMP.ParameterValueList.Add(new ACValue("CPartnerCompany", typeof(Company), null, Global.ParamOption.Optional));
 
 
+            TMP.ResultValueList.Add(new ACValue("BookingResult", typeof(ACMethodEventArgs), null, Global.ParamOption.Required));
+
+            return new ACMethodWrapper(TMP, GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)BookingType).ACCaptionTranslation, null);
+        }
+
+        private static ACMethodWrapper CreateVirtualSplitFacilityChargeMethod(string AcIdentitifer, GlobalApp.FacilityBookingType BookingType)
+        {
+            ACMethodBooking TMP = new ACMethodBooking();
+
+            TMP.ACIdentifier = AcIdentitifer;
+
+            TMP.ParameterValueList.Add(new ACValue(nameof(ACMethodBooking.BookingType), typeof(GlobalApp.FacilityBookingType), BookingType, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue(nameof(MDMovementReason), typeof(MDMovementReason), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue(nameof(ACMethodBooking.OutwardFacilityCharge), typeof(FacilityCharge), null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue("OutwardStackBookingModel", typeof(core.datamodel.ACClass), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("OutwardQuantity", typeof(Nullable<double>), null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue("OutwardTargetQuantity", typeof(Nullable<double>), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("OutwardQuantityAmb", typeof(Nullable<double>), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("OutwardTargetQuantityAmb", typeof(Nullable<double>), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("InwardSplitNo", typeof(Nullable<int>), null, Global.ParamOption.Optional));
+            //TMP.ParameterValueList.Add(new ACValue("InwardFacility", typeof(Facility), null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue(MDBookingNotAvailableMode.ClassName, typeof(MDBookingNotAvailableMode), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("DontAllowNegativeStock", typeof(Nullable<bool>), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("IgnoreManagement", typeof(Nullable<bool>), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("QuantityIsAbsolute", typeof(Nullable<bool>), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue(MDBalancingMode.ClassName, typeof(MDBalancingMode), null, Global.ParamOption.Optional));
+            TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), true, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue("InwardFacilityEntitiesNeeded", typeof(bool), true, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue("Comment", typeof(string), null, Global.ParamOption.Optional));
             TMP.ResultValueList.Add(new ACValue("BookingResult", typeof(ACMethodEventArgs), null, Global.ParamOption.Required));
 
             return new ACMethodWrapper(TMP, GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)BookingType).ACCaptionTranslation, null);

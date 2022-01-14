@@ -2561,7 +2561,10 @@ namespace gip.mes.facility
                         AddBookingMessage(eResultCodes.DependingParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50010"));
                 }
             }
-            else if (material != null && material.MDFacilityManagementType != null && material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
+            else if (material != null 
+                        && material.MDFacilityManagementType != null 
+                        && (    material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility
+                            || (BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge && material.MDFacilityManagementType.FacilityManagementType != MDFacilityManagementType.FacilityManagementTypes.FacilityCharge)))
                 AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50011"));
             else if (this.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
                 && (this.InwardFacilityLot == null && this.InwardFacilityCharge == null)
@@ -2973,6 +2976,13 @@ namespace gip.mes.facility
             /// Pseudo-Code:
             /// Falls Facility übergeben
             ///     Setze AdjustedFacility mit Facility
+            ///     
+            if (BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge
+                && ParamsAdjusted.OutwardFacilityCharge != null)
+            {
+                if (ParamsAdjusted.InwardFacility != ParamsAdjusted.OutwardFacilityCharge.Facility)
+                    ParamsAdjusted.InwardFacility = ParamsAdjusted.OutwardFacilityCharge.Facility;
+            }
 
             // Überprüfe Konfiguration auf Quelllagerplatz
             if (ParamsAdjusted.OutwardFacility != null)

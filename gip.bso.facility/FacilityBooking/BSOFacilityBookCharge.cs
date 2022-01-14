@@ -78,6 +78,8 @@ namespace gip.bso.facility
             this._BookParamReleaseAndLockClone = null;
             this._BookParamRelocation = null;
             this._BookParamRelocationClone = null;
+            this._BookParamSplit = null;
+            this._BookParamSplitClone = null;
             this._AccessFacilityLot = null;
             var b = base.ACDeInit(deleteACClassTask);
             if (_AccessFacilityLot != null)
@@ -318,6 +320,24 @@ namespace gip.bso.facility
             {
                 _BookParamReassignMat = value;
                 OnPropertyChanged("CurrentBookParamReassignMat");
+            }
+        }
+
+        /// <summary>
+        /// Gets the current book param matching.
+        /// </summary>
+        /// <value>The current book param matching.</value>
+        [ACPropertyCurrent(707, "CurrentBookParamSplit")]
+        public ACMethodBooking CurrentBookParamSplit
+        {
+            get
+            {
+                return _BookParamSplit;
+            }
+            protected set
+            {
+                _BookParamSplit = value;
+                OnPropertyChanged("CurrentBookParamSplit");
             }
         }
         #endregion
@@ -824,6 +844,16 @@ namespace gip.bso.facility
                 clone.OutwardFacilityCharge = CurrentFacilityCharge;
             }
             CurrentBookParamReassignMat = clone;
+
+            if (_BookParamSplitClone == null)
+                _BookParamSplitClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Split_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            clone = _BookParamSplitClone.Clone() as ACMethodBooking;
+            if (CurrentFacilityCharge != null)
+            {
+                clone.OutwardFacilityCharge = CurrentFacilityCharge;
+            }
+            CurrentBookParamSplit = clone;
+
         }
 
         /// <summary>
@@ -1395,6 +1425,42 @@ namespace gip.bso.facility
         }
         #endregion
 
+        #region Materialneuzuordnung (Reassignment)
+        /// <summary>
+        /// Facilities the relocation.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Split Quant'}de{'Quant Splitten'}", 712, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void SplitQuant()
+        {
+            if (!PreExecute("SplitQuant")) return;
+            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamSplit, this.DatabaseApp) as ACMethodEventArgs;
+            if (!CurrentBookParamSplit.ValidMessage.IsSucceded() || CurrentBookParamSplit.ValidMessage.HasWarnings())
+                Messages.Msg(CurrentBookParamSplit.ValidMessage);
+            else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                    result.ValidMessage.Message = result.ResultState.ToString();
+                Messages.Msg(result.ValidMessage);
+            }
+            else
+            {
+                ClearBookingData();
+            }
+            PostExecute("SplitQuant");
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled facility relocation].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledSplitQuant()
+        {
+            bool bRetVal = CurrentBookParamSplit.IsEnabled();
+            UpdateBSOMsg();
+            return bRetVal;
+        }
+        #endregion
+
         #region Lot-Handling
         /// <summary>
         /// Updates the BSO MSG.
@@ -1584,6 +1650,10 @@ namespace gip.bso.facility
             {
                 CurrentBookParam = CurrentBookParamReassignMat;
             }
+            else if (page == "ActivateSplitQuant" || page == "SplitQuantTab" || page == "*SplitQuantTab")
+            {
+                CurrentBookParam = CurrentBookParamSplit;
+            }
             PostExecute("OnActivate");
 
         }
@@ -1640,6 +1710,10 @@ namespace gip.bso.facility
 
         ACMethodBooking _BookParamReassignMat;
         ACMethodBooking _BookParamReassignMatClone;
+
+        ACMethodBooking _BookParamSplit;
+        ACMethodBooking _BookParamSplitClone;
+
 
         /// <summary>
         /// The _ act booking param
@@ -1753,6 +1827,12 @@ namespace gip.bso.facility
                     return true;
                 case "IsEnabledFacilityReassign":
                     result = IsEnabledFacilityReassign();
+                    return true;
+                case "SplitQuant":
+                    SplitQuant();
+                    return true;
+                case "IsEnabledSplitQuant":
+                    result = IsEnabledSplitQuant();
                     return true;
                 case "NewChargeNo":
                     NewChargeNo();
