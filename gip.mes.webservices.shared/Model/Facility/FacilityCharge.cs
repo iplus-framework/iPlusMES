@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace gip.mes.webservices
 {
     [DataContract(Name = "cFC")]
-    public class FacilityCharge
+    public class FacilityCharge : ICloneable
     {
         [DataMember(Name = "ID")]
         public Guid FacilityChargeID
@@ -89,6 +89,16 @@ namespace gip.mes.webservices
         public bool NotAvailable
         {
             get; set;
+        }
+
+        public object Clone()
+        {
+            FacilityCharge fc = new FacilityCharge();
+            fc.Material = this.Material;
+            fc.FacilityLot = this.FacilityLot;
+            fc.Facility = this.Facility;
+
+            return fc;
         }
     }
 }
