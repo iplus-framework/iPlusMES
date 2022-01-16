@@ -300,7 +300,7 @@ namespace gip.mes.webservices
                     if (splitNo == CoreWebServiceConst.EmptyParam)
                     {
                         return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID,
-                                                                                                          facilityLotGuidID, splitNoParsed)
+                                                                                                          facilityLotGuidID, null)
                                                               .OrderByDescending(c => c.SplitNo).FirstOrDefault());
                     }
                     return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID, 
