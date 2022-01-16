@@ -178,10 +178,7 @@ namespace gip.bso.manufacturing
                     .ToList()
                     .Where(x => x.EntityState != EntityState.Deleted)
                     .ToList();
-                var localItems = DatabaseApp
-                    .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                    .Select(o => o.Entity)
-                    .OfType<ProdOrderPartslistPosRelation>()
+                var localItems = DatabaseApp.GetAddedEntities<ProdOrderPartslistPosRelation>()
                      .Where(x => x.TargetProdOrderPartslistPosID == targetID)
                     .OrderBy(x => x.Sequence)
                     .ToList();

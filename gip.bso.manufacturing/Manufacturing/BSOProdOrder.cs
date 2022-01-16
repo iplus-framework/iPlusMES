@@ -2095,11 +2095,8 @@ namespace gip.bso.manufacturing
                 .Where(x => x.EntityState != EntityState.Deleted)
                 .ToList();
 
-                var localItems = DatabaseApp
-                .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                .Select(o => o.Entity)
-                .OfType<ProdOrderPartslistPos>()
-                 .Where(x =>
+                var localItems = DatabaseApp.GetAddedEntities<ProdOrderPartslistPos>()
+                    .Where(x =>
                     x.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID &&
                     x.AlternativeProdOrderPartslistPosID == null &&
                     x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot) &&
@@ -2394,10 +2391,7 @@ namespace gip.bso.manufacturing
                             .Where(x => x.EntityState != EntityState.Deleted)
                             .ToList();
 
-                var localItems = DatabaseApp
-                .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                .Select(o => o.Entity)
-                .OfType<ProdOrderPartslistPos>()
+                var localItems = DatabaseApp.GetAddedEntities<ProdOrderPartslistPos>()
                 .Where(c =>
                     c.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID &&
                     c.AlternativeProdOrderPartslistPosID == SelectedProdOrderPartslistPos.ProdOrderPartslistPosID &&
@@ -2664,10 +2658,7 @@ namespace gip.bso.manufacturing
                     .ToList()
                     .Where(x => x.EntityState != EntityState.Deleted)
                     .ToList();
-                var localItems = DatabaseApp
-                    .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                    .Select(o => o.Entity)
-                    .OfType<ProdOrderBatch>()
+                var localItems = DatabaseApp.GetAddedEntities<ProdOrderBatch>()
                     .Where(x => x.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
                     .ToList();
                 _BatchList = baseItems.Union(localItems).OrderBy(x => x.ProdOrderBatchNo).ToList();
@@ -2971,10 +2962,7 @@ namespace gip.bso.manufacturing
                     .Where(x => x.EntityState != EntityState.Deleted)
                     .ToList();
 
-                var localItems = DatabaseApp
-                    .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                    .Select(o => o.Entity)
-                    .OfType<ProdOrderPartslistPos>()
+                var localItems = DatabaseApp.GetAddedEntities<ProdOrderPartslistPos>()
                     .Where(x => x.ParentProdOrderPartslistPosID == SelectedIntermediate.ProdOrderPartslistPosID)
                     .OrderBy(x => x.Sequence)
                     .ToList();

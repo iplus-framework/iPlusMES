@@ -71,7 +71,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
     [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + Facility.ClassName, ConstApp.Facility, typeof(Facility), Facility.ClassName, "FacilityNo", "FacilityNo")] // TODO: Define Child-Entites for Import/Export
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Facility>) })]
-    public partial class Facility
+    public partial class Facility : ICloneable
     {
         public const string ClassName = "Facility";
 
@@ -919,6 +919,67 @@ namespace gip.mes.datamodel
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID.HasValue
                           && this.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.ParentFacilityID == parentFacilityID);
 
+        }
+
+        public object Clone()
+        {
+            Facility clonedObject = new Facility();
+            clonedObject.FacilityID = this.FacilityID;
+            clonedObject.CopyFrom(this, true);
+            return clonedObject;
+        }
+
+        public void CopyFrom(Facility from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                ParentFacilityID = from.ParentFacilityID;
+                VBiFacilityACClassID = from.VBiFacilityACClassID;
+                MDFacilityTypeID = from.MDFacilityTypeID;
+                VBiStackCalculatorACClassID = from.VBiStackCalculatorACClassID;
+                PartslistID = from.PartslistID;
+                LockedFacilityID = from.LockedFacilityID;
+                OutgoingFacilityID = from.OutgoingFacilityID;
+                IncomingFacilityID = from.IncomingFacilityID;
+                CompanyID = from.CompanyID;
+                CompanyPersonID = from.CompanyPersonID;
+                MDFacilityVehicleTypeID = from.MDFacilityVehicleTypeID;
+            }
+
+            FacilityNo = from.FacilityNo;
+            FacilityName = from.FacilityName;
+            MaterialID = from.MaterialID;
+            MDUnitID = from.MDUnitID;
+            InwardEnabled = from.InwardEnabled;
+            OutwardEnabled = from.OutwardEnabled;
+            LastFCSortNo = from.LastFCSortNo;
+            LastFCSortNoReverse = from.LastFCSortNoReverse;
+            ReservedQuantity = from.ReservedQuantity;
+            OrderedQuantity = from.OrderedQuantity;
+            Comment = from.Comment;
+            XMLConfig = from.XMLConfig;
+            Tara = from.Tara;
+            MaxWeightCapacity = from.MaxWeightCapacity;
+            MaxVolumeCapacity = from.MaxVolumeCapacity;
+            Drivername = from.Drivername;
+            Tolerance = from.Tolerance;
+            HighLidNo = from.HighLidNo;
+            FittingsDistanceFront = from.FittingsDistanceFront;
+            FittingsDistanceBehind = from.FittingsDistanceBehind;
+            DistanceFront = from.DistanceFront;
+            DistanceBehind = from.DistanceBehind;
+            InsertName = from.InsertName;
+            InsertDate = from.InsertDate;
+            UpdateName = from.UpdateName;
+            UpdateDate = from.UpdateDate;
+            Density = from.Density;
+            DensityAmb = from.DensityAmb;
+            MinStockQuantity = from.MinStockQuantity;
+            OptStockQuantity = from.OptStockQuantity;
+            OrderPostingOnEmptying = from.OrderPostingOnEmptying;
+            DisabledForMobile = from.DisabledForMobile;
+            KeyOfExtSys = from.KeyOfExtSys;
+            PostingBehaviourIndex = from.PostingBehaviourIndex;
         }
 
         //public static readonly Func<DatabaseApp, Facility, Guid, bool> s_cQry_IsLocatedIn =

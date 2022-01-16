@@ -82,13 +82,15 @@ namespace gip.mes.datamodel
                     return msg;
             }
             int sequence = Sequence;
-            Picking inPicking = Picking;
-            if (inPicking != null)
-                if (inPicking.PickingPos_Picking.IsLoaded)
-                    inPicking.PickingPos_Picking.Remove(this);
+            Picking picking = Picking;
+            if (picking != null && picking.PickingPos_Picking.IsLoaded)
+                picking.PickingPos_Picking.Remove(this);
             database.DeleteObject(this);
-            if (inPicking != null)
-                PickingPos.RenumberSequence(inPicking, sequence);
+            if (picking != null)
+            {
+                PickingPos.RenumberSequence(picking, sequence);
+                picking.UpdateDate = DateTime.Now;
+            }
             return null;
         }
 

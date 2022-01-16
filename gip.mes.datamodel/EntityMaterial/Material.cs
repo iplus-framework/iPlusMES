@@ -82,7 +82,7 @@ namespace gip.mes.datamodel
     ]
     //[ACSerializeableInfo(new Type[] { typeof(ACRef<Material>), typeof(Material) })]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<Material>) })]
-    public partial class Material : IACConfigStore, IACWorkflowNode, IACClassDesignProvider, IImageInfo
+    public partial class Material : IACConfigStore, IACWorkflowNode, IACClassDesignProvider, IImageInfo, ICloneable
     {
         public const string ClassName = "Material";
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
@@ -1138,6 +1138,7 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        #region Design
         /// <summary>Returns a ACClassDesign for presenting itself on the gui</summary>
         /// <param name="acUsage">Filter for selecting designs that belongs to this ACUsages-Group</param>
         /// <param name="acKind">Filter for selecting designs that belongs to this ACKinds-Group</param>
@@ -1155,7 +1156,7 @@ namespace gip.mes.datamodel
             else
                 return null;
         }
-
+        #endregion
 
         #region Image
 
@@ -1204,6 +1205,25 @@ namespace gip.mes.datamodel
             }
         }
 
+        #endregion
+
+        #region Cloning
+        public object Clone()
+        {
+            Material clonedObject = new Material();
+            clonedObject.MaterialID = this.MaterialID;
+            clonedObject.CopyFrom(this, true);
+            return clonedObject;
+        }
+
+        public void CopyFrom(Material from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                // TODO Sasa:
+            }
+            // TODO Sasa:
+        }
         #endregion
     }
 }

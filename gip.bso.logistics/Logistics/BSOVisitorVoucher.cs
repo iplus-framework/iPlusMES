@@ -517,10 +517,7 @@ namespace gip.bso.logistics
             get
             {
                 List<Visitor> visitorList = DatabaseApp.Visitor.ToList();
-                List<Visitor> visitorListAdded = DatabaseApp.ObjectStateManager.GetObjectStateEntries(System.Data.EntityState.Added)
-                                                                .Where(c => c.Entity is Visitor)
-                                                                .Select(c => c.Entity as Visitor)
-                                                                .ToList();
+                IList<Visitor> visitorListAdded = DatabaseApp.GetAddedEntities<Visitor>();
                 if (!visitorListAdded.Any())
                     visitorList.AddRange(visitorListAdded);
                 return visitorList;

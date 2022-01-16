@@ -129,42 +129,30 @@ namespace gip.mes.facility
         {
             return
             s_cQry_AllPositions(dbApp, partslistID)
-            .Union(dbApp
-                        .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                        .Select(o => o.Entity)
-                        .OfType<PartslistPos>().Where(x => x.PartslistID == partslistID).OrderBy(x => x.Sequence));
+            .Union(dbApp.GetAddedEntities<PartslistPos>(x => x.PartslistID == partslistID).OrderBy(x => x.Sequence));
         }
 
         public static IEnumerable<PartslistPos> QueryPosComponents(DatabaseApp dbApp, Guid partslistID)
         {
             return s_cQry_PosComponents(dbApp, partslistID)
-                .Union(dbApp
-                        .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                        .Select(o => o.Entity)
-                        .OfType<PartslistPos>().Where(x =>
-                            x.PartslistID == partslistID &&
-                            x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot &&
-                            x.AlternativePartslistPosID == null).OrderBy(x => x.Sequence));
+                .Union(dbApp.GetAddedEntities<PartslistPos>(x => x.PartslistID == partslistID
+                                                            && x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot
+                                                            && x.AlternativePartslistPosID == null)
+                            .OrderBy(x => x.Sequence));
         }
 
 
         public static IEnumerable<PartslistPos> QueryPosAlternative(DatabaseApp dbApp, Guid partslistPosID)
         {
             return s_cQry_PosAlternative(dbApp, partslistPosID)
-                .Union(dbApp.ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                        .Select(o => o.Entity)
-                        .OfType<PartslistPos>().Where(x =>
-                            x.AlternativePartslistPosID == partslistPosID).OrderBy(x => x.Sequence));
+                .Union(dbApp.GetAddedEntities<PartslistPos>(x => x.AlternativePartslistPosID == partslistPosID).OrderBy(x => x.Sequence));
         }
 
 
         public static IEnumerable<PartslistPosRelation> QueryPosIntermediateComponents(DatabaseApp dbApp, Guid partslistPosID)
         {
             return s_cQry_PosIntermediateComponents(dbApp, partslistPosID)
-                .Union(dbApp.ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                        .Select(o => o.Entity)
-                        .OfType<PartslistPosRelation>().Where(x =>
-                            x.TargetPartslistPosID == partslistPosID).OrderBy(x => x.Sequence));
+                .Union(dbApp.GetAddedEntities<PartslistPosRelation>(x => x.TargetPartslistPosID == partslistPosID).OrderBy(x => x.Sequence));
         }
 
         #endregion

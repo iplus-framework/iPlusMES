@@ -47,7 +47,7 @@ namespace gip.bso.masterdata
         public BSOMaterial(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            ////DatabaseMode = DatabaseModes.OwnDB;
+            _RemoteMaterialForwarder = new ACPropertyConfigValue<string>(this, nameof(RemoteMaterialForwarder), "");
         }
 
         /// <summary>
@@ -170,7 +170,8 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) return;
+                if (AccessPrimary == null) 
+                    return;
                 if (AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
@@ -244,6 +245,14 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("TranslationList");
                     OnPropertyChanged("AvailablePWMethodNodes");
                     OnPropertyChanged("AssignedPWMethodNodes");
+                    if (   value != null
+                        && !String.IsNullOrEmpty(RemoteMaterialForwarder))
+                    {
+                        if (_VisitedMaterials == null)
+                            _VisitedMaterials = new List<Material>();
+                        if (!_VisitedMaterials.Contains(value))
+                            _VisitedMaterials.Add(value);
+                    }
                 }
             }
         }
@@ -525,6 +534,21 @@ namespace gip.bso.masterdata
                 OnPropertyChanged("SelectedACConfig");
             }
         }
+
+        protected ACPropertyConfigValue<string> _RemoteMaterialForwarder;
+        [ACPropertyConfig("en{'ACUrl of RemoteMaterialForwarder'}de{'ACUrl of RemoteMaterialForwarder'}")]
+        public string RemoteMaterialForwarder
+        {
+            get
+            {
+                return _RemoteMaterialForwarder.ValueT;
+            }
+            set
+            {
+                _RemoteMaterialForwarder.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region BSO->ACProperty->FacilityCharge
@@ -753,7 +777,6 @@ namespace gip.bso.masterdata
         public void Save()
         {
             OnSave();
-            DatabaseApp.OnPropertyChanged(Material.ClassName);
         }
 
         /// <summary>
@@ -881,6 +904,36 @@ namespace gip.bso.masterdata
         {
             AccessPrimary.NavSearch(DatabaseApp, DatabaseApp.RecommendedMergeOption);
             OnPropertyChanged("MaterialList");
+        }
+
+        private List<Material> _VisitedMaterials = null;
+        protected override Msg OnPreSave()
+        {
+            if (_VisitedMaterials != null && _VisitedMaterials.Any())
+            {
+                _VisitedMaterials.RemoveAll(c => c.EntityState == System.Data.EntityState.Unchanged);
+            }
+            return base.OnPreSave();
+        }
+
+        protected override void OnPostSave()
+        {
+            if (_VisitedMaterials != null && _VisitedMaterials.Any())
+            {
+                foreach (var changedMaterial in _VisitedMaterials)
+                {
+                    gip.mes.facility.RemoteMaterialForwarder.ForwardMaterial(this, RemoteMaterialForwarder, changedMaterial.MaterialID);
+                }
+            }
+            if (   CurrentMaterial != null
+                && !String.IsNullOrEmpty(RemoteMaterialForwarder))
+            {
+                _VisitedMaterials = new List<Material>();
+                _VisitedMaterials.Add(CurrentMaterial);
+            }
+            else
+                _VisitedMaterials = null;
+            base.OnPostSave();
         }
         #endregion
 

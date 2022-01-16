@@ -59,6 +59,7 @@ namespace gip.bso.logistics
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             //DatabaseMode = DatabaseModes.OwnDB;
+            _ForwardToRemoteStores = new ACPropertyConfigValue<bool>(this, nameof(ForwardToRemoteStores), false);
         }
 
         /// <summary>
@@ -665,6 +666,14 @@ namespace gip.bso.logistics
                 RefreshInOrderPosList();
                 RefreshOutOrderPosList();
                 RefreshProdOrderPartslistPosList();
+                if (   value != null
+                    && ForwardToRemoteStores)
+                {
+                    if (_VisitedPickings == null)
+                        _VisitedPickings = new List<Picking>();
+                    if (!_VisitedPickings.Contains(value))
+                        _VisitedPickings.Add(value);
+                }
             }
         }
 
@@ -1529,6 +1538,21 @@ namespace gip.bso.logistics
 
         #region Local Properties
 
+        protected ACPropertyConfigValue<bool> _ForwardToRemoteStores;
+        [ACPropertyConfig("en{'Forward to remote stores'}de{'An entfernte Läger weiterleiten'}")]
+        public bool ForwardToRemoteStores
+        {
+            get
+            {
+                return _ForwardToRemoteStores.ValueT;
+            }
+            set
+            {
+                _ForwardToRemoteStores.ValueT = value;
+            }
+        }
+
+
         protected ACRef<ACInDeliveryNoteManager> _InDeliveryNoteManager = null;
         public ACInDeliveryNoteManager InDeliveryNoteManager
         {
@@ -1673,26 +1697,19 @@ namespace gip.bso.logistics
 
         #endregion
 
-        #region Mirrored-Stores
-        private List<Facility> _MirroredStores;
-        protected void FillMirroredStores(List<Facility> stores)
+        #region Forward
+        private class ForwardToMirroredStore
         {
-            if (CurrentPicking == null)
-                return;
-            foreach (PickingPos pos in CurrentPicking.PickingPos_Picking)
+            public ForwardToMirroredStore(Facility store)
             {
-                if (pos.FromFacility != null && pos.FromFacility.IsMirroredOnMoreDatabases && !stores.Contains(pos.FromFacility))
-                    stores.Add(pos.FromFacility);
-                if (pos.ToFacility != null && pos.ToFacility.IsMirroredOnMoreDatabases && !stores.Contains(pos.ToFacility))
-                    stores.Add(pos.ToFacility);
+                MirroredStore = store;
+                Pickings = new List<Picking>();
             }
+            public Facility MirroredStore { get; private set; }
+            public List<Picking> Pickings { get; private set; }
         }
-
-        protected void RefreshCurrentMirroredStores()
-        {
-            _MirroredStores = new List<Facility>();
-            FillMirroredStores(_MirroredStores);
-        }
+        private List<ForwardToMirroredStore> _ForwardPlan;
+        private List<Picking> _VisitedPickings = null;
         #endregion
 
         #endregion
@@ -1832,41 +1849,70 @@ namespace gip.bso.logistics
             OnSave();
         }
 
+        protected override Msg OnPreSave()
+        {
+            _ForwardPlan = null;
+            if (ForwardToRemoteStores 
+                && _VisitedPickings != null 
+                && _VisitedPickings.Any())
+            {
+                _ForwardPlan = new List<ForwardToMirroredStore>();
+                IList<PickingPos> changedPositionsInThisBSO = DatabaseApp.GetChangedEntities<PickingPos>(c => c.Picking != null && _VisitedPickings.Contains(c.Picking));
+                foreach (PickingPos changedPos in changedPositionsInThisBSO)
+                {
+                    if (changedPos.FromFacility != null && changedPos.FromFacility.IsMirroredOnMoreDatabases)
+                    {
+                        ForwardToMirroredStore broadcastEntry = _ForwardPlan.Where(c => c.MirroredStore == changedPos.FromFacility).FirstOrDefault();
+                        if (broadcastEntry == null)
+                        {
+                            broadcastEntry = new ForwardToMirroredStore(changedPos.FromFacility);
+                            _ForwardPlan.Add(broadcastEntry);
+                        }
+                        if (!broadcastEntry.Pickings.Contains(changedPos.Picking))
+                            broadcastEntry.Pickings.Add(changedPos.Picking);
+                    }
+                    if (changedPos.ToFacility != null && changedPos.ToFacility.IsMirroredOnMoreDatabases)
+                    {
+                        ForwardToMirroredStore broadcastEntry = _ForwardPlan.Where(c => c.MirroredStore == changedPos.ToFacility).FirstOrDefault();
+                        if (broadcastEntry == null)
+                        {
+                            broadcastEntry = new ForwardToMirroredStore(changedPos.ToFacility);
+                            _ForwardPlan.Add(broadcastEntry);
+                        }
+                        if (!broadcastEntry.Pickings.Contains(changedPos.Picking))
+                            broadcastEntry.Pickings.Add(changedPos.Picking);
+                    }
+                }
+            }
+            return base.OnPreSave();
+        }
+
         protected override void OnPostSave()
         {
             _UnSavedUnAssignedInOrderPos = new List<InOrderPos>();
             _UnSavedUnAssignedOutOrderPos = new List<OutOrderPos>();
             _UnSavedUnAssignedProdOrderPartslistPos = new List<ProdOrderPartslistPos>();
-            if (CurrentPicking != null)
+            if (_ForwardPlan != null && _ForwardPlan.Any())
             {
-                List<Facility> mirroredStores = new List<Facility>();
-                // Deleted
-                if (CurrentPicking.EntityState == System.Data.EntityState.Detached)
+                foreach (var broadcastEntry in _ForwardPlan)
                 {
-                    mirroredStores = _MirroredStores;
-                }
-                else
-                {
-                    FillMirroredStores(mirroredStores);
-                    if (_MirroredStores != null && _MirroredStores.Any())
+                    foreach (var picking in broadcastEntry.Pickings)
                     {
-                        foreach (var mirroredStore in _MirroredStores)
-                        {
-                            if (!mirroredStores.Contains(mirroredStore))
-                            {
-                                mirroredStores.Add(mirroredStore);
-                            }
-                        }
-                    }
-                }
-                if (mirroredStores != null && mirroredStores.Any())
-                {
-                    foreach (var mirroredStore in mirroredStores)
-                    {
-                        mirroredStore.CallSendPicking(false, CurrentPicking.PickingID);
+                        broadcastEntry.MirroredStore.CallSendPicking(false, picking.PickingID);
                     }
                 }
             }
+            if (ForwardToRemoteStores
+                && CurrentPicking != null)
+            {
+                _VisitedPickings = new List<Picking>();
+                _VisitedPickings.Add(CurrentPicking);
+            }
+            else
+                _VisitedPickings = null;
+
+            _ForwardPlan = null;
+
             RefreshInOrderPosList(true);
             RefreshOutOrderPosList(true);
             RefreshProdOrderPartslistPosList(true);
@@ -1953,7 +1999,6 @@ namespace gip.bso.logistics
                     CurrentPicking.VisitorVoucher.ACProperties.Refresh();
 
                 CurrentPicking.PickingPos_Picking.AutoRefresh(RefreshMode.StoreWins);
-                RefreshCurrentMirroredStores();
             }
             PostExecute("Load");
             OnPropertyChanged("PickingPosList");
@@ -1994,7 +2039,6 @@ namespace gip.bso.logistics
             CurrentPicking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
             DatabaseApp.Picking.AddObject(CurrentPicking);
             ACState = Const.SMNew;
-            RefreshCurrentMirroredStores();
             PostExecute("New");
         }
 

@@ -2,25 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
-using gip.core.processapplication;
-using System.Data.Objects;
 using gip.mes.datamodel;
-using gip.mes.facility;
+using System.Globalization;
 
-namespace gip.mes.processapplication
+namespace gip.mes.facility
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Shared store (remote)'}de{'Gemeinsam verwendetes Lager'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
-    public class PAMRemoteStore : PAMParkingspace, IRemoteFacilityForwarder
+    [ACClassInfo(Const.PackName_VarioFacility, "", Global.ACKinds.TPARole, Global.ACStorableTypes.Required, false, false)]
+    public class RemoteMaterialForwarder : PAClassAlarmingBase, IRemoteFacilityForwarder
     {
         #region c'tors
-        static PAMRemoteStore()
-        {
-            RegisterExecuteHandler(typeof(PAMRemoteStore), HandleExecuteACMethod_PAMRemoteStore);
-        }
-
-        public PAMRemoteStore(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
+        public RemoteMaterialForwarder(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _Broadcaster = new RemoteFacilityBroadcaster(this);
@@ -91,37 +85,29 @@ namespace gip.mes.processapplication
         {
             get
             {
-                return nameof(gip.mes.facility.RemoteFacilityManager.RefreshFacility);
+                return nameof(gip.mes.facility.RemoteFacilityManager.RefreshMaterial);
             }
         }
+
         #endregion
 
 
         #region Methods
-        public override void RefreshFacility(bool preventBroadcast, Guid? fbID)
+        public static bool ForwardMaterial(ACComponent requester, string acUrlOfForwarder, Guid materialID)
         {
-            base.RefreshFacility(preventBroadcast, fbID);
-
-            if (   Facility.ValueT == null 
-                || Facility.ValueT.ValueT == null 
-                || preventBroadcast
-                || !_Broadcaster.RemoteInstances.Any()
-                || !IsActive.ValueT)
-                return;
-            SendToRemoteStore(FacilityBooking.ClassName, fbID);
+            ACComponent aCComponent = requester.ACUrlCommand(acUrlOfForwarder) as ACComponent;
+            if (aCComponent == null)
+                return false;
+            if (aCComponent.ConnectionState == ACObjectConnectionState.DisConnected)
+                return false;
+            aCComponent.ExecuteMethod(nameof(SendMaterial), materialID);
+            return true;
         }
 
-        [ACMethodInfo("", "en{'Send Picking order'}de{'Sende Kommissionierauftrag'}", 401, true)]
-        public virtual void SendPicking(bool preventBroadcast, Guid? pickingID)
+        [ACMethodInfo("", "en{'Synchronize remote material'}de{'Synchronize remote material'}", 1001)]
+        public void SendMaterial(Guid materialID)
         {
-            if (Facility.ValueT == null
-                || Facility.ValueT.ValueT == null
-                || preventBroadcast
-                || !_Broadcaster.RemoteInstances.Any()
-                || !IsActive.ValueT)
-                return;
-
-            SendToRemoteStore(Picking.ClassName, pickingID);
+            SendToRemoteStore(Material.ClassName, materialID);
         }
 
         protected virtual void SendToRemoteStore(string entityType, Guid? keyID)
@@ -151,19 +137,17 @@ namespace gip.mes.processapplication
             return _Broadcaster.IsEnabledStopRedirection();
         }
 
-        [ACMethodInteraction("", "en{'Add this store on remote Systems'}de{'Diesen Lagerplatz auf entfernten Systemen anlegen'}", 202, true)]
-        public void SynchronizeThisFacility()
+        [ACMethodInteraction("", "en{'Synchronize all materials'}de{'Alle Materialien synchronisieren'}", 202, true)]
+        public void SynchronizeAllMaterials()
         {
-            if (!IsEnabledSynchronizeThisFacility())
+            if (!IsEnabledSynchronizeAllMaterials())
                 return;
-            SendToRemoteStore(gip.mes.datamodel.Facility.ClassName, this.Facility.ValueT.ValueT.FacilityID);
+            SendToRemoteStore(Material.ClassName, Guid.Empty);
         }
 
-        public bool IsEnabledSynchronizeThisFacility()
+        public bool IsEnabledSynchronizeAllMaterials()
         {
-            return IsEnabledStopRedirection() 
-                && this.Facility.ValueT != null 
-                && this.Facility.ValueT.ValueT != null;
+            return IsEnabledStopRedirection();
         }
 
         #endregion
@@ -181,8 +165,8 @@ namespace gip.mes.processapplication
                 case nameof(StopRedirection):
                     StopRedirection();
                     return true;
-                case nameof(SynchronizeThisFacility):
-                    SynchronizeThisFacility();
+                case nameof(SynchronizeAllMaterials):
+                    SynchronizeAllMaterials();
                     return true;
                 case Const.IsEnabledPrefix + nameof(StartRedirection):
                     result = IsEnabledStartRedirection();
@@ -190,20 +174,16 @@ namespace gip.mes.processapplication
                 case Const.IsEnabledPrefix + nameof(StopRedirection):
                     result = IsEnabledStopRedirection();
                     return true;
-                case Const.IsEnabledPrefix + nameof(SynchronizeThisFacility):
-                    result = IsEnabledSynchronizeThisFacility();
+                case Const.IsEnabledPrefix + nameof(SynchronizeAllMaterials):
+                    result = IsEnabledSynchronizeAllMaterials();
                     return true;
-                case nameof(SendPicking):
-                    SendPicking((bool)acParameter[0], (Guid?)acParameter[1]);
+                case nameof(SendMaterial):
+                    SendMaterial((Guid)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
-        public static bool HandleExecuteACMethod_PAMRemoteStore(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
-        {
-            return HandleExecuteACMethod_PAMParkingspace(out result, acComponent, acMethodName, acClassMethod, acParameter);
-        }
         #endregion
     }
 

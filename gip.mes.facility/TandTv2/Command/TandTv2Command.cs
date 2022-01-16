@@ -429,58 +429,12 @@ namespace gip.mes.facility
         /// <param name="result"></param>
         public static void BuildFilteredStepItemRelations(TandTv2Result result)
         {
-            List<TandTv2StepItemRelation> stepItemRelations = new List<TandTv2StepItemRelation>();
-            foreach (var filteredStepItem in result.FilteredStepItems)
-            {
-                //if (filteredStepItem.HelperSourceItems != null)
-                //    foreach (var source in filteredStepItem.HelperSourceItems)
-                //    {
-                //        if (!stepItemRelations.Any(c => c.SourceStepItemID == source.StepItemID && c.TargetStepItemID == filteredStepItem.StepItemID))
-                //        {
-                //            TandTv2StepItemRelation tmpRelation = new TandTv2StepItemRelation();
-                //            tmpRelation.StepItemRelationID = Guid.NewGuid();
-                //            tmpRelation.TandT_RelationTypeEnum = TandT_RelationTypeEnum.TrackingFlow;
-                //            tmpRelation.SourceStepItem = source;
-                //            tmpRelation.TargetStepItem = filteredStepItem;
-                //            stepItemRelations.Add(tmpRelation);
-
-                //        }
-                //    }
-                //if (filteredStepItem.HelperTargetItems != null)
-                //    foreach (var target in filteredStepItem.HelperTargetItems)
-                //    {
-                //        if (!stepItemRelations.Any(c => c.SourceStepItemID == filteredStepItem.StepItemID && c.TargetStepItemID == target.StepItemID))
-                //        {
-                //            TandTv2StepItemRelation tmpRelation = new TandTv2StepItemRelation();
-                //            tmpRelation.StepItemRelationID = Guid.NewGuid();
-                //            tmpRelation.TandT_RelationTypeEnum = TandT_RelationTypeEnum.TrackingFlow;
-                //            tmpRelation.SourceStepItem = filteredStepItem;
-                //            tmpRelation.TargetStepItem = target;
-                //            stepItemRelations.Add(tmpRelation);
-                //        }
-                //    }
-            }
-
-            using (DatabaseApp databaseApp = new DatabaseApp())
-            {
-                foreach (var item in stepItemRelations)
-                {
-                    databaseApp.ObjectStateManager.ChangeObjectState(item, EntityState.Unchanged);
-                }
-            }
-            result.FilteredStepItemRelations = stepItemRelations;
+            result.FilteredStepItemRelations = new List<TandTv2StepItemRelation>();
         }
 
         public static void BuildEdges(TandTv2Result result)
         {
             result.Edges.Clear();
-            foreach (TandTv2StepItemRelation item in result.FilteredStepItemRelations)
-            {
-                //PAEdge edge = new PAEdge(item.SourceStepItem.PAPointMatOut1, item.TargetStepItem.PAPointMatOut1, new core.datamodel.ACClassPropertyRelation());
-                //result.Edges.Add(edge);
-                //(item.SourceStepItem.PAPointMatOut1.ConnectionList as List<PAEdge>).Add(edge);
-                //(item.TargetStepItem.PAPointMatOut1.ConnectionList as List<PAEdge>).Add(edge);
-            }
         }
 
     }

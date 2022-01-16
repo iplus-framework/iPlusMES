@@ -264,15 +264,13 @@ namespace gip.mes.processapplication
                                                                 && c.VBiACClassID.Value == acClass.ACClassID
                                                                 && !c.VBiACClassPropertyRelationID.HasValue
                                                                 && c.LocalConfigACUrl == SelectedInPointConfig.ACIdentifier));
-                    var query = DatabaseApp.ObjectStateManager.GetObjectStateEntries(System.Data.EntityState.Added);
+                    var query = DatabaseApp.GetAddedEntities<MaterialConfig>();
                     if (query != null && query.Any())
                     {
-                        var query2 = query.Where(c => c.Entity is MaterialConfig
-                                    && (c.Entity as MaterialConfig).VBiACClassID.HasValue
-                                    && (c.Entity as MaterialConfig).VBiACClassID.Value == acClass.ACClassID
-                                    && !(c.Entity as MaterialConfig).VBiACClassPropertyRelationID.HasValue
-                                    && (c.Entity as MaterialConfig).LocalConfigACUrl == SelectedInPointConfig.ACIdentifier)
-                                    .Select(c => c.Entity as MaterialConfig);
+                        var query2 = query.Where(c => c.VBiACClassID.HasValue
+                                    && c.VBiACClassID.Value == acClass.ACClassID
+                                    && !c.VBiACClassPropertyRelationID.HasValue
+                                    && c.LocalConfigACUrl == SelectedInPointConfig.ACIdentifier);
                         foreach (var matEntity in query2)
                         {
                             if (!_InMaterialConfigList.Contains(matEntity))
@@ -294,17 +292,15 @@ namespace gip.mes.processapplication
                             && c.VBiACClassPropertyRelation.TargetACClassID == acClass.ACClassID
                             && (c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.ConnectionPhysical || c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.DynamicConnection))
                             );
-                    var query = DatabaseApp.ObjectStateManager.GetObjectStateEntries(System.Data.EntityState.Added);
+                    var query = DatabaseApp.GetAddedEntities<MaterialConfig>();
                     if (query != null && query.Any())
                     {
-                        var query2 = query.Where(c => c.Entity is MaterialConfig
-                                    && !(c.Entity as MaterialConfig).VBiACClassID.HasValue
-                                    && (c.Entity as MaterialConfig).LocalConfigACUrl == SelectedInPointConfig.ACIdentifier
-                                    && (c.Entity as MaterialConfig).VBiACClassPropertyRelationID.HasValue
-                                    && (c.Entity as MaterialConfig).VBiACClassPropertyRelation.SourceACClassID == SelectedInPoint.ACClassID
-                                    && (c.Entity as MaterialConfig).VBiACClassPropertyRelation.TargetACClassID == acClass.ACClassID
-                                    && ((c.Entity as MaterialConfig).VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.ConnectionPhysical || (c.Entity as MaterialConfig).VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.DynamicConnection))
-                                    .Select(c => c.Entity as MaterialConfig);
+                        var query2 = query.Where(c => !c.VBiACClassID.HasValue
+                                    && c.LocalConfigACUrl == SelectedInPointConfig.ACIdentifier
+                                    && c.VBiACClassPropertyRelationID.HasValue
+                                    && c.VBiACClassPropertyRelation.SourceACClassID == SelectedInPoint.ACClassID
+                                    && c.VBiACClassPropertyRelation.TargetACClassID == acClass.ACClassID
+                                    && c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.ConnectionPhysical || c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.DynamicConnection);
                         foreach (var matEntity in query2)
                         {
                             if (!_InMaterialConfigList.Contains(matEntity))
@@ -383,15 +379,13 @@ namespace gip.mes.processapplication
                                                                 && c.VBiACClassID.Value == acClass.ACClassID
                                                                 && !c.VBiACClassPropertyRelationID.HasValue
                                                                 && c.LocalConfigACUrl == SelectedOutPointConfig.ACIdentifier));
-                    var query = DatabaseApp.ObjectStateManager.GetObjectStateEntries(System.Data.EntityState.Added);
+                    var query = DatabaseApp.GetAddedEntities<MaterialConfig>();
                     if (query != null && query.Any())
                     {
-                        var query2 = query.Where(c => c.Entity is MaterialConfig
-                                    && (c.Entity as MaterialConfig).VBiACClassID.HasValue
-                                    && (c.Entity as MaterialConfig).VBiACClassID.Value == acClass.ACClassID
-                                    && !(c.Entity as MaterialConfig).VBiACClassPropertyRelationID.HasValue
-                                    && (c.Entity as MaterialConfig).LocalConfigACUrl == SelectedOutPointConfig.ACIdentifier)
-                                    .Select(c => c.Entity as MaterialConfig);
+                        var query2 = query.Where(c => c.VBiACClassID.HasValue
+                                    && c.VBiACClassID.Value == acClass.ACClassID
+                                    && !c.VBiACClassPropertyRelationID.HasValue
+                                    && c.LocalConfigACUrl == SelectedOutPointConfig.ACIdentifier);
                         foreach (var matEntity in query2)
                         {
                             if (!_OutMaterialConfigList.Contains(matEntity))
@@ -412,17 +406,15 @@ namespace gip.mes.processapplication
                             && c.VBiACClassPropertyRelation.TargetACClassID == SelectedOutPoint.ACClassID
                             && (c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.ConnectionPhysical || c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.DynamicConnection))
                             );
-                    var query = DatabaseApp.ObjectStateManager.GetObjectStateEntries(System.Data.EntityState.Added);
+                    var query = DatabaseApp.GetAddedEntities<MaterialConfig>();
                     if (query != null && query.Any())
                     {
-                        var query2 = query.Where(c => c.Entity is MaterialConfig
-                                    && !(c.Entity as MaterialConfig).VBiACClassID.HasValue
-                                    && (c.Entity as MaterialConfig).LocalConfigACUrl == SelectedOutPointConfig.ACIdentifier
-                                    && (c.Entity as MaterialConfig).VBiACClassPropertyRelationID.HasValue
-                                    && (c.Entity as MaterialConfig).VBiACClassPropertyRelation.SourceACClassID == acClass.ACClassID
-                                    && (c.Entity as MaterialConfig).VBiACClassPropertyRelation.TargetACClassID == SelectedOutPoint.ACClassID
-                                    && ((c.Entity as MaterialConfig).VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.ConnectionPhysical || (c.Entity as MaterialConfig).VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.DynamicConnection))                          
-                                    .Select(c => c.Entity as MaterialConfig);
+                        var query2 = query.Where(c => !c.VBiACClassID.HasValue
+                                    && c.LocalConfigACUrl == SelectedOutPointConfig.ACIdentifier
+                                    && c.VBiACClassPropertyRelationID.HasValue
+                                    && c.VBiACClassPropertyRelation.SourceACClassID == acClass.ACClassID
+                                    && c.VBiACClassPropertyRelation.TargetACClassID == SelectedOutPoint.ACClassID
+                                    && (c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.ConnectionPhysical || c.VBiACClassPropertyRelation.ConnectionTypeIndex == (short)Global.ConnectionTypes.DynamicConnection));
                         foreach (var matEntity in query2)
                         {
                             if (!_OutMaterialConfigList.Contains(matEntity))

@@ -670,17 +670,11 @@ namespace gip.mes.facility
             positionIds.Contains(x.TargetProdOrderPartslistPosID)).ToList();
 
             // calculate unsaved added items
-            List<ProdOrderPartslistPos> positionsAdded = dbApp
-                .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                .Select(o => o.Entity)
-                .OfType<ProdOrderPartslistPos>()
+            List<ProdOrderPartslistPos> positionsAdded = dbApp.GetAddedEntities<ProdOrderPartslistPos>()
                 .Where(x => x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
                 .ToList();
             List<Guid> positionAddedIds = positionsAdded.Select(x => x.ProdOrderPartslistPosID).ToList();
-            List<ProdOrderPartslistPosRelation> relationsAdded = dbApp
-                .ObjectStateManager.GetObjectStateEntries(EntityState.Added)
-                .Select(o => o.Entity)
-                .OfType<ProdOrderPartslistPosRelation>()
+            List<ProdOrderPartslistPosRelation> relationsAdded = dbApp.GetAddedEntities<ProdOrderPartslistPosRelation>()
                 .Where(x => positionAddedIds.Contains(x.TargetProdOrderPartslistPosID))
                 .ToList();
 
