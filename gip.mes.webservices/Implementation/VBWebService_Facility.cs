@@ -75,8 +75,8 @@ namespace gip.mes.webservices
              )
         );
 
-        public static readonly Func<DatabaseApp, Guid, Guid, Guid, int, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
-                CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid, int, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid, int?, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
+                CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid, int?, IQueryable<FacilityCharge>>(
                     (dbApp, facilityID, materialID, facilityLotID, splitNo) =>
                         dbApp.FacilityCharge
                         .Include(gip.mes.datamodel.Material.ClassName)
@@ -84,7 +84,8 @@ namespace gip.mes.webservices
                         .Include(gip.mes.datamodel.Facility.ClassName)
                         .Include(gip.mes.datamodel.MDUnit.ClassName)
                         .Include(gip.mes.datamodel.MDReleaseState.ClassName)
-                        .Where(c => c.FacilityID == facilityID && c.MaterialID == materialID && c.FacilityLotID == facilityLotID && c.SplitNo == splitNo)
+                        .Where(c => c.FacilityID == facilityID && c.MaterialID == materialID && c.FacilityLotID == facilityLotID 
+                                 && (splitNo == null || c.SplitNo == splitNo))
                         .Select(c => new gip.mes.webservices.FacilityCharge()
                         {
                             FacilityChargeID = c.FacilityChargeID,
@@ -286,7 +287,7 @@ namespace gip.mes.webservices
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityLotID is invalid"));
 
             int splitNoParsed = 0;
-            if (!int.TryParse(splitNo, out splitNoParsed))
+            if (splitNo != CoreWebServiceConst.EmptyParam && !int.TryParse(splitNo, out splitNoParsed))
             {
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "splitNo is invalid"));
             }
@@ -296,7 +297,14 @@ namespace gip.mes.webservices
             {
                 try
                 {
-                    return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID, facilityLotGuidID, splitNoParsed).FirstOrDefault());
+                    if (splitNo == CoreWebServiceConst.EmptyParam)
+                    {
+                        return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID,
+                                                                                                          facilityLotGuidID, splitNoParsed)
+                                                              .OrderByDescending(c => c.SplitNo).FirstOrDefault());
+                    }
+                    return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID, 
+                                                                                                          facilityLotGuidID, splitNoParsed).FirstOrDefault());
                 }
                 catch (Exception e)
                 {
