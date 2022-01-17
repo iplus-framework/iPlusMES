@@ -2035,9 +2035,12 @@ namespace gip.bso.logistics
             if (AccessPrimary == null)
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
-            CurrentPicking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
-            CurrentPicking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
-            DatabaseApp.Picking.AddObject(CurrentPicking);
+            Picking newPicking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
+            newPicking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
+            DatabaseApp.Picking.AddObject(newPicking);
+            if (SelectedFilterMDPickingType != null)
+                newPicking.MDPickingType = SelectedFilterMDPickingType;
+            CurrentPicking = newPicking;
             ACState = Const.SMNew;
             PostExecute("New");
         }
