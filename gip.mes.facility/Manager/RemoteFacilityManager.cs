@@ -373,22 +373,29 @@ namespace gip.mes.facility
 
                     foreach (FacilityCharge changedRemoteFC in changedRemoteFCs)
                     {
-                        FacilityCharge localFC = dbLocal.FacilityCharge.Where(c => c.Material.MaterialNo == changedRemoteFC.Material.MaterialNo
-                                                                                && c.FacilityID == localFacility.FacilityID
-                                                                                && (!changedRemoteFC.FacilityLotID.HasValue || c.FacilityLotID == changedRemoteFC.FacilityLotID)
-                                                                                && c.SplitNo == changedRemoteFC.SplitNo)
-                                                                        .FirstOrDefault();
+                        FacilityCharge localFC = null;
+
+
+                        //localFC = dbLocal.FacilityCharge.Where(c => c.Material.MaterialNo == changedRemoteFC.Material.MaterialNo
+                        //                                                        && c.FacilityID == localFacility.FacilityID
+                        //                                                        && (!changedRemoteFC.FacilityLotID.HasValue || c.FacilityLotID == changedRemoteFC.FacilityLotID)
+                        //                                                        && c.SplitNo == changedRemoteFC.SplitNo)
+                        //                                                .FirstOrDefault();
+
+                        // Search charge with same ID
+                        localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
+
+
                         if (localFC == null)
                         {
                             // Add New
                             FacilityLot localLot = null;
-                            if (changedRemoteFC.FacilityLotID != null)
+                            if (changedRemoteFC.FacilityLotID != null && changedRemoteFC.FacilityLotID != Guid.Empty)
                             {
                                 localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
                                 if (localLot == null)
                                 {
                                     localLot = FacilityLot.NewACObject(dbLocal, null, changedRemoteFC.FacilityLot.LotNo);
-                                    localLot.FacilityLotID = changedRemoteFC.FacilityLotID ?? Guid.Empty;
                                     localLot.FacilityLotID = changedRemoteFC.FacilityLotID ?? Guid.Empty;
                                     localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
                                     localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
