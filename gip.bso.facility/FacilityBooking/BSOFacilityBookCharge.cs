@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
@@ -97,6 +98,23 @@ namespace gip.bso.facility
         #endregion
 
         #region BSO->ACProperty
+
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
+            }
+        }
+
+        #endregion
 
         #region Filters
         public const string _CNotAvailableProperty = "NotAvailable";
@@ -1101,6 +1119,29 @@ namespace gip.bso.facility
             else
                 ClearBookingData();
             return true;
+        }
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowDlgToFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgFacilityRelocation()
+        {
+            if (!IsEnabledShowDlgFacilityRelocation())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentBookParamRelocation.InwardFacility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                CurrentBookParamRelocation.InwardFacility = facility;
+                OnPropertyChanged("CurrentBookParamRelocation");
+            }
+        }
+
+        public bool IsEnabledShowDlgFacilityRelocation()
+        {
+            return CurrentBookParamRelocation != null;
         }
 
         #endregion
