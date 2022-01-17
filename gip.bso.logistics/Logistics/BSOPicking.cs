@@ -666,7 +666,7 @@ namespace gip.bso.logistics
                 RefreshInOrderPosList();
                 RefreshOutOrderPosList();
                 RefreshProdOrderPartslistPosList();
-                if (   value != null
+                if (value != null
                     && ForwardToRemoteStores)
                 {
                     if (_VisitedPickings == null)
@@ -1852,8 +1852,8 @@ namespace gip.bso.logistics
         protected override Msg OnPreSave()
         {
             _ForwardPlan = null;
-            if (ForwardToRemoteStores 
-                && _VisitedPickings != null 
+            if (ForwardToRemoteStores
+                && _VisitedPickings != null
                 && _VisitedPickings.Any())
             {
                 _ForwardPlan = new List<ForwardToMirroredStore>();
@@ -2354,6 +2354,53 @@ namespace gip.bso.logistics
             if (CurrentPicking == null)
                 return false;
             return true;
+        }
+
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowDlgFromFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgFromFacility()
+        {
+            if (!IsEnabledShowDlgInwardFacility())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.FromFacility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                CurrentPickingPos.FromFacility = facility;
+                OnPropertyChanged("CurrentPickingPos");
+            }
+        }
+
+        public bool IsEnabledShowDlgFromFacility()
+        {
+            return CurrentPickingPos != null;
+        }
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowDlgToFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgToFacility()
+        {
+            if (!IsEnabledShowDlgInwardFacility())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.ToFacility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                CurrentPickingPos.ToFacility = facility;
+                OnPropertyChanged("CurrentPickingPos");
+            }
+        }
+
+        public bool IsEnabledShowDlgToFacility()
+        {
+            return CurrentPickingPos != null;
         }
 
         #endregion
