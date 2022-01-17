@@ -376,6 +376,44 @@ namespace gip.mes.webservices
             };
         }
 
+        public WSResponse<bool> CreateFacilityCharge(FacilityCharge facilityCharge)
+        {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
+                    if (response != null)
+                        return new WSResponse<bool>(false, response.Message);
+
+                    datamodel.FacilityCharge fc = datamodel.FacilityCharge.NewACObject(dbApp, null);
+                    fc.MaterialID = facilityCharge.Material.MaterialID;
+                    fc.FacilityLotID = facilityCharge.FacilityLot.FacilityLotID;
+                    fc.FacilityID = facilityCharge.Facility.FacilityID;
+                    fc.ProductionDate = facilityCharge.ProductionDate;
+                    fc.ExpirationDate = facilityCharge.ExpirationDate;
+                    fc.FillingDate = facilityCharge.FillingDate;
+
+                    Msg msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                        return new WSResponse<bool>(false, msg);
+
+                    return new WSResponse<bool>(true);
+
+                }
+                catch (Exception e)
+                {
+                    if (myServiceHost != null)
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(CreateFacilityCharge) + "(10)", e);
+                    return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
+                }
+            }
+        }
+
         #endregion
 
         #region FacilityLot
@@ -457,6 +495,25 @@ namespace gip.mes.webservices
              )
         );
 
+        public static readonly Func<DatabaseApp, string, IQueryable<FacilityLot>> s_cQry_GetFacilityLotByMaterial =
+        CompiledQuery.Compile<DatabaseApp, string, IQueryable<FacilityLot>>(
+            (dbApp, materialNo) =>
+                dbApp.FacilityLot
+                .Include(nameof(Material))
+                .Where(c => c.Material.MaterialNo == materialNo)
+                .Select(c => new gip.mes.webservices.FacilityLot()
+                {
+                    FacilityLotID = c.FacilityLotID,
+                    LotNo = c.LotNo,
+                    FillingDate = c.FillingDate,
+                    StorageLife = c.StorageLife,
+                    ProductionDate = c.ProductionDate,
+                    ExpirationDate = c.ExpirationDate,
+                    Comment = c.Comment
+                }
+             )
+        );
+
         public WSResponse<FacilityLot> GetFacilityLot(string facilityLotID)
         {
             if (string.IsNullOrEmpty(facilityLotID))
@@ -498,7 +555,28 @@ namespace gip.mes.webservices
                 {
                     PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                     if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "SearchFacilityLot(10)", e);
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacilityLot)+"(10)", e);
+                    return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+            }
+        }
+
+        public WSResponse<List<FacilityLot>> SearchFacilityLotByMaterial(string materialNo)
+        {
+            if (string.IsNullOrEmpty(materialNo) || materialNo == CoreWebServiceConst.EmptyParam)
+                return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, "materialNo is empty."));
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLotByMaterial(dbApp, materialNo).ToList());
+                }
+                catch (Exception e)
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    if (myServiceHost != null)
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacilityLotByMaterial)+"(10)", e);
                     return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
@@ -622,6 +700,33 @@ namespace gip.mes.webservices
                     if (myServiceHost != null)
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotBookings(10)", e);
                     return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+            }
+        }
+
+        public WSResponse<FacilityLot> CreateFacilityLot(bool temp)
+        {
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    string secondaryKey =  dbApp.Root().NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), datamodel.FacilityLot.NoColumnName, 
+                                                                           datamodel.FacilityLot.FormatNewNo, myServiceHost);
+                    datamodel.FacilityLot lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                    Msg msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                        return new WSResponse<FacilityLot>(null, msg);
+
+                    return new WSResponse<FacilityLot>(new FacilityLot() { FacilityLotID = lot.FacilityLotID, LotNo = lot.LotNo });
+
+                }
+                catch (Exception e)
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    if (myServiceHost != null)
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(CreateFacilityLot)+"(10)", e);
+                    return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
         }

@@ -59,6 +59,14 @@ namespace gip.mes.webservices
         Task<WSResponse<PostingOverview>> GetFacilityChargeBookingsAsync(string facilityChargeID, string dateFrom, string dateTo);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriFacilityChargeNew, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<bool> CreateFacilityCharge(FacilityCharge facilityCharge);
+#elif NETSTANDARD
+        Task<WSResponse<bool>> CreateFacilityChargeAsync(FacilityCharge facilityCharge);
+#endif
+
         #endregion
 
 
@@ -89,6 +97,14 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<List<FacilityLot>>> SearchFacilityLotAsync(string term);
 #endif
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriFacilityLot_SearchByMaterial, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<FacilityLot>> SearchFacilityLotByMaterial(string materialNo);
+#elif NETSTANDARD
+        Task<WSResponse<List<FacilityLot>>> SearchFacilityLotByMaterialAsync(string materialNo);
+#endif
+
 
 
 #if NETFRAMEWORK
@@ -115,6 +131,14 @@ namespace gip.mes.webservices
         WSResponse<PostingOverview> GetFacilityLotBookings(string facilityLotID, string dateFrom, string dateTo);
 #elif NETSTANDARD
         Task<WSResponse<PostingOverview>> GetFacilityLotBookingsAsync(string facilityLotID, string dateFrom, string dateTo);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriFacilityLotNew, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<FacilityLot> CreateFacilityLot(bool temp);
+#elif NETSTANDARD
+        Task<WSResponse<FacilityLot>> CreateFacilityLotAsync();
 #endif
 
         #endregion

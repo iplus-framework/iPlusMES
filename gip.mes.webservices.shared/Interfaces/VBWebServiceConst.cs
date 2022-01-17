@@ -114,6 +114,8 @@ namespace gip.mes.webservices
         public const string UriFacilityChargeFacilityMaterialLot = "FacilityChargeByFacilityMaterialLot/facility/{facilityID}/material/{materialID}/lot/{facilityLotID}/split/{splitNo}";
         public const string UriFacilityChargeFacilityMaterialLot_F = "FacilityChargeByFacilityMaterialLot/facility/{0}/material/{1}/lot/{2}/split/{3}";
 
+        public const string UriFacilityChargeNew = "NewFacilityCharge";
+
 
         public const string UriFacilityLot = "FacilityLots";
 
@@ -123,6 +125,9 @@ namespace gip.mes.webservices
         public const string UriFacilityLot_Search = "FacilityLots/term/{term}";
         public const string UriFacilityLot_Search_F = "FacilityLots/term/{0}";
 
+        public const string UriFacilityLot_SearchByMaterial = "FacilityLots/materialNo/{materialNo}";
+        public const string UriFacilityLot_SearchByMaterial_F = "FacilityLots/materialNo/{0}";
+
         public const string UriFacilityLot_BarcodeID = "FacilityLots/barcode/{barcodeID}";
         public const string UriFacilityLot_BarcodeID_F = "FacilityLots/barcode/{0}";
 
@@ -131,6 +136,8 @@ namespace gip.mes.webservices
 
         public const string UriFacilityLot_Bookings = "FacilityLots/Bookings/{facilityLotID}/from/{dateFrom}/to/{dateTo}";
         public const string UriFacilityLot_Bookings_F = "FacilityLots/Bookings/{0}/from/{1}/to/{2}";
+
+        public const string UriFacilityLotNew = "NewFacilityLot";
 
 
         public const string UriMaterial_SumID = "Materials/Sum/{materialID}";
