@@ -1,12 +1,9 @@
-﻿using System;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
+using gip.mes.datamodel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using gip.core.datamodel;
-using gip.core.autocomponent;
-using gip.mes.datamodel;
-using System.Globalization;
 
 namespace gip.mes.facility
 {
@@ -99,6 +96,29 @@ namespace gip.mes.facility
                 return _DelegateQueue;
             }
         }
+
+        /// <summary>
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private DateTime? _LastSyncTime;
+        [ACPropertyInfo(999, "LastSyncTime", "en{'TODO:LastSyncTime'}de{'TODO:LastSyncTime'}")]
+        public DateTime? LastSyncTime
+        {
+            get
+            {
+                return _LastSyncTime;
+            }
+            set
+            {
+                if (_LastSyncTime != value)
+                {
+                    _LastSyncTime = value;
+                    OnPropertyChanged("LastSyncTime");
+                }
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -117,7 +137,7 @@ namespace gip.mes.facility
             remoteAppManager = ACUrlCommand(remoteProxyACurl) as ACComponent;
             if (remoteAppManager == null)
                 return false;
-             remoteConnString = remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
+            remoteConnString = remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
             if (String.IsNullOrEmpty(remoteConnString))
                 return false;
             return true;
@@ -353,26 +373,40 @@ namespace gip.mes.facility
 
                     foreach (FacilityCharge changedRemoteFC in changedRemoteFCs)
                     {
-                        FacilityCharge localFC = dbLocal.FacilityCharge.Where(c => c.Material.MaterialNo == changedRemoteFC.Material.MaterialNo
-                                                                                && c.FacilityID == localFacility.FacilityID
-                                                                                && (!changedRemoteFC.FacilityLotID.HasValue || c.FacilityLotID == changedRemoteFC.FacilityLotID)
-                                                                                && c.SplitNo == changedRemoteFC.SplitNo)
-                                                                        .FirstOrDefault();
+                        FacilityCharge localFC = null;
+
+
+                        //localFC = dbLocal.FacilityCharge.Where(c => c.Material.MaterialNo == changedRemoteFC.Material.MaterialNo
+                        //                                                        && c.FacilityID == localFacility.FacilityID
+                        //                                                        && (!changedRemoteFC.FacilityLotID.HasValue || c.FacilityLotID == changedRemoteFC.FacilityLotID)
+                        //                                                        && c.SplitNo == changedRemoteFC.SplitNo)
+                        //                                                .FirstOrDefault();
+
+                        // Search charge with same ID
+                        localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
+
+
                         if (localFC == null)
                         {
                             // Add New
-                            FacilityLot localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.LotNo == changedRemoteFC.FacilityLot.LotNo);
-                            if (localLot == null)
+                            FacilityLot localLot = null;
+                            if (changedRemoteFC.FacilityLotID != null && changedRemoteFC.FacilityLotID != Guid.Empty)
                             {
-                                localLot = FacilityLot.NewACObject(dbLocal, null, changedRemoteFC.FacilityLot.LotNo);
-                                localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
-                                localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
+                                localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
+                                if (localLot == null)
+                                {
+                                    localLot = FacilityLot.NewACObject(dbLocal, null, changedRemoteFC.FacilityLot.LotNo);
+                                    localLot.FacilityLotID = changedRemoteFC.FacilityLotID ?? Guid.Empty;
+                                    localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
+                                    localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
+                                    dbLocal.FacilityLot.AddObject(localLot);
+                                }
                                 localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
-                                dbLocal.FacilityLot.AddObject(localLot);
-
-                                localFC = FacilityCharge.NewACObject(dbLocal, localLot);
-                                dbLocal.FacilityCharge.AddObject(localFC);
                             }
+
+                            localFC = FacilityCharge.NewACObject(dbLocal, localLot);
+                            localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
+                            dbLocal.FacilityCharge.AddObject(localFC);
                         }
                         else if (localFC.NotAvailable)
                         {
@@ -497,18 +531,41 @@ namespace gip.mes.facility
                 using (DatabaseApp dbRemote = new DatabaseApp(remoteConnString))
                 using (DatabaseApp dbLocal = new DatabaseApp())
                 {
+
                     foreach (var entry in remoteStorePosting.FBIds)
                     {
+                        Material[] remoteMaterials = new Material[] { };
+
                         // Synchronize all Materials
                         if (entry.KeyId == Guid.Empty)
                         {
+                            DateTime lastSyncTime = DateTime.Now;
+                            if (LastSyncTime != null)
+                                lastSyncTime = LastSyncTime.Value;
+
+                            remoteMaterials = dbRemote.Material.Where(c => c.UpdateDate > lastSyncTime).ToArray();
                         }
                         // Synchronize particular Materials
                         else
                         {
+                            remoteMaterials = dbRemote.Material.Where(c => c.MaterialID == entry.KeyId).ToArray();
+                        }
+
+                        foreach (Material remoteMaterial in remoteMaterials)
+                        {
+                            Material localMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialID == remoteMaterial.MaterialID);
+                            if (localMaterial == null)
+                            {
+                                localMaterial = Material.NewACObject(dbLocal, null);
+                                dbLocal.Material.AddObject(localMaterial);
+                                localMaterial.MaterialID = remoteMaterial.MaterialID;
+                            }
+
+                            localMaterial.CopyFrom(remoteMaterial, true);
                         }
                     }
 
+                    LastSyncTime = DateTime.Now;
                     MsgWithDetails msgWithDetails = dbLocal.ACSaveChanges();
                     if (msgWithDetails != null)
                         Messages.LogMessageMsg(msgWithDetails);
