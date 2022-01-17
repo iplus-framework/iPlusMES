@@ -2366,7 +2366,7 @@ namespace gip.bso.logistics
         [ACMethodInfo("ShowDlgFromFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
         public void ShowDlgFromFacility()
         {
-            if (!IsEnabledShowDlgInwardFacility())
+            if (!IsEnabledShowDlgFromFacility())
                 return;
 
             VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.FromFacility);
@@ -2389,7 +2389,7 @@ namespace gip.bso.logistics
         [ACMethodInfo("ShowDlgToFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
         public void ShowDlgToFacility()
         {
-            if (!IsEnabledShowDlgInwardFacility())
+            if (!IsEnabledShowDlgToFacility())
                 return;
 
             VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.ToFacility);
