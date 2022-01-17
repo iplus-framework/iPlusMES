@@ -1220,9 +1220,53 @@ namespace gip.mes.datamodel
         {
             if (withReferences)
             {
-                // TODO Sasa:
+                MDMaterialGroupID = from.MDMaterialGroupID;
+                MDMaterialTypeID = from.MDMaterialTypeID;
+                MDFacilityManagementTypeID = from.MDFacilityManagementTypeID;
+                InFacilityID = from.InFacilityID;
+                OutFacilityID = from.OutFacilityID;
+                VBiStackCalculatorACClassID = from.VBiStackCalculatorACClassID;
+                MDInventoryManagementTypeID = from.MDInventoryManagementTypeID;
+                MDGMPMaterialGroupID = from.MDGMPMaterialGroupID;
+                ProductionMaterialID = from.ProductionMaterialID;
+                VBiProgramACClassMethodID = from.VBiProgramACClassMethodID;
+
+                // LabelID = from.LabelID;
+
             }
-            // TODO Sasa:
+
+            MaterialNo = from.MaterialNo;
+            MaterialName1 = from.MaterialName1;
+            MaterialName2 = from.MaterialName2;
+            MaterialName3 = from.MaterialName3;
+            
+            MinStockQuantity = from.MinStockQuantity;
+            OptStockQuantity = from.OptStockQuantity;
+            DontAllowNegativeStock = from.DontAllowNegativeStock;
+            
+            StorageLife = from.StorageLife;
+            VBiProgramACClassMethodID = from.VBiProgramACClassMethodID;
+            UsageInOrder = from.UsageInOrder;
+            UsageOutOrder = from.UsageOutOrder;
+            UsageACProgram = from.UsageACProgram;
+            UsageOwnProduct = from.UsageOwnProduct;
+            IsActive = from.IsActive;
+            ContractorStock = from.ContractorStock;
+            BaseMDUnitID = from.BaseMDUnitID;
+            NetWeight = from.NetWeight;
+            GrossWeight = from.GrossWeight;
+            ProductionWeight = from.ProductionWeight;
+            Density = from.Density;
+            Comment = from.Comment;
+            XMLConfig = from.XMLConfig;
+            PetroleumGroupIndex = from.PetroleumGroupIndex;
+            DensityAmb = from.DensityAmb;
+            IsIntermediate = from.IsIntermediate;
+            ZeroBookingTolerance = from.ZeroBookingTolerance;
+            RetrogradeFIFO = from.RetrogradeFIFO;
+            ExplosionOff = from.ExplosionOff;
+            SpecHeatCapacity = from.SpecHeatCapacity;
+            KeyOfExtSys = from.KeyOfExtSys;
         }
         #endregion
     }
