@@ -1232,7 +1232,8 @@ namespace gip.mes.datamodel
                 VBiProgramACClassMethodID = from.VBiProgramACClassMethodID;
 
                 // LabelID = from.LabelID;
-
+                BaseMDUnitID = from.BaseMDUnitID;
+                VBiProgramACClassMethodID = from.VBiProgramACClassMethodID;
             }
 
             MaterialNo = from.MaterialNo;
@@ -1245,14 +1246,13 @@ namespace gip.mes.datamodel
             DontAllowNegativeStock = from.DontAllowNegativeStock;
             
             StorageLife = from.StorageLife;
-            VBiProgramACClassMethodID = from.VBiProgramACClassMethodID;
             UsageInOrder = from.UsageInOrder;
             UsageOutOrder = from.UsageOutOrder;
             UsageACProgram = from.UsageACProgram;
             UsageOwnProduct = from.UsageOwnProduct;
             IsActive = from.IsActive;
             ContractorStock = from.ContractorStock;
-            BaseMDUnitID = from.BaseMDUnitID;
+            
             NetWeight = from.NetWeight;
             GrossWeight = from.GrossWeight;
             ProductionWeight = from.ProductionWeight;
