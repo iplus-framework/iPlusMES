@@ -458,6 +458,17 @@ namespace gip.bso.logistics
             }
         }
 
+        public List<MDPickingType> MDPickingTypeList
+        {
+            get
+            {
+                if (_FilterMDPickingTypeList == null)
+                    _FilterMDPickingTypeList = LoadFilterMDPickingTypeList();
+                return _FilterMDPickingTypeList;
+            }
+
+    }
+
         private List<MDPickingType> LoadFilterMDPickingTypeList()
         {
             return DatabaseApp.MDPickingType.OrderBy(c => c.SortIndex).ToList();
@@ -2341,6 +2352,8 @@ namespace gip.bso.logistics
             OnPropertyChanged("PickingPosList");
             pickingPos.FromFacility = DefaultFromFacility;
             pickingPos.ToFacility = DefaultToFacility;
+            if (pickingPos.MDDelivPosLoadState == null)
+                pickingPos.MDDelivPosLoadState = DatabaseApp.MDDelivPosLoadState.FirstOrDefault(c => c.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.NewCreated);
             CurrentPickingPos = pickingPos;
             SelectedPickingPos = pickingPos;
         }
