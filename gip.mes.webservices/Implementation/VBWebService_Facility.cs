@@ -44,7 +44,8 @@ namespace gip.mes.webservices
                         FillingDate = c.FacilityLot != null ? c.FacilityLot.FillingDate : null,
                         ExpirationDate = c.FacilityLot != null ? c.FacilityLot.ExpirationDate : null,
                         ProductionDate = c.FacilityLot != null ? c.FacilityLot.ProductionDate : null,
-                        StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0
+                        StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0,
+                        ExternLotNo = c.FacilityLot != null ? c.FacilityLot.ExternLotNo : null
                     },
                     Facility = new gip.mes.webservices.Facility()
                     {
@@ -103,7 +104,8 @@ namespace gip.mes.webservices
                                 FillingDate = c.FacilityLot != null ? c.FacilityLot.FillingDate : null,
                                 ExpirationDate = c.FacilityLot != null ? c.FacilityLot.ExpirationDate : null,
                                 ProductionDate = c.FacilityLot != null ? c.FacilityLot.ProductionDate : null,
-                                StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0
+                                StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0,
+                                ExternLotNo = c.FacilityLot != null ? c.FacilityLot.ExternLotNo : null
                             },
                             Facility = new gip.mes.webservices.Facility()
                             {
@@ -345,7 +347,8 @@ namespace gip.mes.webservices
                     FillingDate = c.FacilityLot != null ? c.FacilityLot.FillingDate : null,
                     ExpirationDate = c.FacilityLot != null ? c.FacilityLot.ExpirationDate : null,
                     ProductionDate = c.FacilityLot != null ? c.FacilityLot.ProductionDate : null,
-                    StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0
+                    StorageLife = c.FacilityLot != null ? c.FacilityLot.StorageLife : (short)0,
+                    ExternLotNo = c.FacilityLot != null ? c.FacilityLot.ExternLotNo : null
                 },
                 Facility = new gip.mes.webservices.Facility()
                 {
@@ -490,6 +493,7 @@ namespace gip.mes.webservices
                     StorageLife = c.StorageLife,
                     ProductionDate = c.ProductionDate,
                     ExpirationDate = c.ExpirationDate,
+                    ExternLotNo = c.ExternLotNo,
                     Comment = c.Comment
                 }
              )
@@ -509,6 +513,7 @@ namespace gip.mes.webservices
                     StorageLife = c.StorageLife,
                     ProductionDate = c.ProductionDate,
                     ExpirationDate = c.ExpirationDate,
+                    ExternLotNo = c.ExternLotNo,
                     Comment = c.Comment
                 }
              )
