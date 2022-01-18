@@ -174,6 +174,8 @@ namespace gip.mes.facility
         {
             try
             {
+                if (remoteStorePosting == null || remoteStorePosting.FBIds == null || !remoteStorePosting.FBIds.Any())
+                    return;
                 MsgWithDetails msgWithDetails = null;
                 using (DatabaseApp dbRemote = new DatabaseApp(remoteConnString))
                 using (DatabaseApp dbLocal = new DatabaseApp())
@@ -394,7 +396,7 @@ namespace gip.mes.facility
             // Search charge with same ID
             localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
 
-
+            bool successSaveCharge = true;
             if (localFC == null)
             {
                 // Add New
@@ -415,7 +417,14 @@ namespace gip.mes.facility
 
                 localFC = FacilityCharge.NewACObject(dbLocal, localLot);
                 localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
+                localFC.CopyFrom(changedRemoteFC, true);
                 dbLocal.FacilityCharge.AddObject(localFC);
+                MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
+                if (msgSaveCharge != null)
+                {
+                    Messages.Msg(msgSaveCharge);
+                    successSaveCharge = false;
+                }
             }
             else if (localFC.NotAvailable)
             {
@@ -423,6 +432,7 @@ namespace gip.mes.facility
                 // Restore -> Make charge available again
                 ACMethodBooking bookReleaseStateFree = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ReleaseState_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
                 bookReleaseStateFree.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbLocal, MDReleaseState.ReleaseStates.Free);
+                bookReleaseStateFree.PreventSendToRemoteStore = true;
                 ACMethodEventArgs resultRelaseFree = ACFacilityManager.BookFacility(bookReleaseStateFree, dbLocal) as ACMethodEventArgs;
                 if (!bookReleaseStateFree.ValidMessage.IsSucceded() || bookReleaseStateFree.ValidMessage.HasWarnings())
                     Messages.Msg(bookReleaseStateFree.ValidMessage);
@@ -431,23 +441,33 @@ namespace gip.mes.facility
                     if (String.IsNullOrEmpty(resultRelaseFree.ValidMessage.Message))
                         resultRelaseFree.ValidMessage.Message = resultRelaseFree.ResultState.ToString();
                     Messages.Msg(resultRelaseFree.ValidMessage);
+                    successSaveCharge = false;
                 }
             }
-            // TODO: Booking to Absolute stock
-            ACMethodBooking bookAbsolute = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InwardMovement_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-            bookAbsolute.QuantityIsAbsolute = true;
-            bookAbsolute.InwardFacilityCharge = localFC;
-            bookAbsolute.InwardTargetQuantity = changedRemoteFC.AvailableQuantity;
 
-            ACMethodEventArgs resultAbsolute = ACFacilityManager.BookFacility(bookAbsolute, dbLocal) as ACMethodEventArgs;
-            if (!bookAbsolute.ValidMessage.IsSucceded() || bookAbsolute.ValidMessage.HasWarnings())
-                Messages.Msg(bookAbsolute.ValidMessage);
-            else if (resultAbsolute.ResultState == Global.ACMethodResultState.Failed || resultAbsolute.ResultState == Global.ACMethodResultState.Notpossible)
+            if(successSaveCharge)
             {
-                if (String.IsNullOrEmpty(resultAbsolute.ValidMessage.Message))
-                    resultAbsolute.ValidMessage.Message = resultAbsolute.ResultState.ToString();
-                Messages.Msg(resultAbsolute.ValidMessage);
+                // TODO: Booking to Absolute stock??
+                ACMethodBooking bookAbsolute = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InwardMovement_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                bookAbsolute.QuantityIsAbsolute = true;
+                bookAbsolute.InwardFacilityCharge = localFC;
+                bookAbsolute.InwardTargetQuantity = changedRemoteFC.AvailableQuantity;
+                bookAbsolute.InwardQuantity = changedRemoteFC.AvailableQuantity;
+                bookAbsolute.PreventSendToRemoteStore = true;
+                //Facility inwardFacility = dbLocal.Facility.FirstOrDefault(c=>c.FacilityID == changedRemoteFC.FacilityID);
+                //bookAbsolute.InwardFacility = inwardFacility;
+
+                ACMethodEventArgs resultAbsolute = ACFacilityManager.BookFacility(bookAbsolute, dbLocal) as ACMethodEventArgs;
+                if (!bookAbsolute.ValidMessage.IsSucceded() || bookAbsolute.ValidMessage.HasWarnings())
+                    Messages.Msg(bookAbsolute.ValidMessage);
+                else if (resultAbsolute.ResultState == Global.ACMethodResultState.Failed || resultAbsolute.ResultState == Global.ACMethodResultState.Notpossible)
+                {
+                    if (String.IsNullOrEmpty(resultAbsolute.ValidMessage.Message))
+                        resultAbsolute.ValidMessage.Message = resultAbsolute.ResultState.ToString();
+                    Messages.Msg(resultAbsolute.ValidMessage);
+                }
             }
+            
         }
 
         private Facility SynchronizeFacility(DatabaseApp dbLocal, Facility remoteFacility, RSPDEntry addOrUpdateFacilityMD)
@@ -532,7 +552,7 @@ namespace gip.mes.facility
                     localPos.ToFacility = null;
             }
         }
-        
+
         #endregion
 
         protected virtual bool IsRemotePickingRequiredHere(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting, DatabaseApp dbRemote, DatabaseApp dbLocal, Picking remotePicking)

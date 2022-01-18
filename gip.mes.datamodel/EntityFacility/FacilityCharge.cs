@@ -324,6 +324,53 @@ namespace gip.mes.datamodel
             this.XMLConfig = facilityCharge.XMLConfig;
         }
 
+        public void CopyFrom(FacilityCharge from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                FacilityLotID = from.FacilityLotID;
+                FacilityID = from.FacilityID;
+                MaterialID = from.MaterialID;
+                PartslistID = from.PartslistID;
+                MDReleaseStateID = from.MDReleaseStateID;
+                CompanyMaterialID = from.CompanyMaterialID;
+                MDUnitID = from.MDUnitID;
+            }
+
+            FacilityChargeSortNo = from.FacilityChargeSortNo;
+            SplitNo = from.SplitNo;
+            NotAvailable = from.NotAvailable;
+            HandlingUnit = from.HandlingUnit;
+            StockQuantity = from.StockQuantity;
+            StockQuantityUOM = from.StockQuantityUOM;
+            ReservedOutwardQuantity = from.ReservedOutwardQuantity;
+            ReservedInwardQuantity = from.ReservedInwardQuantity;
+            FillingDate = from.FillingDate;
+            StorageLife = from.StorageLife;
+            ProductionDate = from.ProductionDate;
+            ExpirationDate = from.ExpirationDate;
+            CostReQuantity = from.CostReQuantity;
+            CostMat = from.CostMat;
+            CostVar = from.CostVar;
+            CostFix = from.CostFix;
+            CostPack = from.CostPack;
+            CostGeneral = from.CostGeneral;
+            CostLoss = from.CostLoss;
+            CostHandlingVar = from.CostHandlingVar;
+            CostHandlingFix = from.CostHandlingFix;
+            Comment = from.Comment;
+            Lock = from.Lock;
+            IsEnabled = from.IsEnabled;
+            XMLConfig = from.XMLConfig;
+            InsertName = from.InsertName;
+            InsertDate = from.InsertDate;
+            UpdateName = from.UpdateName;
+            UpdateDate = from.UpdateDate;
+            RowVersion = from.RowVersion;
+            CPartnerCompanyMaterialID = from.CPartnerCompanyMaterialID;
+            StockQuantityUOMAmb = from.StockQuantityUOMAmb;
+        }
+
         public void AddToParentsList()
         {
             if (this.Material != null)
