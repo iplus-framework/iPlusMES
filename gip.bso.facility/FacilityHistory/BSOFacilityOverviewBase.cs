@@ -258,6 +258,11 @@ namespace gip.bso.facility
                     ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.InOrderPos.ToString(), 250, null, null, true);
                     menuItemList.Add(inOrderPosMenuItem);
                 }
+                if (!string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.PickingNo))
+                {
+                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.PickingPos.ToString(), 250, null, null, true);
+                    menuItemList.Add(inOrderPosMenuItem);
+                }
                 aCMenuItems.AddRange(menuItemList);
             }
             if (vbContent == "SelectedFacilityBookingOverview" && SelectedFacilityBookingOverview != null)
@@ -276,6 +281,11 @@ namespace gip.bso.facility
                 if (!string.IsNullOrEmpty(SelectedFacilityBookingOverview.InwardFacilityChargeInOrderNo))
                 {
                     ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.InOrderPos.ToString(), 250, null, null, true);
+                    menuItemList.Add(inOrderPosMenuItem);
+                }
+                if (!string.IsNullOrEmpty(SelectedFacilityBookingOverview.PickingNo))
+                {
+                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.PickingPos.ToString(), 250, null, null, true);
                     menuItemList.Add(inOrderPosMenuItem);
                 }
                 aCMenuItems.AddRange(menuItemList);
@@ -379,6 +389,14 @@ namespace gip.bso.facility
                     {
                         EntityID = dns.DeliveryNotePosID,
                         EntityName = DeliveryNotePos.ClassName
+                    });
+                    break;
+                case PresenterMenuItems.PickingPos:
+                    PickingPos pickingPos = facilityBooking.PickingPos;
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = pickingPos.PickingPosID,
+                        EntityName = PickingPos.ClassName
                     });
                     break;
                 default:

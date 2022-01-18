@@ -294,6 +294,13 @@ namespace gip.mes.facility
 #endif
         [DataMember(Name = "DNNo")]
         public string DeliveryNoteNo { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(9999, "PickingNo", "en{'Picking-No.'}de{'Kommissions-Nr.'}")]
+#endif
+        [DataMember(Name = "PKNo")]
+        public string PickingNo { get; set; }
+
         #endregion
 
     }

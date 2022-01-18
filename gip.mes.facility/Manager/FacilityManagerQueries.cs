@@ -160,7 +160,8 @@ namespace gip.mes.facility
 
                                     InwardFacilityChargeInOrderNo = fb.InOrderPosID != null ? fb.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fb.ProdOrderPartslistPosID != null ? fb.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : (fb.ProdOrderPartslistPosRelationID != null ? fb.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
-                                    DeliveryNoteNo = fb.InOrderPosID != null ? fb.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : ""
+                                    DeliveryNoteNo = fb.InOrderPosID != null ? fb.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",
+                                    PickingNo = fb.PickingPosID != null  ? fb.PickingPos.Picking.PickingNo : null
 
                                 }).FirstOrDefault(),
                                 val => val
@@ -196,9 +197,10 @@ namespace gip.mes.facility
 
                                     InwardFacilityChargeInOrderNo = fbc.InOrderPosID != null ? fbc.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fbc.ProdOrderPartslistPosID != null ? fbc.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo :(fbc.ProdOrderPartslistPosRelationID != null ? fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
-                                    DeliveryNoteNo = fbc.InOrderPosID != null ? fbc.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : ""
+                                    DeliveryNoteNo = fbc.InOrderPosID != null ? fbc.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",
+                                    PickingNo = fbc.PickingPosID != null ? fbc.PickingPos.Picking.PickingNo : null
                                 })
-                                .ToList());
+                                .ToList());;
             foreach (var fb in fbList)
             {
                 fb.Key.FacilityBookingTypeIndexName = GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)fb.Key.FacilityBookingTypeIndex).ACCaption;

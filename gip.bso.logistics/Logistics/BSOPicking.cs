@@ -3297,6 +3297,8 @@ namespace gip.bso.logistics
                 filterItem.SearchWord = pickingNo;
 
             this.Search();
+            if(PickingList != null && PickingList.Count() > 1)
+                CurrentPicking = PickingList.FirstOrDefault(c=>c.PickingNo == pickingNo);
             if (CurrentPicking != null && pickingPosID != Guid.Empty)
             {
                 if (this.PickingPosList != null && this.PickingPosList.Any())
