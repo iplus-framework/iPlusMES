@@ -80,9 +80,18 @@ namespace gip.mes.webservices
             if (item == null)
                 return;
             var oldPos = PickingPosObservable.Where(c => c.PickingPosID == item.PickingPosID).FirstOrDefault();
+            int index = PickingPosObservable.IndexOf(oldPos);
             if (oldPos != null)
                 PickingPosObservable.Remove(oldPos);
-            PickingPosObservable.Add(item);
+
+            if (index >= 0 && index <= PickingPosObservable.Count)
+            {
+                PickingPosObservable.Insert(index, item);
+            }
+            else
+            {
+                PickingPosObservable.Add(item);
+            }
         }
 
         public void RefreshPickingPosInView()

@@ -458,17 +458,6 @@ namespace gip.bso.logistics
             }
         }
 
-        public List<MDPickingType> MDPickingTypeList
-        {
-            get
-            {
-                if (_FilterMDPickingTypeList == null)
-                    _FilterMDPickingTypeList = LoadFilterMDPickingTypeList();
-                return _FilterMDPickingTypeList;
-            }
-
-    }
-
         private List<MDPickingType> LoadFilterMDPickingTypeList()
         {
             return DatabaseApp.MDPickingType.OrderBy(c => c.SortIndex).ToList();

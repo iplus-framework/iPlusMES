@@ -95,6 +95,7 @@ namespace gip.mes.webservices
                 PickingPos_Picking = c.PickingPos_Picking
                         .ToArray()
                         .Where(d => d.Material != null && (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue))
+                        .OrderBy(d => d.Sequence)
                         .Select(d => new PickingPos()
                         {
                             PickingPosID = d.PickingPosID,
@@ -128,6 +129,7 @@ namespace gip.mes.webservices
                             ActualQuantity = d.ActualQuantity,
                             ActualQuantityUOM = d.ActualQuantityUOM,
                             PostingType = DeterminePostingType(dbApp, pickingManger, d, c),
+                            Sequence = d.Sequence,
                             Comment = d.Comment
                         }).ToArray()
             });

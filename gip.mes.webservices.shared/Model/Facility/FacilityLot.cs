@@ -43,6 +43,13 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "ELN")]
+        public string ExternLotNo
+        {
+            get;
+            set;
+        }
+
         [DataMember(Name = "CM")]
         public string Comment
         {

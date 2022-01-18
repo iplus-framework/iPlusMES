@@ -74,6 +74,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "SQ")]
+        public int Sequence
+        {
+            get; set;
+        }
+
         [DataMember(Name = "PTi")]
         public short PostingTypeIndex
         {
