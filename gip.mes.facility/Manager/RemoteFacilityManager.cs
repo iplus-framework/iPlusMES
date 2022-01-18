@@ -168,6 +168,8 @@ namespace gip.mes.facility
 
         #region Booking and Picking-Sync
 
+        #region Booking and Picking-Sync -> SynchronizeFacility
+
         protected void SynchronizeFacility(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting)
         {
             try
@@ -187,89 +189,13 @@ namespace gip.mes.facility
                                         .FirstOrDefault();
                         if (remoteFacility != null)
                         {
-                            localFacility = dbLocal.Facility
-                                                    .Include(c => c.Facility1_ParentFacility)
-                                                    .Where(c => c.FacilityID == addOrUpdateFacilityMD.KeyId)
-                                                    .FirstOrDefault();
-                            if (localFacility == null)
-                            {
-                                Facility parentFacility = null;
-                                if (remoteFacility.ParentFacilityID.HasValue)
-                                    parentFacility = dbLocal.Facility.Where(c => c.FacilityID == remoteFacility.ParentFacilityID.Value).FirstOrDefault();
-                                localFacility = Facility.NewACObject(dbLocal, parentFacility);
-                                localFacility.CopyFrom(remoteFacility, false);
-                                localFacility.FacilityID = addOrUpdateFacilityMD.KeyId;
-                                localFacility.MDFacilityTypeID = remoteFacility.MDFacilityTypeID;
-                                localFacility.VBiStackCalculatorACClassID = remoteFacility.VBiStackCalculatorACClassID;
-                                dbLocal.Facility.AddObject(localFacility);
-                                //remoteFacility.Clone();
-                            }
-                            else
-                            {
-                                localFacility.CopyFrom(remoteFacility, false);
-                            }
+                            localFacility = SynchronizeFacility(dbLocal, remoteFacility, addOrUpdateFacilityMD);
                         }
                     }
 
-                    Database dbIplus = Root.Database as Database;
-                    core.datamodel.ACClass aCClass = dbIplus.GetACTypeByACUrlComp(remoteStorePosting.FacilityUrlOfRecipient);
-                    if (aCClass == null)
-                    {
-                        if (addOrUpdateFacilityMD != null
-                            && localFacility != null
-                            && remoteFacility != null
-                            && remoteFacility.VBiFacilityACClassID.HasValue)
-                        {
-                            using (ACMonitor.Lock(dbIplus.QueryLock_1X000))
-                            {
-                                aCClass = core.datamodel.ACClass.NewACObject(dbIplus, ParentACComponent.ComponentClass);
-                            }
-                            remoteFacility.VBiFacilityACClass.CopyTo(aCClass, false);
-                            aCClass.ACClassID = remoteFacility.VBiFacilityACClassID.Value;
-                            aCClass.ACURLComponentCached = remoteStorePosting.FacilityUrlOfRecipient;
-                            aCClass.ACURLCached = null;
-                            aCClass.ACClass1_BasedOnACClass = dbIplus.GetACType("PAMRemoteStore");
-                            aCClass.ACProjectID = ParentACComponent.ComponentClass.ACProjectID;
-                            aCClass.ACPackageID = aCClass.ACClass1_BasedOnACClass.ACPackageID;
-                            localFacility.VBiFacilityACClassID = aCClass.ACClassID;
-                            using (ACMonitor.Lock(dbIplus.QueryLock_1X000))
-                            {
-                                dbIplus.ACClass.AddObject(aCClass);
-                                msgWithDetails = dbIplus.ACSaveChanges();
-                                if (msgWithDetails != null)
-                                    dbIplus.ACUndoChanges();
-                            }
-                            if (msgWithDetails != null)
-                                Messages.LogMessageMsg(msgWithDetails);
+                    if (!SynchronizeFacilityACClass(remoteStorePosting, dbLocal, remoteFacility, ref localFacility, addOrUpdateFacilityMD))
+                        return;
 
-                            msgWithDetails = dbLocal.ACSaveChanges();
-                            if (msgWithDetails != null)
-                            {
-                                Messages.LogMessageMsg(msgWithDetails);
-                                dbLocal.ACUndoChanges();
-                            }
-                        }
-                        return;
-                    }
-                    else if (addOrUpdateFacilityMD != null && localFacility.EntityState == System.Data.EntityState.Added)
-                    {
-                        localFacility.VBiFacilityACClassID = aCClass.ACClassID;
-                        msgWithDetails = dbLocal.ACSaveChanges();
-                        if (msgWithDetails != null)
-                        {
-                            Messages.LogMessageMsg(msgWithDetails);
-                            dbLocal.ACUndoChanges();
-                        }
-                    }
-                    if (localFacility == null)
-                    {
-                        localFacility = dbLocal.Facility
-                                                    .Include(c => c.Facility1_ParentFacility)
-                                                    .Where(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == aCClass.ACClassID)
-                                                    .FirstOrDefault();
-                    }
-                    if (localFacility == null || localFacility.Facility1_ParentFacility == null)
-                        return;
                     if (remoteFacility == null)
                     {
                         remoteFacility = dbRemote.Facility
@@ -373,72 +299,7 @@ namespace gip.mes.facility
 
                     foreach (FacilityCharge changedRemoteFC in changedRemoteFCs)
                     {
-                        FacilityCharge localFC = null;
-
-
-                        //localFC = dbLocal.FacilityCharge.Where(c => c.Material.MaterialNo == changedRemoteFC.Material.MaterialNo
-                        //                                                        && c.FacilityID == localFacility.FacilityID
-                        //                                                        && (!changedRemoteFC.FacilityLotID.HasValue || c.FacilityLotID == changedRemoteFC.FacilityLotID)
-                        //                                                        && c.SplitNo == changedRemoteFC.SplitNo)
-                        //                                                .FirstOrDefault();
-
-                        // Search charge with same ID
-                        localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
-
-
-                        if (localFC == null)
-                        {
-                            // Add New
-                            FacilityLot localLot = null;
-                            if (changedRemoteFC.FacilityLotID != null && changedRemoteFC.FacilityLotID != Guid.Empty)
-                            {
-                                localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
-                                if (localLot == null)
-                                {
-                                    localLot = FacilityLot.NewACObject(dbLocal, null, changedRemoteFC.FacilityLot.LotNo);
-                                    localLot.FacilityLotID = changedRemoteFC.FacilityLotID ?? Guid.Empty;
-                                    localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
-                                    localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
-                                    dbLocal.FacilityLot.AddObject(localLot);
-                                }
-                                localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
-                            }
-
-                            localFC = FacilityCharge.NewACObject(dbLocal, localLot);
-                            localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
-                            dbLocal.FacilityCharge.AddObject(localFC);
-                        }
-                        else if (localFC.NotAvailable)
-                        {
-                            // Restore
-                            // Restore -> Make charge available again
-                            ACMethodBooking bookReleaseStateFree = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ReleaseState_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-                            bookReleaseStateFree.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbLocal, MDReleaseState.ReleaseStates.Free);
-                            ACMethodEventArgs resultRelaseFree = ACFacilityManager.BookFacility(bookReleaseStateFree, dbLocal) as ACMethodEventArgs;
-                            if (!bookReleaseStateFree.ValidMessage.IsSucceded() || bookReleaseStateFree.ValidMessage.HasWarnings())
-                                Messages.Msg(bookReleaseStateFree.ValidMessage);
-                            else if (resultRelaseFree.ResultState == Global.ACMethodResultState.Failed || resultRelaseFree.ResultState == Global.ACMethodResultState.Notpossible)
-                            {
-                                if (String.IsNullOrEmpty(resultRelaseFree.ValidMessage.Message))
-                                    resultRelaseFree.ValidMessage.Message = resultRelaseFree.ResultState.ToString();
-                                Messages.Msg(resultRelaseFree.ValidMessage);
-                            }
-                        }
-                        // TODO: Booking to Absolute stock
-                        ACMethodBooking bookAbsolute = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InwardMovement_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-                        bookAbsolute.QuantityIsAbsolute = true;
-                        bookAbsolute.InwardFacilityCharge = localFC;
-                        bookAbsolute.InwardTargetQuantity = changedRemoteFC.AvailableQuantity;
-
-                        ACMethodEventArgs resultAbsolute = ACFacilityManager.BookFacility(bookAbsolute, dbLocal) as ACMethodEventArgs;
-                        if (!bookAbsolute.ValidMessage.IsSucceded() || bookAbsolute.ValidMessage.HasWarnings())
-                            Messages.Msg(bookAbsolute.ValidMessage);
-                        else if (resultAbsolute.ResultState == Global.ACMethodResultState.Failed || resultAbsolute.ResultState == Global.ACMethodResultState.Notpossible)
-                        {
-                            if (String.IsNullOrEmpty(resultAbsolute.ValidMessage.Message))
-                                resultAbsolute.ValidMessage.Message = resultAbsolute.ResultState.ToString();
-                            Messages.Msg(resultAbsolute.ValidMessage);
-                        }
+                        SynchronizeFacilityCharge(dbLocal, changedRemoteFC);
                     }
 
                     foreach (Picking remotePicking in changedRemotePickings)
@@ -446,59 +307,7 @@ namespace gip.mes.facility
                         if (!IsRemotePickingRequiredHere(acUrlOfCaller, remoteConnString, remoteStorePosting, dbRemote, dbLocal, remotePicking))
                             continue;
                         OnHandleRemotePicking(acUrlOfCaller, remoteConnString, remoteStorePosting, dbRemote, dbLocal, remotePicking);
-                        Picking localPicking = dbLocal.Picking.FirstOrDefault(c => c.PickingID == remotePicking.PickingID);
-                        if (localPicking == null)
-                        {
-                            // TODO: Check PickingNo - if duplicate with same PickingNo and different KeyOfExtSys exist ?? 
-                            localPicking = Picking.NewACObject(dbLocal, null, remotePicking.PickingNo);
-                            localPicking.PickingID = remotePicking.PickingID;
-                            localPicking.KeyOfExtSys = remotePicking.KeyOfExtSys;
-                            dbLocal.Picking.AddObject(localPicking);
-                        }
-
-                        localPicking.MDPickingType = dbLocal.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == remotePicking.MDPickingType.MDPickingTypeIndex);
-                        localPicking.DeliveryDateFrom = remotePicking.DeliveryDateFrom;
-                        if (remotePicking.DeliveryCompanyAddress != null)
-                        {
-                            CompanyAddress companyAddress = dbLocal.CompanyAddress.FirstOrDefault(c => c.Company.KeyOfExtSys == remotePicking.DeliveryCompanyAddress.Company.KeyOfExtSys);
-                            remotePicking.DeliveryCompanyAddress = companyAddress;
-                        }
-                        localPicking.PickingStateIndex = remotePicking.PickingStateIndex;
-
-                        // updating pos
-                        Guid[] remotePosIDs = remotePicking.PickingPos_Picking.Select(c => c.PickingPosID).ToArray();
-                        Guid[] localPosIDs = localPicking.PickingPos_Picking.Select(c => c.PickingPosID).ToArray();
-
-
-                        Guid[] localPosIDsForDelete = localPosIDs.Where(c => !remotePosIDs.Contains(c)).ToArray();
-                        foreach (Guid posID in localPosIDsForDelete)
-                        {
-                            PickingPos posForDelete = localPicking.PickingPos_Picking.Where(c => c.PickingPosID == posID).FirstOrDefault();
-                            localPicking.PickingPos_Picking.Remove(posForDelete);
-                            posForDelete.DeleteACObject(dbLocal, false);
-                        }
-
-                        foreach (Guid posID in remotePosIDs)
-                        {
-                            PickingPos remotePos = remotePicking.PickingPos_Picking.FirstOrDefault(c => c.PickingPosID == posID);
-                            PickingPos localPos = localPicking.PickingPos_Picking.FirstOrDefault(c => c.PickingPosID == posID);
-                            if (localPos == null)
-                            {
-                                localPos = PickingPos.NewACObject(dbLocal, localPicking);
-                                localPicking.PickingPos_Picking.Add(localPos);
-                            }
-                            localPos.PickingMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialNo == remotePos.PickingMaterial.MaterialNo);
-                            localPos.PickingQuantityUOM = remotePos.PickingQuantityUOM;
-                            localPos.Sequence = remotePos.Sequence;
-                            if (remotePos.ToFacility != null)
-                                localPos.FromFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.ToFacility.FacilityNo);
-                            else
-                                localPos.FromFacility = null;
-                            if (remotePos.FromFacility != null)
-                                localPos.ToFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.FromFacility.FacilityNo);
-                            else
-                                localPos.ToFacility = null;
-                        }
+                        SynchronizePicking(dbLocal, remotePicking);
                     }
 
                     msgWithDetails = dbLocal.ACSaveChanges();
@@ -511,6 +320,220 @@ namespace gip.mes.facility
                 Messages.LogException(this.GetACUrl(), "SynchronizeFacility", e);
             }
         }
+
+        private bool SynchronizeFacilityACClass(RemoteStorePostingData remoteStorePosting, DatabaseApp dbLocal, Facility remoteFacility, ref Facility localFacility, RSPDEntry addOrUpdateFacilityMD)
+        {
+            MsgWithDetails msgWithDetails = null;
+            Database dbIplus = Root.Database as Database;
+            core.datamodel.ACClass aCClass = dbIplus.GetACTypeByACUrlComp(remoteStorePosting.FacilityUrlOfRecipient);
+            if (aCClass == null)
+            {
+                if (addOrUpdateFacilityMD != null
+                    && localFacility != null
+                    && remoteFacility != null
+                    && remoteFacility.VBiFacilityACClassID.HasValue)
+                {
+                    using (ACMonitor.Lock(dbIplus.QueryLock_1X000))
+                    {
+                        aCClass = core.datamodel.ACClass.NewACObject(dbIplus, ParentACComponent.ComponentClass);
+                    }
+                    remoteFacility.VBiFacilityACClass.CopyTo(aCClass, false);
+                    aCClass.ACClassID = remoteFacility.VBiFacilityACClassID.Value;
+                    aCClass.ACURLComponentCached = remoteStorePosting.FacilityUrlOfRecipient;
+                    aCClass.ACURLCached = null;
+                    aCClass.ACClass1_BasedOnACClass = dbIplus.GetACType("PAMRemoteStore");
+                    aCClass.ACProjectID = ParentACComponent.ComponentClass.ACProjectID;
+                    aCClass.ACPackageID = aCClass.ACClass1_BasedOnACClass.ACPackageID;
+                    localFacility.VBiFacilityACClassID = aCClass.ACClassID;
+                    using (ACMonitor.Lock(dbIplus.QueryLock_1X000))
+                    {
+                        dbIplus.ACClass.AddObject(aCClass);
+                        msgWithDetails = dbIplus.ACSaveChanges();
+                        if (msgWithDetails != null)
+                            dbIplus.ACUndoChanges();
+                    }
+                    if (msgWithDetails != null)
+                        Messages.LogMessageMsg(msgWithDetails);
+
+                    msgWithDetails = dbLocal.ACSaveChanges();
+                    if (msgWithDetails != null)
+                    {
+                        Messages.LogMessageMsg(msgWithDetails);
+                        dbLocal.ACUndoChanges();
+                    }
+                }
+                return false;
+            }
+            else if (addOrUpdateFacilityMD != null && localFacility.EntityState == System.Data.EntityState.Added)
+            {
+                localFacility.VBiFacilityACClassID = aCClass.ACClassID;
+                msgWithDetails = dbLocal.ACSaveChanges();
+                if (msgWithDetails != null)
+                {
+                    Messages.LogMessageMsg(msgWithDetails);
+                    dbLocal.ACUndoChanges();
+                }
+            }
+
+            if (localFacility == null)
+            {
+                localFacility = dbLocal.Facility
+                                            .Include(c => c.Facility1_ParentFacility)
+                                            .Where(c => c.VBiFacilityACClassID.HasValue && c.VBiFacilityACClassID == aCClass.ACClassID)
+                                            .FirstOrDefault();
+            }
+            if (localFacility == null || localFacility.Facility1_ParentFacility == null)
+                return false;
+            return true;
+        }
+
+        private void SynchronizeFacilityCharge(DatabaseApp dbLocal, FacilityCharge changedRemoteFC)
+        {
+            FacilityCharge localFC = null;
+
+            // Search charge with same ID
+            localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
+
+
+            if (localFC == null)
+            {
+                // Add New
+                FacilityLot localLot = null;
+                if (changedRemoteFC.FacilityLotID != null && changedRemoteFC.FacilityLotID != Guid.Empty)
+                {
+                    localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
+                    if (localLot == null)
+                    {
+                        localLot = FacilityLot.NewACObject(dbLocal, null, changedRemoteFC.FacilityLot.LotNo);
+                        localLot.FacilityLotID = changedRemoteFC.FacilityLotID ?? Guid.Empty;
+                        dbLocal.FacilityLot.AddObject(localLot);
+                    }
+                    localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
+                    localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
+                    localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
+                }
+
+                localFC = FacilityCharge.NewACObject(dbLocal, localLot);
+                localFC.FacilityChargeID = changedRemoteFC.FacilityChargeID;
+                dbLocal.FacilityCharge.AddObject(localFC);
+            }
+            else if (localFC.NotAvailable)
+            {
+                // Restore
+                // Restore -> Make charge available again
+                ACMethodBooking bookReleaseStateFree = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ReleaseState_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                bookReleaseStateFree.MDReleaseState = MDReleaseState.DefaultMDReleaseState(dbLocal, MDReleaseState.ReleaseStates.Free);
+                ACMethodEventArgs resultRelaseFree = ACFacilityManager.BookFacility(bookReleaseStateFree, dbLocal) as ACMethodEventArgs;
+                if (!bookReleaseStateFree.ValidMessage.IsSucceded() || bookReleaseStateFree.ValidMessage.HasWarnings())
+                    Messages.Msg(bookReleaseStateFree.ValidMessage);
+                else if (resultRelaseFree.ResultState == Global.ACMethodResultState.Failed || resultRelaseFree.ResultState == Global.ACMethodResultState.Notpossible)
+                {
+                    if (String.IsNullOrEmpty(resultRelaseFree.ValidMessage.Message))
+                        resultRelaseFree.ValidMessage.Message = resultRelaseFree.ResultState.ToString();
+                    Messages.Msg(resultRelaseFree.ValidMessage);
+                }
+            }
+            // TODO: Booking to Absolute stock
+            ACMethodBooking bookAbsolute = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InwardMovement_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            bookAbsolute.QuantityIsAbsolute = true;
+            bookAbsolute.InwardFacilityCharge = localFC;
+            bookAbsolute.InwardTargetQuantity = changedRemoteFC.AvailableQuantity;
+
+            ACMethodEventArgs resultAbsolute = ACFacilityManager.BookFacility(bookAbsolute, dbLocal) as ACMethodEventArgs;
+            if (!bookAbsolute.ValidMessage.IsSucceded() || bookAbsolute.ValidMessage.HasWarnings())
+                Messages.Msg(bookAbsolute.ValidMessage);
+            else if (resultAbsolute.ResultState == Global.ACMethodResultState.Failed || resultAbsolute.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (String.IsNullOrEmpty(resultAbsolute.ValidMessage.Message))
+                    resultAbsolute.ValidMessage.Message = resultAbsolute.ResultState.ToString();
+                Messages.Msg(resultAbsolute.ValidMessage);
+            }
+        }
+
+        private Facility SynchronizeFacility(DatabaseApp dbLocal, Facility remoteFacility, RSPDEntry addOrUpdateFacilityMD)
+        {
+            Facility localFacility = dbLocal.Facility
+                                                                .Include(c => c.Facility1_ParentFacility)
+                                                                .Where(c => c.FacilityID == addOrUpdateFacilityMD.KeyId)
+                                                                .FirstOrDefault();
+            if (localFacility == null)
+            {
+                Facility parentFacility = null;
+                if (remoteFacility.ParentFacilityID.HasValue)
+                    parentFacility = dbLocal.Facility.Where(c => c.FacilityID == remoteFacility.ParentFacilityID.Value).FirstOrDefault();
+                localFacility = Facility.NewACObject(dbLocal, parentFacility);
+                localFacility.CopyFrom(remoteFacility, false);
+                localFacility.FacilityID = addOrUpdateFacilityMD.KeyId;
+                localFacility.MDFacilityTypeID = remoteFacility.MDFacilityTypeID;
+                localFacility.VBiStackCalculatorACClassID = remoteFacility.VBiStackCalculatorACClassID;
+                dbLocal.Facility.AddObject(localFacility);
+            }
+            else
+            {
+                localFacility.CopyFrom(remoteFacility, false);
+            }
+
+            return localFacility;
+        }
+
+        private static void SynchronizePicking(DatabaseApp dbLocal, Picking remotePicking)
+        {
+            Picking localPicking = dbLocal.Picking.FirstOrDefault(c => c.PickingID == remotePicking.PickingID);
+            if (localPicking == null)
+            {
+                // TODO: Check PickingNo - if duplicate with same PickingNo and different KeyOfExtSys exist ?? 
+                localPicking = Picking.NewACObject(dbLocal, null, remotePicking.PickingNo);
+                localPicking.PickingID = remotePicking.PickingID;
+                localPicking.KeyOfExtSys = remotePicking.KeyOfExtSys;
+                dbLocal.Picking.AddObject(localPicking);
+            }
+
+            localPicking.MDPickingType = dbLocal.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == remotePicking.MDPickingType.MDPickingTypeIndex);
+            localPicking.DeliveryDateFrom = remotePicking.DeliveryDateFrom;
+            if (remotePicking.DeliveryCompanyAddress != null)
+            {
+                CompanyAddress companyAddress = dbLocal.CompanyAddress.FirstOrDefault(c => c.Company.KeyOfExtSys == remotePicking.DeliveryCompanyAddress.Company.KeyOfExtSys);
+                remotePicking.DeliveryCompanyAddress = companyAddress;
+            }
+            localPicking.PickingStateIndex = remotePicking.PickingStateIndex;
+
+            // updating pos
+            Guid[] remotePosIDs = remotePicking.PickingPos_Picking.Select(c => c.PickingPosID).ToArray();
+            Guid[] localPosIDs = localPicking.PickingPos_Picking.Select(c => c.PickingPosID).ToArray();
+
+
+            Guid[] localPosIDsForDelete = localPosIDs.Where(c => !remotePosIDs.Contains(c)).ToArray();
+            foreach (Guid posID in localPosIDsForDelete)
+            {
+                PickingPos posForDelete = localPicking.PickingPos_Picking.Where(c => c.PickingPosID == posID).FirstOrDefault();
+                localPicking.PickingPos_Picking.Remove(posForDelete);
+                posForDelete.DeleteACObject(dbLocal, false);
+            }
+
+            foreach (Guid posID in remotePosIDs)
+            {
+                PickingPos remotePos = remotePicking.PickingPos_Picking.FirstOrDefault(c => c.PickingPosID == posID);
+                PickingPos localPos = localPicking.PickingPos_Picking.FirstOrDefault(c => c.PickingPosID == posID);
+                if (localPos == null)
+                {
+                    localPos = PickingPos.NewACObject(dbLocal, localPicking);
+                    localPicking.PickingPos_Picking.Add(localPos);
+                }
+                localPos.PickingMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialNo == remotePos.PickingMaterial.MaterialNo);
+                localPos.PickingQuantityUOM = remotePos.PickingQuantityUOM;
+                localPos.Sequence = remotePos.Sequence;
+                if (remotePos.ToFacility != null)
+                    localPos.FromFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.ToFacility.FacilityNo);
+                else
+                    localPos.FromFacility = null;
+                if (remotePos.FromFacility != null)
+                    localPos.ToFacility = dbLocal.Facility.FirstOrDefault(c => c.FacilityNo == remotePos.FromFacility.FacilityNo);
+                else
+                    localPos.ToFacility = null;
+            }
+        }
+        
+        #endregion
 
         protected virtual bool IsRemotePickingRequiredHere(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting, DatabaseApp dbRemote, DatabaseApp dbLocal, Picking remotePicking)
         {
