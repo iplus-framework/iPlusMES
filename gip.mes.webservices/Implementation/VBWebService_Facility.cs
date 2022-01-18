@@ -1157,7 +1157,11 @@ namespace gip.mes.webservices
                 if (bpParam.InwardFacilityLotID.HasValue)
                     acParam.InwardFacilityLot = dbApp.FacilityLot.Where(c => c.FacilityLotID == bpParam.InwardFacilityLotID.Value).FirstOrDefault();
                 if (bpParam.InwardFacilityChargeID.HasValue)
-                    acParam.InwardFacilityCharge = dbApp.FacilityCharge.Where(c => c.FacilityChargeID == bpParam.InwardFacilityChargeID.Value).FirstOrDefault();
+                {
+                    acParam.InwardFacilityCharge = dbApp.FacilityCharge.Include(c => c.Facility).Where(c => c.FacilityChargeID == bpParam.InwardFacilityChargeID.Value).FirstOrDefault();
+                    if (acParam.InwardFacilityCharge != null)
+                        acParam.InwardFacility = acParam.InwardFacilityCharge.Facility;
+                }
                 if (bpParam.InwardFacilityLocationID.HasValue)
                     acParam.InwardFacilityLocation = dbApp.Facility.Where(c => c.FacilityID == bpParam.InwardFacilityLocationID.Value).FirstOrDefault();
                 if (bpParam.InwardPartslistID.HasValue)
@@ -1175,7 +1179,11 @@ namespace gip.mes.webservices
                 if (bpParam.OutwardFacilityLotID.HasValue)
                     acParam.OutwardFacilityLot = dbApp.FacilityLot.Where(c => c.FacilityLotID == bpParam.OutwardFacilityLotID.Value).FirstOrDefault();
                 if (bpParam.OutwardFacilityChargeID.HasValue)
-                    acParam.OutwardFacilityCharge = dbApp.FacilityCharge.Where(c => c.FacilityChargeID == bpParam.OutwardFacilityChargeID.Value).FirstOrDefault();
+                {
+                    acParam.OutwardFacilityCharge = dbApp.FacilityCharge.Include(c => c.Facility).Where(c => c.FacilityChargeID == bpParam.OutwardFacilityChargeID.Value).FirstOrDefault();
+                    if (acParam.OutwardFacilityCharge != null)
+                        acParam.OutwardFacility = acParam.OutwardFacilityCharge.Facility;
+                }
                 if (bpParam.OutwardFacilityLocationID.HasValue)
                     acParam.OutwardFacilityLocation = dbApp.Facility.Where(c => c.FacilityID == bpParam.OutwardFacilityLocationID.Value).FirstOrDefault();
                 if (bpParam.OutwardPartslistID.HasValue)
