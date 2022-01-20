@@ -287,5 +287,35 @@ namespace gip.mes.datamodel
         }
 
         #endregion
+
+        #region Cloning
+        public object Clone(bool withReferences)
+        {
+            Picking clonedObject = new Picking();
+            clonedObject.PickingID = this.PickingID;
+            clonedObject.CopyFrom(this, withReferences);
+            return clonedObject;
+        }
+
+        public void CopyFrom(Picking from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                MDPickingTypeID = from.MDPickingTypeID;
+                ACClassMethodID = from.ACClassMethodID;
+                VisitorVoucherID = from.VisitorVoucherID;
+                TourplanID = from.TourplanID;
+                DeliveryCompanyAddressID = from.DeliveryCompanyAddressID;
+            }
+
+            PickingNo = from.PickingNo;
+            PickingStateIndex = from.PickingStateIndex;
+            DeliveryDateFrom = from.DeliveryDateFrom;
+            DeliveryDateTo = from.DeliveryDateTo;
+            Comment = from.Comment;
+            XMLConfig = from.XMLConfig;
+            KeyOfExtSys = from.KeyOfExtSys;
+        }
+        #endregion
     }
 }

@@ -21,6 +21,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.Objects;
 using System.Globalization;
 using System.Linq;
@@ -1862,29 +1863,53 @@ namespace gip.bso.logistics
                 {
                     if (changedPos.FromFacility != null && changedPos.FromFacility.IsMirroredOnMoreDatabases)
                     {
-                        ForwardToMirroredStore broadcastEntry = _ForwardPlan.Where(c => c.MirroredStore == changedPos.FromFacility).FirstOrDefault();
-                        if (broadcastEntry == null)
-                        {
-                            broadcastEntry = new ForwardToMirroredStore(changedPos.FromFacility);
-                            _ForwardPlan.Add(broadcastEntry);
-                        }
-                        if (!broadcastEntry.Pickings.Contains(changedPos.Picking))
-                            broadcastEntry.Pickings.Add(changedPos.Picking);
+                        BroadcastFacility(changedPos.FromFacility, changedPos.Picking);
                     }
                     if (changedPos.ToFacility != null && changedPos.ToFacility.IsMirroredOnMoreDatabases)
                     {
-                        ForwardToMirroredStore broadcastEntry = _ForwardPlan.Where(c => c.MirroredStore == changedPos.ToFacility).FirstOrDefault();
-                        if (broadcastEntry == null)
+                        BroadcastFacility(changedPos.ToFacility, changedPos.Picking);
+                    }
+                }
+
+                // scenario for delete
+                IList<PickingPos> deletedItems = DatabaseApp.GetDeletedEntities<PickingPos>(null);
+                if (deletedItems.Any())
+                {
+                    foreach (PickingPos deletedItem in deletedItems)
+                    {
+                        DbDataRecord originalItem = DatabaseApp.GetOriginalValues(deletedItem.EntityKey);
+                        Guid pickingID = (Guid)originalItem["PickingID"];
+                        Picking picking = DatabaseApp.Picking.FirstOrDefault(c=>c.PickingID == pickingID);
+                        if (!string.IsNullOrEmpty(originalItem["FromFacilityID"].ToString()))
                         {
-                            broadcastEntry = new ForwardToMirroredStore(changedPos.ToFacility);
-                            _ForwardPlan.Add(broadcastEntry);
+                            Guid fromFacilityID = (Guid)originalItem["FromFacilityID"];
+                            Facility facility = DatabaseApp.Facility.FirstOrDefault(c=>c.FacilityID == fromFacilityID);
+                            if(facility.IsMirroredOnMoreDatabases)
+                                BroadcastFacility(facility, picking);
                         }
-                        if (!broadcastEntry.Pickings.Contains(changedPos.Picking))
-                            broadcastEntry.Pickings.Add(changedPos.Picking);
+                        if (!string.IsNullOrEmpty(originalItem["ToFacilityID"].ToString()))
+                        {
+                            Guid fromFacilityID = (Guid)originalItem["ToFacilityID"];
+                            Facility facility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityID == fromFacilityID);
+                            if (facility.IsMirroredOnMoreDatabases)
+                                BroadcastFacility(facility, picking);
+                        }
                     }
                 }
             }
             return base.OnPreSave();
+        }
+
+        private void BroadcastFacility(Facility facility, Picking picking)
+        {
+            ForwardToMirroredStore broadcastEntry = _ForwardPlan.Where(c => c.MirroredStore == facility).FirstOrDefault();
+            if (broadcastEntry == null)
+            {
+                broadcastEntry = new ForwardToMirroredStore(facility);
+                _ForwardPlan.Add(broadcastEntry);
+            }
+            if (!broadcastEntry.Pickings.Contains(picking))
+                broadcastEntry.Pickings.Add(picking);
         }
 
         protected override void OnPostSave()
@@ -3297,8 +3322,8 @@ namespace gip.bso.logistics
                 filterItem.SearchWord = pickingNo;
 
             this.Search();
-            if(PickingList != null && PickingList.Count() > 1)
-                CurrentPicking = PickingList.FirstOrDefault(c=>c.PickingNo == pickingNo);
+            if (PickingList != null && PickingList.Count() > 1)
+                CurrentPicking = PickingList.FirstOrDefault(c => c.PickingNo == pickingNo);
             if (CurrentPicking != null && pickingPosID != Guid.Empty)
             {
                 if (this.PickingPosList != null && this.PickingPosList.Any())

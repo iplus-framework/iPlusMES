@@ -451,5 +451,41 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Cloning
+
+        public object Clone(bool withReferences)
+        {
+            PickingPos clonedObject = new PickingPos();
+            clonedObject.PickingPosID = this.PickingPosID;
+            clonedObject.CopyFrom(this, withReferences);
+            return clonedObject;
+        }
+
+        public void CopyFrom(PickingPos from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                OutOrderPosID = from.OutOrderPosID;
+                InOrderPosID = from.InOrderPosID;
+                FromFacilityID = from.FromFacilityID;
+                ToFacilityID = from.ToFacilityID;
+                PickingMaterialID = from.PickingMaterialID;
+                MDDelivPosLoadStateID = from.MDDelivPosLoadStateID;
+            }
+
+            Sequence = from.Sequence;
+            Comment = from.Comment;
+            XMLConfig = from.XMLConfig;
+            InsertName = from.InsertName;
+            InsertDate = from.InsertDate;
+            UpdateName = from.UpdateName;
+            UpdateDate = from.UpdateDate;
+            LineNumber = from.LineNumber;
+            PickingQuantityUOM = from.PickingQuantityUOM;
+            PickingActualUOM = from.PickingActualUOM;
+            KeyOfExtSys = from.KeyOfExtSys;
+        }
+        #endregion
+
     }
 }

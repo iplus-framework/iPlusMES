@@ -324,7 +324,7 @@ namespace gip.mes.datamodel
             this.XMLConfig = facilityCharge.XMLConfig;
         }
 
-        public void CopyFrom(FacilityCharge from, bool withReferences)
+        public void CopyFrom(FacilityCharge from, bool withReferences, bool bWithStock)
         {
             if (withReferences)
             {
@@ -337,14 +337,23 @@ namespace gip.mes.datamodel
                 MDUnitID = from.MDUnitID;
             }
 
+            if (bWithStock)
+            {
+                StockQuantity = from.StockQuantity;
+                ReservedInwardQuantity = from.ReservedInwardQuantity;
+                ReservedOutwardQuantity = from.ReservedOutwardQuantity;
+            }
+            else
+            {
+                StockQuantity = 0;
+                ReservedInwardQuantity = 0;
+                ReservedOutwardQuantity = 0;
+            }
+
             FacilityChargeSortNo = from.FacilityChargeSortNo;
             SplitNo = from.SplitNo;
             NotAvailable = from.NotAvailable;
             HandlingUnit = from.HandlingUnit;
-            StockQuantity = from.StockQuantity;
-            StockQuantityUOM = from.StockQuantityUOM;
-            ReservedOutwardQuantity = from.ReservedOutwardQuantity;
-            ReservedInwardQuantity = from.ReservedInwardQuantity;
             FillingDate = from.FillingDate;
             StorageLife = from.StorageLife;
             ProductionDate = from.ProductionDate;
@@ -362,10 +371,6 @@ namespace gip.mes.datamodel
             Lock = from.Lock;
             IsEnabled = from.IsEnabled;
             XMLConfig = from.XMLConfig;
-            InsertName = from.InsertName;
-            InsertDate = from.InsertDate;
-            UpdateName = from.UpdateName;
-            UpdateDate = from.UpdateDate;
             RowVersion = from.RowVersion;
             CPartnerCompanyMaterialID = from.CPartnerCompanyMaterialID;
             StockQuantityUOMAmb = from.StockQuantityUOMAmb;

@@ -140,5 +140,36 @@ namespace gip.mes.datamodel
             }
         }
         #endregion
+
+        #region Cloning
+        public object Clone(bool withReferences)
+        {
+            FacilityLot clonedObject = new FacilityLot();
+            clonedObject.FacilityLotID = this.FacilityLotID;
+            clonedObject.CopyFrom(this, withReferences);
+            return clonedObject;
+        }
+
+        public void CopyFrom(FacilityLot from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                MaterialID = from.MaterialID;
+                MDReleaseStateID = from.MDReleaseStateID;
+            }
+
+            LotNo = from.LotNo;
+            FillingDate = from.FillingDate;
+            StorageLife = from.StorageLife;
+            ProductionDate = from.ProductionDate;
+            ExpirationDate = from.ExpirationDate;
+            ExternLotNo = from.ExternLotNo;
+            ExternLotNo2 = from.ExternLotNo2;
+            Comment = from.Comment;
+            Lock = from.Lock;
+            IsEnabled = from.IsEnabled;
+            XMLConfig = from.XMLConfig;
+        }
+        #endregion
     }
 }

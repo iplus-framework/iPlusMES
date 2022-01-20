@@ -9,6 +9,7 @@ using System.Data.Objects.DataClasses;
 using System.Data;
 using System.ComponentModel;
 using System.Threading;
+using System.Data.Common;
 
 namespace gip.mes.datamodel
 {
@@ -473,6 +474,15 @@ namespace gip.mes.datamodel
         public IList<Msg> CheckChangedEntities()
         {
             return _ObjectContextHelper.CheckChangedEntities();
+        }
+
+        /// <summary>
+        /// UNSAFE. Use QueryLock_1X000 outside
+        /// </summary>
+        /// <returns></returns>
+        public DbDataRecord GetOriginalValues(EntityKey entityKey)
+        {
+            return _ObjectContextHelper.GetOriginalValues(entityKey);
         }
 
         /// <summary>
