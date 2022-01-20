@@ -41,7 +41,8 @@ namespace gip.bso.logistics
        {
             new object[] { "PickingType", Global.ParamOption.Optional, typeof(string) },
             new object[] { "FromFacility", Global.ParamOption.Optional, typeof(string) },
-            new object[] { "ToFacility", Global.ParamOption.Optional, typeof(string) }
+            new object[] { "ToFacility", Global.ParamOption.Optional, typeof(string) },
+            new object[] { "CompanyNo", Global.ParamOption.Optional, typeof(string) }
        }
    )]
     public partial class BSOPicking : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider
@@ -90,29 +91,38 @@ namespace gip.bso.logistics
                 throw new Exception("FacilityManager not configured");
 
             if (Parameters != null && Parameters.Any())
-            {
-                object pickingTypeOb = Parameters["PickingType"];
-                if (pickingTypeOb != null)
-                {
-                    string pickingType = pickingTypeOb.ToString();
-                    SelectedFilterMDPickingType = FilterMDPickingTypeList.FirstOrDefault(c => c.MDKey == pickingType);
-                }
-                object fromFacilityOb = Parameters["FromFacility"];
-                if (fromFacilityOb != null)
-                {
-                    string fromFacility = fromFacilityOb.ToString();
-                    DefaultFromFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == fromFacility);
-                }
-                object toFacilityOb = Parameters["ToFacility"];
-                if (toFacilityOb != null)
-                {
-                    string toFacility = toFacilityOb.ToString();
-                    DefaultToFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == toFacility);
-                }
-            }
+                InitParams();
 
             Search();
             return true;
+        }
+
+        public void InitParams()
+        {
+            object pickingTypeOb = Parameters["PickingType"];
+            if (pickingTypeOb != null)
+            {
+                string pickingType = pickingTypeOb.ToString();
+                SelectedFilterMDPickingType = FilterMDPickingTypeList.FirstOrDefault(c => c.MDKey == pickingType);
+            }
+            object fromFacilityOb = Parameters["FromFacility"];
+            if (fromFacilityOb != null)
+            {
+                string fromFacility = fromFacilityOb.ToString();
+                DefaultFromFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == fromFacility);
+            }
+            object toFacilityOb = Parameters["ToFacility"];
+            if (toFacilityOb != null)
+            {
+                string toFacility = toFacilityOb.ToString();
+                DefaultToFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == toFacility);
+            }
+            object companyNoOb = Parameters["CompanyNo"];
+            string companyNo = null;
+            if (companyNoOb != null)
+                companyNo = companyNoOb.ToString();
+            AccessFilterDeliveryAddress.NavACQueryDefinition.SetSearchValue("Company\\CompanyNo", Global.LogicalOperators.greaterThanOrEqual, companyNo);
+            AccessFilterDeliveryAddress.NavSearch();
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
@@ -271,6 +281,10 @@ namespace gip.bso.logistics
                 ACFilterItem acFilterPickingStateIndex = new ACFilterItem(FilterTypes.filter, "PickingStateIndex", LogicalOperators.equal, Operators.and, "", true);
                 aCFilterItems.Add(acFilterPickingStateIndex);
 
+                ACFilterItem acFilterCompanyNo = new ACFilterItem(FilterTypes.filter, "DeliveryCompanyAddress\\CompanyNo", LogicalOperators.equal, Operators.and, "", true);
+                aCFilterItems.Add(acFilterCompanyNo);
+
+
                 return aCFilterItems;
             }
         }
@@ -401,7 +415,6 @@ namespace gip.bso.logistics
             }
         }
 
-
         #region Picking -> Filter -> Properties -> FilterPickingTypeIndex -> FilterMDPickingType
         private MDPickingType _SelectedFilterMDPickingType;
         /// <summary>
@@ -467,7 +480,7 @@ namespace gip.bso.logistics
         #endregion
 
 
-        #region FilterPickingState
+        #region Picking -> Filter -> Properties -> FilterPickingState
         private ACValueItem _SelectedFilterPickingState;
         /// <summary>
         /// Selected property for ACValueItem
@@ -534,6 +547,89 @@ namespace gip.bso.logistics
 
         public Facility DefaultFromFacility { get; set; }
         public Facility DefaultToFacility { get; set; }
+
+        #region Picking -> Filter -> Properties -> FilterDeliveryAddress
+
+
+        public List<ACFilterItem> FilterDeliveryAddressDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem acFilterCompanyNo = new ACFilterItem(Global.FilterTypes.filter, "Company\\CompanyNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
+                aCFilterItems.Add(acFilterCompanyNo);
+
+                return aCFilterItems;
+            }
+        }
+
+        private List<ACSortItem> FilterDeliveryAddressDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortPickingNo = new ACSortItem("Company\\CompanyNo", SortDirections.descending, true);
+                acSortItems.Add(acSortPickingNo);
+
+                return acSortItems;
+            }
+        }
+
+        ///
+        ACAccess<CompanyAddress> _AccessFilterDeliveryAddress;
+        [ACPropertyAccess(9999, "FilterDeliveryAddress")]
+        public ACAccess<CompanyAddress> AccessFilterDeliveryAddress
+        {
+            get
+            {
+                if (_AccessFilterDeliveryAddress == null && ACType != null)
+                {
+                    ACQueryDefinition acQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + CompanyAddress.ClassName, ACType.ACIdentifier);
+
+                    acQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterDeliveryAddressDefaultSort);
+                    if (acQueryDefinition.TakeCount == 0)
+                        acQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                    acQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterDeliveryAddressDefaultFilter);
+
+                    _AccessFilterDeliveryAddress = acQueryDefinition.NewAccessNav<CompanyAddress>("FilterDeliveryAddress", this);
+                    _AccessFilterDeliveryAddress.NavSearch();
+                }
+                return _AccessFilterDeliveryAddress;
+            }
+        }
+
+        [ACPropertyInfo(9999, "FilterDeliveryAddress")]
+        public IEnumerable<CompanyAddress> FilterDeliveryAddressList
+        {
+            get
+            {
+                return AccessFilterDeliveryAddress.NavList;
+            }
+        }
+
+        private CompanyAddress _SelectedFilterDeliveryAddress;
+        [ACPropertySelected(9999, "FilterDeliveryAddress", "en{'Delivery Address'}de{'Lieferadresse'}")]
+        public CompanyAddress SelectedFilterDeliveryAddress
+        {
+            get
+            {
+                return _SelectedFilterDeliveryAddress;
+            }
+            set
+            {
+                if (_SelectedFilterDeliveryAddress != value)
+                {
+                    _SelectedFilterDeliveryAddress = value;
+
+                    OnPropertyChanged("SelectedFilterDeliveryAddress");
+                }
+            }
+        }
+
+
+        #endregion
 
         #endregion
 
@@ -632,6 +728,9 @@ namespace gip.bso.logistics
             {
                 query.Include(c => c.VisitorVoucher).Include(c => c.MDPickingType);
             }
+
+            if (SelectedFilterDeliveryAddress != null)
+                result = result.Where(c => c.DeliveryCompanyAddressID == SelectedFilterDeliveryAddress.CompanyAddressID);
 
             return query;
         }
@@ -1426,7 +1525,6 @@ namespace gip.bso.logistics
             OnPropertyChanged("PreBookingAvailableQuantsList");
         }
 
-
         #endregion
 
         #endregion
@@ -1879,12 +1977,12 @@ namespace gip.bso.logistics
                     {
                         DbDataRecord originalItem = DatabaseApp.GetOriginalValues(deletedItem.EntityKey);
                         Guid pickingID = (Guid)originalItem["PickingID"];
-                        Picking picking = DatabaseApp.Picking.FirstOrDefault(c=>c.PickingID == pickingID);
+                        Picking picking = DatabaseApp.Picking.FirstOrDefault(c => c.PickingID == pickingID);
                         if (!string.IsNullOrEmpty(originalItem["FromFacilityID"].ToString()))
                         {
                             Guid fromFacilityID = (Guid)originalItem["FromFacilityID"];
-                            Facility facility = DatabaseApp.Facility.FirstOrDefault(c=>c.FacilityID == fromFacilityID);
-                            if(facility.IsMirroredOnMoreDatabases)
+                            Facility facility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityID == fromFacilityID);
+                            if (facility.IsMirroredOnMoreDatabases)
                                 BroadcastFacility(facility, picking);
                         }
                         if (!string.IsNullOrEmpty(originalItem["ToFacilityID"].ToString()))
@@ -2065,6 +2163,8 @@ namespace gip.bso.logistics
             DatabaseApp.Picking.AddObject(newPicking);
             if (SelectedFilterMDPickingType != null)
                 newPicking.MDPickingType = SelectedFilterMDPickingType;
+            if(SelectedFilterDeliveryAddress != null)
+                newPicking.DeliveryCompanyAddress = SelectedFilterDeliveryAddress;
             CurrentPicking = newPicking;
             ACState = Const.SMNew;
             PostExecute("New");
