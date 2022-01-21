@@ -1,10 +1,10 @@
+using gip.core.autocomponent;
+using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using gip.mes.datamodel;
-using gip.core.datamodel;
-using gip.core.autocomponent;
 using System.Data.Objects;
+using System.Linq;
 
 namespace gip.mes.facility
 {
@@ -1263,7 +1263,7 @@ namespace gip.mes.facility
 
         public void InitBookingParamsFromTemplate(ACMethodBooking acMethodBooking, PickingPos pickingPos, FacilityPreBooking ignorePreBooking = null)
         {
-            if (   acMethodBooking == null
+            if (acMethodBooking == null
                 || pickingPos == null)
                 return;
 
@@ -2107,7 +2107,7 @@ namespace gip.mes.facility
 
                         //Warning50043: Line {0}, material {1} {2} insufficient quantity is {3} {4}.
                         Msg warrMsgMatIssQuant = new Msg(this, eMsgLevel.Warning, this.ACIdentifier, "FinishOrder", 2087, "Warning50043",
-                            pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1,Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol);
+                            pPos.Sequence, pPos.Material.MaterialNo, pPos.Material.MaterialName1, Math.Abs(pPos.DiffQuantityUOM), pPos.MDUnit.Symbol);
                         result.AddDetailMessage(warrMsgMatIssQuant);
                         continue;
                     }
@@ -2263,6 +2263,43 @@ namespace gip.mes.facility
 
             return isRelated;
         }
+        #endregion
+
+        #region MirrorPicking
+
+        public virtual Guid MirroredPickingResolvePickingID(Picking from)
+        {
+            return Guid.NewGuid();
+        }
+
+        public virtual string MirroredPickingResolvePickingNo(Picking from, string formatNewNo = Picking.FormatNewNo)
+        {
+            return Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, formatNewNo, this);
+        }
+
+        public virtual Picking MirrorPicking(DatabaseApp databaseApp, Picking from, string formatNewNo = Picking.FormatNewNo)
+        {
+            string secondaryKey = MirroredPickingResolvePickingNo(from, formatNewNo);
+            Picking mirroredPicking = Picking.NewACObject(databaseApp, null, secondaryKey);
+            mirroredPicking.PickingID = MirroredPickingResolvePickingID(mirroredPicking);
+            mirroredPicking.MirroredFromPickingID = from.PickingID;
+            PickingPos[] positions = from.PickingPos_Picking.ToArray();
+            foreach (PickingPos fromPos in positions)
+            {
+                PickingPos mirroredPos = PickingPos.NewACObject(databaseApp, mirroredPicking);
+                mirroredPos.CopyFrom(fromPos, true);
+                MirroredPickingProcesPos(mirroredPos, fromPos);
+                mirroredPicking.PickingPos_Picking.Add(mirroredPos);
+            }
+            return mirroredPicking;
+        }
+
+        public virtual void MirroredPickingProcesPos(PickingPos mirroredPos, PickingPos fromPos)
+        {
+            mirroredPos.ToFacility = fromPos.FromFacility;
+            mirroredPos.FromFacility = fromPos.ToFacility;
+        }
+
         #endregion
 
         #endregion

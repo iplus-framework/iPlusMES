@@ -2163,7 +2163,7 @@ namespace gip.bso.logistics
             DatabaseApp.Picking.AddObject(newPicking);
             if (SelectedFilterMDPickingType != null)
                 newPicking.MDPickingType = SelectedFilterMDPickingType;
-            if(SelectedFilterDeliveryAddress != null)
+            if (SelectedFilterDeliveryAddress != null)
                 newPicking.DeliveryCompanyAddress = SelectedFilterDeliveryAddress;
             CurrentPicking = newPicking;
             ACState = Const.SMNew;
@@ -2305,6 +2305,28 @@ namespace gip.bso.logistics
                 return false;
             return true;
         }
+
+
+        /// <summary>
+        /// Source Property: MirrorPicking
+        /// </summary>
+        [ACMethodInfo("MirrorPicking", "en{'Mirror picking'}de{'Kommissionierung spiegeln'}", 999)]
+        public void MirrorPicking()
+        {
+            if (!IsEnabledMirrorPicking())
+                return;
+            Picking mirroredPicking = PickingManager.MirrorPicking(DatabaseApp, CurrentPicking);
+            AccessPrimary.NavList.Add(mirroredPicking);
+            OnPropertyChanged("PickingList");
+            CurrentPicking = mirroredPicking;
+            SelectedPicking = mirroredPicking;
+        }
+
+        public bool IsEnabledMirrorPicking()
+        {
+            return CurrentPicking != null && CurrentPicking.PickingPos_Picking.Any();
+        }
+
 
         #endregion
 

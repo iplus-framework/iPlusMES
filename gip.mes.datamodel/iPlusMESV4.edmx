@@ -3798,6 +3798,7 @@
 					<Property Name="MDPickingTypeID" Type="uniqueidentifier" Nullable="false" />
 					<Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
 					<Property Name="DeliveryCompanyAddressID" Type="uniqueidentifier" />
+					<Property Name="MirroredFromPickingID" Type="uniqueidentifier" />
 				</EntityType>
 				<EntityType Name="PickingConfig">
 					<Key>
@@ -11405,6 +11406,18 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
+				<Association Name="FK_Picking_MirroredFromPickingID">
+					<End Role="Picking" Type="Self.Picking" Multiplicity="0..1"/>
+					<End Role="Picking1" Type="Self.Picking" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="Picking">
+							<PropertyRef Name="PickingID" />
+						</Principal>
+						<Dependent Role="Picking1">
+							<PropertyRef Name="MirroredFromPickingID" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
 				<Association Name="FK_PlanningMRProposal_InOrderID">
 					<End Role="InOrder" Type="Self.InOrder" Multiplicity="0..1" />
 					<End Role="PlanningMRProposal" Type="Self.PlanningMRProposal" Multiplicity="*" />
@@ -15986,6 +15999,10 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 						<End Role="CompanyAddress" EntitySet="CompanyAddress" />
 						<End Role="Picking" EntitySet="Picking" />
 					</AssociationSet>
+					<AssociationSet Name="FK_Picking_MirroredFromPickingID" Association="Self.FK_Picking_MirroredFromPickingID">
+						<End Role="Picking" EntitySet="Picking" />
+						<End Role="Picking1" EntitySet="Picking" />
+					</AssociationSet>
 					<AssociationSet Name="FK_PickingConfig_VBiACClassID" Association="Self.FK_PickingConfig_VBiACClassID">
 						<End Role="ACClass" EntitySet="ACClass" />
 						<End Role="PickingConfig" EntitySet="PickingConfig" />
@@ -19631,6 +19648,10 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 					<AssociationSet Name="FK_Picking_DeliveryCompanyAddressID" Association="iPlusMESV4_Model.FK_Picking_DeliveryCompanyAddressID">
 						<End Role="CompanyAddress" EntitySet="CompanyAddress" />
 						<End Role="Picking" EntitySet="Picking" />
+					</AssociationSet>
+					<AssociationSet Name="FK_Picking_MirroredFromPickingID" Association="iPlusMESV4_Model.FK_Picking_MirroredFromPickingID">
+						<End Role="Picking" EntitySet="Picking" />
+						<End Role="Picking1" EntitySet="Picking" />
 					</AssociationSet>
 					<AssociationSet Name="FK_PickingPos_PickingID" Association="iPlusMESV4_Model.FK_PickingPos_PickingID">
 						<End Role="Picking" EntitySet="Picking" />
@@ -34038,6 +34059,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 					<Property Name="MDPickingTypeID" Type="Guid" Nullable="false" />
 					<Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
 					<Property Name="DeliveryCompanyAddressID" Type="Guid" />
+					<Property Name="MirroredFromPickingID" Type="Guid" />
 					<NavigationProperty Name="ACClassMethod" Relationship="iPlusMESV4_Model.FK_Picking_ACClassMethod" FromRole="Picking" ToRole="ACClassMethod" />
 					<NavigationProperty Name="MDPickingType" Relationship="iPlusMESV4_Model.FK_Picking_MDPickingType" FromRole="Picking" ToRole="MDPickingType" />
 					<NavigationProperty Name="Tourplan" Relationship="iPlusMESV4_Model.FK_Picking_TourplanID" FromRole="Picking" ToRole="Tourplan" />
@@ -34045,6 +34067,8 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 					<NavigationProperty Name="PickingConfig_Picking" Relationship="iPlusMESV4_Model.FK_PickingConfig_PickingID" FromRole="Picking" ToRole="PickingConfig" />
 					<NavigationProperty Name="PickingPos_Picking" Relationship="iPlusMESV4_Model.FK_PickingPos_PickingID" FromRole="Picking" ToRole="PickingPos" />
 					<NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Picking_DeliveryCompanyAddressID" FromRole="Picking" ToRole="CompanyAddress" />
+					<NavigationProperty Name="Picking_MirroredFromPicking" Relationship="iPlusMESV4_Model.FK_Picking_MirroredFromPickingID" FromRole="Picking" ToRole="Picking1" />
+					<NavigationProperty Name="Picking1_MirroredFromPicking" Relationship="iPlusMESV4_Model.FK_Picking_MirroredFromPickingID" FromRole="Picking1" ToRole="Picking" />
 				</EntityType>
 				<Association Name="FK_Picking_ACClassMethod">
 					<End Type="iPlusMESV4_Model.ACClassMethod" Role="ACClassMethod" Multiplicity="0..1" />
@@ -34117,6 +34141,18 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 						</Principal>
 						<Dependent Role="Picking">
 							<PropertyRef Name="DeliveryCompanyAddressID" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_Picking_MirroredFromPickingID">
+					<End Type="iPlusMESV4_Model.Picking" Role="Picking" Multiplicity="0..1"/>
+					<End Type="iPlusMESV4_Model.Picking" Role="Picking1" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="Picking">
+							<PropertyRef Name="PickingID" />
+						</Principal>
+						<Dependent Role="Picking1">
+							<PropertyRef Name="MirroredFromPickingID" />
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
@@ -39780,6 +39816,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 								<ScalarProperty Name="PickingID" ColumnName="PickingID" />
 								<ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
 								<ScalarProperty Name="DeliveryCompanyAddressID" ColumnName="DeliveryCompanyAddressID" />
+								<ScalarProperty Name="MirroredFromPickingID" ColumnName="MirroredFromPickingID" />
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
@@ -40759,6 +40796,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a
 				<AssociationConnector Association="iPlusMESV4_Model.FK_Picking_VisitorVoucherID" />
 				<AssociationConnector Association="iPlusMESV4_Model.FK_PickingConfig_PickingID" />
 				<AssociationConnector Association="iPlusMESV4_Model.FK_Picking_DeliveryCompanyAddressID" />
+				<AssociationConnector Association="iPlusMESV4_Model.FK_Picking_MirroredFromPickingID" />
 				<AssociationConnector Association="iPlusMESV4_Model.FK_PickingPos_PickingID" />
 				<EntityTypeShape EntityType="iPlusMESV4_Model.Facility" Width="1.5" PointX="82" PointY="268.625" />
 				<AssociationConnector Association="iPlusMESV4_Model.FK_Facility_FacilityACClassID" />

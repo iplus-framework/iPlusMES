@@ -1,0 +1,1 @@
+alter table dbo.Picking add MirroredFromPickingID uniqueidentifier NULL;
