@@ -26,7 +26,8 @@ namespace gip.mes.webservices
                 //.Include(gip.mes.datamodel.Facility.ClassName)
                 //.Include(gip.mes.datamodel.MDUnit.ClassName)
                 //.Include(gip.mes.datamodel.MDReleaseState.ClassName)
-                .Where(c => !facilityChargeID.HasValue || c.FacilityChargeID == facilityChargeID.Value)
+                .Where(c =>    (!facilityChargeID.HasValue && !c.NotAvailable)
+                            || (facilityChargeID.HasValue && c.FacilityChargeID == facilityChargeID.Value))
                 .Select(c => new gip.mes.webservices.FacilityCharge()
                 {
                     FacilityChargeID = c.FacilityChargeID,
