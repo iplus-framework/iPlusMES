@@ -65,7 +65,8 @@ namespace gip.mes.webservices
                     MDReleaseState = new gip.mes.webservices.MDReleaseState()
                     {
                         MDReleaseStateID = c.MDReleaseStateID.HasValue ? c.MDReleaseStateID.Value : Guid.Empty,
-                        MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : ""
+                        MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : "",
+                        MDReleaseStateIndex = c.MDReleaseState != null ? c.MDReleaseState.MDReleaseStateIndex : (short)0
                     },
                     FillingDate = c.FillingDate,
                     StorageLife = c.StorageLife,
@@ -125,7 +126,8 @@ namespace gip.mes.webservices
                             MDReleaseState = new gip.mes.webservices.MDReleaseState()
                             {
                                 MDReleaseStateID = c.MDReleaseStateID.HasValue ? c.MDReleaseStateID.Value : Guid.Empty,
-                                MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : ""
+                                MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : "",
+                                MDReleaseStateIndex = c.MDReleaseState != null ? c.MDReleaseState.MDReleaseStateIndex : (short)0
                             },
                             FillingDate = c.FillingDate,
                             StorageLife = c.StorageLife,
@@ -369,7 +371,8 @@ namespace gip.mes.webservices
                 MDReleaseState = new gip.mes.webservices.MDReleaseState()
                 {
                     MDReleaseStateID = c.MDReleaseStateID.HasValue ? c.MDReleaseStateID.Value : Guid.Empty,
-                    MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : ""
+                    MDNameTrans = c.MDReleaseState != null ? c.MDReleaseState.MDNameTrans : "",
+                    MDReleaseStateIndex = c.MDReleaseState != null ? c.MDReleaseState.MDReleaseStateIndex : (short)0
                 },
                 FillingDate = c.FillingDate,
                 StorageLife = c.StorageLife,
