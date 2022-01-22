@@ -2390,9 +2390,11 @@ namespace gip.mes.facility
 
             // Falls Material, FacilityCharge, FacilityLot übergeben und keine Mengeneinheiten, 
             // dann können die Mengeneinheiten aus Entitäten abgeleitet werden
-            if (AreQuantityParamsNeeded &&
-                (InwardMaterial == null) && (InwardFacilityCharge == null) && (InwardFacilityLot == null) &&
-                (OutwardMaterial == null) && (OutwardFacilityCharge == null) && (OutwardFacilityLot == null) && (MDUnit == null) && (MDUnit == null))
+            if (AreQuantityParamsNeeded
+                && (MDUnit == null)
+                && (InwardMaterial == null) && (InwardFacilityCharge == null) && (InwardFacilityLot == null)
+                && (OutwardMaterial == null) && (OutwardFacilityCharge == null) && (OutwardFacilityLot == null)
+                && InOrderPos == null && OutOrderPos == null && PickingPos == null && PartslistPosRelation == null && this.PartslistPos == null)
                 AddBookingMessage(eResultCodes.DependingParamsNotSet, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info00013"));
 
             // Zusätzliche Merkmale eines Materials zur Materialindentifikation, müssen immer im Zusammenhang mit dem Material angegeben werden
@@ -2905,6 +2907,48 @@ namespace gip.mes.facility
             {
                 ParamsAdjusted.OutwardMaterial = ParamsAdjusted.InwardMaterial;
                 return true;
+            }
+
+            if (ParamsAdjusted.PickingPos != null)
+            {
+                if (ParamsAdjusted.InwardFacility != null)
+                    ParamsAdjusted.InwardMaterial = ParamsAdjusted.PickingPos.Material;
+                if (ParamsAdjusted.OutwardFacility != null)
+                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.PickingPos.Material;
+                if (ParamsAdjusted.InwardMaterial != null || ParamsAdjusted.OutwardMaterial != null)
+                    return true;
+            }
+            else if (ParamsAdjusted.InOrderPos != null)
+            {
+                if (ParamsAdjusted.InwardFacility != null)
+                {
+                    ParamsAdjusted.InwardMaterial = ParamsAdjusted.InOrderPos.Material;
+                    return true;
+                }
+            }
+            else if (ParamsAdjusted.OutOrderPos != null)
+            {
+                if (ParamsAdjusted.OutwardFacility != null)
+                { 
+                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.OutOrderPos.Material;
+                    return true;
+                }
+            }
+            else if (ParamsAdjusted.PartslistPosRelation != null)
+            {
+                if (ParamsAdjusted.OutwardFacility != null)
+                { 
+                    ParamsAdjusted.OutwardMaterial = ParamsAdjusted.PartslistPosRelation.SourceProdOrderPartslistPos.Material;
+                    return true;
+                }
+            }
+            else if (ParamsAdjusted.PartslistPos != null)
+            {
+                if (ParamsAdjusted.InwardFacility != null)
+                { 
+                    ParamsAdjusted.InwardMaterial = ParamsAdjusted.PartslistPos.Material;
+                    return true;
+                }
             }
 
             if (!AreFacilityEntitiesNeeded || !IsCallForBooking)

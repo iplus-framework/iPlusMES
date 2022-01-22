@@ -421,11 +421,22 @@ namespace gip.mes.datamodel
             }
 
             double sumActualQuantityUOM = 0;
+            short postingType = 0;
             foreach (FacilityBooking fb in FacilityBooking_PickingPos)
             {
                 foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
                 {
-                    sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+                    if ((postingType == 0 || postingType == 1)
+                        && Math.Abs(fbc.OutwardQuantityUOM - 0) > Double.Epsilon)
+                    {
+                        sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+                        postingType = 1;
+                    }
+                    else if (postingType == 0 || postingType == 2)
+                    {
+                        sumActualQuantityUOM += fbc.InwardQuantityUOM;
+                        postingType = 2;
+                    }
                     //try
                     //{
                     //    sumActualQuantity += fbc.OutwardMaterial.ConvertQuantity(fbc.OutwardQuantity, fbc.MDUnit, this.MDUnit);

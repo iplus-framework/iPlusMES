@@ -1409,7 +1409,7 @@ namespace gip.mes.facility
             FacilityChargeList cellOutwardChargeList = null;
 
             // Überprüfe für Quelle und Ziel:
-            if (BP.InwardFacility != null)
+            if (BP.ParamsAdjusted.InwardFacility != null)
             {
                 // Wenn Silo
                 if (BP.ParamsAdjusted.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
@@ -1521,7 +1521,7 @@ namespace gip.mes.facility
                 else
                 {
                     // Ermittle FacilityCharge's auf Ziel-lagerplatz 
-                    if (BP.InwardMaterial != null)
+                    if (BP.ParamsAdjusted.InwardMaterial != null)
                     {
                         if (BP.ParamsAdjusted.InwardPartslist != null)
                         {
@@ -1565,7 +1565,7 @@ namespace gip.mes.facility
                 }
             }
 
-            if (BP.OutwardFacility != null)
+            if (BP.ParamsAdjusted.OutwardFacility != null)
             {
                 // Wenn Silo
                 if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
@@ -1677,7 +1677,7 @@ namespace gip.mes.facility
                 else
                 {
                     // Ermittle FacilityCharge's auf Quelllagerplatz 
-                    if (BP.OutwardMaterial != null)
+                    if (BP.ParamsAdjusted.OutwardMaterial != null)
                     {
                         if (BP.ParamsAdjusted.OutwardPartslist != null)
                         {
@@ -1801,7 +1801,7 @@ namespace gip.mes.facility
             else if ((BP.InwardFacility == null) || (BP.OutwardFacility == null))
             {
                 // Falls Zugang
-                if (BP.InwardFacility != null)
+                if (BP.ParamsAdjusted.InwardFacility != null)
                 {
                     // TODO: Untersuchung ob Silo oder Lagerpatz, dementsprechend volle oder teilliste dem Stackbucher übergeben
                     // Wenn keine FacilityCharge mit FacilityLot vorhanden
