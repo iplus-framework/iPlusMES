@@ -168,7 +168,7 @@ namespace gip.mes.datamodel
 
         public override string ToString()
         {
-            return "#" + FacilityChargeSortNo.ToString() + "/" + (NotAvailable ? "NotAvaiable" : "Available") +
+            return "#" + FacilityChargeSortNo.ToString() + "/" + (NotAvailable ? "NotAvailable" : "Available") +
                 (FacilityLotID != null ? FacilityLot.LotNo : "");
         }
 

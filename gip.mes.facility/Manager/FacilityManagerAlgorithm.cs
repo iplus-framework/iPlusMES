@@ -682,7 +682,7 @@ namespace gip.mes.facility
                                                                         where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
                                                                             && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
                                                                             && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                               //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
+                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
                                                                             && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
                                                                             && (c.SplitNo == splitNo)
                                                                         select c);
@@ -699,12 +699,35 @@ namespace gip.mes.facility
                                                                         select c);
                         }
                     }
+                    else
+                    {
+                        if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
+                        {
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
+                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
+                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
+                                                                            && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
+                                                                            && (c.SplitNo == splitNo)
+                                                                        select c);
+                        }
+                        else
+                        {
+                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
+                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
+                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
+                                                                            && (c.Partslist == null)
+                                                                            && (c.SplitNo == splitNo)
+                                                                        select c);
+                        }
+                    }
                     // Falls ja, dann buche darauf
                     if (facilityChargeList.Any())
                     {
                         inwardFacilityCharge = facilityChargeList.First();
                         // Falls kein Rücksetzen erlaubt und neue Charge angelegt werden muss
-                        if (inwardFacilityCharge.NotAvailable && !BP.IsAutoResetNotAvailable)
+                        if (inwardFacilityCharge.NotAvailable && BP.IsLotManaged && !BP.IsAutoResetNotAvailable)
                             inwardFacilityCharge = null;
                     }
                     // Falls nicht,
@@ -735,7 +758,7 @@ namespace gip.mes.facility
                         if (facilityChargeList.Any())
                         {
                             inwardFacilityCharge = facilityChargeList.First();
-                            if (inwardFacilityCharge.NotAvailable && !BP.IsAutoResetNotAvailable)
+                            if (inwardFacilityCharge.NotAvailable && BP.IsLotManaged && !BP.IsAutoResetNotAvailable)
                                 inwardFacilityCharge = null;
                             else
                             {
@@ -1809,7 +1832,7 @@ namespace gip.mes.facility
                     {
                         FacilityCharge InwardFacilityCharge = null;
                         // Falls alte FacilityCharge rückgesetzt werden kann, wenn im Lager als Nichtvorhanden vorliegt
-                        if (BP.IsAutoResetNotAvailable)
+                        if (BP.IsAutoResetNotAvailable || !BP.ParamsAdjusted.IsLotManaged)
                             InwardFacilityCharge = TryReactivateInwardFacilityCharge(BP);
                         // dann Neuanlage FacilityCharge aus local-Material(B) entweder mit oder ohne FacilityLot (AnonymeCharge)
                         if (InwardFacilityCharge == null)
@@ -1904,7 +1927,7 @@ namespace gip.mes.facility
                     {
                         FacilityCharge OutwardFacilityCharge = null;
                         // Falls alte FacilityCharge rückgesetzt werden kann, wenn im Lager als Nichtvorhanden vorliegt
-                        if (BP.IsAutoResetNotAvailable)
+                        if (BP.IsAutoResetNotAvailable || !BP.ParamsAdjusted.IsLotManaged)
                             OutwardFacilityCharge = TryReactivateOutwardFacilityCharge(BP);
                         // dann Neuanlage FacilityCharge aus local-Material(B) entweder mit oder ohne FacilityLot (AnonymeCharge)
                         if (OutwardFacilityCharge == null)
@@ -1996,44 +2019,54 @@ namespace gip.mes.facility
             // Sonst Umlagerung
             else
             {
-                FacilityCharge OutwardFacilityCharge = null;
-                if (facilityOutwardChargeSubList.Count <= 0)
+                FacilityCharge outwardFacilityCharge = null;
+                FacilityCharge inwardFacilityCharge = null;
+                bool outwardFCListWasEmpty = !facilityOutwardChargeSubList.Any();
+                bool inwardFCListWasEmpty = !facilityInwardChargeSubList.Any();
+                if (outwardFCListWasEmpty)
                 {
                     // Falls alte FacilityCharge rückgesetzt werden kann, wenn im Lager als Nichtvorhanden vorliegt
-                    if (BP.IsAutoResetNotAvailable)
-                        OutwardFacilityCharge = TryReactivateOutwardFacilityCharge(BP);
+                    if (BP.IsAutoResetNotAvailable || !BP.ParamsAdjusted.IsLotManaged)
+                        outwardFacilityCharge = TryReactivateOutwardFacilityCharge(BP);
                     // dann Neuanlage FacilityCharge aus local-Material(B) entweder mit oder ohne FacilityLot (AnonymeCharge)
-                    if (OutwardFacilityCharge == null)
-                        OutwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
-                    OutwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.OutwardMaterial, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardFacilityLot, BP.ParamsAdjusted.OutwardPartslist, true);
-                    OutwardFacilityCharge.NotAvailable = false;
-                    OutwardFacilityCharge.Partslist = BP.ParamsAdjusted.OutwardPartslist;
+                    if (outwardFacilityCharge == null)
+                        outwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
+                    outwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.OutwardMaterial, BP.ParamsAdjusted.OutwardFacility, BP.ParamsAdjusted.OutwardFacilityLot, BP.ParamsAdjusted.OutwardPartslist, true);
+                    outwardFacilityCharge.NotAvailable = false;
+                    outwardFacilityCharge.Partslist = BP.ParamsAdjusted.OutwardPartslist;
                     // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
-                    OutwardFacilityCharge.FillingDate = DateTime.Now;
-                    OutwardFacilityCharge.FacilityChargeSortNo = OutwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                    outwardFacilityCharge.FillingDate = DateTime.Now;
+                    outwardFacilityCharge.FacilityChargeSortNo = outwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                    facilityOutwardChargeSubList.Add(outwardFacilityCharge);
                 }
+                if (inwardFCListWasEmpty && !BP.ParamsAdjusted.IsLotManaged)
 
-                // Wenn keine FacilityCharge mit FacilityLot auf beiden Lagerplätzen vorhanden
-                if ((facilityOutwardChargeSubList.Count <= 0) && (facilityInwardChargeSubList.Count <= 0))
                 {
-                    FacilityCharge InwardFacilityCharge = null;
                     // Falls alte FacilityCharge rückgesetzt werden kann, wenn im Lager als Nichtvorhanden vorliegt
-                    if (BP.IsAutoResetNotAvailable)
-                        InwardFacilityCharge = TryReactivateInwardFacilityCharge(BP);
+                    if (BP.IsAutoResetNotAvailable || !BP.ParamsAdjusted.IsLotManaged)
+                        inwardFacilityCharge = TryReactivateInwardFacilityCharge(BP);
                     // dann Neuanlage FacilityCharge aus FacilityLot und local-Material(B) auf beiden Plätzen
                     // dann Neuanlage FacilityCharge aus local-Material(B) entweder mit oder ohne FacilityLot (AnonymeCharge)
-                    if (InwardFacilityCharge == null)
-                        InwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
-                    InwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.InwardMaterial, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardFacilityLot, BP.ParamsAdjusted.InwardPartslist, true);
-                    InwardFacilityCharge.NotAvailable = false;
-                    InwardFacilityCharge.Partslist = BP.ParamsAdjusted.InwardPartslist;
+                    if (inwardFacilityCharge == null)
+                        inwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
+                    inwardFacilityCharge.CloneFrom(BP.DatabaseApp, BP.ParamsAdjusted.InwardMaterial, BP.ParamsAdjusted.InwardFacility, BP.ParamsAdjusted.InwardFacilityLot, BP.ParamsAdjusted.InwardPartslist, true);
+                    inwardFacilityCharge.NotAvailable = false;
+                    inwardFacilityCharge.Partslist = BP.ParamsAdjusted.InwardPartslist;
                     // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
-                    InwardFacilityCharge.FillingDate = DateTime.Now;
-                    InwardFacilityCharge.FacilityChargeSortNo = InwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                    inwardFacilityCharge.FillingDate = DateTime.Now;
+                    inwardFacilityCharge.FacilityChargeSortNo = inwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                    facilityInwardChargeSubList.Add(inwardFacilityCharge);
+                }
 
+                // If only one quant has to be relocated AND on destination is no quant or is not lot-managed
+                // then only quant has to be posted on both sides
+                if (outwardFCListWasEmpty && (inwardFCListWasEmpty || !BP.ParamsAdjusted.IsLotManaged))
+                {
+                    if (inwardFacilityCharge == null)
+                        inwardFacilityCharge = facilityInwardChargeSubList.FirstOrDefault();
                     // Abgangsbuchung
                     FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
-                    bookingResult = InitFacilityBookingCharge_FromBookingParameter_Outward(BP, FBC, OutwardFacilityCharge);
+                    bookingResult = InitFacilityBookingCharge_FromBookingParameter_Outward(BP, FBC, outwardFacilityCharge);
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
 
@@ -2041,12 +2074,9 @@ namespace gip.mes.facility
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
 
-                    facilityOutwardChargeSubList.Add(OutwardFacilityCharge);
-                    cellOutwardChargeList.Add(OutwardFacilityCharge);
-
                     // Zugangsbuchung
                     FBC = NewFacilityBookingCharge(BP, false);
-                    bookingResult = InitFacilityBookingCharge_FromBookingParameter_Inward(BP, FBC, InwardFacilityCharge);
+                    bookingResult = InitFacilityBookingCharge_FromBookingParameter_Inward(BP, FBC, inwardFacilityCharge);
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
 
@@ -2054,33 +2084,15 @@ namespace gip.mes.facility
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
 
-                    facilityInwardChargeSubList.Add(InwardFacilityCharge);
-                    if (cellInwardChargeList != null)
-                        cellInwardChargeList.Add(InwardFacilityCharge);
+                    //if (cellInwardChargeList != null)
+                    //    cellInwardChargeList.Add(inwardFacilityCharge);
                 }
-
-                // Sonst wenn keine FacilityCharge mit FacilityLot auf Quelle vorhanden aber auf Ziel
-                else //if (((facilityOutwardChargeList.Count <= 0) && (facilityInwardChargeList.Count > 0))
-                //|| (facilityOutwardChargeList.Count > 0))
+                else
                 {
-                    // dann Neuanlage FacilityCharge aus FacilityLot und local-Material(B) auf Quelle
-                    // Mache Umlagerbuchung von Quell-FacilityCharge
-
-                    if (facilityOutwardChargeSubList.Count <= 0)
-                    {
-                        facilityOutwardChargeSubList.Add(OutwardFacilityCharge);
-                        cellOutwardChargeList.Add(OutwardFacilityCharge);
-                        // Abgangsbuchung
-                        /*FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
-                        bookingResult = InitFacilityBookingCharge_FromBookingParameter_Outward(FBC, OutwardFacilityCharge);
-                        if ((bookingResult == BookingResult.Failed) || (bookingResult == BookingResult.Notpossible))
-                            return bookingResult;
-
-                        bookingResult = BookFacilityBookingChargeOut(BP, FBC);
-                        if ((bookingResult == BookingResult.Failed) || (bookingResult == BookingResult.Notpossible))
-                            return bookingResult;*/
-
-                    }
+                    if (cellOutwardChargeList != null && outwardFacilityCharge != null)
+                        cellOutwardChargeList.Add(outwardFacilityCharge);
+                    if (cellInwardChargeList != null && inwardFacilityCharge != null)
+                        cellInwardChargeList.Add(inwardFacilityCharge);
 
                     Double stackQuantity = 0;
 
