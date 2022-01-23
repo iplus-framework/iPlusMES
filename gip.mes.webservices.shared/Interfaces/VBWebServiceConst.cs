@@ -163,6 +163,8 @@ namespace gip.mes.webservices
         public const string UriBookFacility = "BookFacility";
         public const string UriBookFacilities = "BookFacilities";
 
+        public const string UriGetMovementReasons = "MDMovementReasons";
+
         #endregion
 
         #region Inventory

@@ -1987,5 +1987,40 @@ namespace gip.mes.webservices
 
         #endregion
 
+        #region Movement reason
+
+        public static readonly Func<DatabaseApp, IQueryable<MDMovementReason>> s_cQry_GetMovementReasons =
+                CompiledQuery.Compile<DatabaseApp, IQueryable<MDMovementReason>>(
+                    (dbApp) =>
+                        dbApp.MDMovementReason
+                             .OrderBy(x => x.SortIndex)
+                             .ThenBy(x => x.MDKey)
+                             .Select(c => new MDMovementReason()
+                             {
+                                 MDMovementReasonID = c.MDMovementReasonID,
+                                 MDMovementReasonIndex = c.MDMovementReasonIndex,
+                                 MDNameTrans = c.MDNameTrans,
+                             })
+                );
+
+        public WSResponse<List<MDMovementReason>> GetMovementReasons()
+        {
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    return new WSResponse<List<MDMovementReason>>(s_cQry_GetMovementReasons(dbApp).ToList());
+                }
+                catch (Exception e)
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    if (myServiceHost != null)
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMovementReasons) + "(10)", e);
+                    return new WSResponse<List<MDMovementReason>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+            }
+        }
+
+        #endregion
     }
 }

@@ -74,6 +74,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "CM1")]
+        public string Comment1
+        {
+            get; set;
+        }
+
         [DataMember(Name = "SQ")]
         public int Sequence
         {
@@ -116,6 +122,11 @@ namespace gip.mes.webservices
         {
             get;
             set;
+        }
+
+        public double CompleteFactor
+        {
+            get => (ActualQuantity / TargetQuantity) * 100;
         }
 
         public void OnActualQuantityChanged()

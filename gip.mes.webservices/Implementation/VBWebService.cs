@@ -145,6 +145,7 @@ namespace gip.mes.webservices
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MaterialStock), typeof(webservices.MaterialStock)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDFacilityType), typeof(webservices.MDFacilityType)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDReleaseState), typeof(webservices.MDReleaseState)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDMovementReason), typeof(webservices.MDMovementReason)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Picking), typeof(webservices.Picking)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.PickingPos), typeof(webservices.PickingPos)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.MDUnit), typeof(webservices.MDUnit)));

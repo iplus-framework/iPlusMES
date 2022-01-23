@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDFacilityInventoryPosState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDFacilityInventoryState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDFacilityType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MDMovementReason.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\PostingOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilitySumOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\MaterialSumOverview.cs" />

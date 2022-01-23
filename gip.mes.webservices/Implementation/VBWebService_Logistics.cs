@@ -66,7 +66,7 @@ namespace gip.mes.webservices
                               )
         );
 
-        protected IEnumerable<Picking> ConvertToWSPicking(DatabaseApp dbApp, IQueryable<gip.mes.datamodel.Picking> query)
+        protected virtual IEnumerable<Picking> ConvertToWSPicking(DatabaseApp dbApp, IQueryable<gip.mes.datamodel.Picking> query)
         {
             ACPickingManager pickingManger = null;
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
@@ -137,7 +137,7 @@ namespace gip.mes.webservices
             return result;
         }
 
-        private PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, ACPickingManager pickingManger, gip.mes.datamodel.PickingPos pos, gip.mes.datamodel.Picking picking)
+        protected PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, ACPickingManager pickingManger, gip.mes.datamodel.PickingPos pos, gip.mes.datamodel.Picking picking)
         {
             if (pickingManger != null)
                 return pickingManger.DeterminePostingType(dbApp, pos, picking);
@@ -332,7 +332,7 @@ namespace gip.mes.webservices
 
         );
 
-        protected IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, ACPickingManager pickingManager)
+        protected virtual IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, ACPickingManager pickingManager)
         {
             return query.AsEnumerable().Select(d => new PickingPos()
             {

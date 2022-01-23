@@ -323,5 +323,17 @@ namespace gip.mes.webservices
         #endregion
 
         #endregion
+
+        #region Movement reason
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriGetMovementReasons, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<MDMovementReason>> GetMovementReasons();
+#elif NETSTANDARD
+        Task<WSResponse<List<MDMovementReason>>> GetMovementReasonsAsync();
+#endif
+
+        #endregion
     }
 }
