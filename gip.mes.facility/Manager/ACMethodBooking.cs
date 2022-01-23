@@ -2565,8 +2565,8 @@ namespace gip.mes.facility
             }
             else if (material != null 
                         && material.MDFacilityManagementType != null 
-                        && (    material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility
-                            || (BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge && material.MDFacilityManagementType.FacilityManagementType != MDFacilityManagementType.FacilityManagementTypes.FacilityCharge)))
+                        && (    material.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility))
+                            //|| (BookingType == GlobalApp.FacilityBookingType.Split_FacilityCharge && material.MDFacilityManagementType.FacilityManagementType != MDFacilityManagementType.FacilityManagementTypes.FacilityCharge)))
                 AddBookingMessage(eResultCodes.ProhibitedBooking, Root.Environment.TranslateMessage(CurrentFacilityManager, "Info50011"));
             else if (this.BookingType == GlobalApp.FacilityBookingType.InOrderPosInwardMovement
                 && (this.InwardFacilityLot == null && this.InwardFacilityCharge == null)

@@ -665,7 +665,10 @@ namespace gip.mes.facility
                             splitNo = BP.InwardSplitNo.Value;
                         else
                         {
-                            splitNo = BP.DatabaseApp.FacilityCharge.Where(c => c.FacilityLotID == BP.OutwardFacilityCharge.FacilityLotID).Max(c => c.SplitNo);
+                            if (BP.ParamsAdjusted.IsLotManaged)
+                                splitNo = BP.DatabaseApp.FacilityCharge.Where(c => c.FacilityLotID == BP.OutwardFacilityCharge.FacilityLotID).Max(c => c.SplitNo);
+                            else
+                                splitNo = BP.DatabaseApp.FacilityCharge.Where(c => c.MaterialID == BP.OutwardFacilityCharge.MaterialID && c.FacilityID == BP.OutwardFacilityCharge.FacilityID && !c.NotAvailable).Max(c => c.SplitNo);
                             splitNo++;
                         }
                         BP.InwardQuantity = BP.OutwardQuantity;
@@ -733,26 +736,29 @@ namespace gip.mes.facility
                     // Falls nicht,
                     if (inwardFacilityCharge == null)
                     {
-                        // Gibt es eine anonyme Charge auf dieser Facility?
-                        if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
+                        if (BP.IsLotManaged)
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                            && (c.FacilityLot == null)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                        select c);
-                        }
-                        else
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                            && (c.FacilityLot == null)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && (c.Partslist == null)
-                                                                        select c);
+                            // Gibt es eine anonyme Charge auf dieser Facility?
+                            if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
+                            {
+                                facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                            where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
+                                                                                && (c.FacilityLot == null)
+                                                                                && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
+                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
+                                                                                && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
+                                                                            select c);
+                            }
+                            else
+                            {
+                                facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
+                                                                            where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
+                                                                                && (c.FacilityLot == null)
+                                                                                && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
+                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
+                                                                                && (c.Partslist == null)
+                                                                            select c);
+                            }
                         }
                         // Falls ja, dann mache daraus eine nicht anonyme (Was passiert mit Chargenverfolgung?) und buche
                         if (facilityChargeList.Any())
