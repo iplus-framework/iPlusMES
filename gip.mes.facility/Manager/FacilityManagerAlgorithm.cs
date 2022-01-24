@@ -679,51 +679,21 @@ namespace gip.mes.facility
                     FacilityChargeList facilityChargeList = null;
                     if (BP.IsLotManaged)
                     {
-                        if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                            && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                            && (c.SplitNo == splitNo)
-                                                                        select c);
-                        }
-                        else
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                            && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && (c.Partslist == null)
-                                                                            && (c.SplitNo == splitNo)
-                                                                        select c);
-                        }
+                        facilityChargeList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_Mat_Pl(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
+                                                                                                splitNo));
                     }
                     else
                     {
-                        if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                            && (c.SplitNo == splitNo)
-                                                                        select c);
-                        }
-                        else
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && (c.Partslist == null)
-                                                                            && (c.SplitNo == splitNo)
-                                                                        select c);
-                        }
+                        facilityChargeList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_Mat_Pl(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                null,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
+                                                                                                splitNo));
                     }
                     // Falls ja, dann buche darauf
                     if (facilityChargeList.Any())
@@ -739,26 +709,11 @@ namespace gip.mes.facility
                         if (BP.IsLotManaged)
                         {
                             // Gibt es eine anonyme Charge auf dieser Facility?
-                            if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
-                            {
-                                facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                            where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                && (c.FacilityLot == null)
-                                                                                && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                                && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                            select c);
-                            }
-                            else
-                            {
-                                facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                            where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                && (c.FacilityLot == null)
-                                                                                && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                                && (c.Partslist == null)
-                                                                            select c);
-                            }
+                            facilityChargeList = new FacilityChargeList(s_cQry_FCList_Fac_LotNull_Mat_Pl(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
+                                                                                                    BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
+                                                                                                    null));
                         }
                         // Falls ja, dann mache daraus eine nicht anonyme (Was passiert mit Chargenverfolgung?) und buche
                         if (facilityChargeList.Any())
@@ -827,67 +782,39 @@ namespace gip.mes.facility
                     FacilityChargeList facilityChargeList = null;
                     if (BP.IsLotManaged)
                     {
-                        if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
-                                                                                               && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                                               && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                                               && (c.SplitNo == BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo)
-                                                                        select c);
-                        }
-                        else
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                                                && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLot.FacilityLotID)
-                                                                                                && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                                                //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                                                && (c.Partslist == null)
-                                                                                                && (c.SplitNo == BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo)
-                                                                        select c);
-                        }
+                        facilityChargeList = new FacilityChargeList(s_cQry_FCList_FacLoc_Lot_Mat_Pl(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacilityLocation.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo));
                     }
                     // Falls ja,
-                    if (facilityChargeList.Count > 0)
+                    if (facilityChargeList.Any())
                     {
                         // buche darauf
                         inwardFacilityCharge = facilityChargeList.First();
                         // Falls kein Rücksetzen erlaubt und neue Charge angelegt werden muss
-                        if (inwardFacilityCharge.NotAvailable && !BP.IsAutoResetNotAvailable)
+                        if (inwardFacilityCharge.NotAvailable && BP.IsLotManaged && !BP.IsAutoResetNotAvailable)
                             inwardFacilityCharge = null;
                     }
                     // Sonst falls nein,
                     if (inwardFacilityCharge == null)
                     {
-                        // Suche im Einlagerplatz, ob es dort eine anonyme Charge gibt
-                        if (BP.ParamsAdjusted.OutwardFacilityCharge.Partslist != null)
+                        if (BP.ParamsAdjusted.InwardFacilityLocation.IncomingFacilityID.HasValue)
                         {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.Facility1_IncomingFacility.FacilityID)
-                                                                            && (c.FacilityLot == null)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardFacilityCharge.Partslist.PartslistID))
-                                                                        select c);
-                        }
-                        else
-                        {
-                            facilityChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                        where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.Facility1_IncomingFacility.FacilityID)
-                                                                            && (c.FacilityLot == null)
-                                                                            && (c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.MaterialID)
-                                                                            //   || (BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardFacilityCharge.Material.ProductionMaterialID))
-                                                                            && (c.Partslist == null)
-                                                                        select c);
+                            // Suche im Einlagerplatz, ob es dort eine anonyme Charge gibt
+                            facilityChargeList = new FacilityChargeList(s_cQry_FCList_Fac_LotNull_Mat_Pl(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.InwardFacilityLocation.IncomingFacilityID.Value,
+                                                                                                    BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
+                                                                                                    BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
+                                                                                                    null));
                         }
                         // Falls ja, dann mache daraus eine nicht anonyme und buche
-                        if (facilityChargeList.Count > 0)
+                        if (facilityChargeList.Any())
                         {
                             inwardFacilityCharge = facilityChargeList.First();
-                            if (inwardFacilityCharge.NotAvailable && !BP.IsAutoResetNotAvailable)
+                            if (inwardFacilityCharge.NotAvailable && BP.IsLotManaged && !BP.IsAutoResetNotAvailable)
                                 inwardFacilityCharge = null;
                             else
                             {
@@ -963,10 +890,12 @@ namespace gip.mes.facility
                     // Einlagerungsbuchung auf neues Material, Suche ob Quant im Lager vorhanden sonst lege neues Quant an
                     FBC = NewFacilityBookingCharge(BP, false);
 
-                    inwardFacilityCharge = BP.DatabaseApp.FacilityCharge.Where(c => c.FacilityID == BP.OutwardFacilityCharge.FacilityID
-                                                    && c.MaterialID == BP.InwardMaterial.MaterialID
-                                                    && c.FacilityLotID == BP.OutwardFacilityCharge.FacilityLotID
-                                                    && c.SplitNo == BP.OutwardFacilityCharge.SplitNo).FirstOrDefault();
+                    inwardFacilityCharge = s_cQry_FCList_Fac_Lot_Mat(BP.DatabaseApp,
+                                                BP.OutwardFacilityCharge.FacilityID,
+                                                BP.OutwardFacilityCharge.FacilityLotID,
+                                                BP.InwardMaterial.MaterialID,
+                                                BP.OutwardFacilityCharge.SplitNo)
+                                                .FirstOrDefault();
                     if (inwardFacilityCharge == null)
                     {
                         inwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
@@ -1053,25 +982,14 @@ namespace gip.mes.facility
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 /// Local.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
                 int nCount = 0;
-                if (BP.ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                               && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)                                                                                
-                                                                                  || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }                
+                Guid? guidNull = null;
+                nCount = s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(BP.DatabaseApp, 
+                                BP.ParamsAdjusted.InwardFacilityLocation.FacilityID, 
+                                BP.ParamsAdjusted.InwardMaterial.MaterialID, 
+                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                false)
+                                .Count();
                 if (nCount <= 0)
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
@@ -1092,25 +1010,14 @@ namespace gip.mes.facility
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Local.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
                 int nCount = 0;
-                if (BP.ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                               && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
+                Guid? guidNull = null;
+                nCount = s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID,
+                                BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                                BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
+                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                false)
+                                .Count();
                 if (nCount <= 0)
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
@@ -1150,23 +1057,13 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit FacilityLot auf Lagerort vorhanden
                 /// Dann muss eine FacilityCharge auf dem Standard-Auslagerplatz angelegt werden
                 int nCount = 0;
-                if (BP.ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                                                                                && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
+                Guid? guidNull = null;
+                nCount = s_cQry_FCList_FacLoc_Lot_Pl_NotAvailable(BP.DatabaseApp,
+                                BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID,
+                                BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                false)
+                                .Count();
                 if (nCount <= 0)
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
@@ -1185,23 +1082,13 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit FacilityLot auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 int nCount = 0;
-                if (BP.ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                                && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
+                Guid? guidNull = null;
+                nCount = s_cQry_FCList_FacLoc_Lot_Pl_NotAvailable(BP.DatabaseApp,
+                                BP.ParamsAdjusted.InwardFacilityLocation.FacilityID,
+                                BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                false)
+                                .Count();
                 if (nCount <= 0)
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
@@ -1244,27 +1131,15 @@ namespace gip.mes.facility
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Local.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
                 int nCount = 0;
-                if (BP.ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                                                                                && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                                && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                                && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                                && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
+                Guid? guidNull = null;
+                nCount = s_cQry_FCList_FacLoc_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID,
+                                BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                                BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                                BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
+                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                false)
+                                .Count();
                 if (nCount <= 0)
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
@@ -1283,27 +1158,15 @@ namespace gip.mes.facility
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 /// Local.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
                 int nCount = 0;
-                if (BP.ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                               && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in BP.DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                                                                               && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                  || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
+                Guid? guidNull = null;
+                nCount = s_cQry_FCList_FacLoc_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                BP.ParamsAdjusted.InwardFacilityLocation.FacilityID,
+                                BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                false)
+                                .Count();
                 if (nCount <= 0)
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
@@ -1474,10 +1337,7 @@ namespace gip.mes.facility
                     }
 
                     // Ermittle Schichten im Silo
-                    cellInwardChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                && (c.NotAvailable == false)
-                                            select c);
+                    cellInwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.InwardFacility.FacilityID, false));
                 }
 
                 // Ermittle FacilityCharge's auf Ziel-lagerplatz 
@@ -1485,66 +1345,32 @@ namespace gip.mes.facility
                 {
                     if ((BP.InwardFacilityLot != null) && (BP.InwardMaterial != null))
                     {
-                        if (BP.ParamsAdjusted.InwardPartslist != null)
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                        || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                                     && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                                     && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
-                        else
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                        || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                                     && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                                                                                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                     else if (BP.InwardFacilityLot != null)
                     {
-                        if (BP.ParamsAdjusted.InwardPartslist != null)
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                                     && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
-                        else
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                     // Keine Materialnummer vorgegeben
                     else
                     {
-                        if (BP.ParamsAdjusted.InwardPartslist != null)
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
-                        else
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                 }
                 else
@@ -1552,44 +1378,22 @@ namespace gip.mes.facility
                     // Ermittle FacilityCharge's auf Ziel-lagerplatz 
                     if (BP.ParamsAdjusted.InwardMaterial != null)
                     {
-                        if (BP.ParamsAdjusted.InwardPartslist != null)
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                        || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                                     && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
-                        else
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                                        || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                                                                                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                     // Keine Materialnummer vorgegeben
                     else
                     {
-                        if (BP.ParamsAdjusted.InwardPartslist != null)
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.InwardPartslist.PartslistID))
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
-                        else
-                        {
-                            facilityInwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                 where (c.Facility.FacilityID == BP.ParamsAdjusted.InwardFacility.FacilityID)
-                                                                                     && (c.NotAvailable == false)
-                                                                                 select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                 }
             }
@@ -1630,10 +1434,7 @@ namespace gip.mes.facility
                     }
 
                     // Ermittle Schichten im Silo
-                    cellOutwardChargeList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                   where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                 && (c.NotAvailable == false)
-                                             select c);
+                    cellOutwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacility.FacilityID, false));
                 }
 
                 if (BP.ParamsAdjusted.IsLotManaged)
@@ -1641,66 +1442,32 @@ namespace gip.mes.facility
                     // Ermittle FacilityCharge's auf Quelllagerplatz 
                     if ((BP.OutwardFacilityLot != null) && (BP.OutwardMaterial != null))
                     {
-                        if (BP.ParamsAdjusted.OutwardPartslist != null)
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                       || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                                      && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                                      && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
-                        else
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                        || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                                      && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                     else if (BP.OutwardFacilityLot != null)
                     {
-                        if (BP.ParamsAdjusted.OutwardPartslist != null)
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                                      && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
-                        else
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                     // Kein Material vorgegeben
                     else
                     {
-                        if (BP.ParamsAdjusted.OutwardPartslist != null)
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
-                        else
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                 }
                 else
@@ -1708,44 +1475,22 @@ namespace gip.mes.facility
                     // Ermittle FacilityCharge's auf Quelllagerplatz 
                     if (BP.ParamsAdjusted.OutwardMaterial != null)
                     {
-                        if (BP.ParamsAdjusted.OutwardPartslist != null)
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                         || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                                      && ((c.Partslist != null) && (c.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
-                        else
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                                        || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
+                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                     // Kein Material vorgegeben
                     else
                     {
-                        if (BP.ParamsAdjusted.OutwardPartslist != null)
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && ((c.Partslist != null) && (c.Partslist.PartslistID == BP.ParamsAdjusted.OutwardPartslist.PartslistID))
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
-                        else
-                        {
-                            facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot)
-                                                                                  where (c.Facility.FacilityID == BP.ParamsAdjusted.OutwardFacility.FacilityID)
-                                                                                      && (c.NotAvailable == false)
-                                                                                  select c);
-                        }
+                        Guid? guidNull = null;
+                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                false));
                     }
                 }
             }
@@ -1791,10 +1536,12 @@ namespace gip.mes.facility
                     // Einlagerungsbuchung auf neues Material, Suche ob Quant im Lager vorhanden sonst lege neues Quant an
                     FBC = NewFacilityBookingCharge(BP, false);
 
-                    FacilityCharge inwardFacilityCharge = BP.DatabaseApp.FacilityCharge.Where(c => c.FacilityID == outwardFacilityCharge.FacilityID
-                                                    && c.MaterialID == BP.InwardMaterial.MaterialID
-                                                    && c.FacilityLotID == outwardFacilityCharge.FacilityLotID
-                                                    && c.SplitNo == outwardFacilityCharge.SplitNo).FirstOrDefault();
+                    FacilityCharge inwardFacilityCharge = s_cQry_FCList_Fac_Lot_Mat(BP.DatabaseApp,
+                                                outwardFacilityCharge.FacilityID,
+                                                outwardFacilityCharge.FacilityLotID,
+                                                BP.InwardMaterial.MaterialID,
+                                                outwardFacilityCharge.SplitNo)
+                                                .FirstOrDefault();
                     if (inwardFacilityCharge == null)
                     {
                         inwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
@@ -2197,70 +1944,25 @@ namespace gip.mes.facility
             IQueryable<FacilityCharge> queryExistOld = null;
             if (lot != null && partsList != null)
             {
-                queryExistOld = from c in BP.DatabaseApp.FacilityCharge
-                                where
-                                (c.MaterialID == material.MaterialID)
-                                && (c.Facility.FacilityID == facility.FacilityID)
-                                && (c.FacilityLot != null && c.FacilityLotID == lot.FacilityLotID)
-                                && (c.Partslist != null && (c.PartslistID == partsList.PartslistID))
-                                && (c.NotAvailable == true)
-                                orderby c.FillingDate descending
-                                orderby c.FacilityChargeSortNo descending
-                                select c;
+                queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp, facility.FacilityID, lot.FacilityLotID, material.MaterialID, null, partsList.PartslistID, true);
             }
             else if (lot != null && partsList == null)
             {
-                queryExistOld = from c in BP.DatabaseApp.FacilityCharge
-                                where
-                                (c.MaterialID == material.MaterialID)
-                                && (c.Facility.FacilityID == facility.FacilityID)
-                                && (c.FacilityLot != null && c.FacilityLotID == lot.FacilityLotID)
-                                && (c.Partslist == null)
-                                && (c.NotAvailable == true)
-                                orderby c.FillingDate descending
-                                orderby c.FacilityChargeSortNo descending
-                                select c;
+                queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp, facility.FacilityID, lot.FacilityLotID, material.MaterialID, null, null, true);
             }
             else if (lot == null && partsList != null)
             {
-                queryExistOld = from c in BP.DatabaseApp.FacilityCharge
-                                where
-                                (c.MaterialID == material.MaterialID)
-                                && (c.Facility.FacilityID == facility.FacilityID)
-                                && (c.FacilityLot == null)
-                                && (c.Partslist != null && (c.PartslistID == partsList.PartslistID))
-                                && (c.NotAvailable == true)
-                                orderby c.FillingDate descending
-                                orderby c.FacilityChargeSortNo descending
-                                select c;
+                queryExistOld = s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp, facility.FacilityID, null, material.MaterialID, null, partsList.PartslistID, true);
             }
             else
             {
                 if (material.IsLotManaged)
                 {
-                    queryExistOld = from c in BP.DatabaseApp.FacilityCharge
-                                    where
-                                    (c.MaterialID == material.MaterialID)
-                                    && (c.Facility.FacilityID == facility.FacilityID)
-                                    && (c.FacilityLot != null)
-                                    //&& (c.Partslist == null)
-                                    && (c.NotAvailable == true)
-                                    orderby c.FillingDate descending
-                                    orderby c.FacilityChargeSortNo descending
-                                    select c;
+                    queryExistOld = s_cQry_FCList_Fac_Mat_LotNotNull_NotAvailable(BP.DatabaseApp, facility.FacilityID, material.MaterialID, true);
                 }
                 else
                 {
-                    queryExistOld = from c in BP.DatabaseApp.FacilityCharge
-                                    where
-                                    (c.MaterialID == material.MaterialID)
-                                    && (c.Facility.FacilityID == facility.FacilityID)
-                                    //&& (c.FacilityLot == null)
-                                    //&& (c.Partslist == null)
-                                    && (c.NotAvailable == true)
-                                    orderby c.FillingDate descending
-                                    orderby c.FacilityChargeSortNo descending
-                                    select c;
+                    queryExistOld = s_cQry_FCList_Fac_Mat_NotAvailable(BP.DatabaseApp, facility.FacilityID, material.MaterialID, true);
                 }
             }
             InwardFacilityCharge = queryExistOld.FirstOrDefault();
@@ -2286,20 +1988,14 @@ namespace gip.mes.facility
 
             if (BP.OutwardFacilityLot != null)
             {
-                if (!(from c in BP.DatabaseApp.FacilityCharge
-                     where (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                          && (c.NotAvailable == false)
-                     select c).Any())
+                if (!s_cQry_FCList_Lot_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID, false).Any())
                 {
                     return Global.ACMethodResultState.Failed;
                 }
             }
             if (BP.InwardFacilityLot != null)
             {
-                if (!(from c in BP.DatabaseApp.FacilityCharge
-                     where (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                            && (c.NotAvailable == false)
-                     select c).Any())
+                if (!s_cQry_FCList_Lot_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID, false).Any())
                 {
                     return Global.ACMethodResultState.Failed;
                 }
@@ -2321,24 +2017,22 @@ namespace gip.mes.facility
                 return Global.ACMethodResultState.Failed;
             if (BP.OutwardFacilityLot != null)
             {
-                if (!(from c in BP.DatabaseApp.FacilityCharge
-                     where (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                        && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                           || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                        && (c.NotAvailable == false)
-                     select c).Any())
+                if (!s_cQry_FCList_Lot_ProdMat_NotAvailable(BP.DatabaseApp, 
+                    BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID, 
+                    BP.ParamsAdjusted.OutwardMaterial.MaterialID, 
+                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID, 
+                    false).Any())
                 {
                     return Global.ACMethodResultState.Failed;
                 }
             }
             if (BP.InwardFacilityLot != null)
             {
-                if (!(from c in BP.DatabaseApp.FacilityCharge
-                     where (c.FacilityLot != null && c.FacilityLotID == BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                        && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                            || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                        && (c.NotAvailable == false)
-                     select c).Any())
+                if (!s_cQry_FCList_Lot_ProdMat_NotAvailable(BP.DatabaseApp,
+                    BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                    BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                    BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                    false).Any())
                 {
                     return Global.ACMethodResultState.Failed;
                 }
@@ -2389,12 +2083,12 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Local.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                if (!(from c in BP.DatabaseApp.FacilityCharge
-                     where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID)
-                        && ((c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.MaterialID)
-                            || (BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID))
-                        && (c.NotAvailable == false)
-                     select c).Any())
+                if (!s_cQry_FCList_FacLoc_ProdMat_NotAvailable(BP.DatabaseApp, 
+                    BP.ParamsAdjusted.OutwardFacilityLocation.FacilityID, 
+                    BP.ParamsAdjusted.OutwardMaterial.MaterialID, 
+                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID, 
+                    false)
+                    .Any())
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
                     if (BP.ParamsAdjusted.OutwardFacilityLocation.Facility1_OutgoingFacility == null)
@@ -2412,12 +2106,11 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 /// Local.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                if (!(from c in BP.DatabaseApp.FacilityCharge
-                     where (c.Facility.Facility1_ParentFacility.FacilityID == BP.ParamsAdjusted.InwardFacilityLocation.FacilityID)
-                        && ((c.MaterialID == BP.ParamsAdjusted.InwardMaterial.MaterialID)
-                            || (BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID.HasValue && c.MaterialID == BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID))
-                        && (c.NotAvailable == false)
-                     select c).Any())
+                if (!s_cQry_FCList_FacLoc_ProdMat_NotAvailable(BP.DatabaseApp,
+                    BP.ParamsAdjusted.InwardFacilityLocation.FacilityID,
+                    BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                    BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                    false).Any())
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
                     if (BP.ParamsAdjusted.InwardFacilityLocation.Facility1_IncomingFacility == null)
@@ -2541,15 +2234,12 @@ namespace gip.mes.facility
                             }
 
                             Global.ACMethodResultState bookingSubResult = Global.ACMethodResultState.Succeeded;
-                            FacilityChargeList facilityOutwardChargeSubList = new FacilityChargeList(from c in BP.DatabaseApp.FacilityCharge.Include(d => d.FacilityLot).Include(d => d.Facility)
-                                                                                                     where (c.Facility.FacilityID == storeForRetrogradePosting.FacilityID)
-                                                                                                            && (   (c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID)
-                                                                                                                || (relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID.HasValue && c.MaterialID == relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID))
-                                                                                                            && (c.NotAvailable == false)
-                                                                                                            && (c.IsEnabled)
-                                                                                                            && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
-                                                                                                            && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
-                                                                                                     select c);
+                            FacilityChargeList facilityOutwardChargeSubList = new FacilityChargeList(
+                                s_cQry_FCList_Fac_ProdMat_NotAvailable_Retro(BP.DatabaseApp,
+                                                                            storeForRetrogradePosting.FacilityID,
+                                                                            relationForRPost.SourceProdOrderPartslistPos.MaterialID,
+                                                                            relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID,
+                                                                            false));
 
                             StackItemList stackItemListInOut;
                             MsgBooking msgBookingInOut;
