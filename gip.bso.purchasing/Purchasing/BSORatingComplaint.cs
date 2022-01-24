@@ -73,7 +73,7 @@ namespace gip.bso.purchasing
             {
                 BSOCompany bsoCompany = sender as BSOCompany;
                 FilterRating = null;
-                if (FilterCompany == null || FilterCompany.CompanyID != bsoCompany.CurrentCompany.CompanyID)
+                if (FilterCompany == null || bsoCompany.CurrentCompany == null || FilterCompany.CompanyID != bsoCompany.CurrentCompany.CompanyID)
                 {
                     FilterCompany = bsoCompany.CurrentCompany;
                     ratingCompanyScoreAvg = null;

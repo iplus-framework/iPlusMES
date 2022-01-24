@@ -2150,13 +2150,13 @@ namespace gip.bso.sales
                     case OutDevNote_TrackingProperties.SelectedOutOrderPos:
                         if (SelectedOutOrderPos != null)
                         {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos);
+                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos.TopParentOutOrderPos);
                         }
                         break;
                     case OutDevNote_TrackingProperties.SelectedOutOrderPosFromPicking:
                         if (SelectedOutOrderPosFromPicking != null)
                         {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPosFromPicking);
+                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPosFromPicking.TopParentOutOrderPos);
                         }
                         break;
                 }

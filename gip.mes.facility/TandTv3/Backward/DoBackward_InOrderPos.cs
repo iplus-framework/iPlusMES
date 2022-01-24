@@ -30,7 +30,6 @@ namespace gip.mes.facility.TandTv3
                 if (ccInorderPos != null)
                     sameStepItems.AddRange(ccInorderPos.FacilityBookingCharge_InOrderPos);
             }
-           
             return sameStepItems;
         }
 

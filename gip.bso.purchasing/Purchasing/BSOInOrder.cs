@@ -1622,7 +1622,7 @@ namespace gip.bso.purchasing
             if (vbContent == "SelectedInOrderPos" && SelectedInOrderPos != null)
             {
                 TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedInOrderPos);
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedInOrderPos.TopParentInOrderPos);
                 aCMenuItems.AddRange(trackingAndTracingMenuItems);
             }
             return aCMenuItems;

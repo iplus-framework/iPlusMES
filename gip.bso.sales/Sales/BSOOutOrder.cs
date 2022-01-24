@@ -1730,7 +1730,7 @@ namespace gip.bso.sales
             if (vbContent == "SelectedOutOrderPos" && SelectedOutOrderPos != null)
             {
                 TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos);
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos.TopParentOutOrderPos);
                 aCMenuItems.AddRange(trackingAndTracingMenuItems);
             }
             return aCMenuItems;

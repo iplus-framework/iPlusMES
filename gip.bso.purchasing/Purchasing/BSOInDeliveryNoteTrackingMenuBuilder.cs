@@ -40,13 +40,13 @@ namespace gip.bso.purchasing
                     case InDeliveryNote_TrackingPropertiesEnum.SelectedInOrderPos:
                         if (bSOInDeliveryNote.SelectedInOrderPos != null)
                         {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPos);
+                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPos.TopParentInOrderPos);
                         }
                         break;
                     case InDeliveryNote_TrackingPropertiesEnum.SelectedInOrderPosFromPicking:
                         if (bSOInDeliveryNote.SelectedInOrderPosFromPicking != null)
                         {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPosFromPicking);
+                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPosFromPicking.TopParentInOrderPos);
                         }
                         break;
                 }
