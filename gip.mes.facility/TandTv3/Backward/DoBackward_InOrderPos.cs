@@ -22,8 +22,15 @@ namespace gip.mes.facility.TandTv3
         {
             List<IACObjectEntity> sameStepItems = new List<IACObjectEntity>();
             sameStepItems.Add(Item.InOrder);
-            sameStepItems.AddRange(Item.DeliveryNotePos_InOrderPos);
-            sameStepItems.AddRange(Item.FacilityBookingCharge_InOrderPos);
+            InOrderPos childInOrderPos = Item.InOrderPos_ParentInOrderPos.FirstOrDefault();
+            if (childInOrderPos != null)
+            {
+                sameStepItems.AddRange(childInOrderPos.DeliveryNotePos_InOrderPos);
+                InOrderPos ccInorderPos = childInOrderPos.InOrderPos_ParentInOrderPos.FirstOrDefault();
+                if (ccInorderPos != null)
+                    sameStepItems.AddRange(ccInorderPos.FacilityBookingCharge_InOrderPos);
+            }
+           
             return sameStepItems;
         }
 

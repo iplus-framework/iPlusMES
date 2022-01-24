@@ -282,7 +282,7 @@ namespace gip.mes.facility
                     InOrderPos inOrderPos = itemForTrack as InOrderPos;
                     filter.ItemSystemNo = inOrderPos.InOrderPosID.ToString();
                     filter.PrimaryKeyID = inOrderPos.InOrderPosID;
-                    filter.MDTrackingStartItemTypeEnum = MDTrackingStartItemTypeEnum.InOrderPosPreview;
+                    filter.MDTrackingStartItemTypeEnum = MDTrackingStartItemTypeEnum.InOrderPos;
                 }
 
                 // OutOrderPos
