@@ -33,7 +33,7 @@ namespace gip.bso.purchasing
     /// </summary>
     [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order'}de{'Bestellung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrder.ClassName)]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "InOpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}", typeof(InOrderPos), InOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "Material\\MaterialNo,TargetDeliveryDate")]
-    public class BSOInOrder : ACBSOvbNav, IOnTrackingCall
+    public class BSOInOrder : ACBSOvbNav
     {
         #region private
         private UserSettings CurrentUserSettings { get; set; }
@@ -226,7 +226,6 @@ namespace gip.bso.purchasing
         }
 
         #endregion
-
 
         #region BSO->ACProperty
 
@@ -1377,7 +1376,6 @@ namespace gip.bso.purchasing
 
         #endregion
 
-
         #region 1. InOrder
         /// <summary>
         /// Saves this instance.
@@ -1611,28 +1609,6 @@ namespace gip.bso.purchasing
         public bool IsEnabledDeleteInOrderPos()
         {
             return CurrentInOrder != null && CurrentInOrderPos != null;
-        }
-
-        #endregion
-
-        #region Tracking
-        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
-        {
-            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
-            if (vbContent == "SelectedInOrderPos" && SelectedInOrderPos != null)
-            {
-                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedInOrderPos.TopParentInOrderPos);
-                aCMenuItems.AddRange(trackingAndTracingMenuItems);
-            }
-            return aCMenuItems;
-        }
-
-        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
-        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
-        {
-            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
         }
 
         #endregion

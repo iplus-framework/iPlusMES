@@ -106,7 +106,6 @@
     <Compile Include="FacilityHistory\BSOFacilityLocationOverview.cs" />
     <Compile Include="Model\IntermediateMaterialOverview.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TandTv2\BSOTandTv2.cs" />
     <Compile Include="TandTv3\BSOTandTv3.cs" />
     <Compile Include="TandTv3\GraphRelationCommand.cs" />
     <Compile Include="TandTv3\GraphCommand.cs" />
@@ -119,7 +118,6 @@
     <Compile Include="TandTv3\IFactoryTandTPointPresenterComponent.cs" />
     <Compile Include="TandTv3\SearchRouteCombination.cs" />
     <Compile Include="TandTv3\TandTGraphModel.cs" />
-    <Compile Include="TrackingAndTracing\BSOTrackingAndTracing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">

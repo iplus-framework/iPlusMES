@@ -8,8 +8,6 @@ namespace gip.mes.datamodel
 {
     public enum TrackingEnginesEnum
     {
-        v1,
-        v2,
         v3
     }
 }
