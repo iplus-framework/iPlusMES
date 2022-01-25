@@ -1970,10 +1970,7 @@ namespace gip.mes.facility
             }
 
             // Ermittle Schichten im Silo
-            List<FacilityCharge> cellChargeList = (from c in BP.DatabaseApp.FacilityCharge
-                                                   where (c.Facility.FacilityID == facility.FacilityID)
-                                                       && (c.NotAvailable == false)
-                                                   select c).ToList();
+            List<FacilityCharge> cellChargeList = s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).ToList();
             if (cellChargeList.Count > 1)
             {
                 // Reorganisiere
@@ -2159,11 +2156,7 @@ namespace gip.mes.facility
                 if (facility.Material == null)
                     return Global.ACMethodResultState.Succeeded;
 
-                List<FacilityCharge> facilityChargeList = (from c in BP.DatabaseApp.FacilityCharge
-                                                           where (c.Facility.FacilityID == facility.FacilityID)
-                                                               && (c.NotAvailable == false)
-                                                           select c).ToList();
-                if (facilityChargeList.Count > 0)
+                if (s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).Any())
                 {
                     BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                         Root.Environment.TranslateMessage(this, "Error00092",
@@ -2179,30 +2172,10 @@ namespace gip.mes.facility
                 if (facility.Material == null)
                 {
                     // Falls Chargen vorhanden, die ein anderes Material sind, dann kann Belegung nicht geändert werden
-                    // Dieser Fall darf eigentlich nicht vorkommen!!
-                    //if ((from c in Database.FacilityCharge
-                    //     where (c.Facility.FacilityID == facility.FacilityID)
-                    //             //&& (c.Material.MaterialID != material.MaterialID)
-                    //             && (!(   /*(c.Material.MaterialID == material.ComparableMaterial.MaterialID)*/
-                    //                   /*|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == material.ComparableMaterial.MaterialID))*/))
-                    //             /*&&*/ (c.NotAvailable == false)
-                    //     select c).Any())
-                    //{
-                    //    BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
-                    //        Root.Environment.TranslateMessage(this, "Error00096",
-                    //                        facility.FacilityNo, facility.FacilityName));
-                    //    return Global.ACMethodResultState.Notpossible;
-                    //}
-
                     // Überprüfe ob Chargen im Silo vorhanden sind, die von einem anderen Rezept sind
                     if (Partslist != null)
                     {
-                        if ((from c in BP.DatabaseApp.FacilityCharge
-                             where (c.Facility.FacilityID == facility.FacilityID)
-                                     && (  (c.Partslist == null)
-                                        || ((c.Partslist != null) && (c.Partslist.PartslistID != Partslist.PartslistID)))
-                                     && (c.NotAvailable == false)
-                             select c).Any())
+                        if (s_cQry_FCList_Fac_OtherPL_NotAvailable(BP.DatabaseApp, facility.FacilityID, Partslist.PartslistID, false).Any())
                         {
                             BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                                 Root.Environment.TranslateMessage(this, "Error00097",
@@ -2224,12 +2197,8 @@ namespace gip.mes.facility
                         // dann darf Identifikation nur dann geändert werden, wenn keine FacilityChargen enthalten sind
                         if (facility.Partslist != Partslist)
                         {
-                            List<FacilityCharge> facilityChargeList = (from c in BP.DatabaseApp.FacilityCharge
-                                                                       where (c.Facility.FacilityID == facility.FacilityID)
-                                                                           && (c.NotAvailable == false)
-                                                                       select c).ToList();
                             // Falls Chargen vorhanden, dann kann Belegung nicht geändert werden
-                            if (facilityChargeList.Count > 0)
+                            if (s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).Any())
                             {
                                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                                     Root.Environment.TranslateMessage(this, "Error00101",
@@ -2243,12 +2212,8 @@ namespace gip.mes.facility
                     {
                         if (facility.Partslist != null)
                         {
-                            List<FacilityCharge> facilityChargeList = (from c in BP.DatabaseApp.FacilityCharge
-                                                                       where (c.Facility.FacilityID == facility.FacilityID)
-                                                                           && (c.NotAvailable == false)
-                                                                       select c).ToList();
                             // Falls Chargen vorhanden, dann kann Belegung nicht geändert werden
-                            if (facilityChargeList.Count > 0)
+                            if (s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).Any())
                             {
                                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                                     Root.Environment.TranslateMessage(this, "Error00106",
@@ -2263,12 +2228,8 @@ namespace gip.mes.facility
                 // Sonst belegtes Material unterschiedlich
                 else
                 {
-                    List<FacilityCharge> facilityChargeList = (from c in BP.DatabaseApp.FacilityCharge
-                                                               where (c.Facility.FacilityID == facility.FacilityID)
-                                                                   && (c.NotAvailable == false)
-                                                               select c).ToList();
                     // Falls Chargen vorhanden, dann kann Belegung nicht geändert werden
-                    if (facilityChargeList.Count > 0)
+                    if (s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, facility.FacilityID, false).Any())
                     {
                         BP.AddBookingMessage(ACMethodBooking.eResultCodes.ProhibitedBooking,
                             Root.Environment.TranslateMessage(this, "Error00099",
