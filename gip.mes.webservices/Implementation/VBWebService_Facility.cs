@@ -389,6 +389,11 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
+            if (facilityCharge == null)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "paramter facilityCharge is null"));
+            }
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -397,15 +402,38 @@ namespace gip.mes.webservices
                     if (response != null)
                         return new WSResponse<bool>(false, response.Message);
 
+                    Msg msg = null;
+
+                    datamodel.FacilityLot lot = null;
+                    if (facilityCharge.FacilityLot != null)
+                    {
+
+                        string secondaryKey = dbApp.Root().NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), datamodel.FacilityLot.NoColumnName,
+                                                                               datamodel.FacilityLot.FormatNewNo, myServiceHost);
+
+                        lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                        lot.ExpirationDate = facilityCharge.FacilityLot.ExpirationDate;
+                        lot.ExternLotNo = facilityCharge.FacilityLot.ExternLotNo;
+
+                        msg = dbApp.ACSaveChanges();
+                        if (msg != null)
+                        {
+                            return new WSResponse<bool>(false, msg);
+                        }
+                    }
+
                     datamodel.FacilityCharge fc = datamodel.FacilityCharge.NewACObject(dbApp, null);
                     fc.MaterialID = facilityCharge.Material.MaterialID;
-                    fc.FacilityLotID = facilityCharge.FacilityLot.FacilityLotID;
+                    if (lot != null)
+                    {
+                        fc.FacilityLotID = lot.FacilityLotID;
+                    }
                     fc.FacilityID = facilityCharge.Facility.FacilityID;
                     fc.ProductionDate = facilityCharge.ProductionDate;
                     fc.ExpirationDate = facilityCharge.ExpirationDate;
                     fc.FillingDate = facilityCharge.FillingDate;
 
-                    Msg msg = dbApp.ACSaveChanges();
+                    msg = dbApp.ACSaveChanges();
                     if (msg != null)
                         return new WSResponse<bool>(false, msg);
 
