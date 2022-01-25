@@ -1135,7 +1135,7 @@ namespace gip.mes.datamodel
             {
                 using (ACMonitor.Lock(QueryLock_1X000))
                 {
-                    return from c in this.MDUnit where c.IsQuantityUnit orderby c.SortIndex select c;
+                    return MDUnit.Where(c => c.IsQuantityUnit).OrderBy(c => c.SortIndex);
                 }
             }
         }
@@ -1236,58 +1236,42 @@ namespace gip.mes.datamodel
         #region precompiled Queries
         public static readonly Func<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>> s_cQry_GetMDProdOrderPosState =
         CompiledQuery.Compile<DatabaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates, IQueryable<MDProdOrderPartslistPosState>>(
-            (ctx, state) => from c in ctx.MDProdOrderPartslistPosState
-                            where c.MDProdOrderPartslistPosStateIndex == (short)state
-                            select c
+            (ctx, state) => ctx.MDProdOrderPartslistPosState.Where(c => c.MDProdOrderPartslistPosStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>> s_cQry_GetMDDelivPosState =
         CompiledQuery.Compile<DatabaseApp, MDDelivPosState.DelivPosStates, IQueryable<MDDelivPosState>>(
-            (ctx, state) => from c in ctx.MDDelivPosState
-                            where c.MDDelivPosStateIndex == (short)state
-                            select c
+            (ctx, state) => ctx.MDDelivPosState.Where(c => c.MDDelivPosStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, string, IQueryable<MDPickingType>> s_cQry_GetMDPickingType =
         CompiledQuery.Compile<DatabaseApp, string, IQueryable<MDPickingType>>(
-            (ctx, key) => from c in ctx.MDPickingType
-                          where c.MDKey == key
-                          select c
+            (ctx, key) => ctx.MDPickingType.Where(c => c.MDKey == key)
         );
 
         public static readonly Func<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>> s_cQry_GetMDDelivPosLoadState =
         CompiledQuery.Compile<DatabaseApp, MDDelivPosLoadState.DelivPosLoadStates, IQueryable<MDDelivPosLoadState>>(
-            (ctx, state) => from c in ctx.MDDelivPosLoadState
-                            where c.MDDelivPosLoadStateIndex == (short)state
-                            select c
+            (ctx, state) => ctx.MDDelivPosLoadState.Where(c => c.MDDelivPosLoadStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>> s_cQry_GetMDProdOrderState =
         CompiledQuery.Compile<DatabaseApp, MDProdOrderState.ProdOrderStates, IQueryable<MDProdOrderState>>(
-            (ctx, state) => from c in ctx.MDProdOrderState
-                            where c.MDProdOrderStateIndex == (short)state
-                            select c
+            (ctx, state) => ctx.MDProdOrderState.Where(c => c.MDProdOrderStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>> s_cQry_GetMDDelivNoteState =
         CompiledQuery.Compile<DatabaseApp, MDDelivNoteState.DelivNoteStates, IQueryable<MDDelivNoteState>>(
-            (ctx, state) => from c in ctx.MDDelivNoteState
-                            where c.MDDelivNoteStateIndex == (short)state
-                            select c
+            (ctx, state) => ctx.MDDelivNoteState.Where(c => c.MDDelivNoteStateIndex == (short)state)
         );
 
         public static readonly Func<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>> s_cQry_GetMDBookingNotAvailableMode =
         CompiledQuery.Compile<DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes, IQueryable<MDBookingNotAvailableMode>>(
-            (ctx, mode) => from c in ctx.MDBookingNotAvailableMode
-                           where c.MDBookingNotAvailableModeIndex == (short)mode
-                           select c
+            (ctx, mode) => ctx.MDBookingNotAvailableMode.Where(c => c.MDBookingNotAvailableModeIndex == (short)mode)
         );
 
         public static readonly Func<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>> s_cQry_GetMDBalancingMode =
         CompiledQuery.Compile<DatabaseApp, MDBalancingMode.BalancingModes, IQueryable<MDBalancingMode>>(
-            (ctx, mode) => from c in ctx.MDBalancingMode
-                           where c.MDBalancingModeIndex == (short)mode
-                           select c
+            (ctx, mode) => ctx.MDBalancingMode.Where(c => c.MDBalancingModeIndex == (short)mode)
         );
 
         #endregion

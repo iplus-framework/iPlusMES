@@ -595,9 +595,7 @@ namespace gip.bso.masterdata
                 return;
             if (!PreExecute("LoadLabOrderPos")) return;
             // Laden des aktuell selektierten LabOrderPos 
-            CurrentLabOrderPos = (from c in CurrentLabOrder.LabOrderPos_LabOrder
-                                  where c.LabOrderPosID == SelectedLabOrderPos.LabOrderPosID
-                                  select c).First();
+            CurrentLabOrderPos = CurrentLabOrder.LabOrderPos_LabOrder.Where(c => c.LabOrderPosID == SelectedLabOrderPos.LabOrderPosID).FirstOrDefault();
             PostExecute("LoadLabOrderPos");
         }
 

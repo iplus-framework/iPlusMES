@@ -79,10 +79,7 @@ namespace gip.mes.datamodel
             if (   facilityInventory == null
                 || !facilityInventory.FacilityInventoryPos_FacilityInventory.Any())
                 return;
-            var elements = from c in facilityInventory.FacilityInventoryPos_FacilityInventory
-                           where c.Sequence > sequence && c.Sequence != 0
-                           orderby c.Sequence
-                           select c;
+            var elements = facilityInventory.FacilityInventoryPos_FacilityInventory.Where(c => c.Sequence > sequence && c.Sequence != 0).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

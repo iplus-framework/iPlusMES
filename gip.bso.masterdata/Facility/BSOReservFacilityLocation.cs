@@ -158,7 +158,7 @@ namespace gip.bso.masterdata
         public void Search()
         {
             CurrentFacilityReservationData.FacReservationSearchType = FacilityReservationData.FacReservationSearchTypes.SearchByFacilityLocation;
-            _FacilityReservationManager.GetFacilityReservation(CurrentFacilityReservationData);
+            _FacilityReservationManager.GetFacilityReservation(this.DatabaseApp, CurrentFacilityReservationData);
            
         }
         #endregion

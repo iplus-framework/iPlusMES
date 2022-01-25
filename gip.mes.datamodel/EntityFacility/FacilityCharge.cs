@@ -437,7 +437,7 @@ namespace gip.mes.datamodel
 
             this.ReservedInwardQuantity = 0;
             // TODO: OR-Klausel einfügen für Produktionsaufträge
-            List<FacilityReservation> facilityReservationList = (from c in FacilityReservation_FacilityCharge where c.InOrderPos != null select c).ToList();
+            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.InOrderPosID.HasValue);
             foreach (FacilityReservation facilityReservation in facilityReservationList)
             {
                 // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
@@ -466,7 +466,7 @@ namespace gip.mes.datamodel
 
             this.ReservedOutwardQuantity = 0;
             // TODO: OR-Klausel einfügen für Produktionsaufträge
-            List<FacilityReservation> facilityReservationList = (from c in FacilityReservation_FacilityCharge where c.OutOrderPos != null select c).ToList();
+            IEnumerable<FacilityReservation> facilityReservationList = FacilityReservation_FacilityCharge.Where(c => c.OutOrderPosID.HasValue);
             foreach (FacilityReservation facilityReservation in facilityReservationList)
             {
                 // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist

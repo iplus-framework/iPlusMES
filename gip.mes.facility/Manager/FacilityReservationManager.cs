@@ -20,15 +20,6 @@ namespace gip.mes.facility
         }
         #endregion
 
-        public DatabaseApp Database
-        {
-            get
-            {
-                // Für "normale" Anwendungen
-                return this.ObjectContext as DatabaseApp;
-            }
-        }
-
         #region LoadedFacilityReservation
         public IQueryable<FacilityReservation> CurrentFacReservationList
         {
@@ -48,42 +39,29 @@ namespace gip.mes.facility
         #endregion
 
         #region Manager->Search->FacilityReservation
-        public IQueryable<FacilityReservation> GetFacilityReservation(FacilityReservationData facReservationData)
+        public IQueryable<FacilityReservation> GetFacilityReservation(DatabaseApp dbApp, FacilityReservationData facReservationData)
         {
             switch (facReservationData.FacReservationSearchType)
             {
                 case FacilityReservationData.FacReservationSearchTypes.SearchByFacility:
-                    _CurrentFacilityReservationList = from c in Database.FacilityReservation
-                                                      where c.Facility == facReservationData.FacilityFilter
-                                                      orderby c.InsertDate
-                                                      select c;
+                    _CurrentFacilityReservationList = dbApp.FacilityReservation
+                                                      .Where(c => c.Facility == facReservationData.FacilityFilter)
+                                                      .OrderBy(c => c.InsertDate);
                     break;
                 case FacilityReservationData.FacReservationSearchTypes.SearchByFacilityLocation:
-                    _CurrentFacilityReservationList = from c in Database.FacilityReservation
-                                                      where c.Facility.Facility1_ParentFacility == facReservationData.FacilityLocationFilter
-                                                      orderby c.InsertDate
-                                                      select c;
+                    _CurrentFacilityReservationList = dbApp.FacilityReservation
+                                                      .Where(c => c.Facility.Facility1_ParentFacility == facReservationData.FacilityLocationFilter)
+                                                      .OrderBy(c => c.InsertDate);
                     break;
                 case FacilityReservationData.FacReservationSearchTypes.SearchByMaterial:
-                    _CurrentFacilityReservationList = from c in Database.FacilityReservation
-                                                      where c.Material == facReservationData.MaterialFilter
-                                                      orderby c.InsertDate
-                                                      select c;
+                    _CurrentFacilityReservationList = dbApp.FacilityReservation
+                                                      .Where(c => c.Material == facReservationData.MaterialFilter)
+                                                      .OrderBy(c => c.InsertDate);
                     break;
             }
 
             // Wenn nur ein Lagerplatz betroffen ist, dann werden auch die Lagerplatzdaten geladen
-            int count = _CurrentFacilityReservationList.Select(o => o.Facility).Distinct().Count();
-
-            if (count == 1)
-            {
-                _CurrentFacility = _CurrentFacilityReservationList.Select(o => o.Facility).Distinct().First();
-            }
-            else
-            {
-                _CurrentFacility = null;
-            }
-
+            _CurrentFacility = _CurrentFacilityReservationList.Select(o => o.Facility).Distinct().FirstOrDefault();
             return _CurrentFacilityReservationList;
         }
         #endregion

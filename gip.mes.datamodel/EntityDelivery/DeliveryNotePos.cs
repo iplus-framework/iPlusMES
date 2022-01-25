@@ -96,7 +96,7 @@ namespace gip.mes.datamodel
                 || !inDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
                 return;
 
-            var elements = from c in inDeliveryNote.DeliveryNotePos_DeliveryNote where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = inDeliveryNote.DeliveryNotePos_DeliveryNote.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

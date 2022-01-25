@@ -582,8 +582,6 @@ namespace gip.bso.facility
                 if (AccessFacilityLot == null)
                     return null;
                 return AccessFacilityLot.NavList;
-                //if (CurrentFacilityCharge == null || CurrentFacilityCharge.Material == null) return null;
-                //return (from c in CurrentFacilityCharge.Material.FacilityLot_Material select c).OrderBy(x=>x.LotNo).ToList();
             }
         }
 

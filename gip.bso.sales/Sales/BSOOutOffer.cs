@@ -356,7 +356,7 @@ namespace gip.bso.sales
         {
             get
             {
-                return from c in DatabaseApp.Company where c.IsCustomer orderby c.CompanyName select c;
+                return DatabaseApp.Company.Where(c => c.IsCustomer).OrderBy(c => c.CompanyName).AsEnumerable();
             }
         }
 
@@ -369,10 +369,7 @@ namespace gip.bso.sales
                     return null;
                 if (!CurrentOutOffer.CustomerCompany.CompanyAddress_Company.IsLoaded)
                     CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Load();
-                return from c in CurrentOutOffer.CustomerCompany.CompanyAddress_Company
-                       where c.IsHouseCompanyAddress
-                       orderby c.Name1
-                       select c;
+                return CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
 
@@ -385,10 +382,7 @@ namespace gip.bso.sales
                     return null;
                 if (!CurrentOutOffer.CustomerCompany.CompanyAddress_Company.IsLoaded)
                     CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Load();
-                return from c in CurrentOutOffer.CustomerCompany.CompanyAddress_Company
-                       where c.IsDeliveryCompanyAddress
-                       orderby c.Name1
-                       select c;
+                return CurrentOutOffer.CustomerCompany.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
 
@@ -944,9 +938,7 @@ namespace gip.bso.sales
                 return;
             if (!PreExecute("LoadOutOfferPos")) return;
             // Laden des aktuell selektierten OutOfferPos 
-            CurrentOutOfferPos = (from c in CurrentOutOffer.OutOfferPos_OutOffer
-                                  where c.OutOfferPosID == SelectedOutOfferPos.OutOfferPosID
-                                  select c).First();
+            CurrentOutOfferPos = CurrentOutOffer.OutOfferPos_OutOffer.Where(c => c.OutOfferPosID == SelectedOutOfferPos.OutOfferPosID).FirstOrDefault();
             PostExecute("LoadOutOfferPos");
         }
 

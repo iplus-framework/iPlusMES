@@ -319,9 +319,10 @@ namespace gip.mes.facility
                 if (currentPicking.PickingPos_Picking.Any())
                 {
                     // Weise bereits angelegte Lieferscheine dem Besuch zu
-                    IEnumerable<DeliveryNote> inDeliveryNoteList = (from c in currentPicking.PickingPos_Picking
-                                                                    where c.InOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any()
-                                                                    select c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote).Distinct();
+                    IEnumerable<DeliveryNote> inDeliveryNoteList = currentPicking.PickingPos_Picking
+                                                                   .Where(c => c.InOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
+                                                                   .Select(c => c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote)
+                                                                   .Distinct();
                     foreach (DeliveryNote inDeliveryNote in inDeliveryNoteList)
                     {
                         if (inDeliveryNote.VisitorVoucher != null)
@@ -339,10 +340,11 @@ namespace gip.mes.facility
                     }
 
                     // Erzeuge neue Lieferscheine
-                    var queryWithoutOutDelivNote = from c in currentPicking.PickingPos_Picking
-                                                   where c.InOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos != null && !c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any()
-                                                   orderby c.InOrderPos.InOrder.DistributorCompany, c.InOrderPos.InOrder
-                                                   select c.InOrderPos.InOrderPos1_ParentInOrderPos;
+                    var queryWithoutOutDelivNote = currentPicking.PickingPos_Picking
+                                                   .Where(c => c.InOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos != null && !c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
+                                                   .OrderBy(c => c.InOrderPos.InOrder.DistributorCompany)
+                                                   .ThenBy(c => c.InOrderPos.InOrder.InOrderNo)
+                                                   .Select(c => c.InOrderPos.InOrderPos1_ParentInOrderPos);
                     Company lastCompany = null;
                     InOrder lastInOrder = null;
                     DeliveryNote lastDeliveryNote = null;
@@ -401,9 +403,10 @@ namespace gip.mes.facility
                 if (currentPicking.PickingPos_Picking.Any())
                 {
                     // Weise bereits angelegte Lieferscheine dem Besuch zu
-                    IEnumerable<DeliveryNote> outDeliveryNoteList = (from c in currentPicking.PickingPos_Picking
-                                                                     where c.OutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any()
-                                                                     select c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.FirstOrDefault().DeliveryNote).Distinct();
+                    IEnumerable<DeliveryNote> outDeliveryNoteList = currentPicking.PickingPos_Picking
+                                                                    .Where(c => c.OutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any())
+                                                                    .Select(c => c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.FirstOrDefault().DeliveryNote)
+                                                                    .Distinct();
                     foreach (DeliveryNote outDeliveryNote in outDeliveryNoteList)
                     {
                         if (outDeliveryNote.VisitorVoucher != null)
@@ -421,10 +424,11 @@ namespace gip.mes.facility
                     }
 
                     // Erzeuge neue Lieferscheine
-                    var queryWithoutIntDelivNote = from c in currentPicking.PickingPos_Picking
-                                                   where c.OutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null && !c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any()
-                                                   orderby c.OutOrderPos.OutOrder.CustomerCompany, c.OutOrderPos.OutOrder
-                                                   select c.OutOrderPos.OutOrderPos1_ParentOutOrderPos;
+                    var queryWithoutIntDelivNote = currentPicking.PickingPos_Picking
+                                                   .Where(c => c.OutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null && !c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any())
+                                                   .OrderBy(c => c.OutOrderPos.OutOrder.CustomerCompany)
+                                                   .ThenBy(c => c.OutOrderPos.OutOrder.OutOrderNo)
+                                                   .Select(c => c.OutOrderPos.OutOrderPos1_ParentOutOrderPos);
                     Company lastCompany = null;
                     OutOrder lastOutOrder = null;
                     DeliveryNote lastDeliveryNote = null;
@@ -517,9 +521,10 @@ namespace gip.mes.facility
                 currentPicking.PickingPos_Picking.AutoLoad(dbApp);
                 if (currentPicking.PickingPos_Picking.Any())
                 {
-                    IEnumerable<DeliveryNote> inDeliveryNoteList = (from c in currentPicking.PickingPos_Picking
-                                                                    where c.InOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any()
-                                                                    select c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote).Distinct();
+                    IEnumerable<DeliveryNote> inDeliveryNoteList = currentPicking.PickingPos_Picking
+                                                                   .Where(c => c.InOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos != null && c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
+                                                                   .Select(c => c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote)
+                                                                   .Distinct();
                     foreach (DeliveryNote inDeliveryNote in inDeliveryNoteList)
                     {
                         if (inDeliveryNote.VisitorVoucher != currentVisitorVoucher)
@@ -542,9 +547,10 @@ namespace gip.mes.facility
                 currentPicking.PickingPos_Picking.AutoLoad(dbApp);
                 if (currentPicking.PickingPos_Picking.Any())
                 {
-                    IEnumerable<DeliveryNote> outDeliveryNoteList = (from c in currentPicking.PickingPos_Picking
-                                                                     where c.OutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any()
-                                                                     select c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.FirstOrDefault().DeliveryNote).Distinct();
+                    IEnumerable<DeliveryNote> outDeliveryNoteList = currentPicking.PickingPos_Picking
+                                                                    .Where(c => c.OutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos != null && c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.Any())
+                                                                    .Select(c => c.OutOrderPos.OutOrderPos1_ParentOutOrderPos.DeliveryNotePos_OutOrderPos.FirstOrDefault().DeliveryNote)
+                                                                    .Distinct();
                     foreach (DeliveryNote outDeliveryNote in outDeliveryNoteList)
                     {
                         if (outDeliveryNote.VisitorVoucher != currentVisitorVoucher)

@@ -9,14 +9,10 @@ namespace gip.mes.facility
     {
         #region configuration
 
-        private const string V1_Manager = @"ACTrackingAndTracingManager";
-        private const string V2_Manager = @"TandT2Manager";
         private const string V3_Manager = @"TandTv3Manager";
         private const string BSOName_LocalConfigACUrl = @"TandTBSOName";
 
 
-        private const string V1_BSOName = "BSOTrackingAndTracing";
-        private const string V2_BSOName = "BSOTandTv2";
         private const string V3_BSOName = "BSOTandTv3";
 
         #endregion
@@ -31,14 +27,8 @@ namespace gip.mes.facility
         {
             switch (engine)
             {
-                case TrackingEnginesEnum.v2:
-                    DoTracking_v2(bso, direction, itemForTrack, additionalFilter);
-                    break;
                 case TrackingEnginesEnum.v3:
                     DoTracking_v3(bso, direction, itemForTrack, additionalFilter);
-                    break;
-                default:
-                    DoTracking_v1(bso, direction, itemForTrack, additionalFilter);
                     break;
             }
         }
@@ -46,20 +36,8 @@ namespace gip.mes.facility
         public ACRef<ITandTFetchCharge> GetFetchChargeManagerInstance(ACComponent acComponent)
         {
             TrackingConfiguration trackingConfiguration = (TrackingConfiguration)CommandLineHelper.ConfigCurrentDir.GetSection("trackingConfiguration");
-            ACRef<ITandTFetchCharge> manager = null;
-            switch (trackingConfiguration.DefaultTrackingEngine)
-            {
-                case TrackingEnginesEnum.v2:
-                    ACRef<TandT2Manager> v2Manager = TandT2Manager.ACRefToServiceInstance(acComponent);
-                    manager = new ACRef<ITandTFetchCharge>(v2Manager.ValueT, acComponent);
-                    break;
-                case TrackingEnginesEnum.v3:
-                    ACRef<ITandTv3Manager> v3Manager = TandTv3Manager.ACRefToServiceInstance(acComponent);
-                    manager = new ACRef<ITandTFetchCharge>(v3Manager.ValueT, acComponent);
-                    break;
-                default:
-                    break;
-            }
+            ACRef<ITandTv3Manager> v3Manager = TandTv3Manager.ACRefToServiceInstance(acComponent);
+            ACRef<ITandTFetchCharge> manager = new ACRef<ITandTFetchCharge>(v3Manager.ValueT, acComponent);
             return manager;
         }
 
@@ -111,8 +89,8 @@ namespace gip.mes.facility
                 forwardParams = new ACValueList(forwardParamBase);
                 forwardParams.Add(new ACValue("engine", trackingConfiguration.DefaultTrackingEngine));
 
-                backwardTranslation = string.Format("en{{'Backward Track and Trace {0}'}}de{{'Rückverfolgung {0}'}}", trackingConfiguration.DefaultTrackingEngine.ToString());
-                forwardTranslation = string.Format("en{{'Forward Track and Trace {0}'}}de{{'Vorwärtsverfolgung {0}'}}", trackingConfiguration.DefaultTrackingEngine.ToString());
+                backwardTranslation = "en{'Backward Track and Trace'}de{'Rückverfolgung'}";
+                forwardTranslation = "en{'Forward Track and Trace'}de{'Vorwärtsverfolgung'}";
             }
 
             ACMenuItem backwardMenuItem = new ACMenuItem(null, backwardTranslation, "!OnTrackingCall", 0, backwardParams, true, handlerACElement);
@@ -133,104 +111,6 @@ namespace gip.mes.facility
         #region Private handlers methods
 
         #region Private -> DoTracking versions
-        private void DoTracking_v1(ACBSO bso, GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter)
-        {
-            TrackingCommonStart_Config config = GetManagerConfigParam(TrackingEnginesEnum.v1);
-            if (config == null)
-                return;
-
-            TandTFilter filter = additionalFilter as TandTFilter;
-
-            ACMethod acMethod = config.ACClassTT.TypeACSignature();
-            acMethod.ParameterValueList["CallerObject"] = itemForTrack;
-            acMethod.ParameterValueList["SearchModel"] = direction;
-            acMethod.ParameterValueList["IsSearchIntermediately"] = true;
-            acMethod.ParameterValueList["TandTFilter"] = filter;
-            bso.Root.RootPageWPF.StartBusinessobject(config.TandtBSOName, acMethod.ParameterValueList);
-        }
-
-        private void DoTracking_v2(ACBSO bso, GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter)
-        {
-            TrackingCommonStart_Config config = GetManagerConfigParam(TrackingEnginesEnum.v2);
-            if (config == null)
-                return;
-            TandTv2Job job = additionalFilter as TandTv2Job;
-            if (job == null
-                && (additionalFilter == null
-                    || (additionalFilter is string && string.IsNullOrEmpty(additionalFilter as string))))
-            {
-                #region Populate by elements
-                job = new TandTv2Job();
-
-                // DeliveryNotePos
-                if (itemForTrack is DeliveryNotePos)
-                {
-                    DeliveryNotePos deliveryNotePos = itemForTrack as DeliveryNotePos;
-                    job.ItemSystemNo = deliveryNotePos.Sequence.ToString();
-                    job.PrimaryKeyID = deliveryNotePos.DeliveryNotePosID;
-                    job.ItemTypeEnum = TandTv2ItemTypeEnum.DeliveryNotePos;
-                }
-
-                // FacilityBooking
-                if (itemForTrack is FacilityBooking)
-                {
-                    FacilityBooking facilityBooking = itemForTrack as FacilityBooking;
-                    job.ItemSystemNo = facilityBooking.FacilityBookingNo;
-                    job.PrimaryKeyID = facilityBooking.FacilityBookingID;
-                    job.ItemTypeEnum = TandTv2ItemTypeEnum.FacilityBooking;
-                }
-
-                // FacilityBookingCharge
-                if (itemForTrack is FacilityBookingCharge)
-                {
-                    FacilityBookingCharge facilityBookingCharge = itemForTrack as FacilityBookingCharge;
-                    job.ItemSystemNo = facilityBookingCharge.FacilityBookingChargeNo;
-                    job.PrimaryKeyID = facilityBookingCharge.FacilityBookingChargeID;
-                    job.ItemTypeEnum = TandTv2ItemTypeEnum.FacilityBooking;
-                }
-
-                // InOrderPos
-                if (itemForTrack is InOrderPos)
-                {
-                    InOrderPos inOrderPos = itemForTrack as InOrderPos;
-                    job.ItemSystemNo = inOrderPos.Sequence.ToString();
-                    job.PrimaryKeyID = inOrderPos.InOrderPosID;
-                    job.ItemTypeEnum = TandTv2ItemTypeEnum.InOrderPos;
-                }
-
-                // OutOrderPos
-                if (itemForTrack is OutOrderPos)
-                {
-                    OutOrderPos outOrderPos = itemForTrack as OutOrderPos;
-                    job.ItemSystemNo = outOrderPos.Sequence.ToString();
-                    job.PrimaryKeyID = outOrderPos.OutOrderPosID;
-                    job.ItemTypeEnum = TandTv2ItemTypeEnum.OutOrderPos;
-                }
-
-
-                // FacilityPreBooking
-                if (itemForTrack is FacilityPreBooking)
-                {
-                    FacilityPreBooking facilityPreBooking = itemForTrack as FacilityPreBooking;
-                    job.ItemSystemNo = facilityPreBooking.FacilityPreBookingNo;
-                    job.PrimaryKeyID = facilityPreBooking.FacilityPreBookingID;
-                    job.ItemTypeEnum = TandTv2ItemTypeEnum.FacilityPreBooking;
-                }
-                #endregion
-            }
-
-            if (job == null)
-                return;
-
-            if (direction == GlobalApp.TrackingAndTracingSearchModel.Backward)
-                job.TrackingStyleEnum = TandTv2TrackingStyleEnum.Backward;
-            else if (direction == GlobalApp.TrackingAndTracingSearchModel.Forward)
-                job.TrackingStyleEnum = TandTv2TrackingStyleEnum.Forward;
-
-            ACMethod acMethod = config.ACClassTT.TypeACSignature();
-            acMethod.ParameterValueList[TandT2Manager.SearchModel_ParamValueKey] = job;
-            bso.Root.RootPageWPF.StartBusinessobject(config.TandtBSOName, acMethod.ParameterValueList);
-        }
 
         private void DoTracking_v3(ACBSO bso, GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter)
         {
@@ -342,14 +222,8 @@ namespace gip.mes.facility
             TrackingCommonStart_Config config = null;
             switch (engine)
             {
-                case TrackingEnginesEnum.v2:
-                    config = GetManagerConfigParam(V2_Manager, V2_BSOName);
-                    break;
                 case TrackingEnginesEnum.v3:
                     config = GetManagerConfigParam(V3_Manager, V3_BSOName);
-                    break;
-                default:
-                    config = GetManagerConfigParam(V1_Manager, V1_BSOName);
                     break;
             }
             return config;
@@ -382,7 +256,6 @@ namespace gip.mes.facility
         #endregion
 
         #endregion
-
     }
 
     public class TrackingCommonStart_Config

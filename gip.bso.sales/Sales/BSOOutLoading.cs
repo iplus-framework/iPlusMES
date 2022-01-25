@@ -62,126 +62,6 @@ namespace gip.bso.sales
             }
         }
 
-        //[ACPropertyCurrent(9999, "OutDeliveryNote")]
-        //public OutDeliveryNote CurrentOutDeliveryNote
-        //{
-        //    get
-        //    {
-        //        if (AccessPrimary == null) return null; return AccessPrimary.CurrentNavObject as OutDeliveryNote;
-        //    }
-        //    set
-        //    {
-        //        AccessPrimary.CurrentNavObject = value;
-        //        OnPropertyChanged("CurrentOutDeliveryNote");
-        //        OnPropertyChanged("OutDeliveryNotePosList");
-        //        OnPropertyChanged("OutDeliveryNotePosLoadlistList");
-        //    }
-        //}
-
-        //[ACPropertyList(9999, "OutDeliveryNote")]
-        //public IEnumerable<OutDeliveryNote> OutDeliveryNoteList
-        //{
-        //    get
-        //    {
-        //        return AccessPrimary.NavObjectList as IEnumerable<OutDeliveryNote>;
-        //    }
-        //}
-
-        //[ACPropertySelected(9999, "OutDeliveryNote")]
-        //public OutDeliveryNote SelectedOutDeliveryNote
-        //{
-        //    get
-        //    {
-        //        if (AccessPrimary == null) return null; return AccessPrimary.SelectedNavObject as OutDeliveryNote;
-        //    }
-        //    set
-        //    {
-        //        AccessPrimary.SelectedNavObject = value;
-        //        OnPropertyChanged("SelectedOutDeliveryNote");
-        //    }
-        //}
-
-        //OutDeliveryNotePos _CurrentOutDeliveryNotePos;
-        //[ACPropertyCurrent(9999, "OutDeliveryNotePos")]
-        //public OutDeliveryNotePos CurrentOutDeliveryNotePos
-        //{
-        //    get
-        //    {
-        //        return _CurrentOutDeliveryNotePos;
-        //    }
-        //    set
-        //    {
-        //        _CurrentOutDeliveryNotePos = value;
-        //        OnPropertyChanged("CurrentOutDeliveryNotePos");
-        //    }
-        //}
-
-        //[ACPropertyList(9999, "OutDeliveryNotePos")]
-        //public IEnumerable<OutDeliveryNotePos> OutDeliveryNotePosList
-        //{
-        //    get
-        //    {
-        //        return from c in CurrentOutDeliveryNote.OutDeliveryNotePos_OutDeliveryNote select c;
-
-        //    }
-        //}
-
-        //OutDeliveryNotePos _SelectedOutDeliveryNotePos;
-        //[ACPropertySelected(9999, "OutDeliveryNotePos")]
-        //public OutDeliveryNotePos SelectedOutDeliveryNotePos
-        //{
-        //    get
-        //    {
-        //        return _SelectedOutDeliveryNotePos;
-        //    }
-        //    set
-        //    {
-        //        _SelectedOutDeliveryNotePos = value;
-        //        OnPropertyChanged("SelectedOutDeliveryNotePos");
-        //    }
-        //}
-
-        //OutDeliveryNotePosLoadlist _CurrentOutDeliveryNotePosLoadlist;
-        //[ACPropertyCurrent(9999, "OutDeliveryNotePosLoadlist")]
-        //public OutDeliveryNotePosLoadlist CurrentOutDeliveryNotePosLoadlist
-        //{
-        //    get
-        //    {
-        //        return _CurrentOutDeliveryNotePosLoadlist;
-        //    }
-        //    set
-        //    {
-        //        _CurrentOutDeliveryNotePosLoadlist = value;
-        //        OnPropertyChanged("CurrentOutDeliveryNotePosLoadlist");
-        //    }
-        //}
-
-        //[ACPropertyList(9999, "OutDeliveryNotePosLoadlist")]
-        //public IEnumerable<OutDeliveryNotePosLoadlist> OutDeliveryNotePosLoadlistList
-        //{
-        //    get
-        //    {
-        //        return from c in CurrentOutDeliveryNotePos.OutDeliveryNotePosLoadlist_OutDeliveryNotePos
-        //               select c;
-
-        //    }
-        //}
-
-        //OutDeliveryNotePosLoadlist _SelectedOutDeliveryNotePosLoadlist;
-        //[ACPropertySelected(9999, "OutDeliveryNotePosLoadlist")]
-        //public OutDeliveryNotePosLoadlist SelectedOutDeliveryNotePosLoadlist
-        //{
-        //    get
-        //    {
-        //        return _SelectedOutDeliveryNotePosLoadlist;
-        //    }
-        //    set
-        //    {
-        //        _SelectedOutDeliveryNotePosLoadlist = value;
-        //        OnPropertyChanged("SelectedOutDeliveryNotePosLoadlist");
-        //    }
-        //}
-
         #endregion
 
         #region BSO->ACMethod
@@ -210,19 +90,6 @@ namespace gip.bso.sales
         [ACMethodInteraction("OutDeliveryNote", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutDeliveryNote", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
-            //if (SelectedOutDeliveryNote != null && ACSaveOrUndoChanges())
-            //{
-            //    if (!PreExecute("Load")) return;
-            //    CurrentOutDeliveryNote = (from c in Database.OutDeliveryNote
-            //        .Include("OutDeliveryNotePos_OutDeliveryNote")
-            //        .Include(OutOrder.ClassName)
-            //        .Include("OutOrder.DeliveryCompanyAddress")
-            //                              where c.OutDeliveryNoteID == SelectedOutDeliveryNote.OutDeliveryNoteID
-            //                              select c).First();
-            //    ACState = Const.SMEdit;
-            //    PostExecute("Load");
-               
-            //}
         }
 
         public bool IsEnabledLoad()
@@ -284,9 +151,6 @@ namespace gip.bso.sales
                 return;
             if (!PreExecute("LoadOutDeliveryNotePos")) return;
             // Laden des aktuell selektierten OutDeliveryNotePos 
-            //CurrentOutDeliveryNotePos = (from c in CurrentOutDeliveryNote.OutDeliveryNotePos_OutDeliveryNote
-            //                             where c.OutDeliveryNotePosID == SelectedOutDeliveryNotePos.OutDeliveryNotePosID
-            //                             select c).First();
             PostExecute("LoadOutDeliveryNotePos");
         }
 
@@ -336,9 +200,6 @@ namespace gip.bso.sales
             if (!IsEnabledLoadOutDeliveryNotePosLoadlist())
                 return;
             if (!PreExecute("LoadOutDeliveryNotePosLoadlist")) return;
-            //CurrentOutDeliveryNotePosLoadlist = (from c in CurrentOutDeliveryNotePos.OutDeliveryNotePosLoadlist_OutDeliveryNotePos
-            //                                     where c.OutDeliveryNotePosLoadlistID == SelectedOutDeliveryNotePosLoadlist.OutDeliveryNotePosLoadlistID
-            //                                     select c).First();
             PostExecute("LoadOutDeliveryNotePosLoadlist");
         }
 

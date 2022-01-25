@@ -146,34 +146,10 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) return; AccessPrimary.Current = value;
+                if (AccessPrimary == null) 
+                    return; 
+                AccessPrimary.Current = value;
                 OnPropertyChanged("CurrentCompany");
-
-                /* Onlinehelp: Aktualisierung der Steuerelementen oder INotifyPropertyChanged
-                 * Gebundene Steuerelemente der WPF reagieren grundsätzlich auf das Event "PropertyChanged",
-                 * welches durch das Interface INotifyPropertyChanged bereit gestellt wird.
-                 * Alle Datenbankentitäten/Tabellen (z.B. Company, Address) vom EntityFramework implementieren
-                 * dieses Interface, so das Änderungen automatisch in den Steuerelementen aktualisiert werden.
-                 * Jedes BSO (BSOBase) implementiert die Methode OnPropertyChanged, welche aufzurufen ist,
-                 * wenn sich ein über das BSO bereitgestellte Property (z.B. public Nullable<Guid> SelectedFactoryID)
-                 * sich ändert. 
-                 * 
-                 * Damit auch die Listenbereiche aktualisiert werden, ist wie hier zu sehen, das OnPropertyChanged 
-                 * auch für die unterhalb der primären Entität (Company) zu findenen Entitätslisten (FactoryList,
-                 * AddressList und ACProjectList) aufzurufen.
-                 * 
-                 * In Fall von BSOCompany sieht die Datenbankstruktur wie folgt aus:
-                 * Company
-                 *   CompanyFactory (FactoryList)
-                 *   Adress         (AdressList)
-                 *   ACProject      (ACProjectList)
-                 * 
-                 * Zusätzlich wird noch die Adresse mit dem Kennzeichen "IsHouseCompanyAddress" als CurrentHouseAdress 
-                 * abgelegt.
-                 * 
-                 * Es sind also immer in der Set-Methode der primären Entität die OnPropertyChanged für
-                 * die Unterlisten aufzurufen.
-                 */
                 OnPropertyChanged("FactoryList");
                 OnPropertyChanged("CompanyAddressList");
                 OnPropertyChanged("ACProjectList");
@@ -183,13 +159,11 @@ namespace gip.bso.masterdata
                 OnPropertyChanged("CompanyPersonList");
                 if (value != null)
                 {
-                    var query = value.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).Select(c => c);
+                    var query = value.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress);
                     // Hausadress lesen
                     if (query.Any())
                     {
-                        CurrentHouseAdress = (from c in value.CompanyAddress_Company
-                                              where c.IsHouseCompanyAddress
-                                              select c).First();
+                        CurrentHouseAdress = value.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).FirstOrDefault();
                         CurrentCompanyAddress = CurrentHouseAdress;
                     }
                     else
@@ -318,8 +292,7 @@ namespace gip.bso.masterdata
             {
                 if (CurrentCompany == null)
                     return null;
-                return from c in CurrentCompany.CompanyAddress_Company
-                       select c;
+                return CurrentCompany.CompanyAddress_Company.AsEnumerable();
 
             }
         }
@@ -857,7 +830,7 @@ namespace gip.bso.masterdata
             {
                 if (CurrentCompany == null)
                     return null;
-                var query = from c in DatabaseApp.CompanyMaterialStock where c.CompanyMaterial.CompanyID == CurrentCompany.CompanyID orderby c.CompanyMaterial.CompanyMaterialNo select c;
+                var query = DatabaseApp.CompanyMaterialStock.Where(c => c.CompanyMaterial.CompanyID == CurrentCompany.CompanyID).OrderBy(c => c.CompanyMaterial.CompanyMaterialNo);
                 (query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
                 return query;
             }
@@ -1058,9 +1031,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledLoadCompanyAddress())
                 return;
             if (!PreExecute("LoadCompanyAddress")) return;
-            CurrentCompanyAddress = (from c in CurrentCompany.CompanyAddress_Company
-                                     where c.CompanyAddressID == SelectedCompanyAddress.CompanyAddressID
-                                     select c).First();
+            CurrentCompanyAddress = CurrentCompany.CompanyAddress_Company.Where(c => c.CompanyAddressID == SelectedCompanyAddress.CompanyAddressID).FirstOrDefault();
             PostExecute("LoadCompanyAddress");
         }
 
@@ -1177,9 +1148,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledLoadCompanyPerson())
                 return;
             if (!PreExecute("LoadCompanyPerson")) return;
-            CurrentCompanyPerson = (from c in CurrentCompany.CompanyPerson_Company
-                                    where c.CompanyPersonID == SelectedCompanyPerson.CompanyPersonID
-                                    select c).First();
+            CurrentCompanyPerson = CurrentCompany.CompanyPerson_Company.Where(c => c.CompanyPersonID == SelectedCompanyPerson.CompanyPersonID).FirstOrDefault();
             PostExecute("LoadCompanyPerson");
         }
 
@@ -1275,10 +1244,7 @@ namespace gip.bso.masterdata
         public void LoadFactory()
         {
             if (!PreExecute("LoadFactory")) return;
-            CurrentFactory = (from c in CurrentCompany.Company_ParentCompany
-                              where c.CompanyID == SelectedFactory.CompanyID
-                              select c).First();
-            //CurrentFactory.ACProject_TenantCompany.Load(); ???
+            CurrentFactory = CurrentCompany.Company_ParentCompany.Where(c => c.CompanyID == SelectedFactory.CompanyID).FirstOrDefault();
             PostExecute("LoadFactory");
         }
 
@@ -1327,9 +1293,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledLoadCompanyMaterial())
                 return;
             if (!PreExecute("LoadCompanyMaterial")) return;
-            CurrentCompanyMaterial = (from c in CurrentCompany.CompanyMaterial_Company
-                                      where c.CompanyMaterialID == SelectedCompanyMaterial.CompanyMaterialID
-                                      select c).First();
+            CurrentCompanyMaterial = CurrentCompany.CompanyMaterial_Company.Where(c => c.CompanyMaterialID == SelectedCompanyMaterial.CompanyMaterialID).FirstOrDefault();
             PostExecute("LoadCompanyMaterial");
         }
 
@@ -1422,9 +1386,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledLoadCompanyMaterialPickup())
                 return;
             if (!PreExecute("LoadCompanyMaterialPickup")) return;
-            CurrentCompanyMaterialPickup = (from c in CurrentCompany.CompanyMaterial_Company
-                                            where c.CompanyMaterialID == SelectedCompanyMaterialPickup.CompanyMaterialID
-                                            select c).First();
+            CurrentCompanyMaterialPickup = CurrentCompany.CompanyMaterial_Company.Where(c => c.CompanyMaterialID == SelectedCompanyMaterialPickup.CompanyMaterialID).FirstOrDefault();
             PostExecute("LoadCompanyMaterialPickup");
         }
 

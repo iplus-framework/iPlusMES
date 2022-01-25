@@ -511,9 +511,7 @@ namespace gip.bso.manufacturing
                 return;
             if (!PreExecute("LoadDemandOrderPos")) return;
             // Laden des aktuell selektierten DemandOrderPos 
-            CurrentDemandOrderPos = (from c in CurrentDemandOrder.DemandOrderPos_DemandOrder
-                                     where c.DemandOrderPosID == SelectedDemandOrderPos.DemandOrderPosID
-                                     select c).First();
+            CurrentDemandOrderPos = CurrentDemandOrder.DemandOrderPos_DemandOrder.Where(c => c.DemandOrderPosID == SelectedDemandOrderPos.DemandOrderPosID).FirstOrDefault();
             PostExecute("LoadDemandOrderPos");
         }
 

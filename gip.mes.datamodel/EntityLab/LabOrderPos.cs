@@ -89,7 +89,7 @@ namespace gip.mes.datamodel
                 || !labReport.LabOrderPos_LabOrder.Any())
                 return;
 
-            var elements = from c in labReport.LabOrderPos_LabOrder where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = labReport.LabOrderPos_LabOrder.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

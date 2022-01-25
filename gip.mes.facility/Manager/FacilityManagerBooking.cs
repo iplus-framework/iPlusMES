@@ -1095,15 +1095,729 @@ namespace gip.mes.facility
         }
         #endregion
 
-        
+        #region Book PickingPos
+
+        #region Book PickingPos -> Main Methods
+
+        public FacilityPreBooking NewFacilityPreBooking(DatabaseApp dbApp, PickingPos pickingPos, double? actualQuantityUOM = null, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
+        {
+            if (postingType == PostingTypeEnum.NotDefined)
+                postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
+            IACObject businessEntity = pickingPos;
+            if (pickingPos.InOrderPos != null)
+            {
+                businessEntity = pickingPos.InOrderPos;
+                pickingPos.InOrderPos.AutoRefresh(dbApp);
+            }
+            else if (pickingPos.OutOrderPos != null)
+            {
+                businessEntity = pickingPos.OutOrderPos;
+                pickingPos.OutOrderPos.AutoRefresh(dbApp);
+            }
+
+            ACMethodBooking acMethodClone = null;
+            FacilityPreBooking facilityPreBooking = null;
+            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+            if (postingType == PostingTypeEnum.Inward)
+            {
+                if (businessEntity is PickingPos)
+                    acMethodClone = BookParamPickingInwardMovementClone(dbApp);
+                else
+                    acMethodClone = BookParamInOrderPosInwardMovementClone(dbApp);
+                facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, businessEntity, secondaryKey);
+            }
+            else if (postingType == PostingTypeEnum.Outward)
+            {
+                if (businessEntity is PickingPos)
+                    acMethodClone = BookParamPickingOutwardMovementClone(dbApp);
+                else
+                    acMethodClone = BookParamOutOrderPosOutwardMovementClone(dbApp);
+                facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, businessEntity, secondaryKey);
+            }
+            else
+            {
+                acMethodClone = BookParamRelocationMovementClone(dbApp);
+                facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, businessEntity, secondaryKey);
+            }
+            if (facilityPreBooking == null)
+                return null;
+
+            ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+
+            if (postingType == PostingTypeEnum.Inward)
+            {
+                //acMethodBooking.InwardQuantity = deliveryNotePos.InOrderPos.TargetQuantityUOM;
+                double quantityUOM = 0;
+                if (pickingPos.InOrderPos != null)
+                {
+                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.InOrderPos.TargetQuantityUOM - pickingPos.InOrderPos.PreBookingInwardQuantityUOM() - pickingPos.InOrderPos.ActualQuantityUOM;
+                    if (pickingPos.InOrderPos.MDUnit != null)
+                    {
+                        acMethodBooking.InwardQuantity = pickingPos.InOrderPos.Material.ConvertQuantity(quantityUOM, pickingPos.InOrderPos.Material.BaseMDUnit, pickingPos.InOrderPos.MDUnit);
+                        acMethodBooking.MDUnit = pickingPos.InOrderPos.MDUnit;
+                    }
+                    else
+                    {
+                        acMethodBooking.InwardQuantity = quantityUOM;
+                    }
+                    acMethodBooking.InwardMaterial = pickingPos.InOrderPos.Material;
+                    acMethodBooking.InOrderPos = pickingPos.InOrderPos;
+                    if (pickingPos.InOrderPos.InOrder.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = pickingPos.InOrderPos.InOrder.CPartnerCompany;
+                }
+                else if (pickingPos.OutOrderPos != null)
+                {
+                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.OutOrderPos.TargetQuantityUOM - pickingPos.OutOrderPos.PreBookingOutwardQuantityUOM() - pickingPos.OutOrderPos.ActualQuantityUOM;
+                    if (pickingPos.OutOrderPos.MDUnit != null)
+                    {
+                        acMethodBooking.InwardQuantity = pickingPos.OutOrderPos.Material.ConvertQuantity(quantityUOM, pickingPos.OutOrderPos.Material.BaseMDUnit, pickingPos.OutOrderPos.MDUnit);
+                        acMethodBooking.MDUnit = pickingPos.OutOrderPos.MDUnit;
+                    }
+                    else
+                    {
+                        acMethodBooking.InwardQuantity = quantityUOM;
+                    }
+                    acMethodBooking.InwardMaterial = pickingPos.OutOrderPos.Material;
+                    acMethodBooking.OutOrderPos = pickingPos.OutOrderPos;
+                    if (pickingPos.OutOrderPos.OutOrder.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = pickingPos.OutOrderPos.OutOrder.CPartnerCompany;
+                }
+                else
+                {
+                    if (actualQuantityUOM.HasValue)
+                        quantityUOM = actualQuantityUOM.Value;
+                    else
+                    {
+                        //if (pickingPos.TargetQuantity >= 0.0001)
+                        quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        //else
+                        //    quantityUOM = pickingPos.DiffQuantityUOM;
+                    }
+                    acMethodBooking.InwardQuantity = quantityUOM;
+                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.PickingPos = pickingPos;
+                }
+
+            }
+            else if (postingType == PostingTypeEnum.Outward)
+            {
+                double quantityUOM = 0;
+                if (pickingPos.InOrderPos != null)
+                {
+                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.InOrderPos.TargetQuantityUOM - pickingPos.InOrderPos.PreBookingInwardQuantityUOM() - pickingPos.InOrderPos.ActualQuantityUOM;
+                    if (pickingPos.InOrderPos.MDUnit != null)
+                    {
+                        acMethodBooking.OutwardQuantity = pickingPos.InOrderPos.Material.ConvertQuantity(quantityUOM, pickingPos.InOrderPos.Material.BaseMDUnit, pickingPos.InOrderPos.MDUnit);
+                        acMethodBooking.MDUnit = pickingPos.InOrderPos.MDUnit;
+                    }
+                    else
+                    {
+                        acMethodBooking.OutwardQuantity = quantityUOM;
+                    }
+                    acMethodBooking.OutwardMaterial = pickingPos.InOrderPos.Material;
+                    acMethodBooking.InOrderPos = pickingPos.InOrderPos;
+                    if (pickingPos.InOrderPos.InOrder.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = pickingPos.InOrderPos.InOrder.CPartnerCompany;
+                }
+                else if (pickingPos.OutOrderPos != null)
+                {
+                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.OutOrderPos.TargetQuantityUOM - pickingPos.OutOrderPos.PreBookingOutwardQuantityUOM() - pickingPos.OutOrderPos.ActualQuantityUOM;
+                    if (pickingPos.OutOrderPos.MDUnit != null)
+                    {
+                        acMethodBooking.OutwardQuantity = pickingPos.OutOrderPos.Material.ConvertQuantity(quantityUOM, pickingPos.OutOrderPos.Material.BaseMDUnit, pickingPos.OutOrderPos.MDUnit);
+                        acMethodBooking.MDUnit = pickingPos.OutOrderPos.MDUnit;
+                    }
+                    else
+                    {
+                        acMethodBooking.OutwardQuantity = quantityUOM;
+                    }
+                    acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
+                    acMethodBooking.OutOrderPos = pickingPos.OutOrderPos;
+                    if (pickingPos.OutOrderPos.OutOrder.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = pickingPos.OutOrderPos.OutOrder.CPartnerCompany;
+                }
+                else
+                {
+                    if (actualQuantityUOM.HasValue)
+                        quantityUOM = actualQuantityUOM.Value;
+                    else
+                    {
+                        //if (pickingPos.TargetQuantity >= 0.0001)
+                        quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        //else
+                        //    quantityUOM = pickingPos.DiffQuantityUOM;
+                    }
+                    acMethodBooking.OutwardQuantity = quantityUOM;
+                    acMethodBooking.OutwardFacility = pickingPos.FromFacility;
+                    if (pickingPos.FromFacility != null && pickingPos.FromFacility.Material != null)
+                        acMethodBooking.MDUnit = pickingPos.FromFacility.Material.BaseMDUnit;
+                    acMethodBooking.PickingPos = pickingPos;
+                }
+            }
+            else //if (pickingPos.InOrderPos == null && pickingPos.OutOrderPos == null)
+            {
+                double quantityUOM = 0;
+                if (pickingPos.InOrderPos != null)
+                {
+                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.InOrderPos.TargetQuantityUOM - pickingPos.InOrderPos.PreBookingInwardQuantityUOM() - pickingPos.InOrderPos.ActualQuantityUOM;
+                    if (pickingPos.InOrderPos.MDUnit != null)
+                    {
+                        acMethodBooking.InwardQuantity = pickingPos.InOrderPos.Material.ConvertQuantity(quantityUOM, pickingPos.InOrderPos.Material.BaseMDUnit, pickingPos.InOrderPos.MDUnit);
+                        acMethodBooking.OutwardQuantity = acMethodBooking.InwardQuantity;
+                        acMethodBooking.MDUnit = pickingPos.InOrderPos.MDUnit;
+                    }
+                    else
+                    {
+                        acMethodBooking.InwardQuantity = quantityUOM;
+                        acMethodBooking.OutwardQuantity = quantityUOM;
+                    }
+                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.OutwardFacility = pickingPos.FromFacility;
+                    acMethodBooking.InwardMaterial = pickingPos.InOrderPos.Material;
+                    acMethodBooking.InOrderPos = pickingPos.InOrderPos;
+                    if (pickingPos.InOrderPos.InOrder.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = pickingPos.InOrderPos.InOrder.CPartnerCompany;
+                }
+                else if (pickingPos.OutOrderPos != null)
+                {
+                    quantityUOM = actualQuantityUOM.HasValue ? actualQuantityUOM.Value : pickingPos.OutOrderPos.TargetQuantityUOM - pickingPos.OutOrderPos.PreBookingOutwardQuantityUOM() - pickingPos.OutOrderPos.ActualQuantityUOM;
+                    if (pickingPos.OutOrderPos.MDUnit != null)
+                    {
+                        acMethodBooking.OutwardQuantity = pickingPos.OutOrderPos.Material.ConvertQuantity(quantityUOM, pickingPos.OutOrderPos.Material.BaseMDUnit, pickingPos.OutOrderPos.MDUnit);
+                        acMethodBooking.InwardQuantity = acMethodBooking.OutwardQuantity;
+                        acMethodBooking.MDUnit = pickingPos.OutOrderPos.MDUnit;
+                    }
+                    else
+                    {
+                        acMethodBooking.OutwardQuantity = quantityUOM;
+                        acMethodBooking.InwardQuantity = quantityUOM;
+                    }
+                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.OutwardFacility = pickingPos.FromFacility;
+                    acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
+                    acMethodBooking.OutOrderPos = pickingPos.OutOrderPos;
+                    if (pickingPos.OutOrderPos.OutOrder.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = pickingPos.OutOrderPos.OutOrder.CPartnerCompany;
+                }
+                else
+                {
+                    if (actualQuantityUOM.HasValue)
+                        quantityUOM = actualQuantityUOM.Value;
+                    else
+                    {
+                        //if (pickingPos.TargetQuantity >= 0.0001)
+                        quantityUOM = pickingPos.DiffQuantityUOM * -1;
+                        //else
+                        //    quantityUOM = pickingPos.DiffQuantityUOM;
+                    }
+                    acMethodBooking.InwardQuantity = quantityUOM;
+                    acMethodBooking.InwardFacility = pickingPos.ToFacility;
+                    acMethodBooking.OutwardQuantity = quantityUOM;
+                    acMethodBooking.OutwardFacility = pickingPos.FromFacility;
+                    if (pickingPos.FromFacility != null && pickingPos.FromFacility.Material != null)
+                        acMethodBooking.MDUnit = pickingPos.FromFacility.Material.BaseMDUnit;
+                    acMethodBooking.PickingPos = pickingPos;
+                }
+            }
+
+            // TODO: Restliche Parameter von acMethodBooking ausfüllen
+            facilityPreBooking.ACMethodBooking = acMethodBooking;
+            return facilityPreBooking;
+        }
+
+        public List<FacilityPreBooking> CancelFacilityPreBooking(DatabaseApp dbApp, PickingPos pickingPos, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
+        {
+            if (postingType == PostingTypeEnum.NotDefined)
+                postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
+
+            List<FacilityPreBooking> bookings = new List<FacilityPreBooking>();
+            ACMethodBooking acMethodClone = null;
+            FacilityPreBooking facilityPreBooking = null;
+            if (pickingPos.InOrderPos != null)
+            {
+                if (pickingPos.InOrderPos.MDInOrderPosState.InOrderPosState == MDInOrderPosState.InOrderPosStates.Cancelled)
+                    return null;
+                if (pickingPos.InOrderPos.EntityState != System.Data.EntityState.Added)
+                {
+                    pickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad(dbApp);
+                    pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.AutoLoad(dbApp);
+                }
+                else
+                    return null;
+                if (pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.Any())
+                    return null;
+                foreach (FacilityBooking previousBooking in pickingPos.InOrderPos.FacilityBooking_InOrderPos)
+                {
+                    // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
+                    // da der Positionsstatus auch MDOutOrderPosState.OutOrderPosStates.Cancelled sein müsste
+                    if (previousBooking.FacilityBookingType == GlobalApp.FacilityBookingType.InOrderPosCancel)
+                        return null;
+                }
+                foreach (FacilityBooking previousBooking in pickingPos.InOrderPos.FacilityBooking_InOrderPos)
+                {
+                    if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.InOrderPosInwardMovement)
+                        continue;
+                    acMethodClone = BookParamInCancelClone(dbApp);
+                    string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                    facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, pickingPos.InOrderPos, secondaryKey);
+                    ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+                    acMethodBooking.InwardQuantity = previousBooking.InwardQuantity * -1;
+                    acMethodBooking.InwardQuantityAmb = previousBooking.InwardQuantityAmb * -1;
+                    if (previousBooking.MDUnit != null)
+                        acMethodBooking.MDUnit = previousBooking.MDUnit;
+                    acMethodBooking.InwardFacility = previousBooking.InwardFacility;
+                    if (previousBooking.InwardFacilityLot != null)
+                        acMethodBooking.InwardFacilityLot = previousBooking.InwardFacilityLot;
+                    if (previousBooking.InwardFacilityCharge != null)
+                        acMethodBooking.InwardFacilityCharge = previousBooking.InwardFacilityCharge;
+                    if (previousBooking.InwardMaterial != null)
+                        acMethodBooking.InwardMaterial = previousBooking.InwardMaterial;
+                    else
+                        acMethodBooking.InwardMaterial = pickingPos.InOrderPos.Material;
+                    if (postingType == PostingTypeEnum.Relocation
+                        && Math.Abs(previousBooking.OutwardQuantity - 0) > Double.Epsilon)
+                    {
+                        acMethodBooking.OutwardQuantity = previousBooking.OutwardQuantity * -1;
+                        acMethodBooking.OutwardQuantityAmb = previousBooking.OutwardQuantityAmb * -1;
+                        if (previousBooking.MDUnit != null)
+                            acMethodBooking.MDUnit = previousBooking.MDUnit;
+                        acMethodBooking.OutwardFacility = previousBooking.OutwardFacility;
+                        if (previousBooking.OutwardFacilityLot != null)
+                            acMethodBooking.OutwardFacilityLot = previousBooking.OutwardFacilityLot;
+                        if (previousBooking.OutwardFacilityCharge != null)
+                            acMethodBooking.OutwardFacilityCharge = previousBooking.OutwardFacilityCharge;
+                        if (previousBooking.OutwardMaterial != null)
+                            acMethodBooking.OutwardMaterial = previousBooking.OutwardMaterial;
+                        else
+                            acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
+                    }
+                    acMethodBooking.InOrderPos = pickingPos.InOrderPos;
+                    if (previousBooking.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = previousBooking.CPartnerCompany;
+                    facilityPreBooking.ACMethodBooking = acMethodBooking;
+                    bookings.Add(facilityPreBooking);
+                }
+            }
+            else if (pickingPos.OutOrderPos != null)
+            {
+                if (pickingPos.OutOrderPos.MDOutOrderPosState.OutOrderPosState == MDOutOrderPosState.OutOrderPosStates.Cancelled)
+                    return null;
+                if (pickingPos.OutOrderPos.EntityState != System.Data.EntityState.Added)
+                {
+                    pickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoLoad(dbApp);
+                    pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.AutoLoad(dbApp);
+                }
+                else
+                    return null;
+                if (pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.Any())
+                    return null;
+                foreach (FacilityBooking previousBooking in pickingPos.OutOrderPos.FacilityBooking_OutOrderPos)
+                {
+                    // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
+                    // da der Positionsstatus auch MDOutOrderPosState.OutOrderPosStates.Cancelled sein müsste
+                    if (previousBooking.FacilityBookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel)
+                        return null;
+                }
+                foreach (FacilityBooking previousBooking in pickingPos.OutOrderPos.FacilityBooking_OutOrderPos)
+                {
+                    if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.OutOrderPosOutwardMovement)
+                        continue;
+                    acMethodClone = BookParamOutCancelClone(dbApp);
+                    string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                    facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, pickingPos.OutOrderPos, secondaryKey);
+                    ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+                    acMethodBooking.OutwardQuantity = previousBooking.OutwardQuantity * -1;
+                    acMethodBooking.OutwardQuantityAmb = previousBooking.OutwardQuantityAmb * -1;
+                    if (previousBooking.MDUnit != null)
+                        acMethodBooking.MDUnit = previousBooking.MDUnit;
+                    acMethodBooking.OutwardFacility = previousBooking.OutwardFacility;
+                    if (previousBooking.OutwardFacilityLot != null)
+                        acMethodBooking.OutwardFacilityLot = previousBooking.OutwardFacilityLot;
+                    if (previousBooking.OutwardFacilityCharge != null)
+                        acMethodBooking.OutwardFacilityCharge = previousBooking.OutwardFacilityCharge;
+                    if (previousBooking.OutwardMaterial != null)
+                        acMethodBooking.OutwardMaterial = previousBooking.OutwardMaterial;
+                    else
+                        acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
+
+                    if (postingType == PostingTypeEnum.Relocation
+                        && Math.Abs(previousBooking.InwardQuantity - 0) > Double.Epsilon)
+                    {
+                        acMethodBooking.InwardQuantity = previousBooking.InwardQuantity * -1;
+                        acMethodBooking.InwardQuantityAmb = previousBooking.InwardQuantityAmb * -1;
+                        if (previousBooking.MDUnit != null)
+                            acMethodBooking.MDUnit = previousBooking.MDUnit;
+                        acMethodBooking.InwardFacility = previousBooking.InwardFacility;
+                        if (previousBooking.InwardFacilityLot != null)
+                            acMethodBooking.InwardFacilityLot = previousBooking.InwardFacilityLot;
+                        if (previousBooking.InwardFacilityCharge != null)
+                            acMethodBooking.InwardFacilityCharge = previousBooking.InwardFacilityCharge;
+                        if (previousBooking.InwardMaterial != null)
+                            acMethodBooking.InwardMaterial = previousBooking.InwardMaterial;
+                        else
+                            acMethodBooking.InwardMaterial = pickingPos.InOrderPos.Material;
+                    }
+
+                    acMethodBooking.OutOrderPos = pickingPos.OutOrderPos;
+                    if (previousBooking.CPartnerCompany != null)
+                        acMethodBooking.CPartnerCompany = previousBooking.CPartnerCompany;
+                    facilityPreBooking.ACMethodBooking = acMethodBooking;
+                    bookings.Add(facilityPreBooking);
+                }
+            }
+            else
+            {
+                if (pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.NewCreated)
+                    return null;
+                if (pickingPos.EntityState != System.Data.EntityState.Added)
+                {
+                    pickingPos.FacilityBooking_PickingPos.AutoLoad(dbApp);
+                    pickingPos.FacilityPreBooking_PickingPos.AutoLoad(dbApp);
+                }
+                else
+                    return null;
+                if (pickingPos.FacilityBooking_PickingPos.Any())
+                    return null;
+                //foreach (FacilityBooking previousBooking in pickingPos.FacilityBooking_PickingPos)
+                //{
+                //    // Wenn einmal Storniert, dann kann nicht mehr storniert werden. Der Fall dürfte normalerweise nicht auftreten, 
+                //    // da der Positionsstatus auch MDOutOrderPosState.OutOrderPosStates.Cancelled sein müsste
+                //    if (previousBooking.FacilityBookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge)
+                //        return null;
+                //}
+                foreach (FacilityBooking previousBooking in pickingPos.FacilityBooking_PickingPos)
+                {
+                    //if (previousBooking.FacilityBookingType != GlobalApp.FacilityBookingType.OutOrderPosOutwardMovement)
+                    //    continue;
+                    acMethodClone = BookParamRelocationMovementClone(dbApp);
+                    string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                    facilityPreBooking = FacilityPreBooking.NewACObject(dbApp, pickingPos.OutOrderPos, secondaryKey);
+                    ACMethodBooking acMethodBooking = acMethodClone.Clone() as ACMethodBooking;
+
+                    if (Math.Abs(previousBooking.OutwardQuantity - 0) > Double.Epsilon)
+                    {
+                        acMethodBooking.OutwardQuantity = previousBooking.OutwardQuantity * -1;
+                        acMethodBooking.OutwardQuantityAmb = previousBooking.OutwardQuantityAmb * -1;
+                        if (previousBooking.MDUnit != null)
+                            acMethodBooking.MDUnit = previousBooking.MDUnit;
+                        acMethodBooking.OutwardFacility = previousBooking.OutwardFacility;
+                        if (previousBooking.OutwardFacilityLot != null)
+                            acMethodBooking.OutwardFacilityLot = previousBooking.OutwardFacilityLot;
+                        if (previousBooking.OutwardFacilityCharge != null)
+                            acMethodBooking.OutwardFacilityCharge = previousBooking.OutwardFacilityCharge;
+                        if (previousBooking.OutwardMaterial != null)
+                            acMethodBooking.OutwardMaterial = previousBooking.OutwardMaterial;
+                        else
+                            acMethodBooking.OutwardMaterial = pickingPos.OutOrderPos.Material;
+                    }
+
+                    if (Math.Abs(previousBooking.InwardQuantity - 0) > Double.Epsilon)
+                    {
+                        acMethodBooking.InwardQuantity = previousBooking.InwardQuantity * -1;
+                        acMethodBooking.InwardQuantityAmb = previousBooking.InwardQuantityAmb * -1;
+                        if (previousBooking.MDUnit != null)
+                            acMethodBooking.MDUnit = previousBooking.MDUnit;
+                        acMethodBooking.InwardFacility = previousBooking.InwardFacility;
+                        if (previousBooking.InwardFacilityLot != null)
+                            acMethodBooking.InwardFacilityLot = previousBooking.InwardFacilityLot;
+                        if (previousBooking.InwardFacilityCharge != null)
+                            acMethodBooking.InwardFacilityCharge = previousBooking.InwardFacilityCharge;
+                        if (previousBooking.InwardMaterial != null)
+                            acMethodBooking.InwardMaterial = previousBooking.InwardMaterial;
+                        else
+                            acMethodBooking.InwardMaterial = pickingPos.InOrderPos.Material;
+                    }
+
+                    acMethodBooking.PickingPos = pickingPos;
+                    //if (previousBooking.CPartnerCompany != null)
+                    //    acMethodBooking.CPartnerCompany = previousBooking.CPartnerCompany;
+                    facilityPreBooking.ACMethodBooking = acMethodBooking;
+                    bookings.Add(facilityPreBooking);
+                }
+            }
+            return bookings;
+        }
+
+        public List<FacilityPreBooking> CancelFacilityPreBooking(DatabaseApp dbApp, Picking picking)
+        {
+            if (picking == null)
+                return null;
+            if (picking.EntityState != System.Data.EntityState.Added)
+                picking.PickingPos_Picking.AutoLoad(dbApp);
+            List<FacilityPreBooking> result = null;
+            foreach (PickingPos pickingPos in picking.PickingPos_Picking)
+            {
+                var subResult = CancelFacilityPreBooking(dbApp, pickingPos);
+                if (subResult != null)
+                {
+                    if (result == null)
+                        result = subResult;
+                    else
+                        result.AddRange(subResult);
+                }
+            }
+            return result;
+        }
+
+        public virtual void RecalcAfterPosting(DatabaseApp dbApp, PickingPos pickingPos, double postedQuantityUOM, bool isCancellation, bool autoSetState = false, PostingTypeEnum postingType = PostingTypeEnum.NotDefined)
+        {
+            if (postingType == PostingTypeEnum.NotDefined)
+                postingType = DeterminePostingType(dbApp, pickingPos, pickingPos.Picking);
+            if (pickingPos.InOrderPos != null)
+            {
+                pickingPos.InOrderPos.TopParentInOrderPos.RecalcActualQuantity();
+                if (isCancellation)
+                {
+                    MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Cancelled).FirstOrDefault();
+                    if (state != null)
+                        pickingPos.InOrderPos.MDInOrderPosState = state;
+                    pickingPos.InOrderPos.TopParentInOrderPos.CalledUpQuantity -= pickingPos.InOrderPos.TargetQuantity;
+                    pickingPos.InOrderPos.TargetQuantity = 0;
+                    pickingPos.InOrderPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    if (autoSetState
+                        && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                            || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
+                    {
+                        MDInOrderPosState state = dbApp.MDInOrderPosState.Where(c => c.MDInOrderPosStateIndex == (short)MDInOrderPosState.InOrderPosStates.Completed).FirstOrDefault();
+                        if (state != null)
+                            pickingPos.InOrderPos.MDInOrderPosState = state;
+                    }
+                }
+            }
+            else if (pickingPos.OutOrderPos != null)
+            {
+                pickingPos.OutOrderPos.TopParentOutOrderPos.RecalcActualQuantity();
+                if (isCancellation)
+                {
+                    MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Cancelled).FirstOrDefault();
+                    if (state != null)
+                        pickingPos.OutOrderPos.MDOutOrderPosState = state;
+                    pickingPos.OutOrderPos.TopParentOutOrderPos.CalledUpQuantity -= pickingPos.OutOrderPos.TargetQuantity;
+                    pickingPos.OutOrderPos.TargetQuantity = 0;
+                    pickingPos.OutOrderPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    if (autoSetState
+                        && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                            || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
+                    {
+                        MDOutOrderPosState state = dbApp.MDOutOrderPosState.Where(c => c.MDOutOrderPosStateIndex == (short)MDOutOrderPosState.OutOrderPosStates.Completed).FirstOrDefault();
+                        if (state != null)
+                            pickingPos.OutOrderPos.MDOutOrderPosState = state;
+                    }
+                }
+            }
+            else
+            {
+                pickingPos.IncreasePickingActualUOM(postedQuantityUOM);
+                pickingPos.RecalcActualQuantity();
+
+                if (autoSetState
+                    && ((pickingPos.TargetQuantityUOM > 0.0001 && pickingPos.DiffQuantityUOM >= 0)
+                        || (pickingPos.TargetQuantityUOM < -0.0001 && pickingPos.DiffQuantityUOM <= 0)))
+                {
+                    MDDelivPosLoadState state = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                    if (state != null)
+                        pickingPos.MDDelivPosLoadState = state;
+                }
+            }
+            pickingPos.OnEntityPropertyChanged("ActualQuantity");
+            pickingPos.OnEntityPropertyChanged("ActualQuantityUOM");
+            pickingPos.OnEntityPropertyChanged("DiffQuantityUOM");
+            pickingPos.OnEntityPropertyChanged("PickingDiffQuantityUOM");
+        }
+
+        public void InitBookingParamsFromTemplate(ACMethodBooking acMethodBooking, PickingPos pickingPos, FacilityPreBooking ignorePreBooking = null)
+        {
+            if (acMethodBooking == null
+                || pickingPos == null)
+                return;
+
+            if (!InitLotFromPreBooking(acMethodBooking, pickingPos, ignorePreBooking))
+            {
+                InitLotFromPostings(acMethodBooking, pickingPos);
+            }
+        }
+
+        public MsgWithDetails IsQuantStockConsumed(FacilityCharge fc, DatabaseApp dbApp)
+        {
+            if (fc != null && fc.StockQuantity <= 0.00001)
+            {
+                //Question50079 :The quant stock is negative. Is quant spent?
+                return new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "IsQauntStockConsumed", 1647, "Question50079", eMsgButton.YesNo);
+            }
+
+            return null;
+        }
+        public virtual PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, PickingPos pickingPos, Picking picking)
+        {
+            PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
+            if (pickingPos.InOrderPos != null)
+            {
+                postingTypeEnum = PostingTypeEnum.Inward;
+            }
+            else if (pickingPos.OutOrderPos != null)
+            {
+                postingTypeEnum = PostingTypeEnum.Outward;
+                if (picking.PickingType == GlobalApp.PickingType.IssueVehicle)
+                    postingTypeEnum = PostingTypeEnum.Relocation;
+            }
+            else
+            {
+                postingTypeEnum = PostingTypeEnum.Relocation;
+                if (picking.PickingType == GlobalApp.PickingType.Receipt
+                     || picking.PickingType == GlobalApp.PickingType.ReceiptVehicle)
+                    postingTypeEnum = PostingTypeEnum.Inward;
+                else if (picking.PickingType == GlobalApp.PickingType.Issue)
+                    //|| picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle))
+                    postingTypeEnum = PostingTypeEnum.Outward;
+            }
+            return postingTypeEnum;
+        }
+
         #endregion
 
+        #region Book PickingPos -> Helper Methods (public)
+
+        ACMethodBooking _BookParamInOrderPosInwardMovementClone;
+        public ACMethodBooking BookParamInOrderPosInwardMovementClone(DatabaseApp dbApp)
+        {
+            if (_BookParamInOrderPosInwardMovementClone != null)
+                return _BookParamInOrderPosInwardMovementClone;
+            _BookParamInOrderPosInwardMovementClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_InOrderPosInwardMovement.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInOrderPosInwardMovementClone.Database = dbApp;
+            return _BookParamInOrderPosInwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamOutOrderPosOutwardMovementClone;
+        public ACMethodBooking BookParamOutOrderPosOutwardMovementClone(DatabaseApp dbApp)
+        {
+            if (_BookParamOutOrderPosOutwardMovementClone != null)
+                return _BookParamOutOrderPosOutwardMovementClone;
+            _BookParamOutOrderPosOutwardMovementClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_OutOrderPosOutwardMovement.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutOrderPosOutwardMovementClone.Database = dbApp;
+            return _BookParamOutOrderPosOutwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamInCancelClone;
+        public ACMethodBooking BookParamInCancelClone(DatabaseApp dbApp)
+        {
+            if (_BookParamInCancelClone != null)
+                return _BookParamInCancelClone;
+            _BookParamInCancelClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_InOrderPosCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamInCancelClone.Database = dbApp;
+            return _BookParamInCancelClone;
+        }
+
+        ACMethodBooking _BookParamOutCancelClone;
+        public ACMethodBooking BookParamOutCancelClone(DatabaseApp dbApp)
+        {
+            if (_BookParamOutCancelClone != null)
+                return _BookParamOutCancelClone;
+            _BookParamOutCancelClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_OutOrderPosCancel.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamOutCancelClone.Database = dbApp;
+            return _BookParamOutCancelClone;
+        }
+
+        #endregion
+
+        #region Book PickingPos -> Helper Methods (private)
+
+        ACMethodBooking _BookParamPickingInwardMovementClone;
+        private ACMethodBooking BookParamPickingInwardMovementClone(DatabaseApp dbApp)
+        {
+            if (_BookParamPickingInwardMovementClone != null)
+                return _BookParamPickingInwardMovementClone;
+            _BookParamPickingInwardMovementClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamPickingInwardMovementClone.Database = dbApp;
+            return _BookParamPickingInwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamPickingOutwardMovementClone;
+        private ACMethodBooking BookParamPickingOutwardMovementClone(DatabaseApp dbApp)
+        {
+            if (_BookParamPickingOutwardMovementClone != null)
+                return _BookParamPickingOutwardMovementClone;
+            _BookParamPickingOutwardMovementClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingOutward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamPickingOutwardMovementClone.Database = dbApp;
+            return _BookParamPickingOutwardMovementClone;
+        }
+
+        ACMethodBooking _BookParamRelocationMovementClone;
+        private ACMethodBooking BookParamRelocationMovementClone(DatabaseApp dbApp)
+        {
+            if (_BookParamRelocationMovementClone != null)
+                return _BookParamRelocationMovementClone;
+            _BookParamRelocationMovementClone = ACUrlACTypeSignature("!" + GlobalApp.FBT_PickingRelocation.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            _BookParamRelocationMovementClone.Database = dbApp;
+            return _BookParamRelocationMovementClone;
+        }
+
+        private bool InitLotFromPreBooking(ACMethodBooking acMethodBooking, PickingPos pickingPos, FacilityPreBooking ignorePreBooking = null)
+        {
+            if (acMethodBooking == null
+                || pickingPos == null)
+                return false;
+            if (acMethodBooking.InwardFacilityLot != null)
+                return true;
+
+            FacilityLot existingFacilityLot = null;
+            FacilityPreBooking[] existingPrebookings = new FacilityPreBooking[] { };
+
+            if (pickingPos.InOrderPos != null)
+                existingPrebookings = pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.Where(c => ignorePreBooking == null || c != ignorePreBooking).ToArray();
+            else if (pickingPos.OutOrderPos != null)
+                existingPrebookings = pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.Where(c => ignorePreBooking == null || c != ignorePreBooking).ToArray();
+            else
+                existingPrebookings = pickingPos.FacilityPreBooking_PickingPos.Where(c => ignorePreBooking == null || c != ignorePreBooking).ToArray();
+
+            foreach (FacilityPreBooking preBook in existingPrebookings)
+            {
+                ACMethodBooking methodBooking = preBook.ACMethodBooking as ACMethodBooking;
+                if (methodBooking == null || methodBooking.BookingType != acMethodBooking.BookingType)
+                    continue;
+
+                existingFacilityLot = methodBooking.InwardFacilityLot;
+                if (existingFacilityLot != null)
+                    break;
+            }
+
+            if (existingFacilityLot != null)
+                acMethodBooking.InwardFacilityLot = existingFacilityLot;
+            return acMethodBooking.InwardFacilityLot != null;
+        }
+
+        private bool InitLotFromPostings(ACMethodBooking acMethodBooking, PickingPos pickingPos)
+        {
+            if (acMethodBooking == null
+                || pickingPos == null)
+                return false;
+            if (acMethodBooking.InwardFacilityLot != null)
+                return true;
+            if (pickingPos.InOrderPos != null)
+                acMethodBooking.InwardFacilityLot = pickingPos.InOrderPos.FacilityBookingCharge_InOrderPos.Select(c => c.InwardFacilityLot).FirstOrDefault();
+            else if (pickingPos.OutOrderPos != null)
+                acMethodBooking.InwardFacilityLot = pickingPos.OutOrderPos.FacilityBookingCharge_OutOrderPos.Select(c => c.InwardFacilityLot).FirstOrDefault();
+            else
+                acMethodBooking.InwardFacilityLot = pickingPos.FacilityBookingCharge_PickingPos.Select(c => c.InwardFacilityLot).FirstOrDefault();
+            return acMethodBooking.InwardFacilityLot != null;
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
 
         /// <summary>
         /// Stapelbuchungen (Stackcalculator-Ergebnisliste)
         /// </summary>
         #region Stack-Bookingmethods 
-        
+
         #region Ein- Auslagerungen
         private Global.ACMethodResultState DoInwardStackBooking(ACMethodBooking BP, StackItemList stackItemList, List<FacilityCharge> facilityCharges)
         {

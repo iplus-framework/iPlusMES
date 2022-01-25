@@ -236,9 +236,7 @@ namespace gip.bso.logistics
             {
                 if (CurrentVisitor == null)
                     return null;
-                return from c in CurrentVisitor.VisitorVoucher_Visitor
-                       select c;
-
+                return CurrentVisitor.VisitorVoucher_Visitor.AsEnumerable();
             }
         }
 
@@ -275,7 +273,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return from c in DatabaseApp.Company where c.IsCustomer orderby c.CompanyName select c;
+                return DatabaseApp.Company.Where( c => c.IsCustomer).OrderBy(c => c.CompanyName);
             }
         }
 
@@ -292,10 +290,7 @@ namespace gip.bso.logistics
                     return null;
                 if (!CurrentVisitor.VisitedCompany.CompanyAddress_Company.IsLoaded)
                     CurrentVisitor.VisitedCompany.CompanyAddress_Company.Load();
-                return from c in CurrentVisitor.VisitedCompany.CompanyAddress_Company
-                       where c.IsHouseCompanyAddress
-                       orderby c.Name1
-                       select c;
+                return CurrentVisitor.VisitedCompany.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).OrderBy(c => c.Name1);
             }
         }
 
@@ -312,10 +307,7 @@ namespace gip.bso.logistics
                     return null;
                 if (!CurrentVisitor.VisitedCompany.CompanyAddress_Company.IsLoaded)
                     CurrentVisitor.VisitedCompany.CompanyAddress_Company.Load();
-                return from c in CurrentVisitor.VisitedCompany.CompanyAddress_Company
-                       where c.IsDeliveryCompanyAddress
-                       orderby c.Name1
-                       select c;
+                return CurrentVisitor.VisitedCompany.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1);
             }
         }
         #endregion
@@ -604,9 +596,7 @@ namespace gip.bso.logistics
                 return;
             if (!PreExecute("LoadVisitorVoucher")) return;
             // Laden des aktuell selektierten VisitorVoucher 
-            CurrentVisitorVoucher = (from c in CurrentVisitor.VisitorVoucher_Visitor
-                                     where c.VisitorVoucherID == SelectedVisitorVoucher.VisitorVoucherID
-                                     select c).First();
+            CurrentVisitorVoucher = CurrentVisitor.VisitorVoucher_Visitor.Where(c => c.VisitorVoucherID == SelectedVisitorVoucher.VisitorVoucherID).FirstOrDefault();
             PostExecute("LoadVisitorVoucher");
         }
 

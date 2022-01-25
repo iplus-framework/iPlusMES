@@ -126,7 +126,7 @@ namespace gip.bso.sales
         {
             get
             {
-                return from c in DatabaseApp.Company where c.IsCustomer orderby c.CompanyName select c;
+                return DatabaseApp.Company.Where(c => c.IsCustomer).OrderBy(c => c.CompanyName).AsEnumerable();
             }
         }
 
@@ -139,9 +139,7 @@ namespace gip.bso.sales
                     return null;
                 if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
                     CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
-                return from c in CurrentOutOrder.CustomerCompany.CompanyAddress_Company
-                       where c.IsBillingCompanyAddress
-                       orderby c.Name1 select c;
+                return CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Where(c => c.IsBillingCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
 
@@ -154,10 +152,7 @@ namespace gip.bso.sales
                     return null;
                 if (!CurrentOutOrder.CustomerCompany.CompanyAddress_Company.IsLoaded)
                     CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Load();
-                return from c in CurrentOutOrder.CustomerCompany.CompanyAddress_Company
-                       where c.IsDeliveryCompanyAddress
-                       orderby c.Name1
-                       select c;
+                return CurrentOutOrder.CustomerCompany.CompanyAddress_Company.Where(c => c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1).AsEnumerable();
             }
         }
 

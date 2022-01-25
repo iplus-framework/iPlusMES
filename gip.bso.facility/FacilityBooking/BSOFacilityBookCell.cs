@@ -592,7 +592,7 @@ namespace gip.bso.facility
                 if (CurrentFacility == null)
                     return null;
                 CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
-                return (from c in CurrentFacility.FacilityCharge_Facility where c.NotAvailable == false orderby c.FacilityChargeSortNo ascending select c).ToList();
+                return CurrentFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).OrderBy(c => c.FacilityChargeSortNo).AsEnumerable();
             }
         }
 
@@ -633,7 +633,7 @@ namespace gip.bso.facility
                     return null;
                 if (CurrentFacility.Material == null)
                     return null;
-                return (from c in CurrentFacility.Material.Partslist_Material select c).ToList();
+                return CurrentFacility.Material.Partslist_Material.AsEnumerable();
             }
         }
 
@@ -650,24 +650,11 @@ namespace gip.bso.facility
                     return null;
                 if (CurrentFacility.Material == null)
                     return null;
-                return (from c in CurrentFacility.Material.FacilityLot_Material select c).ToList();
+                return CurrentFacility.Material.FacilityLot_Material.AsEnumerable();
             }
         }
-
-        /*public IEnumerable<FacilityLot> OutwardFacilityLotList
-        {
-            get
-            {
-                if (CurrentFacility == null)
-                    return null;
-                if (CurrentFacility.Material == null)
-                    return null;
-                return (from c in CurrentFacility.Material.FacilityLot_Material select c).ToList();
-            }
-        }*/
-
         #endregion
-
+         
         #region Units
         [ACPropertyList(791, "StorageUnit")]
         public IEnumerable<MDUnit> StorageUnitTestList

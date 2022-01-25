@@ -1074,7 +1074,7 @@ namespace gip.bso.logistics
                         return _CurrentACMethodBookingDummy;
                     if (this.PickingManager == null)
                         return null;
-                    ACMethodBooking acMethodClone = this.PickingManager.BookParamInOrderPosInwardMovementClone(this.ACFacilityManager, this.DatabaseApp);
+                    ACMethodBooking acMethodClone = ACFacilityManager.BookParamInOrderPosInwardMovementClone(DatabaseApp);
                     if (acMethodClone != null)
                         _CurrentACMethodBookingDummy = acMethodClone.Clone() as ACMethodBooking;
                     return _CurrentACMethodBookingDummy;
@@ -1700,7 +1700,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return PickingManager.BookParamInOrderPosInwardMovementClone(ACFacilityManager, this.DatabaseApp);
+                return ACFacilityManager.BookParamInOrderPosInwardMovementClone(DatabaseApp);
             }
         }
 
@@ -1708,7 +1708,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return PickingManager.BookParamOutOrderPosOutwardMovementClone(ACFacilityManager, this.DatabaseApp);
+                return ACFacilityManager.BookParamOutOrderPosOutwardMovementClone(DatabaseApp);
             }
         }
 
@@ -1716,7 +1716,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return PickingManager.BookParamInCancelClone(ACFacilityManager, this.DatabaseApp);
+                return ACFacilityManager.BookParamInCancelClone(DatabaseApp);
             }
         }
 
@@ -1724,7 +1724,7 @@ namespace gip.bso.logistics
         {
             get
             {
-                return PickingManager.BookParamOutCancelClone(ACFacilityManager, this.DatabaseApp);
+                return ACFacilityManager.BookParamOutCancelClone(DatabaseApp);
             }
         }
 
@@ -2249,7 +2249,7 @@ namespace gip.bso.logistics
             Global.MsgResult msgResult = Messages.Msg(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
             if (msgResult == Global.MsgResult.No)
                 return;
-            var result = PickingManager.CancelFacilityPreBooking(ACFacilityManager, DatabaseApp, CurrentPicking);
+            var result = ACFacilityManager.CancelFacilityPreBooking(DatabaseApp, CurrentPicking);
             if (result != null && result.Any())
             {
                 foreach (PickingPos pickingPos in PickingPosList.ToList())
@@ -2568,9 +2568,9 @@ namespace gip.bso.logistics
                 return;
             if (!PreExecute("NewFacilityPreBooking"))
                 return;
-            CurrentFacilityPreBooking = PickingManager.NewFacilityPreBooking(ACFacilityManager, DatabaseApp, CurrentPickingPos);
+            CurrentFacilityPreBooking = ACFacilityManager.NewFacilityPreBooking(DatabaseApp, CurrentPickingPos);
             if (CurrentFacilityPreBooking != null)
-                PickingManager.InitBookingParamsFromTemplate(CurrentFacilityPreBooking.ACMethodBooking as ACMethodBooking, CurrentPickingPos, CurrentFacilityPreBooking);
+                ACFacilityManager.InitBookingParamsFromTemplate(CurrentFacilityPreBooking.ACMethodBooking as ACMethodBooking, CurrentPickingPos, CurrentFacilityPreBooking);
 
             OnPropertyChanged("CurrentACMethodBooking");
             OnPropertyChanged("CurrentACMethodBookingLayout");
@@ -2620,7 +2620,7 @@ namespace gip.bso.logistics
                 return;
             if (!PreExecute("CancelFacilityPreBooking"))
                 return;
-            var result = PickingManager.CancelFacilityPreBooking(ACFacilityManager, DatabaseApp, CurrentPickingPos);
+            var result = ACFacilityManager.CancelFacilityPreBooking(DatabaseApp, CurrentPickingPos);
             if (result != null && result.Any())
             {
                 CurrentFacilityPreBooking = result.FirstOrDefault();
@@ -2742,10 +2742,10 @@ namespace gip.bso.logistics
 
                 DeleteFacilityPreBooking();
                 OnPropertyChanged("FacilityBookingList");
-                PickingManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, isCancellation, true);
+                ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, isCancellation, true);
                 Save();
 
-                Msg msg = PickingManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
+                Msg msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
                 if (msg != null)
                 {
                     if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
@@ -3502,6 +3502,32 @@ namespace gip.bso.logistics
 
             ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty);
         }
+        #endregion
+
+        #region Context menu (Tracking)
+
+        #region Tracking
+        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
+        {
+            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
+            if (vbContent == nameof(SelectedFacilityBooking) && SelectedFacilityBooking != null)
+            {
+                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedFacilityBooking);
+                aCMenuItems.AddRange(trackingAndTracingMenuItems);
+            }
+            return aCMenuItems;
+        }
+
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
+        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
+        {
+            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
+        }
+
+        #endregion
+
         #endregion
 
         #endregion

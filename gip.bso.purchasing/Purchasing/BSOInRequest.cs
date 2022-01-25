@@ -253,9 +253,7 @@ namespace gip.bso.purchasing
             {
                 if (CurrentInRequest == null)
                     return null;
-                return from c in CurrentInRequest.InRequestPos_InRequest
-                       select c;
-
+                return CurrentInRequest.InRequestPos_InRequest.AsEnumerable();
             }
         }
 
@@ -329,10 +327,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                return from c in DatabaseApp.CompanyAddress
-                       where c.Company.IsOwnCompany && c.IsDeliveryCompanyAddress
-                       orderby c.Name1
-                       select c;
+                return DatabaseApp.CompanyAddress.Where(c => c.Company.IsOwnCompany && c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1);
             }
         }
 
@@ -345,10 +340,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                return from c in DatabaseApp.Company
-                       where c.IsDistributor
-                       orderby c.CompanyName
-                       select c;
+                return DatabaseApp.Company.Where(c => c.IsDistributor).OrderBy(c => c.CompanyName);
             }
         }
 
@@ -361,9 +353,7 @@ namespace gip.bso.purchasing
         {
             get
             {
-                return from c in DatabaseApp.Company
-                       orderby c.CompanyName
-                       select c;
+                return DatabaseApp.Company.Where(c => c.IsCustomer).OrderBy(c => c.CompanyName).AsEnumerable();
             }
         }
 
@@ -392,36 +382,6 @@ namespace gip.bso.purchasing
         {
             get
             {
-                //if (CurrentInRequest == null)
-                //    return null;
-                //try
-                //{
-                //    if (!CurrentInRequest.ContractualPartnerCompanyReference.IsLoaded)
-                //        CurrentInRequest.ContractualPartnerCompanyReference.Load();
-                //}
-                //catch(Exception)
-                //{
-                //    if (CurrentInRequest.ContractualPartnerCompany == null)
-                //        return null;
-                //}
-                //try
-                //{
-                //    if (!CurrentInRequest.ContractualPartnerCompany.CompanyAddress_Company.IsLoaded)
-                //        CurrentInRequest.ContractualPartnerCompany.CompanyAddress_Company.Load();
-                //}
-                //catch (Exception)
-                //{
-                //    return null;
-                //}
-
-                //try
-                //{
-                //    return (from c in CurrentInRequest.ContractualPartnerCompany.CompanyAddress_Company where c.IsHouseCompanyAddress select c).First();
-                //}
-                //catch(Exception)
-                //{
-                //    return null;
-                //}
                 return null;
             }
         }
@@ -471,7 +431,7 @@ namespace gip.bso.purchasing
 
                 try
                 {
-                    return (from c in CurrentInRequest.DistributorCompany.CompanyAddress_Company where c.IsHouseCompanyAddress select c).First();
+                    return CurrentInRequest.DistributorCompany.CompanyAddress_Company.Where(c => c.IsHouseCompanyAddress).FirstOrDefault();
                 }
                 catch (Exception e)
                 {
@@ -561,10 +521,7 @@ namespace gip.bso.purchasing
             // Vorbelegung mit der eigenen Anschrift
             try
             {
-                CurrentInRequest.DeliveryCompanyAddress = (from c in DatabaseApp.CompanyAddress
-                                                           where c.Company.IsOwnCompany && c.IsDeliveryCompanyAddress
-                                                           orderby c.Name1
-                                                           select c).First();
+                CurrentInRequest.DeliveryCompanyAddress = DatabaseApp.CompanyAddress.Where(c => c.Company.IsOwnCompany && c.IsDeliveryCompanyAddress).OrderBy(c => c.Name1).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -641,9 +598,7 @@ namespace gip.bso.purchasing
             if (!PreExecute("LoadInRequestPos"))
                 return;
             // Laden des aktuell selektierten InRequestPos 
-            CurrentInRequestPos = (from c in CurrentInRequest.InRequestPos_InRequest
-                                   where c.InRequestPosID == SelectedInRequestPos.InRequestPosID
-                                   select c).First();
+            CurrentInRequestPos = CurrentInRequest.InRequestPos_InRequest.Where(c => c.InRequestPosID == SelectedInRequestPos.InRequestPosID).FirstOrDefault();
             PostExecute("LoadInRequestPos");
         }
 

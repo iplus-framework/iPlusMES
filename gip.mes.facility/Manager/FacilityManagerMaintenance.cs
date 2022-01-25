@@ -96,7 +96,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = from c in BP.DatabaseApp.FacilityCharge where c.NotAvailable == false select c;
+                    var query = BP.DatabaseApp.FacilityCharge.Where(c => !c.NotAvailable == false);
                     if (query != null)
                     {
                         InitProgressTotalRange(BP, query.Count());
@@ -163,12 +163,8 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = from c in BP.DatabaseApp.Material select c;
-                    if (query != null)
-                    {
-
-                    }
-                        InitProgressSubRange(BP, query.Count());
+                    var query = BP.DatabaseApp.Material;
+                    InitProgressSubRange(BP, query.Count());
                     foreach (var material in query)
                     {
                         Global.ACMethodResultState bookingResult2 = DoMatchingMaterialStock(BP, FB, material);
@@ -230,7 +226,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = from c in BP.DatabaseApp.CompanyMaterial where c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.MaterialMapping select c;
+                    var query = BP.DatabaseApp.CompanyMaterial.Where(c => c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.MaterialMapping);
                     if (query != null)
                         InitProgressSubRange(BP, query.Count());
                     foreach (var material in query)
@@ -336,7 +332,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = from c in BP.DatabaseApp.Facility where c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer select c;
+                    var query = BP.DatabaseApp.Facility.Where(c => c.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer);
                     if (query != null)
                         InitProgressSubRange(BP, query.Count());
                     foreach (var facility in query)
@@ -426,7 +422,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = from c in BP.DatabaseApp.FacilityLot select c;
+                    var query = BP.DatabaseApp.FacilityLot;
                     if (query != null)
                         InitProgressSubRange(BP, query.Count());
                     foreach (var facilityLot in query)
@@ -1920,15 +1916,6 @@ namespace gip.mes.facility
         #region Closing Helpermethods
         protected virtual History DeleteAndAddHistory(ACMethodBooking BP, GlobalApp.TimePeriods timePeriod, int periode)
         {
-            /*var query = from c in DatabaseApp.FacilityHistory
-                        where c.MDTimePeriod.MDTimePeriodIndex == (int)timePeriod && c.PeriodNo == periode
-                        select c;
-            
-            foreach (var facilityHistory in query)
-            {
-                facilityHistory.DeleteACObject(DatabaseApp, false);
-            }*/
-
             foreach (var history in BP.DatabaseApp.History.Where(w => w.TimePeriodIndex == (int)timePeriod && w.PeriodNo == periode).ToList())
             {
                 history.DeleteACObject(BP.DatabaseApp, false);
