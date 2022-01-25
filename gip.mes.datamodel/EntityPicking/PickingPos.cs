@@ -103,7 +103,7 @@ namespace gip.mes.datamodel
                 || !inPicking.PickingPos_Picking.Any())
                 return;
 
-            var elements = from c in inPicking.PickingPos_Picking where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = inPicking.PickingPos_Picking.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

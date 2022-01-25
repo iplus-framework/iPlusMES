@@ -182,16 +182,6 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("InDeliveryNotePosInWeighing", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
-            //if (SelectedInDeliveryNotePosInWeighing != null && ACSaveOrUndoChanges())
-            //{
-            //    if (!PreExecute("Load")) return;
-            //    CurrentInDeliveryNotePosInWeighing = (from c in Database.InDeliveryNotePosInWeighing
-            //                         where c.InDeliveryNotePosInWeighingID == SelectedInDeliveryNotePosInWeighing.InDeliveryNotePosInWeighingID
-            //                         select c).First();
-            //    ACState = Const.SMEdit;
-            //    PostExecute("Load");
-               
-            //}
         }
 
         /// <summary>

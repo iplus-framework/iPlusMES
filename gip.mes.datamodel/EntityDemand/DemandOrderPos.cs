@@ -107,7 +107,7 @@ namespace gip.mes.datamodel
                 || !demandOrder.DemandOrderPos_DemandOrder.Any())
                 return;
 
-            var elements = from c in demandOrder.DemandOrderPos_DemandOrder where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = demandOrder.DemandOrderPos_DemandOrder.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

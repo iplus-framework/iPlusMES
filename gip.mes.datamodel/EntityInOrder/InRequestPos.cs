@@ -101,7 +101,7 @@ namespace gip.mes.datamodel
                 || !inRequest.InRequestPos_InRequest.Any())
                 return;
 
-            var elements = from c in inRequest.InRequestPos_InRequest where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = inRequest.InRequestPos_InRequest.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

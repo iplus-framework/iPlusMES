@@ -164,7 +164,7 @@ namespace gip.mes.datamodel
                 || !outOrder.OutOrderPos_OutOrder.Any())
                 return;
 
-            var elements = from c in outOrder.OutOrderPos_OutOrder where c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted orderby c.Sequence select c;
+            var elements = outOrder.OutOrderPos_OutOrder.Where(c => c.Sequence > sequence && c.EntityState != System.Data.EntityState.Deleted).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

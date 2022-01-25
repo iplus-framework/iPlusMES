@@ -1060,9 +1060,7 @@ namespace gip.bso.masterdata
                 return;
             if (!PreExecute("LoadMaterialCalculation")) return;
             // Laden des aktuell selektierten MaterialCalculation 
-            CurrentMaterialCalculation = (from c in CurrentMaterial.MaterialCalculation_Material
-                                          where c.MaterialCalculationID == SelectedMaterialCalculation.MaterialCalculationID
-                                          select c).First();
+            CurrentMaterialCalculation = CurrentMaterial.MaterialCalculation_Material.Where(c => c.MaterialCalculationID == SelectedMaterialCalculation.MaterialCalculationID).FirstOrDefault();
             PostExecute("LoadMaterialCalculation");
         }
 

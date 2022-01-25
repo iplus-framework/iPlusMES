@@ -87,7 +87,7 @@ namespace gip.mes.datamodel
                 || !address.CompanyAddressUnloadingpoint_CompanyAddress.Any())
                 return;
 
-            var elements = from c in address.CompanyAddressUnloadingpoint_CompanyAddress where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = address.CompanyAddressUnloadingpoint_CompanyAddress.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

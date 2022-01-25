@@ -86,7 +86,7 @@ namespace gip.mes.datamodel
                 || !material.MaterialGMPAdditive_Material.Any())
                 return;
 
-            var elements = from c in material.MaterialGMPAdditive_Material where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = material.MaterialGMPAdditive_Material.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

@@ -3920,29 +3920,13 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Adjusted.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.Partslist.PartslistID == ParamsAdjusted.OutwardPartslist.PartslistID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(DatabaseApp,
+                    OutwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.OutwardMaterial.MaterialID,
+                    null,
+                    ParamsAdjusted.OutwardPartslist != null ? ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
                     if (OutwardFacilityLocation.Facility1_OutgoingFacility == null)
@@ -3963,29 +3947,13 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 /// Adjusted.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                int nCount = 0;
-                if (ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.Partslist.PartslistID == ParamsAdjusted.InwardPartslist.PartslistID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(DatabaseApp,
+                    InwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.InwardMaterial.MaterialID,
+                    null,
+                    ParamsAdjusted.InwardPartslist != null ? ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
                     if (InwardFacilityLocation.Facility1_IncomingFacility == null)
@@ -4034,26 +4002,12 @@ namespace gip.mes.facility
             {
                 /// Wenn keine FacilityChargen mit FacilityLot auf Lagerort vorhanden
                 /// Dann muss eine FacilityCharge auf dem Standard-Auslagerplatz angelegt werden
-                /// 
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                                && (c.Partslist != null && c.PartslistID == ParamsAdjusted.OutwardPartslist.PartslistID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_Lot_Pl_NotAvailable(DatabaseApp,
+                    OutwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.OutwardPartslist != null ? ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
                     if (OutwardFacilityLocation.Facility1_OutgoingFacility == null)
@@ -4073,25 +4027,12 @@ namespace gip.mes.facility
             {
                 /// Wenn keine FacilityChargen mit FacilityLot auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
-                int nCount = 0;
-                if (ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                                && (c.Partslist != null && c.PartslistID == ParamsAdjusted.InwardPartslist.PartslistID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_Lot_Pl_NotAvailable(DatabaseApp,
+                    InwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.InwardPartslist != null ? ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
                     if (InwardFacilityLocation.Facility1_IncomingFacility == null)
@@ -4139,31 +4080,14 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit FacilityLot und Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Adjusted.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                              && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                              //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                              //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                              && (c.Partslist != null && c.PartslistID == ParamsAdjusted.OutwardPartslist.PartslistID)
-                                                              && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                              && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_Lot_ProdMat_Pl_NotAvailable(DatabaseApp,
+                    OutwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.OutwardMaterial.MaterialID,
+                    null,
+                    ParamsAdjusted.OutwardPartslist != null ? ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
                     if (OutwardFacilityLocation.Facility1_OutgoingFacility == null)
@@ -4184,31 +4108,14 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit FacilityLot und Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 /// Adjusted.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                int nCount = 0;
-                if (ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.Partslist != null && c.PartslistID == ParamsAdjusted.InwardPartslist.PartslistID)
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_Lot_ProdMat_Pl_NotAvailable(DatabaseApp,
+                    InwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.InwardMaterial.MaterialID,
+                    null,
+                    ParamsAdjusted.InwardPartslist != null ? ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
                     if (InwardFacilityLocation.Facility1_IncomingFacility == null)
@@ -4485,23 +4392,11 @@ namespace gip.mes.facility
 
             if (OutwardFacilityLot != null)
             {
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                                      where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                               && (c.Partslist.PartslistID == ParamsAdjusted.OutwardPartslist.PartslistID)
-                                                              && (c.NotAvailable == false)
-                                                                                      select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                                      where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                                         && (c.NotAvailable == false)
-                                                                                      select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_Lot_Pl_NotAvailable(DatabaseApp,
+                    ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.OutwardPartslist != null ? ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     AddBookingMessage(eResultCodes.WrongConfigurationInMaterialManagement,
                         Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00015", "OutwardFacilityLot.LotNo"));
@@ -4510,23 +4405,11 @@ namespace gip.mes.facility
             }
             if (InwardFacilityLot != null)
             {
-                int nCount = 0;
-                if (ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                                      where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                                          && (c.Partslist.PartslistID == ParamsAdjusted.InwardPartslist.PartslistID)
-                                                                                         && (c.NotAvailable == false)
-                                                                                      select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                                      where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                                         && (c.NotAvailable == false)
-                                                                                      select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_Lot_Pl_NotAvailable(DatabaseApp,
+                    ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.InwardPartslist != null ? ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     AddBookingMessage(eResultCodes.WrongConfigurationInMaterialManagement,
                         Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00015", InwardFacilityLot.LotNo));
@@ -4550,29 +4433,12 @@ namespace gip.mes.facility
                 return false;
             if (OutwardFacilityLot != null)
             {
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                              //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                              //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                              && (c.Partslist.PartslistID == ParamsAdjusted.OutwardPartslist.PartslistID)
-                                                              && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.OutwardFacilityLot.FacilityLotID)
-                                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_Lot_Mat_Pl_NotAvailable(DatabaseApp,
+                    ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.OutwardMaterial.MaterialID,
+                    ParamsAdjusted.OutwardPartslist != null ? ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     AddBookingMessage(eResultCodes.WrongConfigurationInMaterialManagement,
                             Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00016", OutwardFacilityLot.LotNo, ParamsAdjusted.OutwardMaterial.MaterialNo, ParamsAdjusted.OutwardMaterial.MaterialName1));
@@ -4582,29 +4448,12 @@ namespace gip.mes.facility
 
             if (InwardFacilityLot != null)
             {
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.Partslist.PartslistID == ParamsAdjusted.InwardPartslist.PartslistID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.FacilityLot != null && c.FacilityLotID == ParamsAdjusted.InwardFacilityLot.FacilityLotID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_Lot_Mat_Pl_NotAvailable(DatabaseApp,
+                    ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                    ParamsAdjusted.InwardMaterial.MaterialID,
+                    ParamsAdjusted.InwardPartslist != null ? ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     AddBookingMessage(eResultCodes.WrongConfigurationInMaterialManagement,
                         Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00016", InwardFacilityLot.LotNo, ParamsAdjusted.InwardMaterial.MaterialNo, ParamsAdjusted.InwardMaterial.MaterialName1));
@@ -4658,29 +4507,13 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Auslagerplatz angelegt werden
                 /// Adjusted.OutwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                int nCount = 0;
-                if (ParamsAdjusted.OutwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                              //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                                              //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                                              && (c.Partslist.PartslistID == ParamsAdjusted.OutwardPartslist.PartslistID)
-                                                                              && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == OutwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.OutwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.OutwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(DatabaseApp,
+                    OutwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.OutwardMaterial.MaterialID,
+                    null,
+                    ParamsAdjusted.OutwardPartslist != null ? ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Auslagerplatz nicht existiert, breche ab
                     if (OutwardFacilityLocation.Facility1_OutgoingFacility == null)
@@ -4701,29 +4534,13 @@ namespace gip.mes.facility
                 /// Wenn keine FacilityChargen mit Material auf Lagerort vorhanden
                 /// Dann muss eine anonyme Charge auf dem Standard-Einlagerplatz angelegt werden
                 /// Adjusted.InwardMaterial ist garantiert gesetzt aufgrund des Aufrufs von CheckAndAdjustMaterial() zuvor
-                int nCount = 0;
-                if (ParamsAdjusted.InwardPartslist != null)
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.Partslist.PartslistID == ParamsAdjusted.InwardPartslist.PartslistID)
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                else
-                {
-                    nCount = (from c in DatabaseApp.FacilityCharge
-                                                                            where (c.Facility.Facility1_ParentFacility.FacilityID == InwardFacilityLocation.FacilityID)
-                                                                               && (c.MaterialID == ParamsAdjusted.InwardMaterial.MaterialID)
-                                                                               //&& ((c.Material.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)
-                                                                               //|| ((c.Material.Material1_AlternativeMaterial != null) && (c.Material.Material1_AlternativeMaterial.MaterialID == ParamsAdjusted.InwardMaterial.ComparableMaterial.MaterialID)))
-                                                                               && (c.NotAvailable == false)
-                                                                            select c).Count();
-                }
-                if (nCount <= 0)
+                Guid? guidNull = null;
+                if (!FacilityManager.s_cQry_FCList_FacLoc_ProdMat_Pl_NotAvailable(DatabaseApp,
+                    InwardFacilityLocation.FacilityID,
+                    ParamsAdjusted.InwardMaterial.MaterialID,
+                    null,
+                    ParamsAdjusted.InwardPartslist != null ? ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                    false).Any())
                 {
                     /// Falls Standard-Einlagerplatz nicht existiert, breche ab
                     if (InwardFacilityLocation.Facility1_IncomingFacility == null)

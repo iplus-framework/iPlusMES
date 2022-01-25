@@ -85,7 +85,7 @@ namespace gip.mes.datamodel
                 || !inOrderPos.InOrderPosSplit_InOrderPos.Any())
                 return;
 
-            var elements = from c in inOrderPos.InOrderPosSplit_InOrderPos where c.Sequence > sequence orderby c.Sequence select c;
+            var elements = inOrderPos.InOrderPosSplit_InOrderPos.Where(c => c.Sequence > sequence).OrderBy(c => c.Sequence);
             int sequenceCount = sequence;
             foreach (var element in elements)
             {

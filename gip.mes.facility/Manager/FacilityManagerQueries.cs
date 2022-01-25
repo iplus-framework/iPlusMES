@@ -613,6 +613,37 @@ namespace gip.mes.facility
                         .ThenByDescending(c => c.FacilityChargeSortNo)
         );
 
+        public static readonly Func<DatabaseApp, Guid, Guid?, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Lot_Pl_NotAvailable =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, bool, IQueryable<FacilityCharge>>(
+            (ctx, facilityLotID, partslistID, notAvailable) => ctx.FacilityCharge
+                        .Include(FacilityLot.ClassName)
+                        .Include(Facility.ClassName)
+                        .Include(Material.ClassName)
+                        .Include(MDReleaseState.ClassName)
+                        .Include(MDUnit.ClassName)
+                        .Where(c => c.FacilityLotID == facilityLotID
+                                    && (!partslistID.HasValue || c.PartslistID == partslistID)
+                                    && c.NotAvailable == notAvailable)
+                        .OrderByDescending(c => c.FillingDate)
+                        .ThenByDescending(c => c.FacilityChargeSortNo)
+        );
+
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Lot_Mat_Pl_NotAvailable =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityCharge>>(
+            (ctx, facilityLotID, materialID, partslistID, notAvailable) => ctx.FacilityCharge
+                        .Include(FacilityLot.ClassName)
+                        .Include(Facility.ClassName)
+                        .Include(Material.ClassName)
+                        .Include(MDReleaseState.ClassName)
+                        .Include(MDUnit.ClassName)
+                        .Where(c => c.FacilityLotID == facilityLotID
+                                    && c.MaterialID == materialID
+                                    && (!partslistID.HasValue || c.PartslistID == partslistID)
+                                    && c.NotAvailable == notAvailable)
+                        .OrderByDescending(c => c.FillingDate)
+                        .ThenByDescending(c => c.FacilityChargeSortNo)
+        );
+
         public static readonly Func<DatabaseApp, Guid, Guid?, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Pl_NotAvailable =
         CompiledQuery.Compile<DatabaseApp, Guid, Guid?, bool, IQueryable<FacilityCharge>>(
             (ctx, facilityID, partslistID, notAvailable) => ctx.FacilityCharge

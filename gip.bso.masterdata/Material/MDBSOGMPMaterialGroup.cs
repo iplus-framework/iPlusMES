@@ -370,9 +370,7 @@ namespace gip.bso.masterdata
             if (!IsEnabledLoadGMPMaterialGroupPos())
             {
                 if (!PreExecute("LoadGMPMaterialGroupPos")) return;
-                CurrentGMPMaterialGroupPos = (from c in CurrentGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup
-                                              where c.MDGMPMaterialGroupPosID == SelectedGMPMaterialGroupPos.MDGMPMaterialGroupPosID
-                                              select c).First();
+                CurrentGMPMaterialGroup.MDGMPMaterialGroupPos_MDGMPMaterialGroup.Where(c => c.MDGMPMaterialGroupPosID == SelectedGMPMaterialGroupPos.MDGMPMaterialGroupPosID).FirstOrDefault();
                 PostExecute("LoadGMPMaterialGroupPos");
 
             }

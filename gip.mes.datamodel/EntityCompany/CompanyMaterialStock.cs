@@ -418,18 +418,6 @@ namespace gip.mes.datamodel
         {
             if (this.CompanyMaterial == null)
                 return;
-
-            //this.ReservedInwardQuantity = 0;
-            //// TODO: OR-Klausel einfügen für Produktionsaufträge
-            //List<FacilityReservation> facilityReservationList = (from c in this.CompanyMaterial.FacilityReservation_CompanyMaterial where c.InOrderPos != null select c).ToList();
-            //foreach (FacilityReservation facilityReservation in facilityReservationList)
-            //{
-            //    // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-            //    // Die TargetQuantity gibt an, wieviel Reserviert ist
-            //    // Die Differenz gibt an, wieviel noch geliefert wird
-            //    // TODO: Zugänge von Produktionsaufträge mit einrechnen
-            //    this.ReservedInwardQuantity += facilityReservation.InOrderPos.TargetQuantity - facilityReservation.InOrderPos.ActualQuantity;
-            //}
         }
 
 
@@ -441,19 +429,6 @@ namespace gip.mes.datamodel
         {
             if (this.CompanyMaterial == null)
                 return;
-
-            //this.ReservedOutwardQuantity = 0;
-            //// TODO: OR-Klausel einfügen für Produktionsaufträge
-            //List<FacilityReservation> facilityReservationList = (from c in CompanyMaterial.FacilityReservation_Material where c.OutOrderPos != null select c).ToList();
-            //foreach (FacilityReservation facilityReservation in facilityReservationList)
-            //{
-            //    // Die ActualQuantity gibt an, wieviel bereits auf dem Material gebucht worden ist
-            //    // Die TargetQuantity gibt an, wieviel Reserviert ist
-            //    // Die Differenz gibt an, wieviel noch abgebucht wird
-            //    // TODO: Abgänge von Produktionsaufträgen mit einrechnen
-            //    this.ReservedOutwardQuantity += facilityReservation.OutOrderPos.TargetQuantity - facilityReservation.OutOrderPos.ActualQuantity;
-
-            //}
         }
 
 

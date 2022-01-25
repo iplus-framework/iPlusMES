@@ -523,12 +523,11 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if (this.FacilityCharge_Facility.Count <= 0)
+                if (!this.FacilityCharge_Facility.Any())
                     return true;
                 try
                 {
-                    FacilityCharge facilityCharge = (from c in this.FacilityCharge_Facility where c.NotAvailable == false select c).FirstOrDefault();
-                    return false;
+                    return !FacilityCharge_Facility.Where(c => !c.NotAvailable).Any();
                 }
                 catch (Exception ec)
                 {
