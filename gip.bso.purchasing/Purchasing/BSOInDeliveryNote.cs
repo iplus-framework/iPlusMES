@@ -1635,7 +1635,7 @@ namespace gip.bso.purchasing
                     {
                         if (CurrentACMethodBooking != null && CurrentDeliveryNotePos != null)
                         {
-                            if (   CurrentDeliveryNotePos.Material == null
+                            if (CurrentDeliveryNotePos.Material == null
                                 || !CurrentDeliveryNotePos.Material.IsLotManaged)
                                 return Global.ControlModes.Disabled;
                         }

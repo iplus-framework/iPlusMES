@@ -3504,6 +3504,32 @@ namespace gip.bso.logistics
         }
         #endregion
 
+        #region Context menu (Tracking)
+
+        #region Tracking
+        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
+        {
+            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
+            if (vbContent == nameof(SelectedFacilityBooking) && SelectedFacilityBooking != null)
+            {
+                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedFacilityBooking);
+                aCMenuItems.AddRange(trackingAndTracingMenuItems);
+            }
+            return aCMenuItems;
+        }
+
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
+        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
+        {
+            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
+        }
+
+        #endregion
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers

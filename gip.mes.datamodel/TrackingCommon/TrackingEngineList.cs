@@ -22,8 +22,6 @@ namespace gip.mes.datamodel
         private static Dictionary<TrackingEnginesEnum, string> LoadTrackingEngines()
         {
             Dictionary<TrackingEnginesEnum, string> engines = new Dictionary<TrackingEnginesEnum, string>();
-            engines.Add(TrackingEnginesEnum.v1, "en{'v1'}de{'v1'}");
-            engines.Add(TrackingEnginesEnum.v2, "en{'v2'}de{'v2'}");
             engines.Add(TrackingEnginesEnum.v3, "en{'v3'}de{'v3'}");
             return engines;
         }

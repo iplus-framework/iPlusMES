@@ -31,24 +31,24 @@ namespace gip.bso.purchasing
                             trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedFacilityBooking);
                         }
                         break;
-                    case InDeliveryNote_TrackingPropertiesEnum.SelectedDeliveryNotePos:
-                        if (bSOInDeliveryNote.SelectedDeliveryNotePos != null)
-                        {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedDeliveryNotePos);
-                        }
-                        break;
-                    case InDeliveryNote_TrackingPropertiesEnum.SelectedInOrderPos:
-                        if (bSOInDeliveryNote.SelectedInOrderPos != null)
-                        {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPos.TopParentInOrderPos);
-                        }
-                        break;
-                    case InDeliveryNote_TrackingPropertiesEnum.SelectedInOrderPosFromPicking:
-                        if (bSOInDeliveryNote.SelectedInOrderPosFromPicking != null)
-                        {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPosFromPicking.TopParentInOrderPos);
-                        }
-                        break;
+                        //case InDeliveryNote_TrackingPropertiesEnum.SelectedDeliveryNotePos:
+                        //    if (bSOInDeliveryNote.SelectedDeliveryNotePos != null)
+                        //    {
+                        //        trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedDeliveryNotePos);
+                        //    }
+                        //    break;
+                        //case InDeliveryNote_TrackingPropertiesEnum.SelectedInOrderPos:
+                        //    if (bSOInDeliveryNote.SelectedInOrderPos != null)
+                        //    {
+                        //        trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPos.TopParentInOrderPos);
+                        //    }
+                        //    break;
+                        //case InDeliveryNote_TrackingPropertiesEnum.SelectedInOrderPosFromPicking:
+                        //    if (bSOInDeliveryNote.SelectedInOrderPosFromPicking != null)
+                        //    {
+                        //        trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(bSOInDeliveryNote, bSOInDeliveryNote.SelectedInOrderPosFromPicking.TopParentInOrderPos);
+                        //    }
+                        //    break;
                 }
                 if (trackingAndTracingMenuItems != null)
                     aCMenuItems.AddRange(trackingAndTracingMenuItems);

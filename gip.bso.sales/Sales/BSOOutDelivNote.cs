@@ -2108,7 +2108,7 @@ namespace gip.bso.sales
 
         private Material GetPreBookingOutwardMaterial()
         {
-            if (CurrentACMethodBooking != null 
+            if (CurrentACMethodBooking != null
                 && CurrentDeliveryNotePos != null
                 && CurrentDeliveryNotePos.Material != null)
                 return CurrentDeliveryNotePos.Material;
@@ -2141,24 +2141,24 @@ namespace gip.bso.sales
                             trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedFacilityBooking);
                         }
                         break;
-                    case OutDevNote_TrackingProperties.SelectedDeliveryNotePos:
-                        if (SelectedDeliveryNotePos != null)
-                        {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedDeliveryNotePos);
-                        }
-                        break;
-                    case OutDevNote_TrackingProperties.SelectedOutOrderPos:
-                        if (SelectedOutOrderPos != null)
-                        {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos.TopParentOutOrderPos);
-                        }
-                        break;
-                    case OutDevNote_TrackingProperties.SelectedOutOrderPosFromPicking:
-                        if (SelectedOutOrderPosFromPicking != null)
-                        {
-                            trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPosFromPicking.TopParentOutOrderPos);
-                        }
-                        break;
+                        //case OutDevNote_TrackingProperties.SelectedDeliveryNotePos:
+                        //    if (SelectedDeliveryNotePos != null)
+                        //    {
+                        //        trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedDeliveryNotePos);
+                        //    }
+                        //    break;
+                        //case OutDevNote_TrackingProperties.SelectedOutOrderPos:
+                        //    if (SelectedOutOrderPos != null)
+                        //    {
+                        //        trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos.TopParentOutOrderPos);
+                        //    }
+                        //    break;
+                        //case OutDevNote_TrackingProperties.SelectedOutOrderPosFromPicking:
+                        //    if (SelectedOutOrderPosFromPicking != null)
+                        //    {
+                        //        trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPosFromPicking.TopParentOutOrderPos);
+                        //    }
+                        //    break;
                 }
                 if (trackingAndTracingMenuItems != null)
                     aCMenuItems.AddRange(trackingAndTracingMenuItems);

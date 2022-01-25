@@ -1723,28 +1723,6 @@ namespace gip.bso.sales
 
         #endregion
 
-        #region Tracking
-        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
-        {
-            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
-            if (vbContent == "SelectedOutOrderPos" && SelectedOutOrderPos != null)
-            {
-                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, SelectedOutOrderPos.TopParentOutOrderPos);
-                aCMenuItems.AddRange(trackingAndTracingMenuItems);
-            }
-            return aCMenuItems;
-        }
-
-        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
-        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
-        {
-            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
-        }
-
-        #endregion
-
         #endregion
 
         #region CompanyMaterialPickup
@@ -2062,7 +2040,7 @@ namespace gip.bso.sales
                 if (
                     doc != null
                     && doc.ReportData != null
-                    && doc.ReportData.Any(c =>    c.ACClassDesign != null
+                    && doc.ReportData.Any(c => c.ACClassDesign != null
                                                && (c.ACClassDesign.ACIdentifier.EndsWith("De")) || c.ACClassDesign.ACIdentifier.EndsWith("En") || c.ACClassDesign.ACIdentifier.EndsWith("Hr")))
                 {
                     doc.SetFlowDocObjValue += Doc_SetFlowDocObjValue;
@@ -2144,7 +2122,7 @@ namespace gip.bso.sales
                 object[] resultList = Messages.InputBoxValues("Invoice-Date", valueList, captionList);
 
                 if (resultList != null)
-                    invoiceDate = (DateTime) resultList[0];
+                    invoiceDate = (DateTime)resultList[0];
 
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder, invoiceDate);
                 if (msg != null)

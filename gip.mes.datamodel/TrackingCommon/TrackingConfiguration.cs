@@ -20,7 +20,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ConfigurationProperty("DefaultTrackingEngine", DefaultValue = TrackingEnginesEnum.v2)]
+        [ConfigurationProperty("DefaultTrackingEngine", DefaultValue = TrackingEnginesEnum.v3)]
         public TrackingEnginesEnum DefaultTrackingEngine
         {
             get
@@ -65,7 +65,7 @@ namespace gip.mes.datamodel
         {
             TrackingConfiguration trackingConfiguration= new TrackingConfiguration();
             trackingConfiguration.WorkingModel = TrackingWorkingModelEnum.Multiple;
-            trackingConfiguration.DefaultTrackingEngine = TrackingEnginesEnum.v2;
+            trackingConfiguration.DefaultTrackingEngine = TrackingEnginesEnum.v3;
             trackingConfiguration.TandTWriteDiagnosticLog = false;
             return trackingConfiguration;
         }
