@@ -1101,7 +1101,7 @@ namespace gip.mes.webservices
             MsgWithDetails msgWithDetails = null;
             try
             {
-                ACPickingManager pickingManager = null;
+                FacilityManager facilityManager = null;
                 datamodel.PickingPos pickingPos = null;
                 if (bpParam.PickingPosID.HasValue)
                     pickingPos = dbApp.PickingPos
@@ -1113,7 +1113,7 @@ namespace gip.mes.webservices
                 FacilityPreBooking preBooking = null;
                 if (pickingPos != null)
                 {
-                    pickingManager = ACPickingManager.GetServiceInstance(myServiceHost);
+                    facilityManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     preBooking = pickingPos.FacilityPreBooking_PickingPos.FirstOrDefault();
                     if (preBooking == null && pickingPos.InOrderPos != null)
                         preBooking = pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.FirstOrDefault();
@@ -1126,8 +1126,8 @@ namespace gip.mes.webservices
                 if (acParam == null)
                 {
                     acParam = facManager.ACUrlACTypeSignature("!" + bpParam.VirtualMethodName, gip.core.datamodel.Database.GlobalDatabase) as facility.ACMethodBooking;
-                    if (pickingPos != null && pickingManager != null)
-                        pickingManager.InitBookingParamsFromTemplate(acParam, pickingPos, preBooking);
+                    if (pickingPos != null && facilityManager != null)
+                        facilityManager.InitBookingParamsFromTemplate(acParam, pickingPos, preBooking);
                 }
 
                 if (pickingPos != null)
@@ -1232,14 +1232,14 @@ namespace gip.mes.webservices
                 }
                 else
                 {
-                    if (acParam.PickingPos != null && pickingManager != null)
+                    if (acParam.PickingPos != null && facilityManager != null)
                     {
                         double postedQuantity = 0;
                         if (acParam.OutwardQuantity.HasValue)
                             postedQuantity = acParam.OutwardQuantity.Value;
                         else if (acParam.InwardQuantity.HasValue)
                             postedQuantity = acParam.InwardQuantity.Value;
-                        pickingManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
+                        facilityManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
                         msgWithDetails = dbApp.ACSaveChangesWithRetry();
 
                         if (msgWithDetails == null)
@@ -1247,7 +1247,7 @@ namespace gip.mes.webservices
                             datamodel.FacilityCharge outwardFC = acParam.OutwardFacilityCharge;
                             if (outwardFC != null)
                             {
-                                msgWithDetails = pickingManager.IsQuantStockConsumed(outwardFC, dbApp);
+                                msgWithDetails = facilityManager.IsQuantStockConsumed(outwardFC, dbApp);
                                 return msgWithDetails;
                             }
                         }

@@ -776,7 +776,7 @@ namespace gip.mes.processapplication
                         if (actualQuantity > 0.00001)
                         {
                             // 1. Bereite Buchung vor
-                            FacilityPreBooking facilityPreBooking = PickingManager.NewFacilityPreBooking(this.ACFacilityManager, dbApp, pickingPos, actualQuantity);
+                            FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
                             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                             bookingParam.OutwardQuantity = (double)actualQuantity;
                             bookingParam.OutwardFacility = outwardFacility;
@@ -817,8 +817,8 @@ namespace gip.mes.processapplication
                                     if (bookingParam.ValidMessage.IsSucceded())
                                     {
                                         facilityPreBooking.DeleteACObject(dbApp, true);
-                                        if (PickingManager != null)
-                                            PickingManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false); 
+                                        if (ACFacilityManager != null)
+                                            ACFacilityManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false); 
                                         //pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
                                         //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
                                         //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();

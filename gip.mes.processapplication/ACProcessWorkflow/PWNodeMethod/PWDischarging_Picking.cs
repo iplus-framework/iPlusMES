@@ -672,7 +672,7 @@ namespace gip.mes.processapplication
                 && !NoPostingOnRelocation)
             {
                 // 1. Bereite Buchung vor
-                FacilityPreBooking facilityPreBooking = PickingManager.NewFacilityPreBooking(this.ACFacilityManager, dbApp, pickingPos, actualQuantity);
+                FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
                 ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                 if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                     bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
@@ -706,7 +706,7 @@ namespace gip.mes.processapplication
                         if (bookingParam.ValidMessage.IsSucceded())
                         {
                             facilityPreBooking.DeleteACObject(dbApp, true);
-                            PickingManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false);
+                            ACFacilityManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false);
                             //pickingPos.RecalcAfterPosting(dbApp, bookingParam.OutwardQuantity.Value, false);
                             //pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
                             //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();

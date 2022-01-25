@@ -68,10 +68,10 @@ namespace gip.mes.webservices
 
         protected virtual IEnumerable<Picking> ConvertToWSPicking(DatabaseApp dbApp, IQueryable<gip.mes.datamodel.Picking> query)
         {
-            ACPickingManager pickingManger = null;
+            FacilityManager facilityManager = null;
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
             if (myServiceHost != null)
-                pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+                facilityManager = FacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
 
             IEnumerable<Picking> result = query.AsEnumerable().Select(c => new Picking()
             {
@@ -128,7 +128,7 @@ namespace gip.mes.webservices
                             TargetQuantityUOM = d.TargetQuantityUOM,
                             ActualQuantity = d.ActualQuantity,
                             ActualQuantityUOM = d.ActualQuantityUOM,
-                            PostingType = DeterminePostingType(dbApp, pickingManger, d, c),
+                            PostingType = DeterminePostingType(dbApp, facilityManager, d, c),
                             Sequence = d.Sequence,
                             Comment = d.Comment
                         }).ToArray()
@@ -137,10 +137,10 @@ namespace gip.mes.webservices
             return result;
         }
 
-        protected PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, ACPickingManager pickingManger, gip.mes.datamodel.PickingPos pos, gip.mes.datamodel.Picking picking)
+        protected PostingTypeEnum DeterminePostingType(DatabaseApp dbApp, FacilityManager facilityManager, gip.mes.datamodel.PickingPos pos, gip.mes.datamodel.Picking picking)
         {
-            if (pickingManger != null)
-                return pickingManger.DeterminePostingType(dbApp, pos, picking);
+            if (facilityManager != null)
+                return facilityManager.DeterminePostingType(dbApp, pos, picking);
             else
             {
                 PostingTypeEnum postingTypeEnum = PostingTypeEnum.Relocation;
@@ -170,7 +170,6 @@ namespace gip.mes.webservices
             }
             return new WSResponse<List<Picking>>(result);
         }
-
 
         public WSResponse<List<Picking>> SearchPickings(string pType, string fromFacility, string toFacility, string fromDate, string toDate)
         {
@@ -255,7 +254,6 @@ namespace gip.mes.webservices
                               )
         ));
 
-
         public WSResponse<Picking> GetPicking(string pickingID)
         {
             if (string.IsNullOrEmpty(pickingID))
@@ -280,12 +278,10 @@ namespace gip.mes.webservices
             return new WSResponse<Picking>(result);
         }
 
-
         public WSResponse<bool> InsertPicking(Picking item)
         {
             return new WSResponse<bool>(true);
         }
-
 
         public WSResponse<bool> UpdatePicking(Picking item)
         {
@@ -332,7 +328,7 @@ namespace gip.mes.webservices
 
         );
 
-        protected virtual IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, ACPickingManager pickingManager)
+        protected virtual IEnumerable<PickingPos> ConvertToWSPickingPos(IQueryable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, FacilityManager facilityManager)
         {
             return query.AsEnumerable().Select(d => new PickingPos()
             {
@@ -365,7 +361,7 @@ namespace gip.mes.webservices
                 TargetQuantityUOM = d.TargetQuantityUOM,
                 ActualQuantity = d.ActualQuantity,
                 ActualQuantityUOM = d.ActualQuantityUOM,
-                PostingType = DeterminePostingType(dbApp, pickingManager, d, d.Picking),
+                PostingType = DeterminePostingType(dbApp, facilityManager, d, d.Picking),
                 Comment = d.Comment
             }).ToArray();
         }
@@ -379,17 +375,17 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(pickingPosID, out guid))
                 return new WSResponse<PickingPos>(null, new Msg(eMsgLevel.Error, "pickingPosID is invalid"));
 
-            ACPickingManager pickingManager = null;
+            FacilityManager facilityManager = null;
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
             if (myServiceHost != null)
-                pickingManager = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+                facilityManager = FacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
 
             PickingPos result = null;
             try
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPickingPos(s_cQry_GetPickingPos(dbApp, guid), dbApp, pickingManager).FirstOrDefault();
+                    result = ConvertToWSPickingPos(s_cQry_GetPickingPos(dbApp, guid), dbApp, facilityManager).FirstOrDefault();
                 }
             }
             catch (Exception e)
