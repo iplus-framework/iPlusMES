@@ -695,6 +695,13 @@ namespace gip.mes.processapplication
         public override void Reset()
         {
             ClearMyConfiguration();
+            // Iteration-Counter is increased to signal that node has been active
+            // this is needed for the property AreOtherParallelNodesCompletable to count the completed nodes
+            if (   this.IterationCount.ValueT <= 0
+                && CurrentACState >= ACStateEnum.SMStarting)
+            {
+                this.IterationCount.ValueT++;
+            }
             base.Reset();
         }
 
@@ -1034,10 +1041,10 @@ namespace gip.mes.processapplication
                 && (BatchPlanningTimes == null || !BatchPlanningTimes.Any()) 
                 && this.CurrentACState == ACStateEnum.SMStarting)
             {
-                int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
-                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
-                if (completable)
+                ParallelNodeStats stats = GetParallelNodeStats();
+                if (stats.AreOtherParallelNodesCompletable)
                 {
+                    int countParallelNodes;
                     if (CompleteParallelNodes(out countParallelNodes))
                     {
                         CurrentACSubState = ACSubStateEnum.SMIdle;
@@ -1062,10 +1069,10 @@ namespace gip.mes.processapplication
             // HandleStartNextBatch has completed this node (not in stopping or starting) because there are no other nodes that are active
             if (CurrentACState == ACStateEnum.SMCompleted || CurrentACState == ACStateEnum.SMIdle)
             {
-                int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
-                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
-                if (completable)
+                ParallelNodeStats stats = GetParallelNodeStats();
+                if (stats.AreOtherParallelNodesCompletable)
                 {
+                    int countParallelNodes;
                     CompleteParallelNodes(out countParallelNodes);
                 }
             }
@@ -1091,12 +1098,11 @@ namespace gip.mes.processapplication
                 ResetPlanningWait();
                 UnSubscribeToProjectWorkCycle();
 
-                int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
                 bool resetToSMStarting = false;
-                bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
-                if (!completable)
+                ParallelNodeStats stats = GetParallelNodeStats();
+                if (stats.AreOtherParallelNodesCompletable)
                     resetToSMStarting = true;
-                countParallelNodes = 0;
+                int countParallelNodes = 0;
                 if (CompleteParallelNodes(out countParallelNodes))
                 {
                     CurrentACSubState = ACSubStateEnum.SMIdle;
@@ -1135,30 +1141,56 @@ namespace gip.mes.processapplication
             }
         }
 
-        private bool AreOtherParallelNodesCompletable(out int countParallelNodes, out int startingParallelNodes, out int completedParallelNodes, out int nodesWithBatchPlanningTimes)
+        public struct ParallelNodeStats
         {
-            countParallelNodes = 0;
-            startingParallelNodes = 0;
-            completedParallelNodes = 0;
-            nodesWithBatchPlanningTimes = 0;
+            public int CountParallelNodes;
+            public int StartingParallelNodes;
+            public int CompletedParallelNodes;
+            public int NodesWithBatchPlanningTimes;
+            public int UnstartedParallelNodes;
+            public int IdleParallelNodesCount { get { return UnstartedParallelNodes + CompletedParallelNodes; } }
+            public int WaitingParallelNodesCount { get { return StartingParallelNodes - NodesWithBatchPlanningTimes; } }
+            public int ActiveParallelNodesCount { get { return CountParallelNodes - StartingParallelNodes - IdleParallelNodesCount; } }
+            public bool AreOtherParallelNodesCompletable 
+            { 
+                get 
+                {
+                    return (CountParallelNodes == StartingParallelNodes + CompletedParallelNodes)
+                            && (NodesWithBatchPlanningTimes <= 0);
+                    //return     (CountParallelNodes == StartingParallelNodes + IdleParallelNodesCount) 
+                    //        && (NodesWithBatchPlanningTimes <= 0); 
+                }
+            }
+        }
+
+        private ParallelNodeStats GetParallelNodeStats()
+        {
+            ParallelNodeStats stats = new ParallelNodeStats();
+            stats.CountParallelNodes = 0;
+            stats.StartingParallelNodes = 0;
+            stats.CompletedParallelNodes = 0;
+            stats.NodesWithBatchPlanningTimes = 0;
+            stats.UnstartedParallelNodes = 0;
             //if (this.ContentACClassWF == null || !this.ContentACClassWF.RefPAACClassMethodID.HasValue)
             //    return false;
             // Are there any parallel nodes which starts the same Sub-Method for parallel Production
             var parallelNodes = AllParallelNodes; // ParallelNodes;
             if (parallelNodes == null || !parallelNodes.Any())
-                return true;
-            countParallelNodes = parallelNodes.Count;
+                return stats;
+            stats.CountParallelNodes = parallelNodes.Count;
             var startingNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMStarting);
             if (startingNodes != null)
-                startingParallelNodes = startingNodes.Count();
+                stats.StartingParallelNodes = startingNodes.Count();
             var completedNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMIdle && c.IterationCount.ValueT > 0);
             if (completedNodes != null)
-                completedParallelNodes = completedNodes.Count();
+                stats.CompletedParallelNodes = completedNodes.Count();
+            var idleNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMIdle && c.IterationCount.ValueT <= 0);
+            if (idleNodes != null)
+                stats.UnstartedParallelNodes = idleNodes.Count();
             var withBatchPlanningTimes = parallelNodes.Where(c => c.BatchPlanningTimes != null && c.BatchPlanningTimes.Any() && c.CurrentACState != ACStateEnum.SMIdle);
             if (withBatchPlanningTimes != null)
-                nodesWithBatchPlanningTimes = withBatchPlanningTimes.Count();
-            return     (startingParallelNodes + completedParallelNodes == countParallelNodes)
-                    && (nodesWithBatchPlanningTimes <= 0);
+                stats.NodesWithBatchPlanningTimes = withBatchPlanningTimes.Count();
+            return stats;
         }
 
         private bool CompleteParallelNodes(out int countParallelNodes)
@@ -1469,10 +1501,9 @@ namespace gip.mes.processapplication
                 }
                 else if (BatchPlanningTimes == null || !BatchPlanningTimes.Any())
                 {
-                    int countParallelNodes, startingParallelNodes, completedParallelNodes, nodesWithBatchPlanningTimes;
-                    bool completable = AreOtherParallelNodesCompletable(out countParallelNodes, out startingParallelNodes, out completedParallelNodes, out nodesWithBatchPlanningTimes);
+                    ParallelNodeStats stats = GetParallelNodeStats();
                     CurrentACSubState = ACSubStateEnum.SMIdle;
-                    if (!completable)
+                    if (!stats.AreOtherParallelNodesCompletable)
                     {
                         using (ACMonitor.Lock(_20015_LockValue))
                         {
