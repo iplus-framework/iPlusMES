@@ -2553,8 +2553,13 @@ namespace gip.bso.manufacturing
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
-                if (batchPlan.PlanState == GlobalApp.BatchPlanState.ReadyToStart)
-                    batchPlan.PlanState = vd.GlobalApp.BatchPlanState.Created;
+                if (   batchPlan.PlanState == GlobalApp.BatchPlanState.ReadyToStart
+                    || batchPlan.PlanState == GlobalApp.BatchPlanState.AutoStart)
+                {
+                    batchPlan.PlanState = GlobalApp.BatchPlanState.Created;
+                    if (batchPlan.PartialTargetCount.HasValue && batchPlan.PartialTargetCount.Value > 0)
+                        batchPlan.PartialTargetCount = null;
+                }
             }
             Save();
             OnPropertyChanged("ProdOrderBatchPlanList");
@@ -2562,7 +2567,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSetBatchStateCreated()
         {
-            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.ReadyToStart);
+            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && (c.PlanState == GlobalApp.BatchPlanState.ReadyToStart || c.PlanState == GlobalApp.BatchPlanState.AutoStart));
         }
 
         [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]

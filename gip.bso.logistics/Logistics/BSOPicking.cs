@@ -732,7 +732,7 @@ namespace gip.bso.logistics
             if (SelectedFilterDeliveryAddress != null)
                 result = result.Where(c => c.DeliveryCompanyAddressID == SelectedFilterDeliveryAddress.CompanyAddressID);
 
-            return query;
+            return result;
         }
 
 
@@ -904,6 +904,9 @@ namespace gip.bso.logistics
                         }
                         _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoLoad();
                         _CurrentPickingPos.FacilityPreBooking_PickingPos.AutoRefresh();
+
+                        _CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad();
+                        _CurrentPickingPos.FacilityBooking_PickingPos.AutoRefresh();
                     }
                     OnPropertyChanged("CurrentPickingPos");
                     OnPropertyChanged("FacilityPreBookingList");

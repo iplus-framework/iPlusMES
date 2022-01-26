@@ -646,11 +646,7 @@ namespace gip.bso.masterdata
                 }
 
                 if (msg.MsgDetailsCount == 0)
-                {
-                    Msg msgDelPos = SelectedPartslistPos.DeleteACObject(Database, true);
-                    if (msgDelPos != null)
-                        msg.AddDetailMessage(msgDelPos);
-                }
+                    msg = SelectedPartslistPos.DeleteACObject(Database, true);
 
                 if (msg != null && msg.MsgDetailsCount > 0)
                 {

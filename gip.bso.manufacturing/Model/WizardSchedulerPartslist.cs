@@ -357,7 +357,7 @@ namespace gip.bso.manufacturing
             set
             {
                 if (_NewTargetQuantity != value)
-                    NewTargetQuantity = ConvertQuantity(value, true);
+                    NewTargetQuantityUOM = ConvertQuantity(value, true);
             }
         }
 

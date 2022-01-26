@@ -175,6 +175,14 @@ namespace gip.mes.processapplication
         }
 
         private int _NoBatchPlanFoundCounter = 0;
+        public int NoBatchPlanFoundCounter
+        {
+            get
+            {
+                return _NoBatchPlanFoundCounter;
+            }
+        }
+
         private const string MN_ReadAndStartNextBatch = "ReadAndStartNextBatch";
         protected virtual StartNextBatchResult ReadAndStartNextBatch(out ProdOrderBatchPlan batchPlanEntry, out ProdOrderBatch nextBatch, out ProdOrderPartslistPos newChildPosForBatch, out Guid? startNextBatchAtProjectID, out bool isLastBatch)
         {
@@ -244,36 +252,25 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
-                        bool parallelNodesHasStartedBatch = false;
-                        bool parallelNodesAreWaiting = false;
-                        var parallelNodes = AllParallelNodes; //ParallelNodes;
-                        bool hasParallelNodes = parallelNodes != null && parallelNodes.Any();
-                        if (hasParallelNodes)
+                        ParallelNodeStats stats = GetParallelNodeStats();
+                        // If there are no active nodes any more and no other node has a breakpoint set,
+                        // an all other nodes are waiting like this one
+                        // then complete this node
+                        if (_NoBatchPlanFoundCounter > 0
+                            && stats.AreOtherParallelNodesCompletable)
+                            //&& stats.ActiveParallelNodesCount <= 0
+                            //&& (stats.WaitingParallelNodesCount == stats.CountParallelNodes - stats.IdleParallelNodesCount))
                         {
-                            parallelNodesHasStartedBatch = parallelNodes.Where(c => c.CurrentACState != ACStateEnum.SMStarting).Any();
-                            if (!parallelNodesHasStartedBatch)
-                                parallelNodesAreWaiting = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMStarting && c.BatchPlanningTimes != null && c.BatchPlanningTimes.Any()).Any();
+                            _NoBatchPlanFoundCounter = 0;
+                            return StartNextBatchResult.Done;
                         }
-
-                        if (_NoBatchPlanFoundCounter > 0 && !parallelNodesHasStartedBatch)
+                        // As far as there are other active nodes, remain in SMStarting-State because somebody maybe wants to reactivate this node
+                        // => return StartNextBatchResult.CycleWait
+                        else
                         {
-                            if (!parallelNodesAreWaiting)
-                            {
-                                if (!hasParallelNodes)
-                                {
-                                    _NoBatchPlanFoundCounter = 0;
-                                    return StartNextBatchResult.Done;
-                                }
-                                else
-                                {
-                                    // Error00123: No batchplan found for this intermediate material
-                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1030, "Error00123");
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                }
-                            }
+                            _NoBatchPlanFoundCounter++;
+                            return StartNextBatchResult.CycleWait;
                         }
-                        _NoBatchPlanFoundCounter++;
-                        return StartNextBatchResult.CycleWait;
                     }
                 }
                 else if (!activeBatchPlan.IsValid)
