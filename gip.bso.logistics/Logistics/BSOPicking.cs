@@ -732,7 +732,7 @@ namespace gip.bso.logistics
             if (SelectedFilterDeliveryAddress != null)
                 result = result.Where(c => c.DeliveryCompanyAddressID == SelectedFilterDeliveryAddress.CompanyAddressID);
 
-            return query;
+            return result;
         }
 
 
