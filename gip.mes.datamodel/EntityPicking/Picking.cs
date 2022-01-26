@@ -293,11 +293,11 @@ namespace gip.mes.datamodel
         {
             Picking clonedObject = new Picking();
             clonedObject.PickingID = this.PickingID;
-            clonedObject.CopyFrom(this, withReferences);
+            clonedObject.CopyFrom(this, withReferences, PickingNo);
             return clonedObject;
         }
 
-        public void CopyFrom(Picking from, bool withReferences)
+        public void CopyFrom(Picking from, bool withReferences, string pickingNo = null)
         {
             if (withReferences)
             {
@@ -308,7 +308,8 @@ namespace gip.mes.datamodel
                 DeliveryCompanyAddressID = from.DeliveryCompanyAddressID;
             }
 
-            PickingNo = from.PickingNo;
+            if (!string.IsNullOrEmpty(pickingNo))
+                PickingNo = pickingNo;
             PickingStateIndex = from.PickingStateIndex;
             DeliveryDateFrom = from.DeliveryDateFrom;
             DeliveryDateTo = from.DeliveryDateTo;

@@ -505,7 +505,7 @@ namespace gip.mes.facility
             }
             else
             {
-                localPicking.CopyFrom(remotePicking, true);
+                localPicking.CopyFrom(remotePicking, true, remotePicking.PickingNo);
             }
 
             // updating pos

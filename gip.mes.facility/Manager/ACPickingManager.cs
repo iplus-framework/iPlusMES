@@ -1589,6 +1589,7 @@ namespace gip.mes.facility
         {
             string secondaryKey = MirroredPickingResolvePickingNo(from, formatNewNo);
             Picking mirroredPicking = Picking.NewACObject(databaseApp, null, secondaryKey);
+            mirroredPicking.CopyFrom(from, true);
             mirroredPicking.PickingID = MirroredPickingResolvePickingID(mirroredPicking);
             mirroredPicking.MirroredFromPickingID = from.PickingID;
             PickingPos[] positions = from.PickingPos_Picking.ToArray();
