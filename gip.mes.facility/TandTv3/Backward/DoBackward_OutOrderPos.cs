@@ -21,11 +21,30 @@ namespace gip.mes.facility.TandTv3
         {
             List<IACObjectEntity> sameStepItems = new List<IACObjectEntity>();
             sameStepItems.Add(Item.OutOrder);
+
             sameStepItems.AddRange(Item.DeliveryNotePos_OutOrderPos);
             return sameStepItems;
         }
 
+        public override void AssignItemToMixPoint(List<IACObjectEntity> sameStepItems)
+        {
+            TandTv3Point mixPoint = Result.AddMixPoint(Step, Item);
+            mixPoint.DeliveryNotePositions.AddRange(
+                Item
+                .OutOrder
+                .OutOrderPos_OutOrder
+                .SelectMany(c => c.DeliveryNotePos_OutOrderPos)
+                .ToArray()
+                );
 
+            mixPoint.PickingPositions.AddRange(
+              Item
+              .OutOrder
+              .OutOrderPos_OutOrder
+              .SelectMany(c => c.PickingPos_OutOrderPos)
+              .ToList());
+
+        }
         #endregion
     }
 }

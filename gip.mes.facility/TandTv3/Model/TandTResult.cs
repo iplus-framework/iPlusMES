@@ -190,7 +190,12 @@ namespace gip.mes.facility.TandTv3
             }
             if (mixPoint == null)
             {
-                DeliveryNotePos dns = inOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault();
+                DeliveryNotePos dns =
+                    inOrderPos
+                    .InOrder
+                    .InOrderPos_InOrder
+                    .SelectMany(c => c.DeliveryNotePos_InOrderPos)
+                    .FirstOrDefault();
                 mixPoint =
                     new TandTv3PointDN()
                     {
@@ -247,6 +252,91 @@ namespace gip.mes.facility.TandTv3
             }
 
             return mixPoint;
+        }
+
+        public TandTv3Point AddMixPoint(TandTStep step, PickingPos pickingPos)
+        {
+
+            FacilityLot inwardLot =
+                    pickingPos
+                    .FacilityBooking_PickingPos
+                    .Where(c => c.InwardFacilityCharge != null && c.InwardFacilityCharge.FacilityLot != null)
+                    .Select(c => c.InwardFacilityCharge.FacilityLot)
+                    .FirstOrDefault();
+            if (inwardLot == null)
+                inwardLot =
+                    pickingPos
+                    .FacilityBooking_PickingPos
+                    .Where(c => c.InwardFacilityLot != null)
+                    .Select(c => c.InwardFacilityLot)
+                    .FirstOrDefault();
+
+            TandTv3Point inputMixPoint =
+                MixPoints
+                .Where(c =>
+                    c is TandTv3PointDN
+                    && c.PickingPositions.Select(x => x.PickingPosID).Contains(pickingPos.PickingPosID)
+                    && c.InwardMaterialNo == pickingPos.PickingMaterial.MaterialNo
+                    && ((c.InwardLot == null && inwardLot == null) || (c.InwardLot.LotNo == inwardLot.LotNo))
+                )
+                .FirstOrDefault();
+
+            if (inputMixPoint == null)
+            {
+                inputMixPoint =
+                    new TandTv3PointDN()
+                    {
+                        IsInputPoint = true,
+                        Step = step
+                    };
+                inputMixPoint.InwardMaterial = pickingPos.PickingMaterial;
+                inputMixPoint.InwardMaterialNo = pickingPos.PickingMaterial.MaterialNo;
+                inputMixPoint.InwardMaterialName = pickingPos.PickingMaterial.MaterialName1;
+
+                inputMixPoint.PickingPositions.Add(pickingPos);
+                //MixPoints.Add(inputMixPoint);
+                //CurrentStep.MixingPoints.Add(inputMixPoint);
+                inputMixPoint.IsInputPoint = true;
+            }
+
+            FacilityLot outwardLot =
+               pickingPos
+               .FacilityBooking_PickingPos
+               .Where(c => c.OutwardFacilityCharge != null && c.OutwardFacilityCharge.FacilityLot != null)
+               .Select(c => c.OutwardFacilityCharge.FacilityLot)
+               .FirstOrDefault();
+            if (outwardLot == null)
+                outwardLot =
+                pickingPos
+                .FacilityBooking_PickingPos
+                .Where(c => c.OutwardFacilityLot != null)
+                .Select(c => c.OutwardFacilityLot)
+                .FirstOrDefault();
+
+            TandTv3Point outputMixPoint =
+                MixPoints
+                .Where(c =>
+                    c is TandTv3PointDN &&
+                    c.PickingPositions.Select(x => x.PickingPosID).Contains(pickingPos.PickingPosID)
+                    && c.OutwardMaterials.Select(x => x.MaterialNo).Contains(pickingPos.PickingMaterial.MaterialNo)
+                    && ((!c.OutwardLotsNos.Any() && outwardLot == null) || (c.OutwardLotsNos.Contains(outwardLot.LotNo)))
+                )
+                .FirstOrDefault();
+
+            if (outputMixPoint == null)
+            {
+                outputMixPoint.OutwardMaterials.Add(pickingPos.PickingMaterial);
+                outputMixPoint.PickingPositions.Add(pickingPos);
+                //MixPoints.Add(outputMixPoint);
+                //CurrentStep.MixingPoints.Add(outputMixPoint);
+                inputMixPoint.IsInputPoint = true;
+
+
+                //MixPointRelations.Add(new MixPointRelation() { SourceMixPoint = inputMixPoint, TargetMixPoint = outputMixPoint }); 
+            }
+
+
+            return null;
         }
         #endregion
 

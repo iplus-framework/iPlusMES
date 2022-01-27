@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30413.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.core.datamodel", "..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj", "{16FB4111-5110-46E5-851D-38A4D7522F85}"
 EndProject
@@ -147,7 +147,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.mes.cmdlet", "gip.mes.c
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.core.sql", "..\iPlus\gip.core.sql\gip.core.sql.sqlproj", "{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.variobatch.sql", "gip.variobatch.sql\gip.variobatch.sql.sqlproj", "{D2F4E983-CF1F-4689-BF8D-4D56A6615491}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.mes.sql", "gip.mes.sql\gip.mes.sql.sqlproj", "{D2F4E983-CF1F-4689-BF8D-4D56A6615491}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -487,6 +487,8 @@ Global
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{746E71A0-CC5A-4A1F-BE03-76AFCF9FAB12}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.DebugDiag|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.DebugDiag|Any CPU.Build.0 = Debug|Any CPU
 		{D2F4E983-CF1F-4689-BF8D-4D56A6615491}.DebugDiag|Any CPU.Deploy.0 = Debug|Any CPU

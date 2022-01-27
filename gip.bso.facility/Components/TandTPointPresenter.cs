@@ -264,6 +264,11 @@ namespace gip.bso.facility
                                     }
                                     break;
                                 case PresenterMenuItems.OutOrderPos:
+                                    if (Content is vbModel.OutOrderPosPreview)
+                                    {
+                                        vbModel.OutOrderPosPreview outOrderpos = Content as vbModel.OutOrderPosPreview;
+                                        manager.ShowInOrderDialog(outOrderpos.OutOrderNo, outOrderpos.ID);
+                                    }
                                     break;
                                 case PresenterMenuItems.PickingPos:
                                     pAOrderInfoEntry = null;

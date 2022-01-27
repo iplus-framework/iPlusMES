@@ -24,9 +24,9 @@ namespace gip.mes.facility.TandTv3
             List<IACObjectEntity> sameStepItems = new List<IACObjectEntity>();
             sameStepItems.Add(Item.DeliveryNote);
             if (Item.InOrderPosID != null)
-                sameStepItems.Add(Item.InOrderPos.InOrderPos1_ParentInOrderPos);
+                sameStepItems.Add(Item.InOrderPos.TopParentInOrderPos);
             if(Item.OutOrderPosID != null)
-                sameStepItems.Add(Item.OutOrderPos.OutOrderPos1_ParentOutOrderPos);
+                sameStepItems.Add(Item.OutOrderPos.TopParentOutOrderPos);
             return sameStepItems;
         }
         #endregion

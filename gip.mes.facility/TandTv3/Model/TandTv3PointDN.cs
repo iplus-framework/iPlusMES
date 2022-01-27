@@ -9,9 +9,7 @@ namespace gip.mes.facility
     {
 
         #region override
-        public DeliveryNotePosPreview DeliveryPreview { get; set; }
-
-        public List<DeliveryNotePosPreview> OtherDeliveryPreviews { get; set; }
+        public List<DeliveryNotePosPreview> DeliveryNotePosPreviews { get; set; }
 
         public List<InOrderPosPreview> InOrderPosPreviews { get; set; }
         public List<OutOrderPosPreview> OutOrderPosPreviews { get; set; }
@@ -22,15 +20,12 @@ namespace gip.mes.facility
         #region Methods
         public override void Finish()
         {
-            List<PickingPos> pickingPositions = null;
             if (InOrderPositions.Any())
             {
                 List<DeliveryNotePos> deliveryNotePositions = InOrderPositions.SelectMany(c => c.DeliveryNotePos_InOrderPos).ToList();
+                
                 if (deliveryNotePositions.Any())
-                {
-                    OtherDeliveryPreviews = deliveryNotePositions.Select(c => new DeliveryNotePosPreview(c)).ToList();
-                    DeliveryPreview = OtherDeliveryPreviews.FirstOrDefault();
-                }
+                    DeliveryNotePosPreviews = deliveryNotePositions.Select(c => new DeliveryNotePosPreview(c)).ToList();
 
                 InOrderPosPreviews = InOrderPositions
                     .Select(c => new
@@ -53,18 +48,14 @@ namespace gip.mes.facility
                     })
                     .ToList();
 
-                pickingPositions = InOrderPositions.SelectMany(c => c.PickingPos_InOrderPos).ToList();
             }
-
 
             if (OutOrderPositions.Any())
             {
                 List<DeliveryNotePos> dnss = OutOrderPositions.SelectMany(c => c.DeliveryNotePos_OutOrderPos).ToList();
+
                 if (dnss.Any())
-                {
-                    OtherDeliveryPreviews = dnss.Select(c => new DeliveryNotePosPreview(c)).ToList();
-                    DeliveryPreview = OtherDeliveryPreviews.FirstOrDefault();
-                }
+                    DeliveryNotePosPreviews = dnss.Select(c => new DeliveryNotePosPreview(c)).ToList();
 
                 OutOrderPosPreviews = null;
                 OutOrderPosPreviews = OutOrderPositions
@@ -87,14 +78,13 @@ namespace gip.mes.facility
                    })
                    .ToList();
 
-                pickingPositions = OutOrderPositions.SelectMany(c => c.PickingPos_OutOrderPos).ToList();
 
             }
 
-            if (pickingPositions != null && pickingPositions.Any())
+            if (PickingPositions != null && PickingPositions.Any())
             {
                 PickingPosPreviews =
-                    pickingPositions
+                    PickingPositions
                     .Select(c =>
                         new
                         {

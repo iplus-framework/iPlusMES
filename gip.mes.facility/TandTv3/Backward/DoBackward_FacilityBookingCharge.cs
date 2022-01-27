@@ -40,18 +40,10 @@ namespace gip.mes.facility.TandTv3
                 sameStepItems.Add(Item.ProdOrderPartslistPosRelation);
 
             if (Item.InOrderPosID != null)
-            {
-                InOrderPos topParentInOrderPos = Item.InOrderPos.TopParentInOrderPos;
-                if (topParentInOrderPos != null)
-                    sameStepItems.Add(topParentInOrderPos);
-            }
+                sameStepItems.Add(Item.InOrderPos.TopParentInOrderPos);
 
             if (Item.OutOrderPosID != null)
-            {
-                OutOrderPos topParentOutOrderPos = Item.OutOrderPos.TopParentOutOrderPos;
-                if (topParentOutOrderPos != null)
-                    sameStepItems.Add(topParentOutOrderPos);
-            }
+                sameStepItems.Add(Item.OutOrderPos.TopParentOutOrderPos);
 
             return sameStepItems;
         }
@@ -126,7 +118,7 @@ namespace gip.mes.facility.TandTv3
 
             if (Item.InOrderPosID != null)
             {
-                TandTv3Point mixPoint = Result.AddMixPoint(Step, Item.InOrderPos);
+                TandTv3Point mixPoint = Result.AddMixPoint(Step, Item.InOrderPos.TopParentInOrderPos);
 
                 if (mixPoint.AddInwardBooking(Item))
                     mixPoint.AddInwardLotQuantity(Item);

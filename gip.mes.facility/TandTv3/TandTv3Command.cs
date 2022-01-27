@@ -230,7 +230,6 @@ namespace gip.mes.facility.TandTv3
 
         #region others
 
-
         public void Calculations(DatabaseApp databaseApp, TandTResult result, MDTrackingDirectionEnum trackingDirection)
         {
             if (trackingDirection == MDTrackingDirectionEnum.Backward)
@@ -563,6 +562,16 @@ namespace gip.mes.facility.TandTv3
                     if (!groupMixPoint.InOrderPositions.Select(c => c.InOrderPosID).Contains(inOrderPos.InOrderPosID))
                         groupMixPoint.InOrderPositions.Add(inOrderPos);
 
+                // OutOrderPositions
+                foreach (var outOrderPos in subItem.OutOrderPositions)
+                    if (!groupMixPoint.OutOrderPositions.Select(c => c.OutOrderPosID).Contains(outOrderPos.OutOrderPosID))
+                        groupMixPoint.OutOrderPositions.Add(outOrderPos);
+
+                // OutOrderPositions
+                foreach (var pickingPos in subItem.PickingPositions)
+                    if (!groupMixPoint.PickingPositions.Select(c => c.PickingPosID).Contains(pickingPos.PickingPosID))
+                        groupMixPoint.PickingPositions.Add(pickingPos);
+
                 // InwardBookings
                 foreach (var inwardBookingPreview in subItem.InwardBookings)
                     if (!groupMixPoint.InwardBookings.Select(c => c.FacilityBookingChargeNo).Contains(inwardBookingPreview.FacilityBookingChargeNo))
@@ -594,7 +603,8 @@ namespace gip.mes.facility.TandTv3
 
                 // OutwardFacilitites
                 foreach (var outwardFacility in subItem.OutwardFacilities)
-                    groupMixPoint.AddOutwardFacility(outwardFacility.Value, outwardFacility.Value.StockQuantityUOM);
+                    if (!groupMixPoint.OutwardFacilities.Select(c => c.Key).Contains(outwardFacility.Key))
+                        groupMixPoint.AddOutwardFacility(outwardFacility.Value, outwardFacility.Value.StockQuantityUOM);
 
                 // PartslistSequence
                 groupMixPoint.PartslistSequence = subItem.PartslistSequence;
@@ -873,6 +883,16 @@ namespace gip.mes.facility.TandTv3
                         dbMixPoint.TandTv3MixPointInOrderPos_TandTv3MixPoint.Add(dbMixPointInOrderPos);
                     }
 
+                    foreach(PickingPos pickingPos in mixPoint.PickingPositions)
+                    {
+                        TandTv3MixPointPickingPos dbMixPointInOrderPos = new TandTv3MixPointPickingPos()
+                        {
+                            TandTv3MixPointPickingPosID = Guid.NewGuid(),
+                            PickingPos = pickingPos
+                        };
+                        dbMixPoint.TandTv3MixPointPickingPos.Add(dbMixPointInOrderPos);
+                    }
+
                 }
 
                 //InwardLotID
@@ -1045,6 +1065,10 @@ namespace gip.mes.facility.TandTv3
 
                 if (!result.Ids.ContainsKey(fbc.FacilityBookingChargeID))
                     result.Ids.Add(fbc.FacilityBookingChargeID, MDTrackingStartItemTypeEnum.FacilityBookingCharge.ToString());
+
+                if (fbc.FacilityBookingCharge.PickingPos != null)
+                    if (!result.Ids.ContainsKey(fbc.FacilityBookingChargeID))
+                        result.Ids.Add(fbc.FacilityBookingCharge.PickingPosID.Value, MDTrackingStartItemTypeEnum.PickingPos.ToString());
             }
 
             // InwardPreBookings
@@ -1089,6 +1113,7 @@ namespace gip.mes.facility.TandTv3
                 if (!result.Ids.ContainsKey(fbPre.TandTv3MixPointFacilityPreBookingID))
                     result.Ids.Add(fbPre.TandTv3MixPointFacilityPreBookingID, MDTrackingStartItemTypeEnum.FacilityPreBooking.ToString());
 
+
             }
 
             // DeliveryNotePositions
@@ -1100,9 +1125,8 @@ namespace gip.mes.facility.TandTv3
             if (mixPoint.DeliveryNotePositions != null && mixPoint.DeliveryNotePositions.Any() && mixPoint is TandTv3PointDN)
             {
                 TandTv3PointDN tandTv3PointDN = mixPoint as TandTv3PointDN;
-                tandTv3PointDN.OtherDeliveryPreviews = mixPoint.DeliveryNotePositions.Select(c => FactoryDeliveryPreviewModel(c)).ToList();
-                tandTv3PointDN.DeliveryPreview = tandTv3PointDN.OtherDeliveryPreviews.FirstOrDefault();
-                tandTv3PointDN.DeliveryNo = tandTv3PointDN.DeliveryPreview.DeliveryNoteNo;
+                tandTv3PointDN.DeliveryNotePosPreviews = mixPoint.DeliveryNotePositions.Select(c => FactoryDeliveryPreviewModel(c)).ToList();
+                tandTv3PointDN.DeliveryNo = tandTv3PointDN.DeliveryNotePosPreviews.Select(c => c.DeliveryNoteNo).FirstOrDefault();
             }
 
             // Relations
@@ -1152,6 +1176,7 @@ namespace gip.mes.facility.TandTv3
             mixPoint.IsInputPoint = dbMixPoint.IsInputPoint;
             if (dbMixPoint.IsInputPoint)
             {
+
                 mixPoint.InOrderPositions = dbMixPoint.TandTv3MixPointInOrderPos_TandTv3MixPoint.Select(c => c.InOrderPos).ToList();
                 foreach (var inOrderPos in mixPoint.InOrderPositions)
                 {
@@ -1161,6 +1186,12 @@ namespace gip.mes.facility.TandTv3
                     if (!result.Ids.ContainsKey(inOrderPos.InOrderPosID))
                         result.Ids.Add(inOrderPos.InOrderPosID, MDTrackingStartItemTypeEnum.InOrderPos.ToString());
                 }
+
+
+                mixPoint.PickingPositions = dbMixPoint.TandTv3MixPointPickingPos.Select(c => c.PickingPos).ToList();
+                foreach (PickingPos pickingPos in mixPoint.PickingPositions)
+                    if (!result.Ids.ContainsKey(pickingPos.PickingPosID))
+                        result.Ids.Add(pickingPos.PickingPosID, MDTrackingStartItemTypeEnum.PickingPos.ToString());
             }
 
             // TandTv3_MixPointLot
@@ -1185,6 +1216,9 @@ namespace gip.mes.facility.TandTv3
             foreach (var facility in mixPoint.InwardFacilities)
                 if (!result.Ids.ContainsKey(facility.Value.FacilityID))
                     result.Ids.Add(facility.Value.FacilityID, MDTrackingStartItemTypeEnum.Facility.ToString());
+
+
+
 
             return mixPoint;
         }

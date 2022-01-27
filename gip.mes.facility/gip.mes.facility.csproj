@@ -185,6 +185,8 @@
     <Compile Include="TandTv3\Backward\DoBackward_InOrderPos.cs" />
     <Compile Include="TandTv3\Backward\DoBackward_OutOrder.cs" />
     <Compile Include="TandTv3\Backward\DoBackward_OutOrderPos.cs" />
+    <Compile Include="TandTv3\Backward\DoBackward_Picking.cs" />
+    <Compile Include="TandTv3\Backward\DoBackward_PickingPos.cs" />
     <Compile Include="TandTv3\Backward\DoBackward_ProdOrder.cs" />
     <Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslist.cs" />
     <Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslistPos.cs" />

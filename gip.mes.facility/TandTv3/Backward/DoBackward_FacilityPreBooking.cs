@@ -17,8 +17,6 @@ namespace gip.mes.facility.TandTv3
         }
         #endregion
 
-
-
         #region IItemTracking
 
         public override List<IACObjectEntity> GetSameStepItems()
@@ -38,10 +36,10 @@ namespace gip.mes.facility.TandTv3
                 sameStepItems.Add(Item.ProdOrderPartslistPosRelation);
 
             if (Item.InOrderPosID != null)
-                sameStepItems.Add(Item.InOrderPos);
+                sameStepItems.Add(Item.InOrderPos.TopParentInOrderPos);
 
             if (Item.OutOrderPosID != null)
-                sameStepItems.Add(Item.OutOrderPos);
+                sameStepItems.Add(Item.OutOrderPos.TopParentOutOrderPos);
 
             return sameStepItems;
         }

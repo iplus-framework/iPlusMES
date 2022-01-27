@@ -53,6 +53,7 @@ namespace gip.mes.facility
             BatchNoList = new List<string>();
             InOrderPositions = new List<InOrderPos>();
             OutOrderPositions = new List<OutOrderPos>();
+            PickingPositions = new List<PickingPos>();
 
             // FacilityChargeIDs = new List<Guid>();
 
@@ -373,6 +374,7 @@ namespace gip.mes.facility
 
         public List<InOrderPos> InOrderPositions { get; set; }
         public List<OutOrderPos> OutOrderPositions { get; set; }
+        public List<PickingPos> PickingPositions { get; set; }
 
         public List<ProdOrderPartslistPosRelation> Relations { get; set; }
 
