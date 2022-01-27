@@ -391,7 +391,7 @@ namespace gip.bso.masterdata
                 LoadMaterialWorkflows();
 
                 OnPropertyChanged("ProdUnitMDUnitList");
-                if (   CurrentPartslist != null
+                if (CurrentPartslist != null
                     && CurrentPartslist.Material != null
                     && CurrentPartslist.ProductionUnits.HasValue
                     && CurrentPartslist.Material.MaterialUnit_Material.Any())
@@ -511,7 +511,7 @@ namespace gip.bso.masterdata
                 foreach (var item in CurrentPartslist.PartslistPos_Partslist)
                     item.PartslistPosRelation_TargetPartslistPos.AutoLoad(this.DatabaseApp);
             }
-                
+
             PostExecute("Load");
             OnPropertyChanged("PartslistPosList");
             OnPropertyChanged("MaterialWFList");
@@ -620,14 +620,24 @@ namespace gip.bso.masterdata
             if (!PreExecute("DeletePartslistPos")) return;
             MsgWithDetails msg = new MsgWithDetails();
 
-            Global.MsgResult result = Global.MsgResult.Yes;
+
+            Global.MsgResult questionDeleteRelations = Global.MsgResult.Yes;
             bool takePartInMixures = SelectedPartslistPos.PartslistPosRelation_SourcePartslistPos.Any();
             if (takePartInMixures)
             {
                 Msg childDeleteQuestion = new Msg() { MessageLevel = eMsgLevel.Question, Message = Root.Environment.TranslateMessage(this, "Error50048") };
-                result = Messages.Msg(childDeleteQuestion, Global.MsgResult.No, eMsgButton.YesNo);
+                questionDeleteRelations = Messages.Msg(childDeleteQuestion, Global.MsgResult.No, eMsgButton.YesNo);
             }
-            if (result == Global.MsgResult.Yes)
+
+            Global.MsgResult questionDeleteReferencedProdPos = Global.MsgResult.Yes;
+            bool isReferencedInProd = SelectedPartslistPos.ProdOrderPartslistPos_BasedOnPartslistPos.Any();
+            if (isReferencedInProd)
+            {
+                Msg msgRemoveProdOrderRef = new Msg() { MessageLevel = eMsgLevel.Question, Message = Root.Environment.TranslateMessage(this, "Error50545") };
+                questionDeleteReferencedProdPos = Messages.Msg(msgRemoveProdOrderRef, Global.MsgResult.No, eMsgButton.YesNo);
+            }
+
+            if (questionDeleteRelations == Global.MsgResult.Yes && questionDeleteReferencedProdPos == MsgResult.Yes)
             {
                 if (takePartInMixures)
                 {
@@ -642,7 +652,11 @@ namespace gip.bso.masterdata
                                 SelectedIntermediate.PartslistPosRelation_SourcePartslistPos.Remove(item);
                         }
                     }
+                }
 
+                if (isReferencedInProd)
+                {
+                    SelectedPartslistPos.ProdOrderPartslistPos_BasedOnPartslistPos.Clear();
                 }
 
                 if (msg.MsgDetailsCount == 0)
@@ -1776,8 +1790,8 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (   CurrentPartslist == null 
-                    || !CurrentPartslist.ProductionUnits.HasValue 
+                if (CurrentPartslist == null
+                    || !CurrentPartslist.ProductionUnits.HasValue
                     || CurrentProdMDUnit == null)
                     return null;
                 if (ProdUnitMDUnitList == null || !ProdUnitMDUnitList.Contains(CurrentProdMDUnit))
@@ -1786,7 +1800,7 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (   CurrentPartslist == null
+                if (CurrentPartslist == null
                     || CurrentProdMDUnit == null)
                     return;
                 if (ProdUnitMDUnitList == null || !ProdUnitMDUnitList.Contains(CurrentProdMDUnit))
