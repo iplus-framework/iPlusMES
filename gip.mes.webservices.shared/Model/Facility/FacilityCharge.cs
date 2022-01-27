@@ -1,11 +1,12 @@
-﻿using System;
+﻿using gip.core.datamodel;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace gip.mes.webservices
 {
     [DataContract(Name = "cFC")]
-    public class FacilityCharge : ICloneable
+    public class FacilityCharge : EntityBase, ICloneable
     {
         [DataMember(Name = "ID")]
         public Guid FacilityChargeID
@@ -99,6 +100,11 @@ namespace gip.mes.webservices
             fc.Facility = this.Facility;
 
             return fc;
+        }
+
+        public void OnPropChanged(string propName)
+        {
+            OnPropertyChanged(propName);
         }
     }
 }

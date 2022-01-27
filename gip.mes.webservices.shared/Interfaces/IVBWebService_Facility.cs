@@ -62,9 +62,9 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriFacilityChargeNew, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> CreateFacilityCharge(FacilityCharge facilityCharge);
+        WSResponse<FacilityCharge> CreateFacilityCharge(FacilityCharge facilityCharge);
 #elif NETSTANDARD
-        Task<WSResponse<bool>> CreateFacilityChargeAsync(FacilityCharge facilityCharge);
+        Task<WSResponse<FacilityCharge>> CreateFacilityChargeAsync(FacilityCharge facilityCharge);
 #endif
 
         #endregion
@@ -131,14 +131,6 @@ namespace gip.mes.webservices
         WSResponse<PostingOverview> GetFacilityLotBookings(string facilityLotID, string dateFrom, string dateTo);
 #elif NETSTANDARD
         Task<WSResponse<PostingOverview>> GetFacilityLotBookingsAsync(string facilityLotID, string dateFrom, string dateTo);
-#endif
-
-#if NETFRAMEWORK
-        [OperationContract]
-        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriFacilityLotNew, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<FacilityLot> CreateFacilityLot(bool temp);
-#elif NETSTANDARD
-        Task<WSResponse<FacilityLot>> CreateFacilityLotAsync();
 #endif
 
         #endregion

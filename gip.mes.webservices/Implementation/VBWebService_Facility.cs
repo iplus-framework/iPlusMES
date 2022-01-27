@@ -78,8 +78,8 @@ namespace gip.mes.webservices
              )
         );
 
-        public static readonly Func<DatabaseApp, Guid, Guid, Guid, int?, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
-                CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid, int?, IQueryable<FacilityCharge>>(
+        public static readonly Func<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>> s_cQry_GetFacilityChargeFromFacilityMaterialLot =
+                CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, int?, IQueryable<FacilityCharge>>(
                     (dbApp, facilityID, materialID, facilityLotID, splitNo) =>
                         dbApp.FacilityCharge
                         .Include(gip.mes.datamodel.Material.ClassName)
@@ -87,7 +87,9 @@ namespace gip.mes.webservices
                         .Include(gip.mes.datamodel.Facility.ClassName)
                         .Include(gip.mes.datamodel.MDUnit.ClassName)
                         .Include(gip.mes.datamodel.MDReleaseState.ClassName)
-                        .Where(c => c.FacilityID == facilityID && c.MaterialID == materialID && c.FacilityLotID == facilityLotID 
+                        .Where(c => c.FacilityID == facilityID 
+                                 && c.MaterialID == materialID 
+                                 && c.FacilityLotID == facilityLotID 
                                  && (splitNo == null || c.SplitNo == splitNo))
                         .Select(c => new gip.mes.webservices.FacilityCharge()
                         {
@@ -383,15 +385,20 @@ namespace gip.mes.webservices
             };
         }
 
-        public WSResponse<bool> CreateFacilityCharge(FacilityCharge facilityCharge)
+        public WSResponse<FacilityCharge> CreateFacilityCharge(FacilityCharge facilityCharge)
         {
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
             if (myServiceHost == null)
-                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
             if (facilityCharge == null)
             {
-                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "paramter facilityCharge is null"));
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge is null"));
+            }
+
+            if (facilityCharge.Material == null)
+            {
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have material."));
             }
 
             using (DatabaseApp dbApp = new DatabaseApp())
@@ -400,51 +407,68 @@ namespace gip.mes.webservices
                 {
                     var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
                     if (response != null)
-                        return new WSResponse<bool>(false, response.Message);
+                        return new WSResponse<FacilityCharge>(null, response.Message);
 
                     Msg msg = null;
 
-                    datamodel.FacilityLot lot = null;
-                    if (facilityCharge.FacilityLot != null)
+                    datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == facilityCharge.Material.MaterialID);
+                    if (material == null)
                     {
+                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, String.Format("The material with ID:{0} not exist in database!", 
+                                                                                                   facilityCharge.Material.MaterialID)));
+                    }
 
+                    FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                    if (facManager == null)
+                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                    datamodel.FacilityLot lot = null;
+                    if (material.IsLotManaged && facilityCharge.FacilityLot != null)
+                    {
                         string secondaryKey = dbApp.Root().NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), datamodel.FacilityLot.NoColumnName,
                                                                                datamodel.FacilityLot.FormatNewNo, myServiceHost);
 
                         lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
                         lot.ExpirationDate = facilityCharge.FacilityLot.ExpirationDate;
                         lot.ExternLotNo = facilityCharge.FacilityLot.ExternLotNo;
+                        dbApp.FacilityLot.AddObject(lot);
 
-                        msg = dbApp.ACSaveChanges();
+                        msg = dbApp.ACSaveChangesWithRetry();
                         if (msg != null)
                         {
-                            return new WSResponse<bool>(false, msg);
+                            return new WSResponse<FacilityCharge>(null, msg);
                         }
                     }
 
-                    datamodel.FacilityCharge fc = datamodel.FacilityCharge.NewACObject(dbApp, null);
-                    fc.MaterialID = facilityCharge.Material.MaterialID;
+                    ACMethodBooking acMethodBooking = new ACMethodBooking();
+                    acMethodBooking.VirtualMethodName = datamodel.GlobalApp.FBT_InventoryNewQuant;
+                    acMethodBooking.InwardFacilityID = facilityCharge.Facility.FacilityID;
+                    acMethodBooking.InwardMaterialID = facilityCharge.Material.MaterialID;
+                    acMethodBooking.InwardQuantity = facilityCharge.StockQuantity;
+
                     if (lot != null)
                     {
-                        fc.FacilityLotID = lot.FacilityLotID;
+                        acMethodBooking.InwardFacilityLotID = lot.FacilityLotID;
                     }
-                    fc.FacilityID = facilityCharge.Facility.FacilityID;
-                    fc.ProductionDate = facilityCharge.ProductionDate;
-                    fc.ExpirationDate = facilityCharge.ExpirationDate;
-                    fc.FillingDate = facilityCharge.FillingDate;
 
-                    msg = dbApp.ACSaveChanges();
-                    if (msg != null)
-                        return new WSResponse<bool>(false, msg);
+                    var bookResponse = Book(acMethodBooking, dbApp, facManager, myServiceHost);
+                    if (bookResponse != null)
+                    {
+                        return new WSResponse<FacilityCharge>(new Msg(bookResponse.MessageLevel, bookResponse.DetailsAsText));
+                    }
 
-                    return new WSResponse<bool>(true);
+                    FacilityCharge fc = s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, acMethodBooking.InwardFacilityID.Value, 
+                                                                                        acMethodBooking.InwardMaterialID.Value,
+                                                                                        lot?.FacilityLotID, acMethodBooking.InwardSplitNo).FirstOrDefault();
+
+                    return new WSResponse<FacilityCharge>(fc);
 
                 }
                 catch (Exception e)
                 {
                     if (myServiceHost != null)
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(CreateFacilityCharge) + "(10)", e);
-                    return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
+                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
         }
@@ -737,33 +761,6 @@ namespace gip.mes.webservices
                     if (myServiceHost != null)
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotBookings(10)", e);
                     return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
-                }
-            }
-        }
-
-        public WSResponse<FacilityLot> CreateFacilityLot(bool temp)
-        {
-            using (DatabaseApp dbApp = new DatabaseApp())
-            {
-                try
-                {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    string secondaryKey =  dbApp.Root().NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), datamodel.FacilityLot.NoColumnName, 
-                                                                           datamodel.FacilityLot.FormatNewNo, myServiceHost);
-                    datamodel.FacilityLot lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
-                    Msg msg = dbApp.ACSaveChanges();
-                    if (msg != null)
-                        return new WSResponse<FacilityLot>(null, msg);
-
-                    return new WSResponse<FacilityLot>(new FacilityLot() { FacilityLotID = lot.FacilityLotID, LotNo = lot.LotNo });
-
-                }
-                catch (Exception e)
-                {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(CreateFacilityLot)+"(10)", e);
-                    return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
         }
