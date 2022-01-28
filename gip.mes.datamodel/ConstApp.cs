@@ -257,6 +257,7 @@
 
         // Other
         public const string Comment = "en{'Comment'}de{'Bemerkung'}";
+        public const string Comment2 = "en{'Comment2'}de{'Bemerkung2'}";
         public const string XMLComment = "en{'Long text'}de{'Langtext'}";
         public const string SetCompleted = "en{'Set to completed'}de{'Auf Fertiggestellt setzen'}";
         public const string NotAvailable = "en{'Not Available'}de{'Nicht verfügbar'}";
