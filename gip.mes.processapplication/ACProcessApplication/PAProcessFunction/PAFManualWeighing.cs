@@ -51,7 +51,7 @@ namespace gip.mes.processapplication
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             CurrentWeighingMaterial = null;
-            ActiveScaleObject = null;
+            ReleaseActiveScaleObject();
             _IsManuallyCompleted = false;
             _VerifyQuantity = 0;
             _HasParentPMMultipleScaleObjects = false;
@@ -130,10 +130,17 @@ namespace gip.mes.processapplication
             set;
         }
 
+        private PAEScaleGravimetric _ActiveScaleObject;
         public PAEScaleGravimetric ActiveScaleObject
         {
-            get;
-            set;
+            get
+            {
+                return _ActiveScaleObject;
+            }
+            set
+            {
+                _ActiveScaleObject = value;
+            }
         }
 
         public virtual bool TareCheck => true;
@@ -161,6 +168,39 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Methods
+        private bool OccupyAndSetActiveScaleObject(PAEScaleGravimetric scale)
+        {
+            if (scale == null)
+                return false;
+            //PAEScaleGravimetric occupiedScale = ActiveScaleObject;
+            //if (occupiedScale == scale && occupiedScale.IsScaleOccupied() == this.GetACUrl())
+            //    return true;
+            if (scale.OccupyScale(this.GetACUrl(), true, false))
+            {
+                ActiveScaleObject = scale;
+                return true;
+            }
+            else
+            {
+                ActiveScaleObject = null;
+                return false;
+            }
+        }
+
+
+        private bool ReleaseActiveScaleObject()
+        {
+            PAEScaleGravimetric scale = ActiveScaleObject;
+            if (scale == null)
+                return true;
+            if (scale.OccupyScale(this.GetACUrl(), true, true))
+            {
+                ActiveScaleObject = null;
+                return true;
+            }
+            else
+                return false;
+        }
 
         [ACMethodInfo("", "", 999)]
         public void SetActiveScaleObject(string scaleACIdentifier)
@@ -169,26 +209,13 @@ namespace gip.mes.processapplication
             {
                 PAEScaleGravimetric targetScale = ParentACComponent.ACUrlCommand(scaleACIdentifier) as PAEScaleGravimetric;
                 if (targetScale != null)
-                    ActiveScaleObject = targetScale;
+                    OccupyAndSetActiveScaleObject(targetScale);
             }
-        }
-
-        public PAEScaleGravimetric GetActiveScaleObject()
-        {
-            if (ActiveScaleObject != null)
-                return ActiveScaleObject;
-
-            return null;
         }
 
         [ACMethodInfo("", "", 999)]
-        public virtual string GetActiveScaleObjectACUrl()
+        public string GetActiveScaleObjectACUrl()
         {
-            if (ActiveScaleObject == null)
-            {
-                var scale = GetActiveScaleObject();
-                return scale?.ACUrl;
-            }
             return ActiveScaleObject?.ACUrl;
         }
 
@@ -199,7 +226,7 @@ namespace gip.mes.processapplication
             if (assignedScaleObjects == null || !assignedScaleObjects.Any())
                 return null;
 
-            return new ACValueList(assignedScaleObjects.Select(c => new ACValue(c.ACIdentifier, c.ComponentClass.ACClassID)).ToArray());
+            return new ACValueList(assignedScaleObjects.Select(c => new ACValue(c.ComponentClass.ACUrlComponent, c.ComponentClass.ACClassID)).ToArray());
         }
 
         internal void CompleteWeighing(double actualQuantity, bool isForBinChange = false)
@@ -212,7 +239,7 @@ namespace gip.mes.processapplication
 
             if (isForBinChange)
             {
-                var scale = GetActiveScaleObject();
+                PAEScaleGravimetric scale = ActiveScaleObject;
                 if (scale != null && TareScaleState.ValueT == (short)TareScaleStateEnum.TareOK)
                 {
                     SetPAFResult(scale.ActualWeight.ValueT + ManuallyAddedQuantity.ValueT);
@@ -557,7 +584,7 @@ namespace gip.mes.processapplication
 
         protected override bool CyclicWaitIfSimulationOn()
         {
-            var scale = GetActiveScaleObject();
+            PAEScaleGravimetric scale = ActiveScaleObject;
             if (scale != null)
             {
                 var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
@@ -639,15 +666,13 @@ namespace gip.mes.processapplication
         {
             if (!_HasParentPMMultipleScaleObjects)
             {
-                var scalesGravimetric = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>();
+                IEnumerable<PAEScaleGravimetric> scalesGravimetric = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>();
                 if (scalesGravimetric.Any())
-                {
-                    ActiveScaleObject = scalesGravimetric.FirstOrDefault();
-                }
+                    OccupyAndSetActiveScaleObject(scalesGravimetric.FirstOrDefault());
                 else
                 {
                     var scale = ParentACComponent as IPAMContScale;
-                    ActiveScaleObject = scale?.Scale;
+                    OccupyAndSetActiveScaleObject(scale?.Scale);
                 }
                 return;
             }
@@ -684,7 +709,7 @@ namespace gip.mes.processapplication
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
                 }
-                ActiveScaleObject = scale;
+                OccupyAndSetActiveScaleObject(scale);
                 return;
             }
 
@@ -724,7 +749,7 @@ namespace gip.mes.processapplication
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
                 }
-                ActiveScaleObject = scale;
+                OccupyAndSetActiveScaleObject(scale);
             }
         }
 
@@ -760,7 +785,7 @@ namespace gip.mes.processapplication
             if (WaitForAcknowledge())
                 return;
 
-            var scale = GetActiveScaleObject();
+            PAEScaleGravimetric scale = ActiveScaleObject;
             if (scale != null && !CheckInToleranceOnlyManuallyAddedQuantity)
             {
                 SetPAFResult(scale.ActualWeight.ValueT + ManuallyAddedQuantity.ValueT);
@@ -783,7 +808,7 @@ namespace gip.mes.processapplication
         {
             bool result = false;
 
-            var scale = GetActiveScaleObject();
+            PAEScaleGravimetric scale = ActiveScaleObject;
             if (scale == null)
             {
                 //Error50364: The active scale could not be determined.
@@ -821,7 +846,7 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 400)]
         public void TareActiveScale()
         {
-            TareScale(GetActiveScaleObject());
+            TareScale(ActiveScaleObject);
         }
 
         private void TareScale(PAEScaleGravimetric scale)
@@ -846,7 +871,7 @@ namespace gip.mes.processapplication
 
             double checkQuantity = ManuallyAddedQuantity.ValueT;
 
-            var scale = GetActiveScaleObject();
+            PAEScaleGravimetric scale = ActiveScaleObject;
             if (scale != null)
             {
                 // If scale is not in stillstand
@@ -945,14 +970,13 @@ namespace gip.mes.processapplication
                 CurrentWeighingMaterial.ValueT = "";
 
             ManuallyAddedQuantity.ValueT = 0;
-            //ActiveScaleObject = null;
+            ReleaseActiveScaleObject();
             TareScaleState.ValueT = (short)TareScaleStateEnum.None;
 
             using (ACMonitor.Lock(_65000_IsManCompLock))
             {
                 _VerifyQuantity = 0;
                 _IsManuallyCompleted = false;
-                //_SkipCheckInTolerance = false;
             }
 
             CurrentACMethod.ValueT = null;
@@ -960,7 +984,7 @@ namespace gip.mes.processapplication
 
         public void Abort(bool isConsumed)
         {
-            var scale = GetActiveScaleObject();
+            PAEScaleGravimetric scale = ActiveScaleObject;
             if (scale != null && !CheckInToleranceOnlyManuallyAddedQuantity)
             {
                 if (TareScaleState.ValueT == (short)TareScaleStateEnum.TareOK)
@@ -990,7 +1014,6 @@ namespace gip.mes.processapplication
                 CurrentACMethod.ValueT.ParameterValueList["FacilityCharge"] = null;
                 CurrentACMethod.ValueT.ParameterValueList["Facility"] = null;
             }
-            //ActiveScaleObject = null;
             TareScaleState.ValueT = (short)TareScaleStateEnum.None;
             base.Reset();
         }
@@ -1145,31 +1168,28 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "LotChange":
+                case nameof(LotChange):
                     result = LotChange(acParameter[0] as Guid?, (bool)acParameter[1], (bool)acParameter[2]);
                     return true;
-                case "Abort":
-                    Abort();
-                    return true;
-                case "TareActiveScale":
+                case nameof(TareActiveScale):
                     TareActiveScale();
                     return true;
-                case "InheritParamsFromConfig":
+                case nameof(InheritParamsFromConfig):
                     InheritParamsFromConfig(acParameter[0] as ACMethod, acParameter[1] as ACMethod, (bool)acParameter[2]);
                     return true;
-                case "GetActiveScaleObjectACUrl":
+                case nameof(GetActiveScaleObjectACUrl):
                     result = GetActiveScaleObjectACUrl();
                     return true;
-                case "SetDefaultACMethodValues":
+                case nameof(SetDefaultACMethodValues):
                     SetDefaultACMethodValues(acParameter[0] as ACMethod);
                     return true;
-                case "SetActiveScaleObject":
+                case nameof(SetActiveScaleObject):
                     SetActiveScaleObject(acParameter[0] as string);
                     return true;
-                case PAFWorkTaskScanBase.MN_OnScanEvent:
+                case nameof(OnScanEvent):
                     result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (bool)acParameter[1], (Guid)acParameter[2], (Guid)acParameter[3], (int)acParameter[4], (short?)acParameter[5]);
                     return true;
-                case "GetAvailableScaleObjects":
+                case nameof(GetAvailableScaleObjects):
                     result = GetAvailableScaleObjects();
                     return true;
             }

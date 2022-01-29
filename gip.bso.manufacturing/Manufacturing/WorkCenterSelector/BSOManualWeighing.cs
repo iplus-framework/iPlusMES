@@ -1148,8 +1148,9 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                scaleObjects = processModuleChildComps.Where(c => typeof(PAEScaleBase).IsAssignableFrom(c.ComponentClass.ObjectType)
-                                                                && availableScales.Any(x => x.Value is Guid && x.ParamAsGuid == c.ComponentClass.ACClassID)).ToArray();
+                scaleObjects = availableScales.Select(c => this.ACUrlCommand(c.ACIdentifier) as IACComponent);
+                //scaleObjects = processModuleChildComps.Where(c => typeof(PAEScaleBase).IsAssignableFrom(c.ComponentClass.ObjectType)
+                //                                                && availableScales.Any(x => x.Value is Guid && x.ParamAsGuid == c.ComponentClass.ACClassID)).ToArray();
             }
 
             List<ACValueItem> scaleObjectInfoList = null;
