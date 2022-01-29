@@ -63,6 +63,7 @@
     <Compile Include="BingMaps\Direction.cs" />
     <Compile Include="BingMaps\MapInteractivity.cs" />
     <Compile Include="Logistics\BSOPicking.cs" />
+    <Compile Include="Logistics\BSOPickingWorkplace.cs" />
     <Compile Include="Logistics\BSOTourBingMaps.cs" />
     <Compile Include="Logistics\BSOTourManagement.cs" />
     <Compile Include="Logistics\BSOTourplan.cs" />
