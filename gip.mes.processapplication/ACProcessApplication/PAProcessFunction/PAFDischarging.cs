@@ -189,6 +189,7 @@ namespace gip.mes.processapplication
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _ = FuncScaleConfig;
             StateDestinationFull.PropertyChanged += StateDestinationFull_PropertyChanged;
             StateTolerance.PropertyChanged += StateTolerance_PropertyChanged;
 
@@ -363,7 +364,6 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-				string tmp = FuncScaleConfig; // Init Config-Param
                 var routes = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatOut1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID, null, RouteDirections.Forwards, true, false);
                 if (routes != null && routes.Any())
                 {

@@ -32,6 +32,7 @@ namespace gip.mes.processapplication
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             bool result = base.ACInit(startChildMode);
+            _ = FuncScaleConfig;
             return result;
         }
 
@@ -417,7 +418,6 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-                string tmp = FuncScaleConfig; // Init Config-Param
                 var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
                 var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                 if (sourcePoint == null)

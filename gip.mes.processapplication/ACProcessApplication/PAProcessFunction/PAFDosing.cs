@@ -342,7 +342,7 @@ namespace gip.mes.processapplication
             StateTolerance.PropertyChanged += StateTolerance_PropertyChanged;
             StateLackOfMaterial.PropertyChanged += StateLackOfMaterial_PropertyChanged;
             StateDosingTime.PropertyChanged += StateDosingTime_PropertyChanged;
-            _ = _FuncScaleConfig.ValueT;
+            _ = FuncScaleConfig;
             _ = _StopOnSourceChange.ValueT;
             return true;
         }
@@ -1374,7 +1374,6 @@ namespace gip.mes.processapplication
             gip.core.datamodel.ACClass parentACClass = ParentACComponent.ComponentClass;
             try
             {
-				string tmp = FuncScaleConfig; // Init Config-Param
                 var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, thisACClass, this.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == parentACClass.ACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
                 var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
                 if (sourcePoint == null)

@@ -38,7 +38,9 @@ namespace gip.mes.processapplication
         {
             DischargingItemManager = new DischargingItemManager(Root, this, ClassName, null, null, null);
             DischargingItemNoValidator = new DischargingItemNoValidator(this, ClassName);
-            return base.ACInit(startChildMode);
+            bool result = base.ACInit(startChildMode);
+            _ = FuncScaleConfig;
+            return result;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)

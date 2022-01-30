@@ -28,6 +28,14 @@ namespace gip.mes.processapplication
             _FuncScaleConfig = new ACPropertyConfigValue<string>(this, PAScaleMappingHelper<IACComponent>.FuncScaleConfigName, "");
         }
 
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            bool result = base.ACInit(startChildMode);
+            _ = FuncScaleConfig;
+            return result;
+
+        }
+
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             using (ACMonitor.Lock(_20015_LockValue))
