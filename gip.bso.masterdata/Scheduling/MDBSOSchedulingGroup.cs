@@ -379,8 +379,11 @@ namespace gip.bso.masterdata.Scheduling
         public void New()
         {
             if (!PreExecute("New")) return;
-            CurrentMDSchedulingGroup = MDSchedulingGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDSchedulingGroup.AddObject(CurrentMDSchedulingGroup);
+            MDSchedulingGroup mDSchedulingGroup = MDSchedulingGroup.NewACObject(DatabaseApp, null);
+            DatabaseApp.MDSchedulingGroup.AddObject(mDSchedulingGroup);
+            AccessPrimary.NavList.Add(mDSchedulingGroup);
+            CurrentMDSchedulingGroup = mDSchedulingGroup;
+            OnPropertyChanged("MDSchedulingGroupList");
             ACState = Const.SMNew;
             PostExecute("Neu");
 
