@@ -35,6 +35,14 @@ namespace gip.mes.webservices
 
 #if NETFRAMEWORK
         [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriRegisteredFacilityChargeID, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<FacilityCharge>> GetRegisteredFacilityCharges(string workplaceID);
+#elif NETSTANDARD
+        Task<WSResponse<List<FacilityCharge>>> GetRegisteredFacilityChargesAsync(string workplaceID);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UriFacilityChargeFacilityMaterialLot, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<FacilityCharge> GetFacilityChargeFromFacilityMaterialLot(string facilityID, string materialID, string facilityLotID, string splitNo);
 #elif NETSTANDARD
@@ -65,6 +73,22 @@ namespace gip.mes.webservices
         WSResponse<FacilityCharge> CreateFacilityCharge(FacilityCharge facilityCharge);
 #elif NETSTANDARD
         Task<WSResponse<FacilityCharge>> CreateFacilityChargeAsync(FacilityCharge facilityCharge);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriActivateFacilityCharge, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<bool> ActivateFacilityCharge(FacilityChargeActivationItem activationItem);
+#elif NETSTANDARD
+        Task<WSResponse<bool>> ActivateFacilityChargeAsync(FacilityChargeActivationItem activationItem);
+#endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriDeactivateFacilityCharge, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<bool> DeactivateFacilityCharge(FacilityChargeActivationItem deactivationItem);
+#elif NETSTANDARD
+        Task<WSResponse<bool>> DeactivateFacilityChargeAsync(FacilityChargeActivationItem deactivationItem);
 #endif
 
         #endregion

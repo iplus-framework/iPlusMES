@@ -42,6 +42,13 @@ namespace gip.mes.webservices
             set;
         }
 
+        [DataMember(Name = "GI")]
+        public string GroupItem
+        {
+            get;
+            set;
+        }
+
         [IgnoreDataMember]
         IEnumerable<PickingPos> _PickingPos_Picking;
         [DataMember(Name = "ixPos")]
@@ -96,7 +103,7 @@ namespace gip.mes.webservices
 
         public void RefreshPickingPosInView()
         {
-            OnPropertyChanged("PickingPos_Picking");
+            OnPropertyChanged(nameof(PickingPos_Picking));
         }
     }
 }

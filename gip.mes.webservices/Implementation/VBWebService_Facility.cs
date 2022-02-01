@@ -160,7 +160,6 @@ namespace gip.mes.webservices
             }
         }
 
-
         public WSResponse<FacilityCharge> GetFacilityCharge(string facilityChargeID)
         {
             if (string.IsNullOrEmpty(facilityChargeID))
@@ -215,6 +214,35 @@ namespace gip.mes.webservices
                     return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
+        }
+
+        public WSResponse<List<FacilityCharge>> GetRegisteredFacilityCharges(string workplaceID)
+        {
+            if (string.IsNullOrEmpty(workplaceID))
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "workplaceID is empty"));
+
+            Guid workplaceGUID;
+            if (!Guid.TryParse(workplaceID, out workplaceGUID))
+            {
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "workplaceID is not valid GUID."));
+            }
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                var registeredChargesID  = dbApp.MaterialConfig.Where(c => c.VBiACClassID == workplaceGUID).ToArray().Select(x => x.Value as Guid?);
+
+                if (registeredChargesID != null && registeredChargesID.Any())
+                {
+                    var charges = dbApp.FacilityCharge.Where(c => registeredChargesID.Any(x => x == c.FacilityChargeID))
+                                                        .ToArray()
+                                                        .Select(c => ConvertFacilityCharge(c))
+                                                        .ToList();
+
+                    return new WSResponse<List<FacilityCharge>>(charges);
+                }
+            }
+
+            return new WSResponse<List<FacilityCharge>>(null,null);
         }
 
         public WSResponse<PostingOverview> GetFacilityChargeBookings(string facilityChargeID, string dateFrom, string dateTo)
@@ -471,6 +499,74 @@ namespace gip.mes.webservices
                     return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
                 }
             }
+        }
+
+        public WSResponse<bool> ActivateFacilityCharge(FacilityChargeActivationItem activationItem)
+        {
+            if (activationItem == null)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "The parameter activationItem is null."));
+            }
+
+            if (activationItem.Material == null)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "In the parameter activationItem material is missing."));
+            }
+
+            if (activationItem.WorkplaceID == Guid.Empty)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
+            }
+
+            try
+            {
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    MaterialConfig mConfig = dbApp.MaterialConfig.FirstOrDefault(c => c.KeyACUrl == FacilityChargeActivationItem.FacilityChargeActivationKeyACUrl
+                                                                                   && c.VBiACClassID == activationItem.WorkplaceID
+                                                                                   && c.MaterialID == activationItem.Material.MaterialID);
+
+                    if (mConfig == null)
+                    {
+                        mes.datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == activationItem.Material.MaterialID);
+                        if (material == null)
+                        {
+                            return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "The material not exists in the database."));
+                        }
+
+                        mConfig = MaterialConfig.NewACObject(dbApp, material);
+                        mConfig.KeyACUrl = FacilityChargeActivationItem.FacilityChargeActivationKeyACUrl;
+                        mConfig.VBiACClassID = activationItem.WorkplaceID;
+                        mConfig.SetValueTypeACClass(dbApp.ContextIPlus.GetACType("Guid"));
+
+                        dbApp.MaterialConfig.AddObject(mConfig);
+                    }
+
+                    mConfig.Value = activationItem.FacilityChargeID;
+
+                    Msg msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        return new WSResponse<bool>(false, msg);
+                    }
+                }
+
+                return new WSResponse<bool>(true);
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
+            }
+        }
+
+        public WSResponse<bool> DeactivateFacilityCharge(FacilityChargeActivationItem deactivationItem)
+        {
+            if (deactivationItem == null)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "The parameter deactivationItem is null"));
+            }
+
+            return new WSResponse<bool>(true);
         }
 
         #endregion
