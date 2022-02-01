@@ -456,6 +456,15 @@ namespace gip.mes.processapplication
             return null;
         }
 
+
+        [ACMethodInteraction("", "en{'Reset schedules'}de{'Zeitpläne zurücksetzen'}", 700, true, "")]
+        public void ResetAllSchedules()
+        {
+            if (!Root.Environment.User.IsSuperuser)
+                return;
+            SchedulesForPWNodes.ValueT = null;
+            InitScheduleListForPWNodes();
+        }
         #endregion
 
         #region Static
@@ -495,6 +504,9 @@ namespace gip.mes.processapplication
                 case MN_UpdateScheduleFromClient:
                     if (acParameter.Length == 1)
                         result = UpdateScheduleFromClient(acParameter[0] as PAScheduleForPWNode);
+                    return true;
+                case nameof(ResetAllSchedules):
+                    ResetAllSchedules();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

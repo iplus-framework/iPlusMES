@@ -725,21 +725,25 @@ namespace gip.mes.processapplication
                 if (ScaleMappingHelper.AssignedScales.Any())
                 {
                     scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>()
-                                                             .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight?.ValueT)
+                                                             .Where(c => c.MinDosingWeight.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT)
                                                              .FirstOrDefault();
 
                     if (scale == null)
-                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().FirstOrDefault(c => c.MinDosingWeight.ValueT == 0 && c.MaxScaleWeight.ValueT == 0);
+                    {
+                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().OrderByDescending(c => c.MaxScaleWeight).FirstOrDefault();
+                    }
                 }
                 else
                 {
-                    scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                              .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight?.ValueT)
+                    scale = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
+                                              .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT)
                                               .FirstOrDefault();
                     if (scale == null)
-                        scale = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                                  .Where(c => c.MinDosingWeight.ValueT == 0 && c.MaxScaleWeight.ValueT == 0)
+                    {
+                        scale = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
+                                                  .OrderByDescending(c => c.MaxScaleWeight)
                                                   .FirstOrDefault();
+                    }
                 }
                 if (scale == null)
                 {
@@ -892,46 +896,49 @@ namespace gip.mes.processapplication
             if (!tolMinus.HasValue)
                 tolMinus = 0;
 
-            if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
+            if (scale != null)
             {
-                tolPlus = scale.TolerancePlus;
-                if (tolPlus < -0.0000001)
+                if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
                 {
-                    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                        tolPlus = targetQuantity * tolPlus * -0.01;
-                    else
-                        tolPlus = 0.001;
-                }
-                else if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
-                {
-                    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                        tolPlus = targetQuantity * 0.05;
-                    else
-                        tolPlus = 0.001;
+                    tolPlus = scale.TolerancePlus;
+                    if (tolPlus < -0.0000001)
+                    {
+                        if (Math.Abs(targetQuantity) > Double.Epsilon)
+                            tolPlus = targetQuantity * tolPlus * -0.01;
+                        else
+                            tolPlus = 0.001;
+                    }
+                    else if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
+                    {
+                        if (Math.Abs(targetQuantity) > Double.Epsilon)
+                            tolPlus = targetQuantity * 0.05;
+                        else
+                            tolPlus = 0.001;
+                    }
+
+                    CurrentACMethod.ValueT["TolerancePlus"] = tolPlus;
                 }
 
-                CurrentACMethod.ValueT["TolerancePlus"] = tolPlus;
-            }
-
-            if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
-            {
-                tolMinus = scale.ToleranceMinus;
-                if (tolMinus < -0.0000001)
+                if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
                 {
-                    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                        tolMinus = targetQuantity * tolMinus * -0.01;
-                    else
-                        tolMinus = 0.001;
-                }
-                else if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
-                {
-                    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                        tolMinus = targetQuantity * 0.05;
-                    else
-                        tolMinus = 0.001;
-                }
+                    tolMinus = scale.ToleranceMinus;
+                    if (tolMinus < -0.0000001)
+                    {
+                        if (Math.Abs(targetQuantity) > Double.Epsilon)
+                            tolMinus = targetQuantity * tolMinus * -0.01;
+                        else
+                            tolMinus = 0.001;
+                    }
+                    else if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
+                    {
+                        if (Math.Abs(targetQuantity) > Double.Epsilon)
+                            tolMinus = targetQuantity * 0.05;
+                        else
+                            tolMinus = 0.001;
+                    }
 
-                CurrentACMethod.ValueT["ToleranceMinus"] = tolMinus;
+                    CurrentACMethod.ValueT["ToleranceMinus"] = tolMinus;
+                }
             }
 
             double actWeight = Math.Round(checkQuantity, 3);
