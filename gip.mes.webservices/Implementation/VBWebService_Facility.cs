@@ -566,7 +566,44 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "The parameter deactivationItem is null"));
             }
 
-            return new WSResponse<bool>(true);
+            if (deactivationItem.Material == null)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "In the parameter activationItem material is missing."));
+            }
+
+            if (deactivationItem.WorkplaceID == Guid.Empty)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
+            }
+
+            try
+            {
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    MaterialConfig mConfig = dbApp.MaterialConfig.FirstOrDefault(c => c.KeyACUrl == FacilityChargeActivationItem.FacilityChargeActivationKeyACUrl
+                                                                                   && c.VBiACClassID == deactivationItem.WorkplaceID
+                                                                                   && c.MaterialID == deactivationItem.Material.MaterialID);
+
+                    if (mConfig == null)
+                    {
+                        return new WSResponse<bool>(true);
+                    }
+
+                    dbApp.MaterialConfig.DeleteObject(mConfig);
+
+                    Msg msg = dbApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        return new WSResponse<bool>(false, msg);
+                    }
+                }
+
+                return new WSResponse<bool>(true);
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
+            }
         }
 
         #endregion
