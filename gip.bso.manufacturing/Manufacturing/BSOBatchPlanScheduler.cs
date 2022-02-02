@@ -164,7 +164,7 @@ namespace gip.bso.manufacturing
 
             if (offsetToEndTime != null)
                 schedulerPartslist.OffsetToEndTime = (TimeSpan)offsetToEndTime.Value;
-            schedulerPartslist.SelectFirstConversionUnit();
+            //schedulerPartslist.SelectFirstConversionUnit();
         }
 
         private TimeSpan? GetExpectedBatchEndTime(WizardSchedulerPartslist wizardSchedulerPartslist)
@@ -3197,7 +3197,7 @@ namespace gip.bso.manufacturing
             item.Partslist = partslist;
             item.PartslistNo = partslist.PartslistNo;
             item.PartslistName = partslist.PartslistName;
-            item.SelectFirstConversionUnit();
+            //item.SelectFirstConversionUnit();
             item.Sn = sn;
             if (targetQuantityUOM > Double.Epsilon)
             {
@@ -3670,7 +3670,7 @@ namespace gip.bso.manufacturing
                                                .FirstOrDefault();
             prodOrderBatchPlan.ProdOrderPartslistPos = ProdOrderManager.GetIntermediate(prodOrderPartslist, materialWFConnection);
 
-            WritePosMDUnit(prodOrderBatchPlan, wizardSchedulerPartslist);
+            //WritePosMDUnit(prodOrderBatchPlan, wizardSchedulerPartslist);
 
             prodOrderBatchPlan.ScheduledEndDate = scheduledEndDate;
             if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
@@ -3804,7 +3804,7 @@ namespace gip.bso.manufacturing
 
             ProdOrderBatchPlan firstBatchPlan = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault();
 
-            WritePosMDUnit(firstBatchPlan, wizardSchedulerPartslist);
+            //WritePosMDUnit(firstBatchPlan, wizardSchedulerPartslist);
 
             SetBSOBatchPlan_BatchParents(vbACClassWF, prodOrderPartslist);
             LoadGeneratedBatchInCurrentLine(firstBatchPlan, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM);
