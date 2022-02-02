@@ -2737,7 +2737,8 @@ namespace gip.bso.manufacturing
                 && SelectedScheduleForPWNode != null
                 && SelectedProdOrderPartslist != null
                 && SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
-                && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished;
+                && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
+                && SelectedProdOrderPartslist.UnPlannedQuantityUOM > Double.Epsilon;
         }
 
         [ACMethodCommand("RemoveSelectedProdorderPartslist", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
