@@ -156,6 +156,8 @@ namespace gip.bso.manufacturing
                     || SelectedMDSchedulingGroup == null)
                     return null;
                 PartslistACClassMethod method = this.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                if (method == null)
+                    return null;
                 _WFNodeMES =
                     DatabaseApp
                     .MDSchedulingGroup
