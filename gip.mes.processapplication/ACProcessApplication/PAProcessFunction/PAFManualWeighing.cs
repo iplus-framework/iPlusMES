@@ -730,7 +730,7 @@ namespace gip.mes.processapplication
 
                     if (scale == null)
                     {
-                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().OrderByDescending(c => c.MaxScaleWeight).FirstOrDefault();
+                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
                     }
                 }
                 else
@@ -741,7 +741,7 @@ namespace gip.mes.processapplication
                     if (scale == null)
                     {
                         scale = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                                  .OrderByDescending(c => c.MaxScaleWeight)
+                                                  .OrderByDescending(c => c.MaxScaleWeight.ValueT)
                                                   .FirstOrDefault();
                     }
                 }
