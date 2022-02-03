@@ -137,7 +137,7 @@ namespace gip.bso.manufacturing
                             return;
                     }
 
-                    UserAckPWNode.ValueT.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, _BSOManualWeighing.ScaleActualWeight, 
+                    UserAckPWNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.CompleteWeighing), _BSOManualWeighing.ScaleActualWeight, 
                                                        _BSOManualWeighing.ScaleBckgrState != ScaleBackgroundState.InTolerance);
                 }
                 else

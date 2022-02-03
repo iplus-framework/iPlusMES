@@ -838,10 +838,10 @@ namespace gip.mes.processapplication
 
             if (ManualWeighingPW != null)
             {
-                if (!result && ManualWeighingPW.ManualWeihgingNextTask.ValueT != ManualWeighingTaskInfo.WaitForTare)
-                    ManualWeighingPW.ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.WaitForTare;
-                else if (result && ManualWeighingPW.ManualWeihgingNextTask.ValueT == ManualWeighingTaskInfo.WaitForTare)
-                    ManualWeighingPW.ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.None;
+                if (!result && ManualWeighingPW.ManualWeighingNextTask.ValueT != ManualWeighingTaskInfo.WaitForTare)
+                    ManualWeighingPW.ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.WaitForTare;
+                else if (result && ManualWeighingPW.ManualWeighingNextTask.ValueT == ManualWeighingTaskInfo.WaitForTare)
+                    ManualWeighingPW.ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.None;
             }
 
             return result;
@@ -961,10 +961,10 @@ namespace gip.mes.processapplication
 
             if (ManualWeighingPW != null)
             {
-                if (mustWait && ManualWeighingPW.ManualWeihgingNextTask.ValueT != ManualWeighingTaskInfo.WaitForAcknowledge)
-                    ManualWeighingPW.ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.WaitForAcknowledge;
-                else if (!mustWait && ManualWeighingPW.ManualWeihgingNextTask.ValueT == ManualWeighingTaskInfo.WaitForAcknowledge)
-                    ManualWeighingPW.ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.None;
+                if (mustWait && ManualWeighingPW.ManualWeighingNextTask.ValueT != ManualWeighingTaskInfo.WaitForAcknowledge)
+                    ManualWeighingPW.ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.WaitForAcknowledge;
+                else if (!mustWait && ManualWeighingPW.ManualWeighingNextTask.ValueT == ManualWeighingTaskInfo.WaitForAcknowledge)
+                    ManualWeighingPW.ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.None;
             }
 
             return mustWait;
