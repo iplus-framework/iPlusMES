@@ -60,6 +60,8 @@ namespace gip.bso.masterdata
             if (!base.ACInit(startChildMode))
                 return false;
 
+            AccessTargetMaterial.NavSearch();
+
             _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
             Search();
 
@@ -75,6 +77,7 @@ namespace gip.bso.masterdata
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessMaterialCalculation = null;
+            _AccessTargetMaterial = null;
             this._AccessMaterialUnit = null;
             //this._ACConfigList = null;
             this._AmbientTemperature = null;
@@ -170,7 +173,7 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) 
+                if (AccessPrimary == null)
                     return;
                 if (AccessPrimary.Current != value)
                 {
@@ -245,7 +248,7 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("TranslationList");
                     OnPropertyChanged("AvailablePWMethodNodes");
                     OnPropertyChanged("AssignedPWMethodNodes");
-                    if (   value != null
+                    if (value != null
                         && !String.IsNullOrEmpty(RemoteMaterialForwarder))
                     {
                         if (_VisitedMaterials == null)
@@ -925,7 +928,7 @@ namespace gip.bso.masterdata
                     gip.mes.facility.RemoteMaterialForwarder.ForwardMaterial(this, RemoteMaterialForwarder, changedMaterial.MaterialID);
                 }
             }
-            if (   CurrentMaterial != null
+            if (CurrentMaterial != null
                 && !String.IsNullOrEmpty(RemoteMaterialForwarder))
             {
                 _VisitedMaterials = new List<Material>();
@@ -1708,13 +1711,107 @@ namespace gip.bso.masterdata
         #endregion
 
 
+        #region AssociatedPartslistPos -> Material replacement
+
+        #region AssociatedPartslistPos -> Material replacement-> Material (TargetMaterial)
+
+        ACAccessNav<Material> _AccessTargetMaterial;
+        [ACPropertyAccess(200, "TargetMaterial")]
+        public ACAccessNav<Material> AccessTargetMaterial
+        {
+            get
+            {
+                if (_AccessTargetMaterial == null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Material", Material.ClassName);
+                    _AccessTargetMaterial = navACQueryDefinition.NewAccessNav<Material>("TargetMaterial", this);
+                    _AccessTargetMaterial.AutoSaveOnNavigation = false;
+                }
+                return _AccessTargetMaterial;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected FilterInventoryPosMaterial.
+        /// </summary>
+        /// <value>The selected FilterInventoryPosMaterial.</value>
+        [ACPropertySelected(201, "TargetMaterial", ConstApp.Material)]
+        public Material SelectedTargetMaterial
+        {
+            get
+            {
+                if (AccessTargetMaterial == null)
+                    return null;
+                return AccessTargetMaterial.Selected;
+            }
+            set
+            {
+                if (AccessTargetMaterial == null)
+                    return;
+                AccessTargetMaterial.Selected = value;
+                OnPropertyChanged("SelectedFilterInventoryPosMaterial");
+            }
+        }
+
+        /// <summary>
+        /// Gets the FilterInventoryPosMaterial list.
+        /// </summary>
+        /// <value>The facility list.</value>
+        [ACPropertyList(202, "TargetMaterial")]
+        public IEnumerable<Material> TargetMaterialList
+        {
+            get
+            {
+                if (AccessTargetMaterial == null)
+                    return null;
+                return AccessTargetMaterial.NavList;
+            }
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Source Property: ReplaceMaterial
+        /// </summary>
+        [ACMethodInfo("ReplaceMaterial", "en{'Replace material'}de{'Material ersetzen'}", 999)]
+        public void ReplaceMaterial()
+        {
+            if (!IsEnabledReplaceMaterial())
+                return;
+            if (Root.Messages.Question(this, "Question50080", Global.MsgResult.No, false, SelectedTargetMaterial.MaterialNo, SelectedTargetMaterial.MaterialName1) == Global.MsgResult.Yes)
+            {
+                PartslistPos[] positions = DatabaseApp.PartslistPos.Where(c => c.MaterialID == CurrentMaterial.MaterialID).ToArray();
+                if (positions.Any())
+                {
+                    foreach (PartslistPos pos in positions)
+                        pos.Material = SelectedTargetMaterial;
+
+                    ACSaveChanges();
+                    SearchAssociatedPos();
+                }
+            }
+        }
+
+        public bool IsEnabledReplaceMaterial()
+        {
+            return
+                CurrentMaterial != null
+                && SelectedTargetMaterial != null
+                && CurrentMaterial.MaterialID != SelectedTargetMaterial.MaterialID
+                && AssociatedPartslistPosList != null
+                && AssociatedPartslistPosList.Any();
+        }
+
+
+        #endregion
         #endregion
 
         #region Workflow
 
         #region Properties
 
-        
+
 
         private core.datamodel.ACClass _SelectedPWMethodNode;
         [ACPropertySelected(800, "PWMethodNode")]
@@ -1761,9 +1858,9 @@ namespace gip.bso.masterdata
                 if (SelectedPWMethodNode == null)
                     return null;
 
-                return CurrentMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.PWMethodNodeConfigKeyACUrl 
-                                                                        && c.ACClassWF != null 
-                                                                        && c.ACClassWF.ACClassMethod != null 
+                return CurrentMaterial?.MaterialConfig_Material.Where(c => c.KeyACUrl == MaterialConfig.PWMethodNodeConfigKeyACUrl
+                                                                        && c.ACClassWF != null
+                                                                        && c.ACClassWF.ACClassMethod != null
                                                                         && c.ACClassWF.ACClassMethod.WorkflowTypeACClass.ACClassID == SelectedPWMethodNode.ACClassID)
                                                                .ToList();
             }
@@ -1790,7 +1887,7 @@ namespace gip.bso.masterdata
                 if (SelectedPWMethodNode == null)
                     return null;
 
-                List<core.datamodel.ACClassWF> wfRootList =  
+                List<core.datamodel.ACClassWF> wfRootList =
                     this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue && !c.ACClassMethod.IsSubMethod)
                                                                 .AsEnumerable()
                                                                 .Where(c => c.ACClassMethod.WorkflowTypeACClass != null
