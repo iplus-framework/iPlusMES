@@ -1295,10 +1295,10 @@ namespace gip.mes.facility
             // Liste von FacilityChargen, die nach buchungsparameter FacilityLot und Material gefiltert sind,
             // um herauszufinden ob FacilityCharge überhaupt existiert und evtl. angelegt werden muss.
             FacilityChargeList facilityInwardChargeSubList = null;
-            FacilityChargeList facilityOutwardChargeSubList = null;
+            FacilityChargeList facilityOutwardChargeSubList = BP.ParamsAdjusted.OutwardFacilityChargeList != null ? new FacilityChargeList(BP.ParamsAdjusted.OutwardFacilityChargeList) : null;
             // Liste von allen FacilityChargen/Schichten im Silo
             FacilityChargeList cellInwardChargeList = null;
-            FacilityChargeList cellOutwardChargeList = null;
+            FacilityChargeList cellOutwardChargeList = BP.ParamsAdjusted.OutwardFacilityChargeList != null ? new FacilityChargeList(BP.ParamsAdjusted.OutwardFacilityChargeList) : null;
 
             // Überprüfe für Quelle und Ziel:
             if (BP.ParamsAdjusted.InwardFacility != null)
@@ -1398,7 +1398,7 @@ namespace gip.mes.facility
                 }
             }
 
-            if (BP.ParamsAdjusted.OutwardFacility != null)
+            if (BP.ParamsAdjusted.OutwardFacility != null && cellOutwardChargeList == null)
             {
                 // Wenn Silo
                 if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
@@ -1437,60 +1437,63 @@ namespace gip.mes.facility
                     cellOutwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacility.FacilityID, false));
                 }
 
-                if (BP.ParamsAdjusted.IsLotManaged)
+                if (facilityOutwardChargeSubList == null)
                 {
-                    // Ermittle FacilityCharge's auf Quelllagerplatz 
-                    if ((BP.OutwardFacilityLot != null) && (BP.OutwardMaterial != null))
+                    if (BP.ParamsAdjusted.IsLotManaged)
                     {
-                        Guid? guidNull = null;
-                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
-                                                                                                BP.ParamsAdjusted.OutwardMaterial.MaterialID,
-                                                                                                BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
-                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                        // Ermittle FacilityCharge's auf Quelllagerplatz 
+                        if ((BP.OutwardFacilityLot != null) && (BP.OutwardMaterial != null))
+                        {
+                            Guid? guidNull = null;
+                            facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                                                                                                    BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                                                                                                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
+                                                                                                    BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                    false));
+                        }
+                        else if (BP.OutwardFacilityLot != null)
+                        {
+                            Guid? guidNull = null;
+                            facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
+                                                                                                    BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                    false));
+                        }
+                        // Kein Material vorgegeben
+                        else
+                        {
+                            Guid? guidNull = null;
+                            facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                    false));
+                        }
                     }
-                    else if (BP.OutwardFacilityLot != null)
-                    {
-                        Guid? guidNull = null;
-                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
-                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                false));
-                    }
-                    // Kein Material vorgegeben
                     else
                     {
-                        Guid? guidNull = null;
-                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                false));
-                    }
-                }
-                else
-                {
-                    // Ermittle FacilityCharge's auf Quelllagerplatz 
-                    if (BP.ParamsAdjusted.OutwardMaterial != null)
-                    {
-                        Guid? guidNull = null;
-                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.OutwardMaterial.MaterialID,
-                                                                                                BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
-                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                false));
-                    }
-                    // Kein Material vorgegeben
-                    else
-                    {
-                        Guid? guidNull = null;
-                        facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
-                                                                                                BP.ParamsAdjusted.OutwardFacility.FacilityID,
-                                                                                                BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                        // Ermittle FacilityCharge's auf Quelllagerplatz 
+                        if (BP.ParamsAdjusted.OutwardMaterial != null)
+                        {
+                            Guid? guidNull = null;
+                            facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.OutwardMaterial.MaterialID,
+                                                                                                    BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
+                                                                                                    BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                    false));
+                        }
+                        // Kein Material vorgegeben
+                        else
+                        {
+                            Guid? guidNull = null;
+                            facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
+                                                                                                    BP.ParamsAdjusted.OutwardFacility.FacilityID,
+                                                                                                    BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
+                                                                                                    false));
+                        }
                     }
                 }
             }
