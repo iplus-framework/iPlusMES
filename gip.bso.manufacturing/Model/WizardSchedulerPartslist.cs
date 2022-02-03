@@ -630,6 +630,11 @@ namespace gip.bso.manufacturing
         public void LoadExistingBatchSuggestion()
         {
             BatchPlanSuggestion = new BatchPlanSuggestion(this);
+            double targetQuantity = TargetQuantityUOM;
+            if (NewTargetQuantityUOM > 0)
+                targetQuantity = NewTargetQuantityUOM;
+            TargetQuantityUOM = targetQuantity;
+            ProdOrderPartslistPos.TargetQuantityUOM = targetQuantity;
             BatchPlanSuggestion.RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * ProdOrderPartslistPos.TargetQuantityUOM;
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
