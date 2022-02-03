@@ -566,7 +566,7 @@ namespace gip.bso.manufacturing
                 else if (_CallPWLotChange && value != null && componentPWNode != null)
                 {
                     double quantity = OnDetermineLotChangeActualQuantity();
-                    Msg msg = componentPWNode.ACUrlCommand("!LotChange", value.FacilityChargeID, quantity, _IsLotConsumed, false) as Msg;
+                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, quantity, _IsLotConsumed, false) as Msg;
                     if (msg != null)
                     {
                         _SelectedFacilityCharge = null;
@@ -597,7 +597,8 @@ namespace gip.bso.manufacturing
 
                     if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
                     {
-                        ACValueList facilityCharges = componentPWNode?.ACUrlCommand("!GetAvailableFacilityCharges", SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
+                        ACValueList facilityCharges = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetAvailableFacilityCharges), 
+                                                                                     SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
                         if (facilityCharges == null)
                             return null;
                         using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
@@ -779,7 +780,7 @@ namespace gip.bso.manufacturing
                 if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing ||
                     SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
                 {
-                    Msg msg = componentPWNode.ACUrlCommand("!StartWeighing", SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID,
+                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.StartWeighing), SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID,
                                                                              SelectedFacilityCharge?.FacilityChargeID, null, forceSetFC_F) as Msg;
                     return msg;
                 }
@@ -837,7 +838,7 @@ namespace gip.bso.manufacturing
                             return;
                     }
 
-                    componentPWNode.ExecuteMethod(PWManualWeighing.MNCompleteWeighing, ScaleActualWeight, false);
+                    componentPWNode.ExecuteMethod(nameof(PWManualWeighing.CompleteWeighing), ScaleActualWeight, false);
                 }
             }
         }
@@ -902,7 +903,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledTare())
                 return;
 
-            CurrentPAFManualWeighing?.ACUrlCommand("!TareActiveScale");
+            CurrentPAFManualWeighing?.ExecuteMethod(nameof(PAFManualWeighing.TareActiveScale));
         }
 
         public bool IsEnabledTare()
@@ -974,7 +975,7 @@ namespace gip.bso.manufacturing
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
             if (componentPWNode != null)
-                componentPWNode.ExecuteMethod("BinChange");
+                componentPWNode.ExecuteMethod(nameof(PWManualWeighing.BinChange));
         }
 
         public virtual bool IsEnabledBinChange()
@@ -1004,10 +1005,10 @@ namespace gip.bso.manufacturing
                     // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
                     if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
                     {
-                        componentPWNode?.ACUrlCommand("!Abort", true);
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true);
                         return;
                     }
-                    componentPWNode?.ACUrlCommand("!Abort", false);
+                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false);
 
                 }
                 else if (_AbortMode == AbortModeEnum.AbortComponentSwitchToEmptyingMode)
@@ -1022,10 +1023,10 @@ namespace gip.bso.manufacturing
 
                     if (msgResult == Global.MsgResult.Yes)
                     {
-                        componentPWNode?.ACUrlCommand("!Abort", true);
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true);
                         return;
                     }
-                    componentPWNode?.ACUrlCommand("!Abort", false);
+                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false);
                 }
                 else if (_AbortMode == AbortModeEnum.SwitchToEmptyingMode)
                 {
@@ -1062,7 +1063,8 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            msg = componentPWNode.ACUrlCommand("!OnApplyManuallyEnteredLot", FacilityChargeNo, SelectedWeighingMaterial?.PosRelation?.ProdOrderPartslistPosRelationID) as Msg;
+            msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.OnApplyManuallyEnteredLot), FacilityChargeNo, 
+                                                SelectedWeighingMaterial?.PosRelation?.ProdOrderPartslistPosRelationID) as Msg;
             if (msg != null)
                 Messages.Msg(msg);
         }
@@ -1140,7 +1142,7 @@ namespace gip.bso.manufacturing
 
             var pafManWeighingRef = new ACRef<IACComponent>(pafManWeighing, this);
 
-            ACValueList availableScales = pafManWeighingRef.ValueT.ACUrlCommand("!GetAvailableScaleObjects") as ACValueList;
+            ACValueList availableScales = pafManWeighingRef.ValueT.ExecuteMethod(nameof(PAFManualWeighing.GetAvailableScaleObjects)) as ACValueList;
 
             if (availableScales == null)
             {
@@ -1165,7 +1167,7 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            var orderInfo = currentProcessModule.GetPropertyNet("OrderInfo");
+            var orderInfo = currentProcessModule.GetPropertyNet(nameof(PAProcessModuleVB.OrderInfo));
             if (orderInfo == null)
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
@@ -1209,7 +1211,7 @@ namespace gip.bso.manufacturing
 
             _CurrentPAFManualWeighing = pafManWeighing;
 
-            var currentACMethod = pafManWeighing.ValueT.GetPropertyNet("CurrentACMethod");
+            var currentACMethod = pafManWeighing.ValueT.GetPropertyNet(nameof(PAProcessFunction.CurrentACMethod));
             if (currentACMethod == null)
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
@@ -1218,7 +1220,7 @@ namespace gip.bso.manufacturing
                 return null;
             }
 
-            var manuallyAddedQuantity = pafManWeighing.ValueT.GetPropertyNet("ManuallyAddedQuantity");
+            var manuallyAddedQuantity = pafManWeighing.ValueT.GetPropertyNet(nameof(PAFManualWeighing.ManuallyAddedQuantity));
             if (manuallyAddedQuantity == null)
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
@@ -1227,7 +1229,7 @@ namespace gip.bso.manufacturing
                 return null;
             }
 
-            var tareScaleState = pafManWeighing.ValueT.GetPropertyNet("TareScaleState");
+            var tareScaleState = pafManWeighing.ValueT.GetPropertyNet(nameof(PAFManualWeighing.TareScaleState));
             if (tareScaleState == null)
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
@@ -1264,7 +1266,7 @@ namespace gip.bso.manufacturing
             }
 
             MaxScaleWeight = null;
-            var actValProp = scale.GetPropertyNet("ActualValue") as IACContainerTNet<double>;
+            var actValProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualValue)) as IACContainerTNet<double>;
             if (actValProp == null)
             {
                 //Error50292: Initialization error: The scale component doesn't have the property {0}.
@@ -1282,7 +1284,7 @@ namespace gip.bso.manufacturing
 
             if (CurrentPAFManualWeighing != null && scale != null )
             {
-                CurrentPAFManualWeighing.ACUrlCommand("!SetActiveScaleObject", scale.ACIdentifier);
+                CurrentPAFManualWeighing.ExecuteMethod(nameof(PAFManualWeighing.SetActiveScaleObject), scale.ACIdentifier);
             }
 
             OnPropertyChanged("CurrentScaleObject");
@@ -1304,7 +1306,7 @@ namespace gip.bso.manufacturing
             {
                 try
                 {
-                    string[] accessArr = (string[])currentProcessModule?.ACUrlCommand("!SemaphoreAccessedFrom");
+                    string[] accessArr = (string[])currentProcessModule?.ExecuteMethod(nameof(PAProcessModule.SemaphoreAccessedFrom));
                     if (accessArr == null || !accessArr.Any())
                     {
                         using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
@@ -1437,7 +1439,7 @@ namespace gip.bso.manufacturing
                 ComponentPWNode = pwNode;
             }
 
-            var weighingCompInfo = pwNode.ValueT.GetPropertyNet("CurrentWeighingComponentInfo");
+            var weighingCompInfo = pwNode.ValueT.GetPropertyNet(nameof(PWManualWeighing.CurrentWeighingComponentInfo));
             if (weighingCompInfo == null)
             {
                 //Error50291: Initialization error: The reference to the property {1} in Workflownode {0} is null.
@@ -1448,7 +1450,7 @@ namespace gip.bso.manufacturing
 
             if (!IsBinChangeAvailable)
             {
-                bool? isBinChangeAvailable = pwNode.ValueT.ACUrlCommand("!IsBinChangeLoopNodeAvailable") as bool?;
+                bool? isBinChangeAvailable = pwNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.IsBinChangeLoopNodeAvailable)) as bool?;
                 IsBinChangeAvailable = isBinChangeAvailable ?? false;
             }
 
@@ -1474,7 +1476,7 @@ namespace gip.bso.manufacturing
                 Messages.Error(this, message, true);
             }
 
-            _NextTaskInfoProperty = pwNode.ValueT.GetPropertyNet("ManualWeihgingNextTask") as IACContainerTNet<ManualWeighingTaskInfo>;
+            _NextTaskInfoProperty = pwNode.ValueT.GetPropertyNet(nameof(PWManualWeighing.ManualWeighingNextTask)) as IACContainerTNet<ManualWeighingTaskInfo>;
             if (_NextTaskInfoProperty != null)
             {
                 NextTaskInfo = _NextTaskInfoProperty.ValueT;
@@ -1508,7 +1510,7 @@ namespace gip.bso.manufacturing
             if (pwNode == null)
                 return null;
 
-            ACValue acValue = pwNode.ACUrlCommand("WeighingComponentsInfo\\ValueT") as ACValue;
+            ACValue acValue = pwNode.ACUrlCommand(nameof(PWManualWeighing.WeighingComponentsInfo) +"\\"+ Const.ValueT) as ACValue;
             Dictionary<string, string> valueList = acValue?.Value as Dictionary<string, string>;
 
             if (valueList != null && valueList.Any())
@@ -1536,7 +1538,7 @@ namespace gip.bso.manufacturing
 
         public void LoadPWConfiguration(IACComponentPWNode pwNode)
         {
-            ACMethod acMethod = pwNode?.ACUrlCommand("MyConfiguration") as ACMethod;
+            ACMethod acMethod = pwNode?.ACUrlCommand(nameof(PWManualWeighing.MyConfiguration)) as ACMethod;
             if (acMethod == null)
             {
                 //Error50288: The configuration(ACMethod) for the workflow node cannot be found!
@@ -2132,7 +2134,7 @@ namespace gip.bso.manufacturing
 
             if (scaleObjects.Count > 1)
             {
-                string activeScaleACUrl = CurrentPAFManualWeighing?.ACUrlCommand("!GetActiveScaleObjectACUrl") as string;
+                string activeScaleACUrl = CurrentPAFManualWeighing?.ExecuteMethod(nameof(PAFManualWeighing.GetActiveScaleObjectACUrl)) as string;
                 if (!string.IsNullOrEmpty(activeScaleACUrl))
                 {
                     DelegateToMainThread((object state) =>
@@ -2310,7 +2312,7 @@ namespace gip.bso.manufacturing
 
             _ACPickingManager = ACRefToPickingManager();
 
-            var result = currentProcessModule.ACUrlCommand("!GetDosableComponents", false) as SingleDosingItems;
+            var result = currentProcessModule.ExecuteMethod(nameof(PAProcessModuleVB.GetDosableComponents), false) as SingleDosingItems;
             if (result == null)
             {
                 //Error50433: Can not get dosable components for single dosing.
@@ -2498,19 +2500,19 @@ namespace gip.bso.manufacturing
                 //            return Global.ControlModes.Enabled;
                 //        return Global.ControlModes.Disabled;
                 //    }
-                case "SelectedFacilityCharge":
+                case nameof(SelectedFacilityCharge):
                     {
                         if (ShowSelectFacilityLotInfo)
                             return Global.ControlModes.Enabled;
                         return Global.ControlModes.Disabled;
                     }
-                case "EnterLotManually":
+                case nameof(EnterLotManually):
                     {
                         if (EnterLotManually)
                             return Global.ControlModes.Enabled;
                         return Global.ControlModes.Collapsed;
                     }
-                case "CurrentScaleObject":
+                case nameof(CurrentScaleObject):
                     {
                         if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
                             return Global.ControlModes.Disabled;
@@ -2576,7 +2578,7 @@ namespace gip.bso.manufacturing
                 if (onlyCheck)
                 {
                     double parsedValue = 0;
-                    string storedValue = currentPWNode.ACUrlCommand("InterdischargingScaleActualValue") as string;
+                    string storedValue = currentPWNode.ACUrlCommand(nameof(PWManualWeighing.InterdischargingScaleActualValue)) as string;
                     if (!string.IsNullOrEmpty(storedValue) && double.TryParse(storedValue, out parsedValue))
                     {
                         storedActualValue = parsedValue;
@@ -2584,7 +2586,7 @@ namespace gip.bso.manufacturing
                 }
                 else
                 {
-                    storedActualValue = currentPWNode.ExecuteMethod("InterdischargingStart") as double?;
+                    storedActualValue = currentPWNode.ExecuteMethod(nameof(PWManualWeighing.InterdischargingStart)) as double?;
                 }
 
                 if (!storedActualValue.HasValue)
@@ -2642,7 +2644,7 @@ namespace gip.bso.manufacturing
 
             if (currentPWNode != null)
             {
-                currentPWNode.ExecuteMethod(PWManualWeighing.MNCompleteInterdischarging);
+                currentPWNode.ExecuteMethod(nameof(PWManualWeighing.CompleteInterdischarging));
             }
 
             InInterdischargingQ = null;
@@ -2666,124 +2668,124 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case "Weigh":
+                case nameof(Weigh):
                     Weigh();
                     return true;
-                case "IsEnabledWeigh":
+                case nameof(IsEnabledWeigh):
                     result = IsEnabledWeigh();
                     return true;
-                case "Acknowledge":
+                case nameof(Acknowledge):
                     Acknowledge();
                     return true;
-                case "IsEnabledAcknowledge":
+                case nameof(IsEnabledAcknowledge):
                     result = IsEnabledAcknowledge();
                     return true;
-                case "Tare":
+                case nameof(Tare):
                     Tare();
                     return true;
-                case "IsEnabledTare":
+                case nameof(IsEnabledTare):
                     result = IsEnabledTare();
                     return true;
-                case "LotChange":
+                case nameof(LotChange):
                     LotChange();
                     return true;
-                case "IsEnabledLotChange":
+                case nameof(IsEnabledLotChange):
                     result = IsEnabledLotChange();
                     return true;
-                case "BinChange":
+                case nameof(BinChange):
                     BinChange();
                     return true;
-                case "IsEnabledBinChange":
+                case nameof(IsEnabledBinChange):
                     result = IsEnabledBinChange();
                     return true;
-                case "Abort":
+                case nameof(Abort):
                     Abort();
                     return true;
-                case "IsEnabledAbort":
+                case nameof(IsEnabledAbort):
                     result = IsEnabledAbort();
                     return true;
-                case "ApplyLot":
+                case nameof(ApplyLot):
                     ApplyLot();
                     return true;
-                case "IsEnabledApplyLot":
+                case nameof(IsEnabledApplyLot):
                     result = IsEnabledApplyLot();
                     return true;
-                case "AddKg":
+                case nameof(AddKg):
                     AddKg();
                     return true;
-                case "IsEnabledAddKg":
+                case nameof(IsEnabledAddKg):
                     result = IsEnabledAddKg();
                     return true;
-                case "RemoveKg":
+                case nameof(RemoveKg):
                     RemoveKg();
                     return true;
-                case "IsEnabledRemoveKg":
+                case nameof(IsEnabledRemoveKg):
                     result = IsEnabledRemoveKg();
                     return true;
-                case "RefreshMaterialOrFC_F":
+                case nameof(RefreshMaterialOrFC_F):
                     RefreshMaterialOrFC_F();
                     return true;
-                case "IsEnabledRefreshMaterialOrFC_F":
+                case nameof(IsEnabledRefreshMaterialOrFC_F):
                     result = IsEnabledRefreshMaterialOrFC_F();
                     return true;
 
-                case "OpenSettings":
+                case nameof(OpenSettings):
                     OpenSettings();
                     return true;
 
-                case "IsEnabledOpenSettings":
+                case nameof(IsEnabledOpenSettings):
                     result = IsEnabledOpenSettings();
                     return true;
 
-                case "RemoveLastUsedLot":
+                case nameof(RemoveLastUsedLot):
                     RemoveLastUsedLot();
                     return true;
 
-                case "IsEnabledRemoveLastUsedLot":
+                case nameof(IsEnabledRemoveLastUsedLot):
                     result = IsEnabledRemoveLastUsedLot();
                     return true;
 
-                case "ShowSingleDosingDialog":
+                case nameof(ShowSingleDosingDialog):
                     ShowSingleDosingDialog();
                     return true;
 
-                case "IsEnabledShowSingleDosingDialog":
+                case nameof(IsEnabledShowSingleDosingDialog):
                     result = IsEnabledShowSingleDosingDialog();
                     return true;
 
-                case "SingleDosingStart":
+                case nameof(SingleDosingStart):
                     SingleDosingStart();
                     return true;
 
-                case "IsEnabledSingleDosingStart":
+                case nameof(IsEnabledSingleDosingStart):
                     result = IsEnabledSingleDosingStart();
                     return true;
 
-                case "AbortComponent":
+                case nameof(AbortComponent):
                     AbortComponent();
                     return true;
-                case "AbortComponentEmptyingMode":
+                case nameof(AbortComponentEmptyingMode):
                     AbortComponentEmptyingMode();
                     return true;
-                case "SwitchEmptyingMode":
+                case nameof(SwitchEmptyingMode):
                     SwitchEmptyingMode();
                     return true;
-                case "CloseAbortDialog":
+                case nameof(CloseAbortDialog):
                     CloseAbortDialog();
                     return true;
-                case "IsEnabledCloseAbortDialog":
+                case nameof(IsEnabledCloseAbortDialog):
                     result = IsEnabledCloseAbortDialog();
                     return true;
-                case "Interdischarge":
+                case nameof(Interdischarge):
                     Interdischarge();
                     return true;
-                case "IsEnabledInterdischarge":
+                case nameof(IsEnabledInterdischarge):
                     result = IsEnabledInterdischarge();
                     return true;
-                case "CompleteInterdischarging":
+                case nameof(CompleteInterdischarging):
                     CompleteInterdischarging();
                     return true;
-                case "IsEnabledCompleteInterdischarging":
+                case nameof(IsEnabledCompleteInterdischarging):
                     result = IsEnabledCompleteInterdischarging();
                     return true;
 

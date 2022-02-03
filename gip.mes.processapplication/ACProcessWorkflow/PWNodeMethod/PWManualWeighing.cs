@@ -126,9 +126,6 @@ namespace gip.mes.processapplication
 
         #region Const
 
-        public const string MNCompleteWeighing = "CompleteWeighing";
-        public const string MNInterdischargingStart = "InterdischargingStart";
-        public const string MNCompleteInterdischarging = "CompleteInterdischarging";
         public const string MaterialConfigLastUsedLotKeyACUrl = "ManWeighLastUsedLot";
 
         #endregion
@@ -232,14 +229,14 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACPropertyBindingTarget(IsPersistable = true)]
+        [ACPropertyBindingSource(IsPersistable = true)]
         public IACContainerTNet<double> InterdischargingScaleActualWeight
         {
             get;
             set;
         }
 
-        [ACPropertyBindingTarget(IsPersistable = true)]
+        [ACPropertyBindingSource(IsPersistable = true)]
         public IACContainerTNet<string> InterdischargingScaleActualValue
         {
             get;
@@ -622,7 +619,7 @@ namespace gip.mes.processapplication
         #endregion
 
         [ACPropertyBindingSource]
-        public IACContainerTNet<ManualWeighingTaskInfo> ManualWeihgingNextTask
+        public IACContainerTNet<ManualWeighingTaskInfo> ManualWeighingNextTask
         {
             get;
             set;
@@ -1320,7 +1317,7 @@ namespace gip.mes.processapplication
 
             if (actualQuantity > 0.000001)
             {
-                var msgBooking = DoManualWeighingBooking(actualQuantity, false, isConsumed, facilityCharge);
+                var msgBooking = DoManualWeighingBooking(actualQuantity, false, isConsumed, facilityCharge, true);
                 if (msgBooking != null)
                 {
                     Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
@@ -2263,7 +2260,7 @@ namespace gip.mes.processapplication
         {
             if (weighingComponent != null)
             {
-                ManualWeihgingNextTask.ValueT = ManualWeighingTaskInfo.None;
+                ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.None;
                 acMethod["TargetQuantity"] = weighingComponent.TargetQuantity;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
                 acMethod["PLPosRelation"] = weighingComponent.PLPosRelation;
@@ -2659,7 +2656,7 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        public Msg DoManualWeighingBooking(double? actualQuantity, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge)
+        public Msg DoManualWeighingBooking(double? actualQuantity, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, bool isForLotChange = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -2741,9 +2738,12 @@ namespace gip.mes.processapplication
                         if(comp != null)
                             targetQuantity = comp.TargetQuantity;
 
-                        double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
-                        if (actualQuantity > calcActualQuantity)
-                            actualQuantity = actualQuantity - calcActualQuantity;
+                        if (isForLotChange)
+                        {
+                            double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
+                            if (actualQuantity > calcActualQuantity)
+                                actualQuantity = actualQuantity - calcActualQuantity;
+                        }
 
                         if (actualQuantity > 0.000001)
                         {
