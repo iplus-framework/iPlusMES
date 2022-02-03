@@ -65,6 +65,8 @@
     <Folder Include="build" />
     <Folder Include="TandTv3" />
     <Folder Include="TandTv3\ProdOrderInputOutput" />
+    <Folder Include="build\udpRecalcActualQuantity" />
+    <Folder Include="build\udfConvertToUnit" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Programmability\udp\udpACClassDeleteVB.sql" />
@@ -73,6 +75,10 @@
     <None Include="Programmability\udw\ProdOrderConnectionsView.sql" />
     <None Include="linq\SplitSQL.linq" />
     <None Include="TandTv3\TableStatus.txt" />
+    <None Include="build\udpRecalcActualQuantity\udpRecalcActualQuantity-build.sql" />
+    <None Include="build\udfConvertToUnit\udfConvertToUnit-build.sql" />
+    <None Include="build\udfConvertToUnit\udfConvertToUnit-build2.sql" />
+    <None Include="build\udfConvertToUnit\test.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Programmability\udf\udf_IsTimeSpanActual.sql" />
