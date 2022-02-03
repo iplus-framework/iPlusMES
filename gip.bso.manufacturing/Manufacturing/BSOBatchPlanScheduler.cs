@@ -164,7 +164,7 @@ namespace gip.bso.manufacturing
 
             if (offsetToEndTime != null)
                 schedulerPartslist.OffsetToEndTime = (TimeSpan)offsetToEndTime.Value;
-            //schedulerPartslist.SelectFirstConversionUnit();
+            schedulerPartslist.SelectFirstConversionUnit();
         }
 
         private TimeSpan? GetExpectedBatchEndTime(WizardSchedulerPartslist wizardSchedulerPartslist)
@@ -3199,7 +3199,7 @@ namespace gip.bso.manufacturing
             item.Partslist = partslist;
             item.PartslistNo = partslist.PartslistNo;
             item.PartslistName = partslist.PartslistName;
-            //item.SelectFirstConversionUnit();
+            item.SelectFirstConversionUnit();
             item.Sn = sn;
             if (targetQuantityUOM > Double.Epsilon)
             {
