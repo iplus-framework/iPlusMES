@@ -2191,7 +2191,7 @@ namespace gip.bso.manufacturing
             FactoryBatchPlans(wizardSchedulerPartslist, ref programNo, out generatedBatchPlans);
         }
 
-        private void MoveBatchSortOrderCorrect(ObservableCollection<ProdOrderBatchPlan> prodOrderBatchPlans)
+        private void MoveBatchSortOrderCorrect(IEnumerable<ProdOrderBatchPlan> prodOrderBatchPlans)
         {
             int nr = 0;
             foreach (var item in prodOrderBatchPlans)
@@ -2581,6 +2581,7 @@ namespace gip.bso.manufacturing
             List<Guid> groupsForRefresh = new List<Guid>();
 
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            List<ProdOrderBatchPlan> notSelected = ProdOrderBatchPlanList.Where(c => !c.IsSelected).OrderBy(c => c.Sequence).ToList();
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
                 batchPlan.AutoRefresh();
             List<ProdOrderPartslist> partslists = selectedBatches.Select(c => c.ProdOrderPartslist).ToList();
@@ -2609,11 +2610,15 @@ namespace gip.bso.manufacturing
 
             MaintainProdOrderState(prodOrders, mDProdOrderStateCancelled, mDProdOrderStateCompleted);
 
+            MoveBatchSortOrderCorrect(notSelected);
+
             MsgWithDetails saveMsg = saveMsg = DatabaseApp.ACSaveChanges();
             if (saveMsg != null)
                 SendMessage(saveMsg);
 
             LoadProdOrderBatchPlanList();
+            OnPropertyChanged("ProdOrderBatchPlanList");
+            OnPropertyChanged("ProdOrderPartslistList");
             if (!IsBSOTemplateScheduleParent)
             {
                 if (groupsForRefresh.Any())
