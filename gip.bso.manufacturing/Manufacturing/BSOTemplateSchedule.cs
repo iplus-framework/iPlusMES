@@ -496,7 +496,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Root.Messages.Info(this, "Info50074");
+                // Root.Messages.Info(this, "Info50074");
             }
         }
 
