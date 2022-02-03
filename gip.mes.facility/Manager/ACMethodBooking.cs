@@ -174,6 +174,7 @@ namespace gip.mes.facility
             ACMethodBooking acMethod = from as ACMethodBooking;
             if (acMethod == null)
                 return;
+            OutwardFacilityChargeList = acMethod.OutwardFacilityChargeList;
         }
 
         public override object Clone()
@@ -1048,6 +1049,12 @@ namespace gip.mes.facility
                 }
                 acValue.Value = value;
             }
+        }
+
+        public IList<FacilityCharge> OutwardFacilityChargeList
+        {
+            get;
+            set;
         }
 
         [ACPropertyInfo(9999, "", "en{'Storage Location (Outward Posting)'}de{'Lagerort (Abgangsbuchung)'}", Const.ContextDatabase + "\\" + Facility.ClassName)]
@@ -4177,7 +4184,9 @@ namespace gip.mes.facility
                 }
                 if (InwardFacility == null)
                 {
-                    if (IsLotManaged && OutwardFacilityLot == null
+                    if (IsLotManaged 
+                        && OutwardFacilityChargeList == null
+                        && OutwardFacilityLot == null
                         && (!OutwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any()
                             || OutwardFacility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer)
                         )
