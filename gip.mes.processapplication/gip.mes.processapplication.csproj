@@ -61,6 +61,7 @@
     <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFMixing.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMBeltscale.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMContinuosfurnace.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMWorkPlaceGeneric.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMDryer.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMExtruder.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMFlowmeter.cs" />
@@ -94,6 +96,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAMTank.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskGeneric.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWTemperature.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskScanBase.cs" />
     <Compile Include="ACProcessWorkflow\PWGroupVB.cs" />
@@ -211,6 +214,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2021-11-15 10-34_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-02-03 17-55_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
