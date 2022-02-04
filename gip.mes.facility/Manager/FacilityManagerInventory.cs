@@ -94,15 +94,10 @@ namespace gip.mes.facility
                     }
                     else
                     {
-                        List<FacilityInventoryPos> positionsWithNewQuantity = positions
-                            .Where(c =>
-                            c.NotAvailable
-                            ||
-                            (
-                                c.NewStockQuantity != null
-                                && (Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > Double.Epsilon)
-                            )
-                        ).ToList();
+                        List<FacilityInventoryPos> positionsWithNewQuantity = positions.Where(c => c.NotAvailable
+                                                                                               || (c.NewStockQuantity != null 
+                                                                                                   && (Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > Double.Epsilon)))
+                                                                                       .ToList();
                         foreach (FacilityInventoryPos facilityInventoryPos in positionsWithNewQuantity)
                         {
                             nr++;
