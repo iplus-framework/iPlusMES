@@ -597,5 +597,126 @@ namespace gip.mes.webservices
 
             return new WSResponse<MsgWithDetails>(result);
         }
+
+        public WSResponse<MsgWithDetails> BookAndFinishPickingOrder(PickingWorkplace pickingWorkplace)
+        {
+            if (pickingWorkplace == null)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "pickingWorkplace is null."));
+            }
+
+            MsgWithDetails result = new MsgWithDetails();
+
+            try
+            {
+                using(Database db = new Database())
+                using (DatabaseApp dbApp = new DatabaseApp(db))
+                {
+                    var subResponse = SetDatabaseUserName<MsgWithDetails>(dbApp);
+                    if (subResponse != null)
+                        return subResponse;
+                    datamodel.Picking picking = dbApp.Picking.FirstOrDefault(c => c.PickingID == pickingWorkplace.PickingID);
+                    if (picking == null)
+                    {
+                        //TODO: message
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
+                    }
+
+                    if (picking.PickingType != GlobalApp.PickingType.Issue)
+                    {
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "This option is only available for issue picking"));
+                    }
+
+                    core.datamodel.ACClass workplace = db.ACClass.FirstOrDefault(c => c.ACClassID == pickingWorkplace.WorkplaceID);
+                    if (workplace == null)
+                    {
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Workplace with ID: not exists in the database."));
+                    }
+
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
+                    ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
+                    FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                    ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+                    if (pickingManger == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+
+                    var materialConfigs = dbApp.MaterialConfig.Where(c => c.VBiACClassID == pickingWorkplace.WorkplaceID).ToArray();
+                    if (materialConfigs == null || !materialConfigs.Any())
+                    {
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Activated quants are not found, please check if you activate all quants!"));
+                    }
+
+                    foreach (datamodel.PickingPos pPos in picking.PickingPos_Picking)
+                    {
+                        if (pPos.MDDelivPosLoadState.DelivPosLoadState < MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+                        {
+                            ACMethodBooking book = new ACMethodBooking();
+
+                            MaterialConfig mc = materialConfigs.FirstOrDefault(c => c.MaterialID == pPos.Material.MaterialID);
+                                
+                            if (mc == null)
+                            {
+                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The quant for material - is not activated."));
+                                continue;
+                            }
+
+                            Guid? fcID = mc.Value as Guid?;
+                            if (!fcID.HasValue)
+                            {
+                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The activated quant for material - is not valid."));
+                                continue;
+                            }
+
+                            datamodel.FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fcID.Value);
+                            if (fc == null || fc.NotAvailable)
+                            {
+                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The activated quant for material is not available or missing!"));
+                                continue;
+                            }
+
+                            if (pPos.RemainingDosingQuantityUOM > 0)
+                                continue;
+
+                            double reqQuantity = Math.Abs(pPos.RemainingDosingQuantityUOM);
+                            if (reqQuantity < 0.000001)
+                                continue;
+
+                            if (reqQuantity > fc.AvailableQuantity)
+                            {
+                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The required quantity is lager than available quantity."));
+                                continue;
+                            }
+
+                            ACMethodBooking aCMethodBooking = new ACMethodBooking();
+                            aCMethodBooking.VirtualMethodName = gip.mes.datamodel.GlobalApp.FBT_PickingOutward;
+                            aCMethodBooking.PickingPosID = pPos.PickingPosID;
+                            aCMethodBooking.OutwardQuantity = Math.Abs(pPos.RemainingDosingQuantityUOM);
+                            aCMethodBooking.OutwardFacilityID = fc.Facility.FacilityID;
+                            aCMethodBooking.OutwardFacilityChargeID = fc.FacilityChargeID;
+                            aCMethodBooking.InwardQuantity = Math.Abs(pPos.RemainingDosingQuantityUOM);
+
+                            MsgWithDetails resultMsg = Book(aCMethodBooking, dbApp, facManager, myServiceHost);
+                        }
+                    }
+
+                    if (result != null && result.MsgDetailsCount > 0)
+                    {
+                        return new WSResponse<MsgWithDetails>(result);
+                    }
+
+                    DeliveryNote deliveryNote = null;
+                    InOrder inOrder = null;
+                    OutOrder outOrder = null;
+                    result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, out deliveryNote, out inOrder, out outOrder, false);
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+
+            return new WSResponse<MsgWithDetails>(result);
+        }
     }
 }

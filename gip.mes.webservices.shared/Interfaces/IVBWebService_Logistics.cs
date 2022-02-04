@@ -112,5 +112,13 @@ namespace gip.mes.webservices
         Task<WSResponse<MsgWithDetails>> FinishPickingOrderWithoutCheckAsync(Guid pickingID);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = VBWebServiceConst.UriPicking_FinishAndBook, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<MsgWithDetails> BookAndFinishPickingOrder(PickingWorkplace pickingWorkplace);
+#elif NETSTANDARD
+        Task<WSResponse<MsgWithDetails>> BookAndFinishPickingOrderAsync(PickingWorkplace pickingWorkplace);
+#endif
+
     }
 }

@@ -47,6 +47,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\PickingMaterial.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\PickingPos.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\PickingPosList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Logistics\PickingWorkplace.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderBatch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderPartslist.cs" />
