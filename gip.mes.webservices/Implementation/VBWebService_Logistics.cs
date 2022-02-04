@@ -671,19 +671,7 @@ namespace gip.mes.webservices
                     datamodel.Picking picking = dbApp.Picking.FirstOrDefault(c => c.PickingID == pickingWorkplace.PickingID);
                     if (picking == null)
                     {
-                        //TODO: message
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
-                    }
-
-                    if (picking.PickingType != GlobalApp.PickingType.Issue)
-                    {
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "This option is only available for issue picking"));
-                    }
-
-                    core.datamodel.ACClass workplace = db.ACClass.FirstOrDefault(c => c.ACClassID == pickingWorkplace.WorkplaceID);
-                    if (workplace == null)
-                    {
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Workplace with ID: not exists in the database."));
                     }
 
                     PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
@@ -694,37 +682,36 @@ namespace gip.mes.webservices
                     if (pickingManger == null)
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
 
+                    if (picking.PickingType != GlobalApp.PickingType.Issue)
+                    {
+                        //Error50546 :This picking option is only available for a issue.
+                        var msg = new Msg(pickingManger, eMsgLevel.Error, nameof(ACPickingManager), nameof(BookAndFinishPickingOrder)+"(10)", 688, "Error50546");
+                        return new WSResponse<MsgWithDetails>(null, msg);
+                    }
+
+                    core.datamodel.ACClass workplace = db.ACClass.FirstOrDefault(c => c.ACClassID == pickingWorkplace.WorkplaceID);
+                    if (workplace == null)
+                    {
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Workplace with ID: not exists in the database."));
+                    }
+
                     var materialConfigs = dbApp.MaterialConfig.Where(c => c.VBiACClassID == pickingWorkplace.WorkplaceID).ToArray();
                     if (materialConfigs == null || !materialConfigs.Any())
                     {
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Activated quants are not found, please check if you activate all quants!"));
+                        //Error50547: Activated quants are not found, please check are you activate all quants!
+                        var msg = new Msg(pickingManger, eMsgLevel.Error, nameof(ACPickingManager), nameof(BookAndFinishPickingOrder) + "(20)", 688, "Error50547");
+                        return new WSResponse<MsgWithDetails>(null, msg);
                     }
 
                     foreach (datamodel.PickingPos pPos in picking.PickingPos_Picking)
                     {
                         if (pPos.MDDelivPosLoadState.DelivPosLoadState < MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
                         {
-                            ACMethodBooking book = new ACMethodBooking();
-
-                            MaterialConfig mc = materialConfigs.FirstOrDefault(c => c.MaterialID == pPos.Material.MaterialID);
-                                
-                            if (mc == null)
+                            datamodel.FacilityCharge fc = null;
+                            Msg msg = pickingManger.GetActivatedFacilityChargeForBooking(dbApp, pPos, materialConfigs, out fc);
+                            if (msg != null)
                             {
-                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The quant for material - is not activated."));
-                                continue;
-                            }
-
-                            Guid? fcID = mc.Value as Guid?;
-                            if (!fcID.HasValue)
-                            {
-                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The activated quant for material - is not valid."));
-                                continue;
-                            }
-
-                            datamodel.FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fcID.Value);
-                            if (fc == null || fc.NotAvailable)
-                            {
-                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The activated quant for material is not available or missing!"));
+                                result.AddDetailMessage(msg);
                                 continue;
                             }
 
@@ -735,9 +722,11 @@ namespace gip.mes.webservices
                             if (reqQuantity < 0.000001)
                                 continue;
 
-                            if (reqQuantity > fc.AvailableQuantity)
+                            Msg msgQ = pickingManger.ValidateQuantityForBooking(reqQuantity, fc.AvailableQuantity, pPos.Material.MaterialName1);
+
+                            if (msgQ != null)
                             {
-                                result.AddDetailMessage(new Msg(eMsgLevel.Error, "The required quantity is lager than available quantity."));
+                                result.AddDetailMessage(msgQ);
                                 continue;
                             }
 
@@ -750,6 +739,10 @@ namespace gip.mes.webservices
                             aCMethodBooking.InwardQuantity = Math.Abs(pPos.RemainingDosingQuantityUOM);
 
                             MsgWithDetails resultMsg = Book(aCMethodBooking, dbApp, facManager, myServiceHost);
+                            if (resultMsg != null && resultMsg.MsgDetailsCount > 0)
+                            {
+                                resultMsg.AddDetailMessage(new Msg(eMsgLevel.Error, resultMsg.DetailsAsText));
+                            }
                         }
                     }
 

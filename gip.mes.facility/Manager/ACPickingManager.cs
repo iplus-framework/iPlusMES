@@ -997,6 +997,47 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
+        public Msg GetActivatedFacilityChargeForBooking(DatabaseApp dbApp, PickingPos pPos, MaterialConfig[] materialConfigs, out FacilityCharge fc)
+        {
+            fc = null;
+
+            MaterialConfig mc = materialConfigs.FirstOrDefault(c => c.MaterialID == pPos.Material.MaterialID);
+
+            string materialName = pPos.Material.MaterialName1;
+
+            if (mc == null)
+            {
+                //Error50548: The quant for {0} is not acitvated.
+                return new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(GetActivatedFacilityChargeForBooking) + "(10)", 1009, "Error50548", materialName);
+            }
+
+            Guid? fcID = mc.Value as Guid?;
+            if (!fcID.HasValue)
+            {
+                //Error50549: The quant for {0} is not valid.
+                return new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(GetActivatedFacilityChargeForBooking) + "(20)", 1018, "Error50549", materialName);
+            }
+
+            fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fcID.Value);
+            if (fc == null || fc.NotAvailable)
+            {
+                //Error50550: The activated quant for {0} is not available or missing!
+                return new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(GetActivatedFacilityChargeForBooking) + "(30)", 1024, "Error50550", materialName);
+            }
+
+            return null;
+        }
+
+        public Msg ValidateQuantityForBooking(double reqQuantity, double availableQuantity, string materialName)
+        {
+            if (reqQuantity > availableQuantity)
+            { 
+                //Error50551: The required quantity is lager than available quantity for {0}.
+                return new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(ValidateQuantityForBooking) + "(10)", 1038, "Error50551", materialName);
+            }
+            return null;
+        }
+
         #endregion
 
         #region Validation
@@ -1571,6 +1612,9 @@ namespace gip.mes.facility
 
             return isRelated;
         }
+
+        
+
         #endregion
 
         #region MirrorPicking
