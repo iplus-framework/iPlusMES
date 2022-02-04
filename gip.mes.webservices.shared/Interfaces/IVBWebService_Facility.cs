@@ -70,25 +70,25 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriFacilityChargeNew, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<FacilityCharge> CreateFacilityCharge(FacilityCharge facilityCharge);
+        WSResponse<FacilityCharge> CreateFacilityCharge(FacilityChargeParamItem facilityCharge);
 #elif NETSTANDARD
-        Task<WSResponse<FacilityCharge>> CreateFacilityChargeAsync(FacilityCharge facilityCharge);
+        Task<WSResponse<FacilityCharge>> CreateFacilityChargeAsync(FacilityChargeParamItem facilityCharge);
 #endif
 
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriActivateFacilityCharge, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> ActivateFacilityCharge(FacilityChargeActivationItem activationItem);
+        WSResponse<bool> ActivateFacilityCharge(FacilityChargeParamItem activationItem);
 #elif NETSTANDARD
-        Task<WSResponse<bool>> ActivateFacilityChargeAsync(FacilityChargeActivationItem activationItem);
+        Task<WSResponse<bool>> ActivateFacilityChargeAsync(FacilityChargeParamItem activationItem);
 #endif
 
 #if NETFRAMEWORK
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriDeactivateFacilityCharge, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<bool> DeactivateFacilityCharge(FacilityChargeActivationItem deactivationItem);
+        WSResponse<bool> DeactivateFacilityCharge(FacilityChargeParamItem deactivationItem);
 #elif NETSTANDARD
-        Task<WSResponse<bool>> DeactivateFacilityChargeAsync(FacilityChargeActivationItem deactivationItem);
+        Task<WSResponse<bool>> DeactivateFacilityChargeAsync(FacilityChargeParamItem deactivationItem);
 #endif
 
         #endregion

@@ -413,7 +413,7 @@ namespace gip.mes.webservices
             };
         }
 
-        public WSResponse<FacilityCharge> CreateFacilityCharge(FacilityCharge facilityCharge)
+        public WSResponse<FacilityCharge> CreateFacilityCharge(FacilityChargeParamItem facilityCharge)
         {
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
             if (myServiceHost == null)
@@ -485,11 +485,25 @@ namespace gip.mes.webservices
                         return new WSResponse<FacilityCharge>(new Msg(bookResponse.MessageLevel, bookResponse.DetailsAsText));
                     }
 
-                    FacilityCharge fc = s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, acMethodBooking.InwardFacilityID.Value, 
-                                                                                        acMethodBooking.InwardMaterialID.Value,
-                                                                                        lot?.FacilityLotID, acMethodBooking.InwardSplitNo).FirstOrDefault();
+                    FacilityCharge fc = s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, acMethodBooking.InwardFacilityID.Value,
+                                                                    acMethodBooking.InwardMaterialID.Value,
+                                                                    lot?.FacilityLotID, acMethodBooking.InwardSplitNo).FirstOrDefault();
 
-                    return new WSResponse<FacilityCharge>(fc);
+                    Msg invMsg = null;
+                    if (facilityCharge.ParamID != Guid.Empty)
+                    {
+                        datamodel.FacilityInventory inv = dbApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityCharge.ParamID);
+                        if (inv != null && fc != null)
+                        {
+                            datamodel.FacilityInventoryPos iPos = datamodel.FacilityInventoryPos.NewACObject(dbApp, inv);
+                            iPos.FacilityChargeID = fc.FacilityChargeID;
+                            iPos.StockQuantity = fc.StockQuantity;
+
+                            invMsg = dbApp.ACSaveChanges();
+                        }
+                    }
+
+                    return new WSResponse<FacilityCharge>(fc, invMsg);
 
                 }
                 catch (Exception e)
@@ -501,7 +515,7 @@ namespace gip.mes.webservices
             }
         }
 
-        public WSResponse<bool> ActivateFacilityCharge(FacilityChargeActivationItem activationItem)
+        public WSResponse<bool> ActivateFacilityCharge(FacilityChargeParamItem activationItem)
         {
             if (activationItem == null)
             {
@@ -513,7 +527,7 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "In the parameter activationItem material is missing."));
             }
 
-            if (activationItem.WorkplaceID == Guid.Empty)
+            if (activationItem.ParamID == Guid.Empty)
             {
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
             }
@@ -522,8 +536,8 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    MaterialConfig mConfig = dbApp.MaterialConfig.FirstOrDefault(c => c.KeyACUrl == FacilityChargeActivationItem.FacilityChargeActivationKeyACUrl
-                                                                                   && c.VBiACClassID == activationItem.WorkplaceID
+                    MaterialConfig mConfig = dbApp.MaterialConfig.FirstOrDefault(c => c.KeyACUrl == FacilityChargeParamItem.FacilityChargeActivationKeyACUrl
+                                                                                   && c.VBiACClassID == activationItem.ParamID
                                                                                    && c.MaterialID == activationItem.Material.MaterialID);
 
                     if (mConfig == null)
@@ -535,8 +549,8 @@ namespace gip.mes.webservices
                         }
 
                         mConfig = MaterialConfig.NewACObject(dbApp, material);
-                        mConfig.KeyACUrl = FacilityChargeActivationItem.FacilityChargeActivationKeyACUrl;
-                        mConfig.VBiACClassID = activationItem.WorkplaceID;
+                        mConfig.KeyACUrl = FacilityChargeParamItem.FacilityChargeActivationKeyACUrl;
+                        mConfig.VBiACClassID = activationItem.ParamID;
                         mConfig.SetValueTypeACClass(dbApp.ContextIPlus.GetACType("Guid"));
 
                         dbApp.MaterialConfig.AddObject(mConfig);
@@ -559,7 +573,7 @@ namespace gip.mes.webservices
             }
         }
 
-        public WSResponse<bool> DeactivateFacilityCharge(FacilityChargeActivationItem deactivationItem)
+        public WSResponse<bool> DeactivateFacilityCharge(FacilityChargeParamItem deactivationItem)
         {
             if (deactivationItem == null)
             {
@@ -571,7 +585,7 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "In the parameter activationItem material is missing."));
             }
 
-            if (deactivationItem.WorkplaceID == Guid.Empty)
+            if (deactivationItem.ParamID == Guid.Empty)
             {
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
             }
@@ -580,8 +594,8 @@ namespace gip.mes.webservices
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    MaterialConfig mConfig = dbApp.MaterialConfig.FirstOrDefault(c => c.KeyACUrl == FacilityChargeActivationItem.FacilityChargeActivationKeyACUrl
-                                                                                   && c.VBiACClassID == deactivationItem.WorkplaceID
+                    MaterialConfig mConfig = dbApp.MaterialConfig.FirstOrDefault(c => c.KeyACUrl == FacilityChargeParamItem.FacilityChargeActivationKeyACUrl
+                                                                                   && c.VBiACClassID == deactivationItem.ParamID
                                                                                    && c.MaterialID == deactivationItem.Material.MaterialID);
 
                     if (mConfig == null)

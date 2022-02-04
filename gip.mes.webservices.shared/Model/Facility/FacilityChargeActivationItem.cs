@@ -6,17 +6,17 @@ using System.Text;
 namespace gip.mes.webservices
 {
     [DataContract(Name = "cFCAI")]
-    public class FacilityChargeActivationItem : FacilityCharge
+    public class FacilityChargeParamItem : FacilityCharge
     {
         public const string FacilityChargeActivationKeyACUrl = "FCActivationItem";
 
-        public FacilityChargeActivationItem() : base()
+        public FacilityChargeParamItem() : base()
         {
 
         }
 
         [DataMember(Name = "wID")]
-        public Guid WorkplaceID
+        public Guid ParamID
         {
             get;
             set;
