@@ -120,9 +120,13 @@ namespace gip.bso.logistics
             object companyNoOb = Parameters["CompanyNo"];
             string companyNo = null;
             if (companyNoOb != null)
+            {
                 companyNo = companyNoOb.ToString();
-            AccessFilterDeliveryAddress.NavACQueryDefinition.SetSearchValue("Company\\CompanyNo", Global.LogicalOperators.greaterThanOrEqual, companyNo);
-            AccessFilterDeliveryAddress.NavSearch();
+                AccessFilterDeliveryAddress.NavACQueryDefinition.SetSearchValue("Company\\CompanyNo", Global.LogicalOperators.equal, companyNo);
+                AccessFilterDeliveryAddress.NavSearch();
+                SelectedFilterDeliveryAddress = FilterDeliveryAddressList.FirstOrDefault();
+            }
+                
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
@@ -557,7 +561,7 @@ namespace gip.bso.logistics
             {
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
-                ACFilterItem acFilterCompanyNo = new ACFilterItem(Global.FilterTypes.filter, "Company\\CompanyNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
+                ACFilterItem acFilterCompanyNo = new ACFilterItem(Global.FilterTypes.filter, "Company\\CompanyNo", Global.LogicalOperators.equal, Global.Operators.and, null, true, true);
                 aCFilterItems.Add(acFilterCompanyNo);
 
                 return aCFilterItems;
