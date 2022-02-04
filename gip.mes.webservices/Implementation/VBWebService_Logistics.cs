@@ -598,6 +598,59 @@ namespace gip.mes.webservices
             return new WSResponse<MsgWithDetails>(result);
         }
 
+        public WSResponse<MsgWithDetails> FinishPickingOrdersByMaterial(BarcodeSequence pickingOrders)
+        {
+            if (pickingOrders == null)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "The parameter pickingOrders is null."));
+            }
+
+            try 
+            {
+                Guid[] pickingIDs = pickingOrders.Sequence.Where(c => c.Picking != null).Select(x => x.Picking.PickingID).ToArray();
+
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    var pickings = dbApp.Picking.Where(c => pickingIDs.Any(x => c.PickingID == x)).ToArray();
+
+                    MsgWithDetails mainResult = new MsgWithDetails();
+
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
+                    ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
+                    FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                    ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
+                    if (pickingManger == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+
+                    foreach (datamodel.Picking picking in pickings)
+                    {
+                        DeliveryNote deliveryNote = null;
+                        InOrder inOrder = null;
+                        OutOrder outOrder = null;
+                        var result = pickingManger.FinishOrder(dbApp, picking, inDeliveryNoteManager, outDeliveryNoteManager, facManager, 
+                                                               out deliveryNote, out inOrder, out outOrder, false);
+
+                        if (result != null && result.MsgDetailsCount > 0)
+                        {
+                            mainResult.AddDetailMessage(new Msg(eMsgLevel.Error, result.DetailsAsText));
+                        }
+                    }
+
+                    if (mainResult != null && mainResult.MsgDetailsCount > 0)
+                    {
+                        return new WSResponse<MsgWithDetails>(mainResult);
+                    }
+
+                    return new WSResponse<MsgWithDetails>(null, null);
+                }
+            }
+            catch (Exception e)
+            {
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+        }
+
         public WSResponse<MsgWithDetails> BookAndFinishPickingOrder(PickingWorkplace pickingWorkplace)
         {
             if (pickingWorkplace == null)

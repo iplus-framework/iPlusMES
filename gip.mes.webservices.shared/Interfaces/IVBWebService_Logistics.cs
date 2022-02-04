@@ -114,6 +114,16 @@ namespace gip.mes.webservices
 
 #if NETFRAMEWORK
         [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = VBWebServiceConst.UriPicking_FinishByMaterial, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<MsgWithDetails> FinishPickingOrdersByMaterial(BarcodeSequence pickingOrders);
+#elif NETSTANDARD
+        Task<WSResponse<MsgWithDetails>> FinishPickingOrdersByMaterialAsync(BarcodeSequence pickingOrders);
+#endif
+
+
+
+#if NETFRAMEWORK
+        [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = VBWebServiceConst.UriPicking_FinishAndBook, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<MsgWithDetails> BookAndFinishPickingOrder(PickingWorkplace pickingWorkplace);
 #elif NETSTANDARD

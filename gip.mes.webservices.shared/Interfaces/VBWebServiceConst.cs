@@ -59,6 +59,7 @@ namespace gip.mes.webservices
         public const string UriPickingPos_Material = "PickingPosByMaterial";
         public const string UriPicking_Finish = "PickingFinish";
         public const string UriPicking_FinishWithoutCheck = "PickingFinishWithoutCheck";
+        public const string UriPicking_FinishByMaterial = "PickingFinishByMaterial";
         public const string UriPicking_FinishAndBook = "PickingFinishAndBook";
 
         #endregion
