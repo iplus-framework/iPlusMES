@@ -26,7 +26,7 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWManualWeighing'}de{'PWManualWeighing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial, IACMyConfigCache
     {
-        public const string PWClassName = "PWManualWeighing";
+        public const string PWClassName = nameof(PWManualWeighing);
 
         #region c´tors
 
@@ -3207,66 +3207,48 @@ namespace gip.mes.processapplication
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            xmlChild = xmlACPropertyList[nameof(_LastOpenMaterial)];
             if (xmlChild == null)
             {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                xmlChild = doc.CreateElement(nameof(_LastOpenMaterial));
                 if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                    xmlChild.InnerText = _LastOpenMaterial?.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            xmlChild = xmlACPropertyList[nameof(CurrentOpenMaterial)];
             if (xmlChild == null)
             {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                xmlChild = doc.CreateElement(nameof(CurrentOpenMaterial));
                 if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                    xmlChild.InnerText = CurrentOpenMaterial?.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            xmlChild = xmlACPropertyList[nameof(CurrentFacilityCharge)];
             if (xmlChild == null)
             {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                xmlChild = doc.CreateElement(nameof(CurrentFacilityCharge));
                 if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                    xmlChild.InnerText = CurrentFacilityCharge?.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            xmlChild = xmlACPropertyList[nameof(HasAnyMaterialToProcess)];
             if (xmlChild == null)
             {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                xmlChild = doc.CreateElement(nameof(HasAnyMaterialToProcess));
                 if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                    xmlChild.InnerText = HasAnyMaterialToProcess.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            xmlChild = xmlACPropertyList[nameof(ManualWeighingNextTask)];
             if (xmlChild == null)
             {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                xmlChild = doc.CreateElement(nameof(ManualWeighingNextTask));
                 if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
-                xmlACPropertyList.AppendChild(xmlChild);
-            }
-
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
-            if (xmlChild == null)
-            {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
-                if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
-                xmlACPropertyList.AppendChild(xmlChild);
-            }
-
-            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
-            if (xmlChild == null)
-            {
-                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
-                if (xmlChild != null)
-                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                    xmlChild.InnerText = ManualWeighingNextTask.ValueT.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
         }
@@ -3303,37 +3285,37 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "StartWeighing":
+                case nameof(StartWeighing):
                     result = StartWeighing(acParameter[0] as Guid?, acParameter[1] as Guid?, acParameter[2] as Guid?, (bool)acParameter[3]);
                     return true;
-                case "CompleteWeighing":
+                case nameof(CompleteWeighing):
                     CompleteWeighing((double)acParameter[0], (bool)acParameter[1]);
                     return true;
-                case "TareScale":
+                case nameof(TareScale):
                     TareScale();
                     return true;
-                case "LotChange":
+                case nameof(LotChange):
                     LotChange(acParameter[0] as Guid?, (double)acParameter[1], (bool)acParameter[2], (bool)acParameter[3]);
                     return true;
-                case "BinChange":
+                case nameof(BinChange):
                     BinChange();
                     return true;
-                case "Abort":
+                case nameof(Abort):
                     Abort((bool)acParameter[0]);
                     return true;
-                case "OnApplyManuallyEnteredLot":
+                case nameof(OnApplyManuallyEnteredLot):
                     result = OnApplyManuallyEnteredLot(acParameter[0] as string, (Guid)acParameter[1]);
                     return true;
-                case "GetAvailableFacilityCharges":
+                case nameof(GetAvailableFacilityCharges):
                     result = GetAvailableFacilityCharges((Guid)acParameter[0]);
                     return true;
                 //case "GetAvailableFacilities":
                 //    result = GetAvailableFacilities((Guid)acParameter[0]);
                 //    return true;
-                case "SMResetting":
+                case nameof(SMResetting):
                     SMResetting();
                     return true;
-                case "IsBinChangeLoopNodeAvailable":
+                case nameof(IsBinChangeLoopNodeAvailable):
                     result = IsBinChangeLoopNodeAvailable();
                     return true;
             }

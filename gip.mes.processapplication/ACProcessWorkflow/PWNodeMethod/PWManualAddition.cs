@@ -23,7 +23,7 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWManualAddition'}de{'PWManualAddition'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWManualAddition : PWManualWeighing
     {
-        public new const string PWClassName = "PWManualAddition";
+        public new const string PWClassName = nameof(PWManualAddition);
 
         static PWManualAddition()
         {
@@ -63,6 +63,8 @@ namespace gip.mes.processapplication
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualAddition), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualAddition), ACStateConst.SMStarting, wrapper);
+
+            RegisterExecuteHandler(typeof(PWManualAddition), HandleExecuteACMethod_PWManualAddition);
         }
 
         public PWManualAddition(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -112,9 +114,23 @@ namespace gip.mes.processapplication
 
         public override bool IsManualWeighing => false;
 
+        public static bool HandleExecuteACMethod_PWManualAddition(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            return HandleExecuteACMethod_PWManualWeighing(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
         protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
         {
             base.DumpPropertyList(doc, xmlACPropertyList);
+
+            XmlElement xmlChild = xmlACPropertyList[nameof(OnlyAcknowledge)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(OnlyAcknowledge));
+                if (xmlChild != null)
+                    xmlChild.InnerText = OnlyAcknowledge.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
         }
     }
 }
