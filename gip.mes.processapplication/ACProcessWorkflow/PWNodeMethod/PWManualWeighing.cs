@@ -144,7 +144,7 @@ namespace gip.mes.processapplication
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
 
-        protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false;
+        protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false;
 
         private gip.core.datamodel.ACProgramLog _NewAddedProgramLog = null;
 
@@ -743,6 +743,9 @@ namespace gip.mes.processapplication
             {
                 _IsAborted = false;
             }
+
+            _IsLotChanged = false;
+
             base.SMIdle();
         }
 
@@ -1199,7 +1202,14 @@ namespace gip.mes.processapplication
                 if (actualQuantity > 0.000001 && actualQuantity < targetQuantity)
                 {
                     Guid? currentFacilityCharge = CurrentFacilityCharge;
-                    var msgBooking = DoManualWeighingBooking(actualQuantity, false, false, currentFacilityCharge, true);
+                    bool isForInterdischarge = true;
+                    if (_IsLotChanged)
+                    {
+                        isForInterdischarge = false;
+                        _IsLotChanged = false;
+                    }
+
+                    var msgBooking = DoManualWeighingBooking(actualQuantity, false, false, currentFacilityCharge, isForInterdischarge);
                     if (msgBooking != null)
                     {
                         Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
@@ -1337,6 +1347,7 @@ namespace gip.mes.processapplication
                 SaveLastUsedLot(newFacilityCharge, currentOpenMaterial);
                 WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
                 SetInfo(comp, WeighingComponentInfoType.SelectFC_F, newFacilityCharge, null, true, true);
+                _IsLotChanged = true;
             }
 
             return msgSet;
