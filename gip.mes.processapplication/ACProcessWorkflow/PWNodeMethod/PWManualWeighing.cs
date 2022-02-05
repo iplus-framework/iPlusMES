@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Xml;
 
 namespace gip.mes.processapplication
 {
@@ -1198,13 +1199,12 @@ namespace gip.mes.processapplication
                 if (actualQuantity > 0.000001 && actualQuantity < targetQuantity)
                 {
                     Guid? currentFacilityCharge = CurrentFacilityCharge;
-                    var msgBooking = DoManualWeighingBooking(actualQuantity, false, false, currentFacilityCharge);
+                    var msgBooking = DoManualWeighingBooking(actualQuantity, false, false, currentFacilityCharge, true);
                     if (msgBooking != null)
                     {
                         Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
                         OnNewAlarmOccurred(ProcessAlarm, msgBooking, false);
                         ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-
                         return;
                     }
 
@@ -2656,7 +2656,7 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        public Msg DoManualWeighingBooking(double? actualQuantity, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, bool isForLotChange = false)
+        public Msg DoManualWeighingBooking(double? actualQuantity, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, bool isForInterdischarge = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -2738,7 +2738,7 @@ namespace gip.mes.processapplication
                         if(comp != null)
                             targetQuantity = comp.TargetQuantity;
 
-                        if (isForLotChange)
+                        if (!isForInterdischarge)
                         {
                             double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
                             if (actualQuantity > calcActualQuantity)
@@ -3093,6 +3093,182 @@ namespace gip.mes.processapplication
             }
 
             TareScale();
+        }
+
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        {
+            base.DumpPropertyList(doc, xmlACPropertyList);
+
+            XmlElement xmlChild = xmlACPropertyList[nameof(InterdischargingScaleActualValue)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(InterdischargingScaleActualValue));
+                if (xmlChild != null)
+                    xmlChild.InnerText = InterdischargingScaleActualValue.ValueT;
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(InterdischargingScaleActualWeight)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(InterdischargingScaleActualWeight));
+                if (xmlChild != null)
+                    xmlChild.InnerText = InterdischargingScaleActualWeight.ValueT.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(MinWeightQuantity)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(MinWeightQuantity));
+                if (xmlChild != null)
+                    xmlChild.InnerText = MinWeightQuantity.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(ComponentsSeqFrom)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(ComponentsSeqFrom));
+                if (xmlChild != null)
+                    xmlChild.InnerText = ComponentsSeqFrom.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(ComponentsSeqTo)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(ComponentsSeqTo));
+                if (xmlChild != null)
+                    xmlChild.InnerText = ComponentsSeqTo.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(ScaleAutoTare)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(ScaleAutoTare));
+                if (xmlChild != null)
+                    xmlChild.InnerText = ScaleAutoTare.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(AutoSelectLot)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(AutoSelectLot));
+                if (xmlChild != null)
+                    xmlChild.InnerText = AutoSelectLot.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(AutoSelectLotPriority)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(AutoSelectLotPriority));
+                if (xmlChild != null)
+                    xmlChild.InnerText = AutoSelectLotPriority.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(LotValidation)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(LotValidation));
+                if (xmlChild != null)
+                    xmlChild.InnerText = LotValidation.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(AutoInsertQuantToStore)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(AutoInsertQuantToStore));
+                if (xmlChild != null)
+                    xmlChild.InnerText = AutoInsertQuantToStore.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(CurrentEndBatchPosKey)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(CurrentEndBatchPosKey));
+                if (xmlChild != null)
+                    xmlChild.InnerText = CurrentEndBatchPosKey?.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList[nameof(IncludeContainerStores)];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement(nameof(IncludeContainerStores));
+                if (xmlChild != null)
+                    xmlChild.InnerText = IncludeContainerStores.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
         }
 
         #endregion

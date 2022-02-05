@@ -485,7 +485,7 @@ namespace gip.bso.manufacturing
 
         private WeighingMaterial _SelectedWeighingMaterial;
         [ACPropertySelected(624, "WeighingMaterial")]
-        public WeighingMaterial SelectedWeighingMaterial
+        public virtual WeighingMaterial SelectedWeighingMaterial
         {
             get => _SelectedWeighingMaterial;
             set
@@ -520,7 +520,7 @@ namespace gip.bso.manufacturing
 
         private FacilityChargeItem _SelectedFacilityCharge;
         [ACPropertySelected(628, "FacilityCharge")]
-        public FacilityChargeItem SelectedFacilityCharge
+        public virtual FacilityChargeItem SelectedFacilityCharge
         {
             get => _SelectedFacilityCharge;
             set
@@ -1993,15 +1993,6 @@ namespace gip.bso.manufacturing
                                         SelectedFacilityCharge = fcItem;
                                     }
                                 }
-                                //else if (compInfo.Facility != null)
-                                //{
-                                //    var fItem = FacilityList.FirstOrDefault(c => c.FacilityID == compInfo.Facility);
-                                //    if (SelectedMaterialF_FC == null)
-                                //    {
-                                //        SelectedMaterialF_FC = fItem;
-                                //        OnPropertyChanged("SelectedMaterialF_FC");
-                                //    }
-                                //}
                             });
                             break;
                         }

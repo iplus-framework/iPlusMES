@@ -105,25 +105,25 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        public override double OnDetermineLotChangeActualQuantity()
-        {
-            if (OnlyAcknowledge && ScaleBckgrState == ScaleBackgroundState.InTolerance)
+        public override FacilityChargeItem SelectedFacilityCharge 
+        { 
+            get => base.SelectedFacilityCharge;
+            set
             {
-                double quantity = 0;
+                base.SelectedFacilityCharge = value;
 
-                if (SelectedWeighingMaterial.AddValue.HasValue)
+                if (OnlyAcknowledge && value != null)
                 {
-                    if (SelectedWeighingMaterial.AddValue < TargetWeight)
-                    {
-                        quantity = SelectedWeighingMaterial.AddValue.Value;
-                        SelectedWeighingMaterial.AddValue = null;
-                    }
+                    double calcQ = SelectedWeighingMaterial.TargetQuantity;
+                    if (ScaleDifferenceWeight < -0.00001)
+                        calcQ = Math.Abs(ScaleDifferenceWeight);
+
+                    if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > calcQ)
+                        SelectedWeighingMaterial.AddValue = calcQ;
+                    else
+                        SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
                 }
-
-                return quantity;
             }
-
-            return base.OnDetermineLotChangeActualQuantity();
         }
     }
 }

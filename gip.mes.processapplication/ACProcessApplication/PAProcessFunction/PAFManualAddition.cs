@@ -38,23 +38,23 @@ namespace gip.mes.processapplication
             }
         }
 
-        protected override bool CheckIsScaleInTol()
-        {
-            if (ManualAdditionPW != null && ManualAdditionPW.OnlyAcknowledge)
-            {
-                var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
-                double? targetQuantity = null;
-                if (targetQ != null)
-                    targetQuantity = targetQ.ParamAsDouble;
+        //protected override bool CheckIsScaleInTol()
+        //{
+        //    if (ManualAdditionPW != null && ManualAdditionPW.OnlyAcknowledge)
+        //    {
+        //        var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
+        //        double? targetQuantity = null;
+        //        if (targetQ != null)
+        //            targetQuantity = targetQ.ParamAsDouble;
 
-                if (targetQuantity.HasValue)
-                {
-                    ManuallyAddedQuantity.ValueT = targetQuantity.Value;
-                }
-            }
+        //        if (targetQuantity.HasValue)
+        //        {
+        //            ManuallyAddedQuantity.ValueT = targetQuantity.Value;
+        //        }
+        //    }
 
-            return base.CheckIsScaleInTol();
-        }
+        //    return base.CheckIsScaleInTol();
+        //}
 
         #endregion
 

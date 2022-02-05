@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.core.autocomponent;
 using System.Data;
+using System.Xml;
 
 namespace gip.mes.processapplication
 {
@@ -110,5 +111,10 @@ namespace gip.mes.processapplication
         }
 
         public override bool IsManualWeighing => false;
+
+        protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
+        {
+            base.DumpPropertyList(doc, xmlACPropertyList);
+        }
     }
 }
