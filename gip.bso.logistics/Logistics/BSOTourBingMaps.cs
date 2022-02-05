@@ -22,6 +22,7 @@ using Microsoft.Maps.MapControl.WPF;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace gip.bso.logistics
 {
@@ -455,7 +456,7 @@ namespace gip.bso.logistics
         /// Called when [property changed].
         /// </summary>
         /// <param name="propertyName">Name of the property.</param>
-        protected void OnPropertyChanged(string propertyName)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
             {

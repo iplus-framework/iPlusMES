@@ -15,6 +15,7 @@ using Microsoft.Win32;
 using System.Windows.Threading;
 using System.Reflection;
 using gip.core.layoutengine.Helperclasses;
+using System.Runtime.CompilerServices;
 
 namespace gip.mes.client
 {
@@ -416,7 +417,7 @@ namespace gip.mes.client
 #region INotifyPropertyChanged Member
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string name)
+        public void OnPropertyChanged([CallerMemberName] string name = "")
         {
             if (PropertyChanged != null)
             {

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1224,7 +1225,7 @@ namespace gip.mes.datamodel
         public event PropertyChangedEventHandler PropertyChanged;
 
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
             {

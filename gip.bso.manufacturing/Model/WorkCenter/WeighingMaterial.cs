@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using System.Runtime.CompilerServices;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using System;
@@ -111,7 +112,7 @@ namespace gip.bso.manufacturing
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        internal void OnPropertyChanged(string propertyName)
+        internal void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

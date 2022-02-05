@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,7 +67,7 @@ namespace gip.mes.processapplication
         public string ACCaption => this.ACIdentifier;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string name)
+        public void OnPropertyChanged([CallerMemberName] string name = "")
         {
             if (PropertyChanged != null)
             {

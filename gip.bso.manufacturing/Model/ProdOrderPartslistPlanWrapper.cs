@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Runtime.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -180,7 +181,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

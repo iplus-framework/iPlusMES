@@ -10,6 +10,7 @@ using gip.core.communication;
 using gip.core.communication.ISOonTCP;
 using System.Threading;
 using System.Xml;
+using System.Runtime.CompilerServices;
 
 namespace gip2006.variobatch.processapplication
 {
@@ -534,7 +535,7 @@ namespace gip2006.variobatch.processapplication
         #region Methods
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string name)
+        public void OnPropertyChanged([CallerMemberName] string name = "")
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)

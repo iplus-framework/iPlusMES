@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Objects;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace gip.bso.facility
@@ -214,7 +215,7 @@ namespace gip.bso.facility
             }
         }
 
-        public override void OnPropertyChanged(string name)
+        public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
             if (name == "ShowNotAvailable")

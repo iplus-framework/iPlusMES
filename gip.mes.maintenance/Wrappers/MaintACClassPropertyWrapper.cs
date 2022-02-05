@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +82,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "", 999)]
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (propertyName == "ACValueItem(MaxValue)\\Value")
             {

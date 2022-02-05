@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using System.Runtime.CompilerServices;
+using gip.core.datamodel;
 using vd = gip.mes.datamodel;
 using System;
 using System.ComponentModel;
@@ -166,7 +167,7 @@ namespace gip.mes.processapplication
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));

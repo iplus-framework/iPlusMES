@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using System.Runtime.CompilerServices;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -557,7 +558,7 @@ namespace gip.bso.manufacturing
                 || (Partslist == second.Partslist);
         }
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

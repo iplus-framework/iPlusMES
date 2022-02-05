@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TandTv3 = gip.mes.facility.TandTv3;
 
 namespace gip.mes.facility
@@ -596,7 +597,7 @@ namespace gip.mes.facility
         /// </summary>
         /// <param name="name">Hello</param>
         [ACMethodInfo("ACComponent", "en{'PropertyChanged'}de{'PropertyChanged'}", 9999)]
-        public virtual void OnPropertyChanged(string name)
+        public virtual void OnPropertyChanged([CallerMemberName] string name = "")
         {
             if (PropertyChanged != null)
             {

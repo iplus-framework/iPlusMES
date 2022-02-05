@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using System.Runtime.CompilerServices;
+using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -85,7 +86,7 @@ namespace gip.mes.processapplication
 
         public Guid? InwardFacilityChargeID { get; set; }
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

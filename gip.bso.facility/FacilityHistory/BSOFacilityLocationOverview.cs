@@ -20,6 +20,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Data.Objects;
 using gip.mes.facility;
+using System.Runtime.CompilerServices;
 
 namespace gip.bso.facility
 {
@@ -184,7 +185,7 @@ namespace gip.bso.facility
             }
         }
 
-        public override void OnPropertyChanged(string name)
+        public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
             if (name == "ShowNotAvailable")

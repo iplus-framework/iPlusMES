@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using TandTv3 = gip.mes.facility.TandTv3;
 
 namespace gip.mes.facility
@@ -39,7 +40,7 @@ namespace gip.mes.facility
 
 
         [ACMethodInfo("TandTv2DisplayItemType", "en{'PropertyChanged'}de{'PropertyChanged'}", 9999)]
-        public virtual void OnPropertyChanged(string name)
+        public virtual void OnPropertyChanged([CallerMemberName] string name = "")
         {
             if (PropertyChanged != null)
             {

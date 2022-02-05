@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Runtime.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -84,7 +85,7 @@ namespace gip.mes.datamodel
         }
 
         [ACMethodInfo("", "", 999)]
-        public new void OnPropertyChanged(string propertyName)
+        public new void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (propertyName == "ACValueItem(MaxValue)\\Value")
             {

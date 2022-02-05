@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace gip.bso.manufacturing
 {
@@ -37,7 +38,7 @@ namespace gip.bso.manufacturing
 
         public PickingRelationTypeEnum PickingRelationType{ get; set; }
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));

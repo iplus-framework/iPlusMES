@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Runtime.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -129,7 +130,7 @@ namespace gip.mes.maintenance
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if(PropertyChanged != null)
             {
