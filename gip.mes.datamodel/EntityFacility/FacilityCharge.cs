@@ -287,6 +287,7 @@ namespace gip.mes.datamodel
             this.FacilityLot = facilityCharge.FacilityLot;
             this.SplitNo = facilityCharge.SplitNo;
             this.Partslist = facilityCharge.Partslist;
+            this.CompanyMaterial = facilityCharge.CompanyMaterial;
 
             this.MDUnit = facilityCharge.MDUnit;
 

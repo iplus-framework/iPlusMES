@@ -45,9 +45,11 @@ namespace gip.mes.processapplication
                     {
                         Guid facilityChargeID = pAOrderInfo.Entities.Where(c => c.EntityName == FacilityCharge.ClassName).Select(c => c.EntityID).FirstOrDefault();
                         FacilityCharge facilityCharge = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
-                        facilityID = facilityCharge.FacilityID;
+                        if (facilityCharge != null)
+                            facilityID = facilityCharge.FacilityID;
                     }
-                    else if (pAOrderInfo.Entities.Any(c => c.EntityName == gip.core.datamodel.ACClass.ClassName))
+                    // Workplace
+                    if (pAOrderInfo.Entities.Any(c => c.EntityName == gip.core.datamodel.ACClass.ClassName))
                         aCClassID = pAOrderInfo.Entities.Where(c => c.EntityName == gip.core.datamodel.ACClass.ClassName).Select(c => c.EntityID).FirstOrDefault();
 
                     configuredPrinters = ACPrintManager.GetConfiguredPrinters(database, ComponentClass.ACClassID, false);
@@ -72,8 +74,12 @@ namespace gip.mes.processapplication
 
             if (facilityID != null)
                 printerInfo = GetPrinterInfoFromFacility(facilityID, configuredPrinters);
-            else
-                printerInfo = GetPrinterInfoFromMachine(aCClass, configuredPrinters);
+            if (printerInfo == null || aCClass != null)
+            {
+                PrinterInfo printerInfo2 = GetPrinterInfoFromMachine(aCClass, configuredPrinters, aCClass != null);
+                if (printerInfo2 != null)
+                    printerInfo = printerInfo2;
+            }
             return printerInfo;
         }
 
@@ -94,6 +100,35 @@ namespace gip.mes.processapplication
             if (printerInfo == null && facility.Facility1_ParentFacility != null)
                 printerInfo = GetPrinterInfoFromFacility(facility.Facility1_ParentFacility, configuredPrinters);
             return printerInfo;
+        }
+
+
+        protected override core.datamodel.ACClass OnResolveBSOForOrderInfo(PAOrderInfo pAOrderInfo)
+        {
+            if (pAOrderInfo != null)
+            {
+                PAOrderInfoEntry batchEntry = pAOrderInfo.Entities.Where(c => c.EntityName == ProdOrderBatch.ClassName).FirstOrDefault();
+                if (batchEntry != null)
+                {
+                    using (DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        Guid? facilityChargeID =
+                        dbApp.FacilityBookingCharge
+                            .Where(c => c.ProdOrderPartslistPos != null
+                                        && c.ProdOrderPartslistPos.ProdOrderBatchID.HasValue
+                                        && c.ProdOrderPartslistPos.ProdOrderBatchID == batchEntry.EntityID
+                                        && c.InwardFacilityChargeID.HasValue)
+                            .Select(c => c.InwardFacilityChargeID)
+                            .FirstOrDefault();
+                        if (facilityChargeID.HasValue)
+                        {
+                            pAOrderInfo.Entities.Remove(batchEntry);
+                            pAOrderInfo.Entities.Insert(0, new PAOrderInfoEntry(FacilityCharge.ClassName, facilityChargeID.Value));
+                        }
+                    }
+                }
+            }
+            return base.OnResolveBSOForOrderInfo(pAOrderInfo);
         }
 
         #endregion

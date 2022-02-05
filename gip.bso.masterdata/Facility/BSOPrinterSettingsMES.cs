@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.core.reporthandler;
 using gip.mes.datamodel;
+using System;
 using System.ComponentModel;
 using System.Linq;
 
@@ -146,6 +147,8 @@ namespace gip.bso.masterdata
         #region Methods -> Overrides
         public override void LoadConfiguredPrinters()
         {
+            if (PrintManager == null)
+                return;
             ConfiguredPrinterList = ACPrintManager.GetConfiguredPrinters(Database as gip.core.datamodel.Database, PrintManager.ComponentClass.ACClassID, false);
             foreach (PrinterInfo pInfo in ConfiguredPrinterList)
             {
@@ -162,8 +165,8 @@ namespace gip.bso.masterdata
 
         public override void SetPrinterTarget(PrinterInfo printerInfo)
         {
-            if(SelectedMachine != null)
-                printerInfo.MachineACUrl = SelectedMachine.ACUrlComponent;
+            if (!String.IsNullOrEmpty(LocationName))
+                printerInfo.MachineACUrl = LocationName;
             else if (SelectedFacility != null)
             {
                 printerInfo.FacilityID = SelectedFacility.FacilityID;
@@ -173,15 +176,18 @@ namespace gip.bso.masterdata
 
         public override bool IsEnabledAddPrinter()
         {
+            if (ConfiguredPrinterList == null)
+                return false;
             return
-                 (SelectedMachine != null || SelectedFacility != null || SelectedVBUser != null)
+                   (!String.IsNullOrEmpty(LocationName) || SelectedFacility != null || SelectedVBUser != null)
                 && (SelectedWindowsPrinter != null || SelectedPrintServer != null)
                 && !ConfiguredPrinterList.Any(c =>
                     (
-                        (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
+                           (SelectedWindowsPrinter != null && c.PrinterName == SelectedWindowsPrinter.PrinterName)
                         || (SelectedPrintServer != null && c.PrinterACUrl == SelectedPrintServer.PrinterACUrl)
                     )
-                    && ((SelectedMachine != null && c.MachineACUrl ==  SelectedMachine.ACUrl) || (SelectedFacility != null && c.FacilityID == SelectedFacility.FacilityID))
+                    && (   (!String.IsNullOrEmpty(LocationName) && c.MachineACUrl == LocationName) 
+                        || (SelectedFacility != null && c.FacilityID == SelectedFacility.FacilityID))
                 );
         }
 
