@@ -90,6 +90,11 @@ namespace gip.bso.logistics
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+
+
+            AccessFilterFromFacility.NavSearch();
+            AccessFilterToFacility.NavSearch();
+
             if (Parameters != null && Parameters.Any())
                 InitParams();
 
@@ -105,18 +110,27 @@ namespace gip.bso.logistics
                 string pickingType = pickingTypeOb.ToString();
                 SelectedFilterMDPickingType = FilterMDPickingTypeList.FirstOrDefault(c => c.MDKey == pickingType);
             }
+
             object fromFacilityOb = Parameters["FromFacility"];
             if (fromFacilityOb != null)
             {
-                string fromFacility = fromFacilityOb.ToString();
-                DefaultFromFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == fromFacility);
+                string fromFacilityNo = fromFacilityOb.ToString();
+                Facility fromFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == fromFacilityNo);
+                if (!AccessFilterFromFacility.NavList.Contains(fromFacility))
+                    AccessFilterFromFacility.NavList.Add(fromFacility);
+                SelectedFilterFromFacility = fromFacility;
             }
+
             object toFacilityOb = Parameters["ToFacility"];
             if (toFacilityOb != null)
             {
-                string toFacility = toFacilityOb.ToString();
-                DefaultToFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == toFacility);
+                string toFacilityNo = toFacilityOb.ToString();
+                Facility toFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == toFacilityNo);
+                if (!AccessFilterToFacility.NavList.Contains(toFacility))
+                    AccessFilterToFacility.NavList.Add(toFacility);
+                SelectedFilterToFacility = toFacility;
             }
+
             object companyNoOb = Parameters["CompanyNo"];
             string companyNo = null;
             if (companyNoOb != null)
@@ -126,7 +140,7 @@ namespace gip.bso.logistics
                 AccessFilterDeliveryAddress.NavSearch();
                 SelectedFilterDeliveryAddress = FilterDeliveryAddressList.FirstOrDefault();
             }
-                
+
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
@@ -217,6 +231,20 @@ namespace gip.bso.logistics
                 _AccessBookingFacilityTarget = null;
             }
 
+            if (_AccessFilterFromFacility != null)
+            {
+                //_AccessFilterFromFacility.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
+                _AccessFilterFromFacility.ACDeInit(false);
+                _AccessFilterFromFacility = null;
+            }
+
+            if (_AccessFilterToFacility != null)
+            {
+                //_AccessFilterToFacility.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
+                _AccessFilterToFacility.ACDeInit(false);
+                _AccessFilterToFacility = null;
+            }
+
             _IsInward = false;
             _QuantDialogMaterial = null;
 
@@ -255,7 +283,6 @@ namespace gip.bso.logistics
         #region BSO->ACProperty
 
         #region Picking -> Filter
-
 
         #region Picking -> Filter -> Default filters
         public List<ACFilterItem> NavigationqueryDefaultFilter
@@ -483,7 +510,6 @@ namespace gip.bso.logistics
         }
         #endregion
 
-
         #region Picking -> Filter -> Properties -> FilterPickingState
         private ACValueItem _SelectedFilterPickingState;
         /// <summary>
@@ -548,9 +574,6 @@ namespace gip.bso.logistics
         }
 
         #endregion
-
-        public Facility DefaultFromFacility { get; set; }
-        public Facility DefaultToFacility { get; set; }
 
         #region Picking -> Filter -> Properties -> FilterDeliveryAddress
 
@@ -635,31 +658,147 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Filter -> From(To)Facility
+
+        public List<ACFilterItem> FilterFacilityNavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                return aCFilterItems;
+            }
+        }
+
+        private List<ACSortItem> FilterFacilityNavigationqueryDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortPickingNo = new ACSortItem("FacilityNo", SortDirections.ascending, true);
+                acSortItems.Add(acSortPickingNo);
+
+                return acSortItems;
+            }
+        }
+
+
+        ACAccess<Facility> _AccessFilterFromFacility;
+        [ACPropertyAccess(9999, "FilterFromFacility")]
+        public ACAccess<Facility> AccessFilterFromFacility
+        {
+            get
+            {
+                if (_AccessFilterFromFacility == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Facility.ClassName, ACType.ACIdentifier);
+
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
+                        if (navACQueryDefinition.TakeCount == 0)
+                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
+
+                        foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
+                            aCFilterItem.PropertyChanged += ACFilterItem_PropertyChanged;
+                    }
+
+                    _AccessFilterFromFacility = navACQueryDefinition.NewAccessNav<Facility>("FilterFromFacility", this);
+                    //_AccessFilterFromFacility.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
+                }
+                return _AccessFilterFromFacility;
+            }
+        }
+
+        [ACPropertyInfo(9999, "FilterFromFacility")]
+        public IEnumerable<Facility> FilterFromFacilityList
+        {
+            get
+            {
+                return AccessFilterFromFacility.NavList;
+            }
+        }
+
+        private Facility _SelectedFilterFromFacility;
+        [ACPropertySelected(9999, "FilterFromFacility", "en{'From facility'}de{'Von Lagerplatz'}")]
+        public Facility SelectedFilterFromFacility
+        {
+            get
+            {
+                return _SelectedFilterFromFacility;
+            }
+            set
+            {
+                if (_SelectedFilterFromFacility != value)
+                {
+                    _SelectedFilterFromFacility = value;
+                    OnPropertyChanged("SelectedFilterFromFacility");
+                }
+            }
+        }
+
+        ACAccess<Facility> _AccessFilterToFacility;
+        [ACPropertyAccess(9999, "FilterToFacility")]
+        public ACAccess<Facility> AccessFilterToFacility
+        {
+            get
+            {
+                if (_AccessFilterToFacility == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Facility.ClassName, ACType.ACIdentifier);
+
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterFacilityNavigationqueryDefaultSort);
+                        if (navACQueryDefinition.TakeCount == 0)
+                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterFacilityNavigationqueryDefaultFilter);
+
+                        foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
+                            aCFilterItem.PropertyChanged += ACFilterItem_PropertyChanged;
+                    }
+
+                    _AccessFilterToFacility = navACQueryDefinition.NewAccessNav<Facility>("FilterToFacility", this);
+                    //_AccessFilterToFacility.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
+                }
+                return _AccessFilterToFacility;
+            }
+        }
+
+        [ACPropertyInfo(9999, "FilterToFacility")]
+        public IEnumerable<Facility> FilterToFacilityList
+        {
+            get
+            {
+                return AccessFilterToFacility.NavList;
+            }
+        }
+
+        private Facility _SelectedFilterToFacility;
+        [ACPropertySelected(9999, "FilterToFacility", "en{'To facility'}de{'Zur Lagerplatz'}")]
+        public Facility SelectedFilterToFacility
+        {
+            get
+            {
+                return _SelectedFilterToFacility;
+            }
+            set
+            {
+                if (_SelectedFilterToFacility != value)
+                {
+                    _SelectedFilterToFacility = value;
+                    OnPropertyChanged("SelectedFilterToFacility");
+                }
+            }
+        }
+
         #endregion
 
         #endregion
 
-        /// <summary>
-        /// Source Property: FilterClear
-        /// </summary>
-        [ACMethodInfo("FilterClear", "en{'Clear'}de{'Löschen'}", 307)]
-        public void FilterClear()
-        {
-            if (!IsEnabledFilterClear())
-                return;
-
-            FilterPickingPickingNo = null;
-            FilterDateFrom = null;
-            FilterDateTo = null;
-            SelectedFilterMDPickingType = null;
-            SelectedFilterPickingState = null;
-        }
-
-        public bool IsEnabledFilterClear()
-        {
-            return true;
-        }
-
+        #endregion
 
         #endregion
 
@@ -735,6 +874,12 @@ namespace gip.bso.logistics
 
             if (SelectedFilterDeliveryAddress != null)
                 result = result.Where(c => c.DeliveryCompanyAddressID == SelectedFilterDeliveryAddress.CompanyAddressID);
+
+            if (SelectedFilterFromFacility != null)
+                result = result.Where(c => c.PickingPos_Picking.Any(x => x.FromFacility != null && x.FromFacility.FacilityID == SelectedFilterFromFacility.FacilityID));
+
+            if (SelectedFilterToFacility != null)
+                result = result.Where(c => c.PickingPos_Picking.Any(x => x.ToFacility != null && x.ToFacility.FacilityID == SelectedFilterToFacility.FacilityID));
 
             return result;
         }
@@ -2496,8 +2641,8 @@ namespace gip.bso.logistics
             if (pickingPos != null)
                 CurrentPicking.PickingPos_Picking.Add(pickingPos);
             OnPropertyChanged("PickingPosList");
-            pickingPos.FromFacility = DefaultFromFacility;
-            pickingPos.ToFacility = DefaultToFacility;
+            pickingPos.FromFacility = SelectedFilterFromFacility;
+            pickingPos.ToFacility = SelectedFilterToFacility;
             if (pickingPos.MDDelivPosLoadState == null)
                 pickingPos.MDDelivPosLoadState = DatabaseApp.MDDelivPosLoadState.FirstOrDefault(c => c.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.NewCreated);
             CurrentPickingPos = pickingPos;
@@ -3046,6 +3191,53 @@ namespace gip.bso.logistics
             return CurrentACMethodBooking != null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo("ShowDlgFilterFromFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgFilterFromFacility()
+        {
+            if (!IsEnabledShowDlgFilterFromFacility())
+                return;
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterFromFacility != null ? SelectedFilterFromFacility : null);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                if (facility != null)
+                    if (!AccessFilterFromFacility.NavList.Contains(facility))
+                        AccessFilterFromFacility.NavList.Add(facility);
+                SelectedFilterFromFacility = facility;
+            }
+        }
+
+        public bool IsEnabledShowDlgFilterFromFacility()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo("ShowDlgFilterToFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgFilterToFacility()
+        {
+            if (!IsEnabledShowDlgFilterToFacility())
+                return;
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterToFacility != null ? SelectedFilterToFacility : null);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                if (facility != null)
+                    if (!AccessFilterToFacility.NavList.Contains(facility))
+                        AccessFilterToFacility.NavList.Add(facility);
+                SelectedFilterToFacility = facility;
+            }
+        }
+
+        public bool IsEnabledShowDlgFilterToFacility()
+        {
+            return true;
+        }
 
         private void ShowDlgFacility(Facility preselectedFacility)
         {
@@ -3067,7 +3259,6 @@ namespace gip.bso.logistics
                 }
             }
         }
-
 
         #endregion
 
@@ -3534,6 +3725,32 @@ namespace gip.bso.logistics
         }
 
         #endregion
+
+        #endregion
+
+        #region ACMethods -> Filter
+
+        /// <summary>
+        /// Source Property: FilterClear
+        /// </summary>
+        [ACMethodInfo("FilterClear", "en{'Clear'}de{'Löschen'}", 307)]
+        public void FilterClear()
+        {
+            if (!IsEnabledFilterClear())
+                return;
+
+            FilterPickingPickingNo = null;
+            FilterDateFrom = null;
+            FilterDateTo = null;
+            SelectedFilterMDPickingType = null;
+            SelectedFilterPickingState = null;
+            SelectedFilterDeliveryAddress = null;
+        }
+
+        public bool IsEnabledFilterClear()
+        {
+            return true;
+        }
 
         #endregion
 
@@ -4011,7 +4228,6 @@ namespace gip.bso.logistics
         #endregion
 
     }
-
 
     public enum FacilitySelectLoctation
     {
