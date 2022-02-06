@@ -118,6 +118,7 @@ namespace gip.bso.manufacturing
 
         private ACMonitorObject _70500_ComponentPWNodeLock = new ACMonitorObject(70500);
         private ACMonitorObject _70600_CurrentOrderInfoValLock = new ACMonitorObject(70600);
+        private ACMonitorObject _70700_PrivateMemberLock = new ACMonitorObject(70700);
 
         private IACContainerT<string> _OrderInfo;
         private IACContainerT<WeighingComponentInfo> _WeighingComponentInfo;
@@ -646,8 +647,6 @@ namespace gip.bso.manufacturing
         }
 
         private string _PAFCurrentMaterial;
-
-
         [ACPropertyInfo(632)]
         public string PAFCurrentMaterial
         {
@@ -1238,9 +1237,14 @@ namespace gip.bso.manufacturing
                 return null;
             }
 
-            _PAFCurrentACMethod = currentACMethod as IACContainerTNet<ACMethod>;
-            (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged += PAFCurrentACMethodPropChanged;
-            ACMethod temp = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
+            var tempMethod = currentACMethod as IACContainerTNet<ACMethod>;
+            tempMethod.PropertyChanged += PAFCurrentACMethodPropChanged;
+            ACMethod temp = tempMethod?.ValueT?.Clone() as ACMethod;
+
+            using (ACMonitor.Lock(_70700_PrivateMemberLock))
+            {
+                _PAFCurrentACMethod = tempMethod;
+            }
 
             _PAFManuallyAddedQuantity = manuallyAddedQuantity as IACContainerTNet<double>;
             (_PAFManuallyAddedQuantity as IACPropertyNetBase).PropertyChanged += PAFManuallyAddedQuantityPropChanged;
@@ -1673,10 +1677,13 @@ namespace gip.bso.manufacturing
 
         private void UnloadPAFManualWeighing()
         {
-            if (_PAFCurrentACMethod != null)
+            using (ACMonitor.Lock(_70700_PrivateMemberLock))
             {
-                (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged -= PAFCurrentACMethodPropChanged;
-                _PAFCurrentACMethod = null;
+                if (_PAFCurrentACMethod != null)
+                {
+                    (_PAFCurrentACMethod as IACPropertyNetBase).PropertyChanged -= PAFCurrentACMethodPropChanged;
+                    _PAFCurrentACMethod = null;
+                }
             }
 
             if (_PAFManuallyAddedQuantity != null)
@@ -1731,8 +1738,14 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == Const.ValueT)
             {
-                ACMethod temp = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
-                ParentBSOWCS?.ApplicationQueue.Add(() => HandlePAFCurrentACMethod(temp));
+                ACMethod acMethod = null;
+                using(ACMonitor.Lock(_70700_PrivateMemberLock))
+                {
+                    acMethod = _PAFCurrentACMethod?.ValueT;
+                }
+
+                ACMethod cloned = acMethod?.Clone() as ACMethod;
+                ParentBSOWCS?.ApplicationQueue.Add(() => HandlePAFCurrentACMethod(cloned));
             }
         }
 
@@ -2241,6 +2254,18 @@ namespace gip.bso.manufacturing
         public bool IsEnabledRemoveLastUsedLot()
         {
             return SelectedLastUsedLot != null;
+        }
+
+        public ACMethod GetPAFCurrentACMethod()
+        {
+            ACMethod result = null;
+
+            using(ACMonitor.Lock(_70700_PrivateMemberLock))
+            {
+                result = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
+            }
+
+            return result;
         }
 
         #endregion

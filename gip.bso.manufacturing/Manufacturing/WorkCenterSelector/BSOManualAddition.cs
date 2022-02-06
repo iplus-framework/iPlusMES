@@ -105,6 +105,8 @@ namespace gip.bso.manufacturing
             set;
         }
 
+        private FacilityChargeItem _SelFacilityCharge;
+
         public override FacilityChargeItem SelectedFacilityCharge 
         { 
             get => base.SelectedFacilityCharge;
@@ -112,16 +114,29 @@ namespace gip.bso.manufacturing
             {
                 base.SelectedFacilityCharge = value;
 
-                if (OnlyAcknowledge && value != null)
+                if (OnlyAcknowledge && value != null && (_SelFacilityCharge == null || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID))
                 {
-                    double calcQ = SelectedWeighingMaterial.TargetQuantity;
-                    if (ScaleDifferenceWeight < -0.00001)
-                        calcQ = Math.Abs(ScaleDifferenceWeight);
+                    _SelFacilityCharge = value;
 
-                    if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > calcQ)
-                        SelectedWeighingMaterial.AddValue = calcQ;
+                    double diff = SelectedWeighingMaterial.TargetQuantity;
+                    ACMethod pafMethod = GetPAFCurrentACMethod();
+                    if (pafMethod != null)
+                    {
+                        double targetQuantity = pafMethod.ParameterValueList.GetDouble("TargetQuantity");
+                        diff = targetQuantity - ScaleActualWeight;
+                    }
+
+                    if (diff < 0.00001)
+                    {
+                        diff = 1;
+                    }
+
+                    if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > diff)
+                        SelectedWeighingMaterial.AddValue = diff;
                     else
                         SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
+
+                    AddKg();
                 }
             }
         }
