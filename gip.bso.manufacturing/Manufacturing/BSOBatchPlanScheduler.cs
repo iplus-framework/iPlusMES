@@ -3668,13 +3668,12 @@ namespace gip.bso.manufacturing
                 prodOrderBatchPlan.ProdOrderPartslistPos.MDUnit = null;
         }
 
-        private vd.ProdOrderBatchPlan FactoryBatchPlan(vd.ACClassWF vbACClassWF, vd.Partslist partslist, vd.ProdOrderPartslist prodOrderPartslist, vd.GlobalApp.BatchPlanState startMode, ref int maxScheduledOrder, DateTime? scheduledEndDate, WizardSchedulerPartslist wizardSchedulerPartslist)
+        private vd.ProdOrderBatchPlan FactoryBatchPlan(vd.ACClassWF vbACClassWF, vd.Partslist partslist, vd.ProdOrderPartslist prodOrderPartslist, vd.GlobalApp.BatchPlanState startMode, int scheduledOrder, DateTime? scheduledEndDate, WizardSchedulerPartslist wizardSchedulerPartslist)
         {
 
             vd.ProdOrderBatchPlan prodOrderBatchPlan = vd.ProdOrderBatchPlan.NewACObject(DatabaseApp, prodOrderPartslist);
             prodOrderBatchPlan.PlanState = startMode;
-            ++maxScheduledOrder;
-            prodOrderBatchPlan.ScheduledOrder = maxScheduledOrder;
+            prodOrderBatchPlan.ScheduledOrder = scheduledOrder;
             prodOrderBatchPlan.VBiACClassWF = vbACClassWF;
 
 
@@ -3744,9 +3743,9 @@ namespace gip.bso.manufacturing
                 int nr = 0;
                 vd.ACClassWF vbACClassWF = wizardSchedulerPartslist.WFNodeMES;
                 List<SchedulingMaxBPOrder> maxSchedulerOrders = ProdOrderManager.GetMaxScheduledOrder(DatabaseApp, FilterPlanningMR?.PlanningMRNo);
-                int maxSchedulingOrder = 0;
+                int scheduledOrder = 0;
                 if (vbACClassWF != null)
-                    maxSchedulingOrder =
+                    scheduledOrder =
                         maxSchedulerOrders
                         .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID)
                         .SelectMany(c => c.WFs)
@@ -3757,7 +3756,8 @@ namespace gip.bso.manufacturing
                 foreach (var item in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
                 {
                     nr++;
-                    vd.ProdOrderBatchPlan batchPlan = FactoryBatchPlan(vbACClassWF, wizardSchedulerPartslist.Partslist, prodOrderPartslist, CreatedBatchState, ref maxSchedulingOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                    scheduledOrder++;
+                    vd.ProdOrderBatchPlan batchPlan = FactoryBatchPlan(vbACClassWF, wizardSchedulerPartslist.Partslist, prodOrderPartslist, CreatedBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                     WriteBatchPlanQuantities(item, batchPlan);
                     batchPlan.Sequence = nr;
@@ -3788,9 +3788,31 @@ namespace gip.bso.manufacturing
             vd.MDProdOrderPartslistPosState mDProdOrderPartslistPosState = DatabaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)vd.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
             PartslistACClassMethod method = wizardSchedulerPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
             vd.ACClassWF vbACClassWF = wizardSchedulerPartslist.WFNodeMES;
+
             List<ProdOrderBatchPlan> existingBatchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+            int existingMinIndex = existingBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Min();
+
             Guid[] wizardBatchPlanIDs = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderBatchPlanID).ToArray();
             List<ProdOrderBatchPlan> missingBatchPlans = existingBatchPlans.Where(c => !wizardBatchPlanIDs.Contains(c.ProdOrderBatchPlanID)).ToList();
+
+            int movingStep = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Count;
+            List<ProdOrderBatchPlan> otherBatchPlans = GetProdOrderBatchPlanList(wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID).ToList();
+            otherBatchPlans = 
+                otherBatchPlans
+                .Where(c => (
+                                c.ScheduledOrder >= existingMinIndex) 
+                                && !missingBatchPlans.Select(x=>x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
+                                && !existingBatchPlans.Select(x=>x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
+                ).ToList();
+            int schedulingOrder = 0;
+            foreach (ProdOrderBatchPlan plan in otherBatchPlans)
+            {
+                plan.ScheduledOrder = schedulingOrder + movingStep + existingMinIndex;
+                schedulingOrder++;
+            }
+
+            schedulingOrder = existingMinIndex;
+          
             foreach (BatchPlanSuggestionItem suggestionItem in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
             {
                 ProdOrderBatchPlan batchPlan = null;
@@ -3798,16 +3820,7 @@ namespace gip.bso.manufacturing
                     batchPlan = existingBatchPlans.FirstOrDefault(c => c.ProdOrderBatchPlanID == suggestionItem.ProdOrderBatchPlan.ProdOrderBatchPlanID);
                 else
                 {
-                    List<SchedulingMaxBPOrder> maxSchedulerOrders = ProdOrderManager.GetMaxScheduledOrder(DatabaseApp, FilterPlanningMR?.PlanningMRNo);
-                    int maxSchedulingOrder =
-                        maxSchedulerOrders
-                        .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID)
-                        .SelectMany(c => c.WFs)
-                        .Where(c => c.ACClassWF.ACClassWFID == vbACClassWF.ACClassWFID)
-                        .Select(c => c.MaxScheduledOrder)
-                        .DefaultIfEmpty()
-                        .Max();
-                    batchPlan = FactoryBatchPlan(vbACClassWF, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, ref maxSchedulingOrder, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                    batchPlan = FactoryBatchPlan(vbACClassWF, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
                     prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                 }
@@ -3816,6 +3829,10 @@ namespace gip.bso.manufacturing
                 batchPlan.ScheduledEndDate = suggestionItem.ExpectedBatchEndTime;
                 if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
                     batchPlan.ScheduledStartDate = batchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
+
+
+                batchPlan.ScheduledOrder = schedulingOrder;
+                schedulingOrder++;
             }
             foreach (ProdOrderBatchPlan missingBatchPlan in missingBatchPlans)
                 missingBatchPlan.DeleteACObject(DatabaseApp, false);
