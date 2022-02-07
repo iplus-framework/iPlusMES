@@ -457,7 +457,8 @@ namespace gip.mes.datamodel
 
         partial void OnPickingMaterialIDChanged()
         {
-            OnPropertyChanged("Material");
+            OnPropertyChanged(nameof(Material));
+            OnPropertyChanged(nameof(MDUnit));
         }
 
         #endregion
