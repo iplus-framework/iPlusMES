@@ -3701,6 +3701,7 @@
 					<Property Name="LineNumber" Type="varchar" MaxLength="10" Nullable="false" />
 					<Property Name="RetrogradeFIFO" Type="bit" />
 					<Property Name="ExplosionOff" Type="bit" />
+					<Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
 				</EntityType>
 				<EntityType Name="PartslistPosRelation">
 					<Key>
@@ -29384,6 +29385,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 					<Property Name="LineNumber" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
 					<Property Name="RetrogradeFIFO" Type="Boolean" />
 					<Property Name="ExplosionOff" Type="Boolean" />
+					<Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
 					<NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="PartslistPos" ToRole="MDUnit" />
 					<NavigationProperty Name="PartslistPos_AlternativePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
 					<NavigationProperty Name="PartslistPos1_AlternativePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
@@ -39024,6 +39026,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
 								<ScalarProperty Name="Sequence" ColumnName="Sequence" />
 								<ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
 								<ScalarProperty Name="PartslistPosID" ColumnName="PartslistPosID" />
+								<ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
