@@ -884,13 +884,20 @@ namespace gip.mes.processapplication
                         return;
                     }
 
-                    StartManualWeighingProd(ParentPWGroup.AccessedProcessModule);
+                    StartNextCompResult result = StartNextCompResult.Done;
+                    if (IsProduction)
+                        result = StartManualWeighingProd(ParentPWGroup.AccessedProcessModule);
+
+                    if (result == StartNextCompResult.CycleWait)
+                    {
+                        SubscribeToProjectWorkCycle();
+                        return;
+                    }
 
                     //Check if manual weighing currently active
                     if (manualWeighing != null)
                     {
                         Guid? currentOpenMat = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetGuid("PLPosRelation");
-                        //CurrentOpenMaterial = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetGuid("PLPosRelation");
                         if (currentOpenMat == null)
                         {
                             SubscribeToProjectWorkCycle();
@@ -908,25 +915,15 @@ namespace gip.mes.processapplication
                         }
 
                         ACValue facilityCharge = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetACValue("FacilityCharge");
-                        //ACValue facility = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetACValue("Facility");
                         if (facilityCharge != null && facilityCharge.Value != null)
                         {
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
                             comp.SwitchState(WeighingComponentState.InWeighing);
-                            //comp.WeighState = (short)WeighingComponentState.InWeighing;
                             SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, facilityCharge.ParamAsGuid, null);
                         }
-                        //else if (facility != null && facility.Value != null)
-                        //{
-                        //    CurrentFacility = facility.ParamAsGuid;
-                        //    //comp.WeighState = (short)WeighingComponentState.InWeighing;
-                        //    comp.SwitchState(WeighingComponentState.InWeighing);
-                        //    SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, null, CurrentFacility);
-                        //}
                         else
                         {
                             //_ExitFromWaitForFC = false;
-                            //ThreadPool.QueueUserWorkItem((object state) => WaitForFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State)); //Auto Comp && Man Lot
                             SetInfo(comp, WeighingComponentInfoType.SelectCompReturnFC_F, null, null);
                         }
                     }
@@ -941,7 +938,14 @@ namespace gip.mes.processapplication
                 bool isAnyNeedToWeigh = false;
                 using (ACMonitor.Lock(_65050_WeighingCompLock))
                 {
-                    isAnyNeedToWeigh = WeighingComponents.Any(c => c.WeighState < (short)WeighingComponentState.InWeighing);
+                    if (WeighingComponents != null)
+                    {
+                        isAnyNeedToWeigh = WeighingComponents.Any(c => c.WeighState < (short)WeighingComponentState.InWeighing);
+                    }
+                    else
+                    {
+                        Messages.LogMessage(eMsgLevel.Info, this.GetACUrl(), nameof(SMRunning), "The property WeighingComponents is null(10)");
+                    }
                 }
 
                 Guid? currentOpenMaterial = CurrentOpenMaterial;
