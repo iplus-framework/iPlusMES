@@ -3083,7 +3083,7 @@ namespace gip.bso.manufacturing
                             return true;
 
                         Partslist selectedPartslist = DefaultWizardSchedulerPartslist.Partslist;
-                        if (selectedPartslist.MDUnitID.HasValue)
+                        if (selectedPartslist.MDUnitID.HasValue && selectedPartslist.MDUnitID != selectedPartslist.Material.BaseMDUnitID)
                             DefaultWizardSchedulerPartslist.TargetQuantity = selectedPartslist.Material.ConvertQuantity(DefaultWizardSchedulerPartslist.TargetQuantityUOM, selectedPartslist.Material.BaseMDUnit, selectedPartslist.MDUnit);
                         SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
                         OnSelectedWizardSchedulerPartslistChanged();
