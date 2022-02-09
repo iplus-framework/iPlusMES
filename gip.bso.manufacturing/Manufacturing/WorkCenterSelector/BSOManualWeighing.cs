@@ -119,6 +119,7 @@ namespace gip.bso.manufacturing
         private ACMonitorObject _70500_ComponentPWNodeLock = new ACMonitorObject(70500);
         private ACMonitorObject _70600_CurrentOrderInfoValLock = new ACMonitorObject(70600);
         private ACMonitorObject _70700_PrivateMemberLock = new ACMonitorObject(70700);
+        private ACMonitorObject _70750_ProcessModuleScalesLock = new ACMonitorObject(70750);
 
         private IACContainerT<string> _OrderInfo;
         private IACContainerT<WeighingComponentInfo> _WeighingComponentInfo;
@@ -161,7 +162,7 @@ namespace gip.bso.manufacturing
                 {
                     DeactivateScale();
                     ACRef<IACComponent> scaleRef = null;
-                    using (ACMonitor.Lock(_20015_LockValue))
+                    using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
                     {
                         scaleRef = _ProcessModuleScales?.FirstOrDefault(c => c.ACUrl == _CurrentScaleObject.Value.ToString());
                     }
@@ -1158,7 +1159,7 @@ namespace gip.bso.manufacturing
 
             if (scaleObjects != null && scaleObjects.Any())
             {
-                using (ACMonitor.Lock(_20015_LockValue))
+                using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
                 {
                     _ProcessModuleScales = scaleObjects.Select(c => new ACRef<IACComponent>(c, this)).ToArray();
                     scaleObjectInfoList = new List<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
@@ -1591,7 +1592,7 @@ namespace gip.bso.manufacturing
             }
 
             ACRef<IACComponent>[] scales = null;
-            using(ACMonitor.Lock(_20015_LockValue))
+            using(ACMonitor.Lock(_70750_ProcessModuleScalesLock))
             {
                 scales = _ProcessModuleScales;
                 _ProcessModuleScales = null;
