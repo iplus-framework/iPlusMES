@@ -3209,7 +3209,7 @@ namespace gip.bso.manufacturing
             if (targetQuantityUOM > Double.Epsilon)
             {
                 item.TargetQuantityUOM = targetQuantityUOM;
-                if (partslist.MDUnitID.HasValue)
+                if (partslist.MDUnitID.HasValue && partslist.Material.BaseMDUnitID != partslist.MDUnitID)
                     item.TargetQuantity = partslist.Material.ConvertQuantity(item.TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
             }
             item.MDSchedulingGroupList = schedulingGroups;
@@ -3300,6 +3300,9 @@ namespace gip.bso.manufacturing
                     ++nr;
                 }
                 DefaultWizardSchedulerPartslist.Sn = expandedItems.Count() + 1;
+
+                foreach(WizardSchedulerPartslist item in expandedItems)
+                    item.ProgramNo = DefaultWizardSchedulerPartslist.ProgramNo;
             }
         }
 
