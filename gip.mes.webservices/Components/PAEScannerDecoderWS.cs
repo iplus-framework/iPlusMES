@@ -99,7 +99,8 @@ namespace gip.mes.webservices
                     || entity.ValidEntity.GetType() == typeof(FacilityLot)
                     || entity.ValidEntity.GetType() == typeof(Facility))
                 {
-                    sequence.Message = new Msg("OK: Bitte Maschine oder Waage scannen!", this, eMsgLevel.Info, ClassName, "OnHandleNextBarcodeSequence", 20);
+                    //Info50080: Ok.Scan now machine or scale!
+                    sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, "Info50080");
                     sequence.State = BarcodeSequence.ActionState.ScanAgain;
                     return new WSResponse<BarcodeSequence>(sequence);
                 }

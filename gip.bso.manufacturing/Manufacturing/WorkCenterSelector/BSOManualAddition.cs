@@ -136,6 +136,11 @@ namespace gip.bso.manufacturing
                     else
                         SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
 
+                    if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
+                    {
+                        SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.InWeighing, DatabaseApp);
+                    }
+
                     AddKg();
                 }
             }

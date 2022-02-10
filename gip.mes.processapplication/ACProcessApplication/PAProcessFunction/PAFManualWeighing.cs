@@ -1074,7 +1074,7 @@ namespace gip.mes.processapplication
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
                     // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
-                    sequence.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(20)", 20, "Error50354");
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(20)", 20, "Error50354");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                 }
                 else
@@ -1089,7 +1089,7 @@ namespace gip.mes.processapplication
                         else
                         {
                             // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
-                            sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                            resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
                             resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                             return resultSequence;
                         }
@@ -1105,7 +1105,7 @@ namespace gip.mes.processapplication
                     else
                     {
                         // Info50052: A new lot was activated or changed. (Neue Charge wurde aktiviert bzw. gewechselt.)
-                        sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(40)", 40, "Info50052");
+                        resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(40)", 40, "Info50052");
                         resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
                     }
                 }
