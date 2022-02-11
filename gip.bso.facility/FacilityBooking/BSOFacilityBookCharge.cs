@@ -680,6 +680,22 @@ namespace gip.bso.facility
             OnSave();
         }
 
+        protected override Msg OnPreSave()
+        {
+            Msg msg = base.OnPreSave();
+            if (msg != null)
+                return msg;
+
+            if (CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && CurrentFacilityCharge.Material.IsLotManaged 
+                                              && CurrentFacilityCharge.FacilityLot == null)
+            {
+                //Error50552 The quants with a lot managed material must have a lot!
+                return new Msg(this, eMsgLevel.Error, nameof(BSOFacilityBookCharge), nameof(OnPreSave), 693, "Error50552");
+            }
+
+            return msg;
+        }
+
         protected override void OnPostSave()
         {
             ACState = Const.SMSearch;
