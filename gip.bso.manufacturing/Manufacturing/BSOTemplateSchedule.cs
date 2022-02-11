@@ -2,10 +2,8 @@
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using static gip.core.datamodel.Global;
