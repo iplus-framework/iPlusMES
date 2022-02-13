@@ -420,7 +420,7 @@ namespace gip.bso.sales
         {
             get
             {
-                if (CurrentOutOrder == null)
+                if (CurrentOutOrder == null || CurrentOutOrder.MDOutOrderType == null)
                     return null;
                 if (CurrentOutOrder.MDOutOrderType.OrderType == GlobalApp.OrderTypes.ReleaseOrder)
                 {
@@ -1430,7 +1430,9 @@ namespace gip.bso.sales
         {
             _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
             RefreshOpenContractPosList();
-            if (CurrentOutOrder != null && CurrentOutOrder.EntityState != System.Data.EntityState.Added)
+            if (CurrentOutOrder != null 
+                && CurrentOutOrder.EntityState != System.Data.EntityState.Added 
+                && CurrentOutOrder.EntityState != System.Data.EntityState.Detached)
                 CurrentOutOrder.OutOrderPos_OutOrder.Load();
             OnPropertyChanged("OutOrderPosList");
             base.OnPostUndoSave();

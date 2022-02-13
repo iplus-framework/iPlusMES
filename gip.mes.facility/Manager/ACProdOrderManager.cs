@@ -520,7 +520,10 @@ namespace gip.mes.facility
 
             // 4.0 Setup initial quantities
             foreach (ProdOrderPartslistPos prodPos in prodOrderPartsListPosItems)
-                prodPos.TargetQuantityUOM = prodPos.BasedOnPartslistPos.TargetQuantityUOM;
+            {
+                if (prodPos.BasedOnPartslistPos != null)
+                    prodPos.TargetQuantityUOM = prodPos.BasedOnPartslistPos.TargetQuantityUOM;
+            }
 
             foreach (ProdOrderPartslistPosRelation prodRel in prodOrderPartsListPosRelationItems)
             {

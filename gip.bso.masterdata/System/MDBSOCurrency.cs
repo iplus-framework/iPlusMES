@@ -502,9 +502,10 @@ namespace gip.bso.masterdata
                 if (CurrentCurrency.MDCurrencyShortname.ToLower() == "kn")
                 {
                     HttpClient httpClient = new HttpClient();
-                    HttpResponseMessage response = await httpClient.GetAsync(String.Format("https://api.hnb.hr/tecajn/v2?valuta={0}&datum-primjene={1:yyyy-MM-dd}",
+                    string request = String.Format("https://api.hnb.hr/tecajn/v2?valuta={0}&datum-primjene={1:yyyy-MM-dd}",
                         CurrentCurrencyExchange.ToMDCurrency.MDCurrencyShortname,
-                        CurrentCurrencyExchange.InsertDate));
+                        CurrentCurrencyExchange.InsertDate);
+                    HttpResponseMessage response = await httpClient.GetAsync(request);
                     if (response.IsSuccessStatusCode)
                     {
                         string json = await response.Content.ReadAsStringAsync();

@@ -97,7 +97,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return ToMDCurrency.MDCurrencyShortname;
+                return ToMDCurrency?.MDCurrencyShortname;
             }
         }
         #endregion

@@ -41,7 +41,7 @@ namespace gip.mes.facility
                     DateTime to = new DateTime(now.Year, 12, 31);
                     string maxInvoiceNo = dbApp.Invoice
                         .Where(c => c.InvoiceDate > from && c.InvoiceDate < to)
-                        .OrderByDescending(c => c.InvoiceNo)
+                        .OrderByDescending(c => c.InsertDate)
                         .Select(c => c.InvoiceNo)
                         .FirstOrDefault();
                     int lastInvoiceNoThisYear = 0;
