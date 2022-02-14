@@ -212,7 +212,10 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern && !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
+                return 
+                    this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern 
+                    && Material != null
+                    && !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
             }
         }
 
@@ -224,7 +227,10 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern && ParentProdOrderPartslistPosID != null && ProdOrderPartslistPos1_ParentProdOrderPartslistPos.IsFinalMixure;
+                return 
+                    this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern 
+                    && ParentProdOrderPartslistPosID != null 
+                    && ProdOrderPartslistPos1_ParentProdOrderPartslistPos.IsFinalMixure;
             }
         }
 

@@ -574,6 +574,7 @@ namespace gip.mes.facility
 
             ProdOrderPartslistPos finalMixure = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault();
 
+            // Positions without relations will be not recreated
             PartslistPos[] plPos = partslist.PartslistPos_Partslist.Where(c => c.PartslistPosRelation_SourcePartslistPos.Any()).ToArray();
             PartslistPosRelation[] plRel = partslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).ToArray();
 

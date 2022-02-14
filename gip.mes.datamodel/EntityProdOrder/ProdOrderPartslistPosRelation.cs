@@ -461,15 +461,20 @@ namespace gip.mes.datamodel
         #region Overrides
         public override string ToString()
         {
-            return
-                SourceProdOrderPartslistPos.ToString() +
-                Environment.NewLine +
-                " => " + "#" + Sequence.ToString() + " => " +
-                Environment.NewLine +
-                TargetProdOrderPartslistPos.ToString() +
-                Environment.NewLine + 
-                "|" + ProdOrderPartslistPosRelationID.ToString(); ;
+            string toStr = "";
+            if(SourceProdOrderPartslistPos != null)
+                toStr = SourceProdOrderPartslistPos.ToString();
 
+            toStr += Environment.NewLine +
+                " => " + "#" + Sequence.ToString() + " => ";
+
+            if(TargetProdOrderPartslistPos != null)
+                toStr += TargetProdOrderPartslistPos.ToString();
+
+            toStr += Environment.NewLine +
+                "|" + ProdOrderPartslistPosRelationID.ToString();
+
+            return toStr;
         }
         #endregion
     }
