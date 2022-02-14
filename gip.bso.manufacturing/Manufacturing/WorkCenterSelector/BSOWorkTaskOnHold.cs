@@ -50,6 +50,36 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private ACValueItem _SelectedWorkTaskSort;
+        [ACPropertySelected(701, "WorkTaskSort", "en{'Sort'}de{'Sort'}")]
+        public ACValueItem SelectedWorkTaskSort
+        {
+            get => _SelectedWorkTaskSort;
+            set
+            {
+                if (WorkTaskOnHoldList == null)
+                    return;
+
+                _SelectedWorkTaskSort = value;
+                OnPropertyChanged();
+                SortWorkTasks();
+            }
+        }
+
+        private ACValueItemList _WorkTaskSortItems;
+        [ACPropertyList(701, "WorkTaskSort")]
+        public ACValueItemList WorkTaskSortItems
+        {
+            get
+            {
+                if (_WorkTaskSortItems == null)
+                {
+                    _WorkTaskSortItems = new ACValueListWorkTaskSortEnum();
+                }
+                return _WorkTaskSortItems;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -171,9 +201,69 @@ namespace gip.bso.manufacturing
             }
 
             WorkTaskOnHoldList = result;
+
+            if (SelectedWorkTaskSort == null)
+                SelectedWorkTaskSort = WorkTaskSortItems.FirstOrDefault();
+            else
+            {
+                SortWorkTasks();
+            }
+            
         }
 
+        private void SortWorkTasks()
+        {
+            if (_SelectedWorkTaskSort == null)
+                return;
+
+            if ((WorkTaskSortEnum)_SelectedWorkTaskSort.Value == WorkTaskSortEnum.BatchSeq)
+            {
+                WorkTaskOnHoldList = WorkTaskOnHoldList.OrderBy(c => c.POProgramNo)
+                                                       .ThenBy(c => c.PartslistNo)
+                                                       .ThenBy(c => c.Sequence).ToList();
+            }
+            else if ((WorkTaskSortEnum)_SelectedWorkTaskSort.Value == WorkTaskSortEnum.BatchSeqDesc)
+            {
+                WorkTaskOnHoldList = WorkTaskOnHoldList.OrderBy(c => c.POProgramNo)
+                                                       .ThenBy(c => c.PartslistNo)
+                                                       .ThenByDescending(c => c.Sequence).ToList();
+            }
+            else if ((WorkTaskSortEnum)_SelectedWorkTaskSort.Value == WorkTaskSortEnum.WFStartDate)
+            {
+                WorkTaskOnHoldList = WorkTaskOnHoldList.OrderBy(c => c.StartDate).ToList();
+            }
+            else if ((WorkTaskSortEnum)_SelectedWorkTaskSort.Value == WorkTaskSortEnum.WFStartDateDesc)
+            {
+                WorkTaskOnHoldList = WorkTaskOnHoldList.OrderByDescending(c => c.StartDate).ToList();
+            }
+        }
 
         #endregion
     }
+
+
+    [ACSerializeableInfo]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'Work task sort'}de{'Arbeitsaufgabe sortieren'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.datamodel.ACValueListWorkTaskSortEnum")]
+    public enum WorkTaskSortEnum : short
+    {
+        BatchSeq = 0,
+        BatchSeqDesc = 10,
+        WFStartDate = 20,
+        WFStartDateDesc = 30
+    }
+
+
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work task sort'}de{'Arbeitsaufgabe sortieren'}", Global.ACKinds.TACEnumACValueList)]
+    public class ACValueListWorkTaskSortEnum : ACValueItemList
+    {
+        public ACValueListWorkTaskSortEnum() : base("WorkTaskSort")
+        {
+            AddEntry((short)WorkTaskSortEnum.BatchSeq, "en{'Batch sequence'}de{'Chargenfolge'}");
+            AddEntry((short)WorkTaskSortEnum.BatchSeqDesc, "en{'Batch sequence desc.'}de{'Chargenfolge desc.'}");
+            AddEntry((short)WorkTaskSortEnum.WFStartDate, "en{'Start date'}de{'Datum des Beginns'}");
+            AddEntry((short)WorkTaskSortEnum.WFStartDateDesc, "en{'Start date desc.'}de{'Startdatum desc.'}");
+        }
+    }
+
+    
 }
