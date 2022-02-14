@@ -192,6 +192,8 @@ namespace gip.bso.masterdata
             if (!PreExecute("UndoSave")) return;
             OnUndoSave();
 
+            ClearChangeTracking();
+
             Search(SelectedPartslist);
             PostExecute("UndoSave");
             this.VisitedMethods = null;
@@ -228,6 +230,7 @@ namespace gip.bso.masterdata
                 if(!ChangedPartslists.Contains(changedPartslist))
                     ChangedPartslists.Add(changedPartslist);
             UpdatePlanningMROrders();
+            ClearChangeTracking();
 
             return result;
         }
@@ -444,7 +447,10 @@ namespace gip.bso.masterdata
         {
             List<Partslist> partslistsforUpdatePlanningMR = GetPlForUpdatePlanningMROrder();
             UpdatePlanningMROrders(partslistsforUpdatePlanningMR);
+        }
 
+        private void ClearChangeTracking()
+        {
             ChangedPartslists.Clear();
             VisitedPartslists.Clear();
             if (CurrentPartslist != null)
