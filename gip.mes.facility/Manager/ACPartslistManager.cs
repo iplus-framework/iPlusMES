@@ -726,16 +726,15 @@ namespace gip.mes.facility
             if (isChangedPartslist)
                 isChangedPartslist = AreEntityPropertiesChanged(databaseApp, new List<EntityObject>() { partslist }, S_Partslist_Change_Fields);
             bool isChangedQuantities = false;
-            bool isChangedIngredients = false;
+            bool isAddedElements = false;
 
             if (!isChangedPartslist)
             {
-                isChangedIngredients =
-                       partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added || c.EntityState == EntityState.Deleted)
-                    || partslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
-                                                       .Any(c => c.EntityState == EntityState.Added || c.EntityState == EntityState.Deleted);
+                isAddedElements =
+                       partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added)
+                    || partslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Any(c => c.EntityState == EntityState.Added);
 
-                if (!isChangedIngredients)
+                if (!isAddedElements)
                 {
                     List<EntityObject> changedPositions =
                          partslist
@@ -758,7 +757,7 @@ namespace gip.mes.facility
                 }
             }
 
-            return isChangedPartslist || isChangedIngredients || isChangedQuantities;
+            return isChangedPartslist || isAddedElements || isChangedQuantities;
         }
 
         private bool AreEntityPropertiesChanged(DatabaseApp databaseApp, List<EntityObject> changedObjects, string[] fieldsForValidation)

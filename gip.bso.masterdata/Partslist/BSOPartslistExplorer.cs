@@ -44,6 +44,9 @@ namespace gip.bso.masterdata
             if (BSOMaterialExplorer_Child != null && BSOMaterialExplorer_Child.Value != null)
                 BSOMaterialExplorer_Child.Value.PropertyChanged += BSOMaterialExplorer_Child_PropertyChanged;
 
+            _VisitedPartslists = new List<Partslist>();
+            _ChangedPartslists = new List<Partslist>();
+
             return true;
         }
 
@@ -64,6 +67,10 @@ namespace gip.bso.masterdata
                 _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
+
+            _VisitedPartslists = null;
+            _ChangedPartslists = null;
+            
             return b;
         }
 
@@ -77,7 +84,7 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Properties
+        #region ChildBSO
 
         ACChildItem<BSOMaterialExplorer> _BSOMaterialExplorer_Child;
         [ACPropertyInfo(9999)]
@@ -94,7 +101,9 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Filters
+        #region Properties
+
+        #region Properties -> Filters
 
         public bool? filterIsEnabled;
         [ACPropertyInfo(9999, "Filter", "en{'Enabled'}de{'Freigegeben'}")]
@@ -161,8 +170,9 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Partslist
-        #region Partslist -> AccessNav
+        #region Properties -> Partslist
+
+        #region Properties -> Partslist -> AccessNav
 
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
@@ -338,7 +348,7 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Partslist -> Select, (Current,) List
+        #region Properties -> Partslist -> Select, (Current,) List
 
         public Partslist PropagatedPartslist;
 
@@ -380,6 +390,9 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("MDUnitList");
                     OnPropertyChanged("CurrentMDUnit");
                     OnPropertyChanged("ConfigurationTransferList");
+                    if (value != null)
+                        if (!_VisitedPartslists.Any(c => c.PartslistID == value.PartslistID))
+                            _VisitedPartslists.Add(value);
                 }
             }
         }
@@ -427,6 +440,35 @@ namespace gip.bso.masterdata
         }
 
         #endregion
+
+        #endregion
+
+        #region Properties -> Tracking Changes
+        // Public property while relation BSOPartslistExplorer and BSOPartslist
+        private List<Partslist> _VisitedPartslists;
+        public List<Partslist> VisitedPartslists
+        {
+            get
+            {
+                return _VisitedPartslists;
+            }
+        }
+
+        private List<Partslist> _ChangedPartslists;
+        public List<Partslist> ChangedPartslists
+        {
+            get
+            {
+                return _ChangedPartslists;
+            }
+            set
+            {
+                _ChangedPartslists = value;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Partslist -> Methods

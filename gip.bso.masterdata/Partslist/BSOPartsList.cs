@@ -15,14 +15,12 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.manager;
 using gip.core.reporthandler.Configuration;
-using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.manager;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Objects;
 using System.Linq;
 using static gip.core.datamodel.Global;
 
@@ -94,6 +92,7 @@ namespace gip.bso.masterdata
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            var b = base.ACDeInit(deleteACClassTask);
             ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
             if (_AccessConfigurationTransfer != null)
                 _AccessConfigurationTransfer.NavSearchExecuting -= _AccessConfigurationTransfer_NavSearchExecuting;
@@ -115,7 +114,7 @@ namespace gip.bso.masterdata
             this._SelectedIntermediateParts = null;
             this._selectedMaterialWF = null;
             this._SelectedPartslistPos = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            
             if (_AccessInputMaterial != null)
             {
                 _AccessInputMaterial.ACDeInit(false);
@@ -166,8 +165,6 @@ namespace gip.bso.masterdata
                 return _ProdOrderManager.ValueT;
             }
         }
-
-        private List<Partslist> _VisitedPartslist = null;
 
         #endregion
 
@@ -226,7 +223,11 @@ namespace gip.bso.masterdata
             if (!ConfigManagerIPlus.MustConfigBeReloadedOnServer(this, VisitedMethods, this.Database))
                 this.VisitedMethods = null;
 
-            CheckForUpdatePlanningMROrders();
+            var changedPartslists = ProcessLastFormulaChange();
+            foreach(Partslist changedPartslist in changedPartslists)
+                if(!ChangedPartslists.Contains(changedPartslist))
+                    ChangedPartslists.Add(changedPartslist);
+            UpdatePlanningMROrders();
 
             return result;
         }
@@ -422,33 +423,42 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region Partslist-> Methods -> Update PlanningMR Orders
+        #region Partslist-> Methods -> ProcessLastFormulaChange && Update PlanningMR Orders
 
-        private void CheckForUpdatePlanningMROrders()
+        private List<Partslist> ProcessLastFormulaChange()
         {
-            UpdatePlLastFormulaChange();
-            List<Partslist> plForUpdatePlanningMRNodes = GetPlForUpdatePlanningMROrder();
-            if (plForUpdatePlanningMRNodes != null && plForUpdatePlanningMRNodes.Any())
-                UpdatePlanningMROrders(plForUpdatePlanningMRNodes);
-        }
-
-        private void UpdatePlLastFormulaChange()
-        {
-            foreach (Partslist partslist in PartslistList)
+            List<Partslist> changedPartslist = new List<Partslist>();
+            foreach (Partslist partslist in VisitedPartslists)
             {
                 bool isChanged = PartslistManager.IsFormulaChanged(DatabaseApp, partslist);
                 if (isChanged)
+                {
                     partslist.LastFormulaChange = DateTime.Now;
+                    changedPartslist.Add(partslist);
+                }
             }
+            return changedPartslist;
         }
+
+        private void UpdatePlanningMROrders()
+        {
+            List<Partslist> partslistsforUpdatePlanningMR = GetPlForUpdatePlanningMROrder();
+            UpdatePlanningMROrders(partslistsforUpdatePlanningMR);
+
+            ChangedPartslists.Clear();
+            VisitedPartslists.Clear();
+            if (CurrentPartslist != null)
+                VisitedPartslists.Add(CurrentPartslist);
+        }
+        
 
         private List<Partslist> GetPlForUpdatePlanningMROrder()
         {
-            List<Partslist> partslists = null;
-            if (PartslistList != null && PartslistList.Any())
+            List<Partslist> partslists = new List<Partslist>();
+            if (ChangedPartslists.Any())
             {
                 List<Partslist> changedPLConnectedWithTemplate =
-                    PartslistList
+                    ChangedPartslists
                     .Where(c => c.ProdOrderPartslist_Partslist.Any(x => x.PlanningMRProposal_ProdOrderPartslist.Any(y => y.ProdOrderPartslist.LastFormulaChange < c.LastFormulaChange)))
                     .ToList();
                 if (changedPLConnectedWithTemplate != null && changedPLConnectedWithTemplate.Any())
@@ -477,6 +487,13 @@ namespace gip.bso.masterdata
                 foreach (ProdOrderPartslist prodOrderPartslist in relatedTemplateProdPl)
                     ProdOrderManager.PartslistRebuild(DatabaseApp, partslist, prodOrderPartslist);
             }
+        }
+
+        private void WriteLastFormulaChangeByDeleteElement(Partslist partslist)
+        {
+            if(!ChangedPartslists.Contains(partslist))
+                ChangedPartslists.Add(partslist);
+            partslist.LastFormulaChange = DateTime.Now;
         }
 
         #endregion
@@ -672,6 +689,7 @@ namespace gip.bso.masterdata
                 }
                 else
                 {
+                    WriteLastFormulaChangeByDeleteElement(SelectedPartslist);
                     SelectedPartslist.PartslistPos_Partslist.Remove(SelectedPartslistPos);
                     SequenceManager<PartslistPos>.Order(PartslistPosList);
                     SelectedPartslistPos = PartslistPosList.FirstOrDefault();
@@ -1131,6 +1149,7 @@ namespace gip.bso.masterdata
             }
             if (msg == null)
             {
+                WriteLastFormulaChangeByDeleteElement(SelectedPartslist);
                 SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Remove(SelectedIntermediateParts);
                 SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
