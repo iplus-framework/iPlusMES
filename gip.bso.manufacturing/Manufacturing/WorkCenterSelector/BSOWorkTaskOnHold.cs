@@ -238,6 +238,32 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+
+            switch (acMethodName)
+            {
+                case nameof(StartWorkTask):
+                    StartWorkTask();
+                    return true;
+                case nameof(IsEnabledStartWorkTask):
+                    result = IsEnabledStartWorkTask();
+                    return true;
+                case nameof(CompleteWorkTask):
+                    CompleteWorkTask();
+                    return true;
+                case nameof(IsEnabledCompleteWorkTask):
+                    result = IsEnabledCompleteWorkTask();
+                    return true;
+                case nameof(RefreshWorkTasks):
+                    RefreshWorkTasks();
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
     }
 
