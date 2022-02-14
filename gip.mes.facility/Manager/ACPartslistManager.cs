@@ -40,7 +40,8 @@ namespace gip.mes.facility
         #endregion
 
         #region const
-        public const string Const_PartslistPosRelation_Change_Fields = @"MaterialPosTypeIndex,MaterialID,TargetQuantityUOM,MDUnitID";
+        public static string[] S_Partslist_Change_Fields = new string[] { "IsEnabled", "MaterialID", "MaterialWFID", "MDUnitID" };
+        public static string[] S_PartslistPosRelation_Change_Fields = new string[] {"MaterialPosTypeIndex","MaterialID","TargetQuantityUOM","MDUnitID", "SourceProdOrderPartslistPosID" };
         #endregion
 
         #region Attach / Deattach
@@ -723,26 +724,16 @@ namespace gip.mes.facility
         {
             bool isChangedPartslist = partslist.EntityState == EntityState.Modified;
             if (isChangedPartslist)
-                isChangedPartslist = IsChangedPartslistPosProperty(databaseApp, new List<EntityObject>() { partslist });
+                isChangedPartslist = AreEntityPropertiesChanged(databaseApp, new List<EntityObject>() { partslist }, S_Partslist_Change_Fields);
             bool isChangedQuantities = false;
             bool isChangedIngredients = false;
 
             if (!isChangedPartslist)
             {
                 isChangedIngredients =
-                // added or deleted positions
-                partslist
-                .PartslistPos_Partslist.Any(c =>
-                    c.EntityState == EntityState.Added ||
-                    c.EntityState == EntityState.Deleted)
-               ||
-               // added or deleted relations
-               partslist
-               .PartslistPos_Partslist
-               .SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
-               .Any(c =>
-                    c.EntityState == EntityState.Added ||
-                    c.EntityState == EntityState.Deleted);
+                       partslist.PartslistPos_Partslist.Any(c => c.EntityState == EntityState.Added || c.EntityState == EntityState.Deleted)
+                    || partslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos)
+                                                       .Any(c => c.EntityState == EntityState.Added || c.EntityState == EntityState.Deleted);
 
                 if (!isChangedIngredients)
                 {
@@ -763,14 +754,14 @@ namespace gip.mes.facility
 
                     List<EntityObject> changedObjects = changedPositions.Union(changedRelations).ToList();
 
-                    isChangedQuantities = IsChangedPartslistPosProperty(databaseApp, changedObjects);
+                    isChangedQuantities = AreEntityPropertiesChanged(databaseApp, changedObjects, S_PartslistPosRelation_Change_Fields);
                 }
             }
 
             return isChangedPartslist || isChangedIngredients || isChangedQuantities;
         }
 
-        private bool IsChangedPartslistPosProperty(DatabaseApp databaseApp, List<EntityObject> changedObjects)
+        private bool AreEntityPropertiesChanged(DatabaseApp databaseApp, List<EntityObject> changedObjects, string[] fieldsForValidation)
         {
 
             bool isChangedProperty = false;
@@ -780,7 +771,7 @@ namespace gip.mes.facility
                 IEnumerable<string> modifiedProperties = myObjectState.GetModifiedProperties();
                 foreach (string modifiedProperty in modifiedProperties)
                 {
-                    if (Const_PartslistPosRelation_Change_Fields.Contains(modifiedProperty))
+                    if (fieldsForValidation.Contains(modifiedProperty))
                     {
                         object oldValue = myObjectState.OriginalValues[modifiedProperty];
                         object newValue = myObjectState.CurrentValues[modifiedProperty];

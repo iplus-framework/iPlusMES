@@ -167,6 +167,8 @@ namespace gip.bso.masterdata
             }
         }
 
+        private List<Partslist> _VisitedPartslist = null;
+
         #endregion
 
         #region Partslist
@@ -429,6 +431,7 @@ namespace gip.bso.masterdata
             if (plForUpdatePlanningMRNodes != null && plForUpdatePlanningMRNodes.Any())
                 UpdatePlanningMROrders(plForUpdatePlanningMRNodes);
         }
+
         private void UpdatePlLastFormulaChange()
         {
             foreach (Partslist partslist in PartslistList)
