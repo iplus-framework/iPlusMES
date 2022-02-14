@@ -79,6 +79,7 @@
     <Compile Include="Manufacturing\WorkCenterSelector\BSOWorkCenterChild.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOWorkCenterSelector.cs" />
     <Compile Include="Manufacturing\OpenPostingsWrapper.cs" />
+    <Compile Include="Manufacturing\WorkCenterSelector\BSOWorkTaskOnHold.cs" />
     <Compile Include="Model\BatchPlanSuggestion.cs" />
     <Compile Include="Model\BatchPlanSuggestionItem.cs" />
     <Compile Include="Model\BatchPlanTimelineItem.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Model\WorkCenter\WorkCenterItem.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterItemFunction.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterRule.cs" />
+    <Compile Include="Model\WorkCenter\WorkTaskOnHoldItem.cs" />
     <Compile Include="Planning\BSODemandOrder.cs" />
     <Compile Include="Planning\BSOProdMatRequirement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
