@@ -109,6 +109,8 @@ namespace gip.mes.webservices
                     return PickingPos;
                 else if (SelectedOrderWF != null)
                     return SelectedOrderWF;
+                else if (WFMethod != null)
+                    return WFMethod;
                 else if (MsgResult != null)
                     return MsgResult;
                 return null;

@@ -45,12 +45,13 @@ namespace gip.mes.webservices
             Guid facilityID, facilityChargeID;
             ParentDecoder.GetGuidFromFacilityEntities(entityFacility, entityCharge, out facilityID, out facilityChargeID);
 
-            WorkTaskScanResult result = component.ACUrlCommand("!OnScanEvent",
+            WorkTaskScanResult result = component.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + PAFWorkTaskScanBase.MN_OnScanEvent,
                 new BarcodeSequenceBase() { State = sequence.State, Message = sequence.Message, QuestionSequence = sequence.QuestionSequence },
                 sequence.State == BarcodeSequenceBase.ActionState.Selection ? ConvertWFInfoToPA(sequence.Sequence.LastOrDefault().SelectedOrderWF) : null,
                 facilityChargeID, 
                 sequence.Sequence.Count,
-                sequence.State == BarcodeSequenceBase.ActionState.Question ? (short?)sequence.Sequence.LastOrDefault().MsgResult : null) as WorkTaskScanResult;
+                sequence.State == BarcodeSequenceBase.ActionState.Question ? (short?)sequence.Sequence.LastOrDefault().MsgResult : null,
+                sequence.Sequence.LastOrDefault().WFMethod) as WorkTaskScanResult;
             if (result != null)
             {
                 if (result.Result.State == BarcodeSequenceBase.ActionState.Selection)

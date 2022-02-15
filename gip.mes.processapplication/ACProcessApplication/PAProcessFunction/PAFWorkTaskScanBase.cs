@@ -133,7 +133,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case PAFWorkTaskScanBase.MN_OnScanEvent:
-                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4]);
+                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], acParameter[5] as ACMethod);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -143,7 +143,7 @@ namespace gip.mes.processapplication
 
         #region public
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
-        public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult)
+        public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
@@ -259,7 +259,10 @@ namespace gip.mes.processapplication
 
                 if (releaseOrderInfo != null)
                 {
-                    scanResult = OnReleasingProcessModuleOnScan(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult);
+                    if (acMethod != null)
+                        scanResult = OnChangingACMethodOnScan(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, acMethod);
+                    else
+                        scanResult = OnReleasingProcessModuleOnScan(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult);
                 }
                 else
                 {
@@ -417,6 +420,27 @@ namespace gip.mes.processapplication
                 WFMethod = pwNode.CurrentACMethod.ValueT,
             });
         }
+
+        protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
+        {
+            WorkTaskScanResult scanResult = new WorkTaskScanResult();
+            if (pwNode.ChangeReceivedParams(this, acMethod))
+            {
+                // Info50057: The order has been deregistered on the machine.
+                // Der Auftrag wurde an der Maschine abgemeldet.
+                scanResult.Result.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(90)", 90, "Info50057");
+                scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+            }
+            else
+            {
+                // Error50370: The order couldn't be deregistered on this machine.
+                // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
+                scanResult.Result.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(100)", 100, "Error50370");
+                scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+            }
+            return scanResult;
+        }
+
 
         protected virtual WorkTaskScanResult OnReleasingProcessModuleOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult)
         {

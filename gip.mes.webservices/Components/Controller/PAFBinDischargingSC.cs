@@ -39,7 +39,7 @@ namespace gip.mes.webservices
             Guid facilityID, facilityChargeID;
             ParentDecoder.GetGuidFromFacilityEntities(entityFacility, entityCharge, out facilityID, out facilityChargeID);
 
-            BarcodeSequenceBase result = component.ACUrlCommand("!OnScanEvent", facilityID, facilityChargeID, sequence.Sequence.Count) as BarcodeSequenceBase;
+            BarcodeSequenceBase result = component.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + PAFWorkTaskScanBase.MN_OnScanEvent, facilityID, facilityChargeID, sequence.Sequence.Count) as BarcodeSequenceBase;
             if (result != null)
             {
                 sequence.State = result.State;

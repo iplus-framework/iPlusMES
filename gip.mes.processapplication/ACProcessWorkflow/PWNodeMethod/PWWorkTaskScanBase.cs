@@ -156,6 +156,21 @@ namespace gip.mes.processapplication
             return true;
         }
 
+        public bool ChangeReceivedParams(PAFWorkTaskScanBase invoker, ACMethod acMethod)
+        {
+            if (acMethod == null)
+                return true;
+            ACMethod thisACMethod = ExecutingACMethod;
+            if (thisACMethod != null)
+            {
+                foreach (ACValue acValue in acMethod.ResultValueList)
+                {
+                }
+                FinishProgramLog(thisACMethod);
+            }
+            return true;
+        }
+
         protected override bool RunWithoutInvokingFunction
         {
             get
