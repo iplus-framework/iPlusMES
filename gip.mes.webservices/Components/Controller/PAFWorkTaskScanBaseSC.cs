@@ -107,6 +107,12 @@ namespace gip.mes.webservices
                         if (orderWFInfo.POPId == Guid.Empty)
                             continue;
                         ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { ForRelease = orderWFInfo.ForRelease };
+                        if (orderWFInfo.WFMethod != null)
+                        {
+                            pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;
+                            pwInfo.WFMethod.FullSerialization = true;
+                        }
+
                         pwInfo.ProdOrderPartslist = vbWebService.ConvertToWSProdOrderPartslists(VBWebService.s_cQry_GetProdOrderPartslist(dbApp, orderWFInfo.POPId)).FirstOrDefault();
                         if (orderWFInfo.IntermPOPPosId != Guid.Empty)
                             pwInfo.Intermediate = vbWebService.ConvertToWSProdOrderPLIntermediates(VBWebService.s_cQry_GetProdOrderPLIntermediates(dbApp, null, orderWFInfo.IntermPOPPosId)).FirstOrDefault();

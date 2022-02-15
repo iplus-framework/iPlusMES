@@ -84,6 +84,12 @@ namespace gip.mes.processapplication
             get;
             set;
         }
+
+        [DataMember]
+        public ACMethod WFMethod
+        {
+            get; set;
+        }
     }
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Register work task'}de{'Erfassung Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWWorkTaskScanBase.PWClassName, true)]
@@ -407,7 +413,8 @@ namespace gip.mes.processapplication
                 ACClassWFId = pwNode.ContentACClassWF != null ? pwNode.ContentACClassWF.ACClassWFID : Guid.Empty,
                 ACUrlWF = pwNode.GetACUrl(),
                 ForRelease = forRelease,
-                WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime
+                WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
+                WFMethod = pwNode.CurrentACMethod.ValueT,
             });
         }
 

@@ -83,6 +83,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember]
+        public ACMethod WFMethod
+        {
+            get; set;
+        }
+
         public object ValidEntity
         {
             get

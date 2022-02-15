@@ -269,7 +269,7 @@ namespace gip.bso.manufacturing
 
 
     [ACSerializeableInfo]
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'Work task sort'}de{'Arbeitsaufgabe sortieren'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.datamodel.ACValueListWorkTaskSortEnum")]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'Work task sort'}de{'Arbeitsaufgabe sortieren'}", Global.ACKinds.TACEnum, QRYConfig = "gip.bso.manufacturing.ACValueListWorkTaskSortEnum")]
     public enum WorkTaskSortEnum : short
     {
         BatchSeq = 0,
