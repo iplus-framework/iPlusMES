@@ -36,17 +36,18 @@ namespace gip.mes.processapplication
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            DischargingItemManager = new DischargingItemManager(Root, this, ClassName, null, null, null);
-            DischargingItemNoValidator = new DischargingItemNoValidator(this, ClassName);
             bool result = base.ACInit(startChildMode);
             _ = FuncScaleConfig;
+
+            _DischargingItemManager = DischargingItemManager.ACRefToServiceInstance(this);
+            if (_DischargingItemManager == null)
+                throw new Exception("DischargingItemManager not configured");
+
             return result;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            DischargingItemManager = null;
-            DischargingItemNoValidator = null;
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
@@ -57,16 +58,32 @@ namespace gip.mes.processapplication
                 }
             }
 
+            if (_DischargingItemManager != null)
+                DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
+            _DischargingItemManager = null;
+
             return base.ACDeInit(deleteACClassTask);
+        }
+
+        #endregion
+
+        #region Manager
+
+        protected ACRef<DischargingItemManager> _DischargingItemManager = null;
+        public DischargingItemManager DischargingItemManager
+        {
+            get
+            {
+                if (_DischargingItemManager == null)
+                    return null;
+                return _DischargingItemManager.ValueT;
+            }
         }
 
         #endregion
 
         #region Properties
 
-        public DischargingItemManager DischargingItemManager { get; private set; }
-
-        public DischargingItemNoValidator DischargingItemNoValidator { get; private set; }
 
         private Msg _InputSourceCodeValidationMessage;
         [ACPropertyInfo(500)]
@@ -171,7 +188,7 @@ namespace gip.mes.processapplication
                         List<DischargingItem> dischargingItems = DischargingItemManager.LoadDischargingItemList(intermediateChildPosID, BinDischarging.SourceInfoType);
                         CurrentDischargingItem = dischargingItems.FirstOrDefault(c => c.ItemID == itemNoGuid);
                         if(CurrentDischargingItem != null)
-                            InputSourceCodeValidationMessage = DischargingItemNoValidator.ValidateInputNo(itemNo, intermediateChildPosID, CurrentDischargingItem.ProdorderPartslistPosRelationID, BinDischarging.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINDischarging_NoOutwardBookings);
+                            InputSourceCodeValidationMessage = DischargingItemManager.DischargingItemNoValidator.ValidateInputNo(itemNo, intermediateChildPosID, CurrentDischargingItem.ProdorderPartslistPosRelationID, BinDischarging.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINDischarging_NoOutwardBookings);
                         else
                         {
                             //TODO: error
@@ -253,7 +270,7 @@ namespace gip.mes.processapplication
                 CurrentDischargingItem = dischargingItems.FirstOrDefault(c => c.ItemID == itemIDVal);
                 if (itemIDVal != Guid.Empty && CurrentDischargingItem != null)
                 {
-                    msg = DischargingItemNoValidator.ValidateInputNo(itemNo, intermediateChildPosID, CurrentDischargingItem.ProdorderPartslistPosRelationID, BinDischarging.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINDischarging_NoOutwardBookings);
+                    msg = DischargingItemManager.DischargingItemNoValidator.ValidateInputNo(itemNo, intermediateChildPosID, CurrentDischargingItem.ProdorderPartslistPosRelationID, BinDischarging.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINDischarging_NoOutwardBookings);
                     InputSourceCodeValidationMessage = msg;
                     if (msg.IsSucceded())
                     {

@@ -57,7 +57,8 @@ namespace gip.mes.processapplication
                     }
                 }
                 else
-                    msg = FactoryErrorMessage(DischargingItemValidationErrors.NotValidGUID, itemNo);
+                    // en{'The value {0} is not valid GUID!'}de{'Der Wert {0} ist keine gültige GUID!'}
+                    msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(ValidateInputNo), 0, "Error50379", itemNo); 
             }
             return msg;
         }
@@ -82,15 +83,18 @@ namespace gip.mes.processapplication
                             msg = CheckFacilityOutwardBooking(intermediatePartPos, relation, facility);
                         }
                         if (msg == null)
-                            msg = FactoryInfoMessage(DischargingItemValidationInfos.BinFacilityFounded, facility.FacilityNo);
+                            // en{'Facility {0} finded!'}de{'Lagerplatz {0} gefunden!'}
+                            msg = new Msg(ACComponent, eMsgLevel.Info, ClassName, nameof(ValidateFacility), 0, "Info50059", facility.FacilityNo);
                     }
                 }
                 else
-                    msg = FactoryErrorMessage(DischargingItemValidationErrors.FacilityNotBinTypePreparation, facility.FacilityNo, FacilityTypesEnum.PreparationBin);
+                    // en{'Facility {0} is not type {1}!'}de{'Lagerplatz {0} ist nicht Typ {1}!'}
+                    msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(ValidateFacility), 0, "Error50380", facility.FacilityNo, FacilityTypesEnum.PreparationBin); 
             }
             else
                 // missing facilit
-                msg = FactoryErrorMessage(DischargingItemValidationErrors.Facility_NotFound, itemNoID);
+                //en{'Facility with ID: {0} not found!'}de{'Lagerort mit ID: {0} nicht gefunden!'}
+                msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(ValidateInputNo), 0, "Error50381", itemNoID);
             return msg;
         }
 
@@ -105,40 +109,41 @@ namespace gip.mes.processapplication
                 case DischargingItemNoValidatorBehaviorEnum.BINSelection_NoInwardBookings:
                     if (inwardReservationBooking != null)
                     {
-                        msg = FactoryErrorMessage(DischargingItemValidationErrors.BinSelection_Facility_ReservationBookingExist, inwardReservationBooking.FacilityBookingNo, facility.FacilityNo);
+                        // en{'Reservation Inward Booking {0} for Facility {1} exist!'}de{'Geplante Ergebnis Buchung {0} für Lagerplatz {1} vorhanden!'}
+                        msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityInwardBooking), 0, "Error50383", inwardReservationBooking.FacilityBookingNo, facility.FacilityNo); 
                     }
                     else
                     {
                         string batchNo = null;
 
                         FacilityBooking fbInward = facility.FacilityBooking_InwardFacility.OrderByDescending(c => c.InsertDate).FirstOrDefault();
-                        if(fbInward != null)
+                        if (fbInward != null)
                         {
                             FacilityBooking fbOutward = facility.FacilityBooking_OutwardFacility.OrderByDescending(c => c.InsertDate).FirstOrDefault();
-                            if(fbOutward == null || fbOutward.InsertDate < fbInward.InsertDate)
+                            if (fbOutward == null || fbOutward.InsertDate < fbInward.InsertDate)
                             {
                                 batchNo = fbInward.ProdOrderPartslistPos.ProdOrderBatch.ProdOrderBatchNo;
                             }
                         }
 
                         // Search batch were exist facility reservation but is not discharged!
-                            //batchNo =
-                            //intermediatePartPos
-                            //.ProdOrderPartslistPos1_ParentProdOrderPartslistPos
-                            //.ProdOrderPartslistPos_ParentProdOrderPartslistPos
-                            //.Where(c =>
-                            //        c.ProdOrderPartslistPosID != intermediatePartPos.ProdOrderPartslistPosID
-                            //        && c.ProdOrderBatch != null
+                        //batchNo =
+                        //intermediatePartPos
+                        //.ProdOrderPartslistPos1_ParentProdOrderPartslistPos
+                        //.ProdOrderPartslistPos_ParentProdOrderPartslistPos
+                        //.Where(c =>
+                        //        c.ProdOrderPartslistPosID != intermediatePartPos.ProdOrderPartslistPosID
+                        //        && c.ProdOrderBatch != null
 
-                            //        && c.FacilityBooking_ProdOrderPartslistPos.Any(x => x.InwardFacilityID == facility.FacilityID && x.InwardQuantity == PWBinSelection.BinSelectionReservationQuantity)
-                            //        && !c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
-                            //            .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
-                            //            .Where(x => x.OutwardFacilityID == facility.FacilityID)
-                            //            .Any()
-                            //    )
-                            //.Select(c => c.ProdOrderBatch.ProdOrderBatchNo)
-                            //.DefaultIfEmpty()
-                            //.FirstOrDefault();
+                        //        && c.FacilityBooking_ProdOrderPartslistPos.Any(x => x.InwardFacilityID == facility.FacilityID && x.InwardQuantity == PWBinSelection.BinSelectionReservationQuantity)
+                        //        && !c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                        //            .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                        //            .Where(x => x.OutwardFacilityID == facility.FacilityID)
+                        //            .Any()
+                        //    )
+                        //.Select(c => c.ProdOrderBatch.ProdOrderBatchNo)
+                        //.DefaultIfEmpty()
+                        //.FirstOrDefault();
 
                         if (!string.IsNullOrEmpty(batchNo))
                         {
@@ -151,15 +156,16 @@ namespace gip.mes.processapplication
                             .Select(c => c.FacilityBookingNo)
                             .DefaultIfEmpty()
                             .FirstOrDefault();
-
-                            msg = FactoryErrorMessage(DischargingItemValidationErrors.BinSelection_Facility_ReservedButNotDiscarged, facility.FacilityNo, reservationFacilityBookingNo, batchNo);
+                            // en{'Facility {0} already reserved with Booking {1} in Batch {2} but not discarged!'}de{'Lagerplatz {0} bereits mit Buchung {1} in Batch {2} reserviert, aber nicht entladen!'}
+                            msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityInwardBooking), 0, "Error50387", facility.FacilityNo, reservationFacilityBookingNo, batchNo);
                         }
                     }
                     break;
                 case DischargingItemNoValidatorBehaviorEnum.BINDischarging_NoOutwardBookings:
                     if (inwardReservationBooking == null)
                     {
-                        msg = FactoryErrorMessage(DischargingItemValidationErrors.BinSelection_Facility_ReservationBookingMissing, facility.FacilityNo);
+                        // en{'Reservation Inward Booking for Facility {0} not exist!'}de{'Geplante Ergebnis Buchung für Lagerpatz {0} nicht existieren!'}
+                        msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityInwardBooking), 0, "Error50385", facility.FacilityNo);
                     }
                     break;
                 default:
@@ -173,7 +179,8 @@ namespace gip.mes.processapplication
         {
             FacilityBooking outwardBooking = relation.FacilityBooking_ProdOrderPartslistPosRelation.FirstOrDefault(c => c.OutwardFacilityID == facility.FacilityID);
             if (outwardBooking != null)
-                return FactoryErrorMessage(DischargingItemValidationErrors.BinDischarging_Facility_OutwardBookingExist, outwardBooking.FacilityBookingNo, facility.FacilityNo);
+                // en{'Outward Booking {0} allready exist for Facility: {1}!'}de{'Einsatzbuchung {0} für Lagerplatz {1} existiert!'}
+                return new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityOutwardBooking), 0, "Error50389", outwardBooking.FacilityBookingNo, facility.FacilityNo);
             return null;
         }
 
@@ -196,10 +203,12 @@ namespace gip.mes.processapplication
                     }
                 }
                 if (msg == null)
-                    msg = FactoryInfoMessage(DischargingItemValidationInfos.BinFacilityChargeFounded, itemNoID);
+                    // en{'Charge {0} finded!'}de{'Charge {0} gefunden!'}
+                    msg = new Msg(ACComponent, eMsgLevel.Info, ClassName, nameof(ValidateFacilityCharge), 0, "Info50060", itemNoID);
             }
             else
-                msg = FactoryInfoMessage(DischargingItemValidationInfos.BinFacilityChargeNew, itemNoID);
+                // en{'New barcode {0}!'}de{'Neu Barkode {0}!'}
+                msg = new Msg(ACComponent, eMsgLevel.Info, ClassName, nameof(ValidateFacilityCharge), 0, "Info50061", itemNoID);
             return msg;
         }
 
@@ -209,8 +218,8 @@ namespace gip.mes.processapplication
 
             FacilityBooking inwardReservationBooking = intermediatePartPos
                 .FacilityBooking_ProdOrderPartslistPos
-                .FirstOrDefault(c => 
-                c.FacilityBookingCharge_FacilityBooking.Any(x=>x.InwardFacilityChargeID == facilityCharge.FacilityChargeID)
+                .FirstOrDefault(c =>
+                c.FacilityBookingCharge_FacilityBooking.Any(x => x.InwardFacilityChargeID == facilityCharge.FacilityChargeID)
                 && c.Comment != null
                 && c.Comment.Contains(PWBinSelection.BinSelectionReservationComment));
 
@@ -219,7 +228,8 @@ namespace gip.mes.processapplication
                 case DischargingItemNoValidatorBehaviorEnum.BINSelection_NoInwardBookings:
                     if (inwardReservationBooking != null)
                     {
-                        msg = FactoryErrorMessage(DischargingItemValidationErrors.BinSelection_FacilityCharge_ReservationBookingExist, inwardReservationBooking.FacilityBookingNo, facilityCharge.FacilityChargeID);
+                        // en{'Reservation Inward Booking {0} for Charge {1} exist!'}de{'Geplante Ergebnis Buchung {0} für Charge {1} vorhanden!'}
+                        msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityChargeInwardBooking), 0, "Error50384", inwardReservationBooking.FacilityBookingNo, facilityCharge.FacilityChargeID);
                     }
                     else
                     {
@@ -254,14 +264,16 @@ namespace gip.mes.processapplication
                             .DefaultIfEmpty()
                             .FirstOrDefault();
 
-                            msg = FactoryErrorMessage(DischargingItemValidationErrors.BinSelection_FacilityCharge_ReservedButNotDiscarged, facilityCharge.FacilityChargeID, reservationFacilityBookingNo, batchNo);
+                            // en{'Charge {0} already reserved with Booking {1} in Batch {2} but not discarged!'}de{'Charge {0} bereits mit Buchung {1} in Batch {2} reserviert, aber nicht entladen!'}
+                            msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityChargeInwardBooking), 0, "Error50388", facilityCharge.FacilityChargeID, reservationFacilityBookingNo, batchNo);
                         }
                     }
                     break;
                 case DischargingItemNoValidatorBehaviorEnum.BINDischarging_NoOutwardBookings:
                     if (inwardReservationBooking == null)
                     {
-                        msg = FactoryErrorMessage(DischargingItemValidationErrors.BinSelection_FacilityCharge_ReservationBookingMissing, facilityCharge.FacilityChargeID);
+                        // en{'Reservation Inward Booking for Charge {0} not exist!'}de{'Geplante Ergebnis Buchung für Charge {0} nicht existieren!'}
+                        msg = new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityChargeInwardBooking), 0, "Error50386", facilityCharge.FacilityChargeID);
                     }
                     break;
                 default:
@@ -276,7 +288,8 @@ namespace gip.mes.processapplication
             Msg msg = null;
             FacilityBooking outwardBooking = relation.FacilityBooking_ProdOrderPartslistPosRelation.FirstOrDefault(c => c.OutwardFacilityChargeID == facilityCharge.FacilityChargeID);
             if (outwardBooking != null)
-                return FactoryErrorMessage(DischargingItemValidationErrors.BinDischarging_FacilityCharge_OutwardBookingExist, outwardBooking.FacilityBookingNo, facilityCharge.FacilityChargeID);
+                // en{'Outward Booking {0} allready exist for Charge: {1}!'}de{'Einsatzbuchung {0} für Charge {1} existiert!'}
+                return new Msg(ACComponent, eMsgLevel.Error, ClassName, nameof(CheckFacilityChargeOutwardBooking), 0, "Error50390", outwardBooking.FacilityBookingNo, facilityCharge.FacilityChargeID);
             return msg;
         }
 
@@ -365,34 +378,15 @@ namespace gip.mes.processapplication
             return new Msg(ACComponent, eMsgLevel.Error, ClassName, error.ToString(), 0, errorID, parameters);
         }
 
-        public Msg FactoryInfoMessage(DischargingItemValidationInfos info, params object[] parameters)
-        {
-            string infoID = "Info" + ((int)info).ToString();
-            return new Msg(ACComponent, eMsgLevel.Info, ClassName, info.ToString(), 0, infoID, parameters);
-        }
+
         #endregion
     }
 
 
     public enum DischargingItemValidationErrors
     {
-        NotValidGUID = 50379,
-        FacilityNotBinTypePreparation = 50380,
-        Facility_NotFound = 50381,
-        BinSelection_Facility_ReservationBookingExist = 50383,
-        BinSelection_FacilityCharge_ReservationBookingExist = 50384,
-        BinSelection_Facility_ReservationBookingMissing = 50385,
-        BinSelection_FacilityCharge_ReservationBookingMissing = 50386,
-        BinSelection_Facility_ReservedButNotDiscarged = 50387,
-        BinSelection_FacilityCharge_ReservedButNotDiscarged = 50388,
-        BinDischarging_Facility_OutwardBookingExist = 50389,
         BinDischarging_FacilityCharge_OutwardBookingExist = 50390
     }
 
-    public enum DischargingItemValidationInfos
-    {
-        BinFacilityFounded = 50059,
-        BinFacilityChargeFounded = 50060,
-        BinFacilityChargeNew = 50061
-    }
+
 }

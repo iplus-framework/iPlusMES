@@ -8,48 +8,69 @@ using System.Linq;
 
 namespace gip.mes.processapplication
 {
-    public class DischargingItemManager
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'DischargingItemManager'}de{'DischargingItemManager'}", Global.ACKinds.TPARole, Global.ACStorableTypes.NotStorable, false, false)]
+    public class DischargingItemManager : PARole
     {
+        public const string C_DefaultServiceACIdentifier = "\\LocalServiceObjects\\DischargingItemManager";
 
         #region DI
 
-        public IRoot Root { get; private set; }
-
-        public IACComponent ACComponent { get; private set; }
-
-        public PAClassAlarmingBase PAClassAlarmingBase
-        {
-            get
-            {
-                return ACComponent as PAClassAlarmingBase;
-            }
-        }
         public IACContainerTNet<PANotifyState> ProcessAlarm { get; set; }
 
-        public FacilityManager FacilityManager { get; set; }
-
-        public ACProdOrderManager ProdOrderManager { get; set; }
+        public DischargingItemNoValidator DischargingItemNoValidator { get; private set; }
 
         public string ClassName { get; private set; }
         #endregion
 
         #region ctor's
 
-
-        public DischargingItemManager(IRoot root, IACComponent component, string className, FacilityManager facilityManager, ACProdOrderManager prodOrderManager, IACContainerTNet<PANotifyState> processAlarm)
+        public DischargingItemManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+           : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            Root = root;
-            ACComponent = component;
-            FacilityManager = facilityManager;
-            ProdOrderManager = prodOrderManager;
-            ProcessAlarm = processAlarm;
-            ClassName = className;
         }
+
+
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            bool baseInit = base.ACInit(startChildMode);
+            DischargingItemNoValidator = new DischargingItemNoValidator(this, nameof(DischargingItemManager));
+            return baseInit;
+        }
+
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            bool baseDeInit = base.ACDeInit(deleteACClassTask);
+            DischargingItemNoValidator = null;
+            return baseDeInit;
+        }
+        #endregion
+
+        #region Static instance
+
+        public static ACComponent GetServiceInstance(ACComponent requester)
+        {
+            return GetServiceInstance<ACComponent>(requester, C_DefaultServiceACIdentifier, CreationBehaviour.OnlyLocal);
+        }
+
+        public static ACRef<DischargingItemManager> ACRefToServiceInstance(ACComponent requester)
+        {
+            DischargingItemManager serviceInstance = GetServiceInstance(requester) as DischargingItemManager;
+            if (serviceInstance != null)
+                return new ACRef<DischargingItemManager>(serviceInstance, requester);
+            return null;
+        }
+
+        #endregion
+
+        #region Manager
+
+
         #endregion
 
         #region Discharging Booking
 
-        public KeyValuePair<Msg, DischargingItem> ProceeedBooking(ManualPreparationSourceInfoTypeEnum sourceInfoType, string id, DischargingItem dischargingItem, string propertyACUrl = "")
+        public KeyValuePair<Msg, DischargingItem> ProceeedBooking(FacilityManager facilityManager, ACProdOrderManager prodOrderManager, ManualPreparationSourceInfoTypeEnum sourceInfoType, string id, DischargingItem dischargingItem, string propertyACUrl = "")
         {
             BinSelectionModel binSelectionModel = new BinSelectionModel();
             binSelectionModel.ProdorderPartslistPosRelationID = dischargingItem.ProdorderPartslistPosRelationID ?? Guid.Empty;
@@ -65,10 +86,10 @@ namespace gip.mes.processapplication
                 default:
                     break;
             }
-            return DoOutwardBooking(binSelectionModel, propertyACUrl);
+            return DoOutwardBooking(facilityManager, prodOrderManager, binSelectionModel, propertyACUrl);
         }
 
-        public virtual KeyValuePair<Msg, DischargingItem> DoOutwardBooking(BinSelectionModel binSelectionModel, string propertyACUrl = "")
+        public virtual KeyValuePair<Msg, DischargingItem> DoOutwardBooking(FacilityManager facilityManager, ACProdOrderManager prodOrderManager, BinSelectionModel binSelectionModel, string propertyACUrl = "")
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -93,7 +114,7 @@ namespace gip.mes.processapplication
                         facilityCharge = facility.FacilityCharge_Facility.FirstOrDefault();
                     }
                     ProdOrderPartslistPosRelation relation = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == (binSelectionModel.ProdorderPartslistPosRelationID ?? Guid.Empty));
-                    FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(FacilityManager, dbApp, relation);
+                    FacilityPreBooking facilityPreBooking = prodOrderManager.NewOutwardFacilityPreBooking(facilityManager, dbApp, relation);
                     ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                     bookingParam.OutwardQuantity = binSelectionModel.RestQuantity;
                     bookingParam.OutwardFacility = facility;
@@ -103,28 +124,26 @@ namespace gip.mes.processapplication
                     if (msg != null)
                     {
                         collectedMessages.AddDetailMessage(msg);
-                        Root.Messages.LogError(ACComponent.GetACUrl(), "DoOutwardBooking(50)", msg.InnerMessage);
-                        if (PAClassAlarmingBase != null)
-                            PAClassAlarmingBase.OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, ACComponent, eMsgLevel.Error, ClassName, "DoOutwardBooking(40)", 991), false);
+                        Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(50)", msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, ClassName, "DoOutwardBooking(40)", 991), false);
                         changePosState = false;
                     }
                     else
                     {
                         bookingParam.IgnoreIsEnabled = true;
-                        ACMethodEventArgs resultBooking = FacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) as ACMethodEventArgs;
+                        ACMethodEventArgs resultBooking = facilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) as ACMethodEventArgs;
                         if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                         {
                             collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                            PAClassAlarmingBase.OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, ACComponent, eMsgLevel.Error, ClassName, "DoOutwardBooking(60)", 1016), false);
+                            OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, ClassName, "DoOutwardBooking(60)", 1016), false);
                             changePosState = false;
                         }
                         else
                         {
                             if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
                             {
-                                Root.Messages.LogError(ACComponent.GetACUrl(), "DoOutwardBooking(70)", bookingParam.ValidMessage.InnerMessage);
-                                if (PAClassAlarmingBase != null)
-                                    PAClassAlarmingBase.OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, ACComponent, eMsgLevel.Error, ClassName, "DoOutwardBooking(70)", 1024), false);
+                                Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(70)", bookingParam.ValidMessage.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, ClassName, "DoOutwardBooking(70)", 1024), false);
                                 changePosState = false;
                             }
                             changePosState = true;
@@ -142,8 +161,8 @@ namespace gip.mes.processapplication
                                 if (msg != null)
                                 {
                                     collectedMessages.AddDetailMessage(msg);
-                                    Root.Messages.LogError(ACComponent.GetACUrl(), "DoOutwardBooking(80)", msg.InnerMessage);
-                                    PAClassAlarmingBase.OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, ACComponent, eMsgLevel.Error, ClassName, "DoOutwardBooking(80)", 1036), false);
+                                    Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(80)", msg.InnerMessage);
+                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, ClassName, "DoOutwardBooking(80)", 1036), false);
                                 }
                             }
                             else
@@ -158,8 +177,8 @@ namespace gip.mes.processapplication
                             if (msg != null)
                             {
                                 collectedMessages.AddDetailMessage(msg);
-                                Root.Messages.LogError(ACComponent.GetACUrl(), "DoOutwardBooking(90)", msg.InnerMessage);
-                                PAClassAlarmingBase.OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, ACComponent, eMsgLevel.Error, ClassName, "DoOutwardBooking(90)", 1048), false);
+                                Root.Messages.LogError(GetACUrl(), "DoOutwardBooking(90)", msg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, ClassName, "DoOutwardBooking(90)", 1048), false);
                             }
                             else
                             {
@@ -173,7 +192,7 @@ namespace gip.mes.processapplication
                 catch (Exception e)
                 {
                     collectedMessages.AddDetailMessage(new Msg(eMsgLevel.Exception, e.Message));
-                    Root.Messages.LogException(ACComponent.GetACUrl(), "DoOutwardBooking(100)", e);
+                    Root.Messages.LogException(GetACUrl(), "DoOutwardBooking(100)", e);
                 }
             }
             return new KeyValuePair<Msg, DischargingItem>(collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null, outwardDischargingItem);

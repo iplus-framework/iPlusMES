@@ -49,7 +49,10 @@ namespace gip.mes.processapplication
             if (!base.ACInit(startChildMode))
                 return false;
 
-            DischargingItemManager = new DischargingItemManager(Root, this, PWClassName, ACFacilityManager, ProdOrderManager, ProcessAlarm);
+            _DischargingItemManager = DischargingItemManager.ACRefToServiceInstance(this);
+            if (_DischargingItemManager == null)
+                throw new Exception("DischargingItemManager not configured");
+
             return true;
         }
 
@@ -57,8 +60,12 @@ namespace gip.mes.processapplication
         {
             using (ACMonitor.Lock(_20015_LockValue))
             {
-                DischargingItemManager = null;
             }
+
+            if (_DischargingItemManager != null)
+                DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
+            _DischargingItemManager = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -90,7 +97,7 @@ namespace gip.mes.processapplication
             get
             {
                 var method = MyConfiguration;
-                if(method != null)
+                if (method != null)
                 {
                     ACValue acValue = method.ParameterValueList.GetACValue("CheckDischargedQuantity");
                     if (acValue != null)
@@ -177,7 +184,16 @@ namespace gip.mes.processapplication
             }
         }
 
-        public DischargingItemManager DischargingItemManager { get; set; }
+        protected ACRef<DischargingItemManager> _DischargingItemManager = null;
+        public DischargingItemManager DischargingItemManager
+        {
+            get
+            {
+                if (_DischargingItemManager == null)
+                    return null;
+                return _DischargingItemManager.ValueT;
+            }
+        }
 
         #endregion
 
@@ -196,10 +212,10 @@ namespace gip.mes.processapplication
         {
             get
             {
-                if(_CheckScale == null)
+                if (_CheckScale == null)
                 {
                     var processModule = ParentPWGroup?.AccessedProcessModule;
-                    if(processModule != null)
+                    if (processModule != null)
                     {
                         core.datamodel.ACClassMethod refPAACClassMethod = null;
                         if (this.ContentACClassWF != null)
@@ -288,9 +304,9 @@ namespace gip.mes.processapplication
                 return;
             }
 
-            if(CheckDischargedQuantity)
+            if (CheckDischargedQuantity)
             {
-                if(CheckScale == null)
+                if (CheckScale == null)
                 {
                     //TODO: alarm
                 }
@@ -533,9 +549,7 @@ namespace gip.mes.processapplication
                             string propertyACUrl = "";
                             if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                                 propertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-                            DischargingItemManager.FacilityManager = ACFacilityManager;
-                            DischargingItemManager.ProdOrderManager = ProdOrderManager;
-                            KeyValuePair<Msg, DischargingItem> bookingResult = DischargingItemManager.ProceeedBooking(SourceInfoType, id, dischargingItem, propertyACUrl);
+                            KeyValuePair<Msg, DischargingItem> bookingResult = DischargingItemManager.ProceeedBooking(ACFacilityManager, ProdOrderManager, SourceInfoType, id, dischargingItem, propertyACUrl);
                             function.SendChangedACMethod();
 
                             if (bookingResult.Key != null && !bookingResult.Key.IsSucceded())
@@ -563,7 +577,7 @@ namespace gip.mes.processapplication
             //if (ApplicationManager != null && ApplicationManager.IsSimulationOn)
             //    return true;
 
-            if(IntermediateChildPosKey == null)
+            if (IntermediateChildPosKey == null)
             {
                 //Error50336: Intermediate Child Position is null!
                 Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "IsCheckDischargingQuantitySuccessfull(10)", 565, "Error50336");
@@ -590,7 +604,7 @@ namespace gip.mes.processapplication
                     double diff = scaleWeightAfterDischarge - targetScaleWeight;
 
                     //Error50346 : Weighing-Check-Alarm: The scale measures a total weight of {0} kg. But {1} kg material must appear in it. The difference of {2} kg is too high (Min-Tol.: {3}, Max-Tol.: {4}).
-                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "IsCheckDischargingQuantitySuccessfull(20)", 613, "Error50346", scaleWeightAfterDischarge, targetScaleWeight, diff, 
+                    Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "IsCheckDischargingQuantitySuccessfull(20)", 613, "Error50346", scaleWeightAfterDischarge, targetScaleWeight, diff,
                                                                                                                                 toleranceMinus, tolerancePlus);
 
                     ActivateProcessAlarmWithLog(msg);

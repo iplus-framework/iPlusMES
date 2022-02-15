@@ -33,21 +33,45 @@ namespace gip.mes.processapplication
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            DischargingItemNoValidator = new DischargingItemNoValidator(this, ClassName);
-            return base.ACInit(startChildMode);
+            bool baseInit = base.ACInit(startChildMode);
+
+            _DischargingItemManager = DischargingItemManager.ACRefToServiceInstance(this);
+            if (_DischargingItemManager == null)
+                throw new Exception("DischargingItemManager not configured");
+
+            return baseInit;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            DischargingItemNoValidator = null;
-            return base.ACDeInit(deleteACClassTask);
+            bool baseDeInit =  base.ACDeInit(deleteACClassTask);
+
+            if (_DischargingItemManager != null)
+                DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
+            _DischargingItemManager = null;
+
+            return baseDeInit;
+        }
+
+        #endregion
+
+        #region Manager
+
+        protected ACRef<DischargingItemManager> _DischargingItemManager = null;
+        public DischargingItemManager DischargingItemManager
+        {
+            get
+            {
+                if (_DischargingItemManager == null)
+                    return null;
+                return _DischargingItemManager.ValueT;
+            }
         }
 
         #endregion
 
         #region Properties
 
-        public DischargingItemNoValidator DischargingItemNoValidator { get; private set; }
 
         private Msg _InputSourceCodeValidationMessage;
         [ACPropertyInfo(999)]
@@ -109,7 +133,7 @@ namespace gip.mes.processapplication
                 if (InputSourceCodeValidationMessage == null)
                 {
                     Guid intermediateChildPosID = (Guid)BinSelection.IntermediateChildPosKey.EntityKeyValues[0].Value;
-                    InputSourceCodeValidationMessage = DischargingItemNoValidator.ValidateInputNo(CurrentACMethod.ValueT[Const_InputSourceCodes].ToString(), intermediateChildPosID, null, BinSelection.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINSelection_NoInwardBookings);
+                    InputSourceCodeValidationMessage = DischargingItemManager.DischargingItemNoValidator.ValidateInputNo(CurrentACMethod.ValueT[Const_InputSourceCodes].ToString(), intermediateChildPosID, null, BinSelection.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINSelection_NoInwardBookings);
                 }
             }
 
@@ -185,7 +209,7 @@ namespace gip.mes.processapplication
             else
             {
                 Guid intermediateChildPosID = (Guid)BinSelection.IntermediateChildPosKey.EntityKeyValues[0].Value;
-                InputSourceCodeValidationMessage = DischargingItemNoValidator.ValidateInputNo(itemNo, intermediateChildPosID, null, BinSelection.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINSelection_NoInwardBookings);
+                InputSourceCodeValidationMessage = DischargingItemManager.DischargingItemNoValidator.ValidateInputNo(itemNo, intermediateChildPosID, null, BinSelection.SourceInfoType, DischargingItemNoValidatorBehaviorEnum.BINSelection_NoInwardBookings);
                 if (InputSourceCodeValidationMessage.IsSucceded())
                 {
                     CurrentACMethod.ValueT[Const_InputSourceCodes] = itemNo;

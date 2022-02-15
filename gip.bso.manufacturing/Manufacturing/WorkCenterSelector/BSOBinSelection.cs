@@ -37,7 +37,10 @@ namespace gip.bso.manufacturing
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
-            DischargingItemManager = new DischargingItemManager(Root, this, ClassName, ACFacilityManager, ProdOrderManager, null);
+            _DischargingItemManager = DischargingItemManager.ACRefToServiceInstance(this);
+            if (_DischargingItemManager == null)
+                throw new Exception("DischargingItemManager not configured");
+
             return init;
         }
 
@@ -58,14 +61,17 @@ namespace gip.bso.manufacturing
                 _PWBinSelection = null;
             }
 
-            DischargingItemManager = null;
-
             if (_ProdOrderManager != null)
                 ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
 
-            FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
+            if (_ACFacilityManager != null)
+                FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+
+            if (_DischargingItemManager != null)
+                DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
+            _DischargingItemManager = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -85,7 +91,16 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public DischargingItemManager DischargingItemManager { get; private set; }
+        protected ACRef<DischargingItemManager> _DischargingItemManager = null;
+        public DischargingItemManager DischargingItemManager
+        {
+            get
+            {
+                if (_DischargingItemManager == null)
+                    return null;
+                return _DischargingItemManager.ValueT;
+            }
+        }
 
         #endregion
 
@@ -539,7 +554,7 @@ namespace gip.bso.manufacturing
                 else
                     freeUpStatus = BinFreeUpActionEnum.BackToStock;
             }
-            
+
             List<DischargingItem> dischargingItems = DischargingItemManager.LoadDischargingItemList(SelectedBinFacility.LastInwardFBC.ProdOrderPartslistPosID ?? Guid.Empty, SourceType);
             DischargingItem dischargingItem = null;
             if (SourceType == ManualPreparationSourceInfoTypeEnum.FacilityID)
@@ -574,7 +589,7 @@ namespace gip.bso.manufacturing
 
         private KeyValuePair<Msg, DischargingItem> MakeOutwardBooking(DischargingItem dischargingItem)
         {
-            return DischargingItemManager.ProceeedBooking(SourceType, dischargingItem.ItemID.ToString(), dischargingItem);
+            return DischargingItemManager.ProceeedBooking(ACFacilityManager, ProdOrderManager, SourceType, dischargingItem.ItemID.ToString(), dischargingItem);
         }
 
         private KeyValuePair<Msg, DischargingItem> MakeNegativeOutwardBooking(DischargingItem dischargingItem)
@@ -586,7 +601,7 @@ namespace gip.bso.manufacturing
                 binSelectionModel.FacilityID = DatabaseApp.Facility.Where(c => c.FacilityNo == dischargingItem.InwardFacilityNo).Select(c => c.FacilityID).FirstOrDefault();
             binSelectionModel.ProdorderPartslistPosRelationID = dischargingItem.ProdorderPartslistPosRelationID;
             binSelectionModel.RestQuantity = -EndBatchPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosRelationID == dischargingItem.ProdorderPartslistPosRelationID).Sum(c => c.TargetQuantityUOM);
-            return DischargingItemManager.DoOutwardBooking(binSelectionModel);
+            return DischargingItemManager.DoOutwardBooking(ACFacilityManager, ProdOrderManager, binSelectionModel);
         }
 
         private KeyValuePair<Msg, DischargingItem> MakeNegativeOutwardBookingOnAusschuss(DischargingItem dischargingItem)
@@ -597,7 +612,7 @@ namespace gip.bso.manufacturing
             binSelectionModel.ProdorderPartslistPosRelationID = dischargingItem.ProdorderPartslistPosRelationID;
             binSelectionModel.RestQuantity = EndBatchPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosRelationID == dischargingItem.ProdorderPartslistPosRelationID).Sum(c => c.TargetQuantityUOM);
 
-            return DischargingItemManager.DoOutwardBooking(binSelectionModel);
+            return DischargingItemManager.DoOutwardBooking(ACFacilityManager, ProdOrderManager, binSelectionModel);
         }
 
         #endregion

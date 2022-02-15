@@ -35,6 +35,10 @@ namespace gip.bso.manufacturing
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _DischargingItemManager = DischargingItemManager.ACRefToServiceInstance(this);
+            if (_DischargingItemManager == null)
+                throw new Exception("DischargingItemManager not configured");
+
             return init;
         }
 
@@ -42,7 +46,6 @@ namespace gip.bso.manufacturing
         {
             if (ItemFunction != null)
                 ItemFunction.ACStateProperty.PropertyChanged -= ACStateProperty_PropertyChanged;
-            DischargingItemManager = null;
 
             if (_WaitForConfirm != null)
                 _WaitForConfirm.PropertyChanged -= _WaitForConfirm_PropertyChanged;
@@ -58,6 +61,10 @@ namespace gip.bso.manufacturing
 
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
+
+            if (_DischargingItemManager != null)
+                DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
+            _DischargingItemManager = null;
 
 
             return base.ACDeInit(deleteACClassTask);
@@ -78,7 +85,16 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public DischargingItemManager DischargingItemManager { get; private set; }
+        protected ACRef<DischargingItemManager> _DischargingItemManager = null;
+        public DischargingItemManager DischargingItemManager
+        {
+            get
+            {
+                if (_DischargingItemManager == null)
+                    return null;
+                return _DischargingItemManager.ValueT;
+            }
+        }
 
         #endregion
 
@@ -210,8 +226,6 @@ namespace gip.bso.manufacturing
                 _IntermediateChildPosID = (Guid)selectedItems[0];
                 _SourceInfoType = (ManualPreparationSourceInfoTypeEnum)selectedItems[1];
             }
-
-            DischargingItemManager = new DischargingItemManager(Root, this, ClassName, ACFacilityManager, ProdOrderManager, null);
 
             LoadDischargingItemList();
 
@@ -357,7 +371,6 @@ namespace gip.bso.manufacturing
             //    _InToleranceError.PropertyChanged += _InToleranceError_PropertyChanged;
             //_InToleranceError = null;
 
-            DischargingItemManager = null;
         }
 
         [ACMethodInfo("SendCode", "en{'Select'}de{'Auswählen'}", 601)]
