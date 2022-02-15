@@ -12,7 +12,7 @@ using System.Threading;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Bin Discharging'}de{'Gebinde entleeren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWBinDischarging : PWNodeProcessMethod, IACMyConfigCache
+    public class PWBinDischarging : PWNodeProcessMethod
     {
         #region c'tors
 
@@ -59,7 +59,6 @@ namespace gip.mes.processapplication
             {
                 DischargingItemManager = null;
             }
-            ClearMyConfiguration();
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -69,27 +68,6 @@ namespace gip.mes.processapplication
 
 
         #region Properties -> Configuration
-
-        private ACMethod _MyConfiguration;
-        [ACPropertyInfo(999)]
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
 
         public ManualPreparationSourceInfoTypeEnum SourceInfoType
         {
@@ -762,16 +740,6 @@ namespace gip.mes.processapplication
                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
         }
-
-        public void ClearMyConfiguration()
-        {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-            }
-            this.HasRules.ValueT = 0;
-        }
-
 
         #endregion
 

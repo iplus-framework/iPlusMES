@@ -23,7 +23,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterialRouteable" />
     /// <seealso cref="gip.core.autocomponent.IACMyConfigCache" />
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflowclass Dosing'}de{'Workflowklasse Dosieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public partial class PWDosing : PWNodeProcessMethod, IPWNodeReceiveMaterialRouteable, IACMyConfigCache
+    public partial class PWDosing : PWNodeProcessMethod, IPWNodeReceiveMaterialRouteable
     {
         public const string PWClassName = "PWDosing";
 
@@ -104,8 +104,6 @@ namespace gip.mes.processapplication
                 _RepeatDosingForPicking = false;
             }
 
-            ClearMyConfiguration();
-
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -124,7 +122,6 @@ namespace gip.mes.processapplication
                 _EmptyScaleAlarm = EmptyScaleAlarmState.None;
                 _RepeatDosingForPicking = false;
             }
-            ClearMyConfiguration();
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
         #endregion
@@ -468,35 +465,14 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Configuration
-        private ACMethod _MyConfiguration;
-        public ACMethod MyConfiguration
+
+        public override void ClearMyConfiguration()
         {
-            get
-            {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
-        public void ClearMyConfiguration()
-        {
+            base.ClearMyConfiguration();
             using (ACMonitor.Lock(_20015_LockValue))
             {
-                _MyConfiguration = null;
                 _ExcludedSilos = null;
             }
-            this.HasRules.ValueT = 0;
         }
 
         public bool ComponentsSkippable

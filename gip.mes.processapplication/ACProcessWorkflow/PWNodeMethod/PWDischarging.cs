@@ -23,7 +23,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.IPWNodeDeliverMaterial" />
     /// <seealso cref="gip.core.autocomponent.IACMyConfigCache" />
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWDischarging'}de{'PWDischarging'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public partial class PWDischarging : PWNodeProcessMethod, IPWNodeDeliverMaterial, IACMyConfigCache
+    public partial class PWDischarging : PWNodeProcessMethod, IPWNodeDeliverMaterial
     {
         public const string PWClassName = "PWDischarging";
 
@@ -60,8 +60,6 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            ClearMyConfiguration();
-
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _CacheModuleDestinations = null;
@@ -348,38 +346,6 @@ namespace gip.mes.processapplication
                     _NoTargetLongWait = value;
                 }
             }
-        }
-
-
-        private ACMethod _MyConfiguration;
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
-        public void ClearMyConfiguration()
-        {
-
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-            }
-            this.HasRules.ValueT = 0;
         }
 
         protected bool SkipIfNoComp

@@ -22,7 +22,7 @@ namespace gip.mes.processapplication
     /// SMStarting (Definiert in PWNode)
     /// </summary>
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'WF-Batch-Manager'}de{'WF-Batch-Manager'}", Global.ACKinds.TPWNodeWorkflow, Global.ACStorableTypes.Optional, false, PWProcessFunction.PWClassName, true)]
-    public partial class PWNodeProcessWorkflowVB : PWNodeProcessWorkflow, IACMyConfigCache
+    public partial class PWNodeProcessWorkflowVB : PWNodeProcessWorkflow
     {
         public new const string PWClassName = "PWNodeProcessWorkflowVB";
 
@@ -111,8 +111,6 @@ namespace gip.mes.processapplication
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             UnSubscribeToProjectWorkCycle();
-            ClearMyConfiguration();
-
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _CurrentProdOrderPartslist = null;
@@ -128,7 +126,6 @@ namespace gip.mes.processapplication
                 _StartNextBatchAtProjectID1 = null;
                 _StartNextBatchAtProjectID2 = null;
                 _ACProgramVB = null;
-                _MyConfiguration = null;
                 _MDSchedulingGroupLoaded = false;
                 _MDSchedulingGroup = null;
             }
@@ -154,7 +151,6 @@ namespace gip.mes.processapplication
                 _StartNextBatchAtProjectID1 = null;
                 _StartNextBatchAtProjectID2 = null;
                 _ACProgramVB = null;
-                _MyConfiguration = null;
                 _MDSchedulingGroupLoaded = false;
                 _MDSchedulingGroup = null;
             }
@@ -228,34 +224,13 @@ namespace gip.mes.processapplication
 
         #region Properties
         #region Manager
-        private ACMethod _MyConfiguration;
-        public ACMethod MyConfiguration
+        public override void ClearMyConfiguration()
         {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
-        public void ClearMyConfiguration()
-        {
+            base.ClearMyConfiguration();
             using (ACMonitor.Lock(_20015_LockValue))
             {
-                _MyConfiguration = null;
                 _IgnoreFIFO = null;
             }
-            this.HasRules.ValueT = 0;
         }
 
         /// <summary>

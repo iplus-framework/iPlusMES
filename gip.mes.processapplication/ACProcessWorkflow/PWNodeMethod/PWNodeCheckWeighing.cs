@@ -12,7 +12,7 @@ namespace gip.mes.processapplication
 {
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Checkweighing'}de{'Kontrollverwiegung'}", Global.ACKinds.TPWNodeStatic, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWNodeCheckWeighing : PWBaseNodeProcess, IPWNodeCheckWeight, IACMyConfigCache
+    public class PWNodeCheckWeighing : PWBaseNodeProcess, IPWNodeCheckWeight
     {
         public const string PWClassName = "PWNodeCheckWeighing";
 
@@ -46,7 +46,6 @@ namespace gip.mes.processapplication
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _IsToleranceError = null;
-            ClearMyConfiguration();
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -66,37 +65,6 @@ namespace gip.mes.processapplication
             {
                 return ParentPWMethod<PWMethodProduction>() != null;
             }
-        }
-
-        private ACMethod _MyConfiguration;
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
-        public void ClearMyConfiguration()
-        {
-
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-            }
-            this.HasRules.ValueT = 0;
         }
 
         protected double TolerancePlus

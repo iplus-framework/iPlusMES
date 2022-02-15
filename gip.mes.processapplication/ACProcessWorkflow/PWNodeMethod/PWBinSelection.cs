@@ -11,7 +11,7 @@ using System.Threading;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWBinSelection'}de{'PWBinSelection'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWBinSelection : PWNodeProcessMethod, IACMyConfigCache
+    public class PWBinSelection : PWNodeProcessMethod
     {
         #region config
         public const string Config_LPHF = @"LPHF";
@@ -56,9 +56,6 @@ namespace gip.mes.processapplication
                 CurrentEndBatchPosKey = null;
                 IntermediateChildPosKey = null;
             }
-
-            ClearMyConfiguration();
-
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -116,28 +113,6 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties -> Configuration
-
-        private ACMethod _MyConfiguration;
-        [ACPropertyInfo(999)]
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
         public ManualPreparationSourceInfoTypeEnum SourceInfoType
         {
             get
@@ -660,14 +635,6 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Methods -> Helper
-
-        public void ClearMyConfiguration()
-        {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-            }
-        }
 
         [ACMethodInfo("", "", 999)]
         public EntityKey GetIntermediateChildPos()

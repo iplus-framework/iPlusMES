@@ -9,7 +9,7 @@ using System.Xml;
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWMixing'}de{'PWMixing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWMixing : PWNodeProcessMethod, IACMyConfigCache
+    public class PWMixing : PWNodeProcessMethod
     {
         public const string PWClassName = "PWMixing";
 
@@ -47,36 +47,6 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
-        private ACMethod _MyConfiguration;
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
-        public void ClearMyConfiguration()
-        {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-                _SkipInvocTries = 0;
-            }
-            this.HasRules.ValueT = 0;
-        }
-
         private int _SkipInvocTries = 0;
         protected int SkipIfCountComp
         {
@@ -92,6 +62,15 @@ namespace gip.mes.processapplication
                     }
                 }
                 return 0;
+            }
+        }
+
+        public override void ClearMyConfiguration()
+        {
+            base.ClearMyConfiguration();
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _SkipInvocTries = 0;
             }
         }
         #endregion

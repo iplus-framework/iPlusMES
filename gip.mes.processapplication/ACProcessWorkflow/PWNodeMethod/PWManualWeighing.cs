@@ -24,7 +24,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterial" />
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWManualWeighing'}de{'PWManualWeighing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial, IACMyConfigCache
+    public class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial
     {
         public const string PWClassName = nameof(PWManualWeighing);
 
@@ -104,7 +104,6 @@ namespace gip.mes.processapplication
             //_WeighingComponentsInfo = null;
             CurrentEndBatchPosKey = null;
             _LastOpenMaterial = null;
-            ClearMyConfiguration();
             _ZeroBookingFacilityCharge = null;
             return base.ACDeInit(deleteACClassTask);
         }
@@ -115,7 +114,6 @@ namespace gip.mes.processapplication
             CurrentEndBatchPosKey = null;
             CurrentOpenMaterial = null;
             _LastOpenMaterial = null;
-            ClearMyConfiguration();
             using (ACMonitor.Lock(_65050_WeighingCompLock))
             {
                 WeighingComponents = null;
@@ -277,27 +275,6 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties => Configuration
-
-        private ACMethod _MyConfiguration;
-        [ACPropertyInfo(9999)]
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
 
         //QUESTION:is this needed
         /// <summary>
@@ -3011,15 +2988,6 @@ namespace gip.mes.processapplication
             {
                 _CanStartFromBSO = canStart;
             }
-        }
-
-        public void ClearMyConfiguration()
-        {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-            }
-            this.HasRules.ValueT = 0;
         }
 
         protected override void OnNewProgramLogAddedToQueue(ACMethod acMethod, gip.core.datamodel.ACProgramLog currentProgramLog)

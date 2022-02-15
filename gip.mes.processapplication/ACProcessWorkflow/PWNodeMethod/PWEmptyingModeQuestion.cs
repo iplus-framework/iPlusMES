@@ -13,7 +13,7 @@ namespace gip.mes.processapplication
 {
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Question for emptying mode'}de{'Abfrage bei Leerfahrmodus'}", Global.ACKinds.TPWNodeStatic, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWEmptyingModeQuestion : PWNodeDecisionFunc, IACMyConfigCache
+    public class PWEmptyingModeQuestion : PWNodeDecisionFunc
     {
         public const string PWClassName = "PWEmptyingModeQuestion";
 
@@ -44,43 +44,11 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            ClearMyConfiguration();
             return base.ACDeInit(deleteACClassTask);
         }
         #endregion
 
         #region Properties
-        private ACMethod _MyConfiguration;
-        public ACMethod MyConfiguration
-        {
-            get
-            {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_MyConfiguration != null)
-                        return _MyConfiguration;
-                }
-
-                var myNewConfig = NewACMethodWithConfiguration();
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    _MyConfiguration = myNewConfig;
-                }
-                return myNewConfig;
-            }
-        }
-
-        public void ClearMyConfiguration()
-        {
-
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _MyConfiguration = null;
-            }
-            this.HasRules.ValueT = 0;
-        }
-
         protected bool ForceElseEvent
         {
             get

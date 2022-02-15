@@ -7,6 +7,8 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.processapplication;
 using System.Xml;
+using System.Collections.Specialized;
+using System.Web;
 
 namespace gip.mes.processapplication
 {
@@ -59,6 +61,7 @@ namespace gip.mes.processapplication
             _PAPointMatIn1 = new PAPoint(this, Const.PAPointMatIn1);
             _PAPointMatOut1 = new PAPoint(this, Const.PAPointMatOut1);
             _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, "InvertMatSensorValue", true);
+            _Dimensions = new ACPropertyConfigValue<string>(this, nameof(Dimensions), "");
         }
 
 
@@ -80,6 +83,7 @@ namespace gip.mes.processapplication
             }
 
             _ = InvertMatSensorValue;
+            _ = Dimensions;
             return true;
         }
 
@@ -94,6 +98,8 @@ namespace gip.mes.processapplication
                 (MatSensorFull.SensorState as IACPropertyNetTarget).ValueUpdatedOnReceival -= ChildProperties_ValueUpdatedOnReceival;
             if (ScaleSensor != null)
                 (ScaleSensor.ActualValue as IACPropertyNetTarget).ValueUpdatedOnReceival -= ChildProperties_ValueUpdatedOnReceival;
+            if (FillLevelRaw != null)
+                (FillLevelRaw as IACPropertyNetTarget).ValueUpdatedOnReceival -= ChildProperties_ValueUpdatedOnReceival;
             UnSubscribeAllTransportFunctions();
             return base.ACPreDeInit(deleteACClassTask);
         }
@@ -143,6 +149,8 @@ namespace gip.mes.processapplication
                 (MatSensorFull.SensorState as IACPropertyNetTarget).ValueUpdatedOnReceival += ChildProperties_ValueUpdatedOnReceival;
             if (ScaleSensor != null)
                 (ScaleSensor.ActualValue as IACPropertyNetTarget).ValueUpdatedOnReceival += ChildProperties_ValueUpdatedOnReceival;
+            if (FillLevelRaw != null)
+                (FillLevelRaw as IACPropertyNetTarget).ValueUpdatedOnReceival += ChildProperties_ValueUpdatedOnReceival;
 
             bool result =  base.ACPostInit();
 
@@ -218,6 +226,53 @@ namespace gip.mes.processapplication
             set
             {
                 _InvertMatSensorValue.ValueT = value;
+            }
+        }
+
+        public const string C_DimLength_1 = "L1";
+        public const string C_DimWidth_1 = "W1";
+        public const string C_DimHeight_1 = "H1";
+        public const string C_DimDiameter_1 = "D1";
+        private ACPropertyConfigValue<string> _Dimensions;
+        [ACPropertyConfig("en{'Dimensions [dm] L1=0.0&D1=0.0'}de{'Dimensionen [dm] L1=0.0&D1=0.0'}")]
+        public string Dimensions
+        {
+            get
+            {
+                return _Dimensions.ValueT;
+            }
+            set
+            {
+                _Dimensions.ValueT = value;
+            }
+        }
+
+        private Dictionary<string, double> _DictDimensions = null;
+        public Dictionary<string, double> DictDimensions
+        {
+            get
+            {
+                if (_DictDimensions != null)
+                    return _DictDimensions;
+                _DictDimensions = new Dictionary<string, double>();
+                try
+                {
+                    if (!String.IsNullOrWhiteSpace(Dimensions))
+                        return _DictDimensions;
+                    string dimensions = Dimensions.Trim();
+                    NameValueCollection nvCol = HttpUtility.ParseQueryString(dimensions);
+                    foreach (string key in nvCol.AllKeys)
+                    {
+                        string sVal = nvCol.Get(key);
+                        if (!string.IsNullOrEmpty(sVal))
+                            _DictDimensions.Add(key, Double.Parse(sVal));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Messages.LogException(this.GetACUrl(), "ReadDimensions", e);
+                }
+                return _DictDimensions;
             }
         }
 
@@ -380,8 +435,11 @@ namespace gip.mes.processapplication
         [ACPropertyBindingTarget(448, "Read from PLC", "en{'Hint'}de{'Hinweis'}", "", false, false)]
         public IACContainerTNet<String> Hint { get; set; }
 
-        [ACPropertyBindingTarget(449, "Read from PLC", "en{'Fill level measured'}de{'Füllstand gemessen'}", "", false, false)]
+        [ACPropertyBindingTarget(449, "Read from PLC", "en{'Fill level measured [kg]'}de{'Füllstand gemessen [kg]'}", "", false, false)]
         public IACContainerTNet<Double> FillLevelScale { get; set; }
+
+        [ACPropertyBindingTarget(450, "Read from PLC", "en{'Fill level raw [m]'}de{'Füllhöhe Rohdaten [m]'}", "", false, false)]
+        public IACContainerTNet<Double> FillLevelRaw { get; set; }
 
         public bool HasBoundFillLevel
         {
@@ -405,6 +463,17 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool HasBoundFillLevelRaw
+        {
+            get
+            {
+                var propTarget = this.FillLevelRaw as IACPropertyNetTarget;
+                if (propTarget == null)
+                    return false;
+                return propTarget.Source != null;
+            }
+        }
+        
         [ACPropertyBindingSource(450, "Error", "en{'Validation error'}de{'Validierungsfehler'}", "", false, false)]
         public IACContainerTNet<PANotifyState> ValidationError { get; set; }
         public const string PropNameValidationError = "ValidationError";
@@ -439,6 +508,14 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected double _CurrentDensity = 0.0;
+        public double CurrentDensity
+        {
+            get
+            {
+                return _CurrentDensity;
+            }
+        }
         public bool IsSimulationOn
         {
             get
@@ -463,29 +540,35 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "RefreshFacility":
+                case nameof(RefreshFacility):
                     RefreshFacility((bool)acParameter[0], (Guid?)acParameter[1]);
                     return true;
-                case "RebuildCurrentTransportFunctions":
+                case nameof(RebuildCurrentTransportFunctions):
                     RebuildCurrentTransportFunctions();
                     return true;
-                case Const.IsEnabledPrefix + "RebuildCurrentTransportFunctions":
+                case Const.IsEnabledPrefix + nameof(RebuildCurrentTransportFunctions):
                     result = IsEnabledRebuildCurrentTransportFunctions();
                     return true;
-                case "GetBSONameForShowBooking":
+                case nameof(GetBSONameForShowBooking):
                     result = GetBSONameForShowBooking(acParameter[0] as string);
                     return true;
-                case "GetBSONameForShowOverview":
+                case nameof(GetBSONameForShowOverview):
                     result = GetBSONameForShowOverview(acParameter[0] as string);
                     return true;
-                case "GetBSONameForShowReservation":
+                case nameof(GetBSONameForShowReservation):
                     result = GetBSONameForShowReservation(acParameter[0] as string);
                     return true;
-                case "IsDischargingToThisSiloActive":
+                case nameof(IsDischargingToThisSiloActive):
                     result = IsDischargingToThisSiloActive();
                     return true;
-                case "IsDosingActiveFromThisSilo":
+                case nameof(IsDosingActiveFromThisSilo):
                     result = IsDosingActiveFromThisSilo();
+                    return true;
+                case nameof(CalculateFillingVolume):
+                    result = CalculateFillingVolume((double[]) acParameter[0], acParameter[1] as Dictionary<string, double>);
+                    return true;
+                case nameof(CalculateFillingWeight):
+                    result = CalculateFillingWeight((double[])acParameter[0], acParameter[1] as Dictionary<string, double>);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -496,25 +579,25 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "FacilityBookingDialogOn":
+                case nameof(FacilityBookingDialogOn):
                     FacilityBookingDialogOn(acComponent);
                     return true;
-                case "ShowFacilityOverview":
+                case nameof(ShowFacilityOverview):
                     ShowFacilityOverview(acComponent);
                     return true;
-                case "ShowReservationDialog":
+                case nameof(ShowReservationDialog):
                     ShowReservationDialog(acComponent);
                     return true;
-                case "WorkflowDialogOn":
+                case nameof(WorkflowDialogOn):
                     WorkflowDialogOn(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "FacilityBookingDialogOn":
+                case Const.IsEnabledPrefix + nameof(FacilityBookingDialogOn):
                     result = IsEnabledFacilityBookingDialogOn(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowFacilityOverview":
+                case Const.IsEnabledPrefix + nameof(ShowFacilityOverview):
                     result = IsEnabledShowFacilityOverview(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowReservationDialog":
+                case Const.IsEnabledPrefix + nameof(ShowReservationDialog):
                     result = IsEnabledShowReservationDialog(acComponent);
                     return true;
             }
@@ -537,6 +620,8 @@ namespace gip.mes.processapplication
                 RecalcFillLevelScale();
                 ValidateSensorState(VSSInvoker.ActualValue);
             }
+            else if (e.PropertyName == nameof(FillLevelRaw))
+                OnRecalculateFillingWeight();
         }
 
         private void ActualWeight_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -804,12 +889,15 @@ namespace gip.mes.processapplication
             {
                 MaterialName.ValueT = material.MaterialName1;
                 MaterialNo.ValueT = material.MaterialNo;
+                _CurrentDensity = material.Density;
             }
             else
             {
                 MaterialName.ValueT = null;
                 MaterialNo.ValueT = null;
+                _CurrentDensity = 0.0;
             }
+            OnRecalculateFillingWeight();
         }
 
         protected virtual void OnRefreshFacility(Facility facilitySilo, bool preventBroadcast, Guid? fbID)
@@ -869,7 +957,7 @@ namespace gip.mes.processapplication
             {
                 if (this.ScaleSensor != null)
                     this.FillLevelScale.ValueT = this.ScaleSensor.ActualValue.ValueT;
-                else
+                else if (!HasBoundFillLevelRaw)
                 {
                     var weighingFunctions = CurrentScaleFunctions;
                     if (weighingFunctions.Where(c => c.CurrentScaleForWeighing != null).Any())
@@ -1221,6 +1309,73 @@ namespace gip.mes.processapplication
                 return true;
             return base.IsEnabledAcknowledgeAlarms();
         }
+
+        protected virtual void OnRecalculateFillingWeight()
+        {
+            if (HasBoundFillLevelScale)
+                return;
+            this.FillLevelScale.ValueT = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingWeight), new double[] { FillLevelRaw.ValueT }, DictDimensions);
+        }
+
+        [ACMethodInfo("Function", "en{'Calculate filling volume [dm³]'}de{'Füllvolumen berechnen [dm³]'}", 9999)]
+        public virtual double CalculateFillingVolume(double[] measuredFillLevel, Dictionary<string, double> dimensions)
+        {
+            double volume = 0.0;
+            if (measuredFillLevel == null || !measuredFillLevel.Any())
+                return volume;
+            double h = measuredFillLevel[0];
+            if (h <= 0.0000000001)
+                return volume;
+            // Cylinder or Cone
+            if (dimensions.ContainsKey(C_DimDiameter_1))
+            {
+                // Horizontal Cylinder
+                if (dimensions.ContainsKey(C_DimLength_1))
+                    return GetVolumeOfHorizontalCylinder(dimensions[C_DimLength_1], dimensions[C_DimDiameter_1], h);
+                // Vertical Cylinder
+                else
+                    return GetVolumeOfVerticalCylinder(dimensions[C_DimDiameter_1], h);
+            }
+            // couboid
+            else if (  dimensions.ContainsKey(C_DimLength_1)
+                    && dimensions.ContainsKey(C_DimWidth_1))
+            {
+                double l = dimensions[C_DimLength_1];
+                double w = dimensions[C_DimWidth_1];
+                volume = l * w * h;
+            }
+            return volume;
+        }
+
+        public static double GetVolumeOfHorizontalCylinder(double l, double d, double h)
+        {
+            double r = d / 2;
+            double volume = l * (Math.Pow(r, 2) * Math.Acos(l - (h / r)) - (r - h) * Math.Sqrt(d * h - Math.Pow(h, 2)));
+            return volume;
+        }
+
+        public static double GetVolumeOfVerticalCylinder(double d, double h)
+        {
+            double r = d / 2;
+            double volume = (1 / 3) * Math.PI * Math.Pow(r, 2) * h;
+            return volume;
+        }
+
+        [ACMethodInfo("Function", "en{'Calculate filling volume [kg]'}de{'Füllvolumen berechnen [kg]'}", 9999)]
+        public virtual double CalculateFillingWeight(double[] measuredFillLevel, Dictionary<string, double> dimensions)
+        {
+            double volume = (double) ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingVolume), measuredFillLevel, dimensions);
+            if (volume > 0.000001)
+            {
+                double density = CurrentDensity;
+                if (density < 0.000001)
+                    density = 1;
+                return volume * density * 0.001;
+            }
+            return volume;
+        }
+
+
         #endregion
 
 
