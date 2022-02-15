@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Generic work task'}de{'Allgemeine Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, nameof(PWWorkTaskGeneric), true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Generic work task'}de{'Allgemeine Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, nameof(PWWorkTaskGeneric), true, BSOConfig = "BSOWorkTaskOnHold")]
     public class PAFWorkTaskGeneric : PAFWorkTaskScanBase
     {
         #region Constructors

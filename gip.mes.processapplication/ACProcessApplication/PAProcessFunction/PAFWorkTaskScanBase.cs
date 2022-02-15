@@ -77,6 +77,13 @@ namespace gip.mes.processapplication
         {
             get; set;
         }
+
+        [DataMember(Name="WFMSD")]
+        public DateTime? WFMethodStartDate
+        {
+            get;
+            set;
+        }
     }
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Register work task'}de{'Erfassung Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWWorkTaskScanBase.PWClassName, true)]
@@ -255,6 +262,82 @@ namespace gip.mes.processapplication
             }
             return scanResult;
         }
+
+        [ACMethodInfo("", "en{'GetOrderInfos'}de{'GetOrderInfos'}", 504)]
+        public virtual WorkTaskScanResult GetOrderInfos()
+        {
+            List<PAProdOrderPartslistWFInfo> ordersForOccupation = GetWaitingProdOrderPartslistWFInfo();
+            List<PAProdOrderPartslistWFInfo> ordersForRelease = GetActivatedProdOrderPartslistWFInfo();
+            if (ordersForOccupation.Any() && ordersForRelease.Any())
+            {
+                foreach (PAProdOrderPartslistWFInfo info in ordersForRelease)
+                {
+                    ordersForOccupation.RemoveAll(c => c.ACClassWFId == info.ACClassWFId && c.POPPosId == info.POPPosId);
+                }
+            }
+
+            int releaseableOrderCount = ordersForRelease != null ? ordersForRelease.Count() : 0;
+            int occupyableOrderCount = ordersForOccupation != null ? ordersForOccupation.Count() : 0;
+
+            List<PAProdOrderPartslistWFInfo> orderInfoList = new List<PAProdOrderPartslistWFInfo>();
+            if (releaseableOrderCount > 0)
+                orderInfoList.AddRange(ordersForRelease);
+            if (occupyableOrderCount > 0)
+                orderInfoList.AddRange(ordersForOccupation);
+
+            return new WorkTaskScanResult() { OrderInfos = orderInfoList.ToArray() };
+        }
+
+        [ACMethodInfo("", "en{'OccupyReleaseProcessModule'}de{'OccupyReleaseProcessModule'}", 504)]
+        public Msg OccupyReleaseProcessModule(string wfACUrl, bool forRelease)
+        {
+            PAProcessModule parentPM = ParentACComponent as PAProcessModule;
+            if (parentPM == null)
+            {
+                // Error50367: The application tree is incorrect. The parent component must be a process module! (Der Anwendungsbaum ist falsch. Die Elternkomponente muss ein Prozessmodul sein!)
+                return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(10)", 10, "Error50367");
+            }
+
+            PWWorkTaskScanBase pwNode  = ACUrlCommand(wfACUrl) as PWWorkTaskScanBase;
+
+            if (pwNode == null || pwNode.ParentPWGroup == null)
+            {
+                // Error50369: The selected order isn't active anymore! (Der ausgewählte Auftrag ist nicht mehr aktiv!)
+                return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(20)", 80, "Error50369");
+            }
+
+            if (forRelease)
+            {
+                if (pwNode.ReleaseProcessModuleOnScan(this))
+                {
+                    // Info50057: The order has been deregistered on the machine.
+                    // Der Auftrag wurde an der Maschine abgemeldet.
+                    return new Msg(this, eMsgLevel.Info, ClassName, nameof(OccupyReleaseProcessModule) + "(30)", 90, "Info50057");
+                }
+                else
+                {
+                    // Error50370: The order couldn't be deregistered on this machine.
+                    // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
+                    return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(40)", 100, "Error50370");
+                }
+            }
+            else
+            {
+                if (pwNode.ParentPWGroup.OccupyWithPModuleOnScan(parentPM))
+                {
+                    // Info50058: The order has been registered on the machine.
+                    // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
+                    return new Msg(this, eMsgLevel.Info, ClassName, nameof(OccupyReleaseProcessModule) + "(50)", 110, "Info50058");
+                }
+                else
+                {
+                    // Error50371: The order couldn't be registered on this machine.
+                    // Der Auftrag konnte an der Maschine nicht angemeldet werden!
+                    return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(60)", 120, "Error50371");
+                }
+            }
+        }
+        
         #endregion
 
 
@@ -323,7 +406,8 @@ namespace gip.mes.processapplication
                 IntermChildPOPPosId = intermediateChildPosID,
                 ACClassWFId = pwNode.ContentACClassWF != null ? pwNode.ContentACClassWF.ACClassWFID : Guid.Empty,
                 ACUrlWF = pwNode.GetACUrl(),
-                ForRelease = forRelease
+                ForRelease = forRelease,
+                WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime
             });
         }
 
