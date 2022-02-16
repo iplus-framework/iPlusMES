@@ -3356,8 +3356,9 @@ namespace gip.bso.manufacturing
 
         public void WizardDefineDefaultPartslist(MDSchedulingGroup schedulingGroup, Partslist partslist, double targetQuantity)
         {
-            List<MDSchedulingGroup> tmpSchedulingGroup = new List<MDSchedulingGroup>() { schedulingGroup };
-            DefaultWizardSchedulerPartslist = GetWizardSchedulerPartslist(partslist, targetQuantity, 1, tmpSchedulingGroup);
+            List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(partslist);
+            DefaultWizardSchedulerPartslist = GetWizardSchedulerPartslist(partslist, targetQuantity, 1, schedulingGroups);
+            DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup = schedulingGroup;
             AllWizardSchedulerPartslistList.Clear();
             AddWizardSchedulerPartslistList(DefaultWizardSchedulerPartslist);
             SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
