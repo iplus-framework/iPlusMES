@@ -833,7 +833,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Svae and Undo
+        #region Save and Undo
         [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
@@ -1045,12 +1045,13 @@ namespace gip.bso.manufacturing
         public virtual void BuildWorkCenterItems()
         {
             _RulesForCurrentUser = GetRulesByCurrentUser();
-            var relevantPAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray().OrderBy(c => c.ACCaption);
+            var relevantPAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList)
+                                    .ToArray().OrderBy(c => c.AssemblyACClassInfo != null ? c.AssemblyACClassInfo.SortIndex : 9999).ThenBy(c => c.ACCaption);
 
             if (_RulesForCurrentUser != null && _RulesForCurrentUser.Any() && !Root.Environment.User.IsSuperuser)
             {
                 relevantPAFs = relevantPAFs.Where(c => _RulesForCurrentUser.Any(x => x.ProcessModuleACUrl == c.ACClass1_ParentACClass.ACUrlComponent)).ToArray()
-                                           .OrderBy(x => x.SortIndex);
+                                           .OrderBy(c => c.AssemblyACClassInfo != null ? c.AssemblyACClassInfo.SortIndex : 9999).ThenBy(c => c.ACCaption);
             }
 
             if (!relevantPAFs.Any())
