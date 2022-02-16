@@ -961,7 +961,7 @@ namespace gip.bso.facility
         private void _SelectedFacilityInventoryPos_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             FacilityInventoryPos item = sender as FacilityInventoryPos;
-            if (e.PropertyName == "NotAvailable")
+            if (e.PropertyName == nameof(item.NotAvailable))
             {
                 if (item.NotAvailable)
                     item.NewStockQuantity = null;
@@ -970,23 +970,24 @@ namespace gip.bso.facility
                     MDFacilityInventoryPosState stateInProgress =
                         item.GetObjectContext<DatabaseApp>()
                         .MDFacilityInventoryPosState
-                        .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
+                        .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
                     item.MDFacilityInventoryPosState = stateInProgress;
                 }
-                OnPropertyChanged("SelectedFacilityInventoryPos");
+                OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
             }
-            else if (e.PropertyName == "NewStockQuantity")
+            else if (e.PropertyName == nameof(item.NewStockQuantity))
             {
-                item.NotAvailable = false;
+                if (item.NewStockQuantity.HasValue )
+                    item.NotAvailable = false;
                 if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
                 {
                     MDFacilityInventoryPosState stateInProgress =
                       item.GetObjectContext<DatabaseApp>()
                       .MDFacilityInventoryPosState
-                      .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
+                      .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
                     item.MDFacilityInventoryPosState = stateInProgress;
                 }
-                OnPropertyChanged("SelectedFacilityInventoryPos");
+                OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
             }
         }
 
@@ -1579,7 +1580,7 @@ namespace gip.bso.facility
                             || c.FacilityLot.LotNo.Contains(FilterNotUsedChargeLotNo)
                          )
 
-                ).OrderBy(c => c.FacilityLot.LotNo)
+                ).OrderBy(c => c.FacilityLot != null ? c.FacilityLot.LotNo : "")
                 .Take(FilterNotUsedChargePageSize)
                 .ToList();
         }
