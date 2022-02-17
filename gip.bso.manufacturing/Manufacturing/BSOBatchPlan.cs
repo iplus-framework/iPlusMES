@@ -1461,7 +1461,8 @@ namespace gip.bso.manufacturing
                 }
 
                 Type typeOfDis = acClassOfPWDischarging.ObjectType;
-                if (!typeof(IPWNodeDeliverMaterial).IsAssignableFrom(typeOfDis))
+                if (  !typeof(IPWNodeDeliverMaterial).IsAssignableFrom(typeOfDis)
+                    || acClassWFDischarging.ACClassMethodID != VBCurrentACClassWF.RefPAACClassMethodID)
                 {
                     acClassOfPWDischarging = null;
                     acClassWFDischarging = null;
@@ -1473,6 +1474,10 @@ namespace gip.bso.manufacturing
 
             return acClassWFDischarging;
         }
+
+        //private bool IsParentWF(gip.core.datamodel.ACClassWF wfToCheck, gip.mes.datamodel.ACClassWF par)
+        //{
+        //}
 
         #endregion
 
