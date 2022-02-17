@@ -62,7 +62,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region Methods
 
         public override void Activate(ACComponent selectedProcessModule)
@@ -86,7 +85,7 @@ namespace gip.bso.manufacturing
 
             _ScaleRef = new ACRef<ACComponent>(scale, this);
 
-            PAFACState = ProcessFunction.GetPropertyNet("ACState") as IACContainerTNet<ACStateEnum>;
+            PAFACState = ProcessFunction.GetPropertyNet(nameof(PAProcessFunction.ACState)) as IACContainerTNet<ACStateEnum>;
             if(PAFACState == null)
             {
                 //Error50326: The property ACState can not be found on the current process function.
@@ -110,7 +109,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Register sample weight'}de{'Stichprobengewicht registrieren'}", 601, true)]
         public void RegisterSampleWeight()
         {
-            Msg msg = ProcessFunction.ExecuteMethod("RegisterSampleWeight") as Msg;
+            Msg msg = ProcessFunction.ExecuteMethod(nameof(PAFSampleWeighing.RegisterSampleWeight)) as Msg;
             if (msg != null)
                 Messages.Msg(msg);
         }
@@ -135,10 +134,10 @@ namespace gip.bso.manufacturing
 
             switch(acMethodName)
             {
-                case "RegisterSampleWeight":
+                case nameof(RegisterSampleWeight):
                     RegisterSampleWeight();
                     return true;
-                case "IsEnabledRegisterSampleWeight":
+                case nameof(IsEnabledRegisterSampleWeight):
                     result = IsEnabledRegisterSampleWeight();
                     return true;
             }

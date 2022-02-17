@@ -20,7 +20,7 @@ using gip.mes.processapplication;
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center'}de{'Arbeitsplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
-    [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + ClassName, "en{'Work center'}de{'Arbeitsplatz'}", typeof(WorkCenterItem), ClassName, "", "")]
+    [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + nameof(BSOWorkCenterSelector), "en{'Work center'}de{'Arbeitsplatz'}", typeof(WorkCenterItem), nameof(BSOWorkCenterSelector), "", "")]
     public class BSOWorkCenterSelector : ACBSOvbNav
     {
         #region c'tors
@@ -131,7 +131,6 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
-        public const string ClassName = "BSOWorkCenterSelector";
         public const string FunctionMonitorTabVBContent = "FuncMonitor";
 
         #endregion
@@ -702,8 +701,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-       
-
         #endregion
 
         #region Methods
@@ -897,7 +894,7 @@ namespace gip.bso.manufacturing
 
             ProcessModuleOrderInfo = null;
 
-            ProcessModuleOrderInfo = processModule.GetPropertyNet("OrderInfo") as IACContainerTNet<string>;
+            ProcessModuleOrderInfo = processModule.GetPropertyNet(nameof(PAProcessModule.OrderInfo)) as IACContainerTNet<string>;
             if(ProcessModuleOrderInfo == null)
             {
                 //error
@@ -949,7 +946,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                string[] accessArr = (string[])currentProcessModule?.ACUrlCommand("!SemaphoreAccessedFrom");
+                string[] accessArr = (string[])currentProcessModule?.ExecuteMethod(nameof(PAProcessModule.SemaphoreAccessedFrom));
                 if (accessArr == null || !accessArr.Any())
                 {
                     CurrentBatch = null;
@@ -977,11 +974,11 @@ namespace gip.bso.manufacturing
                     _CurrentPWGroup = new ACRef<IACComponentPWNode>(pwGroup, this);
                 }
 
-                PAOrderInfo currentOrderInfo = pwGroup?.ExecuteMethod("GetPAOrderInfo") as PAOrderInfo;
+                PAOrderInfo currentOrderInfo = pwGroup?.ExecuteMethod(nameof(PWGroup.GetPAOrderInfo)) as PAOrderInfo;
                 if (currentOrderInfo == null)
                 {
                     Thread.Sleep(200);
-                    currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!GetPAOrderInfo") as PAOrderInfo;
+                    currentOrderInfo = Root.ACUrlCommand(pwGroupACUrl + "!" + nameof(PWGroup.GetPAOrderInfo)) as PAOrderInfo;
                 }
                 if (currentOrderInfo != null)
                 {
@@ -992,7 +989,7 @@ namespace gip.bso.manufacturing
                         return;
                     }
 
-                    var alarmsInPhysicalModel = rootPW.GetPropertyNet(PWProcessFunction.PN_AlarmsInPhysicalModel) as IACContainerTNet<bool>;
+                    var alarmsInPhysicalModel = rootPW.GetPropertyNet(nameof(PWProcessFunction.AlarmsInPhysicalModel)) as IACContainerTNet<bool>;
                     if (alarmsInPhysicalModel == null)
                     {
                         //TODO:error
@@ -1045,7 +1042,7 @@ namespace gip.bso.manufacturing
         public virtual void BuildWorkCenterItems()
         {
             _RulesForCurrentUser = GetRulesByCurrentUser();
-            var relevantPAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList)
+            var relevantPAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, nameof(PAProcessFunction), Const.KeyACUrl_BusinessobjectList)
                                     .ToArray().OrderBy(c => c.AssemblyACClassInfo != null ? c.AssemblyACClassInfo.SortIndex : 9999).ThenBy(c => c.ACCaption);
 
             if (_RulesForCurrentUser != null && _RulesForCurrentUser.Any() && !Root.Environment.User.IsSuperuser)
@@ -1179,7 +1176,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Show/Refresh workflow'}de{'Workflow anzeigen/aktualisieren'}", 610)]
         public void ShowWorkflow()
         {
-            string[] accessArr = (string[])CurrentWorkCenterItem?.ProcessModule?.ACUrlCommand("!SemaphoreAccessedFrom");
+            string[] accessArr = (string[])CurrentWorkCenterItem?.ProcessModule?.ExecuteMethod(nameof(PAProcessModule.SemaphoreAccessedFrom));
             if (accessArr == null || !accessArr.Any())
             {
                 if (TaskPresenter != null)
@@ -1308,7 +1305,7 @@ namespace gip.bso.manufacturing
             if (currentPWGroup == null)
                 return;
 
-            _CurrentPWGroup.ValueT.ACUrlCommand("!SetExtraDisTarget", SelectedExtraDisTarget.ACUrlComponent);
+            _CurrentPWGroup.ValueT.ExecuteMethod(nameof(PWGroupVB.SetExtraDisTarget), SelectedExtraDisTarget.ACUrlComponent);
 
             CloseTopDialog();
         }
@@ -1380,7 +1377,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            _AccessedProcessModulesProp = rootPW.GetPropertyNet(PWProcessFunction.PN_AccessedProcessModules) as IACContainerTNet<List<ACChildInstanceInfo>>;
+            _AccessedProcessModulesProp = rootPW.GetPropertyNet(nameof(PWProcessFunction.AccessedProcessModules)) as IACContainerTNet<List<ACChildInstanceInfo>>;
             if (_AccessedProcessModulesProp == null)
             {
                 //TODO:error
@@ -1472,7 +1469,6 @@ namespace gip.bso.manufacturing
                 SelectedFunction = null;
                 FunctionCommands = null;
             }
-
         }
 
         private void _AlarmsInPhysicalModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -1506,7 +1502,7 @@ namespace gip.bso.manufacturing
 
         private void SelectionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "SelectedACObject")
+            if (e.PropertyName == nameof(SelectionManager.SelectedACObject))
             {
                 FunctionCommands = null;
                 var acClass = SelectionManager?.SelectedACObject?.ACType as core.datamodel.ACClass;
@@ -1550,49 +1546,49 @@ namespace gip.bso.manufacturing
 
             switch (acMethodName)
             {
-                case "ConfigureBSO":
+                case nameof(ConfigureBSO):
                     ConfigureBSO();
                     return true;
-                case "IsEnabledConfigureBSO":
+                case nameof(IsEnabledConfigureBSO):
                     result = IsEnabledConfigureBSO();
                     return true;
-                case "AddRule":
+                case nameof(AddRule):
                     AddRule();
                     return true;
-                case "IsEnabledAddRule()":
+                case nameof(IsEnabledAddRule):
                     result = IsEnabledAddRule();
                     return true;
-                case "RemoveRule":
+                case nameof(RemoveRule):
                     RemoveRule();
                     return true;
-                case "IsEnabledRemoveRule":
+                case nameof(IsEnabledRemoveRule):
                     result = IsEnabledRemoveRule();
                     return true;
-                case "ApplyRulesAndClose":
+                case nameof(ApplyRulesAndClose):
                     ApplyRulesAndClose();
                     return true;
-                case "IsEnabledApplyRulesAndClose":
+                case nameof(IsEnabledApplyRulesAndClose):
                     result = IsEnabledApplyRulesAndClose();
                     return true;
-                case "ShowWorkflow":
+                case nameof(ShowWorkflow):
                     ShowWorkflow();
                     return true;
-                case "IsEnabledShowWorkflow":
+                case nameof(IsEnabledShowWorkflow):
                     result = IsEnabledShowWorkflow();
                     return true;
-                case "SwitchPWGroupToEmptyingMode":
+                case nameof(SwitchPWGroupToEmptyingMode):
                     SwitchPWGroupToEmptyingMode();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
             }
