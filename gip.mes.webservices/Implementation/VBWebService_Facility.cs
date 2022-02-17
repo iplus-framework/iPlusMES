@@ -497,6 +497,7 @@ namespace gip.mes.webservices
                         {
                             datamodel.FacilityInventoryPos iPos = datamodel.FacilityInventoryPos.NewACObject(dbApp, inv);
                             iPos.FacilityChargeID = fc.FacilityChargeID;
+                            iPos.StockQuantity = fc.StockQuantity;
                             iPos.NewStockQuantity = fc.StockQuantity;
 
                             datamodel.MDFacilityInventoryPosState posState = dbApp.MDFacilityInventoryPosState
