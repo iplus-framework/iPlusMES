@@ -26,6 +26,7 @@ using System.Data.Objects;
 using System.Globalization;
 using System.Linq;
 using static gip.core.datamodel.Global;
+using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
 
 namespace gip.bso.logistics
@@ -3763,200 +3764,261 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case "Save":
-                    Save();
-                    return true;
-                case "IsEnabledSave":
-                    result = IsEnabledSave();
-                    return true;
-                case "UndoSave":
-                    UndoSave();
-                    return true;
-                case "IsEnabledUndoSave":
-                    result = IsEnabledUndoSave();
-                    return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
-                    return true;
-                case "IsEnabledLoad":
-                    result = IsEnabledLoad();
-                    return true;
-                case "New":
-                    New();
-                    return true;
-                case "IsEnabledNew":
-                    result = IsEnabledNew();
-                    return true;
-                case "Delete":
-                    Delete();
-                    return true;
-                case "IsEnabledDelete":
-                    result = IsEnabledDelete();
-                    return true;
-                case "Search":
-                    Search();
-                    return true;
-                case "CancelPicking":
-                    CancelPicking();
-                    return true;
-                case "IsEnabledCancelPicking":
-                    result = IsEnabledCancelPicking();
-                    return true;
-                case "UnassignPickingPos":
-                    UnassignPickingPos();
-                    return true;
-                case "IsEnabledUnassignPickingPos":
-                    result = IsEnabledUnassignPickingPos();
-                    return true;
-                case "AddPickingPos":
-                    AddPickingPos();
-                    return true;
-                case "IsEnabledAddPickingPos":
-                    result = IsEnabledAddPickingPos();
-                    return true;
-                case "NewFacilityPreBooking":
-                    NewFacilityPreBooking();
-                    return true;
-                case "IsEnabledNewFacilityPreBooking":
-                    result = IsEnabledNewFacilityPreBooking();
-                    return true;
-                case "CancelFacilityPreBooking":
-                    CancelFacilityPreBooking();
-                    return true;
-                case "IsEnabledCancelFacilityPreBooking":
-                    result = IsEnabledCancelFacilityPreBooking();
-                    return true;
-                case "DeleteFacilityPreBooking":
-                    DeleteFacilityPreBooking();
-                    return true;
-                case "IsEnabledDeleteFacilityPreBooking":
-                    result = IsEnabledDeleteFacilityPreBooking();
-                    return true;
-                case "BookDeliveryPos":
-                    BookDeliveryPos();
-                    return true;
-                case "IsEnabledBookDeliveryPos":
-                    result = IsEnabledBookDeliveryPos();
-                    return true;
-                case "BookCurrentACMethodBooking":
-                    BookCurrentACMethodBooking();
-                    return true;
-                case "IsEnabledBookCurrentACMethodBooking":
-                    result = IsEnabledBookCurrentACMethodBooking();
-                    return true;
-                case "BookAllACMethodBookings":
-                    BookAllACMethodBookings();
-                    return true;
-                case "IsEnabledBookAllACMethodBookings":
-                    result = IsEnabledBookAllACMethodBookings();
-                    return true;
-                case "NewFacilityLot":
-                    NewFacilityLot();
-                    return true;
-                case "IsEnabledNewFacilityLot":
-                    result = IsEnabledNewFacilityLot();
-                    return true;
-                case "ShowFacilityLot":
-                    ShowFacilityLot();
-                    return true;
-                case "IsEnabledShowFacilityLot":
-                    result = IsEnabledShowFacilityLot();
-                    return true;
-                case "OnActivate":
-                    OnActivate((String)acParameter[0]);
-                    return true;
-                case "AssignInOrderPos":
-                    AssignInOrderPos();
-                    return true;
-                case "IsEnabledAssignInOrderPos":
-                    result = IsEnabledAssignInOrderPos();
-                    return true;
-                case "FilterDialogInOrderPos":
-                    result = FilterDialogInOrderPos();
-                    return true;
-                case "AssignDNoteInOrderPos":
-                    AssignDNoteInOrderPos();
-                    return true;
-                case "IsEnabledAssignDNoteInOrderPos":
-                    result = IsEnabledAssignDNoteInOrderPos();
-                    return true;
-                case "AssignOutOrderPos":
-                    AssignOutOrderPos();
-                    return true;
-                case "IsEnabledAssignOutOrderPos":
-                    result = IsEnabledAssignOutOrderPos();
-                    return true;
-                case "FilterDialogOutOrderPos":
-                    result = FilterDialogOutOrderPos();
-                    return true;
-                case "AssignDNoteOutOrderPos":
-                    AssignDNoteOutOrderPos();
-                    return true;
-                case "IsEnabledAssignDNoteOutOrderPos":
-                    result = IsEnabledAssignDNoteOutOrderPos();
-                    return true;
-                case "AssignProdOrderPartslistPos":
+                case nameof(AssignProdOrderPartslistPos):
                     AssignProdOrderPartslistPos();
                     return true;
-                case "IsEnabledAssignProdOrderPartslistPos":
+                case nameof(IsEnabledAssignProdOrderPartslistPos):
                     result = IsEnabledAssignProdOrderPartslistPos();
                     return true;
-                case "FilterDialogProdOrderPartslistPos":
+                case nameof(FilterDialogProdOrderPartslistPos):
                     result = FilterDialogProdOrderPartslistPos();
                     return true;
-                case "ValidateRoutes":
+                case nameof(ShowDlgInwardFacility):
+                    ShowDlgInwardFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgInwardFacility):
+                    result = IsEnabledShowDlgInwardFacility();
+                    return true;
+                case nameof(ShowDlgOutwardFacility):
+                    ShowDlgOutwardFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgOutwardFacility):
+                    result = IsEnabledShowDlgOutwardFacility();
+                    return true;
+                case nameof(ShowDlgFilterFromFacility):
+                    ShowDlgFilterFromFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgFilterFromFacility):
+                    result = IsEnabledShowDlgFilterFromFacility();
+                    return true;
+                case nameof(ShowDlgFilterToFacility):
+                    ShowDlgFilterToFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgFilterToFacility):
+                    result = IsEnabledShowDlgFilterToFacility();
+                    return true;
+                case nameof(OnActivate):
+                    OnActivate((System.String)acParameter[0]);
+                    return true;
+                case nameof(ValidateRoutes):
                     ValidateRoutes();
                     return true;
-                case Const.IsEnabledPrefix + "ValidateRoutes":
+                case nameof(IsEnabledValidateRoutes):
                     result = IsEnabledValidateRoutes();
                     return true;
-                case "StartWorkflow":
+                case nameof(StartWorkflow):
                     StartWorkflow();
                     return true;
-                case Const.IsEnabledPrefix + "StartWorkflow":
+                case nameof(IsEnabledStartWorkflow):
                     result = IsEnabledStartWorkflow();
                     return true;
-                case "ShowDialogOrder":
-                    ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
-                    return true;
-                case "ShowDialogOrderInfo":
-                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
-                    return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "ShowDlgInwardAvailableQuants":
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1]);
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(OnTrackingCall):
+                    OnTrackingCall((TrackingAndTracingSearchModel)acParameter[0], (gip.core.datamodel.IACObject)acParameter[1], (System.Object)acParameter[2], (TrackingEnginesEnum)acParameter[3]);
+                    return true;
+                case nameof(FilterClear):
+                    FilterClear();
+                    return true;
+                case nameof(IsEnabledFilterClear):
+                    result = IsEnabledFilterClear();
+                    return true;
+                case nameof(ProcessWorkflowAssign):
+                    ProcessWorkflowAssign();
+                    return true;
+                case nameof(IsEnabledProcessWorkflowAssign):
+                    result = IsEnabledProcessWorkflowAssign();
+                    return true;
+                case nameof(ProcessWorkflowCancel):
+                    ProcessWorkflowCancel();
+                    return true;
+                case nameof(IsEnabledProcessWorkflowCancel):
+                    result = IsEnabledProcessWorkflowCancel();
+                    return true;
+                case nameof(AssignInOrderPos):
+                    AssignInOrderPos();
+                    return true;
+                case nameof(IsEnabledAssignInOrderPos):
+                    result = IsEnabledAssignInOrderPos();
+                    return true;
+                case nameof(FilterDialogInOrderPos):
+                    result = FilterDialogInOrderPos();
+                    return true;
+                case nameof(AssignDNoteInOrderPos):
+                    AssignDNoteInOrderPos();
+                    return true;
+                case nameof(IsEnabledAssignDNoteInOrderPos):
+                    result = IsEnabledAssignDNoteInOrderPos();
+                    return true;
+                case nameof(AssignOutOrderPos):
+                    AssignOutOrderPos();
+                    return true;
+                case nameof(IsEnabledAssignOutOrderPos):
+                    result = IsEnabledAssignOutOrderPos();
+                    return true;
+                case nameof(FilterDialogOutOrderPos):
+                    result = FilterDialogOutOrderPos();
+                    return true;
+                case nameof(AssignDNoteOutOrderPos):
+                    AssignDNoteOutOrderPos();
+                    return true;
+                case nameof(IsEnabledAssignDNoteOutOrderPos):
+                    result = IsEnabledAssignDNoteOutOrderPos();
+                    return true;
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(CancelPicking):
+                    CancelPicking();
+                    return true;
+                case nameof(IsEnabledCancelPicking):
+                    result = IsEnabledCancelPicking();
+                    return true;
+                case nameof(MirrorPicking):
+                    MirrorPicking();
+                    return true;
+                case nameof(IsEnabledMirrorPicking):
+                    result = IsEnabledMirrorPicking();
+                    return true;
+                case nameof(UnassignPickingPos):
+                    UnassignPickingPos();
+                    return true;
+                case nameof(IsEnabledUnassignPickingPos):
+                    result = IsEnabledUnassignPickingPos();
+                    return true;
+                case nameof(AddPickingPos):
+                    AddPickingPos();
+                    return true;
+                case nameof(IsEnabledAddPickingPos):
+                    result = IsEnabledAddPickingPos();
+                    return true;
+                case nameof(ShowDlgFromFacility):
+                    ShowDlgFromFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgFromFacility):
+                    result = IsEnabledShowDlgFromFacility();
+                    return true;
+                case nameof(ShowDlgToFacility):
+                    ShowDlgToFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgToFacility):
+                    result = IsEnabledShowDlgToFacility();
+                    return true;
+                case nameof(NewFacilityPreBooking):
+                    NewFacilityPreBooking();
+                    return true;
+                case nameof(IsEnabledNewFacilityPreBooking):
+                    result = IsEnabledNewFacilityPreBooking();
+                    return true;
+                case nameof(CancelFacilityPreBooking):
+                    CancelFacilityPreBooking();
+                    return true;
+                case nameof(IsEnabledCancelFacilityPreBooking):
+                    result = IsEnabledCancelFacilityPreBooking();
+                    return true;
+                case nameof(DeleteFacilityPreBooking):
+                    DeleteFacilityPreBooking();
+                    return true;
+                case nameof(IsEnabledDeleteFacilityPreBooking):
+                    result = IsEnabledDeleteFacilityPreBooking();
+                    return true;
+                case nameof(BookDeliveryPos):
+                    BookDeliveryPos();
+                    return true;
+                case nameof(IsEnabledBookDeliveryPos):
+                    result = IsEnabledBookDeliveryPos();
+                    return true;
+                case nameof(BookCurrentACMethodBooking):
+                    BookCurrentACMethodBooking();
+                    return true;
+                case nameof(IsEnabledBookCurrentACMethodBooking):
+                    result = IsEnabledBookCurrentACMethodBooking();
+                    return true;
+                case nameof(BookAllACMethodBookings):
+                    BookAllACMethodBookings();
+                    return true;
+                case nameof(IsEnabledBookAllACMethodBookings):
+                    result = IsEnabledBookAllACMethodBookings();
+                    return true;
+                case nameof(NewFacilityLot):
+                    NewFacilityLot();
+                    return true;
+                case nameof(IsEnabledNewFacilityLot):
+                    result = IsEnabledNewFacilityLot();
+                    return true;
+                case nameof(ShowFacilityLot):
+                    ShowFacilityLot();
+                    return true;
+                case nameof(IsEnabledShowFacilityLot):
+                    result = IsEnabledShowFacilityLot();
+                    return true;
+                case nameof(ShowDlgInwardAvailableQuants):
                     ShowDlgInwardAvailableQuants();
                     return true;
-                case "IsEnabledShowDlgInwardAvailableQuants":
+                case nameof(IsEnabledShowDlgInwardAvailableQuants):
                     result = IsEnabledShowDlgInwardAvailableQuants();
                     return true;
-                case "ShowDlgOutwardAvailableQuants":
+                case nameof(ShowDlgOutwardAvailableQuants):
                     ShowDlgOutwardAvailableQuants();
                     return true;
-                case "IsEnabledShowDlgOutwardAvailableQuants":
+                case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();
                     return true;
-                case "DlgAvailableQuantsOk":
+                case nameof(DlgAvailableQuantsOk):
                     DlgAvailableQuantsOk();
                     return true;
-                case "IsEnabledDlgAvailableQuantsOk":
+                case nameof(IsEnabledDlgAvailableQuantsOk):
                     result = IsEnabledDlgAvailableQuantsOk();
                     return true;
-                case "DlgAvailableQuantsCancel":
+                case nameof(DlgAvailableQuantsCancel):
                     DlgAvailableQuantsCancel();
                     return true;
-                case "FinishOrder":
+                case nameof(FinishOrder):
                     FinishOrder();
                     return true;
-                case "IsEnabledFinishOrder":
+                case nameof(IsEnabledFinishOrder):
                     result = IsEnabledFinishOrder();
                     return true;
-                default:
-                    break;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
