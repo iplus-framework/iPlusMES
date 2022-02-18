@@ -232,6 +232,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private double _ScaleGrossWeight;
+        [ACPropertyInfo(605)]
+        public double ScaleGrossWeight
+        {
+            get => _ScaleGrossWeight;
+            set
+            {
+                _ScaleGrossWeight = value;
+                OnPropertyChanged();
+            }
+        }
+
         private double _TargetWeight;
         [ACPropertyInfo(606)]
         public double TargetWeight
@@ -656,6 +668,19 @@ namespace gip.bso.manufacturing
             {
                 _PAFCurrentMaterial = value;
                 OnPropertyChanged("PAFCurrentMaterial");
+                ShowScaleGross = string.IsNullOrEmpty(_PAFCurrentMaterial);
+            }
+        }
+
+        private bool _ShowScaleGross;
+        [ACPropertyInfo(632)]
+        public bool ShowScaleGross
+        {
+            get => _ShowScaleGross;
+            set
+            {
+                _ShowScaleGross = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1261,7 +1286,7 @@ namespace gip.bso.manufacturing
             if (scale == null)
                 return;
 
-            var actWeightProp = scale.GetPropertyNet("ActualWeight");
+            var actWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualWeight));
             if (actWeightProp == null)
             {
                 //Error50292: Initialization error: The scale component doesn't have the property {0}.
@@ -1284,7 +1309,9 @@ namespace gip.bso.manufacturing
 
             _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
             (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged += ActWeightProp_PropertyChanged;
+            (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
             ScaleRealWeight = _ScaleActualWeight.ValueT;
+            ScaleGrossWeight = _ScaleActualValue.ValueT;
 
 
             if (CurrentPAFManualWeighing != null && scale != null )
@@ -1292,7 +1319,7 @@ namespace gip.bso.manufacturing
                 CurrentPAFManualWeighing.ExecuteMethod(nameof(PAFManualWeighing.SetActiveScaleObject), scale.ACIdentifier);
             }
 
-            OnPropertyChanged("CurrentScaleObject");
+            OnPropertyChanged(nameof(CurrentScaleObject));
         }
 
         private void LoadWFNode(ACComponent currentProcessModule, string orderInfo)
@@ -2617,8 +2644,8 @@ namespace gip.bso.manufacturing
                 _IsEnabledCompleteInterdischarging = true;
                 if (_ScaleActualValue != null)
                 {
-                    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
-                    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
+                    //(_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
+                    //(_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
 
                     _IsEnabledCompleteInterdischarging = false;
 
@@ -2629,12 +2656,16 @@ namespace gip.bso.manufacturing
 
         private void ScaleActualValue_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == Const.ValueT && InInterdischargingQ.HasValue)
+            if (e.PropertyName == Const.ValueT)
             {
                 IACContainerTNet<double> propVal = sender as IACContainerTNet<double>;
                 if (propVal != null)
                 {
-                    VerifyIsActualQLower(propVal.ValueT);
+                    ScaleGrossWeight = propVal.ValueT;
+                    if (InInterdischargingQ.HasValue)
+                    {
+                        VerifyIsActualQLower(propVal.ValueT);
+                    }
                 }
             }
         }
@@ -2644,8 +2675,6 @@ namespace gip.bso.manufacturing
             if (actualValue <= InterdischargingCompleteQ)
             {
                 _IsEnabledCompleteInterdischarging = true;
-                if (_ScaleActualValue != null)
-                    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
             }
         }
 
