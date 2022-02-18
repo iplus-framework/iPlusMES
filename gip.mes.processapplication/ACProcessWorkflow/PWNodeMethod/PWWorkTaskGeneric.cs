@@ -22,6 +22,8 @@ namespace gip.mes.processapplication
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
             //method.ParameterValueList.Add(new ACValue("PiecesPerRack", typeof(int), 0, Global.ParamOption.Required));
             //paramTranslation.Add("PiecesPerRack", "en{'Capacity: Pieces per oven rack'}de{'Kapazität: Stücke pro Stikkenwagen'}");
+            method.ParameterValueList.Add(new ACValue("AutoComplete", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoComplete", "en{'Auto complete'}de{'Autovervollständigung'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWWorkTaskGeneric), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWWorkTaskGeneric), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWWorkTaskGeneric), HandleExecuteACMethod_PWWorkTaskGeneric);
@@ -40,9 +42,34 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
+
+        public bool AutoComplete
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("AutoComplete");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
         #endregion
 
         #region Methods
+
+        public override void SMRunning()
+        {
+            base.SMRunning();
+            if (AutoComplete)
+            {
+                ResetAndComplete();
+            }    
+        }
 
         #region Execute-Helper-Handlers
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

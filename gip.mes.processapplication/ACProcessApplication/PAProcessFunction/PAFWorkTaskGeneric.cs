@@ -25,12 +25,6 @@ namespace gip.mes.processapplication
         {
         }
 
-        public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
-        {
-            base.Recycle(content, parentACObject, parameter, acIdentifier);
-            _AutoComplete = null;
-        }
-
         #endregion
 
         #region Properties
@@ -45,40 +39,6 @@ namespace gip.mes.processapplication
         protected override bool PWWorkTaskScanDeSelector(IACComponent c)
         {
             return c is PWWorkTaskGeneric;
-        }
-
-        private bool? _AutoComplete;
-        public bool AutoComplete
-        {
-            get
-            {
-                if (!_AutoComplete.HasValue)
-                {
-                    _AutoComplete = false;
-                    var acValue = CurrentACMethod?.ValueT?.ParameterValueList?.GetACValue("AutoComplete");
-                    if (acValue != null)
-                    {
-                        _AutoComplete = acValue.ParamAsBoolean;
-                    }
-                }
-                return _AutoComplete.Value;
-            }
-        }
-
-        public override void SMRunning()
-        {
-            base.SMRunning();
-
-            if (AutoComplete)
-            {
-                Abort();
-            }
-        }
-
-        public override void SMIdle()
-        {
-            base.SMIdle();
-            _AutoComplete = null;
         }
 
         #region Execute-Helper-Handlers
@@ -121,8 +81,6 @@ namespace gip.mes.processapplication
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ParameterValueList.Add(new ACValue("Description", typeof(string), "", Global.ParamOption.Optional));
             paramTranslation.Add("Description", "en{'Description'}de{'Bechreibung'}");
-            method.ParameterValueList.Add(new ACValue("AutoComplete", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("AutoComplete", "en{'Auto complete'}de{'Autovervollständigung'}");
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
         }
 
