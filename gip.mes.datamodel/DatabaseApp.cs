@@ -90,8 +90,8 @@ namespace gip.mes.datamodel
 
         static DatabaseApp()
         {
-            if (!Global.ContextMenuCategoryList.Where(c => (short)c.Value == (short)Global.ContextMenuCategory.ProdPlanLog).Any())
-                Global.ContextMenuCategoryList.Add(new ACValueItem("en{'Production, Plannung & Logistics'}de{'Production, Plannung & Logistics'}", (short)Global.ContextMenuCategory.ProdPlanLog, null, null, 250));
+            //if (!Global.ContextMenuCategoryList.Where(c => (short)c.Value == (short)Global.ContextMenuCategory.ProdPlanLog).Any())
+            //    Global.ContextMenuCategoryList.Add(new ACValueItem("en{'Production, Plannung & Logistics'}de{'Production, Plannung & Logistics'}", (short)Global.ContextMenuCategory.ProdPlanLog, null, null, 250));
         }
 
         protected override void Dispose(bool disposing)
