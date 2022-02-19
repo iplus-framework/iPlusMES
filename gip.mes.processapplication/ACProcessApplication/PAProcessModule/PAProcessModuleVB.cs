@@ -167,7 +167,7 @@ namespace gip.mes.processapplication
                 RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, false, compClass, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards, 
                                                                         null, null, null, 0, true, true);
 
-                if(rResult == null)
+                if (rResult == null)
                 {
                     return new SingleDosingItems() { Error = new Msg(eMsgLevel.Error, "Routing result is null!") };
                 }
@@ -179,7 +179,7 @@ namespace gip.mes.processapplication
 
                 SingleDosingItems result = new SingleDosingItems();
 
-                foreach(Route route in rResult.Routes)
+                foreach (Route route in rResult.Routes)
                 {
                     RouteItem rItem = route.GetRouteSource();
                     if (rItem == null)

@@ -31,6 +31,77 @@ namespace gip.mes.processapplication
             }
         }
 
+        public static bool GetRelatedProdOrderPosForWFNode(PWBase pwNode, Database dbIPlus, DatabaseApp dbApp, PWMethodProduction pwMethodProduction,
+            out ProdOrderPartslistPos intermediateChildPos, out ProdOrderPartslistPos intermediatePosition, out ProdOrderPartslistPos endBatchPos,
+            out MaterialWFConnection matWFConnection, out ProdOrderBatch batch, out ProdOrderBatchPlan batchPlan)
+        {
+            intermediateChildPos = null;
+            matWFConnection = null;
+            batch = null;
+            batchPlan = null;
+            intermediatePosition = null;
+
+            endBatchPos = pwMethodProduction.CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
+            if (pwMethodProduction.CurrentProdOrderBatch == null)
+                return false;
+
+            var contentACClassWFVB = pwNode.ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
+            batch = pwMethodProduction.CurrentProdOrderBatch.FromAppContext<ProdOrderBatch>(dbApp);
+            batchPlan = batch.ProdOrderBatchPlan;
+            matWFConnection = null;
+            if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
+            {
+                ProdOrderBatchPlan batchPlan2 = batchPlan;
+                matWFConnection = dbApp.MaterialWFConnection
+                                        .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan2.MaterialWFACClassMethodID.Value
+                                                && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
+                                        .FirstOrDefault();
+            }
+            else
+            {
+                PartslistACClassMethod plMethod = endBatchPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                if (plMethod != null)
+                {
+                    matWFConnection = dbApp.MaterialWFConnection
+                                            .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
+                                                    && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
+                                            .FirstOrDefault();
+                }
+                else
+                {
+                    ProdOrderPartslistPos endBatchPos2 = endBatchPos;
+                    matWFConnection = contentACClassWFVB.MaterialWFConnection_ACClassWF
+                        .Where(c => c.MaterialWFACClassMethod.MaterialWFID == endBatchPos2.ProdOrderPartslist.Partslist.MaterialWFID
+                                    && c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod.Where(d => d.PartslistID == endBatchPos2.ProdOrderPartslist.PartslistID).Any())
+                        .FirstOrDefault();
+                }
+            }
+
+            if (matWFConnection == null)
+                return false;
+
+            MaterialWFConnection matWFConnection2 = matWFConnection;
+            // Find intermediate position which is assigned to this Dosing-Workflownode
+            var currentProdOrderPartslist = endBatchPos.ProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
+            intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection2.MaterialID
+                    && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                    && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
+            if (intermediatePosition == null)
+                return false;
+
+            // Lock, if a parallel Dosing also creates a child Position for this intermediate Position
+            using (ACMonitor.Lock(pwMethodProduction._62000_PWGroupLockObj))
+            {
+                // Find intermediate child position, which is assigned to this Batch
+                intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
+                    .Where(c => c.ProdOrderBatchID.HasValue
+                                && c.ProdOrderBatchID.Value == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID)
+                    .FirstOrDefault();
+            }
+            return intermediateChildPos != null;
+        }
+
         public virtual bool HasAnyMaterialToProcessProd
         {
             get
@@ -44,65 +115,15 @@ namespace gip.mes.processapplication
                 {
                     using (var dbApp = new DatabaseApp(dbIPlus))
                     {
-                        ProdOrderPartslistPos endBatchPos = pwMethodProduction.CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
-                        if (pwMethodProduction.CurrentProdOrderBatch == null)
-                            return true;
-
-                        var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
-                        ProdOrderBatch batch = pwMethodProduction.CurrentProdOrderBatch.FromAppContext<ProdOrderBatch>(dbApp);
-                        ProdOrderBatchPlan batchPlan = batch.ProdOrderBatchPlan;
-                        MaterialWFConnection matWFConnection = null;
-                        if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
-                        {
-                            matWFConnection = dbApp.MaterialWFConnection
-                                                    .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
-                                                            && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                                    .FirstOrDefault();
-                        }
-                        else
-                        {
-                            PartslistACClassMethod plMethod = endBatchPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                            if (plMethod != null)
-                            {
-                                matWFConnection = dbApp.MaterialWFConnection
-                                                        .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
-                                                                && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                                        .FirstOrDefault();
-                            }
-                            else
-                            {
-                                matWFConnection = contentACClassWFVB.MaterialWFConnection_ACClassWF
-                                    .Where(c => c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
-                                                && c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod.Where(d => d.PartslistID == endBatchPos.ProdOrderPartslist.PartslistID).Any())
-                                    .FirstOrDefault();
-                            }
-                        }
-
-                        if (matWFConnection == null)
-                            return true;
-
-                        // Find intermediate position which is assigned to this Dosing-Workflownode
-                        var currentProdOrderPartslist = endBatchPos.ProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
-                        ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
-                            .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
-                                && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-                                && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
-                        if (intermediatePosition == null)
-                            return true;
-
-                        ProdOrderPartslistPos intermediateChildPos = null;
-                        // Lock, if a parallel Dosing also creates a child Position for this intermediate Position
-
-                        using (ACMonitor.Lock(pwMethodProduction._62000_PWGroupLockObj))
-                        {
-                            // Find intermediate child position, which is assigned to this Batch
-                            intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
-                                .Where(c => c.ProdOrderBatchID.HasValue
-                                            && c.ProdOrderBatchID.Value == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID)
-                                .FirstOrDefault();
-                        }
-
-                        if (intermediateChildPos == null)
+                        ProdOrderPartslistPos intermediateChildPos;
+                        MaterialWFConnection matWFConnection;
+                        ProdOrderBatch batch;
+                        ProdOrderBatchPlan batchPlan;
+                        ProdOrderPartslistPos intermediatePos;
+                        ProdOrderPartslistPos endBatchPos;
+                        bool posFound = GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos, 
+                            out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                        if (!posFound)
                             return true;
 
                         ProdOrderPartslistPosRelation[] queryOpenDosings = OnGetOpenDosingsForNextComponent(dbIPlus, dbApp, intermediateChildPos);
@@ -227,8 +248,16 @@ namespace gip.mes.processapplication
             {
                 using (var dbApp = new DatabaseApp(dbIPlus))
                 {
-                    ProdOrderPartslistPos endBatchPos = pwMethodProduction.CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
-                    if (pwMethodProduction.CurrentProdOrderBatch == null)
+
+                    ProdOrderPartslistPos intermediateChildPos;
+                    ProdOrderPartslistPos intermediatePosition;
+                    MaterialWFConnection matWFConnection;
+                    ProdOrderBatch batch;
+                    ProdOrderBatchPlan batchPlan;
+                    ProdOrderPartslistPos endBatchPos;
+                    bool posFound = GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, 
+                        out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                    if (batch == null)
                     {
                         // Error50060: No batch assigned to last intermediate material of this workflow-process
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(2)", 1010, "Error50060");
@@ -238,38 +267,7 @@ namespace gip.mes.processapplication
                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
                         return StartNextCompResult.CycleWait;
                     }
-
-                    var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
-                    ProdOrderBatch batch = pwMethodProduction.CurrentProdOrderBatch.FromAppContext<ProdOrderBatch>(dbApp);
-                    ProdOrderBatchPlan batchPlan = batch.ProdOrderBatchPlan;
-                    MaterialWFConnection matWFConnection = null;
-                    if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
-                    {
-                        matWFConnection = dbApp.MaterialWFConnection
-                                                .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
-                                                        && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                                .FirstOrDefault();
-                    }
-                    else
-                    {
-                        PartslistACClassMethod plMethod = endBatchPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                        if (plMethod != null)
-                        {
-                            matWFConnection = dbApp.MaterialWFConnection
-                                                    .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
-                                                            && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                                    .FirstOrDefault();
-                        }
-                        else
-                        {
-                            matWFConnection = contentACClassWFVB.MaterialWFConnection_ACClassWF
-                                .Where(c => c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
-                                            && c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod.Where(d => d.PartslistID == endBatchPos.ProdOrderPartslist.PartslistID).Any())
-                                .FirstOrDefault();
-                        }
-                    }
-
-                    if (matWFConnection == null)
+                    else if (matWFConnection == null)
                     {
                         // Error50059: No relation defined between Workflownode and intermediate material in Materialworkflow
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(3)", 1020, "Error50059");
@@ -279,14 +277,7 @@ namespace gip.mes.processapplication
                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
                         return StartNextCompResult.CycleWait;
                     }
-
-                    // Find intermediate position which is assigned to this Dosing-Workflownode
-                    var currentProdOrderPartslist = endBatchPos.ProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
-                    ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
-                        .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
-                            && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-                            && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
-                    if (intermediatePosition == null)
+                    else if (intermediatePosition == null)
                     {
                         // Error50061: Intermediate line not found which is assigned to this Dosing-Workflownode
                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(4)", 1030, "Error50061");
@@ -297,17 +288,8 @@ namespace gip.mes.processapplication
                         return StartNextCompResult.CycleWait;
                     }
 
-                    ProdOrderPartslistPos intermediateChildPos = null;
-                    // Lock, if a parallel Dosing also creates a child Position for this intermediate Position
-
                     using (ACMonitor.Lock(pwMethodProduction._62000_PWGroupLockObj))
                     {
-                        // Find intermediate child position, which is assigned to this Batch
-                        intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
-                            .Where(c => c.ProdOrderBatchID.HasValue
-                                        && c.ProdOrderBatchID.Value == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID)
-                            .FirstOrDefault();
-
                         // If intermediate child position not found, generate childposition for this Batch/Intermediate
                         if (intermediateChildPos == null)
                         {
@@ -328,6 +310,7 @@ namespace gip.mes.processapplication
                                 endBatchPos.FacilityLot = endBatchPos.FacilityLot;
                         }
                     }
+
                     if (intermediateChildPos == null)
                     {
                         //Error50165:intermediateChildPos is null.

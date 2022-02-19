@@ -79,68 +79,26 @@ namespace gip.mes.processapplication
             {
                 using (var dbApp = new DatabaseApp(dbIPlus))
                 {
-                    ProdOrderPartslistPos endBatchPos = pwMethodProduction.CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
-                    if (pwMethodProduction.CurrentProdOrderBatch == null)
-                        return;
-                    var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
-                    ProdOrderBatch batch = pwMethodProduction.CurrentProdOrderBatch.FromAppContext<ProdOrderBatch>(dbApp);
-                    ProdOrderBatchPlan batchPlan = batch.ProdOrderBatchPlan;
-                    MaterialWFConnection matWFConnection = null;
-                    if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
+                    ProdOrderPartslistPos intermediateChildPos;
+                    MaterialWFConnection matWFConnection;
+                    ProdOrderBatch batch;
+                    ProdOrderBatchPlan batchPlan;
+                    ProdOrderPartslistPos intermediatePos;
+                    ProdOrderPartslistPos endBatchPos;
+                    bool posFound = PWDosing.GetRelatedProdOrderPosForWFNode(this, dbIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
+                        out endBatchPos, out matWFConnection, out batch, out batchPlan);
+                    if (posFound)
                     {
-                        matWFConnection = dbApp.MaterialWFConnection
-                                                .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
-                                                        && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                                .FirstOrDefault();
-                    }
-                    else
-                    {
-                        PartslistACClassMethod plMethod = endBatchPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                        if (plMethod != null)
-                        {
-                            matWFConnection = dbApp.MaterialWFConnection
-                                                    .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
-                                                            && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
-                                                    .FirstOrDefault();
-                        }
-                        else
-                        {
-                            matWFConnection = contentACClassWFVB.MaterialWFConnection_ACClassWF
-                                .Where(c => c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
-                                            && c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod.Where(d => d.PartslistID == endBatchPos.ProdOrderPartslist.PartslistID).Any())
-                                .FirstOrDefault();
-                        }
-                    }
-
-                    if (matWFConnection == null)
-                        return;
-
-                    // Find intermediate position which is assigned to this Dosing-Workflownode
-                    var currentProdOrderPartslist = endBatchPos.ProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
-                    ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
-                        .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
-                            && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-                            && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
-                    if (intermediatePosition == null)
-                        return;
-                    intermediatePosID = intermediatePosition.ProdOrderPartslistPosID;
-
-                    ProdOrderPartslistPos intermediateChildPos = null;
-                    // Lock, if a parallel Dosing also creates a child Position for this intermediate Position
-                    using (ACMonitor.Lock(pwMethodProduction._62000_PWGroupLockObj))
-                    {
-                        // Find intermediate child position, which is assigned to this Batch
-                        intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
-                            .Where(c => c.ProdOrderBatchID.HasValue
-                                        && c.ProdOrderBatchID.Value == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID)
-                            .FirstOrDefault();
-
-                        if (intermediateChildPos == null)
-                            return;
+                        intermediatePosID = intermediatePos.ProdOrderPartslistPosID;
                         intermediateChildPosID = intermediateChildPos.ProdOrderPartslistPosID;
                     }
                 }
             }
+        }
+
+        public virtual Msg OnGetMessageAfterOccupyingProcessModule(PAFWorkTaskScanBase invoker)
+        {
+            return null;
         }
 
         public bool ReleaseProcessModuleOnScan(PAFWorkTaskScanBase invoker)
@@ -156,20 +114,32 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public bool ChangeReceivedParams(PAFWorkTaskScanBase invoker, ACMethod acMethod)
+        public virtual Msg OnGetMessageOnReleasingProcessModule(PAFWorkTaskScanBase invoker)
+        {
+            return null;
+        }
+
+        public virtual Msg ChangeReceivedParams(PAFWorkTaskScanBase invoker, ACMethod acMethod)
         {
             if (acMethod == null)
-                return true;
+                return null;
             ACMethod thisACMethod = ExecutingACMethod;
             if (thisACMethod != null)
             {
-                foreach (ACValue acValue in acMethod.ResultValueList)
-                {
-                }
+                thisACMethod.ResultValueList.CopyValues(acMethod.ResultValueList, true);
+                Msg msg = OnValidateReceivedParams(invoker, thisACMethod);
+                if (msg != null)
+                    return msg;
                 FinishProgramLog(thisACMethod);
             }
-            return true;
+            return null;
         }
+
+        protected virtual Msg OnValidateReceivedParams(PAFWorkTaskScanBase invoker, ACMethod acMethod)
+        {
+            return null;
+        }
+
 
         protected override bool RunWithoutInvokingFunction
         {

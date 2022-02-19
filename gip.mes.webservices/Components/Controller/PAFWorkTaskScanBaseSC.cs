@@ -112,6 +112,8 @@ namespace gip.mes.webservices
                         {
                             pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;
                             pwInfo.WFMethod.FullSerialization = true;
+                            pwInfo.WFMethod.ResultValueList.RemoveAll(c => !c.IsPrimitiveType);
+                            pwInfo.WFMethod.ParameterValueList.RemoveAll(c => !c.IsPrimitiveType);
                         }
 
                         pwInfo.ProdOrderPartslist = vbWebService.ConvertToWSProdOrderPartslists(VBWebService.s_cQry_GetProdOrderPartslist(dbApp, orderWFInfo.POPId)).FirstOrDefault();

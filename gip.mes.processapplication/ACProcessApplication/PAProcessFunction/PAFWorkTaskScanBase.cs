@@ -315,38 +315,14 @@ namespace gip.mes.processapplication
                 return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(20)", 80, "Error50369");
             }
 
+            WorkTaskScanResult taskScanResult = null;
             if (forRelease)
-            {
-                if (pwNode.ReleaseProcessModuleOnScan(this))
-                {
-                    // Info50057: The order has been deregistered on the machine.
-                    // Der Auftrag wurde an der Maschine abgemeldet.
-                    return new Msg(this, eMsgLevel.Info, ClassName, nameof(OccupyReleaseProcessModule) + "(30)", 90, "Info50057");
-                }
-                else
-                {
-                    // Error50370: The order couldn't be deregistered on this machine.
-                    // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
-                    return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(40)", 100, "Error50370");
-                }
-            }
+                taskScanResult = OnReleasingProcessModuleOnScan(pwNode, null, null, null, Guid.Empty, 0, null);
             else
-            {
-                if (pwNode.ParentPWGroup.OccupyWithPModuleOnScan(parentPM))
-                {
-                    // Info50058: The order has been registered on the machine.
-                    // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
-                    return new Msg(this, eMsgLevel.Info, ClassName, nameof(OccupyReleaseProcessModule) + "(50)", 110, "Info50058");
-                }
-                else
-                {
-                    // Error50371: The order couldn't be registered on this machine.
-                    // Der Auftrag konnte an der Maschine nicht angemeldet werden!
-                    return new Msg(this, eMsgLevel.Error, ClassName, nameof(OccupyReleaseProcessModule) + "(60)", 120, "Error50371");
-                }
-            }
+                taskScanResult = OnOccupyingProcessModuleOnScan(parentPM, pwNode, null, null, null, Guid.Empty, 0, null);
+            return taskScanResult.Result.Message;
         }
-        
+
         #endregion
 
 
@@ -424,18 +400,17 @@ namespace gip.mes.processapplication
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
-            if (pwNode.ChangeReceivedParams(this, acMethod))
+            Msg wfMsg = pwNode.ChangeReceivedParams(this, acMethod);
+            if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
             {
                 // Info50057: The order has been deregistered on the machine.
                 // Der Auftrag wurde an der Maschine abgemeldet.
-                scanResult.Result.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(90)", 90, "Info50057");
+                scanResult.Result.Message = wfMsg != null ? wfMsg : new Msg("OK", this, eMsgLevel.Info, ClassName, "OnScanEvent(80)", 80);
                 scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
             }
             else
             {
-                // Error50370: The order couldn't be deregistered on this machine.
-                // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
-                scanResult.Result.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(100)", 100, "Error50370");
+                scanResult.Result.Message = wfMsg;
                 scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
             }
             return scanResult;
@@ -444,41 +419,68 @@ namespace gip.mes.processapplication
 
         protected virtual WorkTaskScanResult OnReleasingProcessModuleOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult)
         {
+            Msg actionMsg = null;
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
-            if (pwNode.ReleaseProcessModuleOnScan(this))
+            Msg wfMsg = pwNode.OnGetMessageOnReleasingProcessModule(this);
+            if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
             {
-                // Info50057: The order has been deregistered on the machine.
-                // Der Auftrag wurde an der Maschine abgemeldet.
-                scanResult.Result.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(90)", 90, "Info50057");
-                scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+                if (pwNode.ReleaseProcessModuleOnScan(this))
+                {
+                    // Info50057: The order has been deregistered on the machine.
+                    // Der Auftrag wurde an der Maschine abgemeldet.
+                    actionMsg = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(90)", 90, "Info50057");
+                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+                }
+                else
+                {
+                    // Error50370: The order couldn't be deregistered on this machine.
+                    // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
+                    actionMsg = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(100)", 100, "Error50370");
+                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
             }
             else
             {
-                // Error50370: The order couldn't be deregistered on this machine.
-                // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
-                scanResult.Result.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(100)", 100, "Error50370");
+                actionMsg = wfMsg;
                 scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
             }
+            if (wfMsg != null && actionMsg != wfMsg)
+                actionMsg.Message += System.Environment.NewLine + wfMsg.Message;
+            scanResult.Result.Message = actionMsg;
             return scanResult;
         }
 
         protected virtual WorkTaskScanResult OnOccupyingProcessModuleOnScan(PAProcessModule parentPM, PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
+            Msg wfMsg = null;
+            Msg actionMsg = null;
             if (pwNode.ParentPWGroup.OccupyWithPModuleOnScan(parentPM))
             {
+                wfMsg = pwNode.OnGetMessageAfterOccupyingProcessModule(this);
                 // Info50058: The order has been registered on the machine.
-                // Der Auftrag konnte an der Maschine nicht abgemeldet werden!
-                scanResult.Result.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(110)", 110, "Info50058");
-                scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+                // Der Auftrag wurde an der Maschine aktiviert.
+                if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
+                {
+                    actionMsg = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(110)", 110, "Info50058");
+                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+                }
+                else
+                {
+                    actionMsg = wfMsg;
+                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
             }
             else
             {
                 // Error50371: The order couldn't be registered on this machine.
                 // Der Auftrag konnte an der Maschine nicht angemeldet werden!
-                scanResult.Result.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(120)", 120, "Error50371");
+                actionMsg = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(120)", 120, "Error50371");
                 scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
             }
+            if (wfMsg != null && actionMsg != wfMsg)
+                actionMsg.Message += System.Environment.NewLine + wfMsg.Message;
+            scanResult.Result.Message = actionMsg;
             return scanResult;
         }
         #endregion
