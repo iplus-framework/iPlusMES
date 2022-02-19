@@ -127,16 +127,10 @@ namespace gip.mes.processapplication
             if (thisACMethod != null)
             {
                 thisACMethod.ResultValueList.CopyValues(acMethod.ResultValueList, true);
-                Msg msg = OnValidateReceivedParams(invoker, thisACMethod);
-                if (msg != null)
-                    return msg;
-                FinishProgramLog(thisACMethod);
+                if (CurrentACMethod.ValueT != thisACMethod)
+                    UpdateCurrentACMethod();
+                return SaveChangedACMethod();
             }
-            return null;
-        }
-
-        protected virtual Msg OnValidateReceivedParams(PAFWorkTaskScanBase invoker, ACMethod acMethod)
-        {
             return null;
         }
 
