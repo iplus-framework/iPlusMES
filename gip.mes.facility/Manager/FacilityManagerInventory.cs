@@ -34,12 +34,12 @@ namespace gip.mes.facility
                 List<FacilityCharge> facilityCharges =
                     databaseApp
                     .FacilityCharge
-                    .Where(c => 
+                    .Where(c =>
                             !c.NotAvailable
-                            && (   !facilityID.HasValue 
+                            && (!facilityID.HasValue
                                 || c.FacilityID == facilityID.Value
-                                || (   c.Facility.Facility1_ParentFacility != null 
-                                    && (    c.Facility.Facility1_ParentFacility.FacilityID == facilityID.Value
+                                || (c.Facility.Facility1_ParentFacility != null
+                                    && (c.Facility.Facility1_ParentFacility.FacilityID == facilityID.Value
                                          || (c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityID == facilityID.Value))))
                     )
                     // TODO: @aagincic remove limit
@@ -75,6 +75,8 @@ namespace gip.mes.facility
                 int nr = 0;
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
+                    MDFacilityInventoryPosState postedInventoryPosState = databaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Posted);
+
                     FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryNo);
                     int count = facilityInventory.FacilityInventoryPos_FacilityInventory.Count();
                     if (progressCallback != null)
@@ -84,9 +86,9 @@ namespace gip.mes.facility
 
 
                     bool isNotAllowedClosing =
-                        facilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex != (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress
+                        facilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex != (short)FacilityInventoryStateEnum.InProgress
                         ||
-                         positions.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                         positions.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)FacilityInventoryPosStateEnum.Finished);
                     if (isNotAllowedClosing)
                     {
                         Msg msErrorNotAllowedClosing = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = Const_Inventory_NotAllowedClosing };
@@ -94,10 +96,17 @@ namespace gip.mes.facility
                     }
                     else
                     {
-                        List<FacilityInventoryPos> positionsWithNewQuantity = positions.Where(c => c.NotAvailable
-                                                                                               || (c.NewStockQuantity != null 
-                                                                                                   && (Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > Double.Epsilon)))
-                                                                                       .ToList();
+                        List<FacilityInventoryPos> positionsWithNewQuantity =
+                            positions
+                            .Where(c =>
+                                        c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished
+                                        &&
+                                        (
+                                            c.NotAvailable
+                                            || (c.NewStockQuantity != null && (Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > Double.Epsilon))
+                                        )
+                                   )
+                            .ToList();
                         foreach (FacilityInventoryPos facilityInventoryPos in positionsWithNewQuantity)
                         {
                             nr++;
@@ -119,7 +128,7 @@ namespace gip.mes.facility
                                 aCMethodBooking.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(databaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
                                 aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
                                 aCMethodBooking.InwardQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
-                                if (   facilityInventoryPos.FacilityCharge.MDUnit != null 
+                                if (facilityInventoryPos.FacilityCharge.MDUnit != null
                                     && facilityInventoryPos.FacilityCharge.Material.BaseMDUnit != facilityInventoryPos.FacilityCharge.MDUnit)
                                 {
                                     aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.FacilityCharge.Material.ConvertQuantity(aCMethodBooking.InwardTargetQuantity.Value, facilityInventoryPos.FacilityCharge.Material.BaseMDUnit, facilityInventoryPos.FacilityCharge.MDUnit);
@@ -145,6 +154,8 @@ namespace gip.mes.facility
                                 msgWithDetails.AddDetailMessage(new Msg() { Message = msg, MessageLevel = eMsgLevel.Error });
                                 msgWithDetails.AddDetailMessage(aCMethodBooking.ValidMessage);
                             }
+                            else
+                                facilityInventoryPos.MDFacilityInventoryPosState = postedInventoryPosState;
 
                             // Doing inventory booking
                             if (progressCallback != null)
@@ -153,14 +164,14 @@ namespace gip.mes.facility
 
                         if (msgWithDetails.IsSucceded())
                         {
-                            MDFacilityInventoryState finishedState = databaseApp.MDFacilityInventoryState.Where(c => c.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.Finished).FirstOrDefault();
+                            MDFacilityInventoryState finishedState = databaseApp.MDFacilityInventoryState.Where(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Finished).FirstOrDefault();
                             facilityInventory.MDFacilityInventoryState = finishedState;
                             MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
                             if (!saveMsg.IsSucceded())
                                 msgWithDetails.AddDetailMessage(saveMsg);
                         }
                     }
-                }
+                }B
             }
             catch (Exception ec)
             {
