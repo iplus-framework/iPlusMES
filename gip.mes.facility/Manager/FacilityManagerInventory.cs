@@ -171,7 +171,7 @@ namespace gip.mes.facility
                                 msgWithDetails.AddDetailMessage(saveMsg);
                         }
                     }
-                }B
+                }
             }
             catch (Exception ec)
             {
