@@ -53,12 +53,12 @@ namespace gip.mes.client
         { }
 
         #region eventhandling
+        ACMenuItem mainMenu;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             string[] cmLineArg = System.Environment.GetCommandLineArgs();
             ACRoot.SRoot.RootPageWPF = this;
 
-            ACMenuItem mainMenu;
             if (ACRoot.SRoot.Environment.User.MenuACClassDesign == null)
             {
 
@@ -325,6 +325,11 @@ namespace gip.mes.client
             }
             DockingManager.IsBSOManager = true;
             DockingManager.InitBusinessobjectsAtStartup();
+            if (!_startingFullScreen && ACRoot.SRoot.Fullscreen)
+            {
+                StartInFullScreen();
+                _startingFullScreen = true;
+            }
         }
 
         IACComponent _CurrentACComponent = null;
@@ -902,6 +907,27 @@ namespace gip.mes.client
         public double Zoom
         {
             get { return this.sldZoom.Value; }
+        }
+
+        private bool _startingFullScreen = false;
+        private void StartInFullScreen()
+        {
+            if (mainMenu == null || !mainMenu.Items.Any() || DockingManager == null)
+                return;
+            if (_RootVBDesign != null
+                && DockingManager != null
+                && DockingManager.vbDockingPanelTabbedDoc_TabControl != null)
+            {
+                if (DockingManager.vbDockingPanelTabbedDoc_TabControl.SelectedItem == null)
+                {
+                    string startUrl = mainMenu.Items.FirstOrDefault().ACUrl;
+                    if (String.IsNullOrEmpty(startUrl))
+                        return;
+                    DockingManager.StartBusinessobject(startUrl, null, null, true);
+                }
+                _InFullscreen = false;
+                SwitchFullScreen();
+            }
         }
 
 
