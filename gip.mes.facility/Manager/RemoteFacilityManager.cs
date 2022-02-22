@@ -98,12 +98,11 @@ namespace gip.mes.facility
         }
 
         /// <summary>
-        /// <summary>
         /// Source Property: 
         /// </summary>
-        private DateTime? _LastSyncTime;
-        [ACPropertyInfo(999, "LastSyncTime", "en{'TODO:LastSyncTime'}de{'TODO:LastSyncTime'}")]
-        public DateTime? LastSyncTime
+        private DateTime _LastSyncTime;
+        [ACPropertyInfo(true, 200, "LastSyncTime", "en{'LastSyncTime'}de{'LastSyncTime'}")]
+        public DateTime LastSyncTime
         {
             get
             {
@@ -573,9 +572,9 @@ namespace gip.mes.facility
                         // Synchronize all Materials
                         if (entry.KeyId == Guid.Empty)
                         {
-                            DateTime lastSyncTime = DateTime.Now;
-                            if (LastSyncTime != null)
-                                lastSyncTime = LastSyncTime.Value;
+                            DateTime lastSyncTime = new DateTime(2022,1,1);
+                            if (LastSyncTime > DateTime.MinValue)
+                                lastSyncTime = LastSyncTime;
 
                             remoteMaterials = dbRemote.Material.Where(c => c.UpdateDate > lastSyncTime).ToArray();
                         }
@@ -599,10 +598,11 @@ namespace gip.mes.facility
                         }
                     }
 
-                    LastSyncTime = DateTime.Now;
                     MsgWithDetails msgWithDetails = dbLocal.ACSaveChanges();
                     if (msgWithDetails != null)
                         Messages.LogMessageMsg(msgWithDetails);
+                    else
+                        LastSyncTime = DateTime.Now;
                 }
             }
             catch (Exception e)
