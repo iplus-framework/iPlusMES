@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
-    [ACPropertyEntity(4, "MDFacilityInventoryPosStateIndex", ConstApp.ESFacilityInventoryPosState, typeof(MDFacilityInventoryPosState.FacilityInventoryPosStates), "", "", true, MinValue = (short)FacilityInventoryPosStates.New)]
+    [ACPropertyEntity(4, "MDFacilityInventoryPosStateIndex", ConstApp.ESFacilityInventoryPosState, typeof(FacilityInventoryPosStateEnum), "", "", true, MinValue = (short)FacilityInventoryPosStateEnum.New)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDFacilityInventoryPosStateID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
-            entity.FacilityInventoryPosState = FacilityInventoryPosStates.New;
+            entity.FacilityInventoryPosState = FacilityInventoryPosStateEnum.New;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
@@ -51,7 +51,7 @@ namespace gip.mes.datamodel
             {
                 MDFacilityInventoryPosState defaultObj = s_cQry_Default(dbApp).FirstOrDefault();
                 if (defaultObj == null)
-                    defaultObj = s_cQry_Index(dbApp, (short)FacilityInventoryPosStates.New).FirstOrDefault();
+                    defaultObj = s_cQry_Index(dbApp, (short)FacilityInventoryPosStateEnum.New).FirstOrDefault();
                 return defaultObj;
             }
             catch (Exception ec)
@@ -135,11 +135,11 @@ namespace gip.mes.datamodel
 #endregion
 
 #region enums
-        public FacilityInventoryPosStates FacilityInventoryPosState
+        public FacilityInventoryPosStateEnum FacilityInventoryPosState
         {
             get
             {
-                return (FacilityInventoryPosStates)MDFacilityInventoryPosStateIndex;
+                return (FacilityInventoryPosStateEnum)MDFacilityInventoryPosStateIndex;
             }
             set
             {
@@ -148,37 +148,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        /// <summary>
-        /// Enum für das Feld MDFacilityInventoryPosStateIndex
-        /// </summary>
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'FacilityInventoryPosStates'}de{'FacilityInventoryPosStates'}", Global.ACKinds.TACEnum)]
-        public enum FacilityInventoryPosStates : short
-        {
-            New = 1,
-            InProgress = 2,
-            Paused = 3,
-            Finished = 4,
-        }
-
-        static ACValueItemList _FacilityInventoryPosStatesList = null;
-        /// <summary>
-        /// Gibt eine Liste mit Übersetzungen an die GUI zurück.
-        /// </summary>
-        public static ACValueItemList FacilityInventoryPosStatesList
-        {
-            get
-            {
-                if (_FacilityInventoryPosStatesList == null)
-                {
-                    _FacilityInventoryPosStatesList = new ACValueItemList("FacilityInventoryPosStates");
-                    _FacilityInventoryPosStatesList.AddEntry((short)FacilityInventoryPosStates.New, "en{'New'}de{'Neu'}");
-                    _FacilityInventoryPosStatesList.AddEntry((short)FacilityInventoryPosStates.InProgress, "en{'In Process'}de{'In Bearbeitung'}");
-                    _FacilityInventoryPosStatesList.AddEntry((short)FacilityInventoryPosStates.Paused, "en{'Paused'}de{'Pause'}");
-                    _FacilityInventoryPosStatesList.AddEntry((short)FacilityInventoryPosStates.Finished, "en{'Finished'}de{'Beendet'}");
-                }
-                return _FacilityInventoryPosStatesList;
-            }
-        }
 #endregion
 
     }

@@ -660,14 +660,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(9999)]
-        public IEnumerable<ACValueItem> FacilityInventoryPosStatesList
-        {
-            get
-            {
-                return gip.mes.datamodel.MDFacilityInventoryPosState.FacilityInventoryPosStatesList;
-            }
-        }
 
         [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> ZeroStockStatesList

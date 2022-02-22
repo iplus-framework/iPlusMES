@@ -111,6 +111,6 @@
     <None Include="TandTv3\TestBatch.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Programmability\udp\udpTandTv3FilterTrackingDelete.sql" />
+    <None Include="Programmability\udp\udpTandTv3FilterTrackingDelete.sql" />
   </ItemGroup>
 </Project>

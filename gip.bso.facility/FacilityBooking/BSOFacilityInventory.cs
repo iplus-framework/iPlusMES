@@ -880,7 +880,7 @@ namespace gip.bso.facility
                     _SelectedFacilityInventory = value;
 
                     if (_SelectedFacilityInventory != null)
-                        IsEnabledInventoryEdit = _SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
+                        IsEnabledInventoryEdit = _SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
                     else
                         IsEnabledInventoryEdit = false;
 
@@ -893,8 +893,23 @@ namespace gip.bso.facility
 
                     ClearFilterNotUsedCharge();
                     ClearNotUserdFaciltiyChargeList();
+
+                    if (_SelectedFacilityInventory != null)
+                        _SelectedFacilityInventory.PropertyChanged += _SelectedFacilityInventory_PropertyChanged;
                 }
             }
+        }
+
+        private void _SelectedFacilityInventory_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            FacilityInventory item = sender as FacilityInventory;
+            if (item != null)
+                switch (e.PropertyName)
+                {
+                    case nameof(FacilityInventory.MDFacilityInventoryStateID):
+                        IsEnabledInventoryEdit = item.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
+                        break;
+                }
         }
 
         private List<FacilityInventory> _FacilityInventoryList;
@@ -965,26 +980,26 @@ namespace gip.bso.facility
             {
                 if (item.NotAvailable)
                     item.NewStockQuantity = null;
-                if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
+                if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.New)
                 {
                     MDFacilityInventoryPosState stateInProgress =
                         item.GetObjectContext<DatabaseApp>()
                         .MDFacilityInventoryPosState
-                        .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                        .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished);
                     item.MDFacilityInventoryPosState = stateInProgress;
                 }
                 OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
             }
             else if (e.PropertyName == nameof(item.NewStockQuantity))
             {
-                if (item.NewStockQuantity.HasValue )
+                if (item.NewStockQuantity.HasValue)
                     item.NotAvailable = false;
-                if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New)
+                if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.New)
                 {
                     MDFacilityInventoryPosState stateInProgress =
                       item.GetObjectContext<DatabaseApp>()
                       .MDFacilityInventoryPosState
-                      .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                      .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished);
                     item.MDFacilityInventoryPosState = stateInProgress;
                 }
                 OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
@@ -996,7 +1011,7 @@ namespace gip.bso.facility
             return
                 IsEnabledInventoryEdit
                 && SelectedFacilityInventoryPos != null
-                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished;
+                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished;
         }
 
         private void SelectedFacilityInventoryPos_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -1053,7 +1068,10 @@ namespace gip.bso.facility
                        )
                      && (
                             FilterOpenLines == null
-                            || !((c.NotAvailable || c.NewStockQuantity == null) ^ (FilterOpenLines ?? false))
+                            || (
+                                    ((c.NewStockQuantity != null || c.NotAvailable) && !(FilterOpenLines ?? false))
+                                    || ((c.NewStockQuantity == null && !c.NotAvailable) && (FilterOpenLines ?? false))
+                               )
                        )
                  )
                 .OrderBy(c => c.FacilityCharge != null && c.FacilityCharge.FacilityLot != null ? c.FacilityCharge.FacilityLot.LotNo : "")
@@ -1773,7 +1791,7 @@ namespace gip.bso.facility
         {
             return SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState <= MDFacilityInventoryState.FacilityInventoryStates.InProgress;
+                && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState <= FacilityInventoryStateEnum.InProgress;
         }
 
         [ACMethodInteraction("DeletePos", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedFacilityInventory", Global.ACKinds.MSMethodPrePost)]
@@ -1800,7 +1818,7 @@ namespace gip.bso.facility
         {
             if (!IsEnabledStartInventory())
                 return;
-            MDFacilityInventoryState inProgressState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress);
+            MDFacilityInventoryState inProgressState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress);
             SelectedFacilityInventory.MDFacilityInventoryState = inProgressState;
             DatabaseApp.ACSaveChanges();
             OnPropertyChanged("SelectedFacilityInventory");
@@ -1814,7 +1832,7 @@ namespace gip.bso.facility
             return
                 SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.New;
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.New;
         }
 
 
@@ -1824,10 +1842,10 @@ namespace gip.bso.facility
             if (!IsEnabledClosingInventory())
                 return;
             bool existAnyUnclosedPosition =
-                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)FacilityInventoryPosStateEnum.Finished);
             if (existAnyUnclosedPosition)
             {
-                SelectedFilterInventoryPosState = FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
+                SelectedFilterInventoryPosState = FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.InProgress);
                 SearchPos();
                 Root.Messages.Warning(this, "Warning50038");
             }
@@ -1847,7 +1865,7 @@ namespace gip.bso.facility
             return
                 SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
         [ACMethodInfo("CloseAllPositions", "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 100)]
@@ -1857,7 +1875,7 @@ namespace gip.bso.facility
             var questionResult = Root.Messages.Question(this, "Question50055");
             if (questionResult == MsgResult.Yes)
             {
-                MDFacilityInventoryPosState finishedState = DatabaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                MDFacilityInventoryPosState finishedState = DatabaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished);
                 foreach (FacilityInventoryPos item in FacilityInventoryPosList)
                 {
                     item.MDFacilityInventoryPosState = finishedState;
@@ -1871,7 +1889,25 @@ namespace gip.bso.facility
         {
             return SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
+        }
+
+        [ACMethodInfo("SendToERP", "en{'Send to ERP'}de{'An ERP senden'}", 102)]
+        public virtual void SendToERP()
+        {
+            // do nothing
+
+            MDFacilityInventoryState postedInventoryState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Posted);
+            SelectedFacilityInventory.MDFacilityInventoryState = postedInventoryState;
+            ACSaveChanges();
+        }
+
+        public virtual bool IsEnabledSendToERP()
+        {
+            return
+                SelectedFacilityInventory != null
+                && SelectedFacilityInventory.MDFacilityInventoryState != null
+                && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState == FacilityInventoryStateEnum.Finished;
         }
 
         #endregion
@@ -1884,7 +1920,7 @@ namespace gip.bso.facility
         {
             if (!IsEnabledStartInventoryPos())
                 return;
-            SetInventoryPosState(SelectedFacilityInventoryPos, MDFacilityInventoryPosState.FacilityInventoryPosStates.InProgress);
+            SetInventoryPosState(SelectedFacilityInventoryPos, FacilityInventoryPosStateEnum.InProgress);
             OnPropertyChanged("SelectedFacilityInventoryPos");
         }
 
@@ -1892,9 +1928,9 @@ namespace gip.bso.facility
         {
             return
                 SelectedFacilityInventory != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress
                 && SelectedFacilityInventoryPos != null
-                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.New;
+                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.New;
         }
 
 
@@ -1903,7 +1939,7 @@ namespace gip.bso.facility
         {
             if (!IsEnabledClosingInventoryPos())
                 return;
-            SetInventoryPosState(SelectedFacilityInventoryPos, MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+            SetInventoryPosState(SelectedFacilityInventoryPos, FacilityInventoryPosStateEnum.Finished);
             OnPropertyChanged("SelectedFacilityInventoryPos");
         }
 
@@ -1911,10 +1947,10 @@ namespace gip.bso.facility
         {
             return
                 SelectedFacilityInventoryPos != null &&
-                SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryState.FacilityInventoryStates.InProgress;
+                SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
-        private void SetInventoryPosState(FacilityInventoryPos pos, MDFacilityInventoryPosState.FacilityInventoryPosStates posState)
+        private void SetInventoryPosState(FacilityInventoryPos pos, FacilityInventoryPosStateEnum posState)
         {
             MDFacilityInventoryPosState inventoryState = DatabaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)posState);
             pos.MDFacilityInventoryPosState = inventoryState;
@@ -1933,7 +1969,7 @@ namespace gip.bso.facility
         {
             return SelectedFacilityInventoryPos != null
                 && SelectedFacilityInventory.MDFacilityInventoryState != null
-                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished
+                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished
                 && !SelectedFacilityInventoryPos.NotAvailable;
         }
 
@@ -1986,7 +2022,7 @@ namespace gip.bso.facility
         {
             return
                 SelectedFacilityInventory != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex < (short)MDFacilityInventoryState.FacilityInventoryStates.Finished
+                && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex < (short)FacilityInventoryStateEnum.Finished
                 && SelectedNotUsedFacilityCharge != null;
         }
 
@@ -2011,6 +2047,13 @@ namespace gip.bso.facility
                     return !isNotAvailable ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
                 case "SelectedFacilityInventoryPos\\NewStockQuantity":
                     return !isNotAvailable ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
+                case "SelectedFacilityInventoryPos\\MDFacilityInventoryPosState":
+                    return
+                        SelectedFacilityInventoryPos != null
+                        && SelectedFacilityInventoryPos.MDFacilityInventoryPosState != null
+                        && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex <= (short)FacilityInventoryPosStateEnum.Finished
+
+                        ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
             }
 
             return result;
@@ -2122,7 +2165,6 @@ namespace gip.bso.facility
 
         #endregion
 
-
         #region Tracking
 
         /// <summary>
@@ -2158,8 +2200,6 @@ namespace gip.bso.facility
         }
 
         #endregion
-
-
 
         #endregion
 

@@ -1700,7 +1700,7 @@ namespace gip.mes.webservices
                     var subResponse = SetDatabaseUserName<bool>(databaseApp);
                     if (subResponse != null)
                         return subResponse;
-                    mes.datamodel.MDFacilityInventoryState inProgressState = databaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)mes.datamodel.MDFacilityInventoryState.FacilityInventoryStates.InProgress);
+                    mes.datamodel.MDFacilityInventoryState inProgressState = databaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress);
                     mes.datamodel.FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryNo);
 
                     if (facilityInventory == null)
@@ -1739,7 +1739,7 @@ namespace gip.mes.webservices
                     var subResponse = SetDatabaseUserName<bool>(databaseApp);
                     if (subResponse != null)
                         return subResponse;
-                    mes.datamodel.MDFacilityInventoryState finishedState = databaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)mes.datamodel.MDFacilityInventoryState.FacilityInventoryStates.Finished);
+                    mes.datamodel.MDFacilityInventoryState finishedState = databaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Finished);
                     mes.datamodel.FacilityInventory facilityInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryNo);
 
                     if (facilityInventory == null)

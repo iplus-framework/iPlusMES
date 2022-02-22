@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
-    [ACPropertyEntity(4, "MDFacilityInventoryStateIndex", ConstApp.ESFacilityInventoryState, typeof(MDFacilityInventoryState.FacilityInventoryStates), "", "", true, MinValue = (short)FacilityInventoryStates.New)]
+    [ACPropertyEntity(4, "MDFacilityInventoryStateIndex", ConstApp.ESFacilityInventoryState, typeof(FacilityInventoryStateEnum), "", "", true, MinValue = (short)FacilityInventoryStateEnum.New)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
             entity.MDFacilityInventoryStateID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             entity.IsDefault = false;
-            entity.FacilityInventoryState = FacilityInventoryStates.New;
+            entity.FacilityInventoryState = FacilityInventoryStateEnum.New;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
@@ -51,7 +51,7 @@ namespace gip.mes.datamodel
             {
                 MDFacilityInventoryState defaultObj = s_cQry_Default(dbApp).FirstOrDefault();
                 if (defaultObj == null)
-                    defaultObj = s_cQry_Index(dbApp, (short)FacilityInventoryStates.New).FirstOrDefault();
+                    defaultObj = s_cQry_Index(dbApp, (short)FacilityInventoryStateEnum.New).FirstOrDefault();
                 return defaultObj;
             }
             catch (Exception ec)
@@ -136,11 +136,11 @@ namespace gip.mes.datamodel
         #endregion
 
         #region enums
-        public FacilityInventoryStates FacilityInventoryState
+        public FacilityInventoryStateEnum FacilityInventoryState
         {
             get
             {
-                return (FacilityInventoryStates)MDFacilityInventoryStateIndex;
+                return (FacilityInventoryStateEnum)MDFacilityInventoryStateIndex;
             }
             set
             {
@@ -149,36 +149,6 @@ namespace gip.mes.datamodel
             }
         }
 
-        /// <summary>
-        /// Enum für das Feld MDFacilityInventoryStateIndex
-        /// </summary>
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'FacilityInventoryStates'}de{'FacilityInventoryStates'}", Global.ACKinds.TACEnum)]
-        public enum FacilityInventoryStates : short
-        {
-            New = 1,
-            InProgress = 2,
-            Finished = 3,
-        }
-
-        static ACValueItemList _FacilityInventoryStatesList = null;
-        /// <summary>
-        /// Gibt eine Liste mit Übersetzungen an die GUI zurück.
-        /// </summary>
-        public static ACValueItemList FacilityInventoryStatesList
-        {
-            get
-            {
-                if(_FacilityInventoryStatesList == null)
-                {
-                    _FacilityInventoryStatesList = new ACValueItemList("FacilityInventoryStates");
-                    _FacilityInventoryStatesList.AddEntry((short)FacilityInventoryStates.New, "en{'New'}de{'Neu'}");
-                    _FacilityInventoryStatesList.AddEntry((short)FacilityInventoryStates.InProgress, "en{'In Process'}de{'In Bearbeitung'}");
-                    _FacilityInventoryStatesList.AddEntry((short)FacilityInventoryStates.Finished, "en{'Finished'}de{'Beendet'}");
-                }
-
-                return _FacilityInventoryStatesList;
-            }
-        }
         #endregion
 
     }
