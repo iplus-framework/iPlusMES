@@ -38,12 +38,21 @@ namespace gip.mes.webservices
             set;
         }
 
+        public double CompleteFactor
+        {
+            get => (ActualQuantity / TotalQuantity) * 100;
+        }
+
         public void RecalculateActualQuantity()
         {
             if (PickingItems != null)
             {
                 ActualQuantity = PickingItems.Sum(c => c.ActualQuantityUOM);
+                OnPropertyChanged(nameof(ActualQuantity));
+                OnPropertyChanged(nameof(CompleteFactor));
             }
         }
+
+        
     }
 }

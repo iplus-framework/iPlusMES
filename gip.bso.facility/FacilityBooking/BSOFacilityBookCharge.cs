@@ -689,6 +689,9 @@ namespace gip.bso.facility
             if (CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && CurrentFacilityCharge.Material.IsLotManaged 
                                               && CurrentFacilityCharge.FacilityLot == null)
             {
+                if (CurrentFacilityCharge.EntityState != System.Data.EntityState.Added)
+                    return msg;
+
                 //Error50552 The quants with a lot managed material must have a lot!
                 return new Msg(this, eMsgLevel.Error, nameof(BSOFacilityBookCharge), nameof(OnPreSave), 693, "Error50552");
             }
@@ -1956,6 +1959,16 @@ namespace gip.bso.facility
             if (SelectedFacilityCharge != null)
                 pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
             return pAOrderInfo;
+        }
+
+        public override object Clone()
+        {
+            BSOFacilityBookCharge fc = base.Clone() as BSOFacilityBookCharge;
+            if (fc != null)
+            {
+                fc.CurrentFacilityCharge = this.CurrentFacilityCharge;
+            }
+            return fc;
         }
 
         //public override bool IsPoolable
