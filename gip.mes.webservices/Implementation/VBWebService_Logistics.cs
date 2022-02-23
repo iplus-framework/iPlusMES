@@ -78,6 +78,7 @@ namespace gip.mes.webservices
                 PickingID = c.PickingID,
                 PickingNo = c.PickingNo,
                 DeliveryDateFrom = c.DeliveryDateFrom,
+                Comment = c.Comment,
                 PickingType = new MDPickingType()
                 {
                     MDPickingTypeID = c.MDPickingType.MDPickingTypeID,

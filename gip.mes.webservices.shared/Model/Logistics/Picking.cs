@@ -42,6 +42,13 @@ namespace gip.mes.webservices
             set;
         }
 
+        [DataMember(Name = "COM")]
+        public string Comment
+        {
+            get;
+            set;
+        }
+
         [DataMember(Name = "GI")]
         public string GroupItem
         {
@@ -104,6 +111,7 @@ namespace gip.mes.webservices
         public void RefreshPickingPosInView()
         {
             OnPropertyChanged(nameof(PickingPos_Picking));
+            OnPropertyChanged(nameof(PickingPosObservable));
         }
     }
 }
