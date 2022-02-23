@@ -1971,7 +1971,9 @@ namespace gip.mes.facility
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_Facility
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_FacilityLocation
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_Facility_BulkMaterial
-                        || BookingType == GlobalApp.FacilityBookingType.PickingRelocation))
+                        || BookingType == GlobalApp.FacilityBookingType.PickingRelocation
+                        || BookingType == GlobalApp.FacilityBookingType.PickingInward
+                        || BookingType == GlobalApp.FacilityBookingType.PickingInwardCancel))
                     return PostingBehaviourEnum.DoNothing;
 
                 if (InwardFacility == null)
