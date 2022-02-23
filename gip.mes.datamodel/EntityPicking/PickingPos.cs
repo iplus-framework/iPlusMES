@@ -469,11 +469,11 @@ namespace gip.mes.datamodel
         {
             PickingPos clonedObject = new PickingPos();
             clonedObject.PickingPosID = this.PickingPosID;
-            clonedObject.CopyFrom(this, withReferences);
+            clonedObject.CopyFrom(this, withReferences, true);
             return clonedObject;
         }
 
-        public void CopyFrom(PickingPos from, bool withReferences)
+        public void CopyFrom(PickingPos from, bool withReferences, bool copyActualQuantity)
         {
             if (withReferences)
             {
@@ -494,7 +494,8 @@ namespace gip.mes.datamodel
             UpdateDate = from.UpdateDate;
             LineNumber = from.LineNumber;
             PickingQuantityUOM = from.PickingQuantityUOM;
-            PickingActualUOM = from.PickingActualUOM;
+            if (copyActualQuantity)
+                PickingActualUOM = from.PickingActualUOM;
             KeyOfExtSys = from.KeyOfExtSys;
         }
         #endregion

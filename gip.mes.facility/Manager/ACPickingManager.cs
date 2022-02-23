@@ -1031,7 +1031,7 @@ namespace gip.mes.facility
         public Msg ValidateQuantityForBooking(double reqQuantity, double availableQuantity, string materialName)
         {
             if (reqQuantity > availableQuantity)
-            { 
+            {
                 //Error50551: The required quantity is lager than available quantity for {0}.
                 return new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(ValidateQuantityForBooking) + "(10)", 1038, "Error50551", materialName);
             }
@@ -1613,7 +1613,7 @@ namespace gip.mes.facility
             return isRelated;
         }
 
-        
+
 
         #endregion
 
@@ -1640,7 +1640,7 @@ namespace gip.mes.facility
             foreach (PickingPos fromPos in positions)
             {
                 PickingPos mirroredPos = PickingPos.NewACObject(databaseApp, mirroredPicking);
-                mirroredPos.CopyFrom(fromPos, true);
+                mirroredPos.CopyFrom(fromPos, true, false);
                 MirroredPickingProcesPos(mirroredPos, fromPos);
                 mirroredPicking.PickingPos_Picking.Add(mirroredPos);
             }
