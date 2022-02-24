@@ -2712,7 +2712,8 @@ namespace gip.bso.manufacturing
                 return;
             var schedulingGroups = PartslistMDSchedulerGroupConnections.FirstOrDefault(c => c.PartslistID == SelectedProdOrderPartslist.ProdOrderPartslist.Partslist.PartslistID).SchedulingGroups;
             MDSchedulingGroup schedulingGroup = schedulingGroups.FirstOrDefault(c => c.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID);
-            schedulingGroup = schedulingGroups.FirstOrDefault();
+            if (schedulingGroup == null)
+                schedulingGroup = schedulingGroups.FirstOrDefault();
             WizardDefineDefaultPartslist(schedulingGroup, SelectedProdOrderPartslist.ProdOrderPartslist.Partslist, SelectedProdOrderPartslist.UnPlannedQuantityUOM);
             DefaultWizardSchedulerPartslist.ProgramNo = SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.ProgramNo;
             DefaultWizardSchedulerPartslist.MDProdOrderState = SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState;
@@ -3301,7 +3302,7 @@ namespace gip.bso.manufacturing
                 }
                 DefaultWizardSchedulerPartslist.Sn = expandedItems.Count() + 1;
 
-                foreach(WizardSchedulerPartslist item in expandedItems)
+                foreach (WizardSchedulerPartslist item in expandedItems)
                     item.ProgramNo = DefaultWizardSchedulerPartslist.ProgramNo;
             }
         }
@@ -3801,12 +3802,12 @@ namespace gip.bso.manufacturing
 
             int movingStep = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Count;
             List<ProdOrderBatchPlan> otherBatchPlans = GetProdOrderBatchPlanList(wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID).ToList();
-            otherBatchPlans = 
+            otherBatchPlans =
                 otherBatchPlans
                 .Where(c => (
-                                c.ScheduledOrder >= existingMinIndex) 
-                                && !missingBatchPlans.Select(x=>x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
-                                && !existingBatchPlans.Select(x=>x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
+                                c.ScheduledOrder >= existingMinIndex)
+                                && !missingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
+                                && !existingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
                 ).ToList();
             int schedulingOrder = 0;
             foreach (ProdOrderBatchPlan plan in otherBatchPlans)
@@ -3816,7 +3817,7 @@ namespace gip.bso.manufacturing
             }
 
             schedulingOrder = existingMinIndex;
-          
+
             foreach (BatchPlanSuggestionItem suggestionItem in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
             {
                 ProdOrderBatchPlan batchPlan = null;
