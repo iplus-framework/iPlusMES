@@ -206,11 +206,14 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 999)]
         public void SetActiveScaleObject(string scaleACIdentifier)
         {
-            if (ActiveScaleObject == null || ActiveScaleObject.ACIdentifier != scaleACIdentifier)
+            if (!CheckInToleranceOnlyManuallyAddedQuantity)
             {
-                PAEScaleGravimetric targetScale = ParentACComponent.ACUrlCommand(scaleACIdentifier) as PAEScaleGravimetric;
-                if (targetScale != null)
-                    OccupyAndSetActiveScaleObject(targetScale);
+                if (ActiveScaleObject == null || ActiveScaleObject.ACIdentifier != scaleACIdentifier)
+                {
+                    PAEScaleGravimetric targetScale = ParentACComponent.ACUrlCommand(scaleACIdentifier) as PAEScaleGravimetric;
+                    if (targetScale != null)
+                        OccupyAndSetActiveScaleObject(targetScale);
+                }
             }
         }
 
@@ -643,7 +646,8 @@ namespace gip.mes.processapplication
             if (!CanStart())
                 return;
 
-            DetermineTargetScaleObject();
+            if (!CheckInToleranceOnlyManuallyAddedQuantity)
+                DetermineTargetScaleObject();
 
             base.SMStarting();
         }
@@ -773,7 +777,8 @@ namespace gip.mes.processapplication
             if (!Root.Initialized)
                 return;
 
-            DetermineTargetScaleObject();
+            if (!CheckInToleranceOnlyManuallyAddedQuantity)
+                DetermineTargetScaleObject();
 
             if (TareCheck && !WaitForTareScale())
                 return;
@@ -869,9 +874,6 @@ namespace gip.mes.processapplication
         protected virtual bool CheckIsScaleInTol()
         {
             bool result = false;
-
-            //if (_SkipCheckInTolerance)
-            //    return true;
 
             double checkQuantity = ManuallyAddedQuantity.ValueT;
 
@@ -1045,7 +1047,7 @@ namespace gip.mes.processapplication
 
             double quantity = ManuallyAddedQuantity.ValueT;
 
-            if (ActiveScaleObject == null)
+            if (!CheckInToleranceOnlyManuallyAddedQuantity && ActiveScaleObject == null)
                 DetermineTargetScaleObject();
 
             if (!CheckInToleranceOnlyManuallyAddedQuantity && ActiveScaleObject == null)
