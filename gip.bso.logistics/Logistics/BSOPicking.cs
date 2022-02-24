@@ -1430,7 +1430,7 @@ namespace gip.bso.logistics
                     new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageBinContainer).ToString(), true),
                     new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
                     new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, "", true),
-                    new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialNo", Global.LogicalOperators.equal, Global.Operators.or, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Material\\MaterialName1", Global.LogicalOperators.equal, Global.Operators.or, "", true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true)
                 };
             }
@@ -1442,6 +1442,8 @@ namespace gip.bso.logistics
             {
                 return new List<ACFilterItem>()
                 {
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityNo", Global.LogicalOperators.equal, Global.Operators.and, "", true),
+                    new ACFilterItem(Global.FilterTypes.filter, "FacilityName", Global.LogicalOperators.contains, Global.Operators.and, "", true),
                     new ACFilterItem(Global.FilterTypes.filter, "MDFacilityType\\MDFacilityTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)FacilityTypesEnum.StorageBin).ToString(), true)
                 };
             }

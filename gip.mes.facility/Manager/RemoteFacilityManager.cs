@@ -279,7 +279,7 @@ namespace gip.mes.facility
                                         if (!fbcForMirroringToPreBooking.Contains(remoteFBC))
                                             fbcForMirroringToPreBooking.Add(remoteFBC);
                                     }
-                                        
+
                                 }
                             }
                         }
@@ -364,7 +364,7 @@ namespace gip.mes.facility
         private void AssignMirroredPreBooking(DatabaseApp dbLocal, FacilityBookingCharge fbcForMirroring)
         {
             PickingPos localPos = dbLocal.PickingPos.FirstOrDefault(c => c.PickingPosID == fbcForMirroring.PickingPosID);
-            if (localPos != null)
+            if (localPos != null && !localPos.FacilityBooking_PickingPos.Any())
             {
                 // FacilityCharge
                 FacilityCharge outwardFacilityCharge = null;
@@ -394,11 +394,11 @@ namespace gip.mes.facility
                     facility = dbLocal.Facility.FirstOrDefault(c => c.FacilityID == fbcForMirroring.InwardFacilityID);
                     acMethod.OutwardFacility = facility;
                 }
-                if (fbcForMirroring.OutwardFacilityID != null)
-                {
-                    facility = dbLocal.Facility.FirstOrDefault(c => c.FacilityID == fbcForMirroring.OutwardFacilityID);
-                    acMethod.InwardFacility = facility;
-                }
+                //if (fbcForMirroring.OutwardFacilityID != null)
+                //{
+                //    facility = dbLocal.Facility.FirstOrDefault(c => c.FacilityID == fbcForMirroring.OutwardFacilityID);
+                //    acMethod.InwardFacility = facility;
+                //}
             }
         }
 
