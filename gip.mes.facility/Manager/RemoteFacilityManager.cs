@@ -270,16 +270,14 @@ namespace gip.mes.facility
                                     if (!changedRemotePickings.Contains(remoteFBC.PickingPos.Picking))
                                         changedRemotePickings.Add(remoteFBC.PickingPos.Picking);
 
-                                    if (MirroringBookingToPreBooking)
+                                    // Forming mirrored pre booking for (Inward) FBC
+                                    if (MirroringBookingToPreBooking && remoteFBC.InwardFacilityCharge != null)
                                     {
-                                        if (remoteFBC.InwardFacilityCharge != null && !changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
+                                        if (!changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
                                             changedRemoteFCs.Add(remoteFBC.InwardFacilityCharge);
-                                        if (remoteFBC.OutwardFacilityCharge != null && !changedRemoteFCs.Contains(remoteFBC.OutwardFacilityCharge))
-                                            changedRemoteFCs.Add(remoteFBC.OutwardFacilityCharge);
                                         if (!fbcForMirroringToPreBooking.Contains(remoteFBC))
                                             fbcForMirroringToPreBooking.Add(remoteFBC);
                                     }
-
                                 }
                             }
                         }
@@ -347,7 +345,8 @@ namespace gip.mes.facility
                     if (MirroringBookingToPreBooking)
                     {
                         foreach (FacilityBookingCharge fbcForMirroring in fbcForMirroringToPreBooking)
-                            AssignMirroredPreBooking(dbLocal, fbcForMirroring);
+                            if (fbcForMirroring.InwardFacilityChargeID != null)
+                                AssignMirroredPreBooking(dbLocal, fbcForMirroring);
                     }
 
                     msgWithDetails = dbLocal.ACSaveChanges();
@@ -368,8 +367,8 @@ namespace gip.mes.facility
             {
                 // FacilityCharge
                 FacilityCharge outwardFacilityCharge = null;
-                if (fbcForMirroring.OutwardFacilityChargeID != null)
-                    outwardFacilityCharge = dbLocal.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fbcForMirroring.OutwardFacilityChargeID);
+                if (fbcForMirroring.InwardFacilityChargeID != null)
+                    outwardFacilityCharge = dbLocal.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fbcForMirroring.InwardFacilityChargeID);
 
                 FacilityPreBooking preBooking = null;
                 if (outwardFacilityCharge != null)
@@ -394,11 +393,6 @@ namespace gip.mes.facility
                     facility = dbLocal.Facility.FirstOrDefault(c => c.FacilityID == fbcForMirroring.InwardFacilityID);
                     acMethod.OutwardFacility = facility;
                 }
-                //if (fbcForMirroring.OutwardFacilityID != null)
-                //{
-                //    facility = dbLocal.Facility.FirstOrDefault(c => c.FacilityID == fbcForMirroring.OutwardFacilityID);
-                //    acMethod.InwardFacility = facility;
-                //}
             }
         }
 

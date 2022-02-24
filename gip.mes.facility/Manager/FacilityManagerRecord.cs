@@ -261,6 +261,7 @@ namespace gip.mes.facility
             FBC.InOrderPos = BP.ParamsAdjusted.InOrderPos;
             FBC.ProdOrderPartslistPos = BP.ParamsAdjusted.PartslistPos;
             FBC.ProdOrderPartslistPosFacilityLot = BP.ParamsAdjusted.ProdOrderPartslistPosFacilityLot;
+            FBC.PickingPos = BP.PickingPos;
 
             //FBC.InwardFacilityLocation = BP.ParamsAdjusted.InwardFacilityLocation;
             //if (FBC.InwardFacilityLocation == null)
