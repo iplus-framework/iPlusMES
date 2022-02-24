@@ -10,7 +10,7 @@ CREATE TABLE [dbo].[TandTv3MixPointPickingPos](
 GO
 
 ALTER TABLE [dbo].[TandTv3MixPointPickingPos]  WITH CHECK ADD  CONSTRAINT [FK_TandTv3MixPointPickingPos_PickingPosID] FOREIGN KEY([PickingPosID]) REFERENCES [dbo].[PickingPos] ([PickingPosID])
-ALTER TABLE [dbo].[TandTv3MixPointPickingPos]  WITH CHECK ADD  CONSTRAINT [FK_TandTv3MixPointPickingPos_TandTv3TandTv3MixPointID] FOREIGN KEY([TandTv3MixPointID]) REFERENCES [dbo].[TandTv3MixPoint] ([TandTv3MixPointID])
+ALTER TABLE [dbo].[TandTv3MixPointPickingPos]  WITH CHECK ADD  CONSTRAINT [FK_TandTv3MixPointPickingPos_TandTv3MixPointID] FOREIGN KEY([TandTv3MixPointID]) REFERENCES [dbo].[TandTv3MixPoint] ([TandTv3MixPointID])
 GO
 IF EXISTS (SELECT * FROM sysobjects WHERE type = 'P' AND name = 'udpTandTv3FilterTrackingDelete')
 	BEGIN

@@ -101,6 +101,7 @@
     <Compile Include="EntityInvoice\InvoicePos.cs" />
     <Compile Include="EntityMD\FacilityInventoryPosStateEnum.cs" />
     <Compile Include="EntityMD\FacilityInventoryStateEnum.cs" />
+    <Compile Include="EntityMD\MDBatchPlanGroup.cs" />
     <Compile Include="EntityMD\MDCountrySalesTaxMaterial.cs" />
     <Compile Include="EntityMD\MDCountrySalesTaxMDMaterialGroup.cs" />
     <Compile Include="EntityMD\MDInvoiceState.cs" />
@@ -508,6 +509,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2022-02-24_14-38_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2022-02-21_13-45_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

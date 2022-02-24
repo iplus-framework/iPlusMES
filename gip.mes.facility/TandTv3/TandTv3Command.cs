@@ -883,14 +883,14 @@ namespace gip.mes.facility.TandTv3
                         dbMixPoint.TandTv3MixPointInOrderPos_TandTv3MixPoint.Add(dbMixPointInOrderPos);
                     }
 
-                    foreach(PickingPos pickingPos in mixPoint.PickingPositions)
+                    foreach (PickingPos pickingPos in mixPoint.PickingPositions)
                     {
                         TandTv3MixPointPickingPos dbMixPointInOrderPos = new TandTv3MixPointPickingPos()
                         {
                             TandTv3MixPointPickingPosID = Guid.NewGuid(),
                             PickingPos = pickingPos
                         };
-                        dbMixPoint.TandTv3MixPointPickingPos.Add(dbMixPointInOrderPos);
+                        dbMixPoint.TandTv3MixPointPickingPos_TandTv3MixPoint.Add(dbMixPointInOrderPos);
                     }
 
                 }
@@ -1187,8 +1187,7 @@ namespace gip.mes.facility.TandTv3
                         result.Ids.Add(inOrderPos.InOrderPosID, MDTrackingStartItemTypeEnum.InOrderPos.ToString());
                 }
 
-
-                mixPoint.PickingPositions = dbMixPoint.TandTv3MixPointPickingPos.Select(c => c.PickingPos).ToList();
+                mixPoint.PickingPositions = dbMixPoint.TandTv3MixPointPickingPos_TandTv3MixPoint.Select(c => c.PickingPos).ToList();
                 foreach (PickingPos pickingPos in mixPoint.PickingPositions)
                     if (!result.Ids.ContainsKey(pickingPos.PickingPosID))
                         result.Ids.Add(pickingPos.PickingPosID, MDTrackingStartItemTypeEnum.PickingPos.ToString());
