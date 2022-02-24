@@ -111,7 +111,7 @@
     <Compile Include="Facility\BSOPrinterSettingsMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
-    <Compile Include="Logistics\MDBSOMDBatchPlanGroup.cs" />
+    <Compile Include="Logistics\MDBSOBatchPlanGroup.cs" />
     <Compile Include="Logistics\MDBSOPickingType.cs" />
     <Compile Include="Logistics\MDBSOTransportMode.cs" />
     <Compile Include="Logistics\MDBSOVisitorVoucherState.cs" />

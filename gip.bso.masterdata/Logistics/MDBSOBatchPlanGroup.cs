@@ -14,19 +14,19 @@ namespace gip.bso.masterdata
     /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
     /// </summary>
     [ACClassInfo(Const.PackName_VarioLogistics, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix +nameof(MDBatchPlanGroup))]
-    public class MDBSOMDBatchPlanGroup : ACBSOvbNav
+    public class MDBSOBatchPlanGroup : ACBSOvbNav
     {
         #region c´tors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MDBSOMDBatchPlanGroup"/> class.
+        /// Initializes a new instance of the <see cref="MDBSOBatchPlanGroup"/> class.
         /// </summary>
         /// <param name="acType">Type of the ac.</param>
         /// <param name="content">The content.</param>
         /// <param name="parentACObject">The parent AC object.</param>
         /// <param name="parameter">The parameter.</param>
         /// <param name="acIdentifier">The ac identifier.</param>
-        public MDBSOMDBatchPlanGroup(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        public MDBSOBatchPlanGroup(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             //DatabaseMode = DatabaseModes.OwnDB;
