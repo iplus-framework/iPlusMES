@@ -13,7 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
-    [ACPropertyEntity(3, "MDBatchPlanGroupIndex", "en{'Picking type'}de{'Kommissionierung Typ'}", "", "", true)]
+    [ACPropertyEntity(3, nameof(MDBatchPlanGroupIndex), "en{'Batchplan group'}de{'Batchplan Gruppe'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

@@ -13,7 +13,7 @@ namespace gip.bso.masterdata
     /// Allgemeine Stammdatenmaske für MDBatchPlanGroup
     /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix +nameof(MDBatchPlanGroup))]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix +nameof(MDBatchPlanGroup))]
     public class MDBSOBatchPlanGroup : ACBSOvbNav
     {
         #region c´tors
@@ -95,7 +95,7 @@ namespace gip.bso.masterdata
             set
             {
                 if (AccessPrimary == null) return; AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedMDBatchPlanGroup");
+                OnPropertyChanged(nameof(SelectedMDBatchPlanGroup));
             }
         }
 
@@ -113,7 +113,7 @@ namespace gip.bso.masterdata
             set
             {
                 if (AccessPrimary == null) return; AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentMDBatchPlanGroup");
+                OnPropertyChanged(nameof(CurrentMDBatchPlanGroup));
             }
         }
 
@@ -198,12 +198,11 @@ namespace gip.bso.masterdata
         [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
-            if (!PreExecute("New")) return;
-            CurrentMDBatchPlanGroup = MDBatchPlanGroup.NewACObject(DatabaseApp, null);
-            DatabaseApp.MDBatchPlanGroup.AddObject(CurrentMDBatchPlanGroup);
-            ACState = Const.SMNew;
-            PostExecute("New");
-
+            MDBatchPlanGroup newGroup = MDBatchPlanGroup.NewACObject(DatabaseApp, null);
+            DatabaseApp.MDBatchPlanGroup.AddObject(newGroup);
+            AccessPrimary.NavList.Add(newGroup);
+            OnPropertyChanged(nameof(MDBatchPlanGroupList));
+            CurrentMDBatchPlanGroup = newGroup;
         }
 
         /// <summary>
@@ -221,7 +220,8 @@ namespace gip.bso.masterdata
         [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if (!PreExecute("Delete")) return;
+            if(!IsEnabledDelete())
+                return;
             Msg msg = CurrentMDBatchPlanGroup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
@@ -232,7 +232,6 @@ namespace gip.bso.masterdata
             if (AccessPrimary == null) return; if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMDBatchPlanGroup);
             SelectedMDBatchPlanGroup = AccessPrimary.NavList.FirstOrDefault();
             Load();
-            PostExecute("Delete");
         }
 
         /// <summary>
@@ -250,17 +249,13 @@ namespace gip.bso.masterdata
         [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
-            if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("MDBatchPlanGroupList");
+            if (AccessPrimary == null) 
+                return; 
+            AccessPrimary.NavSearch(DatabaseApp);
+            OnPropertyChanged(nameof(MDBatchPlanGroupList));
         }
 
         #endregion
-
-        #region Execute-Helper-Handlers
-
-
-        #endregion
-
 
     }
 }
