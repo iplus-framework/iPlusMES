@@ -13,7 +13,7 @@ namespace gip.mes.processapplication
     [DataContract]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Schedule for WF-Batch-Manager'}de{'Zeitplan für WF-Batch-Manager'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
-    public class PAScheduleForPWNode : INotifyPropertyChanged, ICloneable
+    public class PAScheduleForPWNode : INotifyPropertyChanged, ICloneable, IACObject
     {
         private Guid _MDSchedulingGroupID;
         [DataMember]
@@ -124,7 +124,7 @@ namespace gip.mes.processapplication
             }
             set
             {
-                if(_UpdateTime != null)
+                if (_UpdateTime != null)
                 {
                     _UpdateTime = value;
                     OnPropertyChanged("UpdateTime");
@@ -143,7 +143,7 @@ namespace gip.mes.processapplication
             }
             set
             {
-                if(_UpdateName != value)
+                if (_UpdateName != value)
                 {
                     _UpdateName = value;
                     OnPropertyChanged("UpdateName");
@@ -162,6 +162,40 @@ namespace gip.mes.processapplication
             set
             {
                 _LastProcessingTime = value;
+            }
+        }
+
+        public IACObject ParentACObject
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public IACType ACType
+        {
+            get
+            {
+                return null;
+            }
+
+        }
+
+        public IEnumerable<IACObject> ACContentList
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public string ACIdentifier
+        {
+            get
+            {
+                if (MDSchedulingGroup == null) return null;
+                return MDSchedulingGroup.ACIdentifier;
             }
         }
 
@@ -221,6 +255,28 @@ namespace gip.mes.processapplication
             PAScheduleForPWNode clone = new PAScheduleForPWNode();
             clone.CopyFrom(this, false);
             return clone;
+        }
+
+        public object ACUrlCommand(string acUrl, params object[] acParameter)
+        {
+            return null;
+            //throw new NotImplementedException();
+        }
+
+        public bool IsEnabledACUrlCommand(string acUrl, params object[] acParameter)
+        {
+            return false;
+            //throw new NotImplementedException();
+        }
+
+        public string GetACUrl(IACObject rootACObject = null)
+        {
+            return null;
+        }
+
+        public bool ACUrlBinding(string acUrl, ref IACType acTypeInfo, ref object source, ref string path, ref Global.ControlModes rightControlMode)
+        {
+            return false;
         }
     }
 }

@@ -1179,9 +1179,9 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID) =>
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
                                     .Include("ProdOrderPartslist.MDProdOrderState")
@@ -1208,6 +1208,11 @@ namespace gip.mes.facility
                                                     (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
                                                     || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                                                 )
+                                            && (
+                                                   mdBatchPlanGroup == null
+                                                   ||
+                                                   c.MDBatchPlanGroupID == mdBatchPlanGroup
+                                                )
                                           )
                                     .OrderBy(c => c.ScheduledOrder ?? 0)
                                     .ThenBy(c => c.InsertDate)
@@ -1222,9 +1227,10 @@ namespace gip.mes.facility
             DateTime? filterStartTime,
             DateTime? filterEndTime,
             MDProdOrderState.ProdOrderStates? minProdOrderState,
-            Guid? planningMRID)
+            Guid? planningMRID,
+            Guid? mdBatchPlanGroup)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null, planningMRID) as ObjectQuery<ProdOrderBatchPlan>;
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null, planningMRID, mdBatchPlanGroup) as ObjectQuery<ProdOrderBatchPlan>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
