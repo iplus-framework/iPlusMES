@@ -716,6 +716,7 @@ namespace gip.bso.manufacturing
             }
         }
 
+        bool _SchedulingGroupValidated = false;
         /// <summary>
         /// List property for BatchStartModeConfiguration
         /// </summary>
@@ -728,7 +729,14 @@ namespace gip.bso.manufacturing
             {
                 if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
                 {
-                    return _ScheduleForPWNodeList.OrderBy(c => c.MDSchedulingGroup.SortIndex).ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
+                    if (!_SchedulingGroupValidated && _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).Any())
+                        Messages.Error(this,"A Scheduling-Group was removed. Invoke Reset on Scheduler");
+                    _SchedulingGroupValidated = true;
+
+                    return _ScheduleForPWNodeList
+                        .Where(c => c.MDSchedulingGroup != null)
+                        .OrderBy(c => c.MDSchedulingGroup.SortIndex)
+                        .ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
                 }
                 return _ScheduleForPWNodeList;
             }
