@@ -1342,7 +1342,7 @@ namespace gip.mes.webservices
                 if (bpParam.InwardFacilityChargeID.HasValue)
                 {
                     acParam.InwardFacilityCharge = dbApp.FacilityCharge.Include(c => c.Facility).Where(c => c.FacilityChargeID == bpParam.InwardFacilityChargeID.Value).FirstOrDefault();
-                    if (acParam.InwardFacilityCharge != null)
+                    if (acParam.InwardFacilityCharge != null && (acParam.MDZeroStockState == null || acParam.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.Off))
                         acParam.InwardFacility = acParam.InwardFacilityCharge.Facility;
                 }
                 if (bpParam.InwardFacilityLocationID.HasValue)

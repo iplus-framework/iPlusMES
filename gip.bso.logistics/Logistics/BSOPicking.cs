@@ -913,6 +913,12 @@ namespace gip.bso.logistics
                 if (value != null && _InLoad)
                     value.PickingPos_Picking.AutoRefresh(this.DatabaseApp);
                 OnPropertyChanged("PickingPosList");
+                if (value != null && CurrentPickingPos != null)
+                {
+                    if (!value.PickingPos_Picking.Any())
+                        CurrentPickingPos = null;
+                }
+                OnPropertyChanged(nameof(CurrentPickingPos));
                 RefreshInOrderPosList();
                 RefreshOutOrderPosList();
                 RefreshProdOrderPartslistPosList();
@@ -3361,6 +3367,9 @@ namespace gip.bso.logistics
                         RefreshProdOrderPartslistPosList();
                     }
                     break;
+                //case "*PickingPos":
+                //    OnPropertyChanged(nameof(CurrentPickingPos));
+                //    break;
                 default:
                     break;
             }
