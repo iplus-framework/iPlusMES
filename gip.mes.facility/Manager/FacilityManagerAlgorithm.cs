@@ -2341,7 +2341,189 @@ namespace gip.mes.facility
                 return _BookParamNotAvailableClone.Clone() as ACMethodBooking;
             }
         }
+        #endregion
 
+        #region Anterograde Posting
+        private Global.ACMethodResultState PerformAnterogradePosting(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges)
+        {
+            if (BP.BookingType != GlobalApp.FacilityBookingType.ProdOrderPosOutward
+                || BP.PartslistPosRelation == null
+                || !BP.PartslistPosRelation.Foreflushing
+                || !BP.PartslistPosRelation.ProdOrderBatchID.HasValue
+                || Math.Abs(FBC.OutwardQuantityUOM - 0) <= Double.Epsilon
+                || PartslistManager == null)
+                return Global.ACMethodResultState.Succeeded;
+
+            ProdOrderPartslistPos posForInwardPosting;
+            if (!BP.PartslistPosRelation.TargetProdOrderPartslistPos.Foreflushing)
+                posForInwardPosting = BP.PartslistPosRelation.TargetProdOrderPartslistPos;
+            else
+            {
+                posForInwardPosting = BP.DatabaseApp.ProdOrderPartslistPosRelation
+                    .Include(c => c.TargetProdOrderPartslistPos)
+                    .Include(c => c.TargetProdOrderPartslistPos.Material)
+                    .Include(c => c.TargetProdOrderPartslistPos.BasedOnPartslistPos)
+                    .Include(c => c.TargetProdOrderPartslistPos.BasedOnPartslistPos.Material)
+                    .Where(c => c.ProdOrderBatchID == BP.PartslistPosRelation.ProdOrderBatchID.Value
+                            && c.TargetProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern
+                            && c.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID != null)
+                    .AsEnumerable()
+                    .Where(c => c.TargetProdOrderPartslistPos.IsFinalMixureBatch)
+                    .Select(c => c.TargetProdOrderPartslistPos)
+                    .FirstOrDefault();
+            }
+
+            if (   posForInwardPosting != null 
+                && posForInwardPosting.ProdOrderBatchID.HasValue 
+                && posForInwardPosting.ProdOrderBatchID == BP.PartslistPosRelation.ProdOrderBatchID
+                && posForInwardPosting.ProdOrderBatch.ProdOrderBatchPlanID.HasValue)
+            {
+                double ratio = FBC.OutwardQuantityUOM / BP.PartslistPosRelation.TargetQuantityUOM;
+                double anterogradeInwardQuantityUOM = posForInwardPosting.TargetQuantityUOM * ratio;
+                Guid batchPlanID = posForInwardPosting.ProdOrderBatch.ProdOrderBatchPlanID.Value;
+                var batchPlan = BP.DatabaseApp.ProdOrderBatchPlan.Where(c => c.ProdOrderBatchPlanID == batchPlanID).FirstOrDefault();
+                if (batchPlan != null)
+                {
+                    IList<FacilityReservation> plannedDestinations = batchPlan.FacilityReservation_ProdOrderBatchPlan.OrderBy(c => c.Sequence).ToArray();
+                    if (plannedDestinations != null && plannedDestinations.Any())
+                    {
+                        FacilityReservation facilityReservation = GetNextFreeDestination(plannedDestinations, posForInwardPosting, false, null);
+                        if (facilityReservation != null 
+                            && (!posForInwardPosting.BookingMaterial.IsLotManaged || posForInwardPosting.FacilityLot != null))
+                        {
+                            ACMethodBooking inwardMethod = NewBookParamInwardMovement(BP, posForInwardPosting, anterogradeInwardQuantityUOM, facilityReservation.Facility, posForInwardPosting.FacilityLot);
+                            //FacilityBooking fbInward = NewFacilityBooking(inwardMethod);
+
+                            // Mache Stackbuchung
+                            Global.ACMethodResultState bookingSubResult = BookingOn_Facility_Common(inwardMethod);
+                            if ((bookingSubResult == Global.ACMethodResultState.Failed) || (bookingSubResult == Global.ACMethodResultState.Notpossible))
+                            {
+                                BP.Merge(inwardMethod.ValidMessage);
+                                return bookingSubResult;
+                            }
+                            else
+                            {
+                                BP.FacilityBookings.Add(inwardMethod);
+                            }
+                        }
+                    }
+                }
+
+            }
+            return Global.ACMethodResultState.Succeeded;
+        }
+
+        public virtual FacilityReservation GetNextFreeDestination(IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos batchPos,
+            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
+        {
+            if (plannedSilos == null || !plannedSilos.Any())
+                return null;
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Active))
+            {
+                if (CheckPlannedDestination(plannedSilo, batchPos, changeReservationStateIfFull, ignoreFullSilo))
+                    return plannedSilo;
+            }
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.New))
+            {
+                if (CheckPlannedDestination(plannedSilo, batchPos, changeReservationStateIfFull, ignoreFullSilo))
+                    return plannedSilo;
+            }
+            foreach (FacilityReservation plannedSilo in plannedSilos.Where(c => c.ReservationState == GlobalApp.ReservationState.Finished))
+            {
+                if (CheckPlannedDestination(plannedSilo, batchPos, changeReservationStateIfFull, ignoreFullSilo))
+                {
+                    plannedSilo.ReservationState = GlobalApp.ReservationState.New;
+                    return plannedSilo;
+                }
+            }
+            return null;
+        }
+
+        protected virtual bool CheckPlannedDestination(FacilityReservation plannedSilo, ProdOrderPartslistPos batchPos, 
+            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
+        {
+            if (plannedSilo == null || (ignoreFullSilo != null && ignoreFullSilo == plannedSilo))
+                return false;
+            if (plannedSilo.Facility != null
+                && plannedSilo.Facility.InwardEnabled)
+            {
+                if (plannedSilo.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
+                {
+                    // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
+                    // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
+                    // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
+                    if (!plannedSilo.Facility.MaterialID.HasValue
+                        || (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                                 || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                             && (batchPos.IsFinalMixure
+                                 || (!batchPos.IsFinalMixure
+                                     && (!plannedSilo.Facility.PartslistID.HasValue
+                                           || batchPos.ProdOrderPartslist.PartslistID == plannedSilo.Facility.PartslistID)
+                                    )
+                                )
+                           )
+                       )
+                    {
+                        // Prüfe ob rechnerisch die Charge reinpassen würde
+                        if (plannedSilo.Facility.CurrentFacilityStock != null
+                            && (plannedSilo.Facility.MaxWeightCapacity > 1)
+                            && (batchPos.TargetQuantityUOM + plannedSilo.Facility.CurrentFacilityStock.StockQuantity > (plannedSilo.Facility.MaxWeightCapacity /*+ batchPos.TargetQuantity*/)))
+                        {
+                            if (changeReservationStateIfFull)
+                                Messages.LogDebug(this.GetACUrl(), "CheckPlannedDestination(1)", String.Format("Silo {0} würde rechnerisch überfüllt werden", plannedSilo.Facility.FacilityNo));
+                            plannedSilo.ReservationState = GlobalApp.ReservationState.Finished;
+                            return false;
+                        }
+                        else
+                            return true;
+                    }
+                }
+                // Auf Lagerplätze ohne Belegung darf immer entleert werden
+                else
+                    return true;
+            }
+            // Wenn kein Bezug zu einem Lagerplatz hergstellt ist und MAterial nicht gebucht werdne soll, dann darf entleert werden
+            else if (plannedSilo.Facility == null
+                && batchPos.BookingMaterial.MDFacilityManagementType != null
+                && batchPos.BookingMaterial.MDFacilityManagementType.FacilityManagementType == MDFacilityManagementType.FacilityManagementTypes.NoFacility)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public ACMethodBooking NewBookParamInwardMovement(ACMethodBooking BP, ProdOrderPartslistPos batchPos, 
+                                                        double postingQuantity, Facility inwardFacility, FacilityLot facilityLot)
+        {
+            ACMethodBooking inwardMethod = GetBookParamInwardMovementClone();
+            if (!batchPos.IsFinalMixureBatch)
+                inwardMethod.InwardPartslist = batchPos.ProdOrderPartslist.Partslist;
+            else
+                inwardMethod.InwardMaterial = batchPos.BookingMaterial;
+            inwardMethod.PartslistPos = batchPos;
+            inwardMethod.InwardQuantity = postingQuantity;
+            inwardMethod.InwardFacility = inwardFacility;
+            inwardMethod.InwardFacilityLot = facilityLot;
+            inwardMethod.Database = BP.DatabaseApp;
+            inwardMethod.CheckAndAdjustPropertiesForBooking(BP.DatabaseApp);
+            return inwardMethod;
+        }
+
+        ACMethodBooking _BookParamInwardMovementClone;
+        public ACMethodBooking GetBookParamInwardMovementClone()
+        {
+            using (ACMonitor.Lock(_40010_ValueLock))
+            {
+                if (_BookParamInwardMovementClone != null)
+                    return _BookParamInwardMovementClone.Clone() as ACMethodBooking;
+            }
+            var clone = ACUrlACTypeSignature("!" + FacilityManager.MN_ProdOrderPosInward.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            using (ACMonitor.Lock(_40010_ValueLock))
+            {
+                _BookParamInwardMovementClone = clone;
+                return _BookParamInwardMovementClone.Clone() as ACMethodBooking;
+            }
+        }
 
         #endregion
     }

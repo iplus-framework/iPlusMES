@@ -28,6 +28,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(22, FacilityLot.ClassName, "en{'Lot/Charge'}de{'Los/Charge'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName, "", true)]
     [ACPropertyEntity(23, "TakeMatFromOtherOrder", "en{'Take material from other order'}de{'Entnahme von anderem Auftrag erlaubt'}", "", "", true)]
     [ACPropertyEntity(24, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
+    [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
@@ -348,6 +349,8 @@ namespace gip.mes.datamodel
             {
                 if (this.RetrogradeFIFO.HasValue)
                     return this.RetrogradeFIFO.Value;
+                else if (ProdOrderPartslistPos1_ParentProdOrderPartslistPos != null)
+                    return ProdOrderPartslistPos1_ParentProdOrderPartslistPos.Backflushing;
                 else if (BasedOnPartslistPosID.HasValue && BasedOnPartslistPos != null)
                     return BasedOnPartslistPos.Backflushing;
                 else if (MaterialID.HasValue && Material != null && Material.RetrogradeFIFO.HasValue)
@@ -355,6 +358,29 @@ namespace gip.mes.datamodel
                 return false;
             }
         }
+
+
+        /// <summary>
+        /// Property that evaluates the override of the Anterograde-Fields in Tables ProdOrderPartslistPos->BasedOnPartslistPos->Material
+        /// </summary>
+        public bool Foreflushing
+        {
+            get
+            {
+                if (this.Anterograde.HasValue)
+                    return this.Anterograde.Value;
+                else if (ProdOrderPartslistPos1_ParentProdOrderPartslistPos != null)
+                    return ProdOrderPartslistPos1_ParentProdOrderPartslistPos.Foreflushing;
+                else if (BasedOnPartslistPosID.HasValue && BasedOnPartslistPos != null)
+                    return BasedOnPartslistPos.Foreflushing;
+                else if (MaterialID.HasValue && Material != null && Material.Anterograde.HasValue)
+                    return Material.Anterograde.Value;
+                return false;
+            }
+        }
+
+        //[ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
+
 
         #endregion
 

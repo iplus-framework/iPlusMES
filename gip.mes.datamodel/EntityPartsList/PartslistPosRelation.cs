@@ -16,6 +16,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(6, "MaterialWFRelation", "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", Const.ContextDatabase + "\\MaterialWFRelation", "", true)]
     [ACPropertyEntity(7, "BaseMDUnit", "en{'Base Unit of Measure UOM'}de{'Basismengeneinheit'}", Const.ContextDatabase + "\\SourcePartslistPos\\Material\\MDUnitList", "", true)]
     [ACPropertyEntity(8, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
+    [ACPropertyEntity(9, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistPosRelation.ClassName, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", typeof(PartslistPosRelation), PartslistPosRelation.ClassName, "", PartslistPosRelation.ClassName + "ID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<PartslistPosRelation>) })]
     public partial class PartslistPosRelation : IPartslistPosRelation
@@ -150,6 +151,22 @@ namespace gip.mes.datamodel
                 return false;
             }
         }
+
+        /// <summary>
+        /// Property that evaluates the override of the Anterograde-Fields in Tables PartslistPos->Material
+        /// </summary>
+        public bool Foreflushing
+        {
+            get
+            {
+                if (this.Anterograde.HasValue)
+                    return this.Anterograde.Value;
+                if (SourcePartslistPos != null)
+                    return SourcePartslistPos.Foreflushing;
+                return false;
+            }
+        }
+
         #endregion
 
         #region convention implementation

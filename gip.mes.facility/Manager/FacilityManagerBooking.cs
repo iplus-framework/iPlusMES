@@ -45,7 +45,11 @@ namespace gip.mes.facility
             bookingResult = BookCPartnerCompMatOut(BP, FBC, facilityCharges);
             if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                 return bookingResult;
-           
+
+            bookingResult = PerformAnterogradePosting(BP, FBC, facilityCharges);
+            if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                return bookingResult;
+
             return bookingResult;
         }
 

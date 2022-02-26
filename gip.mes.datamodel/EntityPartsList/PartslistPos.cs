@@ -22,6 +22,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(11, "LineNumber", "en{'Item Number'}de{'Positionsnummer'}", "", "", true)]
     [ACPropertyEntity(12, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(13, "ExplosionOff", "en{'Explosion Off'}de{'Stoprückauflösung'}", "", "", true)]
+    [ACPropertyEntity(14, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACPropertyEntity(9999, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
     [ACPropertyEntity(9999, "ParentPartslistPos", "en{'Parent line'}de{'Elternposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
     [ACPropertyEntity(9999, "AlternativePartslistPos", "en{'Alternative Item'}de{'Alternativposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
@@ -313,6 +314,21 @@ namespace gip.mes.datamodel
                     return this.RetrogradeFIFO.Value;
                 else if (Material != null && Material.RetrogradeFIFO.HasValue)
                     return Material.RetrogradeFIFO.Value;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Property that evaluates the override of the Anterograde-Fields in Tables PartslistPos->Material
+        /// </summary>
+        public bool Foreflushing
+        {
+            get
+            {
+                if (this.Anterograde.HasValue)
+                    return this.Anterograde.Value;
+                else if (Material != null && Material.Anterograde.HasValue)
+                    return Material.Anterograde.Value;
                 return false;
             }
         }

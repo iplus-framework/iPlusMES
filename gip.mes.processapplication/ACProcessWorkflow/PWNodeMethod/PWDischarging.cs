@@ -913,7 +913,8 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        public static FacilityReservation GetNextFreeDestination(ACComponent invoker, IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos, bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
+        public static FacilityReservation GetNextFreeDestination(ACComponent invoker, IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos pPos, 
+            bool changeReservationStateIfFull, FacilityReservation ignoreFullSilo = null)
         {
             if (plannedSilos == null || !plannedSilos.Any())
                 return null;

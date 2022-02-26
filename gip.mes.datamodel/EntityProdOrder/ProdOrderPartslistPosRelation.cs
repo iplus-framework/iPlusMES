@@ -18,6 +18,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(10, "TargetProdOrderPartslistPos", "en{'Intermediate Product'}de{'Zwischenprodukt'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     [ACPropertyEntity(11, "ParentProdOrderPartslistPosRelation", "en{'Partial Quantity from'}de{'Teilmenge von'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPosRelation.ClassName, "", true)]
     [ACPropertyEntity(13, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
+    [ACPropertyEntity(14, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPosRelation.ClassName, "en{'Component Part'}de{'Teilmenge'}", typeof(ProdOrderPartslistPosRelation), ProdOrderPartslistPosRelation.ClassName, "", "ProdOrderPartslistPosRelationID")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<ProdOrderPartslistPosRelation>) })]
     public partial class ProdOrderPartslistPosRelation : IACObjectEntity, IACObject, IPartslistPosRelation
@@ -403,6 +404,23 @@ namespace gip.mes.datamodel
                     return ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.Backflushing;
                 if (SourceProdOrderPartslistPos != null)
                     return SourceProdOrderPartslistPos.Backflushing;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Property that evaluates the override of the Anterograde-Fields in Tables PartslistPos->Material
+        /// </summary>
+        public bool Foreflushing
+        {
+            get
+            {
+                if (this.Anterograde.HasValue)
+                    return this.Anterograde.Value;
+                if (ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation != null)
+                    return ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.Foreflushing;
+                if (SourceProdOrderPartslistPos != null)
+                    return SourceProdOrderPartslistPos.Foreflushing;
                 return false;
             }
         }

@@ -2017,6 +2017,7 @@
           <Property Name="ExplosionOff" Type="bit" />
           <Property Name="SpecHeatCapacity" Type="float" Nullable="false" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
+          <Property Name="Anterograde" Type="bit" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -3718,6 +3719,7 @@
           <Property Name="RetrogradeFIFO" Type="bit" />
           <Property Name="ExplosionOff" Type="bit" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
+          <Property Name="Anterograde" Type="bit" />
         </EntityType>
         <EntityType Name="PartslistPosRelation">
           <Key>
@@ -3731,6 +3733,7 @@
           <Property Name="TargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="MaterialWFRelationID" Type="uniqueidentifier" />
           <Property Name="RetrogradeFIFO" Type="bit" />
+          <Property Name="Anterograde" Type="bit" />
         </EntityType>
         <EntityType Name="PartslistPosSplit">
           <Key>
@@ -4082,6 +4085,7 @@
           <Property Name="ACClassTaskID" Type="uniqueidentifier" />
           <Property Name="TakeMatFromOtherOrder" Type="bit" Nullable="false" />
           <Property Name="RetrogradeFIFO" Type="bit" />
+          <Property Name="Anterograde" Type="bit" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosFacilityLot">
           <Key>
@@ -4114,6 +4118,7 @@
           <Property Name="MDProdOrderPartslistPosStateID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="XMLConfig" Type="text" />
           <Property Name="RetrogradeFIFO" Type="bit" />
+          <Property Name="Anterograde" Type="bit" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosSplit">
           <Key>
@@ -4267,7 +4272,7 @@
           <Property Name="FacilityLotID" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.TandTv2TempPos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="TandTv2TempPos">
           <Key>
             <PropertyRef Name="TandTv2StepID" />
@@ -4799,7 +4804,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.TandTv2TempPos' does not have 
           <Property Name="LabOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4820,7 +4825,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.ACProgramLogView' does not hav
           <Property Name="ProdOrderBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="PartslistSequence" Type="int" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" />
-          <Property Name="MaterialName" Type="varchar" MaxLength="350" />
+          <Property Name="MaterialName" Type="varchar" MaxLength="40" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="PosACUrl" Type="varchar" MaxLength="250" />
           <Property Name="ProdOrderPartslistPosID" Type="uniqueidentifier" />
@@ -4832,7 +4837,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.ACProgramLogView' does not hav
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4847,7 +4852,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialPosView' does n
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4856,7 +4861,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialPosView' does n
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4871,7 +4876,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialRelView' does n
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4880,7 +4885,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialRelView' does n
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4894,7 +4899,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialView' does not 
           <Property Name="Nr" Type="bigint" />
           <Property Name="ProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ACClassID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MachineName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="BasedOnACClassID" Type="uniqueidentifier" Nullable="false" />
@@ -4905,7 +4910,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.MachineMaterialView' does not 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4934,7 +4939,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogPosMachines' does not 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4957,14 +4962,14 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogPosView' does not have
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PartslistSequence" Type="int" Nullable="false" />
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4999,14 +5004,14 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogRelView' does not have
           <Property Name="BasedOnMachine" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="RelSequence" Type="int" Nullable="false" />
           <Property Name="MaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="MaterialName1" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="MaterialName1" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="ActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosSequence" Type="int" Nullable="false" />
           <Property Name="PosBatchNo" Type="varchar" MaxLength="20" />
           <Property Name="MaterialPosTypeIndex" Type="smallint" Nullable="false" />
           <Property Name="PosMaterialNo" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PosMaterialName" Type="varchar" MaxLength="350" Nullable="false" />
+          <Property Name="PosMaterialName" Type="varchar" MaxLength="40" Nullable="false" />
           <Property Name="PosTargetQuantityUOM" Type="float" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="float" Nullable="false" />
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
@@ -5014,7 +5019,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.OrderLogRelView' does not have
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5034,7 +5039,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderConnectionsDetailView
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5048,7 +5053,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderConnectionsView' does
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5070,7 +5075,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderInwardsView' does not
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5094,7 +5099,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.ProdOrderOutwardsView' does no
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5107,7 +5112,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBSystemColumns' does not have
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'IPCDrives2017.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -22791,6 +22796,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="TourplanConfig_Material" Relationship="iPlusMESV4_Model.FK_TourplanConfig_MaterialID" FromRole="Material" ToRole="TourplanConfig" />
           <NavigationProperty Name="Visitor_Material" Relationship="iPlusMESV4_Model.FK_Visitor_MaterialID" FromRole="Material" ToRole="Visitor" />
+          <Property Name="Anterograde" Type="Boolean" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -24846,6 +24852,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="PartslistPosRelation_SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
           <NavigationProperty Name="PartslistPosSplit_PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
           <NavigationProperty Name="ProdOrderPartslistPos_BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
+          <Property Name="Anterograde" Type="Boolean" />
         </EntityType>
         <EntityType Name="PartslistPosRelation">
           <Key>
@@ -24862,6 +24869,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="MaterialWFRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" FromRole="PartslistPosRelation" ToRole="MaterialWFRelation" />
           <NavigationProperty Name="TargetPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
           <NavigationProperty Name="SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
+          <Property Name="Anterograde" Type="Boolean" />
         </EntityType>
         <EntityType Name="PartslistPosSplit">
           <Key>
@@ -25320,6 +25328,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="ProdOrderPartslistPosSplit_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosSplit_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPosSplit" />
           <NavigationProperty Name="TandTv2StepItem_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv3MixPointProdOrderPartslistPos" />
+          <Property Name="Anterograde" Type="Boolean" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosFacilityLot">
           <Key>
@@ -25370,6 +25379,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation" FromRole="ProdOrderPartslistPosRelation1" ToRole="ProdOrderPartslistPosRelation" />
           <NavigationProperty Name="TandTv2StepItem_ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistPosRelationID" FromRole="ProdOrderPartslistPosRelation" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelationID" FromRole="ProdOrderPartslistPosRelation" ToRole="TandTv3MixPointProdOrderPartslistPosRelation" />
+          <Property Name="Anterograde" Type="Boolean" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosSplit">
           <Key>
@@ -34827,7 +34837,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="ProdOrderBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="PartslistSequence" Type="Int32" />
           <Property Name="MaterialNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="PosACUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ProdOrderPartslistPosID" Type="Guid" />
@@ -34852,7 +34862,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -34874,7 +34884,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -34895,7 +34905,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="Nr" Type="Int64" />
           <Property Name="ProgramNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ACClassID" Type="Guid" Nullable="false" />
           <Property Name="MachineName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="BasedOnACClassID" Type="Guid" Nullable="false" />
@@ -34954,7 +34964,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PartslistSequence" Type="Int32" Nullable="false" />
@@ -34994,14 +35004,14 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="BasedOnMachine" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="RelSequence" Type="Int32" Nullable="false" />
           <Property Name="MaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="MaterialName1" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="ActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosSequence" Type="Int32" Nullable="false" />
           <Property Name="PosBatchNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
           <Property Name="PosMaterialNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="PosMaterialName" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="PosTargetQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="PosActualQuantityUOM" Type="Double" Nullable="false" />
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -37168,6 +37178,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <EntitySetMapping Name="Material">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Material">
               <MappingFragment StoreEntitySet="Material">
+                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
                 <ScalarProperty Name="SpecHeatCapacity" ColumnName="SpecHeatCapacity" />
                 <ScalarProperty Name="ExplosionOff" ColumnName="ExplosionOff" />
@@ -38985,6 +38996,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <EntitySetMapping Name="PartslistPos">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPos">
               <MappingFragment StoreEntitySet="PartslistPos">
+                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
                 <ScalarProperty Name="ExplosionOff" ColumnName="ExplosionOff" />
                 <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
@@ -39013,6 +39025,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <EntitySetMapping Name="PartslistPosRelation">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPosRelation">
               <MappingFragment StoreEntitySet="PartslistPosRelation">
+                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
                 <ScalarProperty Name="MaterialWFRelationID" ColumnName="MaterialWFRelationID" />
                 <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
@@ -39357,6 +39370,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <EntitySetMapping Name="ProdOrderPartslistPos">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslistPos">
               <MappingFragment StoreEntitySet="ProdOrderPartslistPos">
+                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
                 <ScalarProperty Name="TakeMatFromOtherOrder" ColumnName="TakeMatFromOtherOrder" />
                 <ScalarProperty Name="ACClassTaskID" ColumnName="ACClassTaskID" />
@@ -39408,6 +39422,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <EntitySetMapping Name="ProdOrderPartslistPosRelation">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslistPosRelation">
               <MappingFragment StoreEntitySet="ProdOrderPartslistPosRelation">
+                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
                 <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
                 <ScalarProperty Name="MDProdOrderPartslistPosStateID" ColumnName="MDProdOrderPartslistPosStateID" />

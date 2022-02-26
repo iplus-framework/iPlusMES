@@ -70,6 +70,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(40, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(41, "ExplosionOff", "en{'Explosion Off'}de{'Stoprückauflösung'}", "", "", true)]
     [ACPropertyEntity(42, "SpecHeatCapacity", "en{'Specific heat capacity J/kgK'}de{'Spezifische Wärmekapazität J/kgK'}", "", "", true)]
+    [ACPropertyEntity(43, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     //QRYMaterialCalculation", "en{'MaterialCalculation'}de{'Materialkalkulation'}", typeof(MaterialCalculation), "MaterialCalculation", "Material\\MaterialName1", "Material\\MaterialName1")]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + Material.ClassName, ConstApp.Material, typeof(Material), Material.ClassName, "MaterialNo,MaterialName1", "MaterialNo", new object[]
         {
@@ -1267,6 +1268,7 @@ namespace gip.mes.datamodel
             ExplosionOff = from.ExplosionOff;
             SpecHeatCapacity = from.SpecHeatCapacity;
             KeyOfExtSys = from.KeyOfExtSys;
+            Anterograde = from.Anterograde;
         }
         #endregion
     }
