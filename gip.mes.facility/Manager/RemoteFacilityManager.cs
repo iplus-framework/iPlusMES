@@ -381,7 +381,7 @@ namespace gip.mes.facility
                 }
 
                 ACMethodBooking acMethod = preBooking.ACMethodBooking as ACMethodBooking;
-                acMethod.OutwardQuantity = fbcForMirroring.OutwardQuantity;
+                acMethod.OutwardQuantity = fbcForMirroring.InwardQuantity;
 
                 // FacilityCharge
                 acMethod.OutwardFacilityCharge = outwardFacilityCharge;
