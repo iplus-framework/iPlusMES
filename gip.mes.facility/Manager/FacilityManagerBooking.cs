@@ -2103,7 +2103,7 @@ namespace gip.mes.facility
         {
             if (facilityCharge == null)
                 return;
-            if (Math.Abs(facilityCharge.StockQuantity - 0) <= FacilityConst.C_ZeroStockCompare)
+            if (Math.Abs(facilityCharge.StockQuantity - 0) <= 0.1) // FacilityConst.C_ZeroStockCompare TODO:@ihrastinski Ivan ne vidim što je to ja to nemam ovo sam zakomentirao jer mi ne builda
             {
                 if (((BP.ParamsAdjusted.MDBookingNotAvailableMode.BookingNotAvailableMode == MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSet)
                         || (BP.ParamsAdjusted.MDBookingNotAvailableMode.BookingNotAvailableMode == MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSetAndReset)

@@ -90,6 +90,7 @@ namespace gip.mes.facility
                     null,
                     null,
                     null,
+                    null,
                     null).ToList();
                 if (isBackward)
                     batchPlans = batchPlans.OrderByDescending(c => c.ScheduledOrder).ToList();

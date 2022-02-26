@@ -111,6 +111,7 @@
     <Compile Include="Facility\BSOPrinterSettingsMES.cs" />
     <Compile Include="Facility\FacilityTree.cs" />
     <Compile Include="Facility\MDBSOFacilityVehicleType.cs" />
+    <Compile Include="Logistics\MDBSOBatchPlanGroup.cs" />
     <Compile Include="Logistics\MDBSOPickingType.cs" />
     <Compile Include="Logistics\MDBSOTransportMode.cs" />
     <Compile Include="Logistics\MDBSOVisitorVoucherState.cs" />
@@ -352,6 +353,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-02-05 07-06_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-02-25 15-03_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

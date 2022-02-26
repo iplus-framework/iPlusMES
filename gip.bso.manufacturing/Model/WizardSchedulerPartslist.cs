@@ -119,6 +119,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+
         #region Properties -> MDSchedulingGroup
 
         private MDSchedulingGroup _SelectedMDSchedulingGroup;
@@ -184,6 +185,57 @@ namespace gip.bso.manufacturing
                 return _WFNode;
             }
         }
+
+        #endregion
+
+
+        #region Properties -> MDBatchPlanGroup
+
+
+        private MDBatchPlanGroup _SelectedBatchPlanGroup;
+        /// <summary>
+        /// Selected property for PAScheduleForPWNode
+        /// </summary>
+        /// <value>The selected FilterConnectedLine</value>
+        [ACPropertySelected(210, "BatchPlanGroup", "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
+        public MDBatchPlanGroup SelectedBatchPlanGroup
+        {
+            get
+            {
+                return _SelectedBatchPlanGroup;
+            }
+            set
+            {
+                if (_SelectedBatchPlanGroup != value)
+                {
+                    _SelectedBatchPlanGroup = value;
+                    OnPropertyChanged("SelectedBatchPlanGroup");
+                }
+            }
+        }
+
+
+        private List<MDBatchPlanGroup> _BatchPlanGroupList;
+        /// <summary>
+        /// List property for PAScheduleForPWNode
+        /// </summary>
+        /// <value>The FilterConnectedLine list</value>
+        [ACPropertyList(220, "BatchPlanGroup", "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
+        public List<MDBatchPlanGroup> BatchPlanGroupList
+        {
+            get
+            {
+                if (_BatchPlanGroupList == null)
+                    _BatchPlanGroupList = LoadBatchPlanGroupList();
+                return _BatchPlanGroupList;
+            }
+        }
+
+        private List<MDBatchPlanGroup> LoadBatchPlanGroupList()
+        {
+            return DatabaseApp.MDBatchPlanGroup.OrderBy(c => c.SortIndex).ToList();
+        }
+
 
         #endregion
 

@@ -716,6 +716,7 @@ namespace gip.bso.manufacturing
             }
         }
 
+        bool _SchedulingGroupValidated = false;
         /// <summary>
         /// List property for BatchStartModeConfiguration
         /// </summary>
@@ -728,7 +729,14 @@ namespace gip.bso.manufacturing
             {
                 if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
                 {
-                    return _ScheduleForPWNodeList.OrderBy(c => c.MDSchedulingGroup.SortIndex).ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
+                    if (!_SchedulingGroupValidated && _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).Any())
+                        Messages.Error(this,"A Scheduling-Group was removed. Invoke Reset on Scheduler");
+                    _SchedulingGroupValidated = true;
+
+                    return _ScheduleForPWNodeList
+                        .Where(c => c.MDSchedulingGroup != null)
+                        .OrderBy(c => c.MDSchedulingGroup.SortIndex)
+                        .ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
                 }
                 return _ScheduleForPWNodeList;
             }
@@ -846,7 +854,6 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search) -> FilterConnectedLine [PAScheduleForPWNode]
 
 
-        #region FilterConnectedLine
         private PAScheduleForPWNode _SelectedFilterConnectedLine;
         /// <summary>
         /// Selected property for PAScheduleForPWNode
@@ -897,7 +904,58 @@ namespace gip.bso.manufacturing
             list.Insert(0, emptyNode);
             return list;
         }
+
+
         #endregion
+
+
+
+        #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search) -> FilterBatchPlanGroup [MDBatchPlanGroup]
+
+
+        private MDBatchPlanGroup _SelectedFilterBatchPlanGroup;
+        /// <summary>
+        /// Selected property for PAScheduleForPWNode
+        /// </summary>
+        /// <value>The selected FilterConnectedLine</value>
+        [ACPropertySelected(9999, "FilterBatchPlanGroup", "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
+        public MDBatchPlanGroup SelectedFilterBatchPlanGroup
+        {
+            get
+            {
+                return _SelectedFilterBatchPlanGroup;
+            }
+            set
+            {
+                if (_SelectedFilterBatchPlanGroup != value)
+                {
+                    _SelectedFilterBatchPlanGroup = value;
+                    OnPropertyChanged("SelectedFilterBatchPlanGroup");
+                }
+            }
+        }
+
+
+        private List<MDBatchPlanGroup> _FilterBatchPlanGroupList;
+        /// <summary>
+        /// List property for PAScheduleForPWNode
+        /// </summary>
+        /// <value>The FilterConnectedLine list</value>
+        [ACPropertyList(9999, "FilterBatchPlanGroup", "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
+        public List<MDBatchPlanGroup> FilterBatchPlanGroupList
+        {
+            get
+            {
+                if (_FilterBatchPlanGroupList == null)
+                    _FilterBatchPlanGroupList = LoadFilterBatchPlanGroupList();
+                return _FilterBatchPlanGroupList;
+            }
+        }
+
+        private List<MDBatchPlanGroup> LoadFilterBatchPlanGroupList()
+        {
+            return DatabaseApp.MDBatchPlanGroup.OrderBy(c => c.SortIndex).ToList();
+        }
 
 
         #endregion
@@ -990,7 +1048,8 @@ namespace gip.bso.manufacturing
                         FilterStartTime,
                         FilterEndTime,
                         minProdOrderState,
-                        FilterPlanningMR?.PlanningMRID);
+                        FilterPlanningMR?.PlanningMRID,
+                        SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID);
 
                 // Filter list if SelectedFilterConnectedLine is selected: Only batch they have connection via ProdOrder with other line
                 if (SelectedFilterConnectedLine != null && SelectedFilterConnectedLine.MDSchedulingGroupID != Guid.Empty)
@@ -1005,7 +1064,8 @@ namespace gip.bso.manufacturing
                        FilterStartTime,
                        FilterEndTime,
                        minProdOrderState,
-                       FilterPlanningMR?.PlanningMRID)
+                       FilterPlanningMR?.PlanningMRID,
+                       SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID)
                    .Select(c => c.ProdOrderPartslist.ProdOrderID);
                     prodOrderBatchPlans = new ObservableCollection<ProdOrderBatchPlan>(prodOrderBatchPlans.Where(c => includedProductionOrders.Contains(c.ProdOrderPartslist.ProdOrderID)));
                 }
@@ -3322,10 +3382,13 @@ namespace gip.bso.manufacturing
                 // Read selected MDSchedulingGroup
                 if (finalMix != null && finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
                 {
-                    vd.ACClassWF vbACClassWf = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault().VBiACClassWF;
+                    ProdOrderBatchPlan bp = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
+                    MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c=>c.MDBatchPlanGroup).Where(c=>c != null).FirstOrDefault();
+                    vd.ACClassWF vbACClassWf = bp.VBiACClassWF;
                     vd.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
                     if (mDSchedulingGroup != null)
                         item.SelectedMDSchedulingGroup = mDSchedulingGroup;
+                    item.SelectedBatchPlanGroup = gr;
                 }
 
                 item.ProdOrderPartslistPos = finalMix;
@@ -3424,7 +3487,8 @@ namespace gip.bso.manufacturing
                     FilterStartTime,
                     FilterEndTime,
                     prodOrderState,
-                    FilterPlanningMR?.PlanningMRID);
+                    FilterPlanningMR?.PlanningMRID,
+                    SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID);
 
             int displayOrder = 0;
 
@@ -3696,6 +3760,8 @@ namespace gip.bso.manufacturing
             if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
                 prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
 
+            //prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
+
             return prodOrderBatchPlan;
         }
 
@@ -3837,6 +3903,7 @@ namespace gip.bso.manufacturing
 
 
                 batchPlan.ScheduledOrder = schedulingOrder;
+                //batchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
                 schedulingOrder++;
             }
             foreach (ProdOrderBatchPlan missingBatchPlan in missingBatchPlans)
