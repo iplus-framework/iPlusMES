@@ -1641,6 +1641,9 @@ namespace gip.mes.facility
                 || pickingPos == null)
                 return;
 
+            if (!(acMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingInward || acMethodBooking.BookingType == GlobalApp.FacilityBookingType.PickingInwardCancel))
+                return;
+
             if (!InitLotFromPreBooking(acMethodBooking, pickingPos, ignorePreBooking))
             {
                 InitLotFromPostings(acMethodBooking, pickingPos);
@@ -1766,6 +1769,7 @@ namespace gip.mes.facility
             if (acMethodBooking == null
                 || pickingPos == null)
                 return false;
+
             if (acMethodBooking.InwardFacilityLot != null)
                 return true;
 
