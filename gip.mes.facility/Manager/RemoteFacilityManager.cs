@@ -496,13 +496,14 @@ namespace gip.mes.facility
             }
             else
             {
+                localFC.NotAvailable = changedRemoteFC.NotAvailable;
                 //localFC.CopyFrom(changedRemoteFC, true, false);
-                //MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
-                //if (msgSaveCharge != null)
-                //{
-                //    Messages.Msg(msgSaveCharge);
-                //    successSaveCharge = false;
-                //}
+                MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
+                if (msgSaveCharge != null)
+                {
+                    Messages.Msg(msgSaveCharge);
+                    successSaveCharge = false;
+                }
             }
 
             if (localFC.NotAvailable)
