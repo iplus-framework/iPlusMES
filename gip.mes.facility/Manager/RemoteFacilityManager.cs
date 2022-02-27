@@ -490,19 +490,19 @@ namespace gip.mes.facility
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
                 {
-                    Messages.Msg(msgSaveCharge);
+                    Messages.LogMessageMsg(msgSaveCharge);
                     successSaveCharge = false;
                 }
             }
             else
             {
-                //localFC.CopyFrom(changedRemoteFC, true, false);
-                //MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
-                //if (msgSaveCharge != null)
-                //{
-                //    Messages.Msg(msgSaveCharge);
-                //    successSaveCharge = false;
-                //}
+                localFC.CopyFrom(changedRemoteFC, true, false);
+                MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
+                if (msgSaveCharge != null)
+                {
+                    Messages.Msg(msgSaveCharge);
+                    successSaveCharge = false;
+                }
             }
 
             if (localFC.NotAvailable)
@@ -513,12 +513,12 @@ namespace gip.mes.facility
                 bookReleaseStateFree.PreventSendToRemoteStore = true;
                 ACMethodEventArgs resultRelaseFree = ACFacilityManager.BookFacility(bookReleaseStateFree, dbLocal) as ACMethodEventArgs;
                 if (!bookReleaseStateFree.ValidMessage.IsSucceded() || bookReleaseStateFree.ValidMessage.HasWarnings())
-                    Messages.Msg(bookReleaseStateFree.ValidMessage);
+                    Messages.LogMessageMsg(bookReleaseStateFree.ValidMessage);
                 else if (resultRelaseFree.ResultState == Global.ACMethodResultState.Failed || resultRelaseFree.ResultState == Global.ACMethodResultState.Notpossible)
                 {
                     if (String.IsNullOrEmpty(resultRelaseFree.ValidMessage.Message))
                         resultRelaseFree.ValidMessage.Message = resultRelaseFree.ResultState.ToString();
-                    Messages.Msg(resultRelaseFree.ValidMessage);
+                    Messages.LogMessageMsg(resultRelaseFree.ValidMessage);
                     successSaveCharge = false;
                 }
             }
@@ -533,14 +533,16 @@ namespace gip.mes.facility
                 bookAbsolute.InwardQuantity = changedRemoteFC.AvailableQuantity;
                 bookAbsolute.PreventSendToRemoteStore = true;
 
+
+
                 ACMethodEventArgs resultAbsolute = ACFacilityManager.BookFacility(bookAbsolute, dbLocal) as ACMethodEventArgs;
                 if (!bookAbsolute.ValidMessage.IsSucceded() || bookAbsolute.ValidMessage.HasWarnings())
-                    Messages.Msg(bookAbsolute.ValidMessage);
+                    Messages.LogMessageMsg(bookAbsolute.ValidMessage);
                 else if (resultAbsolute.ResultState == Global.ACMethodResultState.Failed || resultAbsolute.ResultState == Global.ACMethodResultState.Notpossible)
                 {
                     if (String.IsNullOrEmpty(resultAbsolute.ValidMessage.Message))
                         resultAbsolute.ValidMessage.Message = resultAbsolute.ResultState.ToString();
-                    Messages.Msg(resultAbsolute.ValidMessage);
+                    Messages.LogMessageMsg(resultAbsolute.ValidMessage);
                 }
             }
 
