@@ -496,8 +496,7 @@ namespace gip.mes.facility
             }
             else
             {
-                localFC.NotAvailable = changedRemoteFC.NotAvailable;
-                //localFC.CopyFrom(changedRemoteFC, true, false);
+                localFC.CopyFrom(changedRemoteFC, true, false);
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
                 {
