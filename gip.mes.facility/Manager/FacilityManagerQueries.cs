@@ -768,7 +768,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         .Where(c => c.FacilityID == facilityID
                                     && (c.MaterialID == materialID
                                         || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
-                                    && c.IsEnabled
+                                    //&& c.IsEnabled
                                     && c.NotAvailable == notAvailable
                                     && (!c.MDReleaseStateID.HasValue || c.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)
                                     && (!c.FacilityLotID.HasValue || !c.FacilityLot.MDReleaseStateID.HasValue || c.FacilityLot.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))

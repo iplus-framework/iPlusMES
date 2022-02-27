@@ -1318,11 +1318,12 @@ namespace gip.mes.processapplication
 
                         if (odbd)
                         {
-                            if (dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
+                            if (       (dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
                                     || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
                                     || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenEnd
                                     || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenNextComp
                                     || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait)
+                                    && outwardFacility.ReservedQuantity > -0.0001) // Prevent setting to zero stock. Used for virtual silos like city water that never shorts
                             {
                                 bool hasQuants = outwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any();
 

@@ -742,7 +742,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.FacilityCharge_Facility.OrderBy(c => c.InsertDate).FirstOrDefault();
+                return this.FacilityCharge_Facility.Where(c => c.NotAvailable == false).OrderBy(c => c.FacilityChargeSortNo).FirstOrDefault();
             }
         }
         [ACPropertyInfo(37, "", "en{'Last Quant'}de{'Letztes Quant'}")]
@@ -750,7 +750,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.FacilityCharge_Facility.OrderByDescending(c => c.InsertDate).FirstOrDefault();
+                return this.FacilityCharge_Facility.Where(c => c.NotAvailable == false).OrderByDescending(c => c.FacilityChargeSortNo).FirstOrDefault();
             }
         }
 
@@ -759,7 +759,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.FacilityCharge_Facility.Where(c => c.ExpirationDate.HasValue).OrderBy(c => c.ExpirationDate).FirstOrDefault();
+                return this.FacilityCharge_Facility.Where(c => c.NotAvailable == false && c.ExpirationDate.HasValue).OrderBy(c => c.ExpirationDate).FirstOrDefault();
             }
         }
         [ACPropertyInfo(39, "", "en{'Last Expired Quant'}de{'Letztes abgelaufenes Quant'}")]
@@ -767,7 +767,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return this.FacilityCharge_Facility.Where(c => c.ExpirationDate.HasValue).OrderByDescending(c => c.ExpirationDate).FirstOrDefault();
+                return this.FacilityCharge_Facility.Where(c => c.NotAvailable == false && c.ExpirationDate.HasValue).OrderByDescending(c => c.ExpirationDate).FirstOrDefault();
             }
         }
 

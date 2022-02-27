@@ -1545,11 +1545,11 @@ namespace gip2006.variobatch.processapplication
                 return;
             if (this.ConversionAlarm.ValueT == PANotifyState.AlarmOrFault)
             {
-                base.AcknowledgeAlarms();
                 _AcceptStateFromPLC = true;
                 ConversionAlarm.ValueT = PANotifyState.Off;
                 OnAlarmDisappeared(ConversionAlarm);
             }
+            base.AcknowledgeAlarms();
         }
 
         public override void OnProjSpecFunctionEvent(PAProcessFunction sender, string eventName, params object[] projSpecParams)

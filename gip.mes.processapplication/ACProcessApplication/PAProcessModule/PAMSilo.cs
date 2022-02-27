@@ -9,6 +9,8 @@ using gip.core.processapplication;
 using System.Xml;
 using System.Collections.Specialized;
 using System.Web;
+using gip.mes.facility;
+using System.Globalization;
 
 namespace gip.mes.processapplication
 {
@@ -233,6 +235,7 @@ namespace gip.mes.processapplication
         public const string C_DimWidth_1 = "W1";
         public const string C_DimHeight_1 = "H1";
         public const string C_DimDiameter_1 = "D1";
+        public const string C_SyncFromStockOff = "SyncFromStockOff";
         private ACPropertyConfigValue<string> _Dimensions;
         [ACPropertyConfig("en{'Dimensions [dm] L1=0.0&D1=0.0'}de{'Dimensionen [dm] L1=0.0&D1=0.0'}")]
         public string Dimensions
@@ -257,7 +260,7 @@ namespace gip.mes.processapplication
                 _DictDimensions = new Dictionary<string, double>();
                 try
                 {
-                    if (!String.IsNullOrWhiteSpace(Dimensions))
+                    if (String.IsNullOrWhiteSpace(Dimensions))
                         return _DictDimensions;
                     string dimensions = Dimensions.Trim();
                     NameValueCollection nvCol = HttpUtility.ParseQueryString(dimensions);
@@ -265,7 +268,10 @@ namespace gip.mes.processapplication
                     {
                         string sVal = nvCol.Get(key);
                         if (!string.IsNullOrEmpty(sVal))
-                            _DictDimensions.Add(key, Double.Parse(sVal));
+                        {
+                            sVal = sVal.Trim(';', ' ');
+                            _DictDimensions.Add(key, Double.Parse(sVal, CultureInfo.InvariantCulture));
+                        }
                     }
                 }
                 catch (Exception e)
@@ -273,6 +279,16 @@ namespace gip.mes.processapplication
                     Messages.LogException(this.GetACUrl(), "ReadDimensions", e);
                 }
                 return _DictDimensions;
+            }
+        }
+
+        public bool PreventSyncFillLevelScaleFromStock
+        {
+            get
+            {
+                if (DictDimensions == null || !DictDimensions.Any())
+                    return false;
+                return DictDimensions.ContainsKey(C_SyncFromStockOff);
             }
         }
 
@@ -435,10 +451,13 @@ namespace gip.mes.processapplication
         [ACPropertyBindingTarget(448, "Read from PLC", "en{'Hint'}de{'Hinweis'}", "", false, false)]
         public IACContainerTNet<String> Hint { get; set; }
 
-        [ACPropertyBindingTarget(449, "Read from PLC", "en{'Fill level measured [kg]'}de{'Füllstand gemessen [kg]'}", "", false, false)]
+        [ACPropertyBindingTarget(449, "Read from PLC", "en{'Fill level measured [kg]'}de{'Füllstand gemessen [kg]'}", "", false, true)]
         public IACContainerTNet<Double> FillLevelScale { get; set; }
 
-        [ACPropertyBindingTarget(450, "Read from PLC", "en{'Fill level raw [m]'}de{'Füllhöhe Rohdaten [m]'}", "", false, false)]
+        /// <summary>
+        /// Raw fill level in cm
+        /// </summary>
+        [ACPropertyBindingTarget(450, "Read from PLC", "en{'Fill level raw [cm]'}de{'Füllhöhe Rohdaten [cm]'}", "", false, true)]
         public IACContainerTNet<Double> FillLevelRaw { get; set; }
 
         public bool HasBoundFillLevel
@@ -516,6 +535,7 @@ namespace gip.mes.processapplication
                 return _CurrentDensity;
             }
         }
+
         public bool IsSimulationOn
         {
             get
@@ -546,7 +566,7 @@ namespace gip.mes.processapplication
                 case nameof(RebuildCurrentTransportFunctions):
                     RebuildCurrentTransportFunctions();
                     return true;
-                case Const.IsEnabledPrefix + nameof(RebuildCurrentTransportFunctions):
+                case nameof(IsEnabledRebuildCurrentTransportFunctions):
                     result = IsEnabledRebuildCurrentTransportFunctions();
                     return true;
                 case nameof(GetBSONameForShowBooking):
@@ -570,6 +590,12 @@ namespace gip.mes.processapplication
                 case nameof(CalculateFillingWeight):
                     result = CalculateFillingWeight((double[])acParameter[0], acParameter[1] as Dictionary<string, double>);
                     return true;
+                case nameof(SyncStockWithFillLevelScale):
+                    SyncStockWithFillLevelScale();
+                    return true;
+                case nameof(IsEnabledSyncStockWithFillLevelScale):
+                    result = IsEnabledSyncStockWithFillLevelScale();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -591,13 +617,16 @@ namespace gip.mes.processapplication
                 case nameof(WorkflowDialogOn):
                     WorkflowDialogOn(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + nameof(FacilityBookingDialogOn):
+                case nameof(AskUserSyncStockWithFillLevelScale):
+                    result = AskUserSyncStockWithFillLevelScale(acComponent);
+                    return true;
+                case nameof(IsEnabledFacilityBookingDialogOn):
                     result = IsEnabledFacilityBookingDialogOn(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + nameof(ShowFacilityOverview):
+                case nameof(IsEnabledShowFacilityOverview):
                     result = IsEnabledShowFacilityOverview(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + nameof(ShowReservationDialog):
+                case nameof(IsEnabledShowReservationDialog):
                     result = IsEnabledShowReservationDialog(acComponent);
                     return true;
             }
@@ -889,7 +918,7 @@ namespace gip.mes.processapplication
             {
                 MaterialName.ValueT = material.MaterialName1;
                 MaterialNo.ValueT = material.MaterialNo;
-                _CurrentDensity = material.Density;
+                _CurrentDensity = material.Density > 0.001 ? material.Density : 1000;
             }
             else
             {
@@ -934,7 +963,7 @@ namespace gip.mes.processapplication
 
             _CurrentStock = stockQ.HasValue ? stockQ.Value : 0;
             // Falls Füllstand gebunden an eine Source-Variable, dann aktualiere den Füllstand nicht vom Bestand
-            if (propTarget != null && propTarget.Source == null)
+            if (!HasBoundFillLevel)
                 this.FillLevel.ValueT = _CurrentStock;
             if (String.IsNullOrWhiteSpace(facilitySilo.Comment))
             {
@@ -957,7 +986,7 @@ namespace gip.mes.processapplication
             {
                 if (this.ScaleSensor != null)
                     this.FillLevelScale.ValueT = this.ScaleSensor.ActualValue.ValueT;
-                else if (!HasBoundFillLevelRaw)
+                else if (!HasBoundFillLevelRaw && !PreventSyncFillLevelScaleFromStock)
                 {
                     var weighingFunctions = CurrentScaleFunctions;
                     if (weighingFunctions.Where(c => c.CurrentScaleForWeighing != null).Any())
@@ -1312,16 +1341,35 @@ namespace gip.mes.processapplication
 
         protected virtual void OnRecalculateFillingWeight()
         {
-            if (HasBoundFillLevelScale)
+            if (   HasBoundFillLevelScale 
+                || DictDimensions == null 
+                || !DictDimensions.Any()
+                || _CurrentDensity <= double.Epsilon)
                 return;
-            this.FillLevelScale.ValueT = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingWeight), new double[] { FillLevelRaw.ValueT }, DictDimensions);
+            double fillLevel_dm = FillLevelRaw.ValueT;
+            if (fillLevel_dm <= 0.000000001)
+                this.FillLevelScale.ValueT = 0;
+            else
+            {
+                fillLevel_dm = fillLevel_dm * 0.1; // m => dm
+                this.FillLevelScale.ValueT = (double)ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingWeight), new double[] { fillLevel_dm }, DictDimensions);
+            }
         }
 
+        /// <summary>
+        /// Calculates the volume of the container by passing values in dm
+        /// </summary>
+        /// <param name="measuredFillLevel">Filllevel in dm</param>
+        /// <param name="dimensions">Dimensions in dm</param>
+        /// <returns></returns>
         [ACMethodInfo("Function", "en{'Calculate filling volume [dm³]'}de{'Füllvolumen berechnen [dm³]'}", 9999)]
         public virtual double CalculateFillingVolume(double[] measuredFillLevel, Dictionary<string, double> dimensions)
         {
             double volume = 0.0;
-            if (measuredFillLevel == null || !measuredFillLevel.Any())
+            if (   measuredFillLevel == null 
+                || !measuredFillLevel.Any() 
+                || dimensions == null
+                || !dimensions.Any())
                 return volume;
             double h = measuredFillLevel[0];
             if (h <= 0.0000000001)
@@ -1347,32 +1395,124 @@ namespace gip.mes.processapplication
             return volume;
         }
 
+        /// <summary>
+        /// Volume Calculation of horizontal container in dm³
+        /// </summary>
+        /// <param name="l">length in dm</param>
+        /// <param name="d">diameter in dm</param>
+        /// <param name="h">diameter in dm</param>
+        /// <returns></returns>
         public static double GetVolumeOfHorizontalCylinder(double l, double d, double h)
         {
             double r = d / 2;
-            double volume = l * (Math.Pow(r, 2) * Math.Acos(l - (h / r)) - (r - h) * Math.Sqrt(d * h - Math.Pow(h, 2)));
+            if (h > d)
+                h = d;
+            double volume = l * (Math.Pow(r, 2) * Math.Acos(1 - (h / r)) - (r - h) * Math.Sqrt(d * h - Math.Pow(h, 2)));
             return volume;
         }
 
+        /// <summary>
+        /// Volume Calculation ov vertical container in dm³
+        /// </summary>
+        /// <param name="d">diameter in dm</param>
+        /// <param name="h">height in dm</param>
+        /// <returns></returns>
         public static double GetVolumeOfVerticalCylinder(double d, double h)
         {
             double r = d / 2;
-            double volume = (1 / 3) * Math.PI * Math.Pow(r, 2) * h;
+            double volume = (1.0 / 3.0) * Math.PI * Math.Pow(r, 2) * h; // dm² * dm = dm³
             return volume;
         }
 
+        /// <summary>
+        /// Calculates the weight in the container by volume and density
+        /// </summary>
+        /// <param name="measuredFillLevel">Fill level in dm</param>
+        /// <param name="dimensions">Dimensions in dm</param>
+        /// <returns></returns>
         [ACMethodInfo("Function", "en{'Calculate filling volume [kg]'}de{'Füllvolumen berechnen [kg]'}", 9999)]
         public virtual double CalculateFillingWeight(double[] measuredFillLevel, Dictionary<string, double> dimensions)
         {
             double volume = (double) ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(CalculateFillingVolume), measuredFillLevel, dimensions);
             if (volume > 0.000001)
             {
-                double density = CurrentDensity;
+                double density = CurrentDensity; // g/dm³
                 if (density < 0.000001)
                     density = 1;
-                return volume * density * 0.001;
+                return volume * density * 0.001; // (dm³ * kg / dm³) => kg
             }
             return volume;
+        }
+
+        [ACMethodCommand("", "en{'Update stock with fill level'}de{'Lagerbestand durch Füllhöhe aktualisieren'}", 402, true)]
+        public virtual void SyncStockWithFillLevelScale()
+        {
+            if (!IsEnabledSyncStockWithFillLevelScale())
+                return;
+            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(this) as FacilityManager;
+            if (facManager != null)
+            {
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    Facility facility = dbApp.Facility.Where(c => c.FacilityID == this.Facility.ValueT.ValueT.FacilityID).FirstOrDefault();
+                    if (facility != null
+                        && facility.Material != null
+                        && facility.FirstQuant != null)
+                    {
+                        ACMethodBooking bookingParam = null;
+                        double currentStock = facility.CurrentFacilityStock.StockQuantity;
+                        double currentLevel =  this.FillLevelScale.ValueT;
+                        double diff = currentLevel - currentStock;
+                        if (Math.Abs(diff) <= double.Epsilon)
+                            return;
+                        if (diff > 0)
+                        {
+                            bookingParam = facManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_InwardMovement_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                            bookingParam.InwardFacility = facility;
+                            bookingParam.InwardQuantity = currentLevel;
+                            bookingParam.InwardMaterial = facility.Material;
+                        }
+                        else
+                        {
+                            bookingParam = facManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_OutwardMovement_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                            bookingParam.OutwardFacility = facility;
+                            bookingParam.OutwardQuantity = currentLevel;
+                            bookingParam.OutwardMaterial = facility.Material;
+                        }
+                        bookingParam.QuantityIsAbsolute = true;
+                        bookingParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonIndex == (short)MovementReasonsEnum.Adjustment).FirstOrDefault();
+
+                        if (Root.CurrentInvokingUser != null)
+                            dbApp.UserName = Root.CurrentInvokingUser.VBUserName;
+                        if (OnSyncStockWithFillLevelScale(dbApp, ref bookingParam, facManager))
+                            facManager.BookFacilityWithRetry(ref bookingParam, dbApp);
+                    }
+                }
+            }
+        }
+
+        public virtual bool IsEnabledSyncStockWithFillLevelScale()
+        {
+            double currentLevel = this.FillLevelScale.ValueT;
+            if (   currentLevel <= double.Epsilon
+                || Facility.ValueT == null
+                || Facility.ValueT.ValueT == null
+               )
+                return false;
+            return true;
+        }
+
+        public static bool AskUserSyncStockWithFillLevelScale(IACComponent acComponent)
+        {
+            if (acComponent == null)
+                return false;
+            // TODO Übersetzung:
+            return acComponent.Messages.Question(acComponent, "Question50082", Global.MsgResult.Yes) == Global.MsgResult.Yes;
+        }
+
+        public virtual bool OnSyncStockWithFillLevelScale(DatabaseApp dbApp, ref ACMethodBooking bookingParam, FacilityManager facManager)
+        {
+            return true;
         }
 
 

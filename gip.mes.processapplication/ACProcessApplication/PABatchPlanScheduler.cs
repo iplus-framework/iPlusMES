@@ -518,10 +518,10 @@ namespace gip.mes.processapplication
                 return;
             if (IsSchedulingAlarm.ValueT == PANotifyState.AlarmOrFault)
             {
-                base.AcknowledgeAlarms();
                 IsSchedulingAlarm.ValueT = PANotifyState.Off;
                 OnAlarmDisappeared(IsSchedulingAlarm);
             }
+            base.AcknowledgeAlarms();
         }
 
         #endregion
