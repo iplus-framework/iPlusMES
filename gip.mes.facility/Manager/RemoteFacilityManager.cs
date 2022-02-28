@@ -255,29 +255,22 @@ namespace gip.mes.facility
                                 .Where(c => c.FacilityBookingID == entry.KeyId);
                             foreach (var remoteFBC in queryRemoteFBCs)
                             {
-                                if (remoteFBC.InwardFacilityID.HasValue && remoteFBC.InwardFacilityID.Value == remoteFacility.FacilityID)
+                                if (remoteFBC.InwardFacilityID.HasValue && dbLocal.Facility.Any(c => c.FacilityID == remoteFBC.InwardFacilityID))
                                 {
                                     if (!changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
                                         changedRemoteFCs.Add(remoteFBC.InwardFacilityCharge);
                                 }
-                                if (remoteFBC.OutwardFacilityID.HasValue && remoteFBC.OutwardFacilityID.Value == remoteFacility.FacilityID)
+
+                                if (remoteFBC.OutwardFacilityID.HasValue && dbLocal.Facility.Any(c => c.FacilityID == remoteFBC.OutwardFacilityID))
                                 {
                                     if (!changedRemoteFCs.Contains(remoteFBC.OutwardFacilityCharge))
                                         changedRemoteFCs.Add(remoteFBC.OutwardFacilityCharge);
                                 }
-                                if (remoteFBC.PickingPos != null)
-                                {
-                                    if (!changedRemotePickings.Contains(remoteFBC.PickingPos.Picking))
-                                        changedRemotePickings.Add(remoteFBC.PickingPos.Picking);
 
-                                    // Forming mirrored pre booking for (Inward) FBC
-                                    if (MirroringBookingToPreBooking && remoteFBC.InwardFacilityCharge != null)
-                                    {
-                                        if (!changedRemoteFCs.Contains(remoteFBC.InwardFacilityCharge))
-                                            changedRemoteFCs.Add(remoteFBC.InwardFacilityCharge);
-                                        if (!fbcForMirroringToPreBooking.Contains(remoteFBC))
-                                            fbcForMirroringToPreBooking.Add(remoteFBC);
-                                    }
+                                if (remoteFBC.PickingPos != null && MirroringBookingToPreBooking && remoteFBC.InwardFacilityCharge != null && dbLocal.Facility.Any(c => c.FacilityID == remoteFBC.InwardFacilityID))
+                                {
+                                    if (!fbcForMirroringToPreBooking.Contains(remoteFBC))
+                                        fbcForMirroringToPreBooking.Add(remoteFBC);
                                 }
                             }
                         }
@@ -477,9 +470,20 @@ namespace gip.mes.facility
                 {
                     localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
                     if (localLot == null)
+                    {
                         localLot = changedRemoteFC.FacilityLot.Clone(true) as FacilityLot;
+                        int countExisting = dbLocal.FacilityLot.Where(c=>c.LotNo == changedRemoteFC.FacilityLot.LotNo).Count();
+                        if(countExisting > 0)
+                        {
+                            localLot.LotNo = localLot.LotNo + string.Format(@"-{0}", countExisting);
+                        }
+                    }
                     else
-                        localLot.CopyFrom(changedRemoteFC.FacilityLot, true);
+                    {
+                        localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
+                        localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
+                        localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
+                    }
                 }
 
                 // Add new FacilityCharge with same FacilityChargeID
