@@ -3291,7 +3291,7 @@ namespace gip.bso.manufacturing
             IEnumerable<Tuple<int, Guid>> items =
                 partslist
                 .PartslistConfig_Partslist
-                .Where(c => c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
+                .Where(c => c.LocalConfigACUrl != null && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
                 .ToArray()
                 .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
                 .OrderBy(c => c.Item1)
