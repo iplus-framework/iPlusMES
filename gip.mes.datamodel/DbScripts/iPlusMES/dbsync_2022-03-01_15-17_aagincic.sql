@@ -1,0 +1,1 @@
+alter table  dbo.Partslist alter column DeleteName varchar(20) null;

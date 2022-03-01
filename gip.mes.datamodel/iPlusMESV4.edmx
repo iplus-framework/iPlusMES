@@ -3651,7 +3651,7 @@
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="PreviousPartslistID" Type="uniqueidentifier" />
           <Property Name="DeleteDate" Type="datetime" />
-          <Property Name="DeleteName" Type="varchar" MaxLength="5" />
+          <Property Name="DeleteName" Type="varchar" MaxLength="20" />
           <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="MaterialWFID" Type="uniqueidentifier" />
           <Property Name="ProductionUnits" Type="float" />
@@ -24745,7 +24745,7 @@ warning 6002: The table/view 'IPCDrives2017.dbo.VBTranslationView' does not have
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="PreviousPartslistID" Type="Guid" />
           <Property Name="DeleteDate" Type="DateTime" Precision="3" />
-          <Property Name="DeleteName" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="DeleteName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="IsInEnabledPeriod" Type="Boolean" annotation:StoreGeneratedPattern="Computed" />
           <Property Name="MaterialWFID" Type="Guid" />
           <Property Name="ProductionUnits" Type="Double" />
