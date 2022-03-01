@@ -2838,7 +2838,7 @@ namespace gip.bso.manufacturing
                     batchPlan2Remove.DeleteACObject(this.DatabaseApp, true);
                     partslist.ProdOrderBatchPlan_ProdOrderPartslist.Remove(batchPlan2Remove);
                 }
-                if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+                if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any() && string.IsNullOrEmpty(partslist.ProdOrder.KeyOfExtSys))
                     RemovePartslist(partslist);
                 else if (!IsBSOTemplateScheduleParent)
                 {
@@ -2868,7 +2868,7 @@ namespace gip.bso.manufacturing
             {
                 prodOrder.AutoRefresh();
                 ProdOrderPartslist[] allProdPartslists = prodOrder.ProdOrderPartslist_ProdOrder.ToArray();
-                if (!prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any())
+                if (!prodOrder.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any() && string.IsNullOrEmpty(prodOrder.KeyOfExtSys))
                 {
                     foreach (ProdOrderPartslist pl in allProdPartslists)
                         RemovePartslist(pl);
