@@ -280,14 +280,14 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (AccessPrimary == null) 
-                    return null; 
+                if (AccessPrimary == null)
+                    return null;
                 return AccessPrimary.Current;
             }
             set
             {
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.Current = value;
                 CurrentInOrderPos = null;
                 OnPropertyChanged("CurrentInOrder");
@@ -322,14 +322,14 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (AccessPrimary == null) 
-                    return null; 
+                if (AccessPrimary == null)
+                    return null;
                 return AccessPrimary.Selected;
             }
             set
             {
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.Selected = value;
                 OnPropertyChanged("SelectedInOrder");
             }
@@ -367,12 +367,15 @@ namespace gip.bso.purchasing
             set
             {
                 _CurrentMDUnit = value;
-                if (_CurrentMDUnit != null && CurrentInOrderPos.MDUnit != value)
+                if (CurrentInOrderPos != null && CurrentInOrderPos.MDUnit != value)
                 {
                     CurrentInOrderPos.MDUnit = value;
-                    CurrentInOrderPos.TargetQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.TargetQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
-                    CurrentInOrderPos.ActualQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.ActualQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
-                    CurrentInOrderPos.CalledUpQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.CalledUpQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
+                    if (CurrentInOrderPos.MDUnit != null)
+                    {
+                        CurrentInOrderPos.TargetQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.TargetQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
+                        CurrentInOrderPos.ActualQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.ActualQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
+                        CurrentInOrderPos.CalledUpQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.CalledUpQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
+                    }
                     OnPropertyChanged("CurrentInOrderPos");
                 }
                 OnPropertyChanged("CurrentMDUnit");
@@ -631,6 +634,7 @@ namespace gip.bso.purchasing
                 _CurrentInOrderPos = value;
                 if (_CurrentInOrderPos != null)
                     _CurrentInOrderPos.PropertyChanged += CurrentInOrderPos_PropertyChanged;
+                CurrentMDUnit = CurrentInOrderPos?.MDUnit;
                 OnPropertyChanged("CurrentInOrderPos");
                 OnPropertyChanged("MDUnitList");
                 OnPropertyChanged("CompanyMaterialPickupList");
@@ -1462,7 +1466,7 @@ namespace gip.bso.purchasing
         [ACMethodInteraction(InOrder.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
-            if (!PreExecute("New")) 
+            if (!PreExecute("New"))
                 return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(InOrder), InOrder.NoColumnName, InOrder.FormatNewNo, this);
             CurrentInOrder = InOrder.NewACObject(DatabaseApp, null, secondaryKey);
@@ -1470,7 +1474,7 @@ namespace gip.bso.purchasing
             // Vorbelegung mit der eigenen Anschrift
             try
             {
-                CurrentInOrder.DeliveryCompanyAddress = 
+                CurrentInOrder.DeliveryCompanyAddress =
                     DatabaseApp.CompanyAddress.Where(c => c.Company.IsOwnCompany && c.IsDeliveryCompanyAddress)
                                               .OrderBy(c => c.Name1).FirstOrDefault();
             }
@@ -1513,7 +1517,7 @@ namespace gip.bso.purchasing
         [ACMethodInteraction(InOrder.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentInOrder", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if (!PreExecute("Delete")) 
+            if (!PreExecute("Delete"))
                 return;
             Msg msg = CurrentInOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
@@ -1521,8 +1525,8 @@ namespace gip.bso.purchasing
                 Messages.Msg(msg);
                 return;
             }
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavList.Remove(CurrentInOrder);
             SelectedInOrder = AccessPrimary.NavList.FirstOrDefault();
             Load();
@@ -1544,8 +1548,8 @@ namespace gip.bso.purchasing
         [ACMethodCommand(InOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
-            if (AccessPrimary == null) 
-                return; 
+            if (AccessPrimary == null)
+                return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("InOrderList");
         }
@@ -1561,7 +1565,7 @@ namespace gip.bso.purchasing
         [ACMethodInteraction(InOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInOrderPos", Global.ACKinds.MSMethodPrePost)]
         public void NewInOrderPos()
         {
-            if (!PreExecute("NewInOrderPos")) 
+            if (!PreExecute("NewInOrderPos"))
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var inOrderPos = InOrderPos.NewACObject(DatabaseApp, CurrentInOrder);
@@ -1587,7 +1591,7 @@ namespace gip.bso.purchasing
         [ACMethodInteraction(InOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInOrderPos", Global.ACKinds.MSMethodPrePost)]
         public void DeleteInOrderPos()
         {
-            if (!PreExecute("DeleteInOrderPos")) 
+            if (!PreExecute("DeleteInOrderPos"))
                 return;
             if (IsEnabledUnAssignContractPos())
             {
@@ -1625,7 +1629,7 @@ namespace gip.bso.purchasing
         {
             if (!IsEnabledLoadCompanyMaterialPickup())
                 return;
-            if (!PreExecute("LoadCompanyMaterialPickup")) 
+            if (!PreExecute("LoadCompanyMaterialPickup"))
                 return;
             // Laden des aktuell selektierten CompanyMaterialPickup 
             CurrentCompanyMaterialPickup = CurrentInOrderPos.CompanyMaterialPickup_InOrderPos
@@ -1642,7 +1646,7 @@ namespace gip.bso.purchasing
         [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
         public void NewCompanyMaterialPickup()
         {
-            if (!PreExecute("NewCompanyMaterialPickup")) 
+            if (!PreExecute("NewCompanyMaterialPickup"))
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var companyMaterialPickup = CompanyMaterialPickup.NewACObject(DatabaseApp, CurrentInOrderPos);
@@ -1813,7 +1817,7 @@ namespace gip.bso.purchasing
         /// <returns><c>true</c> if [is enabled assign in order pos]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledAssignContractPos()
         {
-            if (   CurrentOpenContractPos == null
+            if (CurrentOpenContractPos == null
                 || CurrentInOrder == null
                 || CurrentInOrder.MDInOrderType == null
                 || CurrentInOrder.MDInOrderType.OrderType == GlobalApp.OrderTypes.Contract
@@ -1872,7 +1876,7 @@ namespace gip.bso.purchasing
         /// <returns><c>true</c> if [is enabled unassign in order pos]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledUnAssignContractPos()
         {
-            if (   CurrentInOrderPos == null
+            if (CurrentInOrderPos == null
                 || CurrentInOrderPos.InOrderPos1_ParentInOrderPos == null
                 || CurrentInOrderPos.InOrderPos1_ParentInOrderPos.InOrder.MDInOrderType.OrderType != GlobalApp.OrderTypes.Contract)
                 return false;

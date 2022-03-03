@@ -229,15 +229,23 @@ namespace gip.mes.datamodel
             {
                 if (this.InOrderPos != null)
                 {
-                    InOrderPos.TargetQuantity = InOrderPos.Material.ConvertQuantity(InOrderPos.TargetQuantityUOM, InOrderPos.Material.BaseMDUnit, InOrderPos.MDUnit);
-                    InOrderPos.ActualQuantity = InOrderPos.Material.ConvertQuantity(InOrderPos.ActualQuantityUOM, InOrderPos.Material.BaseMDUnit, InOrderPos.MDUnit);
-                    InOrderPos.CalledUpQuantity = InOrderPos.Material.ConvertQuantity(InOrderPos.CalledUpQuantityUOM, InOrderPos.Material.BaseMDUnit, InOrderPos.MDUnit);
+                    InOrderPos.MDUnit = value;
+                    if (InOrderPos.MDUnit != null)
+                    {
+                        InOrderPos.TargetQuantity = InOrderPos.Material.ConvertQuantity(InOrderPos.TargetQuantityUOM, InOrderPos.Material.BaseMDUnit, InOrderPos.MDUnit);
+                        InOrderPos.ActualQuantity = InOrderPos.Material.ConvertQuantity(InOrderPos.ActualQuantityUOM, InOrderPos.Material.BaseMDUnit, InOrderPos.MDUnit);
+                        InOrderPos.CalledUpQuantity = InOrderPos.Material.ConvertQuantity(InOrderPos.CalledUpQuantityUOM, InOrderPos.Material.BaseMDUnit, InOrderPos.MDUnit);
+                    }
                 }
                 else if (this.OutOrderPos != null)
                 {
-                    OutOrderPos.TargetQuantity = OutOrderPos.Material.ConvertQuantity(OutOrderPos.TargetQuantityUOM, OutOrderPos.Material.BaseMDUnit, OutOrderPos.MDUnit);
-                    OutOrderPos.ActualQuantity = OutOrderPos.Material.ConvertQuantity(OutOrderPos.ActualQuantityUOM, OutOrderPos.Material.BaseMDUnit, OutOrderPos.MDUnit);
-                    OutOrderPos.CalledUpQuantity = OutOrderPos.Material.ConvertQuantity(OutOrderPos.CalledUpQuantityUOM, OutOrderPos.Material.BaseMDUnit, OutOrderPos.MDUnit);
+                    OutOrderPos.MDUnit = value;
+                    if (OutOrderPos.MDUnit != null)
+                    {
+                        OutOrderPos.TargetQuantity = OutOrderPos.Material.ConvertQuantity(OutOrderPos.TargetQuantityUOM, OutOrderPos.Material.BaseMDUnit, OutOrderPos.MDUnit);
+                        OutOrderPos.ActualQuantity = OutOrderPos.Material.ConvertQuantity(OutOrderPos.ActualQuantityUOM, OutOrderPos.Material.BaseMDUnit, OutOrderPos.MDUnit);
+                        OutOrderPos.CalledUpQuantity = OutOrderPos.Material.ConvertQuantity(OutOrderPos.CalledUpQuantityUOM, OutOrderPos.Material.BaseMDUnit, OutOrderPos.MDUnit);
+                    }
                 }
                 else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                 {
@@ -245,11 +253,15 @@ namespace gip.mes.datamodel
                     if (pickingPos == null)
                     {
                         ProdOrderPartslistPos pos = pickingPos.ProdorderPartslistPos;
-                        if(pos != null)
+                        if (pos != null)
                         {
-                            pos.TargetQuantity = pos.Material.ConvertQuantity(pos.TargetQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
-                            pos.ActualQuantity = pos.Material.ConvertQuantity(pos.ActualQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
-                            pos.CalledUpQuantity = pos.Material.ConvertQuantity(pos.CalledUpQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                            pos.MDUnit = value;
+                            if (pos.MDUnit != null)
+                            {
+                                pos.TargetQuantity = pos.Material.ConvertQuantity(pos.TargetQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                                pos.ActualQuantity = pos.Material.ConvertQuantity(pos.ActualQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                                pos.CalledUpQuantity = pos.Material.ConvertQuantity(pos.CalledUpQuantityUOM, pos.Material.BaseMDUnit, pos.MDUnit);
+                            }
                         }
                     }
                 }

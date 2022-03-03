@@ -1077,6 +1077,7 @@ namespace gip.bso.logistics
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                     OnPropertyChanged("BookingFacilityList");
                     OnPropertyChanged("BookingFacilityListTarget");
+                    CurrentMDUnit = CurrentPickingPos?.MDUnit;
                 }
             }
         }
@@ -1165,10 +1166,10 @@ namespace gip.bso.logistics
             set
             {
                 _CurrentMDUnit = value;
-                if (_CurrentMDUnit != null && CurrentInOrderPos.MDUnit != value)
+                if (CurrentPickingPos != null && CurrentPickingPos.MDUnit != value)
                 {
                     CurrentPickingPos.MDUnit = value;
-                    OnPropertyChanged("CurrentInOrderPos");
+                    OnPropertyChanged("CurrentPickingPos");
                 }
                 OnPropertyChanged("CurrentMDUnit");
             }
