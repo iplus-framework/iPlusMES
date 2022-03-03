@@ -335,6 +335,8 @@ namespace gip.bso.purchasing
             }
         }
 
+        #region Properties -> InOrderPos -> MDUnit
+
         /// <summary>
         /// Gets the MU quantity unit list.
         /// </summary>
@@ -376,6 +378,8 @@ namespace gip.bso.purchasing
                 OnPropertyChanged("CurrentMDUnit");
             }
         }
+
+        #endregion
 
         Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(605, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]

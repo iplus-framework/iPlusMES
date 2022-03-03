@@ -454,6 +454,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Property -> OutOrderPos -> MDUnit
+
         /// <summary>
         /// Gets the MU quantity unit list.
         /// </summary>
@@ -496,6 +498,8 @@ namespace gip.bso.sales
                 OnPropertyChanged("CurrentMDUnit");
             }
         }
+
+        #endregion
 
         Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]

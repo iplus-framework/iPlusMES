@@ -1123,6 +1123,58 @@ namespace gip.bso.logistics
                 CurrentPickingPos = value;
             }
         }
+
+
+        #region Properties -> InOrderPos -> MDUnit
+
+        /// <summary>
+        /// Gets the MU quantity unit list.
+        /// </summary>
+        /// <value>The MU quantity unit list.</value>
+        [ACPropertyList(603, MDUnit.ClassName)]
+        public IEnumerable<MDUnit> MDUnitList
+        {
+            get
+            {
+                if (CurrentPickingPos == null)
+                    return null;
+                if (CurrentPickingPos.Material != null)
+                    return CurrentPickingPos.Material.MDUnitList;
+                if (CurrentInOrderPos.Material != null)
+                    return CurrentInOrderPos.Material.MDUnitList;
+                if (CurrentOutOrderPos.Material != null)
+                    return CurrentOutOrderPos.Material.MDUnitList;
+                if (CurrentProdOrderPartslistPos.Material != null)
+                    return CurrentProdOrderPartslistPos.Material.MDUnitList;
+                return null;
+            }
+        }
+
+        MDUnit _CurrentMDUnit;
+        /// <summary>
+        /// Gets or sets the current MU quantity unit.
+        /// </summary>
+        /// <value>The current MU quantity unit.</value>
+        [ACPropertyCurrent(604, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}")]
+        public MDUnit CurrentMDUnit
+        {
+            get
+            {
+                return _CurrentMDUnit;
+            }
+            set
+            {
+                _CurrentMDUnit = value;
+                if (_CurrentMDUnit != null && CurrentInOrderPos.MDUnit != value)
+                {
+                    CurrentPickingPos.MDUnit = value;
+                    OnPropertyChanged("CurrentInOrderPos");
+                }
+                OnPropertyChanged("CurrentMDUnit");
+            }
+        }
+
+        #endregion
         #endregion
 
         #region FacilityPreBooking

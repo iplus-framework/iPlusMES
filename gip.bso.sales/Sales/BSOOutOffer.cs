@@ -312,6 +312,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Property -> OutOfferPos -> MDUnit
+
         /// <summary>
         /// Unit list
         /// </summary>
@@ -347,6 +349,8 @@ namespace gip.bso.sales
                 }
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind
