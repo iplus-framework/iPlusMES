@@ -68,8 +68,9 @@ namespace gip.bso.masterdata
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
                 BSOMedia_Child.Value.OnDefaultImageDelete += Value_OnDefaultImageDelete;
 
+            FilterAssociatedPosMaterial.SearchWord = null;
             if (CurrentMaterial != null)
-                FilterAssociatedPosMaterialNo = CurrentMaterial.MaterialNo;
+                FilterAssociatedPosMaterial.SearchWord = CurrentMaterial.MaterialNo;
 
             return true;
         }
@@ -1530,7 +1531,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region AssociatedPartslistPos -> Filter fields
-
+        private string FilterMaterialNoAssociatedPos_PropertyName = @"Material\MaterialNo";
         private ACFilterItem FilterAssociatedPosMaterial
         {
             get
@@ -1542,26 +1543,6 @@ namespace gip.bso.masterdata
                     AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Add(filterItem);
                 }
                 return filterItem;
-            }
-        }
-
-
-        private string FilterMaterialNoAssociatedPos_PropertyName = @"Material\MaterialNo";
-
-        [ACPropertyInfo(999, "FilterAssociatedPosMaterialNo", "en{'Material No.'}de{'Material Nr.'}")]
-        public string FilterAssociatedPosMaterialNo
-        {
-            get
-            {
-                return FilterAssociatedPosMaterial.SearchWord;
-            }
-            set
-            {
-                if (FilterAssociatedPosMaterial.SearchWord != value)
-                {
-                    FilterAssociatedPosMaterial.SearchWord = value;
-                    OnPropertyChanged("FilterAssociatedPosMaterialNo");
-                }
             }
         }
 
@@ -1645,9 +1626,9 @@ namespace gip.bso.masterdata
             base.ChangedSelectedMaterial(material);
             AccessAssociatedPartslistPos.NavList.Clear();
             if (material != null)
-                FilterAssociatedPosMaterialNo = material.MaterialNo;
+                FilterAssociatedPosMaterial.SearchWord = material.MaterialNo;
             else
-                FilterAssociatedPosMaterialNo = null;
+                FilterAssociatedPosMaterial.SearchWord = null;
         }
 
         private List<ACFilterItem> GetQuantitySearchFilter()
