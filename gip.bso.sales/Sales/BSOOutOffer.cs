@@ -157,28 +157,28 @@ namespace gip.bso.sales
             {
                 if (CurrentOutOffer != null)
                     CurrentOutOffer.PropertyChanged -= CurrentOutOffer_PropertyChanged;
-                if (AccessPrimary == null) 
+                if (AccessPrimary == null)
                     return;
 
                 //if (AccessPrimary.Current != value)
                 //{
-                    AccessPrimary.Current = value;
+                AccessPrimary.Current = value;
 
-                    if (CurrentOutOffer != null)
-                    {
-                        CurrentOutOffer.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentOutOffer_PropertyChanged);
-                    }
-                    CurrentOutOfferPos = null;
-                    CurrentOutOfferPos = OutOfferPosList?.FirstOrDefault();
-                    OnPropertyChanged("CurrentOutOffer");
-                    OnPropertyChanged("OutOfferPosList");
-                    OnPropertyChanged("CompanyList");
-                    OnPropertyChanged("BillingCompanyAddressList");
-                    OnPropertyChanged("DeliveryCompanyAddressList");
-                    OnPropertyChanged("CurrentBillingCompanyAddress");
-                    OnPropertyChanged("CurrentDeliveryCompanyAddress");
+                if (CurrentOutOffer != null)
+                {
+                    CurrentOutOffer.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentOutOffer_PropertyChanged);
+                }
+                CurrentOutOfferPos = null;
+                CurrentOutOfferPos = OutOfferPosList?.FirstOrDefault();
+                OnPropertyChanged("CurrentOutOffer");
+                OnPropertyChanged("OutOfferPosList");
+                OnPropertyChanged("CompanyList");
+                OnPropertyChanged("BillingCompanyAddressList");
+                OnPropertyChanged("DeliveryCompanyAddressList");
+                OnPropertyChanged("CurrentBillingCompanyAddress");
+                OnPropertyChanged("CurrentDeliveryCompanyAddress");
 
-                    ResetAccessTenantCompanyFilter(value);
+                ResetAccessTenantCompanyFilter(value);
                 //}
             }
         }
@@ -258,6 +258,7 @@ namespace gip.bso.sales
                 }
                 else
                     PriceListMaterialItems = null;
+                CurrentMDUnit = CurrentOutOfferPos?.MDUnit;
                 OnPropertyChanged("MDUnitList");
                 OnPropertyChanged("CurrentOutOfferPos");
                 OnPropertyChanged("CurrentMDUnit");
@@ -312,6 +313,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Property -> OutOfferPos -> MDUnit
+
         /// <summary>
         /// Unit list
         /// </summary>
@@ -326,6 +329,7 @@ namespace gip.bso.sales
             }
         }
 
+        private MDUnit _CurrentMDUnit;
         /// <summary>
         /// Current MDUnit
         /// </summary>
@@ -334,19 +338,25 @@ namespace gip.bso.sales
         {
             get
             {
-                if (CurrentOutOfferPos == null)
-                    return null;
-                return CurrentOutOfferPos.MDUnit;
+                return _CurrentMDUnit;
             }
             set
             {
-                if (CurrentOutOfferPos != null && value != null)
+                _CurrentMDUnit = value;
+                if (CurrentOutOfferPos != null && CurrentOutOfferPos.MDUnit != value)
                 {
                     CurrentOutOfferPos.MDUnit = value;
-                    OnPropertyChanged("CurrentMDUnit");
+                    if (CurrentOutOfferPos.MDUnit != null)
+                    {
+                        CurrentOutOfferPos.TargetQuantity = CurrentOutOfferPos.Material.ConvertQuantity(CurrentOutOfferPos.TargetQuantityUOM, CurrentOutOfferPos.Material.BaseMDUnit, CurrentOutOfferPos.MDUnit);
+                        OnPropertyChanged("CurrentOutOfferPos");
+                    }
                 }
+                OnPropertyChanged("CurrentMDUnit");
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind

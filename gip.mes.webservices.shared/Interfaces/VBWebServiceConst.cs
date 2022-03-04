@@ -11,6 +11,7 @@ namespace gip.mes.webservices
         public const string UriBarcodeEntity_BarcodeID = "BarcodeEntity/{barcodeID}";
         public const string UriBarcodeEntity_BarcodeID_F = "BarcodeEntity/{0}";
 
+        public const string UriBarcodeEntity = "BarcodeEntity";
         public const string UriBarcodeSequence = "BarcodeSequence";
 
         public const string UriPrint="Print";

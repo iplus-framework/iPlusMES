@@ -392,6 +392,7 @@ namespace gip.bso.sales
                     _CurrentInvoicePos = value;
                     if (_CurrentInvoicePos != null)
                         _CurrentInvoicePos.PropertyChanged += CurrentInvoicePos_PropertyChanged;
+                    CurrentMDUnit = CurrentInvoicePos?.MDUnit;
                     OnPropertyChanged("CurrentInvoicePos");
                     OnPropertyChanged("MDUnitList");
                     OnPropertyChanged("AvailableCompMaterialList");
@@ -454,6 +455,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Property -> InvoicePos -> MDUnit
+
         MDUnit _CurrentMDUnit;
         /// <summary>
         /// Gets or sets the current MU quantity unit.
@@ -469,15 +472,18 @@ namespace gip.bso.sales
             set
             {
                 _CurrentMDUnit = value;
-                if (_CurrentMDUnit != null && CurrentInvoicePos.MDUnit != value)
+                if (CurrentInvoicePos != null && CurrentInvoicePos.MDUnit != value)
                 {
                     CurrentInvoicePos.MDUnit = value;
-                    CurrentInvoicePos.TargetQuantity = CurrentInvoicePos.Material.ConvertQuantity(CurrentInvoicePos.TargetQuantityUOM, CurrentInvoicePos.Material.BaseMDUnit, CurrentInvoicePos.MDUnit);
-                    OnPropertyChanged("CurrentOutOrderPos");
+                    if (CurrentInvoicePos.MDUnit != null)
+                        CurrentInvoicePos.TargetQuantity = CurrentInvoicePos.Material.ConvertQuantity(CurrentInvoicePos.TargetQuantityUOM, CurrentInvoicePos.Material.BaseMDUnit, CurrentInvoicePos.MDUnit);
+                    OnPropertyChanged("CurrentInvoicePos");
                 }
                 OnPropertyChanged("CurrentMDUnit");
             }
         }
+
+        #endregion
 
         Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
@@ -1699,12 +1705,12 @@ namespace gip.bso.sales
         private void Doc_SetFlowDocObjValue(object sender, PaginatorOnSetValueEventArgs e)
         {
             InvoicePos pos = e.ParentDataRow as InvoicePos;
-            if (e.FlowDocObj != null 
+            if (e.FlowDocObj != null
                 && (e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge"
                 || e.FlowDocObj.VBContent == "CurrentInvoice\\NotIsReverseCharge"))
             {
-                if (    CurrentInvoice != null 
-                    &&  (  (!CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge")
+                if (CurrentInvoice != null
+                    && ((!CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\IsReverseCharge")
                         || (CurrentInvoice.IsReverseCharge && e.FlowDocObj.VBContent == "CurrentInvoice\\NotIsReverseCharge")))
                 {
                     var inlineCell = e.FlowDocObj as InlineContextValue;

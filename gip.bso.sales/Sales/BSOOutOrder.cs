@@ -397,6 +397,7 @@ namespace gip.bso.sales
                     _CurrentOutOrderPos = value;
                     if (_CurrentOutOrderPos != null)
                         _CurrentOutOrderPos.PropertyChanged += CurrentOutOrderPos_PropertyChanged;
+                    CurrentMDUnit = CurrentOutOrderPos?.MDUnit;
                     OnPropertyChanged("CurrentOutOrderPos");
                     OnPropertyChanged("MDUnitList");
                     OnPropertyChanged("CompanyMaterialPickupList");
@@ -454,6 +455,8 @@ namespace gip.bso.sales
             }
         }
 
+        #region Property -> OutOrderPos -> MDUnit
+
         /// <summary>
         /// Gets the MU quantity unit list.
         /// </summary>
@@ -484,18 +487,23 @@ namespace gip.bso.sales
             set
             {
                 _CurrentMDUnit = value;
-                if (_CurrentMDUnit != null && CurrentOutOrderPos.MDUnit != value)
+                if (CurrentOutOrderPos != null && CurrentOutOrderPos.MDUnit != value)
                 {
                     CurrentOutOrderPos.MDUnit = value;
-                    CurrentOutOrderPos.TargetQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.TargetQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
-                    CurrentOutOrderPos.ActualQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.ActualQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
-                    CurrentOutOrderPos.CalledUpQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.CalledUpQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
-                    CurrentOutOrderPos.ExternQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.ExternQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    if (CurrentOutOrderPos.MDUnit != null)
+                    {
+                        CurrentOutOrderPos.TargetQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.TargetQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                        CurrentOutOrderPos.ActualQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.ActualQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                        CurrentOutOrderPos.CalledUpQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.CalledUpQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                        CurrentOutOrderPos.ExternQuantity = CurrentOutOrderPos.Material.ConvertQuantity(CurrentOutOrderPos.ExternQuantityUOM, CurrentOutOrderPos.Material.BaseMDUnit, CurrentOutOrderPos.MDUnit);
+                    }
                     OnPropertyChanged("CurrentOutOrderPos");
                 }
                 OnPropertyChanged("CurrentMDUnit");
             }
         }
+
+        #endregion
 
         Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
@@ -1430,8 +1438,8 @@ namespace gip.bso.sales
         {
             _UnSavedUnAssignedContractPos = new List<OutOrderPos>();
             RefreshOpenContractPosList();
-            if (CurrentOutOrder != null 
-                && CurrentOutOrder.EntityState != System.Data.EntityState.Added 
+            if (CurrentOutOrder != null
+                && CurrentOutOrder.EntityState != System.Data.EntityState.Added
                 && CurrentOutOrder.EntityState != System.Data.EntityState.Detached)
                 CurrentOutOrder.OutOrderPos_OutOrder.Load();
             OnPropertyChanged("OutOrderPosList");
