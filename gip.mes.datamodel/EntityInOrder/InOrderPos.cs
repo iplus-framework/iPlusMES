@@ -46,6 +46,10 @@ namespace gip.mes.datamodel
     {
         public const string ClassName = "InOrderPos";
 
+        #region Private members
+        private string PropertyChangedName;
+        #endregion
+
         #region New/Delete
         public static InOrderPos NewACObject(DatabaseApp dbApp, IACObject parentACObject, InOrder attachToOrder = null)
         {
@@ -320,12 +324,14 @@ namespace gip.mes.datamodel
             OnPropertyChanged("DifferenceQuantityUOM");
         }
 
-        bool _OnTargetQuantityChanging = false;
         partial void OnTargetQuantityChanged()
         {
-            if (!_OnTargetQuantityUOMChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (EntityState != System.Data.EntityState.Detached 
+                && Material != null 
+                && MDUnit != null
+                && string.IsNullOrEmpty(PropertyChangedName))
             {
-                _OnTargetQuantityChanging = true;
+                PropertyChangedName = nameof(TargetQuantity);
                 try
                 {
                     TargetQuantityUOM = Material.ConvertToBaseQuantity(TargetQuantity, MDUnit);
@@ -340,19 +346,20 @@ namespace gip.mes.datamodel
                 }
                 finally
                 {
-                    _OnTargetQuantityChanging = false;
+                    PropertyChangedName = null;
                 }
             }
             OnPropertyChanged("RemainingCallQuantity");
             OnPropertyChanged("DifferenceQuantity");
         }
 
-        bool _OnTargetQuantityUOMChanging = false;
         partial void OnTargetQuantityUOMChanged()
         {
-            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && Material != null && MDUnit != null)
+            if (EntityState != System.Data.EntityState.Detached 
+                && Material != null 
+                && MDUnit != null)
             {
-                _OnTargetQuantityUOMChanging = true;
+                PropertyChangedName = nameof(TargetQuantity);
                 try
                 {
                     TargetQuantity = Material.ConvertQuantity(TargetQuantityUOM, Material.BaseMDUnit, MDUnit);
@@ -367,7 +374,41 @@ namespace gip.mes.datamodel
                 }
                 finally
                 {
-                    _OnTargetQuantityUOMChanging = false;
+                    PropertyChangedName = null;
+                }
+            }
+            OnPropertyChanged("RemainingCallQuantityUOM");
+            OnPropertyChanged("DifferenceQuantityUOM");
+        }
+
+        partial void OnMDUnitIDChanged()
+        {
+            if (EntityState != System.Data.EntityState.Detached
+                && Material != null
+                && MDUnit != null)
+            {
+                PropertyChangedName = nameof(MDUnit);
+                _OnActualQuantityChanging = true;
+                _OnCalledUpQuantityChanging = true;
+                try
+                {
+                    TargetQuantity = Material.ConvertQuantity(TargetQuantityUOM, Material.BaseMDUnit, MDUnit);
+                    ActualQuantity = Material.ConvertQuantity(ActualQuantityUOM, Material.BaseMDUnit, MDUnit);
+                    CalledUpQuantity = Material.ConvertQuantity(CalledUpQuantityUOM, Material.BaseMDUnit, MDUnit);
+                }
+                catch (Exception ec)
+                {
+                    string msg = ec.Message;
+                    if (ec.InnerException != null && ec.InnerException.Message != null)
+                        msg += " Inner:" + ec.InnerException.Message;
+
+                    this.Root().Messages.LogException("InOrderPos", "OnTargetQuantityUOMChanged", msg);
+                }
+                finally
+                {
+                    PropertyChangedName = null;
+                    _OnActualQuantityChanging = false;
+                    _OnCalledUpQuantityChanging = false;
                 }
             }
             OnPropertyChanged("RemainingCallQuantityUOM");

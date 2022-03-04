@@ -1077,8 +1077,24 @@ namespace gip.bso.logistics
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
                     OnPropertyChanged("BookingFacilityList");
                     OnPropertyChanged("BookingFacilityListTarget");
+
+                    if (CurrentPickingPos != null)
+                        CurrentPickingPos.PropertyChanged += CurrentPickingPos_PropertyChanged;
+
                     CurrentMDUnit = CurrentPickingPos?.MDUnit;
                 }
+            }
+        }
+
+        private void CurrentPickingPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(CurrentPickingPos.PickingMaterialID):
+                    {
+                        OnPropertyChanged(nameof(MDUnitList));
+                    }
+                    break;
             }
         }
 
@@ -2056,6 +2072,8 @@ namespace gip.bso.logistics
                     }
                 case "CurrentPickingPos\\PickingQuantityUOM":
                 case "CurrentPickingPos\\PickingMaterial":
+                case "CurrentPickingPos\\TargetQuantity":
+                case "CurrentPickingPos\\TargetQuantityUOM":
                     if (CurrentPickingPos == null
                         || CurrentPickingPos.InOrderPosID.HasValue
                         || CurrentPickingPos.OutOrderPosID.HasValue
