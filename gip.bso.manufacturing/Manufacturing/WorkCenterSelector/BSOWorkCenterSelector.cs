@@ -37,8 +37,8 @@ namespace gip.bso.manufacturing
                 return result;
 
             _MainSyncContext = SynchronizationContext.Current;
-            _BSOWorkCenterSelectorRules = new ACPropertyConfigValue<string>(this, "BSOWorkCenterSelectorRules", "");
-            _OnOpenSetLastSelectedWorkCenterItem = new ACPropertyConfigValue<bool>(this, "OnOpenSetLastSelectedWorkCenterItem", true);
+            _BSOWorkCenterSelectorRules = new ACPropertyConfigValue<string>(this, nameof(BSOWorkCenterSelectorRules), "");
+            _OnOpenSetLastSelectedWorkCenterItem = new ACPropertyConfigValue<bool>(this, nameof(OnOpenSetLastSelectedWorkCenterItem), true);
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
