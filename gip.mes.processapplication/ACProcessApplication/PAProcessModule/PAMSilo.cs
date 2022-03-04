@@ -1420,7 +1420,7 @@ namespace gip.mes.processapplication
         public static double GetVolumeOfVerticalCylinder(double d, double h)
         {
             double r = d / 2;
-            double volume = (1.0 / 3.0) * Math.PI * Math.Pow(r, 2) * h; // dm² * dm = dm³
+            double volume = Math.PI * Math.Pow(r, 2) * h; // dm² * dm = dm³
             return volume;
         }
 
