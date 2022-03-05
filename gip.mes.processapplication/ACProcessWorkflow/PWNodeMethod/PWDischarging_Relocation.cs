@@ -270,7 +270,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Booking
-        public virtual Msg DoInwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, FacilityBooking fb, ACEventArgs e, bool isDischargingEnd)
+        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, FacilityBooking fb, ACEventArgs e, bool isDischargingEnd)
         {
             // TDOO: Implement Standard-Behaviour for Relocation
             return null;

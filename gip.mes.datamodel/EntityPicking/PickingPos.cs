@@ -368,6 +368,30 @@ namespace gip.mes.datamodel
             }
         }
 
+        public double RemainingDosingWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+            }
+        }
+
+        public double TargetWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(TargetQuantityUOM);
+            }
+        }
+
+        public double ActualWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(ActualQuantityUOM);
+            }
+        }
+
         public void RecalcAfterPosting(DatabaseApp dbApp, double postedQuantityUOM, bool isCancellation, bool autoSetState = false)
         {
             if (InOrderPos != null)

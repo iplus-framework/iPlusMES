@@ -660,19 +660,19 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Booking
-        public virtual Msg DoInwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
+        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
             PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
-            if (actualQuantity > 0.000001 
+            if (actualWeight > 0.000001 
                 && pickingPos != null
                 && pwMethodTransport != null && !pwMethodTransport.FindChildComponents<PWDosing>(c => c is PWDosing).Any() 
                 && ACFacilityManager != null && PickingManager != null
                 && !NoPostingOnRelocation)
             {
                 // 1. Bereite Buchung vor
-                FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, actualQuantity);
+                FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, pickingPos.Material.ConvertBaseWeightToBaseUnit(actualWeight));
                 ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                 if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                     bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();

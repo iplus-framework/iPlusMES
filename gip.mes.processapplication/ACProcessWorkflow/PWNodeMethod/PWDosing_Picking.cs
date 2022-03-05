@@ -75,13 +75,13 @@ namespace gip.mes.processapplication
                 if (pickingPos == null)
                     return StartNextCompResult.Done;
                 double targetWeight = 0;
-                if (!(pickingPos.RemainingDosingQuantityUOM < (MinDosQuantity * -1)))
+                if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)))
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                     dbApp.ACSaveChanges();
                     return StartNextCompResult.Done;
                 }
-                targetWeight = pickingPos.RemainingDosingQuantityUOM * -1;
+                targetWeight = pickingPos.RemainingDosingWeight * -1;
                 if (targetWeight < 0.000001)
                     targetWeight = 1;
 
@@ -117,7 +117,7 @@ namespace gip.mes.processapplication
                 }
 
                 PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
-                double newRemainingQ = pickingPos.RemainingDosingQuantityUOM + targetWeight;
+                double newRemainingQ = pickingPos.RemainingDosingWeight + targetWeight;
                 if (newRemainingQ >= -0.000001 && MinDosQuantity > -0.0000001)
                 {
                     lastBatchMode = PADosingLastBatchEnum.LastBatch;
@@ -1014,7 +1014,7 @@ namespace gip.mes.processapplication
             {
                 if (((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
                     || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-                    || (pickingPos.RemainingDosingQuantityUOM >= -1 && MinDosQuantity > -0.0000001)) // No Endless Dosing
+                    || (pickingPos.RemainingDosingWeight >= -1 && MinDosQuantity > -0.0000001)) // No Endless Dosing
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                 }

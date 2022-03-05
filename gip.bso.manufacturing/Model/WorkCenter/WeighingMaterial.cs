@@ -58,17 +58,22 @@ namespace gip.bso.manufacturing
                     MaterialNo = _PosRelation.SourceProdOrderPartslistPos?.Material?.MaterialNo;
                     IsLotManaged = _PosRelation.SourceProdOrderPartslistPos != null && _PosRelation.SourceProdOrderPartslistPos.Material != null ?
                                    _PosRelation.SourceProdOrderPartslistPos.Material.IsLotManaged : false;
+                    UnitName = _PosRelation.SourceProdOrderPartslistPos?.Material?.BaseMDUnit?.MDUnitName;
 
                     if (_PosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)vd.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed ||
                         _PosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)vd.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
                     {
-                        TargetQuantity = _PosRelation.TargetQuantityUOM;
-                        ActualQuantity = _PosRelation.ActualQuantityUOM;
+                        TargetQuantity = _PosRelation.TargetWeight;
+                        ActualQuantity = _PosRelation.ActualWeight;
+                        TargetQtyInUnits = _PosRelation.TargetQuantityUOM;
+                        ActualQtyInUnits = _PosRelation.ActualQuantityUOM;
                     }
                     else
                     {
-                        TargetQuantity = Math.Abs(PosRelation.RemainingDosingQuantityUOM);
+                        TargetQuantity = Math.Abs(PosRelation.RemainingDosingWeight);
                         ActualQuantity = 0;
+                        TargetQtyInUnits = PosRelation.RemainingDosingQuantityUOM;
+                        ActualQtyInUnits = 0;
                     }
                 }
                 OnPropertyChanged("PosRelation");
@@ -138,7 +143,10 @@ namespace gip.bso.manufacturing
         }
 
         private double _TargetQuantity;
-        [ACPropertyInfo(106)]
+        /// <summary>
+        /// Target Quantity is weight in kg!
+        /// </summary>
+        [ACPropertyInfo(106, "", "en{'Target weight in kg'}de{'Sollgewicht in kg'")]
         public double TargetQuantity
         {
             get => _TargetQuantity;
@@ -150,7 +158,10 @@ namespace gip.bso.manufacturing
         }
 
         private double _ActualQuantity;
-        [ACPropertyInfo(107)]
+        /// <summary>
+        /// Target Quantity is weight in kg!
+        /// </summary>
+        [ACPropertyInfo(107, "", "en{'Actual weight in kg'}de{'Aktuelles Gewicht in kg'")]
         public double ActualQuantity
         {
             get => _ActualQuantity;
@@ -158,6 +169,42 @@ namespace gip.bso.manufacturing
             {
                 _ActualQuantity = value;
                 OnPropertyChanged("ActualQuantity");
+            }
+        }
+
+        private string _UnitName;
+        [ACPropertyInfo(107, "", "en{'Unit'}de{'Einheit'")]
+        public string UnitName
+        {
+            get => _UnitName;
+            set
+            {
+                _UnitName = value;
+                OnPropertyChanged("UnitName");
+            }
+        }
+
+        private double _TargetQtyInUnits;
+        [ACPropertyInfo(106, "", "en{'Target quantity in Unit'}de{'Sollmenge in Einheiten")]
+        public double TargetQtyInUnits
+        {
+            get => _TargetQtyInUnits;
+            set
+            {
+                _TargetQtyInUnits = value;
+                OnPropertyChanged("TargetQtyInUnits");
+            }
+        }
+
+        private double _ActualQtyInUnits;
+        [ACPropertyInfo(107, "", "en{'Actual weight in kg'}de{'Sollemgne in Einheiten'")]
+        public double ActualQtyInUnits
+        {
+            get => _ActualQtyInUnits;
+            set
+            {
+                _ActualQtyInUnits = value;
+                OnPropertyChanged("ActualQtyInUnits");
             }
         }
 
@@ -355,7 +402,7 @@ namespace gip.bso.manufacturing
                 {
                     using (ACMonitor.Lock(dbApp.QueryLock_1X000))
                         PosRelation.AutoRefresh();
-                    ActualQuantity = TargetQuantity + PosRelation.RemainingDosingQuantityUOM;
+                    ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
                 }
                 catch
                 {
@@ -372,7 +419,7 @@ namespace gip.bso.manufacturing
                         PosRelation.AutoRefresh();
                         PosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
                     }
-                    TargetQuantity = Math.Abs(PosRelation.RemainingDosingQuantityUOM);
+                    TargetQuantity = Math.Abs(PosRelation.RemainingDosingWeight);
                     ActualQuantity = 0;
                 }
                 catch

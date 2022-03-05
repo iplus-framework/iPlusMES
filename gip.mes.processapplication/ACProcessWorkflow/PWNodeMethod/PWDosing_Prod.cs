@@ -139,7 +139,6 @@ namespace gip.mes.processapplication
                             {
                                 if (!relation.SourceProdOrderPartslistPos.Material.UsageACProgram)
                                     continue;
-                                double dosingQuantity = relation.RemainingDosingQuantityUOM;
 
                                 PAProcessFunction responsibleFunc = null;
                                 gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
@@ -337,7 +336,7 @@ namespace gip.mes.processapplication
                         {
                             if (!relation.SourceProdOrderPartslistPos.Material.UsageACProgram)
                                 continue;
-                            double dosingQuantity = relation.RemainingDosingQuantityUOM;
+                            double dosingWeight = relation.RemainingDosingWeight;
                             bool interDischargingNeeded = false;
                             IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                             ScaleBoundaries scaleBoundaries = null;
@@ -367,15 +366,15 @@ namespace gip.mes.processapplication
                                     }
                                 }
                                 // FALL A:
-                                else if (Math.Abs(relation.RemainingDosingQuantityUOM) > remainingWeight.Value)
+                                else if (Math.Abs(relation.RemainingDosingWeight) > remainingWeight.Value)
                                 {
                                     // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
                                     // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && relation.TargetQuantityUOM > scaleBoundaries.MaxWeightCapacity)
+                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && relation.TargetWeight > scaleBoundaries.MaxWeightCapacity)
                                     {
                                         // Fall A.1:
                                         interDischargingNeeded = true;
-                                        dosingQuantity = remainingWeight.Value;
+                                        dosingWeight = remainingWeight.Value;
                                     }
                                     else
                                     {
@@ -388,29 +387,29 @@ namespace gip.mes.processapplication
                                     && relation.SourceProdOrderPartslistPos.Material != null 
                                     && relation.SourceProdOrderPartslistPos.Material.IsDensityValid)
                                 {
-                                    double remainingDosingVolume = (Math.Abs(relation.RemainingDosingQuantityUOM) * 1000) / relation.SourceProdOrderPartslistPos.Material.Density;
+                                    double remainingDosingVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(Math.Abs(relation.RemainingDosingQuantityUOM)); 
                                     if (remainingDosingVolume > scaleBoundaries.RemainingVolumeCapacity.Value)
                                     {
-                                        double targetVolume = (relation.TargetQuantityUOM * 1000) / relation.SourceProdOrderPartslistPos.Material.Density;
+                                        double targetVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(relation.TargetQuantityUOM); 
                                         // FALL B:
                                         // Falls die Komponentenvolumen größer als die maximale Volumenkapazität ist, dann muss die Komponente gesplittet werden, 
                                         // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
                                         if (scaleBoundaries.MaxVolumeCapacity > 0.00000001 && targetVolume > scaleBoundaries.MaxVolumeCapacity)
                                         {
-                                            double dosingQuantityAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
+                                            double dosingWeightAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
                                             // Falls Dichte > 1000 g/dm³, dann kann das errechnete zu dosierende Teilgewicht größer als das Restgewicht in der Waage sein,
                                             // dann muss das Restgewicht genommen werden (interDischargingNeeded ist true wenn weiter oben die Restgewichtermittlung durchgeführt wurde 
                                             // und die komponentenmenge gesplittet werden musste. SIEHE FALL A.1)
-                                            if (!interDischargingNeeded || dosingQuantityAccordingVolume < dosingQuantity)
+                                            if (!interDischargingNeeded || dosingWeightAccordingVolume < dosingWeight)
                                             {
                                                 // FALL B.1:
-                                                dosingQuantity = dosingQuantityAccordingVolume;
+                                                dosingWeight = dosingWeightAccordingVolume;
                                             }
                                             // Prüfe erneut ob Restgewicht der Waage überschritten wird, falls ja reduziere die Restmenge
                                             // Dieser Fall kommt dann vor, wenn die Dichte > 1000 g/dm³ ist, jedoch die zu dosierende Komponentenmenge kleiner war als das Restgewicht der Waage.
                                             // Dann wurde interDischargingNeeded nicht gesetzt (FALL A ist nicht eingetreten).
-                                            if (!remainingWeight.HasValue && dosingQuantity > remainingWeight.Value)
-                                                dosingQuantity = remainingWeight.Value;
+                                            if (!remainingWeight.HasValue && dosingWeight > remainingWeight.Value)
+                                                dosingWeight = remainingWeight.Value;
                                             interDischargingNeeded = true;
                                         }
                                         else
@@ -725,7 +724,7 @@ namespace gip.mes.processapplication
                             acMethod["PLPosRelation"] = relation.ProdOrderPartslistPosRelationID;
                             acMethod["Route"] = dosingRoute != null ? dosingRoute.Clone() as Route : null;
                             acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
-                            acMethod["TargetQuantity"] = Math.Abs(dosingQuantity);
+                            acMethod["TargetQuantity"] = Math.Abs(dosingWeight);
                             acMethod[Material.ClassName] = relation.SourceProdOrderPartslistPos.Material.MaterialName1;
                             if (relation.SourceProdOrderPartslistPos.Material.Density > 0.00001)
                                 acMethod["Density"] = relation.SourceProdOrderPartslistPos.Material.Density;
@@ -897,7 +896,7 @@ namespace gip.mes.processapplication
         protected virtual ProdOrderPartslistPosRelation[] OnGetOpenDosingsForNextComponent(Database dbIPlus, DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos)
         {
             ProdOrderPartslistPosRelation[] queryOpenDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-                                .Where(c => c.RemainingDosingQuantityUOM < (MinDosQuantity * -1)
+                                .Where(c => c.RemainingDosingWeight < (MinDosQuantity * -1)
                                             && c.MDProdOrderPartslistPosState != null
                                             && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                                || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
@@ -1023,7 +1022,7 @@ namespace gip.mes.processapplication
                 if (mode == ManageDosingStatesMode.QueryOpenDosings)
                 {
                     var queryOpenDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-                                        .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                        .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
                                                     && c.MDProdOrderPartslistPosState != null
                                                     && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                                         || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
@@ -1510,7 +1509,7 @@ namespace gip.mes.processapplication
                     if (needKompScaling && !ScaleOtherComp && dosingPosRelation.ProdOrderBatch != null)
                     {
                         var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                            .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                            .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
                             && c.MDProdOrderPartslistPosState != null
                             && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                 || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
@@ -1689,7 +1688,7 @@ namespace gip.mes.processapplication
                             //dosingPosRelation.MDProdOrderPartslistPosState = posState;
 
                             var queryOpenDosings = dosingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                                .Where(c => c.RemainingDosingQuantityUOM < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
                                 && c.MDProdOrderPartslistPosState != null
                                 && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                     || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));

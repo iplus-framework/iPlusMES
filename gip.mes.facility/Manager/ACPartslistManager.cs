@@ -532,17 +532,15 @@ namespace gip.mes.facility
                 RecalcIntermediateItem(childMixItem, setDefaultValueAtIncompatibleUnits);
             }
 
-            //bool hasIncompatibleBaseUnits = mixItem.PartslistPosRelation_TargetPartslistPos.Where(c => c.SourcePartslistPos.Material.BaseMDUnitID != mixItem.Material.BaseMDUnitID).Any();
-            //bool hasIncompatibleBaseUnits = mixItem.PartslistPosRelation_TargetPartslistPos.Where(c => !mixItem.Material.IsConvertableToBaseUnit(c.SourcePartslistPos.Material.BaseMDUnit)).Any();
-            int convertableUnits = mixItem.PartslistPosRelation_TargetPartslistPos.Where(c => mixItem.Material.IsConvertableToBaseUnit(c.SourcePartslistPos.Material.BaseMDUnit)).Count();
+            int convertableUnits = mixItem.PartslistPosRelation_TargetPartslistPos.Where(c => c.SourcePartslistPos.Material.IsBaseUnitConvertableToUnit(mixItem.Material.BaseMDUnit)).Count();
             if (convertableUnits > 0)
             {
                 double mixSumUOM = 0;
                 foreach (var relation in mixItem.PartslistPosRelation_TargetPartslistPos)
                 {
-                    if (mixItem.Material.IsConvertableToBaseUnit(relation.SourcePartslistPos.Material.BaseMDUnit))
+                    if (relation.SourcePartslistPos.Material.IsBaseUnitConvertableToUnit(mixItem.Material.BaseMDUnit))
                     {
-                        mixSumUOM += mixItem.Material.ConvertToBaseQuantity(relation.TargetQuantityUOM, relation.SourcePartslistPos.Material.BaseMDUnit);
+                        mixSumUOM += relation.SourcePartslistPos.Material.ConvertFromBaseQuantity(relation.TargetQuantityUOM, mixItem.Material.BaseMDUnit);
                     }
                 }
                 mixItem.TargetQuantityUOM = mixSumUOM;

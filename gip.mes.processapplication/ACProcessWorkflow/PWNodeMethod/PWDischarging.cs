@@ -713,10 +713,10 @@ namespace gip.mes.processapplication
                         CheckIfAutomaticTargetChangePossible = null;
                         if (discharging != null)
                         {
-                            double actualQuantity = 0;
+                            double actualWeight = 0;
                             var acValue = e.GetACValue("ActualQuantity");
                             if (acValue != null)
-                                actualQuantity = acValue.ParamAsDouble;
+                                actualWeight = acValue.ParamAsDouble;
                             //short simulationWeight = (short)acMethod["Source"];
 
                             using (var dbIPlus = new Database())
@@ -728,7 +728,7 @@ namespace gip.mes.processapplication
                                     currentBatchPos = ParentPWMethod<PWMethodProduction>().CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
                                     // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
                                     // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
-                                    OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualQuantity);
+                                    OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualWeight);
 
                                     var routeItem = CurrentDischargingDest(dbIPlus);
                                     PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
@@ -736,7 +736,7 @@ namespace gip.mes.processapplication
                                     {
                                         try
                                         {
-                                            DoInwardBooking(actualQuantity, dbApp, routeItem, null, currentBatchPos, e, true);
+                                            DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
                                         }
                                         finally
                                         {
@@ -765,11 +765,11 @@ namespace gip.mes.processapplication
                                 }
                                 else if (IsTransport)
                                 {
-                                    if (this.IsSimulationOn && actualQuantity <= 0.000001)
+                                    if (this.IsSimulationOn && actualWeight <= 0.000001)
                                     {
                                         ACValue acValueTargetQ = acMethod.ParameterValueList.GetACValue("TargetQuantity");
                                         if (acValueTargetQ != null)
-                                            actualQuantity = acValueTargetQ.ParamAsDouble;
+                                            actualWeight = acValueTargetQ.ParamAsDouble;
                                     }
 
                                     var routeItem = CurrentDischargingDest(dbIPlus);
@@ -788,13 +788,13 @@ namespace gip.mes.processapplication
                                                     picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                     PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
                                                     if (picking != null)
-                                                        DoInwardBooking(actualQuantity, dbApp, routeItem, picking, pickingPos, e, true);
+                                                        DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
                                                 }
                                                 else if (pwMethod.CurrentDeliveryNotePos != null)
                                                 {
                                                     notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
                                                     if (notePos != null)
-                                                        DoInwardBooking(actualQuantity, dbApp, routeItem, notePos, e, true);
+                                                        DoInwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
                                                 }
                                             }
                                             else if (IsRelocation)
@@ -808,16 +808,16 @@ namespace gip.mes.processapplication
                                                     PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
                                                     if (picking != null)
                                                     {
-                                                        if (this.IsSimulationOn && actualQuantity <= 0.000001 && pickingPos != null)
-                                                            actualQuantity = pickingPos.TargetQuantityUOM;
-                                                        DoInwardBooking(actualQuantity, dbApp, routeItem, picking, pickingPos, e, true);
+                                                        if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
+                                                            actualWeight = pickingPos.TargetQuantityUOM;
+                                                        DoInwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
                                                     }
                                                 }
                                                 else if (pwMethod.CurrentFacilityBooking != null)
                                                 {
                                                     fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
                                                     if (fBooking != null)
-                                                        DoInwardBooking(actualQuantity, dbApp, routeItem, fBooking, e, true);
+                                                        DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
                                                 }
                                             }
                                             else if (IsLoading)
@@ -830,13 +830,13 @@ namespace gip.mes.processapplication
                                                     picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                                     PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
                                                     if (picking != null)
-                                                        DoOutwardBooking(actualQuantity, dbApp, routeItem, picking, pickingPos, e, true);
+                                                        DoOutwardBooking(actualWeight, dbApp, routeItem, picking, pickingPos, e, true);
                                                 }
                                                 else if (pwMethod.CurrentDeliveryNotePos != null)
                                                 {
                                                     notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
                                                     if (notePos != null)
-                                                        DoOutwardBooking(actualQuantity, dbApp, routeItem, notePos, e, true);
+                                                        DoOutwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
                                                 }
                                             }
                                         }

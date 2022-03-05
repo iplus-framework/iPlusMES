@@ -1149,13 +1149,13 @@ namespace gip.mes.processapplication
         /// <param name="dbApp"></param>
         /// <param name="dbIPlus"></param>
         /// <param name="currentBatchPos"></param>
-        /// <param name="actualQuantity"></param>
+        /// <param name="actualWeight"></param>
         /// <returns></returns>
-        protected virtual void OnTaskCallbackCheckQuantity(ACMethodEventArgs eM, IACTask taskEntry, ACMethod acMethod, DatabaseApp dbApp, Database dbIPlus, ProdOrderPartslistPos currentBatchPos, ref double actualQuantity)
+        protected virtual void OnTaskCallbackCheckQuantity(ACMethodEventArgs eM, IACTask taskEntry, ACMethod acMethod, DatabaseApp dbApp, Database dbIPlus, ProdOrderPartslistPos currentBatchPos, ref double actualWeight)
         {
             // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
             // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
-            if (    actualQuantity <= 0.000001
+            if (    actualWeight <= 0.000001
                 && (   eM == null
                     || eM.ResultState < Global.ACMethodResultState.Failed))
             {
@@ -1165,27 +1165,27 @@ namespace gip.mes.processapplication
                     double calculatedBatchWeight = 0;
                     if (prodOrderManager.CalcProducedBatchWeight(dbApp, currentBatchPos, out calculatedBatchWeight) == null)
                     {
-                        double diff = calculatedBatchWeight - currentBatchPos.ActualQuantityUOM;
+                        double diff = calculatedBatchWeight - currentBatchPos.ActualWeight;
                         if (diff > 0.00001)
-                            actualQuantity = diff;
+                            actualWeight = diff;
                     }
                 }
             }
 
             if ((this.IsSimulationOn/* || simulationWeight == 1*/)
-                && actualQuantity <= 0.000001
+                && actualWeight <= 0.000001
                 && currentBatchPos != null)
             {
-                actualQuantity = currentBatchPos.TargetQuantityUOM;
+                actualWeight = currentBatchPos.TargetWeight;
             }
             // Entleerschritt liefert keine Menge
-            else if (actualQuantity <= 0.000001)
+            else if (actualWeight <= 0.000001)
             {
-                actualQuantity = -0.001;
+                actualWeight = -0.001;
             }
         }
 
-        public virtual Msg DoInwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, Facility inwardFacility, ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant = false)
+        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Facility inwardFacility, ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -1251,7 +1251,7 @@ namespace gip.mes.processapplication
                 }
 
                 // Falls dosiert
-                if (actualQuantity > 0.00001 && IsProduction)
+                if (actualWeight > 0.00001 && IsProduction)
                 {
                     // 1. Bereite Buchung vor
                     FacilityLot facilityLot = null;
@@ -1268,7 +1268,7 @@ namespace gip.mes.processapplication
 
                     FacilityPreBooking facilityPreBooking = ParentPWMethod<PWMethodProduction>().ProdOrderManager.NewInwardFacilityPreBooking(ParentPWMethod<PWMethodProduction>().ACFacilityManager, dbApp, currentBatchPos);
                     ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                    bookingParam.InwardQuantity = actualQuantity;
+                    bookingParam.InwardQuantity = currentBatchPos.BookingMaterial.ConvertBaseWeightToBaseUnit(actualWeight);
                     bookingParam.InwardFacility = inwardFacility;
                     bookingParam.InwardFacilityLot = facilityLot;
                     if (!currentBatchPos.IsFinalMixureBatch)
@@ -1307,7 +1307,7 @@ namespace gip.mes.processapplication
                             {
                                 facilityPreBooking.DeleteACObject(dbApp, true);
                                 currentBatchPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
-                                OnDoInwardBookingSucceeded(actualQuantity, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
+                                OnDoInwardBookingSucceeded(actualWeight, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
 
                                 //batchPos.RecalcActualQuantity();
                                 //batchPos.TopParentPartslistPos.RecalcActualQuantity();
@@ -1350,7 +1350,7 @@ namespace gip.mes.processapplication
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
         }
 
-        protected virtual void OnDoInwardBookingSucceeded(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, 
+        protected virtual void OnDoInwardBookingSucceeded(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, 
             ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant,
             FacilityPreBooking facilityPreBooking, ACMethodBooking bookingParam)
         {

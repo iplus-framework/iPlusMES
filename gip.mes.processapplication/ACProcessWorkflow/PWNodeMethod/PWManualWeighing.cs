@@ -1119,18 +1119,18 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 999)]
-        public virtual void CompleteWeighing(double actualQuantity, bool bookAndWeighRest)
+        public virtual void CompleteWeighing(double actualWeight, bool bookAndWeighRest)
         {
             PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
 
             if (bookAndWeighRest && manualWeighing != null)
             {
                 var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
-                double targetQuantity = 0;
+                double targetWeight = 0;
                 if (targetQ != null)
-                    targetQuantity = targetQ.ParamAsDouble;
+                    targetWeight = targetQ.ParamAsDouble;
 
-                if (actualQuantity > 0.000001 && actualQuantity < targetQuantity)
+                if (actualWeight > 0.000001 && actualWeight < targetWeight)
                 {
                     Guid? currentFacilityCharge = CurrentFacilityCharge;
                     bool isForInterdischarge = true;
@@ -1140,7 +1140,7 @@ namespace gip.mes.processapplication
                         _IsLotChanged = false;
                     }
 
-                    var msgBooking = DoManualWeighingBooking(actualQuantity, false, false, currentFacilityCharge, isForInterdischarge);
+                    var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentFacilityCharge, isForInterdischarge);
                     if (msgBooking != null)
                     {
                         Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
@@ -1149,7 +1149,7 @@ namespace gip.mes.processapplication
                         return;
                     }
 
-                    double rest = targetQuantity - actualQuantity;
+                    double rest = targetWeight - actualWeight;
                     manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = rest;
                     manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
 
@@ -1169,7 +1169,7 @@ namespace gip.mes.processapplication
             }
             else if (manualWeighing != null)
             {
-                manualWeighing.CompleteWeighing(actualQuantity);
+                manualWeighing.CompleteWeighing(actualWeight);
             }
         }
 
@@ -1231,7 +1231,7 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 999)]
-        public virtual Msg LotChange(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
+        public virtual Msg LotChange(Guid? newFacilityCharge, double actualWeight, bool isConsumed, bool forceSetFC_F)
         {
             if (newFacilityCharge == null)
             {
@@ -1256,9 +1256,9 @@ namespace gip.mes.processapplication
                 msgSet = SetFacilityCharge(newFacilityCharge, currentOpenMaterial, forceSetFC_F);
             }
 
-            if (actualQuantity > 0.000001)
+            if (actualWeight > 0.000001)
             {
-                var msgBooking = DoManualWeighingBooking(actualQuantity, false, isConsumed, facilityCharge, true);
+                var msgBooking = DoManualWeighingBooking(actualWeight, false, isConsumed, facilityCharge, true);
                 if (msgBooking != null)
                 {
                     Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
@@ -1268,7 +1268,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            if(facilityCharge.HasValue && isConsumed)
+            if (facilityCharge.HasValue && isConsumed)
             {
                 DoFacilityChargeZeroBooking(facilityCharge.Value);
             }
@@ -1560,7 +1560,7 @@ namespace gip.mes.processapplication
                                                 .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
                                                 .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID)
                                                 .ToArray()
-                                                .Where(c => c.RemainingDosingQuantityUOM < (MinWeightQuantity * -1) && c.MDProdOrderPartslistPosState != null
+                                                .Where(c => c.RemainingDosingWeight < (MinWeightQuantity * -1) && c.MDProdOrderPartslistPosState != null
                                                         && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
                                                          && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
                                                 .OrderBy(c => c.Sequence)
@@ -1591,7 +1591,7 @@ namespace gip.mes.processapplication
                                 comp.SwitchState((WeighingComponentState)newState);
 
                                 //comp.WeighState = newState;
-                                comp.TargetQuantity = Math.Abs(rel.RemainingDosingQuantityUOM);
+                                comp.TargetWeight = Math.Abs(rel.RemainingDosingWeight);
                                 //if(_WeighingComponentsInfo != null && _WeighingComponentsInfo.ContainsKey(comp.PLPosRelation.ToString()))
                                 //    _WeighingComponentsInfo[comp.PLPosRelation.ToString()] = newState.ToString();
                                 SetInfo(comp, WeighingComponentInfoType.State, null, null);
@@ -2161,7 +2161,7 @@ namespace gip.mes.processapplication
             if (weighingComponent != null)
             {
                 ManualWeighingNextTask.ValueT = ManualWeighingTaskInfo.None;
-                acMethod["TargetQuantity"] = weighingComponent.TargetQuantity;
+                acMethod["TargetQuantity"] = weighingComponent.TargetWeight;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
                 acMethod["PLPosRelation"] = weighingComponent.PLPosRelation;
 
@@ -2286,7 +2286,7 @@ namespace gip.mes.processapplication
 
             if (weighingComponent != null)
             {
-                acMethod["TargetQuantity"] = weighingComponent.TargetQuantity;
+                acMethod["TargetQuantity"] = weighingComponent.TargetWeight;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
                 acMethod["PLPosRelation"] = weighingComponent.PLPosRelation;
                 acMethod["Route"] = new Route();
@@ -2401,17 +2401,17 @@ namespace gip.mes.processapplication
                                     if (isCC != null)
                                         isComponentConsumed = isCC.ParamAsBoolean;
 
-                                    double? actQuantity = e.GetDouble("ActualQuantity");
+                                    double? actWeight = e.GetDouble("ActualQuantity");
                                     //double? tolerancePlus = (double)e.ParentACMethod["TolerancePlus"];
                                     double? toleranceMinus = (double)e.ParentACMethod["ToleranceMinus"];
                                     double? targetQuantity = (double)e.ParentACMethod["TargetQuantity"];
 
                                     bool isWeighingInTol = true;
-                                    if (targetQuantity.HasValue && toleranceMinus.HasValue && actQuantity.HasValue && (actQuantity < (targetQuantity - toleranceMinus)))
+                                    if (targetQuantity.HasValue && toleranceMinus.HasValue && actWeight.HasValue && (actWeight < (targetQuantity - toleranceMinus)))
                                         isWeighingInTol = false;
 
-                                    if (actQuantity > 0.000001)
-                                        msg = DoManualWeighingBooking(actQuantity, isWeighingInTol, false, currentFacilityCharge);
+                                    if (actWeight > 0.000001)
+                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge);
 
                                     if (isComponentConsumed)
                                     {
@@ -2556,7 +2556,7 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        public Msg DoManualWeighingBooking(double? actualQuantity, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, bool isForInterdischarge = false)
+        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, bool isForInterdischarge = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -2633,10 +2633,11 @@ namespace gip.mes.processapplication
                             }
                         }
 
+                        double actualQuantity = actualWeight.HasValue ? weighingPosRelation.SourceProdOrderPartslistPos.Material.ConvertBaseWeightToBaseUnit(actualWeight.Value) : 0;
                         double targetQuantity = weighingPosRelation.TargetQuantityUOM;
                         WeighingComponent comp = GetWeighingComponent(weighingPosRelation.ParentProdOrderPartslistPosRelationID);  //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == weighingPosRelation.ProdOrderPartslistPosRelationID);
-                        if(comp != null)
-                            targetQuantity = comp.TargetQuantity;
+                        if (comp != null)
+                            targetQuantity = weighingPosRelation.SourceProdOrderPartslistPos.Material.ConvertBaseWeightToBaseUnit(comp.TargetWeight);
 
                         if (!isForInterdischarge)
                         {
@@ -3231,7 +3232,7 @@ namespace gip.mes.processapplication
             Material = posRelation.SourceProdOrderPartslistPos.MaterialID.Value;
             Sequence = posRelation.Sequence;
             WeighState = weighState;
-            TargetQuantity = Math.Abs(posRelation.RemainingDosingQuantityUOM);
+            TargetWeight = Math.Abs(posRelation.RemainingDosingWeight);
             MaterialName = posRelation.SourceProdOrderPartslistPos.Material?.MaterialName1;
 
             ErrorInfoPartslistNo = posRelation.TargetProdOrderPartslistPos?.ProdOrderPartslist?.Partslist?.PartslistNo;
@@ -3251,7 +3252,7 @@ namespace gip.mes.processapplication
             set;
         }
 
-        public double TargetQuantity
+        public double TargetWeight
         {
             get;
             set;

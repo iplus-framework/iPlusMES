@@ -299,6 +299,23 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(9999)]
         public double RestQuantityUOM { get; set; }
 
+        public double TargetWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(TargetQuantityUOM);
+            }
+        }
+
+        public double ActualWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(ActualQuantityUOM);
+            }
+        }
+
+
         /// <summary>
         /// Test is current pos OutwardRoot type - for enabling in Prod Order editor
         /// </summary>

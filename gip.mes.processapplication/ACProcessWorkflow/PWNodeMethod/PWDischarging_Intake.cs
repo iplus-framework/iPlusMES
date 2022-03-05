@@ -631,12 +631,12 @@ namespace gip.mes.processapplication
             }
 
             PAMIntake intakeBin = module as PAMIntake;
-            double actualQuantity = intakeBin.Scale != null ? intakeBin.Scale.ActualWeight.ValueT - intakeBin.Scale.StoredTareWeight.ValueT : 0;
-            if (actualQuantity < 1 && this.IsSimulationOn)
+            double actualWeight = intakeBin.Scale != null ? intakeBin.Scale.ActualWeight.ValueT - intakeBin.Scale.StoredTareWeight.ValueT : 0;
+            if (actualWeight < 1 && this.IsSimulationOn)
             {
                 if (intakeBin.Scale != null)
                     intakeBin.Scale.ActualWeight.ValueT += 1;
-                actualQuantity = 1;
+                actualWeight = 1;
             }
 
             var queryPosSameMaterial = dbApp.DeliveryNotePos.Where(c => c.DeliveryNoteID == dnPos.DeliveryNoteID
@@ -723,9 +723,9 @@ namespace gip.mes.processapplication
                     && destinationSilo.MDFacilityType != null
                     && destinationSilo.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     destinationSilo.Material = dnPos.Material;
-                if (actualQuantity > 0)
+                if (actualWeight > 0)
                 {
-                    DoInwardBooking(actualQuantity, dbApp, previousDischargingRoute.LastOrDefault(), dnPos, null, false);
+                    DoInwardBooking(actualWeight, dbApp, previousDischargingRoute.LastOrDefault(), dnPos, null, false);
                 }
                 if (dbApp.IsChanged)
                 {
@@ -751,7 +751,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Booking
-        public virtual Msg DoInwardBooking(double actualQuantity, DatabaseApp dbApp, RouteItem dischargingDest, DeliveryNotePos dnPos, ACEventArgs e, bool isDischargingEnd)
+        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, DeliveryNotePos dnPos, ACEventArgs e, bool isDischargingEnd)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -790,39 +790,39 @@ namespace gip.mes.processapplication
 
                 int count = queryPosSameMaterial.Count();
 
-                if (actualQuantity <= 0.000001 && isDischargingEnd && count > 0 && this.IsSimulationOn)
+                if (actualWeight <= 0.000001 && isDischargingEnd && count > 0 && this.IsSimulationOn)
                 {
                     foreach (var posSameMat in queryPosSameMaterial)
                     {
-                        actualQuantity += (double)posSameMat.InOrderPos.DifferenceQuantityUOM;
+                        actualWeight += (double)posSameMat.InOrderPos.DifferenceWeight;
                     }
                 }
-                if (actualQuantity <= 0.000001 && this.IsSimulationOn)
-                    actualQuantity = 1;
+                if (actualWeight <= 0.000001 && this.IsSimulationOn)
+                    actualWeight = 1;
 
-                double restQuantity = actualQuantity;
+                double restWeight = actualWeight;
                 for (int i = 0; i < count; i++)
                 {
-                    double bookingQuantity = 0;
+                    double bookingWeight = 0;
                     //bool isRestQ = false;
                     DeliveryNotePos currentPos = queryPosSameMaterial[i];
                     // Falls noch mehr Lieferscheinpositionen vorhanden, dann buche nur Teilmenge ab
                     if (i < (count - 1))
                     {
-                        double diffQuantity = currentPos.InOrderPos.DifferenceQuantityUOM;
+                        double diffQuantity = currentPos.InOrderPos.DifferenceWeight;
                         if (diffQuantity < -0.0000001)
                         {
-                            bookingQuantity = restQuantity + diffQuantity;
+                            bookingWeight = restWeight + diffQuantity;
                             // Falls Lieferscheinrestmenge größer als dosierter istwert, dann buche gesamte Istmenge auf diese Lieferscheinposition
-                            if (bookingQuantity < -0.0000001)
+                            if (bookingWeight < -0.0000001)
                             {
-                                bookingQuantity = restQuantity;
+                                bookingWeight = restWeight;
                             }
                             // Sonst buche rest von dieser Lieferscheinposition ab
                             else
                             {
-                                bookingQuantity = Math.Abs(diffQuantity);
-                                restQuantity -= bookingQuantity;
+                                bookingWeight = Math.Abs(diffQuantity);
+                                restWeight -= bookingWeight;
                             }
                         }
                         else
@@ -831,10 +831,10 @@ namespace gip.mes.processapplication
                     else
                     {
                         //isRestQ = true;
-                        bookingQuantity = restQuantity;
+                        bookingWeight = restWeight;
                     }
 
-                    if (bookingQuantity > 0.0000001)
+                    if (bookingWeight > 0.0000001)
                     {
                         FacilityLot facilityLot = null;
                         FacilityPreBooking hasBookings = currentPos.InOrderPos.FacilityPreBooking_InOrderPos.FirstOrDefault();
@@ -859,7 +859,7 @@ namespace gip.mes.processapplication
 
                         FacilityPreBooking facilityPreBooking = inDeliveryNoteManager.NewFacilityPreBooking(facilityManager, dbApp, currentPos);
                         ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                        bookingParam.InwardQuantity = bookingQuantity;
+                        bookingParam.InwardQuantity = currentPos.Material.ConvertBaseWeightToBaseUnit(bookingWeight);
                         bookingParam.InwardFacility = inwardFacility;
                         bookingParam.InwardFacilityLot = facilityLot;
 

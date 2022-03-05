@@ -330,6 +330,13 @@ namespace gip.mes.datamodel
             if (this.BaseMDUnit != null && mdUnit.MDUnitID == this.BaseMDUnit.MDUnitID)
                 return quantity;
 
+            if (((BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && mdUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+                    || (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && mdUnit.SIDimension == GlobalApp.SIDimensions.Volume))
+                && Density > 0.0001)// Density g / dm³
+            {
+                return ConvertQuantity(quantity, mdUnit, BaseMDUnit);
+            }
+
             // Umrechnen über MaterialUnit
             var query = this.MaterialUnit_Material.Where(c => c.ToMDUnitID == mdUnit.MDUnitID);
             if (query.Any())
@@ -365,6 +372,13 @@ namespace gip.mes.datamodel
             if (mdUnit.MDUnitID == this.BaseMDUnit.MDUnitID)
                 return true;
 
+            if (    (  (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && mdUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+                    || (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && mdUnit.SIDimension == GlobalApp.SIDimensions.Volume))
+                && Density >= 0.0001)// Density g / dm³
+            {
+                return true;
+            }
+
             // Umrechnen über MaterialUnit
             var query = this.MaterialUnit_Material.Where(c => c.ToMDUnitID == mdUnit.MDUnitID);
             if (query.Any())
@@ -391,6 +405,13 @@ namespace gip.mes.datamodel
             // Einheiten identisch
             if (toMDUnit.MDUnitID == this.BaseMDUnit.MDUnitID)
                 return quantity;
+
+            if (      ((BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+                    || (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume))
+                && Density >= 0.0001)// Density g / dm³
+            {
+                return ConvertQuantity(quantity, BaseMDUnit, toMDUnit);
+            }
 
             // Umrechnen über MaterialUnit
             var query = this.MaterialUnit_Material.Where(c => c.ToMDUnitID == toMDUnit.MDUnitID);
@@ -443,6 +464,36 @@ namespace gip.mes.datamodel
                 return 0;
             if (Math.Abs(quantity - 0) <= Double.Epsilon)
                 return 0;
+
+            if (      ((fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+                    || (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume))
+                && Density >= 0.0001)// Density g / dm³
+            {
+                // Mass to Volume
+                if (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+                {
+                    double weightInGram = quantity;
+                    if (fromMDUnit.ISOCode != ConstApp.UOM_ISOCode_g)
+                    {
+                        if (fromMDUnit.ISOCode == ConstApp.UOM_ISOCode_kg)
+                            weightInGram = quantity * 1000;
+                        else // UOM_ISOCode_t
+                            weightInGram = quantity * 1000 * 1000;
+                    }
+                    return weightInGram / Density;
+                }
+                // Volume to mass
+                else
+                {
+                    double weightInGram = quantity * Density;
+                    if (toMDUnit.ISOCode == ConstApp.UOM_ISOCode_g)
+                        return weightInGram;
+                    else if (toMDUnit.ISOCode == ConstApp.UOM_ISOCode_kg)
+                        return weightInGram * 0.001;
+                    else //if (toMDUnit.ISOCode == ConstApp.UOM_ISOCode_t)
+                        return weightInGram * 0.000001;
+                }
+            }
 
             // Falls Umwandlung von Basiseinheit nach Materialeinheit
             if (this.BaseMDUnitID == fromMDUnit.MDUnitID)
@@ -520,6 +571,13 @@ namespace gip.mes.datamodel
             if (fromMDUnit.MDUnitID == toMDUnit.MDUnitID)
                 return true;
 
+            if (   (   (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+                    || (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume))
+                && Density >= 0.0001)
+            {
+                return true;
+            }
+
             // Falls Umwandlung von Basiseinheit nach Materialeinheit
             if (this.BaseMDUnitID == fromMDUnit.MDUnitID)
             {
@@ -558,6 +616,11 @@ namespace gip.mes.datamodel
         }
 
 
+        public bool IsBaseUnitConvertableToUnit(MDUnit toMDUnit)
+        {
+            return IsConvertableToUnit(this.BaseMDUnit, toMDUnit);
+        }
+
         /// <summary>
         /// Converts to base weight.
         /// </summary>
@@ -566,11 +629,16 @@ namespace gip.mes.datamodel
         /// <returns>System.Single.</returns>
         public Double ConvertToBaseWeight(Double fromQuantity, MDUnit fromMDUnit)
         {
-            MDUnit weightUnit = MDUnit.GetSIUnit(this.GetObjectContext<DatabaseApp>(), GlobalApp.SIDimensions.Mass);
-            if (weightUnit == null)
+            if (fromMDUnit.ISOCode == ConstApp.UOM_ISOCode_kg)
+                return fromQuantity;
+            if (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume)
             {
-                throw new ArgumentException("Base Weight ");
+                if (Density >= 0.0001)
+                    return fromQuantity * Density * 0.001;
             }
+            MDUnit weightUnit = MDUnitList.Where(c => c.ISOCode == ConstApp.UOM_ISOCode_kg).FirstOrDefault();
+            if (weightUnit == null)
+                throw new ArgumentException("Not convertable");
             return ConvertQuantity(fromQuantity, fromMDUnit, weightUnit);
         }
 
@@ -583,14 +651,45 @@ namespace gip.mes.datamodel
         /// <returns></returns>
         public Double ConvertBaseWeightToUnit(Double weight, MDUnit toMDUnit)
         {
-            MDUnit weightUnit = MDUnit.GetSIUnit(this.GetObjectContext<DatabaseApp>(), GlobalApp.SIDimensions.Mass);
-            if (weightUnit == null)
+            if (toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume)
             {
-                throw new ArgumentException("Base Weight ");
+                if (Density >= 0.0001)
+                    return (weight * 1000) / Density;
             }
+
+            MDUnit weightUnit = MDUnitList.Where(c => c.ISOCode == ConstApp.UOM_ISOCode_kg).FirstOrDefault();
+            if (weightUnit == null)
+                throw new ArgumentException("Not convertable");
             return ConvertQuantity(weight, weightUnit, toMDUnit);
         }
 
+        public double ConvertToBaseWeight(Double fromQuantityInUOM)
+        {
+            return ConvertToBaseWeight(fromQuantityInUOM, this.BaseMDUnit);
+        }
+
+        public double ConvertBaseWeightToBaseUnit(Double weight)
+        {
+            return ConvertBaseWeightToUnit(weight, this.BaseMDUnit);
+        }
+
+        public double ConvertToVolume(Double fromQuantityInUOM)
+        {
+            if (this.BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume)
+                return fromQuantityInUOM;
+            double weight = ConvertToBaseWeight(fromQuantityInUOM);
+            return ConvertWeightToVolume(weight);
+        }
+
+        public double ConvertWeightToVolume(Double weight)
+        {
+            if (this.Density >= 0.0001)
+                return (weight * 1000) / Density;
+            MDUnit volumeUnit = MDUnitList.Where(c => c.SIDimension == GlobalApp.SIDimensions.Volume).FirstOrDefault();
+            if (volumeUnit == null)
+                throw new ArgumentException("Not convertable");
+            return ConvertBaseWeightToUnit(weight, volumeUnit);
+        }
 
         /// <summary>
         /// Falls chemisch/physisch gleiche Materialen unter verschiedenen Materialnummern verwaltet werden,

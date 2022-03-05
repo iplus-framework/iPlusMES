@@ -460,6 +460,31 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        public double DifferenceWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(DifferenceQuantityUOM);
+            }
+        }
+
+        public double TargetWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(TargetQuantityUOM);
+            }
+        }
+
+        public double ActualWeight
+        {
+            get
+            {
+                return Material.ConvertToBaseWeight(ActualQuantityUOM);
+            }
+        }
+
         public InOrderPos TopParentInOrderPos
         {
             get

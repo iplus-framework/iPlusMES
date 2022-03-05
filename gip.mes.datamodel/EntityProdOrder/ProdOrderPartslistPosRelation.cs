@@ -263,6 +263,29 @@ namespace gip.mes.datamodel
             }
         }
 
+        public double RemainingDosingWeight
+        {
+            get
+            {
+                return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+            }
+        }
+
+        public double TargetWeight
+        {
+            get
+            {
+                return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(TargetQuantityUOM);
+            }
+        }
+
+        public double ActualWeight
+        {
+            get
+            {
+                return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(ActualQuantityUOM);
+            }
+        }
 
         public void IncreaseActualQuantityUOM(double quantityUOM, bool autoRefresh = false)
         {

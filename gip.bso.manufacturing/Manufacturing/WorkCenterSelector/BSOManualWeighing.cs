@@ -579,8 +579,8 @@ namespace gip.bso.manufacturing
                 }
                 else if (_CallPWLotChange && value != null && componentPWNode != null)
                 {
-                    double quantity = OnDetermineLotChangeActualQuantity();
-                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, quantity, _IsLotConsumed, false) as Msg;
+                    double weight = OnDetermineLotChangeActualQuantity();
+                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, false) as Msg;
                     if (msg != null)
                     {
                         _SelectedFacilityCharge = null;
