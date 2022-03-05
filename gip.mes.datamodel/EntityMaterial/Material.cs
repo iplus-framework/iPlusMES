@@ -344,7 +344,7 @@ namespace gip.mes.datamodel
                 MaterialUnit materialUnit = query.First();
                 double result = materialUnit.FromUnitToBase(quantity);
                 if (BaseMDUnit.Rounding >= 0)
-                    result = Math.Round(result, BaseMDUnit.Rounding);
+                    result = BaseMDUnit.GetRoundedValue(result);
                 return result;
             }
 
@@ -420,7 +420,7 @@ namespace gip.mes.datamodel
                 MaterialUnit materialUnit = query.First();
                 double result = materialUnit.FromBaseToUnit(quantity);
                 if (toMDUnit.Rounding >= 0)
-                    result = Math.Round(result, toMDUnit.Rounding);
+                    result = toMDUnit.GetRoundedValue(result);
                 return result;
             }
 
@@ -503,7 +503,7 @@ namespace gip.mes.datamodel
                 {
                     double result = queryTo.First().FromBaseToUnit(quantity);
                     if (toMDUnit.Rounding >= 0)
-                        result = Math.Round(result, toMDUnit.Rounding);
+                        result = toMDUnit.GetRoundedValue(result);
                     return result;
                 }
             }
@@ -515,7 +515,7 @@ namespace gip.mes.datamodel
                 {
                     double result = queryFrom.First().FromUnitToBase(quantity);
                     if (toMDUnit.Rounding >= 0)
-                        result = Math.Round(result, toMDUnit.Rounding);
+                        result = toMDUnit.GetRoundedValue(result);
                     return result;
                 }
             }
@@ -530,7 +530,7 @@ namespace gip.mes.datamodel
                     double quantityBase = queryFrom.First().FromUnitToBase(quantity);
                     double result = queryTo.First().FromBaseToUnit(quantityBase);
                     if (toMDUnit.Rounding >= 0)
-                        result = Math.Round(result, toMDUnit.Rounding);
+                        result = toMDUnit.GetRoundedValue(result);
                     return result;
                 }
                 if ((fromMDUnit.SIDimension != GlobalApp.SIDimensions.None) && (!fromMDUnit.IsSIUnit) && (fromMDUnit.SIUnit != null) && (fromMDUnit.SIUnit.MDUnitID == this.BaseMDUnitID))
@@ -540,7 +540,7 @@ namespace gip.mes.datamodel
                         double quantityBase = fromMDUnit.SIUnit.ConvertToUnit(quantity, fromMDUnit);
                         double result = queryTo.First().FromBaseToUnit(quantityBase);
                         if (toMDUnit.Rounding >= 0)
-                            result = Math.Round(result, toMDUnit.Rounding);
+                            result = toMDUnit.GetRoundedValue(result);
                         return result;
                     }
                 }
@@ -552,7 +552,7 @@ namespace gip.mes.datamodel
                         double quantityBase = queryFrom.First().FromUnitToBase(quantity);
                         double result = toMDUnit.SIUnit.ConvertToUnit(quantityBase, toMDUnit);
                         if (toMDUnit.Rounding >= 0)
-                            result = Math.Round(result, toMDUnit.Rounding);
+                            result = toMDUnit.GetRoundedValue(result);
                         return result;
                     }
                 }

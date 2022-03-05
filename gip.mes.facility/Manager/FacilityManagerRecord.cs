@@ -75,17 +75,34 @@ namespace gip.mes.facility
             FB.OutwardFacilityCharge = BP.OutwardFacilityCharge;
             //FB.OutwardFacilityLocation = BP.OutwardFacilityLocation;
 
-            FB.InwardQuantity = BP.InwardQuantity.HasValue ? BP.InwardQuantity.Value : 0;
-            FB.InwardTargetQuantity = BP.InwardTargetQuantity.HasValue ? BP.InwardTargetQuantity.Value : 0;
+            if (BP.ParamsAdjusted != null)
+            {
+                FB.InwardQuantity = BP.ParamsAdjusted.InwardQuantity.HasValue ? BP.ParamsAdjusted.InwardQuantity.Value : 0;
+                FB.InwardTargetQuantity = BP.ParamsAdjusted.InwardTargetQuantity.HasValue ? BP.ParamsAdjusted.InwardTargetQuantity.Value : 0;
 
-            FB.OutwardQuantity = BP.OutwardQuantity.HasValue ? BP.OutwardQuantity.Value : 0;
-            FB.OutwardTargetQuantity = BP.OutwardTargetQuantity.HasValue ? BP.OutwardTargetQuantity.Value : 0;
+                FB.OutwardQuantity = BP.ParamsAdjusted.OutwardQuantity.HasValue ? BP.ParamsAdjusted.OutwardQuantity.Value : 0;
+                FB.OutwardTargetQuantity = BP.ParamsAdjusted.OutwardTargetQuantity.HasValue ? BP.ParamsAdjusted.OutwardTargetQuantity.Value : 0;
 
-            FB.InwardQuantityAmb = BP.InwardQuantityAmb.HasValue ? BP.InwardQuantityAmb.Value : 0;
-            FB.InwardTargetQuantityAmb = BP.InwardTargetQuantityAmb.HasValue ? BP.InwardTargetQuantityAmb.Value : 0;
+                FB.InwardQuantityAmb = BP.ParamsAdjusted.InwardQuantityAmb.HasValue ? BP.ParamsAdjusted.InwardQuantityAmb.Value : 0;
+                FB.InwardTargetQuantityAmb = BP.ParamsAdjusted.InwardTargetQuantityAmb.HasValue ? BP.ParamsAdjusted.InwardTargetQuantityAmb.Value : 0;
 
-            FB.OutwardQuantityAmb = BP.OutwardQuantityAmb.HasValue ? BP.OutwardQuantityAmb.Value : 0;
-            FB.OutwardTargetQuantityAmb = BP.OutwardTargetQuantityAmb.HasValue ? BP.OutwardTargetQuantityAmb.Value : 0;
+                FB.OutwardQuantityAmb = BP.ParamsAdjusted.OutwardQuantityAmb.HasValue ? BP.ParamsAdjusted.OutwardQuantityAmb.Value : 0;
+                FB.OutwardTargetQuantityAmb = BP.ParamsAdjusted.OutwardTargetQuantityAmb.HasValue ? BP.ParamsAdjusted.OutwardTargetQuantityAmb.Value : 0;
+            }
+            else
+            {
+                FB.InwardQuantity = BP.InwardQuantity.HasValue ? BP.InwardQuantity.Value : 0;
+                FB.InwardTargetQuantity = BP.InwardTargetQuantity.HasValue ? BP.InwardTargetQuantity.Value : 0;
+
+                FB.OutwardQuantity = BP.OutwardQuantity.HasValue ? BP.OutwardQuantity.Value : 0;
+                FB.OutwardTargetQuantity = BP.OutwardTargetQuantity.HasValue ? BP.OutwardTargetQuantity.Value : 0;
+
+                FB.InwardQuantityAmb = BP.InwardQuantityAmb.HasValue ? BP.InwardQuantityAmb.Value : 0;
+                FB.InwardTargetQuantityAmb = BP.InwardTargetQuantityAmb.HasValue ? BP.InwardTargetQuantityAmb.Value : 0;
+
+                FB.OutwardQuantityAmb = BP.OutwardQuantityAmb.HasValue ? BP.OutwardQuantityAmb.Value : 0;
+                FB.OutwardTargetQuantityAmb = BP.OutwardTargetQuantityAmb.HasValue ? BP.OutwardTargetQuantityAmb.Value : 0;
+            }
 
             FB.MDUnit = BP.MDUnit;
 
@@ -356,7 +373,7 @@ namespace gip.mes.facility
                             return Global.ACMethodResultState.Failed;
                         if (InwardFacilityCharge.MDUnit.Rounding >= 0)
                         {
-                            floatVal = Math.Round(floatVal, InwardFacilityCharge.MDUnit.Rounding);
+                            floatVal = InwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                             FBC.InwardQuantity = floatVal;
                         }
                         else
@@ -400,7 +417,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.InwardQuantityUOM, FBC.InwardMaterial.BaseMDUnit, FBC.InwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (InwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.InwardQuantity = Math.Round(floatVal, InwardFacilityCharge.MDUnit.Rounding);
+                            FBC.InwardQuantity = InwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.InwardQuantity = floatVal;
                     }
@@ -417,7 +434,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.InwardTargetQuantityUOM, FBC.InwardMaterial.BaseMDUnit, FBC.InwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (InwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.InwardTargetQuantity = Math.Round(floatVal, InwardFacilityCharge.MDUnit.Rounding);
+                            FBC.InwardTargetQuantity = InwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.InwardTargetQuantity = floatVal;
                     }
@@ -437,7 +454,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.InwardQuantityUOM, FBC.InwardMaterial.BaseMDUnit, FBC.InwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (InwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.InwardQuantity = Math.Round(floatVal, InwardFacilityCharge.MDUnit.Rounding);
+                            FBC.InwardQuantity = InwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.InwardQuantity = floatVal;
                     }
@@ -454,7 +471,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.InwardTargetQuantityUOM, FBC.InwardMaterial.BaseMDUnit, FBC.InwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (InwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.InwardTargetQuantity = Math.Round(floatVal, InwardFacilityCharge.MDUnit.Rounding);
+                            FBC.InwardTargetQuantity = InwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.InwardTargetQuantity = floatVal;
                     }
@@ -621,7 +638,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.OutwardQuantityUOM, FBC.OutwardMaterial.BaseMDUnit, FBC.OutwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (OutwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.OutwardQuantity = Math.Round(floatVal, OutwardFacilityCharge.MDUnit.Rounding);
+                            FBC.OutwardQuantity = OutwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.OutwardQuantity = floatVal;
                     }
@@ -638,7 +655,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.OutwardTargetQuantityUOM, FBC.OutwardMaterial.BaseMDUnit, FBC.OutwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (OutwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.OutwardTargetQuantity = Math.Round(floatVal, OutwardFacilityCharge.MDUnit.Rounding);
+                            FBC.OutwardTargetQuantity = OutwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.OutwardTargetQuantity = floatVal;
 
@@ -659,7 +676,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.OutwardQuantityUOM, FBC.OutwardMaterial.BaseMDUnit, FBC.OutwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (OutwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.OutwardQuantity = Math.Round(floatVal, OutwardFacilityCharge.MDUnit.Rounding);
+                            FBC.OutwardQuantity = OutwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.OutwardQuantity = floatVal;
                     }
@@ -676,7 +693,7 @@ namespace gip.mes.facility
                         if (ConvertQuantityInFacilityChargeUnit(BP, FBC.OutwardTargetQuantityUOM, FBC.OutwardMaterial.BaseMDUnit, FBC.OutwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                             return Global.ACMethodResultState.Failed;
                         if (OutwardFacilityCharge.MDUnit.Rounding >= 0)
-                            FBC.OutwardTargetQuantity = Math.Round(floatVal, OutwardFacilityCharge.MDUnit.Rounding);
+                            FBC.OutwardTargetQuantity = OutwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                         else
                             FBC.OutwardTargetQuantity = floatVal;
                     }

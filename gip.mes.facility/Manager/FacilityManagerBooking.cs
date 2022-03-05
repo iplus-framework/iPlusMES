@@ -1054,7 +1054,7 @@ namespace gip.mes.facility
                     return Global.ACMethodResultState.Failed;
                 if (FBC.InwardFacilityCharge.MDUnit.Rounding >= 0)
                 {
-                    floatVal = Math.Round(floatVal, FBC.InwardFacilityCharge.MDUnit.Rounding);
+                    floatVal = FBC.InwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                     FBC.InwardFacilityCharge.StockQuantity = floatVal;
                 }
                 else
@@ -1086,7 +1086,7 @@ namespace gip.mes.facility
                 if (ConvertQuantityInFacilityChargeUnit(BP, FBC.OutwardFacilityCharge.StockQuantityUOM, FBC.OutwardMaterial.BaseMDUnit, FBC.OutwardFacilityCharge, ref floatVal) == Global.ACMethodResultState.Failed)
                     return Global.ACMethodResultState.Failed;
                 if (FBC.OutwardFacilityCharge.MDUnit.Rounding >= 0)
-                    FBC.OutwardFacilityCharge.StockQuantity = Math.Round(floatVal, FBC.OutwardFacilityCharge.MDUnit.Rounding);
+                    FBC.OutwardFacilityCharge.StockQuantity = FBC.OutwardFacilityCharge.MDUnit.GetRoundedValue(floatVal);
                 else
                     FBC.OutwardFacilityCharge.StockQuantity = floatVal;
                 if (FBC.StorageDate.HasValue)

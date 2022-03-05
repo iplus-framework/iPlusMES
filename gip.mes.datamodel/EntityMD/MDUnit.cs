@@ -247,7 +247,7 @@ namespace gip.mes.datamodel
                 if (siUnit.MDUnitID == toMDUnit.MDUnitID)
                 {
                     if (toMDUnit.Rounding >= 0)
-                        quantityInSIUnit = Math.Round(quantityInSIUnit, toMDUnit.Rounding);
+                        quantityInSIUnit = toMDUnit.GetRoundedValue(quantityInSIUnit);
                     return quantityInSIUnit;
                 }
 
@@ -259,7 +259,7 @@ namespace gip.mes.datamodel
                 MDUnitConversion conversionTo = query2.First();
                 double result = quantityInSIUnit * conversionTo.Divisor / conversionTo.Multiplier;
                 if (toMDUnit.Rounding >= 0)
-                    result = Math.Round(result, toMDUnit.Rounding);
+                    result = toMDUnit.GetRoundedValue(result);
                 return result;
             }
             else
@@ -286,7 +286,7 @@ namespace gip.mes.datamodel
                 if (siUnit != null)
                     result = siUnit.ConvertToUnit(result, toMDUnit);
                 if (toMDUnit.Rounding >= 0)
-                    result = Math.Round(result, toMDUnit.Rounding);
+                    result = toMDUnit.GetRoundedValue(result);
                 return result;
             }
         }
@@ -387,7 +387,7 @@ namespace gip.mes.datamodel
                     conversionTo = query.First();
                 double result = (quantityFrom / conversionTo.Divisor) * conversionTo.Multiplier;
                 if (fromMDUnit.Rounding >= 0)
-                    result = Math.Round(result, fromMDUnit.Rounding);
+                    result = fromMDUnit.GetRoundedValue(result);
                 return result;
             }
         }
@@ -451,6 +451,13 @@ namespace gip.mes.datamodel
             if (dbApp == null)
                 return null;
             return s_cQry_SiUnit(dbApp, (short)forDimension).FirstOrDefault();
+        }
+
+        public double GetRoundedValue(double value)
+        {
+            if (Rounding <= -1)
+                return value;
+            return Math.Round(value, Rounding);
         }
 
         #endregion

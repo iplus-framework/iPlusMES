@@ -2754,13 +2754,13 @@ namespace gip.mes.facility
             else if (ParamsAdjusted.MDUnit.Rounding >= 0)
             {
                 if (ParamsAdjusted.InwardQuantity.HasValue)
-                    ParamsAdjusted.InwardQuantity = Math.Round(ParamsAdjusted.InwardQuantity.Value, ParamsAdjusted.MDUnit.Rounding);
+                    ParamsAdjusted.InwardQuantity = ParamsAdjusted.MDUnit.GetRoundedValue(ParamsAdjusted.InwardQuantity.Value);
                 if (ParamsAdjusted.OutwardQuantity.HasValue)
-                    ParamsAdjusted.OutwardQuantity = Math.Round(ParamsAdjusted.OutwardQuantity.Value, ParamsAdjusted.MDUnit.Rounding);
+                    ParamsAdjusted.OutwardQuantity = ParamsAdjusted.MDUnit.GetRoundedValue(ParamsAdjusted.OutwardQuantity.Value);
                 if (ParamsAdjusted.InwardTargetQuantity.HasValue)
-                    ParamsAdjusted.InwardTargetQuantity = Math.Round(ParamsAdjusted.InwardTargetQuantity.Value, ParamsAdjusted.MDUnit.Rounding);
+                    ParamsAdjusted.InwardTargetQuantity = ParamsAdjusted.MDUnit.GetRoundedValue(ParamsAdjusted.InwardTargetQuantity.Value);
                 if (ParamsAdjusted.OutwardTargetQuantity.HasValue)
-                    ParamsAdjusted.OutwardTargetQuantity = Math.Round(ParamsAdjusted.OutwardTargetQuantity.Value, ParamsAdjusted.MDUnit.Rounding);
+                    ParamsAdjusted.OutwardTargetQuantity = ParamsAdjusted.MDUnit.GetRoundedValue(ParamsAdjusted.OutwardTargetQuantity.Value);
             }
 
 
