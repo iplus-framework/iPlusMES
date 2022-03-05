@@ -397,7 +397,6 @@ namespace gip.bso.sales
                     _CurrentOutOrderPos = value;
                     if (_CurrentOutOrderPos != null)
                         _CurrentOutOrderPos.PropertyChanged += CurrentOutOrderPos_PropertyChanged;
-                    CurrentMDUnit = CurrentOutOrderPos?.MDUnit;
                     OnPropertyChanged("CurrentOutOrderPos");
                     OnPropertyChanged("MDUnitList");
                     OnPropertyChanged("CompanyMaterialPickupList");

@@ -370,12 +370,6 @@ namespace gip.bso.purchasing
                 if (CurrentInOrderPos != null && CurrentInOrderPos.MDUnit != value)
                 {
                     CurrentInOrderPos.MDUnit = value;
-                    if (CurrentInOrderPos.MDUnit != null)
-                    {
-                        CurrentInOrderPos.TargetQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.TargetQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
-                        CurrentInOrderPos.ActualQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.ActualQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
-                        CurrentInOrderPos.CalledUpQuantity = CurrentInOrderPos.Material.ConvertQuantity(CurrentInOrderPos.CalledUpQuantityUOM, CurrentInOrderPos.Material.BaseMDUnit, CurrentInOrderPos.MDUnit);
-                    }
                     OnPropertyChanged("CurrentInOrderPos");
                 }
                 OnPropertyChanged("CurrentMDUnit");
@@ -651,11 +645,12 @@ namespace gip.bso.purchasing
         {
             switch (e.PropertyName)
             {
-                case "MaterialID":
+                case nameof(CurrentInOrderPos.MaterialID):
                     {
                         if (CurrentInOrderPos.Material != null && CurrentInOrderPos.Material.BaseMDUnit != null)
                             CurrentInOrderPos.MDUnit = CurrentInOrderPos.Material.BaseMDUnit;
-                        OnPropertyChanged("CurrentInOrderPos");
+                        OnPropertyChanged(nameof(CurrentInOrderPos));
+                        OnPropertyChanged(nameof(MDUnitList));
                     }
                     break;
             }

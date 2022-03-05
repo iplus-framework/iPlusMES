@@ -697,6 +697,10 @@ namespace gip.bso.manufacturing
             {
                 _SelectedSingleDosingItem = value;
                 OnPropertyChanged("SelectedSingleDosingItem");
+                if (_SelectedSingleDosingItem != null)
+                {
+                    BroadcastToVBControls(Const.CmdFocusAndSelectAll, nameof(SingleDosTargetQuantity), null);
+                }
             }
         }
 

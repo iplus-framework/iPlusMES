@@ -258,7 +258,6 @@ namespace gip.bso.sales
                 }
                 else
                     PriceListMaterialItems = null;
-                CurrentMDUnit = CurrentOutOfferPos?.MDUnit;
                 OnPropertyChanged("MDUnitList");
                 OnPropertyChanged("CurrentOutOfferPos");
                 OnPropertyChanged("CurrentMDUnit");

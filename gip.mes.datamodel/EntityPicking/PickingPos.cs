@@ -195,6 +195,8 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        private MDUnit _MDUnit;
         [ACPropertyInfo(4, "", "en{'Unit of Measurement'}de{'Maßeinheit'}", Const.ContextDatabase + "\\MDUnitList")]
         public MDUnit MDUnit
         {
@@ -222,7 +224,11 @@ namespace gip.mes.datamodel
                     return mdUnit;
                 }
                 else if (this.PickingMaterial != null)
-                    return this.PickingMaterial.BaseMDUnit;
+                {
+                    if(_MDUnit == null)
+                        _MDUnit = PickingMaterial.BaseMDUnit;
+                    return _MDUnit;
+                }
                 return null;
             }
             set
@@ -265,6 +271,14 @@ namespace gip.mes.datamodel
                         }
                     }
                 }
+                else if (this.PickingMaterial != null)
+                {
+                    PickingQuantityUOM = PickingMaterial.ConvertQuantity(TargetQuantity, _MDUnit, value);
+                    _MDUnit = value;
+                    OnPropertyChanged(nameof(TargetQuantity));
+                    OnPropertyChanged(nameof(TargetQuantityUOM));
+                    OnPropertyChanged(nameof(MDUnit));
+                }
             }
         }
 
@@ -278,10 +292,30 @@ namespace gip.mes.datamodel
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.TargetQuantity;
                 else if (this.PickingMaterial != null && this.PickingQuantityUOM.HasValue)
-                    return this.PickingQuantityUOM.Value;
+                    return PickingMaterial.ConvertQuantity(PickingQuantityUOM.Value, Material.BaseMDUnit, MDUnit);
                 else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                     return this.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.TargetQuantity).Sum();
                 return 0;
+            }
+            set
+            {
+                if (this.InOrderPos != null)
+                {
+                    //InOrderPos.TargetQuantity = value;
+                }
+                else if (this.OutOrderPos != null)
+                {
+                    // OutOrderPos.TargetQuantity = value;
+                }
+                else if (this.PickingMaterial != null && this.PickingQuantityUOM.HasValue)
+                {
+                    PickingQuantityUOM = PickingMaterial.ConvertToBaseQuantity(value, MDUnit);
+                }
+                //else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
+                //    return this.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.TargetQuantity).Sum();
+
+                OnPropertyChanged(nameof(TargetQuantity));
+                OnPropertyChanged(nameof(TargetQuantityUOM));
             }
         }
 
@@ -299,6 +333,24 @@ namespace gip.mes.datamodel
                 else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                     return this.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.TargetQuantityUOM).Sum();
                 return 0;
+            }
+            set
+            {
+                if (this.InOrderPos != null)
+                {
+                    //InOrderPos.TargetQuantityUOM = value;
+                }
+                else if (this.OutOrderPos != null)
+                {
+                    //OutOrderPos.TargetQuantityUOM = value;
+                }
+                else if (this.PickingMaterial != null && this.PickingQuantityUOM.HasValue)
+                {
+                    PickingQuantityUOM = value;
+                }
+
+                OnPropertyChanged(nameof(TargetQuantity));
+                OnPropertyChanged(nameof(TargetQuantityUOM));
             }
         }
 
