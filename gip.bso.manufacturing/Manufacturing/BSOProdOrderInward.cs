@@ -312,6 +312,27 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region InwardFacilityPreBooking -> Methods -> Dlg Facility, FaciltiyCharge
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgInwardFacility()
+        {
+            if (!IsEnabledShowDlgInwardFacility())
+                return;
+            FacilitySelectLoctation = FacilitySelectLoctation.PrebookingInward;
+            ShowDlgFacility(SelectedInwardACMethodBooking.InwardFacility);
+        }
+
+        public bool IsEnabledShowDlgInwardFacility()
+        {
+            return SelectedInwardACMethodBooking != null;
+        }
+
+        #endregion
+
         #endregion
 
         #region InwardFacilityPreBooking -> ACMethodBooking

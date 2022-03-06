@@ -4373,9 +4373,4 @@ namespace gip.bso.logistics
 
     }
 
-    public enum FacilitySelectLoctation
-    {
-        PrebookingInward,
-        PrebookingOutward
-    }
 }

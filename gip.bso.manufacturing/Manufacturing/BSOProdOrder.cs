@@ -196,6 +196,23 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
+            }
+        }
+
+        #endregion
+
         #region Properties
 
 
@@ -2068,7 +2085,6 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
 
         #endregion
 
@@ -4209,6 +4225,126 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Facility & FacilityCharge Dialog
+
+        #region  Facility & FacilityCharge Dialog -> FacilityPreBooking -> Available quants
+
+        private bool _IsInward;
+        private Material _QuantDialogMaterial;
+
+
+        private FacilityCharge _SelectedPreBookingAvailableQuants;
+        /// <summary>
+        /// Selected property for FacilityCharge
+        /// </summary>
+        /// <value>The selected PreBookingAvailableQuants</value>
+        [ACPropertySelected(500, "PropertyGroupName", "en{'TODO: PreBookingAvailableQuants'}de{'TODO: PreBookingAvailableQuants'}")]
+        public FacilityCharge SelectedPreBookingAvailableQuants
+        {
+            get
+            {
+                return _SelectedPreBookingAvailableQuants;
+            }
+            set
+            {
+                if (_SelectedPreBookingAvailableQuants != value)
+                {
+                    _SelectedPreBookingAvailableQuants = value;
+                    OnPropertyChanged("SelectedPreBookingAvailableQuants");
+                }
+            }
+        }
+
+
+        private List<FacilityCharge> _PreBookingAvailableQuantsList;
+        /// <summary>
+        /// List property for FacilityCharge
+        /// </summary>
+        /// <value>The PreBookingAvailableQuants list</value>
+        [ACPropertyList(501, "PropertyGroupName")]
+        public List<FacilityCharge> PreBookingAvailableQuantsList
+        {
+            get
+            {
+                if (_PreBookingAvailableQuantsList == null)
+                    _PreBookingAvailableQuantsList = LoadPreBookingAvailableQuantsList();
+                return _PreBookingAvailableQuantsList;
+            }
+        }
+
+        private List<FacilityCharge> LoadPreBookingAvailableQuantsList()
+        {
+            if (_QuantDialogMaterial == null)
+                return new List<FacilityCharge>();
+            return
+                DatabaseApp.FacilityCharge
+                .Include(c => c.FacilityLot)
+                .Include(c => c.Material)
+                .Include(c => c.MDUnit)
+                .Include(c => c.Facility)
+                .Where(c => c.MaterialID == _QuantDialogMaterial.MaterialID && !c.NotAvailable)
+                .OrderBy(c => c.ExpirationDate)
+                .ThenBy(c => c.FillingDate)
+                .Take(ACQueryDefinition.C_DefaultTakeCount)
+                .ToList();
+        }
+
+
+
+        #endregion
+
+        private void ShowDlgFacility(Facility preselectedFacility)
+        {
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(preselectedFacility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                switch (FacilitySelectLoctation)
+                {
+                    case FacilitySelectLoctation.PrebookingInward:
+                        SelectedInwardACMethodBooking.InwardFacility = facility;
+                        OnPropertyChanged("SelectedInwardACMethodBooking");
+                        break;
+                    case FacilitySelectLoctation.PrebookingOutward:
+                        SelectedOutwardACMethodBooking.OutwardFacility = facility;
+                        OnPropertyChanged("SelectedOutwardACMethodBooking");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // DlgAvailableQuantsOk
+        /// <summary>
+        /// Source Property: DlgAvailableQuantsOk
+        /// </summary>
+        [ACMethodInfo("DlgAvailableQuantsOk", "en{'Ok'}de{'Ok'}", 999)]
+        public void DlgAvailableQuantsOk()
+        {
+            if (!IsEnabledDlgAvailableQuantsOk())
+                return;
+            SelectedOutwardACMethodBooking.OutwardFacility = SelectedPreBookingAvailableQuants.Facility;
+            SelectedOutwardACMethodBooking.OutwardFacilityCharge = SelectedPreBookingAvailableQuants;
+            SelectedOutwardACMethodBooking.OutwardMaterial = null;
+            SelectedOutwardACMethodBooking.OutwardFacilityLot = null;
+            OnPropertyChanged("SelectedOutwardACMethodBooking");
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgAvailableQuantsOk()
+        {
+            return SelectedPreBookingAvailableQuants != null;
+        }
+
+        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999)]
+        public void DlgAvailableQuantsCancel()
+        {
+            CloseTopDialog();
+        }
+
+        #endregion
         public override object Clone()
         {
             BSOProdOrder clone = base.Clone() as BSOProdOrder;

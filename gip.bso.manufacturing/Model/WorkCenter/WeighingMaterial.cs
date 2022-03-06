@@ -146,7 +146,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Target Quantity is weight in kg!
         /// </summary>
-        [ACPropertyInfo(106, "", "en{'Target weight in kg'}de{'Sollgewicht in kg'")]
+        [ACPropertyInfo(106, "", "en{'Target weight in kg'}de{'Sollgewicht in kg'}")]
         public double TargetQuantity
         {
             get => _TargetQuantity;
@@ -161,7 +161,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Target Quantity is weight in kg!
         /// </summary>
-        [ACPropertyInfo(107, "", "en{'Actual weight in kg'}de{'Aktuelles Gewicht in kg'")]
+        [ACPropertyInfo(107, "", "en{'Actual weight in kg'}de{'Aktuelles Gewicht in kg'}")]
         public double ActualQuantity
         {
             get => _ActualQuantity;
@@ -173,7 +173,7 @@ namespace gip.bso.manufacturing
         }
 
         private string _UnitName;
-        [ACPropertyInfo(107, "", "en{'Unit'}de{'Einheit'")]
+        [ACPropertyInfo(107, "", "en{'Unit'}de{'Einheit'}")]
         public string UnitName
         {
             get => _UnitName;
@@ -185,7 +185,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _TargetQtyInUnits;
-        [ACPropertyInfo(106, "", "en{'Target quantity in Unit'}de{'Sollmenge in Einheiten")]
+        [ACPropertyInfo(106, "", "en{'Target quantity in Unit'}de{'Sollmenge in Einheiten'}")]
         public double TargetQtyInUnits
         {
             get => _TargetQtyInUnits;
@@ -197,7 +197,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _ActualQtyInUnits;
-        [ACPropertyInfo(107, "", "en{'Actual weight in kg'}de{'Sollemgne in Einheiten'")]
+        [ACPropertyInfo(107, "", "en{'Actual weight in kg'}de{'Sollemgne in Einheiten'}")]
         public double ActualQtyInUnits
         {
             get => _ActualQtyInUnits;

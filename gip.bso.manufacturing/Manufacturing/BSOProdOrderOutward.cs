@@ -500,6 +500,43 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region OutwardFacilityPreBooking -> Methods -> Dlg Facility, FaciltiyCharge
+        public FacilitySelectLoctation FacilitySelectLoctation { get; set; }
+
+        [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgOutwardFacility()
+        {
+            if (!IsEnabledShowDlgOutwardFacility())
+                return;
+            FacilitySelectLoctation = FacilitySelectLoctation.PrebookingOutward;
+            ShowDlgFacility(SelectedOutwardACMethodBooking.OutwardFacility);
+        }
+
+        public bool IsEnabledShowDlgOutwardFacility()
+        {
+            return SelectedOutwardACMethodBooking != null;
+        }
+
+        /// <summary>
+        /// @aagincic: only added - not used for now
+        /// </summary>
+        [ACMethodInfo("ShowDlgOutwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
+        public void ShowDlgOutwardAvailableQuants()
+        {
+            if (!IsEnabledShowDlgOutwardAvailableQuants())
+                return;
+            _IsInward = false;
+            _QuantDialogMaterial = SelectedOutwardACMethodBooking.OutwardMaterial;
+            _PreBookingAvailableQuantsList = null;
+            ShowDialog(this, "DlgAvailableQuants");
+        }
+
+        public bool IsEnabledShowDlgOutwardAvailableQuants()
+        {
+            return SelectedOutwardACMethodBooking != null && SelectedOutwardACMethodBooking.OutwardMaterial != null;
+        }
+        #endregion
+
         #endregion
 
         #region OutwardFacilityPreBooking -> Search
