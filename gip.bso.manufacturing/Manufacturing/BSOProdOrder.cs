@@ -4229,7 +4229,6 @@ namespace gip.bso.manufacturing
 
         #region  Facility & FacilityCharge Dialog -> FacilityPreBooking -> Available quants
 
-        private bool _IsInward;
         private Material _QuantDialogMaterial;
 
 

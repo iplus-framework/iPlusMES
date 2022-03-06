@@ -525,7 +525,6 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledShowDlgOutwardAvailableQuants())
                 return;
-            _IsInward = false;
             _QuantDialogMaterial = SelectedOutwardACMethodBooking.OutwardMaterial;
             _PreBookingAvailableQuantsList = null;
             ShowDialog(this, "DlgAvailableQuants");

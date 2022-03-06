@@ -107,7 +107,7 @@ namespace gip.mes.webservices
                     {
                         if (orderWFInfo.POPId == Guid.Empty)
                             continue;
-                        ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { ForRelease = orderWFInfo.ForRelease };
+                        ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { ForRelease = orderWFInfo.ForRelease, ACUrlWF = orderWFInfo.ACUrlWF };
                         if (orderWFInfo.WFMethod != null)
                         {
                             pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;

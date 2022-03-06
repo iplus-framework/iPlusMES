@@ -76,6 +76,25 @@ namespace gip.mes.webservices
                     return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "SelectedOrderWF is empty"));
             }
 
+            if (sequence.Sequence != null)
+            {
+                foreach (var entry in sequence.Sequence)
+                {
+                    if (entry.WFMethod != null)
+                        entry.WFMethod.FullSerialization = true;
+                    if (entry.SelectedOrderWF != null && entry.SelectedOrderWF.WFMethod != null)
+                        entry.SelectedOrderWF.WFMethod.FullSerialization = true;
+                    if (entry.OrderWFInfos != null && entry.OrderWFInfos.Any())
+                    {
+                        foreach (var orderWFInfo in entry.OrderWFInfos)
+                        {
+                            if (orderWFInfo.WFMethod != null)
+                                orderWFInfo.WFMethod.FullSerialization = true;
+                        }
+                    }
+                }
+            }
+
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
             if (myServiceHost == null)
                 return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
