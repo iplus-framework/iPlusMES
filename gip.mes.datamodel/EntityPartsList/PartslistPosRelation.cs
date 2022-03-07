@@ -208,24 +208,29 @@ namespace gip.mes.datamodel
         {
             PartslistPosRelation clonedObject = new PartslistPosRelation();
             clonedObject.PartslistPosRelationID = this.PartslistPosRelationID;
-            clonedObject.CopyFrom(this, withReferences);
+            clonedObject.CopyFrom(this, withReferences, true);
             return clonedObject;
         }
 
-        public void CopyFrom(PartslistPosRelation from, bool withReferences)
+        public void CopyFrom(PartslistPosRelation from, bool withReferences, bool copyQuantity)
         {
             if (withReferences)
             {
                 TargetPartslistPosID = from.TargetPartslistPosID;
                 SourcePartslistPosID = from.SourcePartslistPosID;
+                MaterialWFRelationID = from.MaterialWFRelationID;
+            }
+
+            if(copyQuantity)
+            {
+                TargetQuantity = from.TargetQuantity;
+                TargetQuantityUOM = from.TargetQuantityUOM;
             }
 
             Sequence = from.Sequence;
-            TargetQuantity = from.TargetQuantity;
-            TargetQuantityUOM = from.TargetQuantityUOM;
-            MaterialWFRelationID = from.MaterialWFRelationID;
             RetrogradeFIFO = from.RetrogradeFIFO;
             Anterograde = from.Anterograde;
+            XMLConfig = from.XMLConfig;
         }
         #endregion
     }

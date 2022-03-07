@@ -469,28 +469,32 @@ namespace gip.mes.datamodel
         {
             PartslistPos clonedObject = new PartslistPos();
             clonedObject.PartslistPosID = this.PartslistPosID;
-            clonedObject.CopyFrom(this, withReferences);
+            clonedObject.CopyFrom(this, withReferences, true);
             return clonedObject;
         }
 
-        public void CopyFrom(PartslistPos from, bool withReferences)
+        public void CopyFrom(PartslistPos from, bool withReferences, bool copyQuantity)
         {
             if (withReferences)
             {
                 PartslistID = from.PartslistID;
                 MaterialID = from.MaterialID;
                 MDUnitID = from.MDUnitID;
+                ParentPartslistPosID = from.ParentPartslistPosID;
+                AlternativePartslistPosID = from.AlternativePartslistPosID;
+                ParentPartslistID = from.ParentPartslistID;
+            }
+
+            if(copyQuantity)
+            {
+                TargetQuantityUOM = from.TargetQuantityUOM;
+                TargetQuantity = from.TargetQuantity;
             }
 
             Sequence = from.Sequence;
             SequenceProduction = from.SequenceProduction;
             MaterialPosTypeIndex = from.MaterialPosTypeIndex;
-            TargetQuantityUOM = from.TargetQuantityUOM;
-            TargetQuantity = from.TargetQuantity;
             IsBaseQuantityExcluded = from.IsBaseQuantityExcluded;
-            ParentPartslistPosID = from.ParentPartslistPosID;
-            AlternativePartslistPosID = from.AlternativePartslistPosID;
-            ParentPartslistID = from.ParentPartslistID;
             XMLConfig = from.XMLConfig;
             LineNumber = from.LineNumber;
             RetrogradeFIFO = from.RetrogradeFIFO;
