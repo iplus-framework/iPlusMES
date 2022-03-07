@@ -134,7 +134,7 @@ namespace gip.bso.manufacturing
 
         private ACRef<IACComponent> _CurrentPAFManualWeighing;
 
-        private IACContainerT<double> _PAFManuallyAddedQuantity;
+        protected IACContainerT<double> _PAFManuallyAddedQuantity;
 
         private IACContainerT<short> _TareScaleState;
 
