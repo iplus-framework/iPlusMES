@@ -292,7 +292,8 @@ namespace gip.mes.datamodel
                 else if (this.OutOrderPos != null)
                     return OutOrderPos.TargetQuantity;
                 else if (this.PickingMaterial != null && this.PickingQuantityUOM.HasValue)
-                    return PickingMaterial.ConvertQuantity(PickingQuantityUOM.Value, Material.BaseMDUnit, MDUnit);
+                    return this.PickingQuantityUOM.Value;
+                    //return PickingMaterial.ConvertQuantity(PickingQuantityUOM.Value, Material.BaseMDUnit, MDUnit);
                 else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                     return this.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.TargetQuantity).Sum();
                 return 0;
@@ -307,9 +308,10 @@ namespace gip.mes.datamodel
                 {
                     // OutOrderPos.TargetQuantity = value;
                 }
-                else if (this.PickingMaterial != null && this.PickingQuantityUOM.HasValue)
+                else if (this.PickingMaterial != null)
                 {
-                    PickingQuantityUOM = PickingMaterial.ConvertToBaseQuantity(value, MDUnit);
+                    PickingQuantityUOM = value;
+                    //PickingQuantityUOM = PickingMaterial.ConvertToBaseQuantity(value, MDUnit);
                 }
                 //else if (this.PickingPosProdOrderPartslistPos_PickingPos != null && this.PickingPosProdOrderPartslistPos_PickingPos.Any())
                 //    return this.PickingPosProdOrderPartslistPos_PickingPos.Select(c => c.ProdorderPartslistPos.TargetQuantity).Sum();
@@ -344,7 +346,7 @@ namespace gip.mes.datamodel
                 {
                     //OutOrderPos.TargetQuantityUOM = value;
                 }
-                else if (this.PickingMaterial != null && this.PickingQuantityUOM.HasValue)
+                else if (this.PickingMaterial != null)
                 {
                     PickingQuantityUOM = value;
                 }
