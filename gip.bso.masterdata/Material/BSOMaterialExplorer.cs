@@ -202,7 +202,7 @@ namespace gip.bso.masterdata
                 if(AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
-                    ChangedSelectedMaterial(value);
+                    //ChangedSelectedMaterial(value);
                     OnPropertyChanged("CurrentMaterial");
                 }
             }
@@ -253,7 +253,7 @@ namespace gip.bso.masterdata
                 if(AccessPrimary.Selected != value)
                 {
                     AccessPrimary.Selected = value;
-                    ChangedSelectedMaterial(value);
+                    //ChangedSelectedMaterial(value);
                     OnPropertyChanged("SelectedMaterial");
                 }
             }

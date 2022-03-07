@@ -463,5 +463,42 @@ namespace gip.mes.datamodel
         }
         #endregion
 
+        #region Cloning
+
+        public object Clone(bool withReferences)
+        {
+            PartslistPos clonedObject = new PartslistPos();
+            clonedObject.PartslistPosID = this.PartslistPosID;
+            clonedObject.CopyFrom(this, withReferences);
+            return clonedObject;
+        }
+
+        public void CopyFrom(PartslistPos from, bool withReferences)
+        {
+            if (withReferences)
+            {
+                PartslistID = from.PartslistID;
+                MaterialID = from.MaterialID;
+                MDUnitID = from.MDUnitID;
+            }
+
+            Sequence = from.Sequence;
+            SequenceProduction = from.SequenceProduction;
+            MaterialPosTypeIndex = from.MaterialPosTypeIndex;
+            TargetQuantityUOM = from.TargetQuantityUOM;
+            TargetQuantity = from.TargetQuantity;
+            IsBaseQuantityExcluded = from.IsBaseQuantityExcluded;
+            ParentPartslistPosID = from.ParentPartslistPosID;
+            AlternativePartslistPosID = from.AlternativePartslistPosID;
+            ParentPartslistID = from.ParentPartslistID;
+            XMLConfig = from.XMLConfig;
+            LineNumber = from.LineNumber;
+            RetrogradeFIFO = from.RetrogradeFIFO;
+            ExplosionOff = from.ExplosionOff;
+            KeyOfExtSys = from.KeyOfExtSys;
+            Anterograde = from.Anterograde;
+        }
+        #endregion
+
     }
 }

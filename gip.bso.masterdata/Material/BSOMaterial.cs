@@ -834,6 +834,9 @@ namespace gip.bso.masterdata
                         .Include(c => c.Label.LabelTranslation_Label)
                         .Where(c => c.MaterialID == SelectedMaterial.MaterialID));
             PostExecute("Load");
+
+            if (SelectedMaterial != null)
+                ChangedSelectedMaterial(SelectedMaterial);
         }
 
         /// <summary>
@@ -1482,7 +1485,7 @@ namespace gip.bso.masterdata
             {
                 result =
                     result.Where(c =>
-                                    FilterAssociatedPosIntermMatNo == null
+                                    string.IsNullOrEmpty(FilterAssociatedPosIntermMatNo)
                                     ||
                                     c.PartslistPosRelation_SourcePartslistPos
                                     .Any(x => x.TargetPartslistPos.Material.MaterialNo == FilterAssociatedPosIntermMatNo)
