@@ -273,14 +273,17 @@ namespace gip.mes.webservices
                 ActualQuantityUOM = c.ActualQuantityUOM,
                 TargetQuantity = c.TargetQuantity,
                 TargetQuantityUOM = c.TargetQuantityUOM,
+                RetrogradeFIFO = c.RetrogradeFIFO,
                 SourcePos = new ProdOrderPartslistPos()
                 {
                     ProdOrderPartslistPosID = c.SourceProdOrderPartslistPosID,
+                    RetrogradeFIFO = c.RetrogradeFIFO,
                     Material = new Material()
                     {
                         MaterialID = c.SourceProdOrderPartslistPos.Material.MaterialID,
                         MaterialNo = c.SourceProdOrderPartslistPos.Material.MaterialNo,
                         MaterialName1 = c.SourceProdOrderPartslistPos.Material.MaterialName1,
+                        RetrogradeFIFO = c.SourceProdOrderPartslistPos.Material.RetrogradeFIFO,
                         BaseMDUnit = new MDUnit()
                         {
                             MDUnitID = c.SourceProdOrderPartslistPos.Material.BaseMDUnit.MDUnitID,
@@ -324,7 +327,7 @@ namespace gip.mes.webservices
                 {
                     ProdOrderPartslistPosID = c.TargetProdOrderPartslistPosID
                 }
-            });
+            }) ;
         }
 
         public WSResponse<List<ProdOrderPartslistPosRelation>> GetProdOrderInputMaterials(string targetPOPLPosID)

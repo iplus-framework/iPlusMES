@@ -42,5 +42,11 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+
+        [DataMember(Name = "RF")]
+        public bool? RetrogradeFIFO
+        {
+            get; set;
+        }
     }
 }

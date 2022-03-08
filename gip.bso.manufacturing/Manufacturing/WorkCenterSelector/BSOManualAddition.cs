@@ -114,38 +114,39 @@ namespace gip.bso.manufacturing
             {
                 base.SelectedFacilityCharge = value;
 
-                if (   OnlyAcknowledge 
-                    && value != null 
-                    && (_SelFacilityCharge == null 
-                        || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID
-                        || (_PAFManuallyAddedQuantity != null && Math.Abs(_PAFManuallyAddedQuantity.ValueT) <= Double.Epsilon)))
+                if (OnlyAcknowledge)
                 {
-                    _SelFacilityCharge = value;
-
-                    double diff = SelectedWeighingMaterial.TargetQuantity;
-                    ACMethod pafMethod = GetPAFCurrentACMethod();
-                    if (pafMethod != null)
+                    if (value != null
+                        && (_SelFacilityCharge == null
+                            || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID
+                            /*|| (_PAFManuallyAddedQuantity != null && Math.Abs(_PAFManuallyAddedQuantity.ValueT) <= Double.Epsilon)*/))
                     {
-                        double targetQuantity = pafMethod.ParameterValueList.GetDouble("TargetQuantity");
-                        diff = targetQuantity - ScaleActualWeight;
-                    }
+                        _SelFacilityCharge = value;
 
-                    if (diff < 0.00001)
+                        double diff = SelectedWeighingMaterial.TargetQuantity;
+                        ACMethod pafMethod = GetPAFCurrentACMethod();
+                        if (pafMethod != null)
+                        {
+                            double targetQuantity = pafMethod.ParameterValueList.GetDouble("TargetQuantity");
+                            diff = targetQuantity - ScaleActualWeight;
+                        }
+
+                        if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > diff)
+                            SelectedWeighingMaterial.AddValue = diff;
+                        else
+                            SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
+
+                        if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
+                        {
+                            SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.InWeighing, DatabaseApp);
+                        }
+
+                        AddKg();
+                    }
+                    else if (_SelFacilityCharge != null && value == null)
                     {
-                        diff = 1;
+                        _SelFacilityCharge = null;
                     }
-
-                    if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > diff)
-                        SelectedWeighingMaterial.AddValue = diff;
-                    else
-                        SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
-
-                    if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
-                    {
-                        SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.InWeighing, DatabaseApp);
-                    }
-
-                    AddKg();
                 }
             }
         }

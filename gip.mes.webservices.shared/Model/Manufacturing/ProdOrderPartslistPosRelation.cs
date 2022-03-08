@@ -57,5 +57,16 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+
+        [DataMember(Name = "RF")]
+        public bool? RetrogradeFIFO
+        {
+            get; set;
+        }
+
+        public double CompleteFactor
+        {
+            get => (ActualQuantity / TargetQuantity) * 100;
+        }
     }
 }

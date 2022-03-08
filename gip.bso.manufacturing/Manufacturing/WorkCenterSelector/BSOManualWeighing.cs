@@ -1422,14 +1422,14 @@ namespace gip.bso.manufacturing
                         HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT);
                     }
 
-                    string pwParamInfo = pwGroup.ExecuteMethod(nameof(PWGroupVB.GetAllPWParamInfo), null) as string;
-                    if (!string.IsNullOrEmpty(pwParamInfo))
-                    {
-                        //AddToMessageList(new MessageItem(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
+                    //string pwParamInfo = pwGroup.ExecuteMethod(nameof(PWGroupVB.GetAllPWParamInfo), null) as string;
+                    //if (!string.IsNullOrEmpty(pwParamInfo))
+                    //{
+                    //    //AddToMessageList(new MessageItem(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
 
-                        AddToMessageList(new MessageItemPWInfo(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
-                        RefreshMessageList();
-                    }
+                    //    AddToMessageList(new MessageItemPWInfo(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
+                    //    RefreshMessageList();
+                    //}
                 }
                 catch (Exception e)
                 {

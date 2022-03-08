@@ -205,4 +205,14 @@ namespace gip.bso.manufacturing
             return this.ReflectACUrlBinding(acUrl, ref acTypeInfo, ref source, ref path, ref rightControlMode);
         }
     }
+
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'MessageItemPWInfo'}de{'MessageItemPWInfo'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, true, true)]
+    public class MessageItemPWInfo : MessageItem
+    {
+        public MessageItemPWInfo(IACComponent pwNode, IACBSO bso, eMsgLevel msgLevel = eMsgLevel.Default) : base(pwNode, bso, msgLevel)
+        {
+        }
+
+        public override bool IsAlarmMessage => false;
+    }
 }
