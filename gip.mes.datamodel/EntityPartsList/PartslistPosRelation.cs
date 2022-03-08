@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Reihenfolge'}","", "", true)]
-    [ACPropertyEntity(2, "TargetQuantityUOM", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}","", "", true)]
-    [ACPropertyEntity(3, "TargetQuantity", ConstApp.TargetQuantity,"", "", true)]
+    [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
+    [ACPropertyEntity(2, "TargetQuantityUOM", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}", "", "", true)]
+    [ACPropertyEntity(3, "TargetQuantity", ConstApp.TargetQuantity, "", "", true)]
     [ACPropertyEntity(4, "SourcePartslistPos", "en{'Sub-Item from'}de{'Unterposition von'}", Const.ContextDatabase + "\\PartslistPos", "", true)]
     [ACPropertyEntity(5, "TargetPartslistPos", "en{'Intermediate Product'}de{'Zwischenprodukt'}", Const.ContextDatabase + "\\PartslistPos", "", true)]
     [ACPropertyEntity(6, "MaterialWFRelation", "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", Const.ContextDatabase + "\\MaterialWFRelation", "", true)]
@@ -58,7 +58,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IACObjectEntity Members
-        
+
         static public string KeyACIdentifier
         {
             get
@@ -112,7 +112,7 @@ namespace gip.mes.datamodel
         bool _OnTargetQuantityUOMChanging = false;
         partial void OnTargetQuantityUOMChanged()
         {
-            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && SourcePartslistPos!= null && SourcePartslistPos.Material != null && SourcePartslistPos.MDUnit != null)
+            if (!_OnTargetQuantityChanging && EntityState != System.Data.EntityState.Detached && SourcePartslistPos != null && SourcePartslistPos.Material != null && SourcePartslistPos.MDUnit != null)
             {
                 _OnTargetQuantityUOMChanging = true;
                 try
@@ -199,6 +199,38 @@ namespace gip.mes.datamodel
         public IPartslistPos I_TargetPartslistPos
         {
             get { return this.TargetPartslistPos; }
+        }
+        #endregion
+
+        #region Cloning
+
+        public object Clone(bool withReferences)
+        {
+            PartslistPosRelation clonedObject = new PartslistPosRelation();
+            clonedObject.PartslistPosRelationID = this.PartslistPosRelationID;
+            clonedObject.CopyFrom(this, withReferences, true);
+            return clonedObject;
+        }
+
+        public void CopyFrom(PartslistPosRelation from, bool withReferences, bool copyQuantity)
+        {
+            if (withReferences)
+            {
+                TargetPartslistPosID = from.TargetPartslistPosID;
+                SourcePartslistPosID = from.SourcePartslistPosID;
+                MaterialWFRelationID = from.MaterialWFRelationID;
+            }
+
+            if(copyQuantity)
+            {
+                TargetQuantity = from.TargetQuantity;
+                TargetQuantityUOM = from.TargetQuantityUOM;
+            }
+
+            Sequence = from.Sequence;
+            RetrogradeFIFO = from.RetrogradeFIFO;
+            Anterograde = from.Anterograde;
+            XMLConfig = from.XMLConfig;
         }
         #endregion
     }

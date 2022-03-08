@@ -114,7 +114,11 @@ namespace gip.bso.manufacturing
             {
                 base.SelectedFacilityCharge = value;
 
-                if (OnlyAcknowledge && value != null && (_SelFacilityCharge == null || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID))
+                if (   OnlyAcknowledge 
+                    && value != null 
+                    && (_SelFacilityCharge == null 
+                        || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID
+                        || (_PAFManuallyAddedQuantity != null && Math.Abs(_PAFManuallyAddedQuantity.ValueT) <= Double.Epsilon)))
                 {
                     _SelFacilityCharge = value;
 

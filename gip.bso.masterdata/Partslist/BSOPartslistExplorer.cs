@@ -160,7 +160,10 @@ namespace gip.bso.masterdata
                         _AccessPrimary.NavACQueryDefinition.SearchWord = value;
                         OnPropertyChanged("SearchWord");
                         if (string.IsNullOrEmpty(value))
+                        {
                             ClearSearch();
+                            Search();
+                        }
                         else
                             Search();
                     }
