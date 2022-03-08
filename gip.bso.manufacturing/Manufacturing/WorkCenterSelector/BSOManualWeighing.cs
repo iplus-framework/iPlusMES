@@ -1421,6 +1421,15 @@ namespace gip.bso.manufacturing
                         //ParentBSOWCS?.ApplicationQueue.Add(() => HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT));
                         HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT);
                     }
+
+                    string pwParamInfo = pwGroup.ExecuteMethod(nameof(PWGroupVB.GetAllPWParamInfo), null) as string;
+                    if (!string.IsNullOrEmpty(pwParamInfo))
+                    {
+                        //AddToMessageList(new MessageItem(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
+
+                        AddToMessageList(new MessageItemPWInfo(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
+                        RefreshMessageList();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1704,6 +1713,13 @@ namespace gip.bso.manufacturing
                 }
 
                 ComponentPWNodesList = null;
+            }
+
+            MessageItem msgPWInfo = MessagesListSafe.FirstOrDefault(c => c is MessageItemPWInfo);
+            if (msgPWInfo != null)
+            {
+                RemoveFromMessageList(msgPWInfo);
+                RefreshMessageList();
             }
         }
 
