@@ -244,7 +244,7 @@ namespace gip.bso.masterdata
                 //if (_MDCurrencyExchangeList == null)
                 //    _MDCurrencyExchangeList = Database.MDCurrencyExchange.ToList();
                 //return _MDCurrencyExchangeList;
-                return CurrentCurrency.MDCurrencyExchange_MDCurrency.ToList();
+                return CurrentCurrency.MDCurrencyExchange_MDCurrency.OrderByDescending(c => c.InsertDate).ToList();
 
             }
         }

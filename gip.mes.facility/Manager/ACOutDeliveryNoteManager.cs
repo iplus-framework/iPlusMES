@@ -774,6 +774,7 @@ namespace gip.mes.facility
                 invoice.BillingCompanyAddress = outOrder.BillingCompanyAddress;
                 invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
                 invoice.IssuerCompanyAddress = outOrder.IssuerCompanyAddress;
+                invoice.Comment = outOrder.Comment;
 
                 invoice.MDCurrency = invoice.IssuerCompanyAddress.MDCountry.MDCurrency;
                 invoice.UpdateExchangeRate();

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.sales
 {
@@ -232,11 +233,10 @@ namespace gip.bso.sales
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "InvoiceNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<Invoice>(Invoice.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
@@ -253,6 +253,33 @@ namespace gip.bso.sales
             }
             return result;
         }
+
+        public List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem acFilterInvoiceNo = new ACFilterItem(Global.FilterTypes.filter, "InvoiceNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
+                aCFilterItems.Add(acFilterInvoiceNo);
+
+                return aCFilterItems;
+            }
+        }
+
+        private List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortInvoiceDate = new ACSortItem("InvoiceDate", SortDirections.descending, true);
+                acSortItems.Add(acSortInvoiceDate);
+
+                return acSortItems;
+            }
+        }
+
 
         [ACPropertyCurrent(101, Invoice.ClassName)]
         public Invoice CurrentInvoice
