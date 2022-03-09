@@ -1869,6 +1869,7 @@ namespace gip.mes.facility
             targetBatchPlan.MaterialWFACClassMethod = sourceBatchPlan.MaterialWFACClassMethod;
             targetBatchPlan.IsValidated = sourceBatchPlan.IsValidated;
             targetBatchPlan.PlannedStartDate = sourceBatchPlan.PlannedStartDate;
+            targetBatchPlan.MDBatchPlanGroup = sourceBatchPlan.MDBatchPlanGroup;
 
             // TODO: Recalc max ScheduledOrder
             SchedulingMaxBPOrderWF schedulingMaxOrder =
