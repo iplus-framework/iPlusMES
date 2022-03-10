@@ -3145,6 +3145,18 @@ namespace gip.mes.processapplication
             }
         }
 
+        [ACMethodInfo("","",9999)]
+        public string GetPWParametersInfo()
+        {
+            var configStores = MandatoryConfigStores?.ToArray();
+            if (configStores != null)
+            {
+                return ConfigManagerIPlus.GetParametersInfo(configStores);
+            }
+
+            return null;
+        }
+
         #endregion
 
         #endregion
@@ -3209,6 +3221,9 @@ namespace gip.mes.processapplication
                     return true;
                 case nameof(IsBinChangeLoopNodeAvailable):
                     result = IsBinChangeLoopNodeAvailable();
+                    return true;
+                case nameof(GetPWParametersInfo):
+                    result = GetPWParametersInfo();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

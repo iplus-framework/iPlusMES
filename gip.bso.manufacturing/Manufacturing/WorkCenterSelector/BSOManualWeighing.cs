@@ -1422,14 +1422,16 @@ namespace gip.bso.manufacturing
                         HandlePWNodeACState(runningNode.ComponentPWNodeACState, runningNode.ComponentPWNodeACState.ValueT);
                     }
 
-                    //string pwParamInfo = pwGroup.ExecuteMethod(nameof(PWGroupVB.GetAllPWParamInfo), null) as string;
-                    //if (!string.IsNullOrEmpty(pwParamInfo))
-                    //{
-                    //    //AddToMessageList(new MessageItem(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
-
-                    //    AddToMessageList(new MessageItemPWInfo(null, null, eMsgLevel.Info) { Message = pwParamInfo, HandleByAcknowledgeButton = false });
-                    //    RefreshMessageList();
-                    //}
+                    var mwNode = mwPWNodes?.FirstOrDefault();
+                    if (mwNode != null)
+                    {
+                        string configStoresInfo = mwNode.ComponentPWNode?.ValueT?.ExecuteMethod(nameof(PWManualWeighing.GetPWParametersInfo)) as string;
+                        if (!string.IsNullOrEmpty(configStoresInfo))
+                        {
+                            AddToMessageList(new MessageItemPWInfo(null, null, eMsgLevel.Info) { Message = configStoresInfo, HandleByAcknowledgeButton = false });
+                            RefreshMessageList();
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1715,7 +1717,7 @@ namespace gip.bso.manufacturing
                 ComponentPWNodesList = null;
             }
 
-            MessageItem msgPWInfo = MessagesListSafe.FirstOrDefault(c => c is MessageItemPWInfo);
+            var msgPWInfo = MessagesListSafe.FirstOrDefault(c => c is MessageItemPWInfo);
             if (msgPWInfo != null)
             {
                 RemoveFromMessageList(msgPWInfo);
@@ -2558,12 +2560,6 @@ namespace gip.bso.manufacturing
 
             switch (vbControl.VBContent)
             {
-                //case "SelectedWeighingMaterial":
-                //    {
-                //        if (WeighingMaterialsFSM)
-                //            return Global.ControlModes.Enabled;
-                //        return Global.ControlModes.Disabled;
-                //    }
                 case nameof(SelectedFacilityCharge):
                     {
                         if (ShowSelectFacilityLotInfo)
