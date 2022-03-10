@@ -323,7 +323,7 @@ namespace gip.mes.processapplication
         }
 
         bool? _IgnoreFIFO = null;
-        protected bool IgnoreFIFO
+        public bool IgnoreFIFO
         {
             get
             {

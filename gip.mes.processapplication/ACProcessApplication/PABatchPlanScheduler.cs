@@ -76,7 +76,7 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
-                    PAScheduleForPWNodeList additionalElements = CreateScheduleListForPWNodes(this, databaseApp, SchedulesForPWNodes.ValueT.Select(c => c.MDSchedulingGroupID).ToArray());
+                    PAScheduleForPWNodeList additionalElements = CreateScheduleListForPWNodes(this, databaseApp, SchedulesForPWNodes.ValueT.ToArray());
                     if (additionalElements.Any())
                     {
                         PAScheduleForPWNodeList scheduleList = SchedulesForPWNodes.ValueT;
@@ -230,7 +230,8 @@ namespace gip.mes.processapplication
                         }
                         else
                         {
-                            if (instancesOfThisSchedule.Any())
+                            bool canStartMultiple = scheduleForPWNode.MDSchedulingGroup?.MDKey[0] == '+';
+                            if (!canStartMultiple && instancesOfThisSchedule.Any())
                             {
                                 // If there are any active nodes, that are not completed, than next Batchplans must wait
                                 if (instancesOfThisSchedule.Where(c => (c.CurrentACState >= ACStateEnum.SMRunning && c.CurrentACState < ACStateEnum.SMCompleted)
@@ -469,7 +470,7 @@ namespace gip.mes.processapplication
 
         #region Static
 
-        public static PAScheduleForPWNodeList CreateScheduleListForPWNodes(ACComponent invoker, DatabaseApp databaseApp, Guid[] ignoreACClassWFIds)
+        public static PAScheduleForPWNodeList CreateScheduleListForPWNodes(ACComponent invoker, DatabaseApp databaseApp, IEnumerable<PAScheduleForPWNode> ignoreACClassWFs)
         {
             List<MDSchedulingGroup> allPWNodes =
                 databaseApp
@@ -477,8 +478,15 @@ namespace gip.mes.processapplication
                 .AsEnumerable()
                 .OrderBy(c => c.ACCaption)
                 .ToList();
-            if (ignoreACClassWFIds != null && ignoreACClassWFIds.Any())
+            if (ignoreACClassWFs != null && ignoreACClassWFs.Any())
+            {
+                foreach (var node in ignoreACClassWFs)
+                {
+                    node.MDSchedulingGroup = allPWNodes.Where(c => c.MDSchedulingGroupID == node.MDSchedulingGroupID).FirstOrDefault();
+                }
+                var ignoreACClassWFIds = ignoreACClassWFs.Select(c => c.MDSchedulingGroupID).ToArray();
                 allPWNodes = allPWNodes.Where(c => !ignoreACClassWFIds.Contains(c.MDSchedulingGroupID)).ToList();
+            }
             PAScheduleForPWNodeList list = new PAScheduleForPWNodeList(allPWNodes.Select(c => new PAScheduleForPWNode()
             {
                 MDSchedulingGroupID = c.MDSchedulingGroupID,
