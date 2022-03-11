@@ -1040,7 +1040,7 @@ namespace gip.bso.masterdata
         #region IntermedateParts -> Select, (Current,) List
 
         private PartslistPosRelation _SelectedIntermediateParts;
-        [ACPropertySelected(9999, "IntermediateParts")]
+        [ACPropertySelected(9999, "IntermediateParts", isRightmanagement:true)]
         public PartslistPosRelation SelectedIntermediateParts
         {
             get
@@ -1902,7 +1902,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertySelected(9999, "InputMaterial", "en{'Material'}de{'Material'}")]
+        [ACPropertySelected(9999, "InputMaterial", "en{'Material'}de{'Material'}", "", true)]
         public Material SelectedInputMaterial
         {
             get
