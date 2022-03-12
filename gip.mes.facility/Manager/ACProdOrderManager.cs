@@ -1868,7 +1868,7 @@ namespace gip.mes.facility
             targetBatchPlan.PlanStateIndex = sourceBatchPlan.PlanStateIndex;
             targetBatchPlan.MaterialWFACClassMethod = sourceBatchPlan.MaterialWFACClassMethod;
             targetBatchPlan.IsValidated = sourceBatchPlan.IsValidated;
-            targetBatchPlan.PlannedStartDate = sourceBatchPlan.PlannedStartDate;
+            //targetBatchPlan.PlannedStartDate = sourceBatchPlan.PlannedStartDate;
             targetBatchPlan.MDBatchPlanGroup = sourceBatchPlan.MDBatchPlanGroup;
 
             // TODO: Recalc max ScheduledOrder
@@ -1879,10 +1879,10 @@ namespace gip.mes.facility
                 .FirstOrDefault();
             //schedulingMaxOrder.MaxScheduledOrder++;
             targetBatchPlan.ScheduledOrder = schedulingMaxOrder.MaxScheduledOrder + sourceBatchPlan.ScheduledOrder;
-            targetBatchPlan.ScheduledStartDate = sourceBatchPlan.ScheduledStartDate;
-            targetBatchPlan.ScheduledEndDate = sourceBatchPlan.ScheduledEndDate;
-            targetBatchPlan.CalculatedStartDate = sourceBatchPlan.CalculatedStartDate;
-            targetBatchPlan.CalculatedEndDate = sourceBatchPlan.CalculatedEndDate;
+            targetBatchPlan.ScheduledStartDate = DateTime.Now;
+            //targetBatchPlan.ScheduledEndDate = sourceBatchPlan.ScheduledEndDate;
+            //targetBatchPlan.CalculatedStartDate = sourceBatchPlan.CalculatedStartDate;
+            //targetBatchPlan.CalculatedEndDate = sourceBatchPlan.CalculatedEndDate;
             targetBatchPlan.PartialTargetCount = sourceBatchPlan.PartialTargetCount;
             targetBatchPlan.PartialActualCount = sourceBatchPlan.PartialActualCount;
             targetBatchPlan.StartOffsetSecAVG = sourceBatchPlan.StartOffsetSecAVG;

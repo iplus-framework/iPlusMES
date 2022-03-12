@@ -3142,7 +3142,7 @@ namespace gip.bso.manufacturing
                     || batchPlan.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished;
             if (notValidBatchForChange)
                 return;
-
+            ClearMessages();
             try
             {
                 ClearMessages();
@@ -3161,7 +3161,15 @@ namespace gip.bso.manufacturing
             {
                 IsWizardExistingBatch = false;
                 IsWizard = false;
-                throw ex;
+                Exception tmp = ex;
+                string errorMessage ="";
+                while(tmp != null)
+                {
+                    errorMessage+=tmp.Message;
+                    tmp = tmp.InnerException;
+                }
+                Msg msg = new Msg(eMsgLevel.Error, errorMessage);
+                SendMessage(msg);
             }
 
             OnPropertyChanged("CurrentLayout");
