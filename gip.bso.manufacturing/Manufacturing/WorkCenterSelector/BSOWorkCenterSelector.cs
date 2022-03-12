@@ -1212,7 +1212,15 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
+                try
+                {
+                    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoLoad();
+                    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
+                }
+                catch (Exception e)
+                {
+                    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist), e);
+                }
                 var inputList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
                                                     .Where(c => c.SourceProdOrderPartslistPos != null
                                                             && c.TopParentPartslistPosRelation != null
