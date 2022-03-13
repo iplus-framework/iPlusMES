@@ -171,11 +171,11 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if ((ActualQuantityUOM + 0.001) >= TargetQuantityUOM && TargetQuantityUOM > 0.001)
+                if ((ActualQuantityUOM + 1) >= TargetQuantityUOM && TargetQuantityUOM > 1)
                     return PlanningStateEnum.TargetQuantityReached;
-                else if (UnPlannedQuantityUOM <= 0.001)
+                else if (UnPlannedQuantityUOM <= 1)
                     return PlanningStateEnum.Planned;
-                else if (UnPlannedQuantityUOM > 0.001 && PlannedQuantityUOM > 0.001)
+                else if (UnPlannedQuantityUOM > 1 && PlannedQuantityUOM > 1)
                     return PlanningStateEnum.PartiallyPlanned;
                 return PlanningStateEnum.UnPlanned;
             }
