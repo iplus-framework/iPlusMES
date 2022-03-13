@@ -20,6 +20,7 @@ using gip.core.autocomponent;
 using System.Data.Objects;
 using gip.mes.autocomponent;
 using System.Windows.Input;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.masterdata
 {
@@ -1470,12 +1471,66 @@ namespace gip.bso.masterdata
                 if (_AccessAssociatedPartslistPos == null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(this, Const.QueryPrefix + "AssociatedPartslistPos", "PartslistPos");
+                    if (navACQueryDefinition.TakeCount == 0)
+                        navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                    navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(AccessAssociatedPartslistPosDefaultSort);
+                    navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(AccessAssociatedPartslistPosDefaultFilter);
                     _AccessAssociatedPartslistPos = navACQueryDefinition.NewAccessNav<PartslistPos>("AssociatedPartslistPos", this);
+                    _AccessAssociatedPartslistPos.NavSearchExecuting += _AccessAssociatedPartslistPos_NavSearchExecuting;
                     _AccessAssociatedPartslistPos.AutoSaveOnNavigation = false;
-                    _AccessAssociatedPartslistPos.NavSearchExecuting += _AccessAssociatedPartslistPos_NavSearchExecuting; ;
-
                 }
                 return _AccessAssociatedPartslistPos;
+            }
+        }
+
+
+        public List<ACFilterItem> AccessAssociatedPartslistPosDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem isDeletedFilter = new ACFilterItem(Global.FilterTypes.filter, "Partslist\\DeleteDate", Global.LogicalOperators.isNull, Global.Operators.and, null, true);
+                aCFilterItems.Add(isDeletedFilter);
+
+                ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
+                aCFilterItems.Add(phOpen);
+
+                ACFilterItem partslistNoFilter = new ACFilterItem(FilterTypes.filter, "Partslist\\PartslistNo", LogicalOperators.contains, Operators.or, "", true, true);
+                aCFilterItems.Add(partslistNoFilter);
+
+                ACFilterItem filterPartslistName = new ACFilterItem(FilterTypes.filter, "Partslist\\PartslistName", LogicalOperators.contains, Operators.or, "", true, true);
+                aCFilterItems.Add(filterPartslistName);
+
+                ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
+                aCFilterItems.Add(phClose);
+
+                ACFilterItem filterIsEnabled = new ACFilterItem(FilterTypes.filter, FilterMaterialNoAssociatedPos_PartslistEnabled, LogicalOperators.contains, Operators.and, "True", true);
+                aCFilterItems.Add(filterIsEnabled);
+
+                ACFilterItem filterPartslistMaterial = new ACFilterItem(FilterTypes.filter, "Partslist\\Material\\MaterialNo", LogicalOperators.contains, Operators.and, "", true);
+                aCFilterItems.Add(filterPartslistMaterial);
+
+                ACFilterItem filterPosMaterial = new ACFilterItem(FilterTypes.filter, FilterMaterialNoAssociatedPos_PropertyName, LogicalOperators.contains, Operators.and, "", true);
+                aCFilterItems.Add(filterPosMaterial);
+
+                return aCFilterItems;
+            }
+        }
+
+        private List<ACSortItem> AccessAssociatedPartslistPosDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem partslistNo = new ACSortItem("Partslist\\PartslistNo", SortDirections.ascending, true);
+                acSortItems.Add(partslistNo);
+
+                ACSortItem version = new ACSortItem("Partslist\\PartslistVersion", SortDirections.ascending, true);
+                acSortItems.Add(version);
+
+                return acSortItems;
             }
         }
 
@@ -1493,6 +1548,10 @@ namespace gip.bso.masterdata
             }
             return result;
         }
+
+        #endregion
+
+        #region AssociatedPartslistPos -> SelectedAssociatedPartslistPos
 
         /// <summary>
         /// Gets or sets the selected AssociatedPartslistPos.
@@ -1535,17 +1594,12 @@ namespace gip.bso.masterdata
 
         #region AssociatedPartslistPos -> Filter fields
         private string FilterMaterialNoAssociatedPos_PropertyName = @"Material\MaterialNo";
+        private string FilterMaterialNoAssociatedPos_PartslistEnabled = "Partslist\\IsEnabled";
         private ACFilterItem FilterAssociatedPosMaterial
         {
             get
             {
-                ACFilterItem filterItem = AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == FilterMaterialNoAssociatedPos_PropertyName);
-                if (filterItem == null)
-                {
-                    filterItem = new ACFilterItem(Global.FilterTypes.filter, FilterMaterialNoAssociatedPos_PropertyName, Global.LogicalOperators.equal, Global.Operators.and, "", false);
-                    AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.Add(filterItem);
-                }
-                return filterItem;
+                return AccessAssociatedPartslistPos.NavACQueryDefinition.ACFilterColumns.FirstOrDefault(c => c.PropertyName == FilterMaterialNoAssociatedPos_PropertyName);
             }
         }
 
@@ -1595,8 +1649,6 @@ namespace gip.bso.masterdata
             }
         }
 
-        // FilterAssociatedPosIntermMatNo
-
         private string _FilterAssociatedPosIntermMatNo;
         /// <summary>
         /// Doc  FilterAssociatedPosIntermMatNo
@@ -1619,6 +1671,38 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Doc  FilterAssociatedPosIntermMatNo
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterIsEnabled", "en{'Enabled'}de{'Freigegeben'}")]
+        public bool? FilterIsPartslistEnabled
+        {
+            get
+            {
+                ACFilterItem isEnabledFilter =
+                    AccessAssociatedPartslistPos
+                    .NavACQueryDefinition
+                    .ACFilterColumns.FirstOrDefault(c => c.PropertyName == FilterMaterialNoAssociatedPos_PartslistEnabled);
+                bool filerIsPartslistEnabled = false;
+                if (string.IsNullOrEmpty(isEnabledFilter.SearchWord))
+                    return null;
+                if (!bool.TryParse(isEnabledFilter.SearchWord, out filerIsPartslistEnabled))
+                    return null;
+                return filerIsPartslistEnabled;
+            }
+            set
+            {
+                ACFilterItem isEnabledFilter =
+                    AccessAssociatedPartslistPos
+                    .NavACQueryDefinition
+                    .ACFilterColumns.FirstOrDefault(c => c.PropertyName == FilterMaterialNoAssociatedPos_PartslistEnabled);
+                if (value != null)
+                    isEnabledFilter.SearchWord = value.ToString();
+                else
+                    isEnabledFilter.SearchWord = null;
+            }
+        }
 
         #endregion
 
@@ -1693,7 +1777,6 @@ namespace gip.bso.masterdata
         }
 
         #endregion
-
 
         #region AssociatedPartslistPos -> Material replacement
 
@@ -1789,6 +1872,7 @@ namespace gip.bso.masterdata
 
 
         #endregion
+
         #endregion
 
         #region Workflow

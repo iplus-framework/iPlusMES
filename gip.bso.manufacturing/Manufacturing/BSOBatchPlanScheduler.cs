@@ -560,9 +560,12 @@ namespace gip.bso.manufacturing
 
         private void SchedulesForPWNodesProp_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            string selectedLine = GetSelectedLine();
-            LoadScheduleListForPWNodes(selectedLine);
-        }
+            if(RefreshBatchListByRecieveChange)
+            {
+                string selectedLine = GetSelectedLine();
+                LoadScheduleListForPWNodes(selectedLine);
+            }
+         }
 
         #endregion
 
@@ -698,6 +701,8 @@ namespace gip.bso.manufacturing
                 return ParentACComponent != null && ParentACComponent is BSOTemplateSchedule;
             }
         }
+
+        public bool RefreshBatchListByRecieveChange = true;
         #endregion
 
         #region Properties -> Explorer

@@ -37,7 +37,7 @@ namespace gip.bso.manufacturing
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
                 throw new Exception("ProdOrderManager not configured");
-
+            BSOBatchPlanScheduler_Child.Value.RefreshBatchListByRecieveChange = false;
             Search();
             return true;
         }
@@ -448,7 +448,7 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-      
+
         #endregion
 
         #region BackgroundWorker
