@@ -1203,7 +1203,6 @@ namespace gip2006.variobatch.processapplication
                 case ACStateEnum.SMRunning:
                     if (!_RequestValue.Bit08_Start)
                     {
-                        _RequestValue.Bit08_Start = true;
                         IPAFSwitchable switchFunc = ParentACComponent as IPAFSwitchable;
                         if (switchFunc != null && switchFunc.CurrentACMethod != null && switchFunc.CurrentACMethod.ValueT != null)
                         {
@@ -1211,6 +1210,7 @@ namespace gip2006.variobatch.processapplication
                             if (acValue != null && acValue.ParamAsBoolean)
                                 _RequestValue.Bit12_Stop = true;
                         }
+                        _RequestValue.Bit08_Start = true;
                         changed = true;
                     }
                     break;
