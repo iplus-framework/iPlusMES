@@ -743,6 +743,25 @@ namespace gip.bso.manufacturing
             set;
         }
 
+        private int _SingleDosNumberOfRepetitions;
+        [ACPropertyInfo(851, "", "en{'Number of repetitions'}de{'Anzahl der Wiederholungen'}")]
+        public int SingleDosNumberOfRepetitions
+        {
+            get => _SingleDosNumberOfRepetitions;
+            set
+            {
+                _SingleDosNumberOfRepetitions = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [ACPropertyInfo(true, 9999)]
+        public int MaxSingleDosNumOfRepetitions
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #endregion
@@ -1961,7 +1980,7 @@ namespace gip.bso.manufacturing
                 {
                     case WeighingComponentInfoType.State:
                         {
-                            WeighingMaterial comp = WeighingMaterialList.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
                             if (comp != null)
                             {
                                 comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
@@ -1973,7 +1992,7 @@ namespace gip.bso.manufacturing
                         }
                     case WeighingComponentInfoType.StateSelectCompAndFC_F:
                         {
-                            WeighingMaterial comp = WeighingMaterialList.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
                             if (comp == null)
                                 return;
 
@@ -1997,7 +2016,7 @@ namespace gip.bso.manufacturing
                         }
                     case WeighingComponentInfoType.SelectCompReturnFC_F:
                         {
-                            WeighingMaterial comp = WeighingMaterialList.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
                             DelegateToMainThread((object state) =>
                             {
                                 if (SelectedWeighingMaterial != comp)
@@ -2012,7 +2031,7 @@ namespace gip.bso.manufacturing
                     case WeighingComponentInfoType.StateSelectFC_F:
                     case WeighingComponentInfoType.SelectFC_F:
                         {
-                            WeighingMaterial comp = WeighingMaterialList.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
+                            WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
 
                             DelegateToMainThread((object state) =>
                             {
@@ -2057,6 +2076,28 @@ namespace gip.bso.manufacturing
                                     }
                                 }
                             });
+                            break;
+                        }
+                    case WeighingComponentInfoType.RefreshCompTargetQ:
+                        {
+                            var refreshItems = WeighingMaterialList?.Where(c => c.WeighingMatState <= WeighingComponentState.InWeighing 
+                                                                            || c.WeighingMatState == WeighingComponentState.PartialCompleted).ToList();
+
+                            DelegateToMainThread((object state) =>
+                            {
+                                try
+                                {
+                                    foreach (WeighingMaterial refreshItem in refreshItems)
+                                    {
+                                        refreshItem.PosRelation.AutoRefresh();
+                                    }
+                                }
+                                catch
+                                {
+
+                                }
+                            });
+
                             break;
                         }
                 }
@@ -2129,18 +2170,18 @@ namespace gip.bso.manufacturing
                 if (result.HasValue)
                     return result.Value;
 
-                double act = Math.Round(actual, 3);
+                double act = Math.Round(actual, 5);
 
                 if (act > target)
                 {
-                    if (act <= Math.Round(target + tolPlus.Value, 3))
+                    if (act <= Math.Round(target + tolPlus.Value, 5))
                         return ScaleBackgroundState.InTolerance;
                     else
                         return ScaleBackgroundState.OutTolerance;
                 }
                 else
                 {
-                    if (act >= Math.Round(target - tolMinus.Value, 3))
+                    if (act >= Math.Round(target - tolMinus.Value, 5))
                         return ScaleBackgroundState.InTolerance;
                 }
             }
@@ -2506,9 +2547,45 @@ namespace gip.bso.manufacturing
 
             ACComponent processModule = CurrentProcessModule;
 
-            RunWorkflow(workflow, acClassMethod, processModule, false);
+            bool runOnce = true;
+
+            if (SingleDosNumberOfRepetitions > 1)
+            {
+                int maxRep = MaxSingleDosNumOfRepetitions;
+                if (maxRep <= 0)
+                    maxRep = 50;
+
+
+                if (SingleDosNumberOfRepetitions > maxRep)
+                {
+                    runOnce = true;
+                }
+                else
+                {
+                    //Question50083: The number of repetitions is set to {0}. Are you sure that you want dose {0} times?
+                    if (Messages.Question(this, "Question50083", Global.MsgResult.No, false, SingleDosNumberOfRepetitions) == Global.MsgResult.Yes)
+                    {
+                        for (int i=0; i<SingleDosNumberOfRepetitions; i++)
+                        {
+                            RunWorkflow(workflow, acClassMethod, processModule, false, true);
+                        }
+
+                        runOnce = false;
+                    }
+                    else
+                    {
+                        runOnce = true;
+                    }
+                }
+            }
+            
+            if (runOnce)
+            {
+                RunWorkflow(workflow, acClassMethod, processModule, false);
+            }
 
             SingleDosTargetQuantity = 0;
+            SingleDosNumberOfRepetitions = 0;
             SelectedSingleDosTargetStorage = null;
 
             CloseTopDialog();
