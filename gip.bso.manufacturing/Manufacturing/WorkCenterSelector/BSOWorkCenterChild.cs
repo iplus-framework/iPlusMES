@@ -163,7 +163,8 @@ namespace gip.bso.manufacturing
 
         #region Methods => Start workflow picking
 
-        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true)
+        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
+                                bool skipProcessModuleValidation = false)
         {
             bool wfRunsBatches = false;
             ACComponent appManager = null;
@@ -172,25 +173,28 @@ namespace gip.bso.manufacturing
             if (processModule == null)
                 return false;
 
-            string orderInfo = processModule.ACUrlCommand("OrderInfo") as string;
+            if (!skipProcessModuleValidation)
+            {
+                string orderInfo = processModule.ACUrlCommand("OrderInfo") as string;
 
-            if (!string.IsNullOrEmpty(orderInfo))
-            {
-                //Question50075: The process module is occupied with order {0}. Are you sure that you want continue?
-                if (Messages.Question(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
+                if (!string.IsNullOrEmpty(orderInfo))
                 {
-                    return false;
+                    //Question50075: The process module is occupied with order {0}. Are you sure that you want continue?
+                    if (Messages.Question(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
+                    {
+                        return false;
+                    }
                 }
-            }
-            
-            string orderReservationInfo = processModule.ACUrlCommand("OrderReservationInfo") as string;
-            if (!string.IsNullOrEmpty(orderReservationInfo))
-            {
-                //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
-                if (Messages.Question(this, "Question50076", 
-                    Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
+
+                string orderReservationInfo = processModule.ACUrlCommand("OrderReservationInfo") as string;
+                if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
-                    return false;
+                    //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
+                    if (Messages.Question(this, "Question50076",
+                        Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
+                    {
+                        return false;
+                    }
                 }
             }
 

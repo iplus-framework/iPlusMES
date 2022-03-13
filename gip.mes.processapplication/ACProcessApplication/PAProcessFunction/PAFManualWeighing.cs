@@ -943,11 +943,11 @@ namespace gip.mes.processapplication
                 }
             }
 
-            double actWeight = Math.Round(checkQuantity, 3);
+            double actWeight = Math.Round(checkQuantity, 5);
 
-            if (actWeight >= Math.Round(targetQuantity - tolMinus.Value, 3))
+            if (actWeight >= Math.Round(targetQuantity - tolMinus.Value, 5))
             {
-                if (actWeight <= Math.Round(targetQuantity + tolPlus.Value, 3))
+                if (actWeight <= Math.Round(targetQuantity + tolPlus.Value, 5))
                     result = true;
             }
             return result;

@@ -68,6 +68,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("IncludeContainerStores", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("IncludeContainerStores", "en{'IncludeContainerStores'}de{'IncludeContainerStores'}");
 
+            method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWManualWeighing), HandleExecuteACMethod_PWManualWeighing);
@@ -458,6 +461,21 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("IncludeContainerStores");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
+        public bool ScaleOtherComp
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ScaleOtherComp");
                     if (acValue != null)
                         return acValue.ParamAsBoolean;
                 }
@@ -2407,11 +2425,25 @@ namespace gip.mes.processapplication
                                     double? targetQuantity = (double)e.ParentACMethod["TargetQuantity"];
 
                                     bool isWeighingInTol = true;
-                                    if (targetQuantity.HasValue && toleranceMinus.HasValue && actWeight.HasValue && (actWeight < (targetQuantity - toleranceMinus)))
-                                        isWeighingInTol = false;
+
+
+                                    if (targetQuantity.HasValue && actWeight.HasValue && toleranceMinus.HasValue)
+                                    {
+                                        double actWeightRounded = Math.Round(actWeight.Value, 5);
+                                        if (actWeightRounded < Math.Round(targetQuantity.Value - toleranceMinus.Value, 5))
+                                        {
+                                            isWeighingInTol = false;
+                                        }
+                                    }
+
+                                    //if (targetQuantity.HasValue && toleranceMinus.HasValue && actWeight.HasValue && (actWeight < (targetQuantity - toleranceMinus)))
+                                    //    isWeighingInTol = false;
 
                                     if (actWeight > 0.000001)
-                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge);
+                                    {
+                                        bool scaleOtherComp = ScaleOtherComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
+                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge, false, scaleOtherComp);
+                                    }
 
                                     if (isComponentConsumed)
                                     {
@@ -2556,7 +2588,8 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, bool isForInterdischarge = false)
+        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, 
+                                           bool isForInterdischarge = false, bool scaleOtherCompAfterAbort = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -2730,6 +2763,35 @@ namespace gip.mes.processapplication
                                             weighingPosRelation.RecalcActualQuantityFast();
                                             if (dbApp.IsChanged)
                                                 dbApp.ACSaveChanges();
+
+                                            if (scaleOtherCompAfterAbort)
+                                            {
+                                                var queryOpenDosings = weighingPosRelation.ProdOrderBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
+                                                    .Where(c => c.RemainingDosingWeight < -0.00001 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                                    && c.MDProdOrderPartslistPosState != null
+                                                    && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
+                                                        || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted));
+
+                                                if (weighingPosRelation.ActualQuantityUOM > 0.1 && queryOpenDosings.Any())
+                                                {
+                                                    double scaleFactor = weighingPosRelation.ActualQuantityUOM / weighingPosRelation.TargetQuantityUOM;
+                                                    foreach (var plPos in queryOpenDosings)
+                                                    {
+                                                        if (plPos != weighingPosRelation)
+                                                        {
+                                                            plPos.TargetQuantityUOM = plPos.TargetQuantityUOM * scaleFactor;
+
+                                                            var wComp = GetWeighingComponent(plPos.ProdOrderPartslistPosRelationID);
+                                                            if (wComp != null)
+                                                                wComp.TargetWeight = Math.Abs(plPos.RemainingDosingWeight);
+
+                                                        }
+                                                    }
+                                                    SetInfo(null, WeighingComponentInfoType.RefreshCompTargetQ, null, null);
+                                                }
+
+                                                msg = dbApp.ACSaveChanges();
+                                            }
                                         }
                                     }
                                     else
@@ -3410,7 +3472,8 @@ namespace gip.mes.processapplication
         SelectFC_F = 15, 
         StateSelectFC_F = 20, //Manual component select - automatic facility charge or facility select
         StateSelectCompAndFC_F = 30, //Automatic component select - automatic facility charge or facility select
-        SelectCompReturnFC_F = 40 //Automatic component select - manual facility charge or facility select
+        SelectCompReturnFC_F = 40, //Automatic component select - manual facility charge or facility select
+        RefreshCompTargetQ = 50
     }
 
     [ACSerializeableInfo]

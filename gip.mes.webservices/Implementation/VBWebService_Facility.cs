@@ -1934,6 +1934,7 @@ namespace gip.mes.webservices
         #endregion
 
         #region Inventory -> Pos -> Lifecycle
+
         public WSResponse<bool> UpdateFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos)
         {
             WSResponse<bool> response = new WSResponse<bool>();
@@ -1945,11 +1946,26 @@ namespace gip.mes.webservices
                     if (subResponse != null)
                         return subResponse;
 
-                    mes.datamodel.FacilityInventoryPos dbFacilityInventoryPos =
-                        databaseApp
-                        .FacilityInventoryPos
-                        .Where(c => c.FacilityInventoryPosID == facilityInventoryPos.FacilityInventoryPosID)
-                        .FirstOrDefault();
+
+
+                    mes.datamodel.FacilityInventoryPos dbFacilityInventoryPos = null;
+
+                    if (facilityInventoryPos.FacilityInventoryPosID != Guid.Empty)
+                    {
+                        dbFacilityInventoryPos = databaseApp.FacilityInventoryPos
+                                                            .Where(c => c.FacilityInventoryPosID == facilityInventoryPos.FacilityInventoryPosID)
+                                                            .FirstOrDefault();
+                    }
+                    else if (!facilityInventoryPos.NotAvailable)
+                    {
+                        datamodel.FacilityInventory inv = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryNo == facilityInventoryPos.FacilityInventoryNo);
+                        if (inv != null)
+                        {
+                            dbFacilityInventoryPos = datamodel.FacilityInventoryPos.NewACObject(databaseApp, inv);
+                            dbFacilityInventoryPos.FacilityChargeID = facilityInventoryPos.FacilityChargeID;
+                        }
+                    }
+
 
                     if (dbFacilityInventoryPos == null)
                     {
