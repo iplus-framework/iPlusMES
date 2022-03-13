@@ -560,12 +560,12 @@ namespace gip.bso.manufacturing
 
         private void SchedulesForPWNodesProp_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(RefreshBatchListByRecieveChange)
+            if (RefreshBatchListByRecieveChange)
             {
                 string selectedLine = GetSelectedLine();
                 LoadScheduleListForPWNodes(selectedLine);
             }
-         }
+        }
 
         #endregion
 
@@ -2477,6 +2477,21 @@ namespace gip.bso.manufacturing
         }
 
         public bool IsEnabledDeleteBatch()
+        {
+            return SelectedProdOrderBatchPlan != null
+                && SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.Created
+                && SelectedProdOrderBatchPlan.BatchActualCount <= 0;
+        }
+
+        [ACMethodInfo("BatchPlanEdit", "en{'Edit'}de{'Bearbeiten'}", 503)]
+        public void BatchPlanEdit()
+        {
+            if (!IsEnabledBatchPlanEdit())
+                return;
+            ChangeBatchPlan(SelectedProdOrderBatchPlan);
+        }
+
+        public bool IsEnabledBatchPlanEdit()
         {
             return SelectedProdOrderBatchPlan != null
                 && SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.Created
