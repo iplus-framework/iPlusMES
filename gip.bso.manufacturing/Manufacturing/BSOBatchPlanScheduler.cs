@@ -762,7 +762,7 @@ namespace gip.bso.manufacturing
                 if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
                 {
                     if (!_SchedulingGroupValidated && _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).Any())
-                        Messages.Error(this,"A Scheduling-Group was removed. Invoke Reset on Scheduler");
+                        Messages.Error(this, "A Scheduling-Group was removed. Invoke Reset on Scheduler");
                     _SchedulingGroupValidated = true;
 
                     return _ScheduleForPWNodeList
@@ -2697,7 +2697,7 @@ namespace gip.bso.manufacturing
                     prodOrders.Add(mOrderInfo);
                 }
 
-                if (   batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
+                if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
                     || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
                 {
                     batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
@@ -3003,7 +3003,7 @@ namespace gip.bso.manufacturing
                 }
                 else if (!IsBSOTemplateScheduleParent || poInfo.DeactivateAll)
                 {
-                    if (   (    poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any()
+                    if ((poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any()
                             && !poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any(c => c.PlanStateIndex < (short)GlobalApp.BatchPlanState.Completed))
                         || poInfo.DeactivateAll)
                     {
@@ -3162,10 +3162,10 @@ namespace gip.bso.manufacturing
                 IsWizardExistingBatch = false;
                 IsWizard = false;
                 Exception tmp = ex;
-                string errorMessage ="";
-                while(tmp != null)
+                string errorMessage = "";
+                while (tmp != null)
                 {
-                    errorMessage+=tmp.Message;
+                    errorMessage += tmp.Message;
                     tmp = tmp.InnerException;
                 }
                 Msg msg = new Msg(eMsgLevel.Error, errorMessage);
@@ -3267,6 +3267,7 @@ namespace gip.bso.manufacturing
                 {
                     case NewScheduledBatchWizardPhaseEnum.SelectMaterial:
                         BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.FilterMDSchedulingGroupID = SelectedScheduleForPWNode.MDSchedulingGroupID;
+                        BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.FilterIsConnectedWithEnabledPartslist = true;
                         BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.Search();
                         success = true;
                         break;
@@ -3519,7 +3520,7 @@ namespace gip.bso.manufacturing
                 if (finalMix != null && finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
                 {
                     ProdOrderBatchPlan bp = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
-                    MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c=>c.MDBatchPlanGroup).Where(c=>c != null).FirstOrDefault();
+                    MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
                     vd.ACClassWF vbACClassWf = bp.VBiACClassWF;
                     vd.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
                     if (mDSchedulingGroup != null)

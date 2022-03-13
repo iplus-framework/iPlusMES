@@ -138,6 +138,14 @@ namespace gip.bso.masterdata
                         c.Partslist_Material.Any(x => x.IsEnabled)
                         && linieMaterials.Contains(c.MaterialID)) as ObjectQuery<Material>;
             }
+
+            if (FilterIsConnectedWithEnabledPartslist != null)
+            {
+                query = 
+                    query
+                    .Where(c => c.Partslist_Material.Any(x => x.IsEnabled == (FilterIsConnectedWithEnabledPartslist ?? false))) as ObjectQuery<Material>;
+            }
+
             return query;
         }
 
@@ -197,9 +205,9 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) 
-                    return; 
-                if(AccessPrimary.Current != value)
+                if (AccessPrimary == null)
+                    return;
+                if (AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
                     //ChangedSelectedMaterial(value);
@@ -249,8 +257,8 @@ namespace gip.bso.masterdata
             }
             set
             {
-                if (AccessPrimary == null) return; 
-                if(AccessPrimary.Selected != value)
+                if (AccessPrimary == null) return;
+                if (AccessPrimary.Selected != value)
                 {
                     AccessPrimary.Selected = value;
                     //ChangedSelectedMaterial(value);
@@ -271,6 +279,8 @@ namespace gip.bso.masterdata
         #region Properties
 
         public Guid? FilterMDSchedulingGroupID { get; set; }
+
+        public bool? FilterIsConnectedWithEnabledPartslist { get; set; }
 
         [ACPropertyInfo(5, "", "en{'Filter'}de{'Filter'}")]
         public string SearchWord
