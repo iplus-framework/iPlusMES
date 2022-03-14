@@ -68,5 +68,22 @@ namespace gip.mes.webservices
         {
             get => (ActualQuantity / TargetQuantity) * 100;
         }
+
+        public bool IsRetrograde
+        {
+            get 
+            {
+                if (RetrogradeFIFO.HasValue)
+                    return RetrogradeFIFO.Value;
+
+                if (SourcePos != null && SourcePos.RetrogradeFIFO.HasValue)
+                    return SourcePos.RetrogradeFIFO.Value;
+
+                if (SourcePos != null && SourcePos.Material != null && SourcePos.Material.RetrogradeFIFO.HasValue)
+                    return SourcePos.Material.RetrogradeFIFO.Value;
+
+                return false;
+            }
+        }
     }
 }

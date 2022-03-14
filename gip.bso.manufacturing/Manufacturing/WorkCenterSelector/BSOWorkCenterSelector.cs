@@ -471,6 +471,12 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public Picking CurrentPicking
+        {
+            get;
+            set;
+        }
+
         private ProdOrderPartslistPos _EndBatchPos;
         [ACPropertyInfo(604)]
         public ProdOrderPartslistPos EndBatchPos
