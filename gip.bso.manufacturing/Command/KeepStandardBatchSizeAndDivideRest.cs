@@ -44,7 +44,7 @@ namespace gip.bso.manufacturing
                 calcBatchSize = standardBatchSize;
                 calcBatchCount = (int)(totalSize / standardBatchSize);
                 Rest = totalSize - (calcBatchCount * calcBatchSize);
-                if (Math.Abs(minBatchSize) > Double.Epsilon && Rest < minBatchSize)
+                if (Math.Abs(minBatchSize) > Double.Epsilon && Math.Abs(Rest) > Double.Epsilon &&  Rest < minBatchSize)
                 {
                     calcBatchCount--;
                     Rest = totalSize - (calcBatchCount * calcBatchSize);
