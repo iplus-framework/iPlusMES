@@ -487,12 +487,12 @@ namespace gip.mes.processapplication
                         if (_LastPriorityTime.HasValue)
                             return _LastPriorityTime.Value;
                     }
-                    if (this.TimeInfo.ValueT != null && this.TimeInfo.ValueT.ActualTimes.StartTime > DateTime.MinValue)
-                        return this.TimeInfo.ValueT.ActualTimes.StartTime;
-                    else if (this.RootPW != null
+                    if (this.RootPW != null
                               && this.RootPW.TimeInfo.ValueT != null
                               && this.RootPW.TimeInfo.ValueT.ActualTimes != null)
                         return this.RootPW.TimeInfo.ValueT.ActualTimes.StartTime;
+                    else if (this.TimeInfo.ValueT != null && this.TimeInfo.ValueT.ActualTimes.StartTime > DateTime.MinValue)
+                        return this.TimeInfo.ValueT.ActualTimes.StartTime;
                     else
                         return ACProgramVB.InsertDate;
                 }
@@ -714,7 +714,7 @@ namespace gip.mes.processapplication
                     if (IsProduction)
                     {
                         gip.mes.datamodel.MaterialWFConnection materialWFConnection = null;
-                        gip.mes.datamodel.ProdOrderPartslist currentProdOrderPartslist  = null;
+                        gip.mes.datamodel.ProdOrderPartslist currentProdOrderPartslist = null;
                         currentProdOrderPartslist = acProgramVB.ACProgramLog_ACProgram
                                                         .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPosID.HasValue)
                                                         .Select(f => f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist)
@@ -763,6 +763,17 @@ namespace gip.mes.processapplication
                             }
                         }
                     }
+                    //else if (IsTransport)
+                    //{
+                    //    if (CurrentPicking != null)
+                    //    {
+                    //        using (ACMonitor.Lock(_20015_LockValue))
+                    //        {
+                    //            _BatchPlanningTimes = new List<BatchPlanningTime>();
+                    //            _BatchPlanningTimes.Add(new BatchPlanningTime());
+                    //        }
+                    //    }
+                    //}
                     dbApp.Detach(acProgramVB);
                 }
             }
@@ -816,6 +827,15 @@ namespace gip.mes.processapplication
 
 
             return true;
+        }
+
+        protected bool WillReadAndStartNextBatchCompleteNode()
+        {
+            if (IsTransport)
+                return WillReadAndStartNextBatchCompleteNode_Picking();
+            else if (IsProduction)
+                return WillReadAndStartNextBatchCompleteNode_Prod();
+            return false;
         }
 
         protected virtual bool CheckIfBatchIsStartedInSubWf(Guid prodOrderBatchID)
@@ -1022,6 +1042,8 @@ namespace gip.mes.processapplication
                     int countParallelNodes;
                     if (CompleteParallelNodes(out countParallelNodes))
                     {
+                        if (!this.IsProduction && IsInPlanningWait)
+                            return;
                         CurrentACSubState = ACSubStateEnum.SMIdle;
                         // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
                         if (CurrentACState == ACStateEnum.SMStarting)
@@ -1162,7 +1184,9 @@ namespace gip.mes.processapplication
             var idleNodes = parallelNodes.Where(c => c.CurrentACState == ACStateEnum.SMIdle && c.IterationCount.ValueT <= 0);
             if (idleNodes != null)
                 stats.UnstartedParallelNodes = idleNodes.Count();
-            var withBatchPlanningTimes = parallelNodes.Where(c => c.BatchPlanningTimes != null && c.BatchPlanningTimes.Any() && c.CurrentACState != ACStateEnum.SMIdle);
+            var withBatchPlanningTimes = parallelNodes.Where(c =>   (    (c.IsProduction && c.BatchPlanningTimes != null && c.BatchPlanningTimes.Any())
+                                                                      || (!c.IsProduction && c.IsInPlanningWait))
+                                                                  && c.CurrentACState != ACStateEnum.SMIdle);
             if (withBatchPlanningTimes != null)
                 stats.NodesWithBatchPlanningTimes = withBatchPlanningTimes.Count();
             return stats;
@@ -1180,7 +1204,8 @@ namespace gip.mes.processapplication
             countParallelNodes = parallelNodes.Count;
 
             var completedNodes = parallelNodes.Where(c =>      (     c.CurrentACState == ACStateEnum.SMStarting 
-                                                                 && (c.BatchPlanningTimes == null || !c.BatchPlanningTimes.Any()))
+                                                                 && (   (c.IsProduction && (c.BatchPlanningTimes == null || !c.BatchPlanningTimes.Any()))
+                                                                     || (!c.IsProduction && !c.IsInPlanningWait)))
                                                             || (c.CurrentACState == ACStateEnum.SMStopping && !c.HasActiveSubworkflows) 
                                                             || c.CurrentACState == ACStateEnum.SMIdle);
 
@@ -1254,7 +1279,7 @@ namespace gip.mes.processapplication
 
             ResetPlanningWait();
 
-            if (!IgnoreFIFO)
+            if (!IgnoreFIFO && !WillReadAndStartNextBatchCompleteNode())
             {
                 gip.core.datamodel.ACClass refPAAClass = null;
 
@@ -1309,7 +1334,12 @@ namespace gip.mes.processapplication
                                    || (    this.MDSchedulingGroup == null 
                                         && this.MaterialWFConnection != null
                                         && c.MaterialWFConnection != null 
-                                        && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID))
+                                        && this.MaterialWFConnection.MaterialID == c.MaterialWFConnection.MaterialID)
+                                   || (    this.CurrentPicking != null 
+                                        && this.CurrentPicking.ACClassMethodID.HasValue
+                                        && c.CurrentPicking != null
+                                        && c.CurrentPicking.ACClassMethodID.HasValue
+                                        && c.CurrentPicking.ACClassMethodID == c.CurrentPicking.ACClassMethodID) )
                                 ).ToArray();
 
                 }
@@ -1478,7 +1508,7 @@ namespace gip.mes.processapplication
                 {
                     ParallelNodeStats stats = GetParallelNodeStats();
                     CurrentACSubState = ACSubStateEnum.SMIdle;
-                    if (!stats.AreOtherParallelNodesCompletable)
+                    if (!stats.AreOtherParallelNodesCompletable && IsProduction)
                     {
                         using (ACMonitor.Lock(_20015_LockValue))
                         {

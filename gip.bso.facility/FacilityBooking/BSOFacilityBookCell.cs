@@ -592,7 +592,7 @@ namespace gip.bso.facility
                 if (CurrentFacility == null)
                     return null;
                 CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
-                return CurrentFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).OrderBy(c => c.FacilityChargeSortNo).AsEnumerable();
+                return CurrentFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable).OrderBy(c => c.FacilityChargeSortNo).ToList();
             }
         }
 

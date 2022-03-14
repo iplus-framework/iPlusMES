@@ -166,7 +166,6 @@ namespace gip.mes.processapplication
             }
             else
             {
-
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     _BatchPlanningTimes = new List<BatchPlanningTime>();
@@ -627,6 +626,11 @@ namespace gip.mes.processapplication
             }
 
             //queryBatchPlans.Where();
+        }
+
+        protected bool WillReadAndStartNextBatchCompleteNode_Prod()
+        {
+            return false;
         }
 
         protected virtual void OnBatchplanCompleted(DatabaseApp dbApp, ProdOrderPartslistPos intermediatePosition, ProdOrderBatchPlan lastBatchPlanEntry)

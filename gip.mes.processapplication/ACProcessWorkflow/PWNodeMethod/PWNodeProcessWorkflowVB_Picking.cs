@@ -81,6 +81,9 @@ namespace gip.mes.processapplication
             if (!canBeStarted)
                 return StartNextBatchResult.WaitForNextEvent;
 
+            if (WillReadAndStartNextBatchCompleteNode_Picking())
+                return StartNextBatchResult.Done;
+
             string message = "";
             using (Database dbiPlus = new Database())
             using (DatabaseApp dbApp = new DatabaseApp())
@@ -151,16 +154,22 @@ namespace gip.mes.processapplication
                     return StartNextBatchResult.Done;
                 }
 
-                PWMethodSingleDosing singleDosing = ParentPWMethod<PWMethodSingleDosing>();
-                Guid? selectedSingleDosingACClassWFID = singleDosing?.SelectedSingleDosingACClassWFID;
-                if (singleDosing != null && selectedSingleDosingACClassWFID.HasValue && ContentACClassWF != null)
-                {
-                    if (ContentACClassWF.ACClassWFID != selectedSingleDosingACClassWFID.Value)
-                        return StartNextBatchResult.Done;
-                }
-
+                if (WillReadAndStartNextBatchCompleteNode_Picking())
+                    return StartNextBatchResult.Done;
             }
             return StartNextBatchResult.StartNextBatch;
+        }
+
+        protected bool WillReadAndStartNextBatchCompleteNode_Picking()
+        {
+            PWMethodSingleDosing singleDosing = ParentPWMethod<PWMethodSingleDosing>();
+            Guid? selectedSingleDosingACClassWFID = singleDosing?.SelectedSingleDosingACClassWFID;
+            if (singleDosing != null && selectedSingleDosingACClassWFID.HasValue && ContentACClassWF != null)
+            {
+                if (ContentACClassWF.ACClassWFID != selectedSingleDosingACClassWFID.Value)
+                    return true;
+            }
+            return false;
         }
 
         #endregion
