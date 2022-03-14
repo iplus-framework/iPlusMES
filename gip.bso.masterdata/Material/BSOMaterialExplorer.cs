@@ -139,9 +139,18 @@ namespace gip.bso.masterdata
                         && linieMaterials.Contains(c.MaterialID)) as ObjectQuery<Material>;
             }
 
+            if (FilterIsNotDeleted != null)
+            {
+                query = query
+                    .Where(c => 
+                                c.Partslist_Material
+                                .Any(x => (x.DeleteDate == null) == (FilterIsNotDeleted ?? false))
+                           ) as ObjectQuery<Material>;
+            }
+
             if (FilterIsConnectedWithEnabledPartslist != null)
             {
-                query = 
+                query =
                     query
                     .Where(c => c.Partslist_Material.Any(x => x.IsEnabled == (FilterIsConnectedWithEnabledPartslist ?? false))) as ObjectQuery<Material>;
             }
@@ -281,6 +290,7 @@ namespace gip.bso.masterdata
         public Guid? FilterMDSchedulingGroupID { get; set; }
 
         public bool? FilterIsConnectedWithEnabledPartslist { get; set; }
+        public bool? FilterIsNotDeleted { get; set; }
 
         [ACPropertyInfo(5, "", "en{'Filter'}de{'Filter'}")]
         public string SearchWord

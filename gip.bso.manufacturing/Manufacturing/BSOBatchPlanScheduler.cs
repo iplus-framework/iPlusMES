@@ -1336,43 +1336,45 @@ namespace gip.bso.manufacturing
 
         protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
         CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) => ctx.ProdOrderPartslist
-                                                        .Include("MDProdOrderState")
-                                                        .Include("ProdOrder")
-                                                        .Include("Partslist")
-                                                        .Include("Partslist.Material")
-                                                        .Include("Partslist.Material.BaseMDUnit")
-                                                        .Include("Partslist.Material.MaterialUnit_Material")
-                                                        .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
-                                                        .Where(c =>
-                                                             (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
-                                                             && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
-                                                             && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
-                                                                 || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
-                                                                )
-                                                             && (
-                                                                    filterStartTime == null
-                                                                    ||
-                                                                    c.InsertDate >= filterStartTime
-                                                                )
-                                                             && (
-                                                                    filterEndTime == null
-                                                                    ||
-                                                                    c.InsertDate < filterEndTime
-                                                                )
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) => 
+                ctx
+                .ProdOrderPartslist
+                .Include("MDProdOrderState")
+                .Include("ProdOrder")
+                .Include("Partslist")
+                .Include("Partslist.Material")
+                .Include("Partslist.Material.BaseMDUnit")
+                .Include("Partslist.Material.MaterialUnit_Material")
+                .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
+                .Where(c =>
+                        (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
+                        && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
+                        && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
+                            || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                        )
+                        && (
+                            filterStartTime == null
+                            ||
+                            c.InsertDate >= filterStartTime
+                        )
+                        && (
+                            filterEndTime == null
+                            ||
+                            c.InsertDate < filterEndTime
+                        )
 
-                                                             && c
-                                                                 .Partslist
-                                                                 .PartslistACClassMethod_Partslist
-                                                                .Where(d => d
-                                                                            .MaterialWFACClassMethod
-                                                                            .ACClassMethod.ACClassWF_ACClassMethod
-                                                                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
-                                                                            .Where(x => x.MDSchedulingGroupID == mdSchedulingGroupID)
-                                                                            .Any()
-                                                             ).Any())
-                                                        .OrderByDescending(c => c.ProdOrder.ProgramNo)
-                                                        .Select(c => new ProdOrderPartslistPlanWrapper()
+                        && c
+                            .Partslist
+                            .PartslistACClassMethod_Partslist
+                        .Where(d => d
+                                    .MaterialWFACClassMethod
+                                    .ACClassMethod.ACClassWF_ACClassMethod
+                                    .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                                    .Where(x => x.MDSchedulingGroupID == mdSchedulingGroupID)
+                                    .Any()
+                        ).Any())
+                .OrderByDescending(c => c.ProdOrder.ProgramNo)
+                .Select(c => new ProdOrderPartslistPlanWrapper()
                                                         {
                                                             ProdOrderPartslist = c,
                                                             PlannedQuantityUOM = c.ProdOrderBatchPlan_ProdOrderPartslist.Any() ? c.ProdOrderBatchPlan_ProdOrderPartslist.Sum(d => d.TotalSize) : 0.0
@@ -1943,6 +1945,58 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged("SelectedBatchPlanTimelineItem");
             }
         }
+
+        #endregion
+
+        #region Properties -> MDBatchPlanGroup
+
+
+        #region MDBatchPlanGroup
+        private MDBatchPlanGroup _SelectedMDBatchPlanGroup;
+        /// <summary>
+        /// Selected property for MDBatchPlanGroup
+        /// </summary>
+        /// <value>The selected MDBatchPlanGroup</value>
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: MDBatchPlanGroup'}de{'TODO: MDBatchPlanGroup'}")]
+        public MDBatchPlanGroup SelectedMDBatchPlanGroup
+        {
+            get
+            {
+                return _SelectedMDBatchPlanGroup;
+            }
+            set
+            {
+                if (_SelectedMDBatchPlanGroup != value)
+                {
+                    _SelectedMDBatchPlanGroup = value;
+                    OnPropertyChanged("SelectedMDBatchPlanGroup");
+                }
+            }
+        }
+
+
+        private List<MDBatchPlanGroup> _MDBatchPlanGroupList;
+        /// <summary>
+        /// List property for MDBatchPlanGroup
+        /// </summary>
+        /// <value>The MDBatchPlanGroup list</value>
+        [ACPropertyList(9999, "PropertyGroupName")]
+        public List<MDBatchPlanGroup> MDBatchPlanGroupList
+        {
+            get
+            {
+                if (_MDBatchPlanGroupList == null)
+                    _MDBatchPlanGroupList = LoadMDBatchPlanGroupList();
+                return _MDBatchPlanGroupList;
+            }
+        }
+
+        private List<MDBatchPlanGroup> LoadMDBatchPlanGroupList()
+        {
+            return DatabaseApp.MDBatchPlanGroup.OrderBy(c=>c.SortIndex).ToList();
+        }
+        #endregion
+
 
         #endregion
 
@@ -2843,6 +2897,29 @@ namespace gip.bso.manufacturing
             return true;
         }
 
+
+        [ACMethodInteraction("NavigateToProdOrder2", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedProdOrderPartslist")]
+        public void NavigateToProdOrder2()
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrderPartslistID,
+                    EntityName = ProdOrderPartslist.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToProdOrder2()
+        {
+            return SelectedProdOrderPartslist != null && SelectedProdOrderPartslist.ProdOrderPartslist != null;
+        }
+
         #endregion
 
         #region Methods -> (Tab)ProdOrder -> Manipulate Batch Plan
@@ -3287,6 +3364,7 @@ namespace gip.bso.manufacturing
                 {
                     case NewScheduledBatchWizardPhaseEnum.SelectMaterial:
                         BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.FilterMDSchedulingGroupID = SelectedScheduleForPWNode.MDSchedulingGroupID;
+                        BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.FilterIsNotDeleted = true;
                         BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.FilterIsConnectedWithEnabledPartslist = true;
                         BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.Search();
                         success = true;
