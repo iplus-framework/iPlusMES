@@ -2747,7 +2747,12 @@ namespace gip.bso.manufacturing
             List<Guid> groupsForRefresh = new List<Guid>();
 
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-            List<ProdOrderBatchPlan> notSelected = ProdOrderBatchPlanList.Where(c => !c.IsSelected).OrderBy(c => c.Sequence).ToList();
+            List<ProdOrderBatchPlan> notSelected = 
+                ProdOrderBatchPlanList
+                .Where(c => !c.IsSelected)
+                .OrderBy(c => c.ScheduledOrder ?? 0)
+                .ThenBy(c => c.InsertDate)
+                .ToList();
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
                 batchPlan.AutoRefresh();
             bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
