@@ -1133,6 +1133,7 @@ namespace gip.bso.masterdata
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
             SelectedIntermediateParts = partslistPosRelation;
             OnPropertyChanged("IntermediatePartsList");
+            OnPropertyChanged("PartslistPosList");
             PostExecute("NewIntermediateParts");
         }
 
@@ -1160,6 +1161,7 @@ namespace gip.bso.masterdata
                 SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
                 OnPropertyChanged("IntermediatePartsList");
+                OnPropertyChanged("PartslistPosList");
             }
             PostExecute("DeleteIntermediateParts");
         }
