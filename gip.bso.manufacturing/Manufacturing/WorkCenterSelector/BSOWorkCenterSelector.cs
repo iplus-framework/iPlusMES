@@ -471,10 +471,15 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private Picking _CurrentPicking;
         public Picking CurrentPicking
         {
-            get;
-            set;
+            get => _CurrentPicking;
+            set
+            {
+                _CurrentPicking = value;
+                LoadPartslist();
+            }
         }
 
         private ProdOrderPartslistPos _EndBatchPos;
@@ -932,6 +937,7 @@ namespace gip.bso.manufacturing
             {
                 CurrentBatch = null;
                 EndBatchPos = null;
+                CurrentPicking = null;
 
                 using (ACMonitor.Lock(_70050_MembersLock))
                 {
@@ -957,6 +963,7 @@ namespace gip.bso.manufacturing
                 {
                     CurrentBatch = null;
                     EndBatchPos = null;
+                    CurrentPicking = null;
                     return;
                 }
 
@@ -1038,6 +1045,7 @@ namespace gip.bso.manufacturing
                             if (picking != null)
                             {
                                 ProdOrderProgramNo = picking.ACCaption;
+                                CurrentPicking = picking;
                             }
                         }
                     }
@@ -1211,12 +1219,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("","en{'Load Bill of material'}de{'Load Bill of material'}", 620, true)]
         public void LoadPartslist()
         {
-            if (_CurrentBatch == null)
-            {
-                InputComponentList = null;
-                return;
-            }
-            else
+            if (_CurrentBatch != null)
             {
                 try
                 {
@@ -1247,6 +1250,34 @@ namespace gip.bso.manufacturing
                 }
 
                 InputComponentList = inputComponentsList;
+            }
+            else if (_CurrentPicking != null)
+            {
+                try
+                {
+                    _CurrentPicking.PickingPos_Picking.AutoLoad();
+                    _CurrentPicking.PickingPos_Picking.AutoRefresh();
+                }
+                catch (Exception e)
+                {
+                    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist) + "10", e);
+                }
+
+                var inputList = _CurrentPicking.PickingPos_Picking.OrderBy(c => c.Sequence);
+
+                List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
+                foreach (var picking in inputList)
+                {
+                    InputComponentItem compItem = new InputComponentItem(picking);
+                    //OnInputComponentCreated(compItem, relation, DatabaseApp);
+                    inputComponentsList.Add(compItem);
+                }
+
+                InputComponentList = inputComponentsList;
+            }
+            else
+            {
+                InputComponentList = null;
             }
         }
 

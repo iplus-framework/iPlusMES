@@ -32,9 +32,18 @@ namespace gip.bso.manufacturing
                 MaterialName = pickingPos.Material.MaterialName1;
             }
 
-            TargetQuantityUOM = pickingPos.ActualQuantity;
+            TargetQuantityUOM = pickingPos.TargetQuantity;
             ActualQuantityUOM = pickingPos.ActualQuantity;
             DifferenceQuantityUOM = pickingPos.DiffQuantityUOM;
+
+            if (pickingPos.MDDelivPosLoadState != null && pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+            {
+                State = new MDProdOrderPartslistPosState() { MDProdOrderPartslistPosStateIndex = (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed };
+            }
+            else
+            {
+                State = new MDProdOrderPartslistPosState() { MDProdOrderPartslistPosStateIndex = (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created };
+            }
 
         }
 
