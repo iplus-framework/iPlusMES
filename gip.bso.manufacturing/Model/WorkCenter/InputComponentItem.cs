@@ -24,6 +24,29 @@ namespace gip.bso.manufacturing
             State = relation.MDProdOrderPartslistPosState;
         }
 
+        public InputComponentItem(PickingPos pickingPos)
+        {
+            if (pickingPos.Material != null)
+            {
+                MaterialNo = pickingPos.Material.MaterialNo;
+                MaterialName = pickingPos.Material.MaterialName1;
+            }
+
+            TargetQuantityUOM = pickingPos.TargetQuantity;
+            ActualQuantityUOM = pickingPos.ActualQuantity;
+            DifferenceQuantityUOM = pickingPos.DiffQuantityUOM;
+
+            if (pickingPos.MDDelivPosLoadState != null && pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
+            {
+                State = new MDProdOrderPartslistPosState() { MDProdOrderPartslistPosStateIndex = (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed };
+            }
+            else
+            {
+                State = new MDProdOrderPartslistPosState() { MDProdOrderPartslistPosStateIndex = (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created };
+            }
+
+        }
+
         [ACPropertyInfo(100, "", ConstApp.MaterialNo)]
         public string MaterialNo
         {

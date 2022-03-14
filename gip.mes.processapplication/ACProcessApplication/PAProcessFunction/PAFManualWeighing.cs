@@ -196,7 +196,7 @@ namespace gip.mes.processapplication
                 return true;
             if (scale.OccupyScale(this.GetACUrl(), true, true))
             {
-                ActiveScaleObject = null;
+                //ActiveScaleObject = null;
                 return true;
             }
             else

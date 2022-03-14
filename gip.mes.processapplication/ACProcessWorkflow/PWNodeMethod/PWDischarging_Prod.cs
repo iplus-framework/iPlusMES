@@ -382,7 +382,7 @@ namespace gip.mes.processapplication
                         PWGroupVB pwGroup = ParentPWGroup as PWGroupVB;
                         targetSiloACComp = null;
                         // Prüfe zuerst ob in Leerfahrmodus und prüfe ob es sich um ein Ziel handelt, das von hier aus direkt angesteuert werden kann oder ob es über die nachfolgenden PWGruppen geschleuet werden muss:
-                        if (pwGroup != null && pwGroup.IsInEmptyingMode)
+                        if (pwGroup != null && pwGroup.IsInEmptyingMode && !KeepPlannedDestOnEmptying)
                         {
                             var subResult = ResolveExtraDestOnEmptyingMode(ref targetSiloACComp, ref msg, true);
                             if (subResult == StartDisResult.CycleWait)
