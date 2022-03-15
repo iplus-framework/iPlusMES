@@ -1771,7 +1771,7 @@ namespace gip.mes.facility
 
         #region ProdOrder -> Clone ProdOrder
 
-        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
+        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, DateTime scheduledStartDate, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
             ProdOrder targetProdOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
@@ -1786,14 +1786,14 @@ namespace gip.mes.facility
 
             List<ProdOrderPartslist> originalPartslists = sourceProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
             foreach (ProdOrderPartslist originalPartslist in originalPartslists)
-                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, maxSchedulerOrders, connectionOldNewItems);
+                ClonePartslist(databaseApp, originalPartslist, targetProdOrder, maxSchedulerOrders, connectionOldNewItems, scheduledStartDate);
 
             return targetProdOrder;
         }
 
         public ProdOrderPartslist ClonePartslist(DatabaseApp databaseApp, ProdOrderPartslist sourcePartslist, ProdOrder targetProdOrder,
             List<SchedulingMaxBPOrder> maxSchedulerOrders,
-            Dictionary<Guid, Guid> connectionOldNewItems)
+            Dictionary<Guid, Guid> connectionOldNewItems, DateTime scheduledStartDate)
         {
             ProdOrderPartslist targetPartslist = ProdOrderPartslist.NewACObject(databaseApp, targetProdOrder);
             connectionOldNewItems.Add(sourcePartslist.ProdOrderPartslistID, targetPartslist.ProdOrderPartslistID);
@@ -1816,7 +1816,7 @@ namespace gip.mes.facility
 
             List<ProdOrderBatchPlan> sourcebatchPlans = sourcePartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
             foreach (ProdOrderBatchPlan sourceBatchPlan in sourcebatchPlans)
-                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, maxSchedulerOrders, connectionOldNewItems);
+                CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, maxSchedulerOrders, connectionOldNewItems, scheduledStartDate);
 
             List<ProdOrderBatch> sourceBatches = sourcePartslist.ProdOrderBatch_ProdOrderPartslist.ToList();
             foreach (ProdOrderBatch sourceBatch in sourceBatches)
@@ -1850,7 +1850,7 @@ namespace gip.mes.facility
 
         public ProdOrderBatchPlan CloneBatchPlan(DatabaseApp databaseApp, ProdOrderBatchPlan sourceBatchPlan, ProdOrderPartslist targetPartslist,
             List<SchedulingMaxBPOrder> maxSchedulerOrders,
-            Dictionary<Guid, Guid> connectionOldNewItems)
+            Dictionary<Guid, Guid> connectionOldNewItems, DateTime scheduledStartDate)
         {
             ProdOrderBatchPlan targetBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, targetPartslist);
             targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(targetBatchPlan);
@@ -1879,7 +1879,7 @@ namespace gip.mes.facility
                 .FirstOrDefault();
             //schedulingMaxOrder.MaxScheduledOrder++;
             targetBatchPlan.ScheduledOrder = schedulingMaxOrder.MaxScheduledOrder + sourceBatchPlan.ScheduledOrder;
-            targetBatchPlan.ScheduledStartDate = DateTime.Now;
+            targetBatchPlan.ScheduledStartDate = scheduledStartDate;
             //targetBatchPlan.ScheduledEndDate = sourceBatchPlan.ScheduledEndDate;
             //targetBatchPlan.CalculatedStartDate = sourceBatchPlan.CalculatedStartDate;
             //targetBatchPlan.CalculatedEndDate = sourceBatchPlan.CalculatedEndDate;

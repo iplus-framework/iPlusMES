@@ -342,6 +342,26 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        private string _MatNameWithFinalProductName;
+        [ACPropertyInfo(999, "MatNameWithFinalProductName", ConstApp.MaterialName1)]
+        public string MatNameWithFinalProductName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_MatNameWithFinalProductName))
+                    _MatNameWithFinalProductName = GetMatNameWithFinalProductName();
+                return _MatNameWithFinalProductName;
+            }
+            set
+            {
+                if (_MatNameWithFinalProductName != value)
+                {
+                    _MatNameWithFinalProductName = value;
+                    OnPropertyChanged("MatNameWithFinalProductName");
+                }
+            }
+        }
         #endregion
 
         #region Partial methods
@@ -718,6 +738,21 @@ namespace gip.mes.datamodel
             if (altMatUnit == null)
                 return null;
             return altMatUnit.FromBaseToUnit(value);
+        }
+
+        public string GetMatNameWithFinalProductName()
+        {
+            string name = "";
+            name = ProdOrderPartslist.Partslist.Material.MaterialName1.Trim();
+            ProdOrderPartslist pl = ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).FirstOrDefault();
+            if (pl.ProdOrderPartslistID != ProdOrderPartslist.ProdOrderPartslistID)
+            {
+                name += Environment.NewLine
+                    + "("
+                    + pl.Partslist.Material.MaterialName1.Trim()
+                    + ")";
+            }
+            return name;
         }
 
         #endregion
