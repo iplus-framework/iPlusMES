@@ -1041,6 +1041,8 @@ namespace gip.bso.manufacturing
                         entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == Picking.ClassName);
                         if (entry != null)
                         {
+                            CurrentBatch = null;
+
                             var picking = DatabaseApp.Picking.FirstOrDefault(c => c.PickingID == entry.EntityID);
                             if (picking != null)
                             {
