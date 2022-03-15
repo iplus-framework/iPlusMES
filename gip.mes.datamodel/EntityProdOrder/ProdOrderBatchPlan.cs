@@ -743,13 +743,13 @@ namespace gip.mes.datamodel
         public string GetMatNameWithFinalProductName()
         {
             string name = "";
-            name = ProdOrderPartslist.Partslist.Material.MaterialName1;
+            name = ProdOrderPartslist.Partslist.Material.MaterialName1.Trim();
             ProdOrderPartslist pl = ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).FirstOrDefault();
             if (pl.ProdOrderPartslistID != ProdOrderPartslist.ProdOrderPartslistID)
             {
                 name += Environment.NewLine
                     + "("
-                    + pl.Partslist.Material.MaterialName1
+                    + pl.Partslist.Material.MaterialName1.Trim()
                     + ")";
             }
             return name;
