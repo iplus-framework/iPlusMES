@@ -701,7 +701,11 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Flag is network batch list refresh is executed
+        /// </summary>
         public bool RefreshBatchListByRecieveChange = true;
+        
         #endregion
 
         #region Properties -> Explorer
