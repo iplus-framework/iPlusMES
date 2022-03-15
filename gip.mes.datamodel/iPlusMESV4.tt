@@ -327,6 +327,10 @@ if(entity.Properties.Where(p => p.DeclaringType == entity && p.TypeUsage.EdmType
 {
 	implementedNamespaces.Add("ITargetQuantity");
 }
+if(entity.Name == "ProdOrderBatchPlan")
+{
+	implementedNamespaces.Add("IScheduledOrder");
+}
 if(
 	entity.Properties.Where(p => p.DeclaringType == entity && p.TypeUsage.EdmType is SimpleType && code.Escape(p) == "MDNameTrans").Any() &&
 	entity.Properties.Where(p => p.DeclaringType == entity && p.TypeUsage.EdmType is SimpleType && code.Escape(p) == "MDKey").Any()

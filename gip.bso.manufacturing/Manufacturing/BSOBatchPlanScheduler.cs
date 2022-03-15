@@ -601,7 +601,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         protected ACRef<ACComponent> _BatchPlanScheduler = null;
         public ACComponent BatchPlanScheduler
         {
@@ -942,10 +941,7 @@ namespace gip.bso.manufacturing
             return list;
         }
 
-
         #endregion
-
-
 
         #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search) -> FilterBatchPlanGroup [MDBatchPlanGroup]
 
@@ -1121,7 +1117,6 @@ namespace gip.bso.manufacturing
             }
             return prodOrderBatchPlans;
         }
-
 
         #endregion
 
@@ -1336,7 +1331,7 @@ namespace gip.bso.manufacturing
 
         protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
         CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) => 
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) =>
                 ctx
                 .ProdOrderPartslist
                 .Include("MDProdOrderState")
@@ -1375,10 +1370,10 @@ namespace gip.bso.manufacturing
                         ).Any())
                 .OrderByDescending(c => c.ProdOrder.ProgramNo)
                 .Select(c => new ProdOrderPartslistPlanWrapper()
-                                                        {
-                                                            ProdOrderPartslist = c,
-                                                            PlannedQuantityUOM = c.ProdOrderBatchPlan_ProdOrderPartslist.Any() ? c.ProdOrderBatchPlan_ProdOrderPartslist.Sum(d => d.TotalSize) : 0.0
-                                                        })
+                {
+                    ProdOrderPartslist = c,
+                    PlannedQuantityUOM = c.ProdOrderBatchPlan_ProdOrderPartslist.Any() ? c.ProdOrderBatchPlan_ProdOrderPartslist.Sum(d => d.TotalSize) : 0.0
+                })
         );
 
 
@@ -1993,7 +1988,7 @@ namespace gip.bso.manufacturing
 
         private List<MDBatchPlanGroup> LoadMDBatchPlanGroupList()
         {
-            return DatabaseApp.MDBatchPlanGroup.OrderBy(c=>c.SortIndex).ToList();
+            return DatabaseApp.MDBatchPlanGroup.OrderBy(c => c.SortIndex).ToList();
         }
         #endregion
 
@@ -2610,6 +2605,39 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderBatchPlan != null && SelectedProdOrderBatchPlan.ProdOrderPartslist != null;
         }
 
+        [ACMethodInteraction("MoveSelectedBatchUp", "en{'Up'}de{'Oben'}", 602, false, "SelectedProdOrderBatchPlan")]
+        public void MoveSelectedBatchUp()
+        {
+            if (!IsEnabledMoveSelectedBatchUp())
+                return;
+
+            ProdOrderBatchPlan[] plans = ProdOrderBatchPlanList.ToArray();
+            ScheduledOrderManager<ProdOrderBatchPlan>.MoveUp(plans);
+            ProdOrderBatchPlanList = new ObservableCollection<ProdOrderBatchPlan>(plans.OrderBy(c => c.ScheduledOrder));
+        }
+
+        public bool IsEnabledMoveSelectedBatchUp()
+        {
+            return
+                ProdOrderBatchPlanList != null
+                && ProdOrderBatchPlanList.Any(c => c.IsSelected);
+        }
+
+        [ACMethodInteraction("MoveSelectedBatchDown", "en{'Down'}de{'Unten'}", 603, false, "SelectedProdOrderBatchPlan")]
+        public void MoveSelectedBatchDown()
+        {
+            if (!IsEnabledMoveSelectedBatchDown())
+                return;
+
+            ProdOrderBatchPlan[] plans = ProdOrderBatchPlanList.ToArray();
+            ScheduledOrderManager<ProdOrderBatchPlan>.MoveDown(plans);
+            ProdOrderBatchPlanList = new ObservableCollection<ProdOrderBatchPlan>(plans.OrderBy(c=>c.ScheduledOrder));
+        }
+
+        public bool IsEnabledMoveSelectedBatchDown()
+        {
+            return IsEnabledMoveSelectedBatchUp();
+        }
 
         #endregion
 
@@ -2747,7 +2775,7 @@ namespace gip.bso.manufacturing
             List<Guid> groupsForRefresh = new List<Guid>();
 
             List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-            List<ProdOrderBatchPlan> notSelected = 
+            List<ProdOrderBatchPlan> notSelected =
                 ProdOrderBatchPlanList
                 .Where(c => !c.IsSelected)
                 .OrderBy(c => c.ScheduledOrder ?? 0)
