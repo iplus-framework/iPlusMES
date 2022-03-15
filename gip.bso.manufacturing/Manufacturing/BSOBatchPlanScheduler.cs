@@ -4348,16 +4348,16 @@ namespace gip.bso.manufacturing
 
                 if (resultMsg != null)
                 {
-                    if (resultMsg is MsgWithDetails)
-                    {
-                        MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
-                        if (msgWithDetails.MsgDetails.Any())
-                            foreach (Msg detailMsg in msgWithDetails.MsgDetails)
-                                SendMessage(detailMsg);
-                    }
-                    else
-                        SendMessage(resultMsg);
-                    Root.Messages.Msg(resultMsg);
+                    //if (resultMsg is MsgWithDetails)
+                    //{
+                    //    MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
+                    //    if (msgWithDetails.MsgDetails.Any())
+                    //        foreach (Msg detailMsg in msgWithDetails.MsgDetails)
+                    //            SendMessage(detailMsg);
+                    //}
+                    //else
+                    //    SendMessage(resultMsg);
+                    //Root.Messages.Msg(resultMsg);
                 }
 
             }

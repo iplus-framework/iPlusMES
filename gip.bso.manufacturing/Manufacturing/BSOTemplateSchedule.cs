@@ -176,6 +176,27 @@ namespace gip.bso.manufacturing
             }
         }
 
+                /// <summary>
+                    /// Source Property: 
+                    /// </summary>
+        private DateTime _BatchPlanTermin;
+        [ACPropertySelected(999, "BatchPlanTermin", "en{'Batch Plan Termin'}de{'Batch Plan Termin'}")]
+        public DateTime BatchPlanTermin
+        {
+            get
+            {
+                return _BatchPlanTermin;
+            }
+            set
+            {
+                if (_BatchPlanTermin != value)
+                {
+                    _BatchPlanTermin = value;
+                    OnPropertyChanged("BatchPlanTermin");
+                }
+            }
+        }
+
         #endregion
 
         #region BSO->ACMethod
@@ -320,26 +341,8 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledGeneratePlan())
                 return;
-            // Info50075.
-            if (Root.Messages.Question(this, "Info50075", Global.MsgResult.No, false) == Global.MsgResult.Yes)
-            {
-                List<ProdOrderPartslist> prodOrderPartslistsChanged =
-                    SelectedPlanningMR
-                    .PlanningMRProposal_PlanningMR
-                    .Where(c => c.ProdOrder != null)
-                    .Select(c => c.ProdOrder).Distinct()
-                    .SelectMany(c => c.ProdOrderPartslist_ProdOrder)
-                    .Where(c => c.Partslist.LastFormulaChange > c.LastFormulaChange)
-                    .ToList();
-
-                if (prodOrderPartslistsChanged.Any())
-                {
-                    UpdateChangedPartslist(prodOrderPartslistsChanged);
-                }
-
-                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_GeneratePlan);
-                ShowDialog(this, DesignNameProgressBar);
-            }
+            BatchPlanTermin = DateTime.Now;
+            ShowDialog(this, "DlgGeneratePlan");
         }
 
         public bool IsEnabledGeneratePlan()
@@ -348,6 +351,48 @@ namespace gip.bso.manufacturing
                 && SelectedPlanningMR.PlanningMRProposal_PlanningMR.Any();
         }
 
+        /// <summary>
+        /// Method GeneratePlan
+        /// </summary>
+        [ACMethodInfo("GeneratePlan", "en{'Ok'}de{'Ok'}", 100)]
+        public void GeneratePlanOK()
+        {
+            if (!IsEnabledGeneratePlanOk())
+                return;
+            CloseTopDialog();
+
+            List<ProdOrderPartslist> prodOrderPartslistsChanged =
+                SelectedPlanningMR
+                .PlanningMRProposal_PlanningMR
+                .Where(c => c.ProdOrder != null)
+                .Select(c => c.ProdOrder).Distinct()
+                .SelectMany(c => c.ProdOrderPartslist_ProdOrder)
+                .Where(c => c.Partslist.LastFormulaChange > c.LastFormulaChange)
+                .ToList();
+
+            if (prodOrderPartslistsChanged.Any())
+            {
+                UpdateChangedPartslist(prodOrderPartslistsChanged);
+            }
+
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_GeneratePlan);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledGeneratePlanOk()
+        {
+            return SelectedPlanningMR != null
+                && SelectedPlanningMR.PlanningMRProposal_PlanningMR.Any();
+        }
+
+        /// <summary>
+        /// Method GeneratePlan
+        /// </summary>
+        [ACMethodInfo("GeneratePlan", "en{'Ok'}de{'Ok'}", 100)]
+        public void GeneratePlanCancel()
+        {
+            CloseTopDialog();
+        }
 
         private void GenerateProdOrders()
         {
@@ -383,7 +428,7 @@ namespace gip.bso.manufacturing
                         if (!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
                             mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
 
-                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null, maxSchedulerOrders);
+                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null, BatchPlanTermin, maxSchedulerOrders);
                     generated.Add(targetProdOrder);
                 }
 
