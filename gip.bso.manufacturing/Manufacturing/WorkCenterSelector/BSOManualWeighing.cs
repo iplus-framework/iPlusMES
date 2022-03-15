@@ -2439,6 +2439,7 @@ namespace gip.bso.manufacturing
 
             result.ForEach(c => c.MaterialIconDesign = DefaultMaterialIcon);
 
+            SingleDosNumberOfRepetitions = 0;
             SingleDosingItemList = result;
             ShowDialog(this, "SingleDosingDialog");
         }
