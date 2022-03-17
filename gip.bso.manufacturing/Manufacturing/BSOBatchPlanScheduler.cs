@@ -1348,8 +1348,9 @@ namespace gip.bso.manufacturing
                 .Where(c =>
                         (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
                         && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
-                        && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
-                            || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                        && (
+                                (!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
+                                || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                         )
                         && (
                             filterStartTime == null
@@ -1363,12 +1364,10 @@ namespace gip.bso.manufacturing
                         )
 
                         && c
-                            .Partslist
-                            .PartslistACClassMethod_Partslist
-                        .Where(d => d
-                                    .MaterialWFACClassMethod
-                                    .ACClassMethod.ACClassWF_ACClassMethod
-                                    .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                            .ProdOrderBatchPlan_ProdOrderPartslist
+                            .Where(d => d
+                                    .VBiACClassWF
+                                    .MDSchedulingGroupWF_VBiACClassWF
                                     .Where(x => x.MDSchedulingGroupID == mdSchedulingGroupID)
                                     .Any()
                         ).Any())
@@ -4069,6 +4068,8 @@ namespace gip.bso.manufacturing
 
                 if (FilterPlanningMR != null && success)
                 {
+
+
                     PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == FilterPlanningMR.PlanningMRID);
                     PlanningMRProposal proposal = PlanningMRProposal.NewACObject(DatabaseApp, planningMR);
                     proposal.ProdOrder = prodOrderPartslist.ProdOrder;
