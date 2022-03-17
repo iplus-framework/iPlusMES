@@ -16,6 +16,7 @@ using System.Xml;
 using gip.mes.datamodel;
 using System.Threading;
 using gip.mes.processapplication;
+using System.Windows.Threading;
 
 namespace gip.bso.manufacturing
 {
@@ -45,6 +46,11 @@ namespace gip.bso.manufacturing
                 _ApplicationQueue = new ACDelegateQueue(this.GetACUrl() + ";AppQueue");
                 _ApplicationQueue.StartWorkerThread();
             }
+
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 1);
+            _timer.Tick += new EventHandler(_timer_Tick);
+            _timer.Start();
 
             return result;
         }
@@ -128,10 +134,19 @@ namespace gip.bso.manufacturing
 
             _MainSyncContext = null;
 
+            _timer.Stop();
+            _timer = null;
+
             return base.ACDeInit(deleteACClassTask);
         }
 
         public const string FunctionMonitorTabVBContent = "FuncMonitor";
+
+
+        private void _timer_Tick(object sender, EventArgs e)
+        {
+            CurrentTime = DateTime.Now;
+        }
 
         #endregion
 
@@ -264,7 +279,7 @@ namespace gip.bso.manufacturing
                     if (_CurrentProcessModule != null)
                     {
                         PAProcessModuleACCaption = _CurrentProcessModule.ACCaption;
-                        _IsCurrentUserConfigured = _RulesForCurrentUser != null 
+                        _IsCurrentUserConfigured = _RulesForCurrentUser != null
                                                    && _RulesForCurrentUser.Any(c => c.ProcessModuleACUrl == _CurrentProcessModule.ACUrl);
                     }
                     else
@@ -712,6 +727,30 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+
+        private DispatcherTimer _timer;
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private DateTime _CurrentTime;
+        [ACPropertySelected(999, "CurrentTime", "en{'CurrentTime'}de{'CurrentTime'}")]
+        public DateTime CurrentTime
+        {
+            get
+            {
+                return _CurrentTime;
+            }
+            set
+            {
+                if (_CurrentTime != value)
+                {
+                    _CurrentTime = value;
+                    OnPropertyChanged("CurrentTime");
+                }
+            }
+        }
+
+
         #endregion
 
         #region Methods
@@ -900,13 +939,13 @@ namespace gip.bso.manufacturing
 
         private void RegisterOnOrderInfoPropChanged(ACComponent processModule)
         {
-            if(ProcessModuleOrderInfo != null)
+            if (ProcessModuleOrderInfo != null)
                 ProcessModuleOrderInfo.PropertyChanged -= ProcessModuleOrderInfo_PropertyChanged;
 
             ProcessModuleOrderInfo = null;
 
             ProcessModuleOrderInfo = processModule.GetPropertyNet(nameof(PAProcessModule.OrderInfo)) as IACContainerTNet<string>;
-            if(ProcessModuleOrderInfo == null)
+            if (ProcessModuleOrderInfo == null)
             {
                 //error
                 return;
@@ -919,7 +958,7 @@ namespace gip.bso.manufacturing
 
         private void ProcessModuleOrderInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == Const.ValueT)
+            if (e.PropertyName == Const.ValueT)
             {
                 IACContainerTNet<string> senderProp = sender as IACContainerTNet<string>;
                 if (senderProp != null)
@@ -978,7 +1017,7 @@ namespace gip.bso.manufacturing
 
                 if (pwGroup == null)
                 {
-                    Messages.Error(this, "Can not get mapped PWGroup! ACUrl: "+pwGroupACUrl);
+                    Messages.Error(this, "Can not get mapped PWGroup! ACUrl: " + pwGroupACUrl);
                     return;
                 }
 
@@ -1205,7 +1244,7 @@ namespace gip.bso.manufacturing
             {
                 var wfInstance = Root.ACUrlCommand(wf) as IACComponentPWNode;
                 if (TaskPresenter != null && wfInstance != null)
-                    //&& wfInstance.ParentRootWFNode != TaskPresenter.SelectedRootWFNode)
+                //&& wfInstance.ParentRootWFNode != TaskPresenter.SelectedRootWFNode)
                 {
                     TaskPresenter.Unload();
                     TaskPresenter.Load(wfInstance.ParentRootWFNode);
@@ -1218,7 +1257,7 @@ namespace gip.bso.manufacturing
             return CurrentWorkCenterItem != null && CurrentWorkCenterItem.ProcessModule != null;
         }
 
-        [ACMethodInfo("","en{'Load Bill of material'}de{'Load Bill of material'}", 620, true)]
+        [ACMethodInfo("", "en{'Load Bill of material'}de{'Load Bill of material'}", 620, true)]
         public void LoadPartslist()
         {
             if (_CurrentBatch != null)
@@ -1244,7 +1283,7 @@ namespace gip.bso.manufacturing
                                                     .ThenBy(s => s.TopParentPartslistPosRelation.Sequence);
 
                 List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
-                foreach(var relation in inputList)
+                foreach (var relation in inputList)
                 {
                     InputComponentItem compItem = new InputComponentItem(relation);
                     OnInputComponentCreated(compItem, relation, DatabaseApp);
@@ -1337,7 +1376,7 @@ namespace gip.bso.manufacturing
             ShowDialog(this, "ExtraDisTargetDialog");
         }
 
-        [ACMethodInfo("","",9999, true)]
+        [ACMethodInfo("", "", 9999, true)]
         public virtual void SwitchPWGroupToEmptyingMode()
         {
             if (SelectedExtraDisTarget == null)

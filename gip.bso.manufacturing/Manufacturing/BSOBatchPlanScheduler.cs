@@ -705,7 +705,7 @@ namespace gip.bso.manufacturing
         /// Flag is network batch list refresh is executed
         /// </summary>
         public bool RefreshBatchListByRecieveChange = true;
-        
+
         #endregion
 
         #region Properties -> Explorer
@@ -996,6 +996,28 @@ namespace gip.bso.manufacturing
 
 
         #endregion
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _FilterOnlyOnThisLine;
+        [ACPropertySelected(999, "FilterOnlyOnThisLine", "en{'Batch on this line'}de{'Charge auf dieser Linie'}")]
+        public bool FilterOnlyOnThisLine
+        {
+            get
+            {
+                return _FilterOnlyOnThisLine;
+            }
+            set
+            {
+                if (_FilterOnlyOnThisLine != value)
+                {
+                    _FilterOnlyOnThisLine = value;
+                    OnPropertyChanged("FilterOnlyOnThisLine");
+                }
+            }
+        }
+
 
         #endregion
 
@@ -1328,14 +1350,15 @@ namespace gip.bso.manufacturing
                     FilterOrderStartTime,
                     FilterOrderEndTime,
                     (short?)minProdOrderState,
-                    (short?)maxProdOrderState) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+                    (short?)maxProdOrderState,
+                    FilterOnlyOnThisLine) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return batchQuery.Take(Const_MaxResultSize).ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState) =>
+        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine) =>
                 ctx
                 .ProdOrderPartslist
                 .Include("MDProdOrderState")
@@ -1348,8 +1371,9 @@ namespace gip.bso.manufacturing
                 .Where(c =>
                         (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
                         && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
-                        && ((!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
-                            || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                        && (
+                                (!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
+                                || (planningMRID.HasValue && c.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
                         )
                         && (
                             filterStartTime == null
@@ -1362,16 +1386,30 @@ namespace gip.bso.manufacturing
                             c.InsertDate < filterEndTime
                         )
 
-                        && c
+                        &&
+                        (
+                            (!filterOnlyOnThisLine && c
                             .Partslist
                             .PartslistACClassMethod_Partslist
-                        .Where(d => d
-                                    .MaterialWFACClassMethod
-                                    .ACClassMethod.ACClassWF_ACClassMethod
-                                    .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                            .Where(d => d
+                                        .MaterialWFACClassMethod
+                                        .ACClassMethod.ACClassWF_ACClassMethod
+                                        .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                                        .Where(x => x.MDSchedulingGroupID == mdSchedulingGroupID)
+                                        .Any()
+                            ).Any())
+                        ||
+                            (filterOnlyOnThisLine &&
+                            c
+                            .ProdOrderBatchPlan_ProdOrderPartslist
+                            .Where(d => d
+                                    .VBiACClassWF
+                                    .MDSchedulingGroupWF_VBiACClassWF
                                     .Where(x => x.MDSchedulingGroupID == mdSchedulingGroupID)
                                     .Any()
-                        ).Any())
+                            ).Any())
+                        )
+                )
                 .OrderByDescending(c => c.ProdOrder.ProgramNo)
                 .Select(c => new ProdOrderPartslistPlanWrapper()
                 {
@@ -2635,7 +2673,7 @@ namespace gip.bso.manufacturing
 
             ProdOrderBatchPlan[] plans = ProdOrderBatchPlanList.ToArray();
             ScheduledOrderManager<ProdOrderBatchPlan>.MoveDown(plans);
-            ProdOrderBatchPlanList = new ObservableCollection<ProdOrderBatchPlan>(plans.OrderBy(c=>c.ScheduledOrder));
+            ProdOrderBatchPlanList = new ObservableCollection<ProdOrderBatchPlan>(plans.OrderBy(c => c.ScheduledOrder));
         }
 
         public bool IsEnabledMoveSelectedBatchDown()
@@ -4069,6 +4107,8 @@ namespace gip.bso.manufacturing
 
                 if (FilterPlanningMR != null && success)
                 {
+
+
                     PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == FilterPlanningMR.PlanningMRID);
                     PlanningMRProposal proposal = PlanningMRProposal.NewACObject(DatabaseApp, planningMR);
                     proposal.ProdOrder = prodOrderPartslist.ProdOrder;
