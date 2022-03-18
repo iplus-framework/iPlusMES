@@ -53,13 +53,13 @@ namespace gip.bso.manufacturing
         #region Component
 
         #region Component
-        private ProdOrderPartslistPosRelation _SelectedComponent;
+        private ProdOrderPartslistPos _SelectedComponent;
         /// <summary>
         /// Selected property for ProdOrderPartslistPosRelation
         /// </summary>
         /// <value>The selected Component</value>
         [ACPropertySelected(9999, "Component", "en{'TODO: Component'}de{'TODO: Component'}")]
-        public ProdOrderPartslistPosRelation SelectedComponent
+        public ProdOrderPartslistPos SelectedComponent
         {
             get
             {
@@ -76,48 +76,44 @@ namespace gip.bso.manufacturing
         }
 
 
-        private List<ProdOrderPartslistPosRelation> _ComponentList;
+        private List<ProdOrderPartslistPos> _ComponentList;
         /// <summary>
         /// List property for ProdOrderPartslistPosRelation
         /// </summary>
         /// <value>The Component list</value>
         [ACPropertyList(9999, "Component")]
-        public List<ProdOrderPartslistPosRelation> ComponentList
+        public List<ProdOrderPartslistPos> ComponentList
         {
             get
             {
                 if (_ComponentList == null)
-                    _ComponentList = new List<ProdOrderPartslistPosRelation>();
+                    _ComponentList = new List<ProdOrderPartslistPos>();
                 return _ComponentList;
             }
         }
 
-        private List<ProdOrderPartslistPosRelation> LoadComponentList(Guid prodOrderBatchPlanID)
+        private List<ProdOrderPartslistPos> LoadComponentList(Guid prodOrderBatchPlanID)
         {
-            List<ProdOrderPartslistPosRelation> relationList = new List<ProdOrderPartslistPosRelation>();
+            List<ProdOrderPartslistPos> relationList = new List<ProdOrderPartslistPos>();
             // detect batch
             ProdOrderBatchPlan batchPlan = DatabaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
 
             // get list
             relationList =
-                DatabaseApp
-                .ProdOrderPartslistPosRelation
-                .Include(x => x.SourceProdOrderPartslistPos)    
-                .Include(x => x.SourceProdOrderPartslistPos.MDUnit)
-                .Include(x => x.SourceProdOrderPartslistPos.Material)
-                .Include(x => x.SourceProdOrderPartslistPos.Material.BaseMDUnit)
-                .Where(c => c.TargetProdOrderPartslistPosID == batchPlan.ProdOrderPartslistPosID)
-                .OrderBy(c => c.Sequence)
+                DatabaseApp 
+                .ProdOrderPartslistPos
+               .Include(x => x.Material)
+               .Include(x => x.Material.BaseMDUnit)
+               .Include(x => x.MDUnit)
+               .Where(x =>
+                    x.ProdOrderPartslistID == batchPlan.ProdOrderPartslistID &&
+                    x.AlternativeProdOrderPartslistPosID == null &&
+                    x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot) &&
+                    x.ParentProdOrderPartslistPosID == null &&
+                    x.AlternativeProdOrderPartslistPosID == null)
+                .OrderBy(x => x.Sequence)
                 .ToList();
 
-            // correct quantity
-            double quantityIndex = (batchPlan.BatchSize * batchPlan.BatchTargetCount) / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
-
-            foreach (ProdOrderPartslistPosRelation relation in relationList)
-            {
-                relation.TargetQuantityUOM *= quantityIndex;
-                DatabaseApp.ObjectStateManager.ChangeObjectState(relation, System.Data.EntityState.Unchanged);
-            }
             return relationList;
         }
         #endregion
