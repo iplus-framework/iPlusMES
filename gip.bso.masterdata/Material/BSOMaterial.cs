@@ -856,7 +856,6 @@ namespace gip.bso.masterdata
         public void New()
         {
             if (!PreExecute("New")) return;
-
             CurrentMaterial = Material.NewACObject(DatabaseApp, null);
             DatabaseApp.Material.AddObject(CurrentMaterial);
             AccessPrimary.NavList.Add(CurrentMaterial);
