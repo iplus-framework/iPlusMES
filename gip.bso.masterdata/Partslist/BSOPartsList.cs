@@ -114,7 +114,7 @@ namespace gip.bso.masterdata
             this._SelectedIntermediateParts = null;
             this._selectedMaterialWF = null;
             this._SelectedPartslistPos = null;
-            
+
             if (_AccessInputMaterial != null)
             {
                 _AccessInputMaterial.ACDeInit(false);
@@ -206,6 +206,9 @@ namespace gip.bso.masterdata
         protected override Msg OnPreSave()
         {
             Msg result = null;
+
+            IsUpdatedExcludeFromSumCalc = UpdateExcludeFromSumCalc();
+
             if (CurrentPartslist != null)
             {
                 // Damir to sasa: Caclulation doesn't work if, TargetUOM-Quantity is set and MDUnit of Partslist is not set. If TargetQuantity is Zero, 
@@ -226,8 +229,8 @@ namespace gip.bso.masterdata
                 this.VisitedMethods = null;
 
             var changedPartslists = ProcessLastFormulaChange();
-            foreach(Partslist changedPartslist in changedPartslists)
-                if(!ChangedPartslists.Contains(changedPartslist))
+            foreach (Partslist changedPartslist in changedPartslists)
+                if (!ChangedPartslists.Contains(changedPartslist))
                     ChangedPartslists.Add(changedPartslist);
             UpdatePlanningMROrders();
             ClearChangeTracking();
@@ -239,6 +242,18 @@ namespace gip.bso.masterdata
         {
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
+
+            if (IsUpdatedExcludeFromSumCalc)
+            {
+                OnPropertyChanged(nameof(IntermediateList));
+                if (SelectedIntermediate != null && SelectedIntermediate.Material.ExcludeFromSumCalc)
+                {
+                    OnPropertyChanged(nameof(IntermediatePartsList));
+                    OnPropertyChanged(nameof(SelectedIntermediateParts));
+                }
+            }
+            IsUpdatedExcludeFromSumCalc = false;
+
             base.OnPostSave();
         }
 
@@ -456,7 +471,7 @@ namespace gip.bso.masterdata
             if (CurrentPartslist != null)
                 VisitedPartslists.Add(CurrentPartslist);
         }
-        
+
 
         private List<Partslist> GetPlForUpdatePlanningMROrder()
         {
@@ -497,7 +512,7 @@ namespace gip.bso.masterdata
 
         private void WriteLastFormulaChangeByDeleteElement(Partslist partslist)
         {
-            if(!ChangedPartslists.Contains(partslist))
+            if (!ChangedPartslists.Contains(partslist))
                 ChangedPartslists.Add(partslist);
             partslist.LastFormulaChange = DateTime.Now;
         }
@@ -1040,7 +1055,7 @@ namespace gip.bso.masterdata
         #region IntermedateParts -> Select, (Current,) List
 
         private PartslistPosRelation _SelectedIntermediateParts;
-        [ACPropertySelected(9999, "IntermediateParts", isRightmanagement:true)]
+        [ACPropertySelected(9999, "IntermediateParts", isRightmanagement: true)]
         public PartslistPosRelation SelectedIntermediateParts
         {
             get
@@ -2217,6 +2232,35 @@ namespace gip.bso.masterdata
                 return false;
             return true;
         }
+
+        public bool UpdateExcludeFromSumCalc()
+        {
+            bool isUpdated = false;
+            foreach (Partslist pl in PartslistList)
+            {
+                PartslistPos[] positionsExcludedFromSum = pl.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern && c.Material.ExcludeFromSumCalc).ToArray();
+                foreach (PartslistPos pos in positionsExcludedFromSum)
+                {
+                    if (pos.TargetQuantityUOM > double.Epsilon)
+                    {
+                        pos.TargetQuantityUOM = 0;
+                        isUpdated = true;
+                    }
+                    PartslistPosRelation[] relations = pos.PartslistPosRelation_TargetPartslistPos.ToArray();
+                    foreach (PartslistPosRelation rel in relations)
+                    {
+                        if (rel.TargetQuantityUOM > double.Epsilon)
+                        {
+                            rel.TargetQuantityUOM = 0;
+                            isUpdated = true;
+                        }
+                    }
+                }
+            }
+            return isUpdated;
+        }
+
+        private bool IsUpdatedExcludeFromSumCalc;
         #endregion
 
         #region ACObject

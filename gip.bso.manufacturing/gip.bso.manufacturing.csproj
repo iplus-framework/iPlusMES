@@ -60,6 +60,7 @@
     <Compile Include="Command\KeepStandardBatchSizeAndDivideRest.cs" />
     <Compile Include="Manufacturing\BSOBatchPlan.cs" />
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
+    <Compile Include="Manufacturing\BSOProdOrderBatchComponents.cs" />
     <Compile Include="Manufacturing\BSOProdOrderOpenPositions.cs" />
     <Compile Include="Manufacturing\BSOTemplateSchedule.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOBinDischarging.cs" />
@@ -321,7 +322,11 @@
     </None>
     <None Include="VBControlScripts\2022-03-17 15-09_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>  </ItemGroup>
+    </None>
+    <None Include="VBControlScripts\2022-03-18 18-30_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

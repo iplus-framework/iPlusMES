@@ -26,6 +26,7 @@ namespace gip.mes.facility
             _C_BSONameForShowFacilityBookCell = new ACPropertyConfigValue<string>(this, "BSONameForShowFacilityBookCell", "");
             _C_BSONameForShowFacilityOverview = new ACPropertyConfigValue<string>(this, "BSONameForShowFacilityOverview", "");
             _C_BSONameForShowOrder = new ACPropertyConfigValue<string>(this, "BSONameForShowOrder", "");
+            _C_BSONameForShowComponent = new ACPropertyConfigValue<string>(this, "BSOProdOrderBatchComponents", "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -63,6 +64,39 @@ namespace gip.mes.facility
             set
             {
                 _C_BSONameForShowOrder.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowComponent;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for show componets'}de{'Klassenname und ACIdentifier für Komponenten anzeigen'}")]
+        public string BSONameForShowComponent
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(_C_BSONameForShowComponent.ValueT))
+                    return _C_BSONameForShowComponent.ValueT;
+                gip.core.datamodel.ACClass classOfBso = (Root.Database as Database).GetACType("BSOProdOrderBatchComponents");
+                if (classOfBso != null)
+                {
+                    gip.core.datamodel.ACClass derivation = null;
+                    using (ACMonitor.Lock(gip.core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
+                    {
+                        derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
+                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
+                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
+                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
+                    }
+                    if (derivation != null)
+                        _C_BSONameForShowComponent.ValueT = derivation.ACIdentifier + "(Dialog)";
+                }
+
+                if (String.IsNullOrEmpty(_C_BSONameForShowComponent.ValueT))
+                    _C_BSONameForShowComponent.ValueT = "BSOProdOrderBatchComponents(Dialog)";
+                return _C_BSONameForShowComponent.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowComponent.ValueT = value;
             }
         }
 
@@ -518,6 +552,31 @@ namespace gip.mes.facility
             }
         }
 
+        public override void ShowDialogComponents(IACComponent caller, PAOrderInfo orderInfo = null)
+        {
+            if (caller == null)
+                return;
+
+            if (orderInfo == null)
+                orderInfo = QueryOrderInfo(caller);
+            if (orderInfo != null)
+            {
+                // Falls Produktionsauftrag
+                if (orderInfo.Entities.Where(c => c.EntityName == ProdOrderBatchPlan.ClassName).Any())
+                {
+                    string bsoName = BSONameForShowComponent;
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogComponent", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
+            }
+        }
+
         public override bool IsEnabledShowDialogOrder(IACComponent caller)
         {
             IACContainerTNet<String> orderInfoProp = null;
@@ -710,7 +769,6 @@ namespace gip.mes.facility
             //    return false;
             return false;
         }
-
 
         public virtual void ShowFacilityBookCellDialog(IACComponent caller)
         {

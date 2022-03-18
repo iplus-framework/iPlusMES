@@ -2681,6 +2681,28 @@ namespace gip.bso.manufacturing
             return IsEnabledMoveSelectedBatchUp();
         }
 
+        [ACMethodInteraction("ShowComponents", "en{'Show components'}de{'Komponenten anzeigen'}", 503, false, "SelectedProdOrderBatchPlan")]
+        public void ShowComponents()
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedProdOrderBatchPlan.ProdOrderBatchPlanID,
+                    EntityName = ProdOrderBatchPlan.ClassName
+                });
+                service.ShowDialogComponents(this, info);
+            }
+        }
+
+        public bool IsEnabledShowComponents()
+        {
+            return SelectedProdOrderBatchPlan != null;
+        }
+
         #endregion
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
@@ -2994,6 +3016,7 @@ namespace gip.bso.manufacturing
         {
             return SelectedProdOrderPartslist != null && SelectedProdOrderPartslist.ProdOrderPartslist != null;
         }
+
 
         #endregion
 
