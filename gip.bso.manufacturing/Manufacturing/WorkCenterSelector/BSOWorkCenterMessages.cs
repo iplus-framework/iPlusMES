@@ -414,9 +414,6 @@ namespace gip.bso.manufacturing
 
         public virtual bool AddToMessageList(MessageItem messageItem)
         {
-            if (messageItem != null && string.IsNullOrEmpty(messageItem.Message))
-                return true;
-
             using (ACMonitor.Lock(_70100_MessageListLock))
             {
                 if (_MessagesListSafe == null)

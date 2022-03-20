@@ -73,7 +73,21 @@ namespace gip.mes.webservices
             {
                 BarcodeEntity lastEntity = sequence.Sequence.LastOrDefault();
                 if (lastEntity.SelectedOrderWF == null && lastEntity.WFMethod == null)
-                    return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "SelectedOrderWF is empty"));
+                {
+                    sequence.Sequence.Clear();
+                    WSResponse<BarcodeEntity> nextEntity = GetBarcodeEntity(sequence.CurrentBarcode);
+
+                    if (!nextEntity.Suceeded)
+                    {
+                        sequence.State = BarcodeSequence.ActionState.Cancelled;
+                        sequence.Message = nextEntity.Message;
+                        return new WSResponse<BarcodeSequence>(sequence, nextEntity.Message);
+                    }
+
+                    sequence.AddSequence(nextEntity.Data);
+
+                    //return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "SelectedOrderWF is empty"));
+                }
             }
 
             if (sequence.Sequence != null)
