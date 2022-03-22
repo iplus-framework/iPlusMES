@@ -55,6 +55,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("BookTargetQIfZero", "en{'Post target quantity when actual = 0'}de{'Sollmenge buchen wenn Istgewicht = 0'}");
             method.ParameterValueList.Add(new ACValue("DoseFromFillingSilo", typeof(bool?), null, Global.ParamOption.Optional));
             paramTranslation.Add("DoseFromFillingSilo", "en{'Dose from silo that is filling'}de{'Dosiere aus Silo das befüllt wird'}");
+            method.ParameterValueList.Add(new ACValue("FacilityNoSort", typeof(string), null, Global.ParamOption.Optional));
+            paramTranslation.Add("FacilityNoSort", "en{'Priorization order container number'}de{'Priorisierungsreihenfolge Silonummer'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDosing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDosing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWDosing), HandleExecuteACMethod_PWDosing);
@@ -592,7 +594,23 @@ namespace gip.mes.processapplication
             }
         }
 
-
+        public string FacilityNoSort
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("FacilityNoSort");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsString;
+                    }
+                }
+                return null;
+            }
+        }
+        
         public bool AutoChangeScale
         {
             get
@@ -1546,14 +1564,19 @@ namespace gip.mes.processapplication
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
+            // FacilityNoSort
+
             core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
-            return PartslistManager.GetRoutes(relation, dbApp, dbIPlus,
+            IEnumerable<Route> routes = PartslistManager.GetRoutes(relation, dbApp, dbIPlus,
                                         accessAClass,
                                         queryParams.SearchMode,
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
                                         queryParams.ExclusionList);
+            if (possibleSilos != null && possibleSilos.Any())
+                possibleSilos = ApplyPriorizationRules(possibleSilos);
+            return routes;
         }
 
         public virtual IEnumerable<Route> GetRoutes(PickingPos pickingPos,
@@ -1567,13 +1590,58 @@ namespace gip.mes.processapplication
             }
 
             core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
-            return PickingManager.GetRoutes(pickingPos, dbApp, dbIPlus,
+            IEnumerable<Route> routes = PickingManager.GetRoutes(pickingPos, dbApp, dbIPlus,
                                         accessAClass,
                                         queryParams.SearchMode,
                                         queryParams.FilterTimeOlderThan,
                                         out possibleSilos,
                                         queryParams.IgnoreFacilityID,
                                         queryParams.ExclusionList);
+            if (possibleSilos != null && possibleSilos.Any())
+                possibleSilos = ApplyPriorizationRules(possibleSilos);
+            return routes;
+        }
+
+        protected virtual IList<Facility> ApplyPriorizationRules(IList<Facility> possibleSilos)
+        {
+            if (String.IsNullOrEmpty(FacilityNoSort))
+                return possibleSilos;
+            string[] facilitySortRules = FacilityNoSort.Split(';');
+            if (facilitySortRules == null || !facilitySortRules.Any())
+                return possibleSilos;
+            List<Facility> priorizedList = new List<Facility>();
+            List<Facility> posterizedList = new List<Facility>();
+            int insertIndex = 0;
+            foreach (string entry in facilitySortRules)
+            {
+                string rule = entry.Trim();
+                if (string.IsNullOrEmpty(rule))
+                    continue;
+                Facility facility;
+                if (rule[0] == '!')
+                {
+                    rule = rule.Substring(1);
+                    if (String.IsNullOrEmpty(rule))
+                        continue;
+                    facility = possibleSilos.Where(c => c.FacilityNo == rule).FirstOrDefault();
+                    if (facility != null)
+                    {
+                        possibleSilos.Remove(facility);
+                        possibleSilos.Add(facility);
+                    }
+                }
+                else
+                {
+                    facility = possibleSilos.Where(c => c.FacilityNo == rule).FirstOrDefault();
+                    if (facility != null)
+                    {
+                        possibleSilos.Remove(facility);
+                        possibleSilos.Insert(insertIndex, facility);
+                        insertIndex++;
+                    }
+                }
+            }
+            return possibleSilos;
         }
 
         public virtual RouteItem CurrentDosingSource(Database db)
@@ -1938,6 +2006,16 @@ namespace gip.mes.processapplication
                 xmlChild = doc.CreateElement("DoseFromFillingSilo");
                 if (xmlChild != null)
                     xmlChild.InnerText = DoseFromFillingSilo.HasValue ? DoseFromFillingSilo.ToString() : "null";
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+
+            xmlChild = xmlACPropertyList["FacilityNoSort"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("FacilityNoSort");
+                if (xmlChild != null)
+                    xmlChild.InnerText = FacilityNoSort;
                 xmlACPropertyList.AppendChild(xmlChild);
             }
         }
