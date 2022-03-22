@@ -756,6 +756,26 @@ namespace gip.mes.processapplication
                     || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp);
             }
         }
+
+        public override bool IsPWGroupOrRootPWInSkipMode
+        {
+            get
+            {
+                var rootPW = RootPW;
+                if (rootPW == null)
+                    return false;
+
+                return ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
+                || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
+                || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)
+                || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
+                || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
+                || ((ACSubStateEnum)rootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
+                || ((ACSubStateEnum)rootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
+                || ((ACSubStateEnum)rootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
+            }
+        }
+
         #endregion
 
         #endregion
