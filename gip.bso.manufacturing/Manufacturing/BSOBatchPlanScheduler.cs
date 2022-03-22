@@ -579,7 +579,8 @@ namespace gip.bso.manufacturing
                 {
                     // Always Base-UOM:
                     Partslist selectedPartslist = BSOPartslistExplorer_Child.Value.SelectedPartslist;
-                    WizardDefineDefaultPartslist(SelectedScheduleForPWNode.MDSchedulingGroup, selectedPartslist, 0);
+                    if (SelectedScheduleForPWNode != null)
+                        WizardDefineDefaultPartslist(SelectedScheduleForPWNode.MDSchedulingGroup, selectedPartslist, 0);
                 }
             }
         }
