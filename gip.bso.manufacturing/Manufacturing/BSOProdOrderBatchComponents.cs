@@ -94,12 +94,12 @@ namespace gip.bso.manufacturing
 
         private List<ProdOrderPartslistPos> LoadComponentList(Guid prodOrderBatchPlanID)
         {
-            List<ProdOrderPartslistPos> relationList = new List<ProdOrderPartslistPos>();
+            List<ProdOrderPartslistPos> components = new List<ProdOrderPartslistPos>();
             // detect batch
             ProdOrderBatchPlan batchPlan = DatabaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
 
             // get list
-            relationList =
+            components =
                 DatabaseApp 
                 .ProdOrderPartslistPos
                .Include(x => x.Material)
@@ -114,7 +114,14 @@ namespace gip.bso.manufacturing
                 .OrderBy(x => x.Sequence)
                 .ToList();
 
-            return relationList;
+            double quantityIndex = (batchPlan.BatchSize * batchPlan.BatchTargetCount) / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
+            foreach(ProdOrderPartslistPos pos in components)
+            {
+                pos.TargetQuantityUOM *= quantityIndex;
+                DatabaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
+            }      
+
+            return components;
         }
         #endregion
 
