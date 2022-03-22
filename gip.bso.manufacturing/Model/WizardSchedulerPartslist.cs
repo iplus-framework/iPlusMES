@@ -134,10 +134,10 @@ namespace gip.bso.manufacturing
             {
                 if (_SelectedMDSchedulingGroup != value)
                 {
-                    _SelectedMDSchedulingGroup = value;
-                    OnPropertyChanged("SelectedMDSchedulingGroup");
                     _WFNodeMES = null;
                     _WFNode = null;
+                    _SelectedMDSchedulingGroup = value;
+                    OnPropertyChanged("SelectedMDSchedulingGroup");
                     OnPropertyChanged("WFNodeMES");
                     OnPropertyChanged("WFNode");
                 }
@@ -169,6 +169,10 @@ namespace gip.bso.manufacturing
                     .Select(c => c.VBiACClassWF)
                     .FirstOrDefault();
                 return _WFNodeMES;
+            }
+            set
+            {
+                _WFNodeMES = value;
             }
         }
 
