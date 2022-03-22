@@ -32,12 +32,11 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
-            var test = BSOBatchPlanScheduler_Child;
 
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
                 throw new Exception("ProdOrderManager not configured");
-            BSOBatchPlanScheduler_Child.Value.RefreshBatchListByRecieveChange = false;
+            ChildBSOBatchPlanScheduler.RefreshBatchListByRecieveChange = false;
             Search();
             return true;
         }
@@ -80,6 +79,17 @@ namespace gip.bso.manufacturing
                 if (_BSOBatchPlanScheduler_Child == null)
                     _BSOBatchPlanScheduler_Child = new ACChildItem<BSOBatchPlanScheduler>(this, Const_BSOBatchPlanScheduler_Child);
                 return _BSOBatchPlanScheduler_Child;
+            }
+        }
+
+
+        public virtual BSOBatchPlanScheduler ChildBSOBatchPlanScheduler
+        {
+            get
+            {
+                if (BSOBatchPlanScheduler_Child == null)
+                    return null;
+                return BSOBatchPlanScheduler_Child.Value;
             }
         }
 
@@ -176,9 +186,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-                /// <summary>
-                    /// Source Property: 
-                    /// </summary>
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
         private DateTime _BatchPlanTermin;
         [ACPropertySelected(999, "BatchPlanTermin", "en{'Batch Plan Termin'}de{'Batch Plan Termin'}")]
         public DateTime BatchPlanTermin
@@ -328,8 +338,8 @@ namespace gip.bso.manufacturing
 
         public void NotifiyChangedCurrentPlanningMR(PlanningMR planningMR)
         {
-            if (BSOBatchPlanScheduler_Child != null && BSOBatchPlanScheduler_Child.Value != null)
-                BSOBatchPlanScheduler_Child.Value.FilterPlanningMR = planningMR ?? new PlanningMR();
+            if (ChildBSOBatchPlanScheduler != null)
+                ChildBSOBatchPlanScheduler.FilterPlanningMR = planningMR ?? new PlanningMR();
         }
 
 
@@ -442,7 +452,7 @@ namespace gip.bso.manufacturing
                     Root.Messages.Msg(msgWithDetails);
 
                 foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
-                    BSOBatchPlanScheduler_Child.Value.RefreshServerState(mdSchedulingGroupID);
+                    ChildBSOBatchPlanScheduler.RefreshServerState(mdSchedulingGroupID);
             }
             catch (Exception ec)
             {
@@ -525,17 +535,17 @@ namespace gip.bso.manufacturing
         {
             base.BgWorkerCompleted(sender, e);
             CloseWindow(this, DesignNameProgressBar);
-            BSOBatchPlanScheduler_Child.Value.ClearMessages();
+            ChildBSOBatchPlanScheduler.ClearMessages();
             ACBackgroundWorker worker = sender as ACBackgroundWorker;
             string command = worker.EventArgs.Argument.ToString();
 
             if (e.Cancelled)
             {
-                BSOBatchPlanScheduler_Child.Value.SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+                ChildBSOBatchPlanScheduler.SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
             }
             if (e.Error != null)
             {
-                BSOBatchPlanScheduler_Child.Value.SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+                ChildBSOBatchPlanScheduler.SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
             }
             else
             {
