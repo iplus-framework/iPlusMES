@@ -2803,6 +2803,53 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderBatchPlan != null;
         }
 
+        [ACMethodInteraction("ShowParslist", "en{'Show recipe'}de{'Rezept Anzeigen'}", 605, true, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
+        public void ShowParslist()
+        {
+            double treeQuantityRatio = SelectedProdOrderBatchPlan.ProdOrderPartslist.TargetQuantity / SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.TargetQuantityUOM;
+            rootPartslistExpand = new PartslistExpand(SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist, treeQuantityRatio);
+            rootPartslistExpand.IsChecked = true;
+            rootPartslistExpand.LoadTree();
+
+            if (rootPartslistExpand.Children == null || rootPartslistExpand.Children.Count == 0)
+            {
+                string partslistNo = rootPartslistExpand.PartslistNo;
+                StartPartslistBSO(partslistNo);
+            }
+            else
+            {
+                _PartListExpandList = new List<PartslistExpand>() { rootPartslistExpand };
+                CurrentPartListExpand = rootPartslistExpand;
+                ShowDialog(this, "ProdOrderPartslistExpandDlg");
+            }
+        }
+
+
+        public bool IsEnabledShowParslist()
+        {
+            return SelectedProdOrderBatchPlan != null;
+        }
+
+        [ACMethodInfo("ShowPartslistOK", "en{'Ok'}de{'Ok'}", 999)]
+        public void ShowPartslistOK()
+        {
+            CloseTopDialog();
+            string partslistNo = CurrentPartListExpand.PartslistNo;
+            StartPartslistBSO(partslistNo);
+        }
+
+        public bool IsEnabledShowPartslistOK()
+        {
+            return CurrentPartListExpand != null;
+        }
+
+        private void StartPartslistBSO(string partslistNo)
+        {
+            ACMethod acMethod = Root.ACType.ACType.ACUrlACTypeSignature(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + Const.BSOiPlusStudio);
+            acMethod.ParameterValueList["AutoFilter"] = partslistNo;
+            this.Root().RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + nameof(BSOPartslist), acMethod.ParameterValueList);
+        }
+
         #endregion
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
