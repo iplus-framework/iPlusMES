@@ -1534,7 +1534,7 @@ namespace gip.mes.facility
                     double ratioInwardPosQuantityGrowth = 0;
                     if (inwardPos.TargetQuantityUOM > 0)
                         ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
-                    if (ratioInwardPosQuantityGrowth == 0 && !noChange)
+                    if (ratioInwardPosQuantityGrowth == 0 && !noChange && inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                         ratioInwardPosQuantityGrowth = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
 
                     List<ProdOrderPartslistPosRelation> mixureDestinationRelations =
@@ -1559,7 +1559,7 @@ namespace gip.mes.facility
 
                             // calculate ratio of relation quantity in source quantity of partslist
                             double plRelQueryRatio = 0;
-                            if (plRel != null)
+                            if (plRel != null && plRel.SourcePartslistPos.TargetQuantityUOM > 0)
                                 plRelQueryRatio = plRel.TargetQuantityUOM / plRel.SourcePartslistPos.TargetQuantityUOM;
                             if (plRel == null || plRelQueryRatio == 0)
                             {
