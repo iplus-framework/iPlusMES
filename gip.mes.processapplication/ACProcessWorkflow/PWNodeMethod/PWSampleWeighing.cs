@@ -50,8 +50,8 @@ namespace gip.mes.processapplication
 
         #region Properties
 
-        public const string LabOrderTemplateName = "LOSampleWeighingTemplate";
-        public const string LabOrderPosTagKey = "StoredSampleWeight";
+        public const string C_LabOrderTemplateName = "LOSampleWeighingTemplate";
+        public const string C_LabOrderPosTagKey = "StoredSampleWeight";
 
         private gip.core.datamodel.ACProgramLog _NewAddedProgramLog = null;
 
@@ -361,23 +361,10 @@ namespace gip.mes.processapplication
                                     if (alibiNoParam != null)
                                         alibiNo = alibiNoParam.ParamAsString;
 
-                                    using(Database db = new core.datamodel.Database())
+                                    using (Database db = new core.datamodel.Database())
                                     using (DatabaseApp dbApp = new DatabaseApp(db))
                                     {
-                                        string secondaryKey = Root.NoManager.GetNewNo(db, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, this);
-                                        Weighing weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
-                                        weighing.Weight = actualWeight;
-                                        weighing.IdentNr = alibiNo == null ? "" : alibiNo;
-                                        dbApp.Weighing.AddObject(weighing);
-
-                                        Msg msg = dbApp.ACSaveChanges();
-                                        if (msg != null)
-                                        {
-                                            dbApp.ACUndoChanges();
-                                            AddAlarm(msg, true);
-                                            return;
-                                        }
-
+                                        Msg msg;
                                         ProdOrderPartslistPos plPos = dbApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == plPosID);
                                         if (plPos == null)
                                         {
@@ -388,55 +375,16 @@ namespace gip.mes.processapplication
                                             return;
                                         }
 
-                                        LabOrder sampleWeighingTemplate = dbApp.LabOrder.FirstOrDefault(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template
-                                                                                                          && c.TemplateName == LabOrderTemplateName);
-
-                                        if (sampleWeighingTemplate == null)
-                                        {
-                                            msg = CreateLabOrderTemplate(dbApp, plPos.Material, out sampleWeighingTemplate);
-                                            if (msg != null)
-                                            {
-                                                AddAlarm(msg, true);
-                                                _InCallback = false;
-                                                return;
-                                            }
-                                        }
-
-                                        if (weighing == null)
-                                        {
-                                            //Error50321: Can not find the Weighing in the database with WeighingID: {0}
-                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(40)", 392, "Error50321");
-                                            AddAlarm(msg, true);
-                                            _InCallback = false;
-                                            return;
-                                        }
-
-                                        LabOrder labOrder = null;
-
-                                        Msg message = LabOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, out labOrder);
-                                        if (message != null)
-                                        {
-                                            AddAlarm(message, true);
-                                            _InCallback = false;
-                                            return;
-                                        }
-
-                                        LabOrderPos labOrderPos = labOrder.LabOrderPos_LabOrder.FirstOrDefault();
-                                        if (labOrderPos == null)
+                                        LabOrderPos labOrderPos;
+                                        msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, C_LabOrderTemplateName, actualWeight, alibiNo, out labOrderPos);
+                                        if (msg == null && labOrderPos != null)
                                         {
                                             //Error50323: The LabOrder position Sample weight not exist.
                                             msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
-                                            AddAlarm(msg, true);
-                                            return;
                                         }
-
-                                        weighing.LabOrderPos = labOrderPos;
-                                        labOrderPos.ActualValue = weighing.Weight;
-
-                                        message = dbApp.ACSaveChanges();
-                                        if (message != null)
+                                        if (msg != null)
                                         {
-                                            AddAlarm(message, true);
+                                            AddAlarm(msg, true);
                                             _InCallback = false;
                                             return;
                                         }
@@ -463,15 +411,58 @@ namespace gip.mes.processapplication
             _InCallback = false;
         }
 
-        private Msg CreateLabOrderTemplate(DatabaseApp dbApp, Material material, out LabOrder template)
+        public static Msg CreateNewLabOrder(IRoot root, IACComponent requester, ACLabOrderManager labOrderManager, DatabaseApp dbApp, ProdOrderPartslistPos plPos, string templateName, double actualWeight, string alibiNo, out LabOrderPos labOrderPos)
         {
-            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(LabOrder), LabOrder.NoColumnName, LabOrder.FormatNewNo, this);
+            labOrderPos = null;
+            string secondaryKey = root.NoManager.GetNewNo(dbApp, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, requester);
+            Weighing weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
+            weighing.Weight = actualWeight;
+            weighing.IdentNr = alibiNo == null ? "" : alibiNo;
+            dbApp.Weighing.AddObject(weighing);
+
+            Msg msg = dbApp.ACSaveChanges();
+            if (msg != null)
+            {
+                dbApp.ACUndoChanges();
+                return msg;
+            }
+
+            LabOrder sampleWeighingTemplate = dbApp.LabOrder.FirstOrDefault(c => c.LabOrderTypeIndex == (short)GlobalApp.LabOrderType.Template
+                                                                              && c.TemplateName == templateName);
+
+            if (sampleWeighingTemplate == null)
+            {
+                msg = CreateLabOrderTemplate(root, requester, dbApp, plPos.BookingMaterial, templateName, out sampleWeighingTemplate);
+                if (msg != null)
+                    return msg;
+            }
+
+            LabOrder labOrder = null;
+            msg = labOrderManager.CreateNewLabOrder(dbApp, sampleWeighingTemplate, "Sample weighing", null, null, plPos, null, out labOrder);
+            if (msg != null)
+                return msg;
+
+            if (labOrder.LabOrderPos_LabOrder.Any())
+                labOrderPos = labOrder.LabOrderPos_LabOrder.Where(c => c.MDLabTag.MDKey == C_LabOrderPosTagKey).FirstOrDefault();
+            if (labOrderPos == null)
+                return null;
+
+            weighing.LabOrderPos = labOrderPos;
+            labOrderPos.ActualValue = weighing.Weight;
+
+            msg = dbApp.ACSaveChanges();
+            return msg;
+        }
+
+        public static Msg CreateLabOrderTemplate(IRoot root, IACComponent requester, DatabaseApp dbApp, Material material, string templateName, out LabOrder template)
+        {
+            string secondaryKey = root.NoManager.GetNewNo(dbApp, typeof(LabOrder), LabOrder.NoColumnName, LabOrder.FormatNewNo, requester);
             template = LabOrder.NewACObject(dbApp, null, secondaryKey);
             template.LabOrderTypeIndex = (short)GlobalApp.LabOrderType.Template;
             template.MDLabOrderState = dbApp.MDLabOrderState.FirstOrDefault(c => c.IsDefault);
             template.Material = material;
             template.SampleTakingDate = DateTime.Now;
-            template.TemplateName = LabOrderTemplateName;
+            template.TemplateName = templateName;
             dbApp.LabOrder.AddObject(template);
 
             Msg msg = dbApp.ACSaveChanges();
@@ -482,13 +473,13 @@ namespace gip.mes.processapplication
                 return msg;
             }
 
-            MDLabTag labTag = dbApp.MDLabTag.FirstOrDefault(c => c.MDKey == LabOrderPosTagKey);
+            MDLabTag labTag = dbApp.MDLabTag.FirstOrDefault(c => c.MDKey == C_LabOrderPosTagKey);
             if (labTag == null)
             {
                 labTag = MDLabTag.NewACObject(dbApp, null);
                 labTag.MDNameTrans = "en{'Sample weight'}de{'Stichproben gewicht'}";
                 labTag.SortIndex = 10000;
-                labTag.MDKey = LabOrderPosTagKey;
+                labTag.MDKey = C_LabOrderPosTagKey;
                 dbApp.MDLabTag.AddObject(labTag);
 
                 msg = dbApp.ACSaveChanges();

@@ -1980,41 +1980,13 @@ namespace gip.mes.processapplication
                 double tolPlus = newACMethod.ParameterValueList.GetDouble("TolerancePlus");
                 if (Math.Abs(tolPlus) <= Double.Epsilon)
                     tolPlus = configACMethod.ParameterValueList.GetDouble("TolerancePlus");
-                // Falls Toleranz negativ, dann ist die Toleranz in % angegeben
-                if (tolPlus < -0.0000001)
-                {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolPlus = targetQ * tolPlus * -0.01;
-                    else
-                        tolPlus = 0.001;
-                }
-                else if (Math.Abs(tolPlus) <= Double.Epsilon)
-                {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolPlus = targetQ * 0.05;
-                    else
-                        tolPlus = 0.001;
-                }
+                tolPlus = RecalcAbsoluteTolerance(tolPlus, targetQ);
                 newACMethod["TolerancePlus"] = tolPlus;
 
                 double tolMinus = newACMethod.ParameterValueList.GetDouble("ToleranceMinus");
                 if (Math.Abs(tolMinus) <= Double.Epsilon)
                     tolMinus = configACMethod.ParameterValueList.GetDouble("ToleranceMinus");
-                // Falls Toleranz negativ, dann ist die Toleranz in % angegeben
-                if (tolMinus < -0.0000001)
-                {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolMinus = targetQ * tolMinus * -0.01;
-                    else
-                        tolMinus = 0.001;
-                }
-                else if (Math.Abs(tolMinus) <= Double.Epsilon)
-                {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolMinus = targetQ * 0.05;
-                    else
-                        tolMinus = 0.001;
-                }
+                tolMinus = RecalcAbsoluteTolerance(tolMinus, targetQ);
                 newACMethod["ToleranceMinus"] = tolMinus;
 
                 if (newACMethod.ParameterValueList.GetDouble("Afterflow") <= 0)
@@ -2069,7 +2041,27 @@ namespace gip.mes.processapplication
                     newACMethod["AdjustmentFlowRate"] = configACMethod.ParameterValueList.GetInt16("AdjustmentFlowRate");
             }
         }
-#endregion
+
+        public static double RecalcAbsoluteTolerance(double tolValue, double targetQ)
+        {
+            // Falls Toleranz negativ, dann ist die Toleranz in % angegeben
+            if (tolValue < -0.0000001)
+            {
+                if (Math.Abs(targetQ) > Double.Epsilon)
+                    tolValue = targetQ * tolValue * -0.01;
+                else
+                    tolValue = 0.001;
+            }
+            else if (Math.Abs(tolValue) <= Double.Epsilon)
+            {
+                if (Math.Abs(targetQ) > Double.Epsilon)
+                    tolValue = targetQ * 0.05;
+                else
+                    tolValue = 0.001;
+            }
+            return tolValue;
+        }
+        #endregion
 
     }
 
