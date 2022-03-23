@@ -40,6 +40,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -55,6 +56,7 @@
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEConveyorBelt.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEElevator.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEPump.cs" />
+    <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAESamplePiLightBox.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAESampleMagazine.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScaleCalibratable.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScrew.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAMTank.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSamplePiLightBox.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskGeneric.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWTemperature.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskScanBase.cs" />
@@ -111,6 +114,7 @@
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
     <Compile Include="Manager\ACPrintManagerMES.cs" />
     <Compile Include="Model\DosingRestInfo.cs" />
+    <Compile Include="Model\SamplePiCommand.cs" />
     <Compile Include="Model\EndPListMode.cs" />
     <Compile Include="Model\StartNextStageMode.cs" />
     <Compile Include="Model\BatchSuggestionCommandModeEnum.cs" />
@@ -167,6 +171,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
       <Project>{893d3b1b-dc55-4684-8b5d-941f1049151b}</Project>
       <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.communication\gip.core.communication.csproj">
+      <Project>{96014A57-E700-478F-850E-452E9BFCAA90}</Project>
+      <Name>gip.core.communication</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
       <Project>{16fb4111-5110-46e5-851d-38a4d7522f85}</Project>

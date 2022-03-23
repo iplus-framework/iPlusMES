@@ -114,7 +114,7 @@ namespace gip.bso.manufacturing
                 .OrderBy(x => x.Sequence)
                 .ToList();
 
-            double quantityIndex = (batchPlan.BatchSize * batchPlan.BatchTargetCount) / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
+            double quantityIndex = batchPlan.BatchSize / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
             foreach(ProdOrderPartslistPos pos in components)
             {
                 pos.TargetQuantityUOM *= quantityIndex;
