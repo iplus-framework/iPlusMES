@@ -274,9 +274,9 @@ namespace gip.mes.processapplication
                         //        if (!selmods.Where(c => c.VBiACClassID == pm.ACType.ACTypeID).Any())
                         //            continue;
                         //    }
-                        //    if (plan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                        //    if (plan.PlanMode == BatchPlanMode.UseBatchCount)
                         //        sb.AppendFormat("({0}/{1})", plan.BatchActualCount, plan.BatchTargetCount);
-                        //    else if (plan.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+                        //    else if (plan.PlanMode == BatchPlanMode.UseTotalSize)
                         //        sb.AppendFormat("({0:0.}/{1:0.})", plan.ActualQuantity, plan.TotalSize);
                         //}
                         return String.Format("O:{0}-{2}\nP:{1}", prodOrderPartsList.ProdOrder.ProgramNo, prodOrderPartsList.Partslist.Material.MaterialName1, sb.ToString());
@@ -296,11 +296,11 @@ namespace gip.mes.processapplication
                     if (prodOrderBatch.ProdOrderBatchPlan != null)
                     {
                         prodOrderBatch.ProdOrderBatchPlan.AutoRefresh();
-                        if (prodOrderBatch.ProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                        if (prodOrderBatch.ProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount)
                         {
                             strPlanInfo = String.Format("({0}/{1})", prodOrderBatch.ProdOrderBatchPlan.BatchActualCount, prodOrderBatch.ProdOrderBatchPlan.BatchTargetCount);
                         }
-                        else if (prodOrderBatch.ProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+                        else if (prodOrderBatch.ProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize)
                         {
                             strPlanInfo = String.Format("({0:0.}/{1:0.})", prodOrderBatch.ProdOrderBatchPlan.ActualQuantity, prodOrderBatch.ProdOrderBatchPlan.TotalSize);
                         }

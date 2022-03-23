@@ -60,9 +60,9 @@ namespace gip.mes.processapplication
             }
         }
 
-        private vd.GlobalApp.BatchPlanStartModeEnum _StartMode;
+        private vd.BatchPlanStartModeEnum _StartMode;
         [DataMember]
-        public vd.GlobalApp.BatchPlanStartModeEnum StartMode
+        public vd.BatchPlanStartModeEnum StartMode
         {
             get
             {
@@ -105,7 +105,7 @@ namespace gip.mes.processapplication
         {
             get
             {
-                ACValueItem item = vd.GlobalApp.BatchPlanStartModeEnumList.Where(c => (vd.GlobalApp.BatchPlanStartModeEnum)c.Value == StartMode).FirstOrDefault();
+                ACValueItem item = DatabaseApp.BatchPlanStartModeEnumList.Where(c => (vd.BatchPlanStartModeEnum)c.Value == StartMode).FirstOrDefault();
                 if (item != null)
                     return item.ACCaption;
                 return StartMode.ToString();

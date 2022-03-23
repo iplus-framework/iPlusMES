@@ -1,0 +1,2 @@
+update ACClass set ACIdentifier = 'BatchPlanMode', AssemblyQualifiedName = 'gip.mes.datamodel.BatchPlanMode, gip.mes.datamodel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'BatchPlanMode';
+update ACClass set ACIdentifier = 'BatchPlanStartModeEnum', AssemblyQualifiedName = 'gip.mes.datamodel.BatchPlanStartModeEnum, gip.mes.datamodel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'BatchPlanStartModeEnum';

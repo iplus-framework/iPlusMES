@@ -66,7 +66,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public GlobalApp.BatchPlanMode? PlanMode { get; set; }
+        public BatchPlanMode? PlanMode { get; set; }
 
         public BatchSuggestionCommandModeEnum? BatchSuggestionMode { get; set; }
 
@@ -720,7 +720,7 @@ namespace gip.bso.manufacturing
 
         public void LoadNewBatchSuggestion(BatchSuggestionCommandModeEnum? suggestionMode)
         {
-            if (PlanMode != null && PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+            if (PlanMode != null && PlanMode == BatchPlanMode.UseTotalSize)
             {
                 double targetQuantity = TargetQuantityUOM;
                 if (NewTargetQuantityUOM > 0)

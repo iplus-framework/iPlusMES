@@ -274,7 +274,7 @@ namespace gip.mes.processapplication
                 }
                 else if (!activeBatchPlan.IsValid)
                 {
-                    if (this.IterationCount.ValueT > 0 && activeBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize && activeBatchPlan.TotalSize <= 0.00001)
+                    if (this.IterationCount.ValueT > 0 && activeBatchPlan.PlanMode == BatchPlanMode.UseTotalSize && activeBatchPlan.TotalSize <= 0.00001)
                     {
                         activeBatchPlan.PlanState = GlobalApp.BatchPlanState.Completed;
                         _NoBatchPlanFoundCounter = 0;
@@ -696,7 +696,7 @@ namespace gip.mes.processapplication
                 }
                 // Überprüfe ob nochmal ein Batch gestratet werden muss
                 bool createOneBatchMore = false;
-                if (batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseFromTo)
+                if (batchPlanEntry.PlanMode == BatchPlanMode.UseFromTo)
                 {
                     if (nextBatchNo <= batchPlanEntry.BatchNoTo)
                     {
@@ -705,7 +705,7 @@ namespace gip.mes.processapplication
                             isLastBatch = true;
                     }
                 }
-                else if (batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                else if (batchPlanEntry.PlanMode == BatchPlanMode.UseBatchCount)
                 {
                     if (batchPlanEntry.BatchActualCount < batchPlanEntry.BatchTargetCount)
                     {
@@ -724,7 +724,7 @@ namespace gip.mes.processapplication
                     else if (batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)
                         isLastBatch = true;
                 }
-                else //if (batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+                else //if (batchPlanEntry.PlanMode == BatchPlanMode.UseTotalSize)
                 {
                     if ((!adaptToRestQuantity && batchPlanEntry.RemainingQuantity + batchSize.Value > batchSize.Value)
                         || (adaptToRestQuantity && batchPlanEntry.RemainingQuantity > 1))
@@ -740,14 +740,14 @@ namespace gip.mes.processapplication
                     totalSizeReached = (prodOrderPartslistPos.RemainingCallQuantity * -1) > toleranceRemainingQuantity;
                 else
                     totalSizeReached = prodOrderPartslistPos.RemainingCallQuantity + batchSize.Value < batchSize.Value;
-                //if (adaptToRestQuantity && (batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize))
+                //if (adaptToRestQuantity && (batchPlanEntry.PlanMode == BatchPlanMode.UseTotalSize))
                 //totalSizeReached = prodOrderPartslistPos.RemainingCallQuantity < 1;
                 // Überprüfe ob die Gesamtmenge erreicht ist. Sie darf um max. einen Batch darf größer sein
 
                 if (!createOneBatchMore || totalSizeReached)
                 {
                     NextBatchState nextBatchState = NextBatchState.CompletedNoNewEntry;
-                    if (batchPlanEntry.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
+                    if (batchPlanEntry.PlanMode != BatchPlanMode.UseBatchCount
                         || isLastBatch 
                         || totalSizeReached)
                     {
@@ -755,7 +755,7 @@ namespace gip.mes.processapplication
                                 && (!batchPlanEntry.DiffPartialCount.HasValue
                                     || (batchPlanEntry.DiffPartialCount <= 0 && batchPlanEntry.BatchActualCount >= batchPlanEntry.BatchTargetCount)))
                             || totalSizeReached
-                            || batchPlanEntry.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount)
+                            || batchPlanEntry.PlanMode != BatchPlanMode.UseBatchCount)
                             batchPlanEntry.PlanState = GlobalApp.BatchPlanState.Completed;
                         else if ((batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
                             || (!batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.PartialActualCount.HasValue))
@@ -813,7 +813,7 @@ namespace gip.mes.processapplication
         public virtual double GetBatchSizeForNextBatch(DatabaseApp dbApp, ProdOrderPartslistPos intermediatePosition, ProdOrderPartslist currentProdOrderPartslist,
                                                         ProdOrderBatchPlan batchPlanEntry, ProdOrderBatch lastBatch, int nextBatchNo, GetBatchSizePhase phase)
         {
-            bool batchwiseCreation = batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount || batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseFromTo;
+            bool batchwiseCreation = batchPlanEntry.PlanMode == BatchPlanMode.UseBatchCount || batchPlanEntry.PlanMode == BatchPlanMode.UseFromTo;
             double batchCreateSize = batchwiseCreation ? batchPlanEntry.BatchSize : batchPlanEntry.TotalSize;
 
             if (phase == GetBatchSizePhase.BeforeCreateBatch)

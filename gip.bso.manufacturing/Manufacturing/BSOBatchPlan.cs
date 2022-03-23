@@ -863,7 +863,7 @@ namespace gip.bso.manufacturing
                 case "SelectedBatchPlanForIntermediate\\BatchNoFrom":
                 case "SelectedBatchPlanForIntermediate\\BatchNoTo":
                     {
-                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != GlobalApp.BatchPlanMode.UseFromTo)
+                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != BatchPlanMode.UseFromTo)
                             result = Global.ControlModes.Disabled;
                         else if (vbControl.VBContent == "SelectedBatchPlanForIntermediate\\BatchNoFrom")
                         {
@@ -883,7 +883,7 @@ namespace gip.bso.manufacturing
                     }
                 case "SelectedBatchPlanForIntermediate\\BatchTargetCount":
                     {
-                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount)
+                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != BatchPlanMode.UseBatchCount)
                             result = Global.ControlModes.Disabled;
                         else if (SelectedBatchPlanForIntermediate.BatchTargetCount <= 0)
                             result = Global.ControlModes.EnabledWrong;
@@ -891,7 +891,7 @@ namespace gip.bso.manufacturing
                     }
                 case "SelectedBatchPlanForIntermediate\\BatchSize":
                     {
-                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode == BatchPlanMode.UseTotalSize)
                             result = Global.ControlModes.Disabled;
                         else
                         {
@@ -904,7 +904,7 @@ namespace gip.bso.manufacturing
                     }
                 case "SelectedBatchPlanForIntermediate\\TotalSize":
                     {
-                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != GlobalApp.BatchPlanMode.UseTotalSize)
+                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != BatchPlanMode.UseTotalSize)
                             result = Global.ControlModes.Disabled;
                         else if (SelectedBatchPlanForIntermediate.TotalSize <= 0.000001)
                             result = Global.ControlModes.EnabledWrong;
@@ -943,7 +943,7 @@ namespace gip.bso.manufacturing
                     }
                 case "SelectedBatchPlanForIntermediate\\YieldTotalSizeExpected":
                     {
-                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount)
+                        if (SelectedBatchPlanForIntermediate == null || SelectedBatchPlanForIntermediate.PlanMode != BatchPlanMode.UseBatchCount)
                             result = Global.ControlModes.Disabled;
                         else if (SelectedBatchPlanForIntermediate.YieldTotalSizeExpected <= 0)
                             result = Global.ControlModes.EnabledWrong;

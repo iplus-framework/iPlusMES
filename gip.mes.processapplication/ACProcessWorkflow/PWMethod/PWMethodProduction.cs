@@ -827,15 +827,15 @@ namespace gip.mes.processapplication
                     ProdOrderBatch batch = CurrentProdOrderBatch.FromAppContext<ProdOrderBatch>(dbApp);
                     if (batch.ProdOrderBatchPlan != null)
                     {
-                        if (batch.ProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseFromTo)
+                        if (batch.ProdOrderBatchPlan.PlanMode == BatchPlanMode.UseFromTo)
                         {
                             batch.ProdOrderBatchPlan.BatchNoTo = batch.BatchSeqNo;
                         }
-                        else if (batch.ProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                        else if (batch.ProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount)
                         {
                             batch.ProdOrderBatchPlan.BatchTargetCount = batch.ProdOrderBatchPlan.BatchActualCount;
                         }
-                        else //if (batchPlanEntry.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+                        else //if (batchPlanEntry.PlanMode == BatchPlanMode.UseTotalSize)
                         {
                             batch.ProdOrderBatchPlan.TotalSize = batch.ProdOrderBatchPlan.ActualQuantity;
                         }

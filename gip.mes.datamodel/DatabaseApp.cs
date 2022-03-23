@@ -1157,12 +1157,36 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        static ACValueItemList _BatchPlanModeList = null;
         [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> BatchPlanModeList
         {
             get
             {
-                return GlobalApp.BatchPlanModeList;
+                if (_BatchPlanModeList == null)
+                {
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(BatchPlanMode));
+                    if (acClass != null)
+                        _BatchPlanModeList = acClass.ACValueListForEnum;
+                }
+                return _BatchPlanModeList;
+            }
+        }
+
+        static ACValueItemList _BatchPlanStartModeEnumList = null;
+        [ACPropertyInfo(9999)]
+        public static IEnumerable<ACValueItem> BatchPlanStartModeEnumList
+        {
+            get
+            {
+                if (_BatchPlanStartModeEnumList == null)
+                {
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(BatchPlanStartModeEnum));
+                    if (acClass != null)
+                        _BatchPlanStartModeEnumList = acClass.ACValueListForEnum;
+                }
+                return _BatchPlanStartModeEnumList;
             }
         }
 

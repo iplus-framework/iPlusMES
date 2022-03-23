@@ -59,6 +59,7 @@
         public const string ESOutOrderType = "en{'Sales Order Type'}de{'Verkaufsauftragsart'}";
         public const string ESProcessErrorAction = "en{'Process Error Action'}de{'Prozessfehleraktion'}";
         public const string ESProdOrderPartslistPosState = "en{'Prod.Order BOM Pos. Status'}de{'Prod.auftrag Stückl. Pos.-Status'}";
+        public const string ESMDBatchPlanMode = "en{'Batch planning mode'}de{'Batch Planmodus'}";
         public const string ESMDBatchPlanStartMode = "en{'Batch plan mode'}de{'Batch plan mode'}";
         public const string ESProdOrderState = "en{'Production Order Status'}de{'Produktionsauftragsstatus'}";
         public const string ESRatingComplaintType = "en{'Complaint Type'}de{'Reklamationsart'}";

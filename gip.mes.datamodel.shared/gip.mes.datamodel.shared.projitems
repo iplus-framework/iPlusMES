@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BarcodeSequenceBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BatchPlanMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BatchPlanStartModeEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PostingTypeEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FacilityTypesEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalApp.cs" />

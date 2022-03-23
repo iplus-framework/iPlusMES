@@ -523,7 +523,7 @@ namespace gip.mes.facility
                                             {
                                                 foreach (var batchPlan in openPlans)
                                                 {
-                                                    double factor = batchPlan.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize ? batchPlan.TotalSize / prodOrderPartsList.TargetQuantity  : batchPlan.BatchSize / prodOrderPartsList.TargetQuantity;
+                                                    double factor = batchPlan.PlanMode == BatchPlanMode.UseTotalSize ? batchPlan.TotalSize / prodOrderPartsList.TargetQuantity  : batchPlan.BatchSize / prodOrderPartsList.TargetQuantity;
                                                     double expectedBatchWeight = node2Check.CalcExpectedBatchWeightAtThisIntermPos(dbApp, factor);
                                                     double totalSumMinMax = minMaxWeight.Value;
                                                     if (maxRepeatsInterDis.HasValue && maxRepeatsInterDis > 0)

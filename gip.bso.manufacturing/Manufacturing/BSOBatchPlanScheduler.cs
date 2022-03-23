@@ -177,7 +177,7 @@ namespace gip.bso.manufacturing
 
             if (batchPlanMode != null && batchPlanMode.Value != null)
             {
-                schedulerPartslist.PlanMode = (GlobalApp.BatchPlanMode)batchPlanMode.Value;
+                schedulerPartslist.PlanMode = (BatchPlanMode)batchPlanMode.Value;
                 schedulerPartslist.PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)schedulerPartslist.PlanMode).ACCaption;
             }
 
@@ -734,9 +734,9 @@ namespace gip.bso.manufacturing
                     _SelectedScheduleForPWNode = value;
                     OnPropertyChanged("SelectedScheduleForPWNode");
                     if (_SelectedScheduleForPWNode != null)
-                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (GlobalApp.BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
+                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
                     else
-                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (GlobalApp.BatchPlanStartModeEnum)c.Value == GlobalApp.BatchPlanStartModeEnum.Off).FirstOrDefault();
+                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == BatchPlanStartModeEnum.Off).FirstOrDefault();
                     LoadProdOrderBatchPlanList();
 
                     OnPropertyChanged("TargetScheduleForPWNodeList");
@@ -809,7 +809,7 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_FilterBatchPlanStartModeList == null)
-                    _FilterBatchPlanStartModeList = vd.GlobalApp.BatchPlanStartModeEnumList;
+                    _FilterBatchPlanStartModeList = DatabaseApp.BatchPlanStartModeEnumList as ACValueItemList;
                 return _FilterBatchPlanStartModeList;
             }
         }
@@ -1049,7 +1049,7 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == "PartialTargetCount"
                 && SelectedScheduleForPWNode != null
-                && SelectedScheduleForPWNode.StartMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic
+                && SelectedScheduleForPWNode.StartMode == BatchPlanStartModeEnum.SemiAutomatic
                 && !_IsRefreshingBatchPlan)
             {
                 if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount > 0)
@@ -1804,7 +1804,9 @@ namespace gip.bso.manufacturing
             {
                 if (_FilterBatchplanSuggestionModeList == null)
                 {
-                    _FilterBatchplanSuggestionModeList = new ACValueListBatchSuggestionCommandModeEnum();
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(BatchSuggestionCommandModeEnum));
+                    if (acClass != null)
+                        _FilterBatchplanSuggestionModeList = acClass.ACValueListForEnum;
                 }
                 return _FilterBatchplanSuggestionModeList;
             }
@@ -1815,7 +1817,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledRecalculateBatchSuggestion())
                 return;
-            if (SelectedWizardSchedulerPartslist.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+            if (SelectedWizardSchedulerPartslist.PlanMode == BatchPlanMode.UseTotalSize)
             {
                 SelectedWizardSchedulerPartslist.LoadNewBatchSuggestion(FilterBatchplanSuggestionMode);
             }
@@ -2126,7 +2128,7 @@ namespace gip.bso.manufacturing
                 return;
             PAScheduleForPWNode updateNode = new PAScheduleForPWNode();
             updateNode.CopyFrom(SelectedScheduleForPWNode, true);
-            updateNode.StartMode = (vd.GlobalApp.BatchPlanStartModeEnum)SelectedFilterBatchPlanStartMode.Value;
+            updateNode.StartMode = (vd.BatchPlanStartModeEnum)SelectedFilterBatchPlanStartMode.Value;
             var result = BatchPlanScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { updateNode });
             if (result != null)
             {
@@ -2155,7 +2157,7 @@ namespace gip.bso.manufacturing
             ClearMessages();
             bool isMovingValueValid = false;
             bool isMove = false;
-            if (SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+            if (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount)
             {
                 int diffBatchCount = SelectedProdOrderBatchPlan.BatchTargetCount - SelectedProdOrderBatchPlan.BatchActualCount;
                 // "Question50045" Please enter the number of batches you want to move to {0}:
@@ -2202,7 +2204,7 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            else if (SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+            else if (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize)
             {
                 // "Question50046" Please enter the quantity you want to move to {0}:
 
@@ -2294,9 +2296,9 @@ namespace gip.bso.manufacturing
                 && SelectedProdOrderBatchPlan.ProdOrderPartslist != null
                 && SelectedProdOrderBatchPlan.PlanState < GlobalApp.BatchPlanState.Completed
                 && (
-                       (SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount
+                       (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount
                         && SelectedProdOrderBatchPlan.BatchActualCount < SelectedProdOrderBatchPlan.BatchTargetCount)
-                    || (SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize
+                    || (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize
                         && SelectedProdOrderBatchPlan.RemainingQuantity > 0.00001)
                     )
                 && SelectedTargetScheduleForPWNode != null
@@ -3907,9 +3909,9 @@ namespace gip.bso.manufacturing
                     case "SelectedProdOrderBatchPlan\\PartialTargetCount":
                         //SelectedProdOrderBatchPlan.PlannedStartDate && SelectedProdOrderBatchPlan.end
                         if (SelectedScheduleForPWNode != null
-                            && SelectedScheduleForPWNode.StartMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic
+                            && SelectedScheduleForPWNode.StartMode == BatchPlanStartModeEnum.SemiAutomatic
                             && SelectedProdOrderBatchPlan != null
-                            && SelectedProdOrderBatchPlan.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount
+                            && SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount
                             && SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount)
                             result = Global.ControlModes.Enabled;
                         else
@@ -3919,7 +3921,7 @@ namespace gip.bso.manufacturing
                     case "SelectedProdOrderBatchPlan\\ScheduledEndDate":
                         if (SelectedProdOrderBatchPlan != null
                             && (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.ReadyToStart || SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.Paused)
-                            && (SelectedProdOrderBatchPlan.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount
+                            && (SelectedProdOrderBatchPlan.PlanMode != BatchPlanMode.UseBatchCount
                                || SelectedProdOrderBatchPlan.BatchTargetCount > SelectedProdOrderBatchPlan.BatchActualCount))
                             result = Global.ControlModes.Enabled;
                         else
@@ -4049,7 +4051,7 @@ namespace gip.bso.manufacturing
                     OnPropertyChanged("ScheduleForPWNodeList");
                     SelectedScheduleForPWNode = selected;
                     if (SelectedScheduleForPWNode != null)
-                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (GlobalApp.BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
+                        SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
                 }
             }
 

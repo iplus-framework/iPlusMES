@@ -1220,48 +1220,6 @@ namespace gip.mes.datamodel
 #endif
         #endregion
 
-        #region BatchPlanMode
-        /// <summary>
-        /// Enum BatchPlanMode
-        /// </summary>
-#if NETFRAMEWORK
-        [ACSerializeableInfo]
-        [ACClassInfo(Const.PackName_VarioAutomation, "en{'Batch planning mode'}de{'Batch Planmodus'}", Global.ACKinds.TACEnum)]
-#else
-        [DataContract]
-#endif
-
-        public enum BatchPlanMode : short
-        {
-            UseFromTo = 0,
-            UseBatchCount = 1,
-            UseTotalSize = 2,
-        }
-
-#if NETFRAMEWORK
-        static ACValueItemList _BatchPlanModeList = null;
-        /// <summary>
-        /// Gibt eine Liste aller Enums zurück, damit die Gui
-        /// damit arbeiten kann.
-        /// </summary>
-        static public ACValueItemList BatchPlanModeList
-        {
-            get
-            {
-                if (GlobalApp._BatchPlanModeList == null)
-                {
-
-                    GlobalApp._BatchPlanModeList = new ACValueItemList("BatchPlanModeIndex");
-                    GlobalApp._BatchPlanModeList.AddEntry((short)BatchPlanMode.UseFromTo, "en{'Use from/to values'}de{'Nach Von/Bis-Batch-Nr.'}");
-                    GlobalApp._BatchPlanModeList.AddEntry((short)BatchPlanMode.UseBatchCount, "en{'Use target batch count'}de{'Nach Soll-Batchzahl'}");
-                    GlobalApp._BatchPlanModeList.AddEntry((short)BatchPlanMode.UseTotalSize, "en{'Use total size'}de{'Nach Gesamtgröße'}");
-                }
-                return GlobalApp._BatchPlanModeList;
-            }
-        }
-#endif
-        #endregion
-
         #region BatchPlanState
         /// <summary>
         /// Enum BatchPlanState
@@ -1307,48 +1265,6 @@ namespace gip.mes.datamodel
                     GlobalApp._BatchPlanStateList.AddEntry((short)BatchPlanState.Paused, "en{'Paused'}de{'Pausiert'}");
                 }
                 return GlobalApp._BatchPlanStateList;
-            }
-        }
-#endif
-        #endregion
-
-        #region BatchPlanStartMode
-
-#if NETFRAMEWORK
-        [ACSerializeableInfo]
-        [ACClassInfo(Const.PackName_VarioSystem, "en{'BatchPlanStartModes'}de{'BatchPlanStartModes'}", Global.ACKinds.TACEnum)]
-#else
-       [DataContract]
-#endif
-        public enum BatchPlanStartModeEnum : short
-        {
-            Off = 0,
-            AutoSequential = 1,
-            AutoTime = 2,
-            AutoTimeAndSequential = 3,
-            SemiAutomatic = 4
-        }
-
-#if NETFRAMEWORK
-        static ACValueItemList _BatchPlanStartModeEnumList = null;
-        /// <summary>
-        /// Gibt eine Liste aller Enums zurück, damit die Gui
-        /// damit arbeiten kann.
-        /// </summary>
-        static public ACValueItemList BatchPlanStartModeEnumList
-        {
-            get
-            {
-                if (GlobalApp._BatchPlanStartModeEnumList == null)
-                {
-                    GlobalApp._BatchPlanStartModeEnumList = new ACValueItemList("BatchPlanStartModeEnumList");
-                    GlobalApp._BatchPlanStartModeEnumList.AddEntry((short)BatchPlanStartModeEnum.Off, "en{'Off'}de{'Aus'}");
-                    GlobalApp._BatchPlanStartModeEnumList.AddEntry((short)BatchPlanStartModeEnum.AutoSequential, "en{'Sequential'}de{'Sequenziell'}");
-                    GlobalApp._BatchPlanStartModeEnumList.AddEntry((short)BatchPlanStartModeEnum.AutoTime, "en{'Scheduling'}de{'Nach Zeitplan'}");
-                    GlobalApp._BatchPlanStartModeEnumList.AddEntry((short)BatchPlanStartModeEnum.AutoTimeAndSequential, "en{'Scheduling and sequential'}de{'Nach Zeitplan und Sequenziell'}}");
-                    GlobalApp._BatchPlanStartModeEnumList.AddEntry((short)BatchPlanStartModeEnum.SemiAutomatic, "en{'Partial quantity'}de{'Nach Teilmenge'}}");
-                }
-                return GlobalApp._BatchPlanStartModeEnumList;
             }
         }
 #endif

@@ -58,7 +58,7 @@ namespace gip.mes.processapplication
             paramTranslation.Add("BatchSizeMax", "en{'Max. Batchsize'}de{'Max. Batchgröße'}");
             
             // PlanMode
-            method.ParameterValueList.Add(new ACValue("PlanMode", typeof(GlobalApp.BatchPlanMode), false, Global.ParamOption.Optional));
+            method.ParameterValueList.Add(new ACValue("PlanMode", typeof(BatchPlanMode), false, Global.ParamOption.Optional));
             paramTranslation.Add("PlanMode", "en{'Batch planning mode'}de{'Batch Planmodus'}");
             
             // BatchSuggestionCommandModeEnum

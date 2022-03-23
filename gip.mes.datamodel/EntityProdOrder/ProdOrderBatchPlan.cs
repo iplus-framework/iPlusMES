@@ -13,7 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(6, "BatchActualCount", "en{'Actual Batch Count'}de{'Ist Batchanzahl'}", "", "", true)]
     [ACPropertyEntity(7, "BatchSize", "en{'Batch Size'}de{'Batchgröße'}", "", "", true)]
     [ACPropertyEntity(8, "TotalSize", "en{'Total Size'}de{'Gesamtgröße'}", "", "", true)]
-    [ACPropertyEntity(10, "PlanModeIndex", "en{'Mode'}de{'Modus'}", typeof(GlobalApp.BatchPlanMode), Const.ContextDatabase + "\\BatchPlanModeList", "", true)]
+    [ACPropertyEntity(10, "PlanModeIndex", "en{'Mode'}de{'Modus'}", typeof(BatchPlanMode), Const.ContextDatabase + "\\BatchPlanModeList", "", true)]
     [ACPropertyEntity(11, "PlanStateIndex", "en{'Status'}de{'Status'}", typeof(GlobalApp.BatchPlanState), Const.ContextDatabase + "\\BatchPlanStateList", "", true)]
     [ACPropertyEntity(12, ProdOrderPartslistPos.ClassName, "en{'From Intermediate'}de{'Von Zwischenprodukt'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     [ACPropertyEntity(13, MaterialWFACClassMethod.ClassName, "en{'MaterialWFACClassMethod'}de{'MaterialWFACClassMethod'}", Const.ContextDatabase + "\\" + MaterialWFACClassMethod.ClassName, "", true)]
@@ -44,7 +44,7 @@ namespace gip.mes.datamodel
             ProdOrderBatchPlan entity = new ProdOrderBatchPlan();
             entity.ProdOrderBatchPlanID = Guid.NewGuid();
             entity.DefaultValuesACObject();
-            entity.PlanMode = GlobalApp.BatchPlanMode.UseBatchCount;
+            entity.PlanMode = BatchPlanMode.UseBatchCount;
             entity.PlanState = GlobalApp.BatchPlanState.Created;
             entity.IsValidated = false;
             entity.PlannedStartDate = DateTime.Now;
@@ -172,11 +172,11 @@ namespace gip.mes.datamodel
 
         #region Properties
 
-        public GlobalApp.BatchPlanMode PlanMode
+        public BatchPlanMode PlanMode
         {
             get
             {
-                return (GlobalApp.BatchPlanMode)PlanModeIndex;
+                return (BatchPlanMode)PlanModeIndex;
             }
             set
             {
@@ -275,7 +275,7 @@ namespace gip.mes.datamodel
                 if (_YieldTotalSizeExpected != value)
                 {
                     _YieldTotalSizeExpected = value;
-                    if (BatchSize >= 0.000001 && Yield >= 0.000001 && PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                    if (BatchSize >= 0.000001 && Yield >= 0.000001 && PlanMode == BatchPlanMode.UseBatchCount)
                     {
                         BatchTargetCount = (int)(_YieldTotalSizeExpected / (Yield * BatchSize));
                         if (Math.Abs(_YieldTotalSizeExpected - YieldTotalSize) > Double.Epsilon && _YieldTotalSizeExpected > YieldTotalSize)
@@ -371,7 +371,7 @@ namespace gip.mes.datamodel
         {
             if (EntityState == System.Data.EntityState.Detached)
                 return;
-            if (this.PlanMode != GlobalApp.BatchPlanMode.UseFromTo)
+            if (this.PlanMode != BatchPlanMode.UseFromTo)
                 return;
             if (_OnTotalSizeChanging || _OnBatchTargetCountChanging || _OnPlanModeIndexChanging)
                 return;
@@ -408,7 +408,7 @@ namespace gip.mes.datamodel
         {
             if (EntityState == System.Data.EntityState.Detached)
                 return;
-            if (this.PlanMode != GlobalApp.BatchPlanMode.UseFromTo)
+            if (this.PlanMode != BatchPlanMode.UseFromTo)
                 return;
             if (_OnTotalSizeChanging || _OnBatchTargetCountChanging || _OnPlanModeIndexChanging)
                 return;
@@ -445,7 +445,7 @@ namespace gip.mes.datamodel
         {
             if (EntityState == System.Data.EntityState.Detached)
                 return;
-            if (this.PlanMode != GlobalApp.BatchPlanMode.UseBatchCount)
+            if (this.PlanMode != BatchPlanMode.UseBatchCount)
                 return;
             if (_OnTotalSizeChanging || _OnTotalSizeChanging || _OnBatchSizeChanging || _OnPlanModeIndexChanging)
                 return;
@@ -475,7 +475,7 @@ namespace gip.mes.datamodel
         {
             if (EntityState == System.Data.EntityState.Detached)
                 return;
-            if (this.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+            if (this.PlanMode == BatchPlanMode.UseTotalSize)
                 return;
             if (_OnTotalSizeChanging || _OnPlanModeIndexChanging)
                 return;
@@ -483,11 +483,11 @@ namespace gip.mes.datamodel
             try
             {
                 this.IsValidated = false;
-                if (this.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                if (this.PlanMode == BatchPlanMode.UseBatchCount)
                 {
                     this.TotalSize = this.BatchTargetCount * this.BatchSize;
                 }
-                else if (this.PlanMode == GlobalApp.BatchPlanMode.UseFromTo)
+                else if (this.PlanMode == BatchPlanMode.UseFromTo)
                 {
                     if (this.BatchNoFrom.HasValue && this.BatchNoTo.HasValue && this.BatchNoFrom.Value < this.BatchNoTo.Value)
                     {
@@ -524,7 +524,7 @@ namespace gip.mes.datamodel
             OnPropertyChanged("DifferenceQuantity");
             OnPropertyChanged("YieldBatchSize");
             OnPropertyChanged("YieldTotalSize");
-            if (this.PlanMode != GlobalApp.BatchPlanMode.UseTotalSize)
+            if (this.PlanMode != BatchPlanMode.UseTotalSize)
                 return;
             if (_OnBatchSizeChanging || _OnBatchTargetCountChanging || _OnBatchBatchNoToChanging || _OnBatchBatchNoFromChanging || _OnPlanModeIndexChanging)
                 return;
@@ -539,7 +539,7 @@ namespace gip.mes.datamodel
 
 
         bool _OnPlanModeIndexChanging = false;
-        GlobalApp.BatchPlanMode _PreviousMode = GlobalApp.BatchPlanMode.UseBatchCount;
+        BatchPlanMode _PreviousMode = BatchPlanMode.UseBatchCount;
         partial void OnPlanModeIndexChanging(global::System.Int16 value)
         {
             if (EntityState == System.Data.EntityState.Detached)
@@ -554,14 +554,14 @@ namespace gip.mes.datamodel
             _OnPlanModeIndexChanging = true;
             try
             {
-                if (this.PlanMode == GlobalApp.BatchPlanMode.UseTotalSize)
+                if (this.PlanMode == BatchPlanMode.UseTotalSize)
                 {
                     this.BatchNoFrom = null;
                     this.BatchNoTo = null;
                     this.BatchSize = 0;
                     this.BatchTargetCount = 0;
                 }
-                else if (this.PlanMode == GlobalApp.BatchPlanMode.UseBatchCount)
+                else if (this.PlanMode == BatchPlanMode.UseBatchCount)
                 {
                     int nBatchCount = this.BatchTargetCount;
                     if (this.BatchNoFrom.HasValue && this.BatchNoTo.HasValue && this.BatchNoFrom.Value < this.BatchNoTo.Value)
@@ -571,7 +571,7 @@ namespace gip.mes.datamodel
                     this.BatchNoFrom = null;
                     this.BatchNoTo = null;
                 }
-                else //if (this.PlanMode == GlobalApp.BatchPlanMode.UseFromTo)
+                else //if (this.PlanMode == BatchPlanMode.UseFromTo)
                 {
                     if (this.BatchTargetCount > 0)
                     {
@@ -684,9 +684,9 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return !((PlanMode == GlobalApp.BatchPlanMode.UseBatchCount && (BatchTargetCount <= 0 || BatchSize <= 0.001))
-                        || (PlanMode == GlobalApp.BatchPlanMode.UseFromTo && (BatchNoFrom <= 0 || BatchNoTo <= 0 || BatchSize <= 0.001))
-                        || (PlanMode == GlobalApp.BatchPlanMode.UseTotalSize && (TotalSize <= 0.001)));
+                return !((PlanMode == BatchPlanMode.UseBatchCount && (BatchTargetCount <= 0 || BatchSize <= 0.001))
+                        || (PlanMode == BatchPlanMode.UseFromTo && (BatchNoFrom <= 0 || BatchNoTo <= 0 || BatchSize <= 0.001))
+                        || (PlanMode == BatchPlanMode.UseTotalSize && (TotalSize <= 0.001)));
             }
         }
 

@@ -69,7 +69,7 @@ namespace gip.mes.processapplication
                     {
                         foreach (var item in newScheduleList)
                         {
-                            item.StartMode = GlobalApp.BatchPlanStartModeEnum.Off;
+                            item.StartMode = BatchPlanStartModeEnum.Off;
                         }
                     }
                     SchedulesForPWNodes.ValueT = newScheduleList;
@@ -179,7 +179,7 @@ namespace gip.mes.processapplication
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
-                activatedSchedules = activatedSchedules.Where(c => c.StartMode != vd.GlobalApp.BatchPlanStartModeEnum.Off).ToArray();
+                activatedSchedules = activatedSchedules.Where(c => c.StartMode != vd.BatchPlanStartModeEnum.Off).ToArray();
             }
             if (!activatedSchedules.Any())
                 return;
@@ -211,7 +211,7 @@ namespace gip.mes.processapplication
                         queryLoadedInstances = queryLoadedInstances.Where(c => c.InitState == ACInitState.Initialized);
                     foreach (PAScheduleForPWNode scheduleForPWNode in activatedSchedules)
                     {
-                        GlobalApp.BatchPlanStartModeEnum startMode;
+                        BatchPlanStartModeEnum startMode;
                         using (ACMonitor.Lock(_20015_LockValue))
                         {
                             startMode = scheduleForPWNode.StartMode;
@@ -222,7 +222,7 @@ namespace gip.mes.processapplication
                             : new PWNodeProcessWorkflowVB[] { };
                         List<ProdOrderBatchPlan> startableBatchPlans = new List<ProdOrderBatchPlan>();
 
-                        if (startMode == GlobalApp.BatchPlanStartModeEnum.AutoTime)
+                        if (startMode == BatchPlanStartModeEnum.AutoTime)
                         {
                             IQueryable<ProdOrderBatchPlan> readyBatchPlans = s_cQry_ReadyBatchPlansForPWNode(dbApp, scheduleForPWNode.MDSchedulingGroupID, AppDefManagerID);
                             DateTime dateTimeIfNull = DateTime.Now.AddDays(1);
@@ -243,7 +243,7 @@ namespace gip.mes.processapplication
                             if (!readyBatchPlans.Any())
                                 continue;
                             ProdOrderBatchPlan nextBatchPlan = null;
-                            if (startMode == GlobalApp.BatchPlanStartModeEnum.SemiAutomatic)
+                            if (startMode == BatchPlanStartModeEnum.SemiAutomatic)
                             {
                                 nextBatchPlan = readyBatchPlans.Where(c => c.PartialTargetCount.HasValue
                                                                             && c.PartialTargetCount > 0
@@ -277,7 +277,7 @@ namespace gip.mes.processapplication
                             {
                                 nextBatchPlan = readyBatchPlans.FirstOrDefault();
                                 // If Scheduled date not reached, then wait
-                                if (startMode == GlobalApp.BatchPlanStartModeEnum.AutoTimeAndSequential
+                                if (startMode == BatchPlanStartModeEnum.AutoTimeAndSequential
                                     && !((nextBatchPlan.ScheduledStartDate ?? DateTime.Now) <= DateTime.Now)
                                     )
                                     continue;
@@ -451,7 +451,7 @@ namespace gip.mes.processapplication
                 // Force Broadcast
                 (SchedulesForPWNodes as IACPropertyNetServer).ChangeValueServer(scheduleList, true);
 
-                if (item.StartMode != GlobalApp.BatchPlanStartModeEnum.Off)
+                if (item.StartMode != BatchPlanStartModeEnum.Off)
                     DelegateQueue.Add(() => { ProcessActivatedSchedules(new PAScheduleForPWNode[] { item }); });
             }
             return null;
@@ -491,7 +491,7 @@ namespace gip.mes.processapplication
             {
                 MDSchedulingGroupID = c.MDSchedulingGroupID,
                 MDSchedulingGroup = c,
-                StartMode = vd.GlobalApp.BatchPlanStartModeEnum.Off,
+                StartMode = vd.BatchPlanStartModeEnum.Off,
                 UpdateName = invoker.Root.Environment.User.Initials,
                 UpdateTime = DateTime.Now
             }));
