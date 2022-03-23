@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using static gip.mes.datamodel.GlobalApp;
 
 namespace gip.bso.manufacturing
 {
@@ -4389,314 +4390,368 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case "BatchCreateManuallyCmd":
-                    BatchCreateManuallyCmd();
+                case nameof(DlgAvailableQuantsOk):
+                    DlgAvailableQuantsOk();
                     return true;
-                case "BatchCreateDlgCancel":
-                    BatchCreateDlgCancel();
+                case nameof(IsEnabledDlgAvailableQuantsOk):
+                    result = IsEnabledDlgAvailableQuantsOk();
                     return true;
-                case "ShowDialogOrder":
-                    if (acParameter != null)
-                    {
-                        if (acParameter.Count() == 4)
-                            ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1], (Guid)acParameter[2], (Guid)acParameter[3]);
-                        else if (acParameter.Count() == 6)
-                            ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1], (Guid)acParameter[2], (Guid)acParameter[3], (System.Guid?)acParameter[4], (System.Guid?)acParameter[5]);
-                    }
+                case nameof(DlgAvailableQuantsCancel):
+                    DlgAvailableQuantsCancel();
                     return true;
-                case "ShowDialogOrderInfo":
-                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                case nameof(BookSelectedInwardACMethodBooking):
+                    BookSelectedInwardACMethodBooking(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : true);
                     return true;
-                case "DialogOK":
-                    DialogOK();
-                    return true;
-                case "DialogCancel":
-                    DialogCancel();
-                    return true;
-                case "NewInwardFacilityPreBooking":
-                    NewInwardFacilityPreBooking();
-                    return true;
-                case "DeleteInwardFacilityPreBooking":
-                    DeleteInwardFacilityPreBooking();
-                    return true;
-                case "CancelInwardFacilityPreBooking":
-                    CancelInwardFacilityPreBooking();
-                    return true;
-                case "BookSelectedInwardACMethodBooking":
-                    BookSelectedInwardACMethodBooking(acParameter.Count() == 1 ? (Boolean)acParameter[0] : true);
-                    return true;
-                case "BookAllInwardACMBookings":
-                    BookAllInwardACMBookings();
-                    return true;
-                case "IsEnabledNewInwardFacilityPreBooking":
-                    result = IsEnabledNewInwardFacilityPreBooking();
-                    return true;
-                case "IsEnabledDeleteInwardFacilityPreBooking":
-                    result = IsEnabledDeleteInwardFacilityPreBooking();
-                    return true;
-                case "IsEnabledCancelInwardFacilityPreBooking":
-                    result = IsEnabledCancelInwardFacilityPreBooking();
-                    return true;
-                case "IsEnabledBookSelectedInwardACMethodBooking":
+                case nameof(IsEnabledBookSelectedInwardACMethodBooking):
                     result = IsEnabledBookSelectedInwardACMethodBooking();
                     return true;
-                case "IsEnabledBookAllInwardACMBookings":
+                case nameof(BookAllInwardACMBookings):
+                    BookAllInwardACMBookings();
+                    return true;
+                case nameof(IsEnabledBookAllInwardACMBookings):
                     result = IsEnabledBookAllInwardACMBookings();
                     return true;
-                case "NewOutwardPartslistPos":
+                case nameof(NewInwardFacilityPreBooking):
+                    NewInwardFacilityPreBooking();
+                    return true;
+                case nameof(IsEnabledNewInwardFacilityPreBooking):
+                    result = IsEnabledNewInwardFacilityPreBooking();
+                    return true;
+                case nameof(DeleteInwardFacilityPreBooking):
+                    DeleteInwardFacilityPreBooking();
+                    return true;
+                case nameof(IsEnabledDeleteInwardFacilityPreBooking):
+                    result = IsEnabledDeleteInwardFacilityPreBooking();
+                    return true;
+                case nameof(CancelInwardFacilityPreBooking):
+                    CancelInwardFacilityPreBooking();
+                    return true;
+                case nameof(IsEnabledCancelInwardFacilityPreBooking):
+                    result = IsEnabledCancelInwardFacilityPreBooking();
+                    return true;
+                case nameof(ShowDlgInwardFacility):
+                    ShowDlgInwardFacility();
+                    return true;
+                case nameof(IsEnabledShowDlgInwardFacility):
+                    result = IsEnabledShowDlgInwardFacility();
+                    return true;
+                case nameof(NewOutwardPartslistPos):
                     NewOutwardPartslistPos();
                     return true;
-                case "IsEnabledNewOutwardPartslistPos":
+                case nameof(IsEnabledNewOutwardPartslistPos):
                     result = IsEnabledNewOutwardPartslistPos();
                     return true;
-                case "DeleteOutwardPartslistPos":
+                case nameof(DeleteOutwardPartslistPos):
                     DeleteOutwardPartslistPos();
                     return true;
-                case "IsEnabledDeleteOutwardPartslistPos":
+                case nameof(IsEnabledDeleteOutwardPartslistPos):
                     result = IsEnabledDeleteOutwardPartslistPos();
                     return true;
-                case "RecalcOutwardPartslistPos":
+                case nameof(RecalcOutwardPartslistPos):
                     RecalcOutwardPartslistPos();
                     return true;
-                case "IsEnabledRecalcOutwardPartslistPos":
+                case nameof(IsEnabledRecalcOutwardPartslistPos):
                     result = IsEnabledRecalcOutwardPartslistPos();
                     return true;
-                case "RecalcProdOrderIntermediateBatch":
-                    RecalcProdOrderIntermediateBatch();
+                case nameof(BookSelectedOutwardACMethodBooking):
+                    BookSelectedOutwardACMethodBooking(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : true);
                     return true;
-                case "IsEnabledRecalcProdOrderIntermediateBatch":
-                    result = IsEnabledProdOrderIntermediateBatch();
-                    return true;
-                case "NewOutwardFacilityPreBooking":
-                    NewOutwardFacilityPreBooking();
-                    return true;
-                case "DeleteOutwardFacilityPreBooking":
-                    DeleteOutwardFacilityPreBooking();
-                    return true;
-                case "CancelOutwardFacilityPreBooking":
-                    CancelOutwardFacilityPreBooking();
-                    return true;
-                case "BookSelectedOutwardACMethodBooking":
-                    BookSelectedOutwardACMethodBooking(acParameter.Count() == 1 ? (Boolean)acParameter[0] : true);
-                    return true;
-                case "BookAllOutwardACMBookings":
-                    BookAllOutwardACMBookings();
-                    return true;
-                case "IsEnabledNewOutwardFacilityPreBooking":
-                    result = IsEnabledNewOutwardFacilityPreBooking();
-                    return true;
-                case "IsEnabledDeleteOutwardFacilityPreBooking":
-                    result = IsEnabledDeleteOutwardFacilityPreBooking();
-                    return true;
-                case "IsEnabledCancelOutwardFacilityPreBooking":
-                    result = IsEnabledCancelOutwardFacilityPreBooking();
-                    return true;
-                case "IsEnabledBookSelectedOutwardACMethodBooking":
+                case nameof(IsEnabledBookSelectedOutwardACMethodBooking):
                     result = IsEnabledBookSelectedOutwardACMethodBooking();
                     return true;
-                case "IsEnabledBookAllOutwardACMBookings":
+                case nameof(BookAllOutwardACMBookings):
+                    BookAllOutwardACMBookings();
+                    return true;
+                case nameof(IsEnabledBookAllOutwardACMBookings):
                     result = IsEnabledBookAllOutwardACMBookings();
                     return true;
-                case "New":
-                    New();
+                case nameof(CancelOutwardFacilityPreBooking):
+                    CancelOutwardFacilityPreBooking();
                     return true;
-                case "Delete":
-                    Delete();
+                case nameof(IsEnabledCancelOutwardFacilityPreBooking):
+                    result = IsEnabledCancelOutwardFacilityPreBooking();
                     return true;
-                case "IsEnabledDelete":
-                    result = IsEnabledDelete();
+                case nameof(NewOutwardFacilityPreBooking):
+                    NewOutwardFacilityPreBooking();
                     return true;
-                case "Save":
-                    Save();
+                case nameof(IsEnabledNewOutwardFacilityPreBooking):
+                    result = IsEnabledNewOutwardFacilityPreBooking();
                     return true;
-                case "IsEnabledSave":
-                    result = IsEnabledSave();
+                case nameof(DeleteOutwardFacilityPreBooking):
+                    DeleteOutwardFacilityPreBooking();
                     return true;
-                case "UndoSave":
-                    UndoSave();
+                case nameof(IsEnabledDeleteOutwardFacilityPreBooking):
+                    result = IsEnabledDeleteOutwardFacilityPreBooking();
                     return true;
-                case "RecalcAllQuantites":
-                    RecalcAllQuantites();
+                case nameof(ShowDlgOutwardFacility):
+                    ShowDlgOutwardFacility();
                     return true;
-                case "FinishOrder":
-                    FinishOrder();
+                case nameof(IsEnabledShowDlgOutwardFacility):
+                    result = IsEnabledShowDlgOutwardFacility();
                     return true;
-                case "CheckForOpenPostings":
-                    CheckForOpenPostings();
+                case nameof(ShowDlgOutwardAvailableQuants):
+                    ShowDlgOutwardAvailableQuants();
                     return true;
-                case "IsEnabledFinishOrder":
-                    result = IsEnabledFinishOrder();
+                case nameof(IsEnabledShowDlgOutwardAvailableQuants):
+                    result = IsEnabledShowDlgOutwardAvailableQuants();
                     return true;
-                case "Search":
-                    ProdOrder selectedProdOrder = null;
-                    ProdOrderPartslist selectedProdOrderPartslist = null;
-                    if (acParameter.Count() > 0)
-                        selectedProdOrder = acParameter[0] != null ? (acParameter[0] as ProdOrder) : null;
-                    if (acParameter.Count() > 1)
-                        selectedProdOrderPartslist = acParameter[1] != null ? (acParameter[1] as ProdOrderPartslist) : null;
-                    Search(selectedProdOrder, selectedProdOrderPartslist);
+                case nameof(ChangeViaPartslistCancel):
+                    ChangeViaPartslistCancel();
                     return true;
-                case "Load":
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
-                    return true;
-                case "AddPartslist":
-                    AddPartslist();
-                    return true;
-                case "IsEnabledAddPartslist":
-                    result = IsEnabledAddPartslist();
-                    return true;
-                case "AddPartslistDlgOk":
-                    AddPartslistDlgOk();
-                    return true;
-                case "IsEnabledAddPartslistDlgOk":
-                    result = IsEnabledAddPartslistDlgOk();
-                    return true;
-                case "AddPartslistDlgCancel":
-                    AddPartslistDlgCancel();
-                    return true;
-                case "DeleteProdOrderPartslist":
-                    DeleteProdOrderPartslist();
-                    return true;
-                case "IsEnabledDeleteProdOrderPartslist":
-                    result = IsEnabledDeleteProdOrderPartslist();
-                    return true;
-                case "StartProdOrderPartslist":
-                    StartProdOrderPartslist();
-                    return true;
-                case "IsEnabledStartProdOrderPartslist":
-                    result = IsEnabledStartProdOrderPartslist();
-                    return true;
-                case "PartslistChangeTargetQuantityDlg":
-                    PartslistChangeTargetQuantityDlg();
-                    return true;
-                case "PartslistChangeTargetQuantityDlgOk":
-                    PartslistChangeTargetQuantityDlgOk();
-                    return true;
-                case "PartslistChangeTargetQuantityDlgCancel":
-                    PartslistChangeTargetQuantityDlgCancel();
-                    return true;
-                case "IsEnabledPartslistChangeTargetQuantityDlg":
-                    result = IsEnabledPartslistChangeTargetQuantityDlg();
-                    return true;
-                case "IsEnabledPartslistChangeTargetQuantityDlgOk":
-                    result = IsEnabledPartslistChangeTargetQuantityDlgOk();
-                    return true;
-                case "BOMExplosion":
-                    BOMExplosion();
-                    return true;
-                case "IsEnabledBOMExplosion":
-                    result = IsEnabledBOMExplosion();
-                    return true;
-                case "BOMExplosionDlgOk":
-                    BOMExplosionDlgOk();
-                    return true;
-                case "IsEnabledBOMExplosionDlgOk":
-                    result = IsEnabledBOMExplosionDlgOk();
-                    return true;
-                case "BOMExplosionDlgCancel":
-                    BOMExplosionDlgCancel();
-                    return true;
-                case "NewProdOrderPartslistPos":
-                    NewProdOrderPartslistPos();
-                    return true;
-                case "DeleteProdOrderPartslistPos":
-                    DeleteProdOrderPartslistPos();
-                    return true;
-                case "CreateNewLabOrderFromProdOrderPartslist":
-                    CreateNewLabOrderFromProdOrderPartslist();
-                    return true;
-                case "IsEnabledCreateNewLabOrderFromProdOrderPartslist":
-                    result = IsEnabledCreateNewLabOrderFromProdOrderPartslist();
-                    return true;
-                case "ShowLabOrderFromProdOrder":
-                    ShowLabOrderFromProdOrder();
-                    return true;
-                case "IsEnabledShowLabOrderFromProdOrder":
-                    result = IsEnabledShowLabOrderFromProdOrder();
-                    return true;
-                case "IsEnabledNewProdOrderPartslistPos":
-                    result = IsEnabledNewProdOrderPartslistPos();
-                    return true;
-                case "IsEnabledDeleteProdOrderPartslistPos":
-                    result = IsEnabledDeleteProdOrderPartslistPos();
-                    return true;
-                case "AlternativeNewProdOrderPartslistPos":
+                case nameof(AlternativeNewProdOrderPartslistPos):
                     AlternativeNewProdOrderPartslistPos();
                     return true;
-                case "IsEnabledAlternativeNewProdOrderPartslistPos":
+                case nameof(IsEnabledAlternativeNewProdOrderPartslistPos):
                     result = IsEnabledAlternativeNewProdOrderPartslistPos();
                     return true;
-                case "AlternativeDeleteProdOrderPartslistPos":
+                case nameof(AlternativeDeleteProdOrderPartslistPos):
                     AlternativeDeleteProdOrderPartslistPos();
                     return true;
-                case "IsEnabledAlternativeDeleteProdOrderPartslistPos":
+                case nameof(IsEnabledAlternativeDeleteProdOrderPartslistPos):
                     result = IsEnabledAlternativeDeleteProdOrderPartslistPos();
                     return true;
-                case "SearchIntermediate":
+                case nameof(RecalcIntermediateSum):
+                    RecalcIntermediateSum();
+                    return true;
+                case nameof(IsEnabledRecalcIntermediateSum):
+                    result = IsEnabledRecalcIntermediateSum();
+                    return true;
+                case nameof(SearchIntermediate):
                     SearchIntermediate();
                     return true;
-                case "BatchAdd":
+                case nameof(BatchAdd):
                     BatchAdd();
                     return true;
-                case "BatchDelete":
+                case nameof(BatchDelete):
                     BatchDelete();
                     return true;
-                case "BatchDeleteAll":
+                case nameof(BatchDeleteAll):
                     BatchDeleteAll();
                     return true;
-                case "IsEnabledBatchAdd":
+                case nameof(IsEnabledBatchAdd):
                     result = IsEnabledBatchAdd();
                     return true;
-                case "IsEnabledBatchDelete":
+                case nameof(IsEnabledBatchDelete):
                     result = IsEnabledBatchDelete();
                     return true;
-                case "IsEnabledBatchAllDelete":
+                case nameof(IsEnabledBatchAllDelete):
                     result = IsEnabledBatchAllDelete();
                     return true;
-                case "ProdOrderIntermediateBatchCreateDlg":
+                case nameof(ProdOrderIntermediateBatchCreateDlg):
                     ProdOrderIntermediateBatchCreateDlg();
                     return true;
-                case "ProdOrderIntermediateBatchAssign":
+                case nameof(ProdOrderIntermediateBatchAssign):
                     ProdOrderIntermediateBatchAssign();
                     return true;
-                case "ProdOrderIntermediateBatchUnAssign":
+                case nameof(ProdOrderIntermediateBatchUnAssign):
                     ProdOrderIntermediateBatchUnAssign();
                     return true;
-                case "ProdOrderIntermediateBatchClearSelection":
+                case nameof(ProdOrderIntermediateBatchClearSelection):
                     ProdOrderIntermediateBatchClearSelection();
                     return true;
-                case "GenerateLotNumber":
+                case nameof(GenerateLotNumber):
                     GenerateLotNumber();
                     return true;
-                case "IsEnabledProdOrderIntermediateBatchCreateDlg":
+                case nameof(GeneratePartLotNumber):
+                    GeneratePartLotNumber();
+                    return true;
+                case nameof(RemovePartLotNumber):
+                    RemovePartLotNumber();
+                    return true;
+                case nameof(RecalcProdOrderIntermediateBatch):
+                    RecalcProdOrderIntermediateBatch();
+                    return true;
+                case nameof(IsEnabledProdOrderIntermediateBatch):
+                    result = IsEnabledProdOrderIntermediateBatch();
+                    return true;
+                case nameof(IsEnabledProdOrderIntermediateBatchCreateDlg):
                     result = IsEnabledProdOrderIntermediateBatchCreateDlg();
                     return true;
-                case "IsEnabledProdOrderIntermediateBatchAssign":
+                case nameof(IsEnabledProdOrderIntermediateBatchAssign):
                     result = IsEnabledProdOrderIntermediateBatchAssign();
                     return true;
-                case "IsEnabledProdOrderIntermediateBatchUnAssign":
+                case nameof(IsEnabledProdOrderIntermediateBatchUnAssign):
                     result = IsEnabledProdOrderIntermediateBatchUnAssign();
                     return true;
-                case "IsEnabledProdOrderIntermediateBatchClearSelection":
+                case nameof(IsEnabledProdOrderIntermediateBatchClearSelection):
                     result = IsEnabledProdOrderIntermediateBatchClearSelection();
                     return true;
-                case "IsEnabledGenerateLotNumber":
+                case nameof(IsEnabledGenerateLotNumber):
                     result = IsEnabledGenerateLotNumber();
                     return true;
-                case "BatchCreateAutomaticallyCalculate":
+                case nameof(IsEnabledGeneratePartLotNumber):
+                    result = IsEnabledGeneratePartLotNumber();
+                    return true;
+                case nameof(IsEnabledRemovePartLotNumber):
+                    result = IsEnabledRemovePartLotNumber();
+                    return true;
+                case nameof(BatchCreateAutomaticallyCalculate):
                     BatchCreateAutomaticallyCalculate();
                     return true;
-                case "BatchCreateAutomaticallyCreateDlgOk":
+                case nameof(BatchCreateAutomaticallyCreateDlgOk):
                     BatchCreateAutomaticallyCreateDlgOk();
                     return true;
-                case "IsEnabledBatchCreateAutomaticallyCalculate":
+                case nameof(IsEnabledBatchCreateAutomaticallyCalculate):
                     result = IsEnabledBatchCreateAutomaticallyCalculate();
                     return true;
-                case "IsEnabledBatchCreateAutomaticallyCreateDlgOk":
+                case nameof(IsEnabledBatchCreateAutomaticallyCreateDlgOk):
                     result = IsEnabledBatchCreateAutomaticallyCreateDlgOk();
                     return true;
-                case "IsEnabledRecalcIntermediateSum":
-                    result = IsEnabledRecalcIntermediateSum();
+                case nameof(BatchCreateManuallyCmd):
+                    BatchCreateManuallyCmd();
+                    return true;
+                case nameof(BatchCreateDlgCancel):
+                    BatchCreateDlgCancel();
+                    return true;
+                case nameof(SetSelectedMaterial):
+                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                    return true;
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Guid)acParameter[3], acParameter.Count() == 5 ? (System.Nullable<System.Guid>)acParameter[4] : null, acParameter.Count() == 6 ? (System.Nullable<System.Guid>)acParameter[5] : null, acParameter.Count() == 7 ? (System.Nullable<System.Guid>)acParameter[6] : null);
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
+                    return true;
+                case nameof(OnTrackingCall):
+                    OnTrackingCall((TrackingAndTracingSearchModel)acParameter[0], (gip.core.datamodel.IACObject)acParameter[1], (System.Object)acParameter[2], (TrackingEnginesEnum)acParameter[3]);
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(RecalcAllQuantites):
+                    RecalcAllQuantites();
+                    return true;
+                case nameof(FinishOrder):
+                    result = FinishOrder();
+                    return true;
+                case nameof(IsEnabledFinishOrder):
+                    result = IsEnabledFinishOrder();
+                    return true;
+                case nameof(CheckForOpenPostings):
+                    CheckForOpenPostings();
+                    return true;
+                case nameof(NavigateToOpenPosting):
+                    NavigateToOpenPosting();
+                    return true;
+                case nameof(Search):
+                    Search(acParameter.Count() == 1 ? (gip.mes.datamodel.ProdOrder)acParameter[0] : null, acParameter.Count() == 2 ? (gip.mes.datamodel.ProdOrderPartslist)acParameter[1] : null);
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(AddPartslist):
+                    AddPartslist();
+                    return true;
+                case nameof(IsEnabledAddPartslist):
+                    result = IsEnabledAddPartslist();
+                    return true;
+                case nameof(AddPartslistDlgOk):
+                    AddPartslistDlgOk();
+                    return true;
+                case nameof(IsEnabledAddPartslistDlgOk):
+                    result = IsEnabledAddPartslistDlgOk();
+                    return true;
+                case nameof(AddPartslistDlgCancel):
+                    AddPartslistDlgCancel();
+                    return true;
+                case nameof(DeleteProdOrderPartslist):
+                    DeleteProdOrderPartslist();
+                    return true;
+                case nameof(IsEnabledDeleteProdOrderPartslist):
+                    result = IsEnabledDeleteProdOrderPartslist();
+                    return true;
+                case nameof(StartProdOrderPartslist):
+                    StartProdOrderPartslist();
+                    return true;
+                case nameof(IsEnabledStartProdOrderPartslist):
+                    result = IsEnabledStartProdOrderPartslist();
+                    return true;
+                case nameof(PartslistChangeTargetQuantityDlg):
+                    PartslistChangeTargetQuantityDlg();
+                    return true;
+                case nameof(PartslistChangeTargetQuantityDlgOk):
+                    PartslistChangeTargetQuantityDlgOk();
+                    return true;
+                case nameof(PartslistChangeTargetQuantityDlgCancel):
+                    PartslistChangeTargetQuantityDlgCancel();
+                    return true;
+                case nameof(IsEnabledPartslistChangeTargetQuantityDlg):
+                    result = IsEnabledPartslistChangeTargetQuantityDlg();
+                    return true;
+                case nameof(IsEnabledPartslistChangeTargetQuantityDlgOk):
+                    result = IsEnabledPartslistChangeTargetQuantityDlgOk();
+                    return true;
+                case nameof(BOMExplosion):
+                    BOMExplosion();
+                    return true;
+                case nameof(IsEnabledBOMExplosion):
+                    result = IsEnabledBOMExplosion();
+                    return true;
+                case nameof(BOMExplosionDlgOk):
+                    BOMExplosionDlgOk();
+                    return true;
+                case nameof(IsEnabledBOMExplosionDlgOk):
+                    result = IsEnabledBOMExplosionDlgOk();
+                    return true;
+                case nameof(BOMExplosionDlgCancel):
+                    BOMExplosionDlgCancel();
+                    return true;
+                case nameof(NewProdOrderPartslistPos):
+                    NewProdOrderPartslistPos();
+                    return true;
+                case nameof(DeleteProdOrderPartslistPos):
+                    DeleteProdOrderPartslistPos();
+                    return true;
+                case nameof(CreateNewLabOrderFromProdOrderPartslist):
+                    CreateNewLabOrderFromProdOrderPartslist();
+                    return true;
+                case nameof(IsEnabledCreateNewLabOrderFromProdOrderPartslist):
+                    result = IsEnabledCreateNewLabOrderFromProdOrderPartslist();
+                    return true;
+                case nameof(ShowLabOrderFromProdOrder):
+                    ShowLabOrderFromProdOrder();
+                    return true;
+                case nameof(IsEnabledShowLabOrderFromProdOrder):
+                    result = IsEnabledShowLabOrderFromProdOrder();
+                    return true;
+                case nameof(IsEnabledNewProdOrderPartslistPos):
+                    result = IsEnabledNewProdOrderPartslistPos();
+                    return true;
+                case nameof(IsEnabledDeleteProdOrderPartslistPos):
+                    result = IsEnabledDeleteProdOrderPartslistPos();
+                    return true;
+                case nameof(ChangeViaPartslistDlg):
+                    ChangeViaPartslistDlg();
+                    return true;
+                case nameof(IsEnabledChangeViaPartslistDlg):
+                    result = IsEnabledChangeViaPartslistDlg();
+                    return true;
+                case nameof(ChangeViaPartslistOk):
+                    ChangeViaPartslistOk();
+                    return true;
+                case nameof(IsEnabledChangeViaPartslistOk):
+                    result = IsEnabledChangeViaPartslistOk();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

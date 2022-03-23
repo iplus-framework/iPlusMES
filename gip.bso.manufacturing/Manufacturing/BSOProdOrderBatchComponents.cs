@@ -49,7 +49,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region Component
 
         #region Component
@@ -138,6 +137,22 @@ namespace gip.bso.manufacturing
             }
         }
 
+
+        #endregion
+
+        #region Overrides
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(ShowDialogComponent):
+                    ShowDialogComponent((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
 
         #endregion
     }
