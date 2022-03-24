@@ -99,6 +99,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAMTank.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Rework.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSamplePiLightBox.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskGeneric.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWTemperature.cs" />

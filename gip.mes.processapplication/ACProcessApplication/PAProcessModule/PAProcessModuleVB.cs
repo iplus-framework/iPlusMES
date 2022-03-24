@@ -27,7 +27,14 @@ namespace gip.mes.processapplication
         public PAProcessModuleVB(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _ACUrlExtraDisDest = new ACPropertyConfigValue<string>(this, "ACUrlExtraDisDest", "");
+            _ACUrlExtraDisDest = new ACPropertyConfigValue<string>(this, nameof(ACUrlExtraDisDest), "");
+            _ReworkEnabled = new ACPropertyConfigValue<bool>(this, nameof(ReworkEnabled), false);
+        }
+
+        public override bool ACPostInit()
+        {
+            _ = ReworkEnabled;
+            return base.ACPostInit();
         }
         #endregion
 
@@ -41,6 +48,17 @@ namespace gip.mes.processapplication
                 return _ACUrlExtraDisDest.ValueT;
             }
         }
+
+        private ACPropertyConfigValue<bool> _ReworkEnabled;
+        [ACPropertyConfig("en{'Rework enabled'}de{'Rework aktiviert'}")]
+        public bool ReworkEnabled
+        {
+            get
+            {
+                return _ReworkEnabled.ValueT;
+            }
+        }
+
         #endregion
 
         #region Properties

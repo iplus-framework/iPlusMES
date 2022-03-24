@@ -24,7 +24,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterial" />
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWManualWeighing'}de{'PWManualWeighing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
-    public class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial
+    public partial class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial
     {
         public const string PWClassName = nameof(PWManualWeighing);
 
@@ -70,6 +70,12 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
+
+            method.ParameterValueList.Add(new ACValue("ReworkMaterialNo", typeof(string), "", Global.ParamOption.Optional));
+            paramTranslation.Add("ReworkMaterialNo", "en{'Material number for rework'}de{'Materialnummer für Nacharbeit'}");
+
+            method.ParameterValueList.Add(new ACValue("ReworkQuantity", typeof(int), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("ReworkQuantity", "en{'Rework quantity [%]'}de{'Nachbearbeitungsmenge [%]'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
@@ -144,8 +150,9 @@ namespace gip.mes.processapplication
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
-
-        protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false;
+        
+        //TODO: _IsAborted and _ScaleComp change with PAF paramter AbortType
+        protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false, _ScaleComp = false;
 
         private gip.core.datamodel.ACProgramLog _NewAddedProgramLog = null;
 
@@ -480,6 +487,36 @@ namespace gip.mes.processapplication
                         return acValue.ParamAsBoolean;
                 }
                 return false;
+            }
+        }
+
+        public string ReworkMaterialNo
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReworkMaterialNo");
+                    if (acValue != null)
+                        return acValue.ParamAsString;
+                }
+                return null;
+            }
+        }
+
+        public int ReworkQuantityPercentage
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ReworkQuantity");
+                    if (acValue != null)
+                        return acValue.ParamAsInt32;
+                }
+                return 0;
             }
         }
 
@@ -1217,7 +1254,8 @@ namespace gip.mes.processapplication
                 using (Database db = new core.datamodel.Database())
                 using (DatabaseApp dbApp = new DatabaseApp(db))
                 {
-                    ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial.Value);
+                    ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                                                           .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial.Value);
                     if (rel == null)
                     {
                         //Error50374: ProdOrderPartslistPosRelation {0} doesn't exist in the database.
@@ -1391,8 +1429,9 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 999)]
-        public virtual void Abort(bool isConsumed)
+        public virtual void Abort(bool isConsumed, bool scaleComp = false)
         {
+            _ScaleComp = scaleComp;
             PAFManualWeighing paf = CurrentExecutingFunction<PAFManualWeighing>();
             using (ACMonitor.Lock(_65003_IsAbortedLock))
             {
@@ -2441,8 +2480,9 @@ namespace gip.mes.processapplication
 
                                     if (actWeight > 0.000001)
                                     {
-                                        bool scaleOtherComp = ScaleOtherComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
+                                        bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
                                         msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge, false, scaleOtherComp);
+                                        _ScaleComp = false;
                                     }
 
                                     if (isComponentConsumed)
@@ -3267,7 +3307,10 @@ namespace gip.mes.processapplication
                     BinChange();
                     return true;
                 case nameof(Abort):
-                    Abort((bool)acParameter[0]);
+                    if (acParameter.Count() > 1)
+                        Abort((bool)acParameter[0], (bool)acParameter[1]);
+                    else
+                        Abort((bool)acParameter[0]);
                     return true;
                 case nameof(OnApplyManuallyEnteredLot):
                     result = OnApplyManuallyEnteredLot(acParameter[0] as string, (Guid)acParameter[1]);
@@ -3377,6 +3420,14 @@ namespace gip.mes.processapplication
             //if(info.ContainsKey(PLPosRelation.ToString()))
             //    info[PLPosRelation.ToString()] = WeighState.ToString();
         }
+
+        public void RefreshComponent(ProdOrderPartslistPosRelation posRelation)
+        {
+            Material = posRelation.SourceProdOrderPartslistPos.MaterialID.Value;
+            Sequence = posRelation.Sequence;
+            TargetWeight = Math.Abs(posRelation.RemainingDosingWeight);
+            MaterialName = posRelation.SourceProdOrderPartslistPos.Material?.MaterialName1;
+        }
     }
 
     [ACSerializeableInfo]
@@ -3473,7 +3524,7 @@ namespace gip.mes.processapplication
         StateSelectFC_F = 20, //Manual component select - automatic facility charge or facility select
         StateSelectCompAndFC_F = 30, //Automatic component select - automatic facility charge or facility select
         SelectCompReturnFC_F = 40, //Automatic component select - manual facility charge or facility select
-        RefreshCompTargetQ = 50
+        RefreshCompTargetQ = 50,
     }
 
     [ACSerializeableInfo]

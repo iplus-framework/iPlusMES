@@ -162,12 +162,19 @@ namespace gip.bso.manufacturing
                 {
                     DeactivateScale();
                     ACRef<IACComponent> scaleRef = null;
+                    ACRef<IACComponent>[] scalesRef = null;
                     using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
                     {
-                        scaleRef = _ProcessModuleScales?.FirstOrDefault(c => c.ACUrl == _CurrentScaleObject.Value.ToString());
+                        scalesRef = _ProcessModuleScales?.ToArray();
                     }
+
+                    scaleRef = scalesRef?.FirstOrDefault(c => c.ACUrl == _CurrentScaleObject.Value.ToString());
+
                     if (scaleRef != null)
-                        ActivateScale(scaleRef.ValueT);
+                    {
+                        IACComponent scaleComp = scaleRef.ValueT;
+                        ActivateScale(scaleComp);
+                    }
                 }
                 else
                     DeactivateScale();
@@ -351,6 +358,8 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected bool ScaleOtherComponentOnAbort = false;
+
         #endregion
 
         #region Properties => OrderInfo
@@ -485,6 +494,7 @@ namespace gip.bso.manufacturing
         {
             Cancel = 0,
             AbortComponent = 10,
+            AbortComponentScaleOtherComponents = 15,
             AbortComponentSwitchToEmptyingMode = 20,
             SwitchToEmptyingMode = 30,
             Interdischarging = 40
@@ -761,6 +771,12 @@ namespace gip.bso.manufacturing
             get;
             set;
         }
+
+        #endregion
+
+        #region Properties => Rework
+
+        protected bool IsReworkEnabled = false;
 
         #endregion
 
@@ -1053,11 +1069,21 @@ namespace gip.bso.manufacturing
                     // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
                     if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
                     {
-                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true);
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
                         return;
                     }
-                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false);
+                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, false);
 
+                }
+                else if (_AbortMode == AbortModeEnum.AbortComponentScaleOtherComponents)
+                {
+                    ShowSelectFacilityLotInfo = false;
+                    if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
+                    {
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, true);
+                        return;
+                    }
+                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, true);
                 }
                 else if (_AbortMode == AbortModeEnum.AbortComponentSwitchToEmptyingMode)
                 {
@@ -1071,10 +1097,10 @@ namespace gip.bso.manufacturing
 
                     if (msgResult == Global.MsgResult.Yes)
                     {
-                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true);
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
                         return;
                     }
-                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false);
+                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, false);
                 }
                 else if (_AbortMode == AbortModeEnum.SwitchToEmptyingMode)
                 {
@@ -1207,10 +1233,12 @@ namespace gip.bso.manufacturing
 
             if (scaleObjects != null && scaleObjects.Any())
             {
+                var scalesArray = scaleObjects.Select(c => new ACRef<IACComponent>(c, this)).ToArray();
+                scaleObjectInfoList = new List<ACValueItem>(scalesArray.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
+
                 using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
                 {
-                    _ProcessModuleScales = scaleObjects.Select(c => new ACRef<IACComponent>(c, this)).ToArray();
-                    scaleObjectInfoList = new List<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
+                    _ProcessModuleScales = scalesArray;
                     ScaleObjectsList = scaleObjectInfoList;
                 }
             }
@@ -1236,6 +1264,8 @@ namespace gip.bso.manufacturing
             LoadWFNode(currentProcessModule, _OrderInfo.ValueT);
 
             HandlePAFCurrentACMethod(acMethod);
+
+            InitRework(currentProcessModule);
 
             orderInfo.PropertyChanged += OrderInfoPropertyChanged;
 
@@ -1620,6 +1650,10 @@ namespace gip.bso.manufacturing
             var enterLotManually = acMethod.ParameterValueList.GetACValue("EnterLotManually");
             if (enterLotManually != null)
                 EnterLotManually = enterLotManually.ParamAsBoolean;
+
+            var scaleOtherComp = acMethod.ParameterValueList.GetACValue("ScaleOtherComp");
+            if (scaleOtherComp != null)
+                ScaleOtherComponentOnAbort = scaleOtherComp.ParamAsBoolean;
 
             OnLoadPWConfiguration(acMethod);
 
@@ -2209,7 +2243,7 @@ namespace gip.bso.manufacturing
         private void SelectActiveScaleObject(WeighingMaterial weighingMaterial)
         {
             List<ACValueItem> scaleObjectsList = null;
-            using (ACMonitor.Lock(_20015_LockValue))
+            using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
             {
                 scaleObjectsList = ScaleObjectsList;
             }
@@ -2672,6 +2706,20 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
+        [ACMethodInfo("", "en{'Abort and scale other comp.'}de{'Abbrechen und Restliche Komp. anpassen'}", 695)]
+        public void AbortComponentScaleOther()
+        {
+            _AbortMode = AbortModeEnum.AbortComponentScaleOtherComponents;
+            InInterdischargingQ = null;
+            _IsEnabledCompleteInterdischarging = false;
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledAbortComponentScaleOther()
+        {
+            return ScaleOtherComponentOnAbort;
+        }
+
         [ACMethodInfo("", "en{'Abort and emptying mode'}de{'Abbrechen und Leerfahren'}", 695)]
         public void AbortComponentEmptyingMode()
         {
@@ -2795,6 +2843,69 @@ namespace gip.bso.manufacturing
         public bool IsEnabledCompleteInterdischarging()
         {
             return _IsEnabledCompleteInterdischarging;
+        }
+
+        #endregion
+
+        #region Methods => Rework
+
+        private void InitRework(ACComponent currentProcessModule)
+        {
+            ACClass processModuleClass = null;
+
+            var contextIplus = DatabaseApp.ContextIPlus;
+            using (ACMonitor.Lock(contextIplus.QueryLock_1X000))
+            {
+                processModuleClass = currentProcessModule?.ComponentClass.FromIPlusContext<ACClass>(contextIplus);
+            }
+
+            bool reworkEnabled = false;
+
+            var config = processModuleClass?.ConfigurationEntries.FirstOrDefault(c => c.KeyACUrl == processModuleClass.ACConfigKeyACUrl && c.LocalConfigACUrl == nameof(PAProcessModuleVB.ReworkEnabled));
+            if (config != null)
+            {
+                bool? val = config.Value as bool?;
+                if (val.HasValue)
+                    reworkEnabled = val.Value;
+
+                IsReworkEnabled = reworkEnabled;
+            }
+            else
+            {
+                //Messages.Error(this, "Can not find the configuration property ReworkEnabled on the process module!");
+            }
+        }
+
+        [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700)]
+        public void OpenReworkDialog()
+        {
+            ShowDialog(this, "ReworkDialog");
+        }
+
+        public bool IsEnabledOpetReworkDialog()
+        {
+            return IsReworkEnabled;
+        }
+
+        [ACMethodInfo("", "en{'Turn on rework'}de{'Turn on rework'}", 701)]
+        public void TurnOnRework()
+        {
+            ManualWeighingPWNode pwNode = null;
+
+            using (ACMonitor.Lock(_70500_ComponentPWNodeLock))
+            {
+                pwNode = ComponentPWNodesList?.FirstOrDefault();
+            }
+
+            if (pwNode == null)
+                return;
+
+            pwNode.ComponentPWNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.ActivateRework));
+        }
+
+        public bool IsEnabledTurnOnRework()
+        {
+            return true;
         }
 
         #endregion

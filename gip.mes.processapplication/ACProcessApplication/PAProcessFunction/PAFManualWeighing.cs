@@ -188,7 +188,6 @@ namespace gip.mes.processapplication
             }
         }
 
-
         private bool ReleaseActiveScaleObject()
         {
             PAEScaleGravimetric scale = ActiveScaleObject;
