@@ -876,6 +876,8 @@ namespace gip.mes.facility
 
                     BP.ParamsAdjusted.MDBookingNotAvailableMode = DatabaseApp.s_cQry_GetMDBookingNotAvailableMode(BP.DatabaseApp, MDBookingNotAvailableMode.BookingNotAvailableModes.AutoSetAndReset).FirstOrDefault();
                     double quantityToBook = BP.OutwardFacilityCharge.StockQuantity;
+                    if (BP.ParamsAdjusted.OutwardQuantity.HasValue)
+                        quantityToBook = BP.ParamsAdjusted.OutwardQuantity.Value;
                     bookingResult = InitFacilityBookingCharge_FromFacilityCharge_Outward(BP, FBC, BP.OutwardFacilityCharge,
                                        false,
                                        quantityToBook, quantityToBook, BP.OutwardFacilityCharge.MDUnit);

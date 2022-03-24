@@ -646,6 +646,41 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Material reassignment
+
+        private Material _SelectedRassignmentMaterial;
+        [ACPropertySelected(9999,"ReassignmentMaterial", "en{'Suggested material'}de{'Empfohlenes Material'}")]
+        public Material SelectedRassignmentMaterial
+        {
+            get => _SelectedRassignmentMaterial;
+            set
+            {
+                _SelectedRassignmentMaterial = value;
+                CurrentBookParamReassignMat.InwardMaterial = _SelectedRassignmentMaterial;
+                OnPropertyChanged();
+            }
+        }
+
+        private IEnumerable<Material> _ReassignemntMaterials;
+        [ACPropertyList(9999, "ReassignmentMaterial")]
+        public IEnumerable<Material> ReassignemntMaterials
+        {
+            get
+            {
+                if (_ReassignemntMaterials == null && CurrentFacilityCharge != null)
+                {
+                    _ReassignemntMaterials = ACFacilityManager.GetSuggestedReassignmentMaterials(DatabaseApp, CurrentFacilityCharge.Material);
+                }
+                return _ReassignemntMaterials;
+            }
+            set
+            {
+                _ReassignemntMaterials = value;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -882,6 +917,8 @@ namespace gip.bso.facility
                 clone.OutwardFacilityCharge = CurrentFacilityCharge;
             }
             CurrentBookParamReassignMat = clone;
+            SelectedRassignmentMaterial = null;
+            ReassignemntMaterials = null;
 
             if (_BookParamSplitClone == null)
                 _BookParamSplitClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Split_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
@@ -1486,7 +1523,7 @@ namespace gip.bso.facility
         }
         #endregion
 
-        #region Materialneuzuordnung (Reassignment)
+        #region SplitQuant
         /// <summary>
         /// Facilities the relocation.
         /// </summary>

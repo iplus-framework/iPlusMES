@@ -792,5 +792,22 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         .ThenByDescending(c => c.FacilityChargeSortNo)
         );
         #endregion
+
+        #region MaterialReassignment and Rework
+
+        public virtual IEnumerable<Material> GetSuggestedReassignmentMaterials(DatabaseApp dbApp, Material forMaterial)
+        {
+            if (dbApp == null)
+                return null;
+
+            return dbApp.Material.Where(c => c.MDMaterialGroup.MDMaterialGroupIndex == (short)MDMaterialGroup.MaterialGroupTypes.Rework);
+        }
+
+        public virtual bool IsReworkMaterialCompatible(DatabaseApp dbApp, Material reworkMaterial, Material targetMaterial)
+        {
+            return true;
+        }
+
+        #endregion
     }
 }
