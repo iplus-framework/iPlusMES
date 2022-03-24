@@ -189,6 +189,7 @@ namespace gip.mes.datamodel
             MiscGoods = 7,
             Merchandise = 8,
             Service = 9,
+            Rework = 20,
             //Services = 100,
             Textarticle = 110,
             Licence = 120       // Nur für Softwarelizenzen
@@ -213,6 +214,7 @@ namespace gip.mes.datamodel
                     _MaterialGroupTypesList.AddEntry((short)MaterialGroupTypes.MiscGoods, "en{'Misc. Goods'}de{'Sonstige Waren'}");
                     _MaterialGroupTypesList.AddEntry((short)MaterialGroupTypes.Merchandise, "en{'Merchandise'}de{'Handelsware'}");
                     _MaterialGroupTypesList.AddEntry((short)MaterialGroupTypes.Service, "en{'Service'}de{'Dienstleistung'}");
+                    _MaterialGroupTypesList.AddEntry((short)MaterialGroupTypes.Rework, "en{'Rework'}de{'Rework'}");
                     _MaterialGroupTypesList.AddEntry((short)MaterialGroupTypes.Textarticle, "en{'Text Article'}de{'Textartikel'}");
                     _MaterialGroupTypesList.AddEntry((short)MaterialGroupTypes.Licence, "en{'License'}de{'Lizenz'}");
 
