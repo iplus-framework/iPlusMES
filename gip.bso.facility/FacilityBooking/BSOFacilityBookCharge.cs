@@ -480,8 +480,10 @@ namespace gip.bso.facility
                     }
 
                     OnPropertyChanged_CurrentFacilityCharge();
-                    OnPropertyChanged("CurrentFacilityCharge");
-                    OnPropertyChanged("ContractualPartnerList");
+                    OnPropertyChanged(nameof(CurrentFacilityCharge));
+                    OnPropertyChanged(nameof(ContractualPartnerList));
+                    OnPropertyChanged(nameof(ContractualPartnerList));
+                    OnPropertyChanged(nameof(StorageUnitTestList));
                     RefreshFilterFacilityLotAccess();
                     ClearBookingData();
                 }
