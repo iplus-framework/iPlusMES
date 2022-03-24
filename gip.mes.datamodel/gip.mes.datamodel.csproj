@@ -510,6 +510,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DbScripts\iPlusMES\dbsync_2022-03-24_16-47_aagincic .sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="DbScripts\iPlusMES\dbsync_2022-03-24_12-35_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
