@@ -27,9 +27,9 @@ namespace gip.mes.datamodel
     {
         public ACValueListBatchPlanMode() : base("BatchPlanMode")
         {
-            AddEntry((short)BatchPlanMode.UseFromTo, "en{'Use from/to values'}de{'Nach Von/Bis-Batch-Nr.'}");
-            AddEntry((short)BatchPlanMode.UseBatchCount, "en{'Use target batch count'}de{'Nach Soll-Batchzahl'}");
-            AddEntry((short)BatchPlanMode.UseTotalSize, "en{'Use total size'}de{'Nach Gesamtgröße'}");
+            AddEntry(BatchPlanMode.UseFromTo, "en{'Use from/to values'}de{'Nach Von/Bis-Batch-Nr.'}");
+            AddEntry(BatchPlanMode.UseBatchCount, "en{'Use target batch count'}de{'Nach Soll-Batchzahl'}");
+            AddEntry(BatchPlanMode.UseTotalSize, "en{'Use total size'}de{'Nach Gesamtgröße'}");
 
         }
     }

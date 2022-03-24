@@ -18,11 +18,11 @@ namespace gip.mes.datamodel
     {
         public ACValueListFacilityInventoryPosStateEnum() : base("FacilityInventoryPosStateEnum")
         {
-            AddEntry((short)FacilityInventoryPosStateEnum.New, "en{'New'}de{'Neu'}");
-            AddEntry((short)FacilityInventoryPosStateEnum.InProgress, "en{'In Process'}de{'In Bearbeitung'}");
-            AddEntry((short)FacilityInventoryPosStateEnum.Paused, "en{'Paused'}de{'Pause'}");
-            AddEntry((short)FacilityInventoryPosStateEnum.Finished, "en{'Finished'}de{'Beendet'}");
-            AddEntry((short)FacilityInventoryPosStateEnum.Posted, "en{'Posted'}de{'Gesendet'}");
+            AddEntry(FacilityInventoryPosStateEnum.New, "en{'New'}de{'Neu'}");
+            AddEntry(FacilityInventoryPosStateEnum.InProgress, "en{'In Process'}de{'In Bearbeitung'}");
+            AddEntry(FacilityInventoryPosStateEnum.Paused, "en{'Paused'}de{'Pause'}");
+            AddEntry(FacilityInventoryPosStateEnum.Finished, "en{'Finished'}de{'Beendet'}");
+            AddEntry(FacilityInventoryPosStateEnum.Posted, "en{'Posted'}de{'Gesendet'}");
         }
     }
 }

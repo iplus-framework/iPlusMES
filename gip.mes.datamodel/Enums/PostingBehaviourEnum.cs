@@ -10,9 +10,9 @@ namespace gip.mes.datamodel
     {
         public ACValueListPostingBehaviourEnum() : base("PostingBehaviourEnum")
         {
-            AddEntry((short)PostingBehaviourEnum.DoNothing, "en{'No Action'}de{'Keine Aktion'}");
-            AddEntry((short)PostingBehaviourEnum.BlockOnRelocation, "en{'Blocks new quants after relocation'}de{'Sperrt neue Quanten nach der Umlagerung'}");
-            AddEntry((short)PostingBehaviourEnum.ZeroStockOnRelocation, "en{'Set the stock to zero after relocation'}de{'Setzt quanten auf Nullbestand nach einer Umlagerung'}");
+            AddEntry(PostingBehaviourEnum.DoNothing, "en{'No Action'}de{'Keine Aktion'}");
+            AddEntry(PostingBehaviourEnum.BlockOnRelocation, "en{'Blocks new quants after relocation'}de{'Sperrt neue Quanten nach der Umlagerung'}");
+            AddEntry(PostingBehaviourEnum.ZeroStockOnRelocation, "en{'Set the stock to zero after relocation'}de{'Setzt quanten auf Nullbestand nach einer Umlagerung'}");
         }
     }
 }

@@ -48,11 +48,11 @@ namespace gip.mes.datamodel
     {
         public ACValueListFacilityTypesEnum() : base("FacilityTypesEnum")
         {
-            AddEntry((short)FacilityTypesEnum.StorageLocation, "en{'Storage Location'}de{'Lagerort'}");
-            AddEntry((short)FacilityTypesEnum.StorageBin, "en{'Storage Bin'}de{'Lagerplatz'}");
-            AddEntry((short)FacilityTypesEnum.StorageBinContainer, "en{'Tank/Silo/Cell/Scale Container'}de{'Tank/Silo/Zelle/Waage-Behältnis'}");
-            AddEntry((short)FacilityTypesEnum.Vehicle, "en{'Vehicle'}de{'Fahrzeug'}");
-            AddEntry((short)FacilityTypesEnum.VehicleContainer, "en{'Vehicle Container'}de{'Fahrzeugbehältnis'}");
+            AddEntry(FacilityTypesEnum.StorageLocation, "en{'Storage Location'}de{'Lagerort'}");
+            AddEntry(FacilityTypesEnum.StorageBin, "en{'Storage Bin'}de{'Lagerplatz'}");
+            AddEntry(FacilityTypesEnum.StorageBinContainer, "en{'Tank/Silo/Cell/Scale Container'}de{'Tank/Silo/Zelle/Waage-Behältnis'}");
+            AddEntry(FacilityTypesEnum.Vehicle, "en{'Vehicle'}de{'Fahrzeug'}");
+            AddEntry(FacilityTypesEnum.VehicleContainer, "en{'Vehicle Container'}de{'Fahrzeugbehältnis'}");
         }
     }
 #endif

@@ -28,10 +28,10 @@ namespace gip.mes.datamodel
     {
         public ACValueListPickingStateEnum() : base("PickingState")
         {
-            AddEntry((short)PickingStateEnum.New, "en{'New'}de{'Neu'}");
-            AddEntry((short)PickingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
-            AddEntry((short)PickingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
-            AddEntry((short)PickingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
+            AddEntry(PickingStateEnum.New, "en{'New'}de{'Neu'}");
+            AddEntry(PickingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
+            AddEntry(PickingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
+            AddEntry(PickingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
         }
     }
 }

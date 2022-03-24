@@ -23,11 +23,11 @@ namespace gip.mes.datamodel
     {
         public ACValueListBatchPlanStartModeEnum() : base("BatchPlanStartModeEnum")
         {
-            AddEntry((short)BatchPlanStartModeEnum.Off, "en{'Off'}de{'Aus'}");
-            AddEntry((short)BatchPlanStartModeEnum.AutoSequential, "en{'Sequential'}de{'Sequenziell'}");
-            AddEntry((short)BatchPlanStartModeEnum.AutoTime, "en{'Scheduling'}de{'Nach Zeitplan'}");
-            AddEntry((short)BatchPlanStartModeEnum.AutoTimeAndSequential, "en{'Scheduling and sequential'}de{'Nach Zeitplan und Sequenziell'}");
-            AddEntry((short)BatchPlanStartModeEnum.SemiAutomatic, "en{'Partial quantity'}de{'Nach Teilmenge'}");
+            AddEntry(BatchPlanStartModeEnum.Off, "en{'Off'}de{'Aus'}");
+            AddEntry(BatchPlanStartModeEnum.AutoSequential, "en{'Sequential'}de{'Sequenziell'}");
+            AddEntry(BatchPlanStartModeEnum.AutoTime, "en{'Scheduling'}de{'Nach Zeitplan'}");
+            AddEntry(BatchPlanStartModeEnum.AutoTimeAndSequential, "en{'Scheduling and sequential'}de{'Nach Zeitplan und Sequenziell'}");
+            AddEntry(BatchPlanStartModeEnum.SemiAutomatic, "en{'Partial quantity'}de{'Nach Teilmenge'}");
         }
     }
 #endif

@@ -32,19 +32,19 @@ namespace gip.mes.datamodel
     {
         public ACValueListMovementReasonsEnum() : base("MovementReasons")
         {
-            AddEntry((short)MovementReasonsEnum.Adjustment, "en{'Adjustment'}de{'Korrektur'}");
-            AddEntry((short)MovementReasonsEnum.ZeroStock, "en{'Zero Stock'}de{'Nullbestand'}");
-            AddEntry((short)MovementReasonsEnum.Enabling, "en{'Enabling'}de{'Freigabe'}");
-            AddEntry((short)MovementReasonsEnum.Blocking, "en{'Blocking'}de{'Sperrung'}");
-            AddEntry((short)MovementReasonsEnum.Consumption, "en{'Consumption'}de{'Verbrauch'}");
-            AddEntry((short)MovementReasonsEnum.Production, "en{'Production'}de{'Herstellung'}");
-            AddEntry((short)MovementReasonsEnum.GoodsReceipt, "en{'Goods Receipt'}de{'Wareneingang'}");
-            AddEntry((short)MovementReasonsEnum.GoodsIssue, "en{'Goods Issue'}de{'Warenausgang'}");
-            AddEntry((short)MovementReasonsEnum.Relocation, "en{'Relocation'}de{'Umlagerung'}");
-            AddEntry((short)MovementReasonsEnum.Inventory, "en{'Inventory'}de{'Inventur'}");
-            AddEntry((short)MovementReasonsEnum.ConsumptionWithoutBalance, "en{'Consumption Without Balance'}de{'Verbrauch ohne Bilanz'}");
-            AddEntry((short)MovementReasonsEnum.ProductionWithoutBalance, "en{'Production Without Balance'}de{'Herstellung ohne Bilanz'}");
-            AddEntry((short)MovementReasonsEnum.Reject, "en{'Reject'}de{'Ausschuss'}");
+            AddEntry(MovementReasonsEnum.Adjustment, "en{'Adjustment'}de{'Korrektur'}");
+            AddEntry(MovementReasonsEnum.ZeroStock, "en{'Zero Stock'}de{'Nullbestand'}");
+            AddEntry(MovementReasonsEnum.Enabling, "en{'Enabling'}de{'Freigabe'}");
+            AddEntry(MovementReasonsEnum.Blocking, "en{'Blocking'}de{'Sperrung'}");
+            AddEntry(MovementReasonsEnum.Consumption, "en{'Consumption'}de{'Verbrauch'}");
+            AddEntry(MovementReasonsEnum.Production, "en{'Production'}de{'Herstellung'}");
+            AddEntry(MovementReasonsEnum.GoodsReceipt, "en{'Goods Receipt'}de{'Wareneingang'}");
+            AddEntry(MovementReasonsEnum.GoodsIssue, "en{'Goods Issue'}de{'Warenausgang'}");
+            AddEntry(MovementReasonsEnum.Relocation, "en{'Relocation'}de{'Umlagerung'}");
+            AddEntry(MovementReasonsEnum.Inventory, "en{'Inventory'}de{'Inventur'}");
+            AddEntry(MovementReasonsEnum.ConsumptionWithoutBalance, "en{'Consumption Without Balance'}de{'Verbrauch ohne Bilanz'}");
+            AddEntry(MovementReasonsEnum.ProductionWithoutBalance, "en{'Production Without Balance'}de{'Herstellung ohne Bilanz'}");
+            AddEntry(MovementReasonsEnum.Reject, "en{'Reject'}de{'Ausschuss'}");
         }
     }
 #endif

@@ -285,10 +285,10 @@ namespace gip.bso.manufacturing
     {
         public ACValueListWorkTaskOnHoldSortEnum() : base("WorkTaskSort")
         {
-            AddEntry((short)WorkTaskOnHoldSortEnum.BatchSeq, "en{'Batch sequence'}de{'Chargenfolge'}");
-            AddEntry((short)WorkTaskOnHoldSortEnum.BatchSeqDesc, "en{'Batch sequence desc.'}de{'Chargenfolge desc.'}");
-            AddEntry((short)WorkTaskOnHoldSortEnum.WFStartDate, "en{'Start date'}de{'Datum des Beginns'}");
-            AddEntry((short)WorkTaskOnHoldSortEnum.WFStartDateDesc, "en{'Start date desc.'}de{'Startdatum desc.'}");
+            AddEntry(WorkTaskOnHoldSortEnum.BatchSeq, "en{'Batch sequence'}de{'Chargenfolge'}");
+            AddEntry(WorkTaskOnHoldSortEnum.BatchSeqDesc, "en{'Batch sequence desc.'}de{'Chargenfolge desc.'}");
+            AddEntry(WorkTaskOnHoldSortEnum.WFStartDate, "en{'Start date'}de{'Datum des Beginns'}");
+            AddEntry(WorkTaskOnHoldSortEnum.WFStartDateDesc, "en{'Start date desc.'}de{'Startdatum desc.'}");
         }
     }
 
