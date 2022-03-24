@@ -2847,7 +2847,9 @@ namespace gip.bso.manufacturing
         {
             ACMethod acMethod = Root.ACType.ACType.ACUrlACTypeSignature(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + Const.BSOiPlusStudio);
             acMethod.ParameterValueList["AutoFilter"] = partslistNo;
-            this.Root().RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + nameof(BSOPartslist), acMethod.ParameterValueList);
+            var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(Partslist));
+            if (acClass != null && acClass.ManagingBSO != null)
+                this.Root().RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
         }
 
         #endregion
