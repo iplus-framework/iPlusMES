@@ -145,7 +145,13 @@ namespace gip.mes.processapplication
             CreateNewProgramLog(NewACMethodWithConfiguration());
 
             if (ParentPWGroup != null)
+            {
                 ParentPWGroup.ProcessModuleChanged += ParentPWGroup_ProcessModuleChanged;
+                if (ParentPWGroup.AccessedProcessModule != null)
+                {
+                    HandleProcessModuleMapping(ParentPWGroup.AccessedProcessModule, false);
+                }
+            }
 
             if (CurrentACState == ACStateEnum.SMStarting)
                 CurrentACState = ACStateEnum.SMCompleted;
@@ -178,19 +184,23 @@ namespace gip.mes.processapplication
                 ParentPWGroup.ProcessModuleChanged -= ParentPWGroup_ProcessModuleChanged;
                 return;
             }
+            HandleProcessModuleMapping(e.Module, e.Removed);
+        }
 
+        private void HandleProcessModuleMapping(PAProcessModule paModule, bool removed)
+        { 
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
                 return;
-            List<PAESamplePiLightBox> boxes = e.Module.FindChildComponents<PAESamplePiLightBox>();
+            List<PAESamplePiLightBox> boxes = paModule.FindChildComponents<PAESamplePiLightBox>();
             if (boxes == null || !boxes.Any())
                 return;
 
             if (   ParentPWGroup.TimeInfo.ValueT.ActualTimes == null
                 || ParentPWGroup.TimeInfo.ValueT.ActualTimes.IsNull
-                || !TimeInfo.ValueT.ActualTimes.StartTimeValue.HasValue)
+                || !ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.HasValue)
                 return;
-            DateTime startTimeFrom = TimeInfo.ValueT.ActualTimes.StartTimeValue.Value;
+            DateTime startTimeFrom = ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.Value;
 
             double tolPlus = 0;
             double tolMinus = 0;
@@ -216,18 +226,20 @@ namespace gip.mes.processapplication
                     return;
                 }
 
-                MaterialUnit materialUnit = material.MaterialUnit_Material.Where(c => c.ToMDUnit.SIDimension == GlobalApp.SIDimensions.Mass).FirstOrDefault();
-                if (materialUnit == null)
+                setPoint = material.ProductionWeight;
+                if (setPoint <= Double.Epsilon)
+                {
+                    MaterialUnit materialUnit = material.MaterialUnit_Material.Where(c => c.ToMDUnit.SIDimension == GlobalApp.SIDimensions.Mass).FirstOrDefault();
+                    if (materialUnit != null && materialUnit.ProductionWeight >= Double.Epsilon)
+                        setPoint = materialUnit.ProductionWeight;
+                }
+
+                if (setPoint <= Double.Epsilon)
                 {
                     // TODO Error:
                     return;
                 }
-                if (materialUnit.ProductionWeight <= Double.Epsilon)
-                {
-                    // TODO Error:
-                    return;
-                }
-                setPoint = materialUnit.ProductionWeight;
+
                 tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
                 tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
             }
@@ -238,17 +250,17 @@ namespace gip.mes.processapplication
                 return;
             this.ApplicationManager.ApplicationQueue.Add(() =>
             {
-                if (e.Removed)
+                if (removed)
                 {
                     using (var dbIPlus = new Database())
                     using (var dbApp = new DatabaseApp(dbIPlus))
                     {
                         Msg msg;
-                        ProdOrderPartslistPos plPos = dbApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == intermediatePosition.ProdOrderPartslistPosID);
+                        ProdOrderPartslistPos plPos = dbApp.ProdOrderPartslistPos.FirstOrDefault(c => c.ProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID);
                         if (plPos == null)
                         {
                             //Error50318: Can not find the ProdOrderPartslistPos in the database with ProdOrderPartslistPosID: {0}
-                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(10)", 357, "Error50318", intermediatePosition.ProdOrderPartslistPosID);
+                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(10)", 357, "Error50318", intermediateChildPos.ProdOrderPartslistPosID);
                             AddAlarm(msg, true);
                             return;
                         }
@@ -258,11 +270,12 @@ namespace gip.mes.processapplication
                             if (box.StopOrder())
                             {
                                 SamplePiStats stats = box.GetArchivedValues(startTimeFrom, DateTime.Now, true);
+                                stats.SetToleranceAndRecalc(setPoint, tolPlus, tolMinus);
                                 if (stats != null)
                                 {
                                     LabOrderPos labOrderPos;
                                     msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, out labOrderPos);
-                                    if (msg == null && labOrderPos != null)
+                                    if (msg == null && labOrderPos == null)
                                     {
                                         //Error50323: The LabOrder position Sample weight not exist.
                                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
@@ -272,7 +285,11 @@ namespace gip.mes.processapplication
                                         AddAlarm(msg, true);
                                         return;
                                     }
+                                    labOrderPos.ReferenceValue = setPoint;
+                                    labOrderPos.ValueMax = setPoint + tolPlus;
+                                    labOrderPos.ValueMin = setPoint - tolMinus;
                                     labOrderPos[C_LabOrderExtFieldStats] = stats;
+                                    msg = dbApp.ACSaveChanges();
                                 }
                             }
                         }

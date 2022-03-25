@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.communication;
 using gip.core.datamodel;
+using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace gip.mes.processapplication
             RegisterExecuteHandler(typeof(PAESamplePiLightBox), HandleExecuteACMethod_PAESamplePiLightBox);
         }
 
-        public PAESamplePiLightBox(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
+        public PAESamplePiLightBox(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
@@ -38,14 +39,18 @@ namespace gip.mes.processapplication
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            InitializeExtPropInLabOrderPos();
             return true;
         }
 
         public override bool ACPostInit()
         {
             (SetPoint as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            SetPoint.ForceBroadcast = true;
             (TolPlus as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus.ForceBroadcast = true;
             (TolMinus as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
+            TolPlus.ForceBroadcast = true;
             (ActualValue as ACPropertyNetServerBase<double>).ForceCreatePropertyValueLog();
             if (ApplicationManager != null)
                 ApplicationManager.ProjectWorkCycleR5min += ApplicationManager_ProjectWorkCycleR5min;
@@ -235,12 +240,12 @@ namespace gip.mes.processapplication
                 return null;
             LastResultValues = response.Data;
             SamplePiStats result = ParseValues(response.Data, SetPoint.ValueT, TolPlus.ValueT, TolMinus.ValueT);
-            if (result != null && result.Any())
+            if (result != null && result.Values.Any())
             {
                 ACPropertyNetSource<double> actValueProp = ActualValue as ACPropertyNetSource<double>;
                 if (actValueProp.PropertyLog != null)
                 {
-                    foreach (SamplePiValue value in result)
+                    foreach (SamplePiValue value in result.Values)
                     {
                         actValueProp.PropertyLog.AddValue(value.Value, value.DTStamp);
                     }
@@ -248,15 +253,24 @@ namespace gip.mes.processapplication
                 }
                 var logProp = (SetPoint as ACPropertyNetServerBase<double>);
                 if (logProp != null && logProp.PropertyLog != null)
+                {
                     logProp.PropertyLog.AddValue(this.SetPoint.ValueT, DateTime.Now);
+                    logProp.PropertyLog.SaveChanges();
+                }
 
                 logProp = (TolPlus as ACPropertyNetServerBase<double>);
                 if (logProp != null && logProp.PropertyLog != null)
+                {
                     logProp.PropertyLog.AddValue(this.SetPoint.ValueT + this.TolPlus.ValueT, DateTime.Now);
+                    logProp.PropertyLog.SaveChanges();
+                }
 
                 logProp = (TolMinus as ACPropertyNetServerBase<double>);
                 if (logProp != null && logProp.PropertyLog != null)
+                {
                     logProp.PropertyLog.AddValue(this.SetPoint.ValueT - this.TolMinus.ValueT, DateTime.Now);
+                    logProp.PropertyLog.SaveChanges();
+                }
 
                 this.AverageValue.ValueT = result.AverageValue;
                 if (result.CountInTol > result.CountAbove + result.CountBelow)
@@ -300,7 +314,7 @@ namespace gip.mes.processapplication
                         piValue.TolState = -1;
                     else
                         piValue.TolState = 0;
-                    result.Add(piValue);
+                    result.Values.Add(piValue);
                 }
             }
             
@@ -340,7 +354,7 @@ namespace gip.mes.processapplication
             SamplePiStats stats = new SamplePiStats(setPoint, tolPlus, tolMinus);
             var actValueSeries =  (ActualValue as ACPropertyNetServerBase<double>).GetArchiveLog(from, to);
             if (actValueSeries != null && actValueSeries.PropertyLogList != null && actValueSeries.PropertyLogList.Any())
-                stats.AddRange(actValueSeries.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
+                stats.Values.AddRange(actValueSeries.PropertyLogList.Select(c => new SamplePiValue() { Value = (double)c.Value, DTStamp = c.Time }));
             return stats;
         }
 
@@ -376,7 +390,50 @@ namespace gip.mes.processapplication
             return Client != null && !String.IsNullOrEmpty(Client.ServiceUrl);
         }
 
-        public static bool HandleExecuteACMethod_PAESamplePiLightBox(out object result, IACComponent acComponent, string acMethodName, ACClassMethod acClassMethod, object[] acParameter)
+        private static bool _ExtPropInitialized = false;
+        private void InitializeExtPropInLabOrderPos()
+        {
+            if (_ExtPropInitialized)
+                return;
+            _ExtPropInitialized = true;
+            gip.core.datamodel.Database typeDB = gip.core.datamodel.Database.GlobalDatabase;
+            if (typeDB != null)
+            {
+                try
+                {
+                    core.datamodel.ACClass pickingPosType = typeDB.GetACType(typeof(LabOrderPos));
+                    if (pickingPosType != null)
+                    {
+                        core.datamodel.ACClassProperty extPropStats = pickingPosType.GetProperty(PWSamplePiLightBox.C_LabOrderExtFieldStats);
+                        if (extPropStats == null)
+                        {
+                            core.datamodel.ACClass dataTypeSamplePi = typeDB.GetACType(typeof(SamplePiStats));
+                            if (dataTypeSamplePi != null)
+                            {
+                                using (ACMonitor.Lock(typeDB.QueryLock_1X000))
+                                {
+                                    extPropStats = core.datamodel.ACClassProperty.NewACObject(typeDB, pickingPosType);
+                                    extPropStats.ACIdentifier = PWSamplePiLightBox.C_LabOrderExtFieldStats;
+                                    extPropStats.ACCaptionTranslation = "en{'SamplePiStats'}de{'SamplePiStats'}";
+                                    extPropStats.ValueTypeACClass = dataTypeSamplePi;
+                                    extPropStats.ACKind = Global.ACKinds.PSPropertyExt;
+                                    extPropStats.ACPropUsage = Global.ACPropUsages.Property;
+                                    extPropStats.IsNullable = true;
+                                    pickingPosType.ACClassProperty_ACClass.Add(extPropStats);
+                                    typeDB.ACSaveChanges();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.Messages.LogException("PAESamplePiLightBox", "InitializeExtPropInLabOrderPos()", e);
+                }
+            }
+        }
+
+        public static bool HandleExecuteACMethod_PAESamplePiLightBox(out object result, IACComponent acComponent, string acMethodName, core.datamodel.ACClassMethod acClassMethod, object[] acParameter)
         {
             //result = null;
             //switch(acMethodName)
@@ -391,7 +448,7 @@ namespace gip.mes.processapplication
             return HandleExecuteACMethod_PAModule(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
 
-        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, ACClassMethod acClassMethod, params object[] acParameter)
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
@@ -437,10 +494,11 @@ namespace gip.mes.processapplication
     [DataContract(Name = "PiV")]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'SamplePiValue'}de{'SamplePiValue'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
-    public class SamplePiValue : INotifyPropertyChanged
+    public class SamplePiValue : INotifyPropertyChanged, IVBChartTupleT<DateTime, double>
     {
         double _Value;
         [DataMember(Name = "V")]
+        [ACPropertyInfo(201, "", "en{'Weight'}de{'Gewicht'}", "", false)]
         public double Value
         {
             get
@@ -459,6 +517,7 @@ namespace gip.mes.processapplication
 
         short _TolState;
         [DataMember(Name = "S")]
+        [ACPropertyInfo(202, "", "en{'Tolerance state'}de{'Toleranzstatus'}", "", false)]
         public short TolState
         {
             get
@@ -475,9 +534,20 @@ namespace gip.mes.processapplication
             }
         }
 
+        public void RecalcTolSate(double setPoint, double tolPlus, double tolMinus)
+        {
+            if (Value < setPoint - tolMinus)
+                TolState = -1;
+            else if (Value > setPoint + tolPlus)
+                TolState = 1;
+            else
+                TolState = 0;
+        }
+
 
         DateTime _DTStamp;
         [DataMember(Name = "DT")]
+        [ACPropertyInfo(203, "", "en{'Time'}de{'Uhrzeit'}", "", false)]
         public DateTime DTStamp
         {
             get
@@ -494,6 +564,38 @@ namespace gip.mes.processapplication
             }
         }
 
+        public DateTime ValueT1
+        {
+            get 
+            {
+                return DTStamp;
+            }
+        }
+
+        public double ValueT2
+        {
+            get
+            {
+                return Value;
+            }
+        }
+
+        public object Value1
+        {
+            get
+            {
+                return DTStamp;
+            }
+        }
+
+        public object Value2
+        {
+            get
+            {
+                return Value;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -504,9 +606,10 @@ namespace gip.mes.processapplication
     }
 
 
+    [DataContract(Name = "PiS")]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'SamplePiStats'}de{'SamplePiStats'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
-    public class SamplePiStats : List<SamplePiValue>, INotifyPropertyChanged
+    public class SamplePiStats : INotifyPropertyChanged
     {
         public SamplePiStats() : base()
         {
@@ -514,14 +617,21 @@ namespace gip.mes.processapplication
 
         public SamplePiStats(double setPoint, double tolPlus, double tolMinus)
         {
-            SetPoint = setPoint;
-            TolMinus = tolPlus;
-            TolMinus = tolMinus;
+            SetToleranceAndRecalc(setPoint, tolPlus, tolMinus);
         }
 
+        public void SetToleranceAndRecalc(double setPoint, double tolPlus, double tolMinus, bool recalc = false)
+        {
+            SetPoint = setPoint;
+            TolPlus = tolPlus;
+            TolMinus = tolMinus;
+            if (recalc)
+                Values.ForEach(c => c.RecalcTolSate(setPoint, tolPlus, tolMinus));
+        }
 
         [IgnoreDataMember]
         double _SetPoint;
+        [ACPropertyInfo(201, "", "en{'Setpoint'}de{'Sollwert'}", "", false)]
         [DataMember(Name = "SP")]
         public double SetPoint
         {
@@ -542,6 +652,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         double _TolPlus;
+        [ACPropertyInfo(202, "", "en{'Tolerance +'}de{'Toleranz +'}", "", false)]
         [DataMember(Name = "P")]
         public double TolPlus
         {
@@ -561,6 +672,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         double _TolMinus;
+        [ACPropertyInfo(203, "", "en{'Tolerance -'}de{'Toleranz -'}", "", false)]
         [DataMember(Name = "M")]
         public double TolMinus
         {
@@ -580,6 +692,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         private double? _AverageValue;
+        [ACPropertyInfo(204, "", "en{'Average weight'}de{'Durchschnittsgewicht'}", "", false)]
         [IgnoreDataMember]
         public double AverageValue
         {
@@ -598,6 +711,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         private int? _CountAbove;
+        [ACPropertyInfo(205, "", "en{'Count above'}de{'Anzahl Überhalb'}", "", false)]
         [IgnoreDataMember]
         public int CountAbove
         {
@@ -616,6 +730,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         private int? _CountBelow;
+        [ACPropertyInfo(206, "", "en{'Count below'}de{'Anzahl Unterhalb'}", "", false)]
         [IgnoreDataMember]
         public int CountBelow
         {
@@ -632,7 +747,9 @@ namespace gip.mes.processapplication
             }
         }
 
+        [IgnoreDataMember]
         private int? _CountInTol;
+        [ACPropertyInfo(207, "", "en{'Count in tolerance'}de{'Anzahl in Toleranz'}", "", false)]
         [IgnoreDataMember]
         public int CountInTol
         {
@@ -651,6 +768,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         private int? _CountValid;
+        [ACPropertyInfo(208, "", "en{'Valid measurements'}de{'Gültige Messwerte'}", "", false)]
         [IgnoreDataMember]
         public int CountValid
         {
@@ -669,6 +787,7 @@ namespace gip.mes.processapplication
 
         [IgnoreDataMember]
         private int? _CountInvalid;
+        [ACPropertyInfo(209, "", "en{'Inalid measurements'}de{'Ungültige Messwerte'}", "", false)]
         [IgnoreDataMember]
         public int CountInvalid
         {
@@ -685,23 +804,43 @@ namespace gip.mes.processapplication
             }
         }
 
+        [IgnoreDataMember]
+        private List<SamplePiValue> _Values;
+        [ACPropertyInfo(210, "", "en{'Measurements'}de{'Messwerte'}", "", false)]
+        [DataMember(Name = "VS")]
+        public List<SamplePiValue> Values
+        {
+            get
+            {
+                if (_Values == null)
+                    _Values = new List<SamplePiValue>();
+                return _Values;
+            }
+            set
+            {
+                _Values = value;
+                OnPropertyChanged();
+            }
+        }
+
         public IEnumerable<SamplePiValue> ValidValues
         {
             get
             {
                 double filterMinValue = SetPoint * 0.5;
                 double filterMaxValue = SetPoint * 1.5;
-                return this.Where(c => c.Value > filterMinValue && c.Value < filterMaxValue);
+                return Values.Where(c => c.Value > filterMinValue && c.Value < filterMaxValue);
             }
         }
 
         public void RecalcStatistics()
         {
+            Values.ForEach(c => c.RecalcTolSate(SetPoint, TolPlus, TolMinus));
             if (ValidValues != null && ValidValues.Any())
             {
                 SamplePiValue[] validValues = ValidValues.ToArray();
                 _CountValid = validValues.Count();
-                _CountInvalid = Count - _CountValid.Value;
+                _CountInvalid = Values.Count - _CountValid.Value;
                 _CountInTol = validValues.Count(c => c.TolState == 0);
                 _CountBelow = validValues.Count(c => c.TolState < 0);
                 _CountAbove = validValues.Count(c => c.TolState > 0);

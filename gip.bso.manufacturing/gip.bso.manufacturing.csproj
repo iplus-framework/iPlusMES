@@ -58,6 +58,7 @@
     <Compile Include="Command\BatchSuggestionCommand.cs" />
     <Compile Include="Command\KeepEqualBatchSizes.cs" />
     <Compile Include="Command\KeepStandardBatchSizeAndDivideRest.cs" />
+    <Compile Include="Manufacturing\BSOLabOrderMES.cs" />
     <Compile Include="Manufacturing\BSOBatchPlan.cs" />
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
     <Compile Include="Manufacturing\BSOProdOrderBatchComponents.cs" />
@@ -333,6 +334,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-03-23 22-18_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-03-25 14-54_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

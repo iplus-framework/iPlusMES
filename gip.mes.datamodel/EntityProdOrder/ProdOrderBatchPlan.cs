@@ -172,6 +172,7 @@ namespace gip.mes.datamodel
 
         #region Properties
 
+        [ACPropertyInfo(999, "", "en{'Mode'}de{'Modus'}", Const.ContextDatabase + "\\BatchPlanModeList")]
         public BatchPlanMode PlanMode
         {
             get
