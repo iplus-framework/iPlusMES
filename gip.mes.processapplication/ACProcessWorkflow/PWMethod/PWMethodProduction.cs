@@ -609,6 +609,7 @@ namespace gip.mes.processapplication
                 {
                     currentProdOrderPartslistPos = _CurrentProdOrderPartslistPos;
                 }
+                gip.core.datamodel.ACProgramLog newAddedProgramLog = _NewAddedProgramLog;
 
                 if (currentProdOrderPartslistPos != null)
                 {
@@ -617,7 +618,7 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             orderLog.ProdOrderPartslistPosID = currentProdOrderPartslistPos.ProdOrderPartslistPosID;
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();

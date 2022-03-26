@@ -248,6 +248,7 @@ namespace gip.mes.processapplication
             if (_NewAddedProgramLog != null)
             {
                 var currentPickingPos = CurrentPickingPos;
+                gip.core.datamodel.ACProgramLog newAddedProgramLog = _NewAddedProgramLog;
                 if (currentPickingPos != null)
                 {
                     this.ApplicationManager.ApplicationQueue.Add(() =>
@@ -255,7 +256,7 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             orderLog.PickingPosID = currentPickingPos.PickingPosID;
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();

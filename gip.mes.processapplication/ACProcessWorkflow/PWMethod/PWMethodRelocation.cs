@@ -196,13 +196,16 @@ namespace gip.mes.processapplication
                 ACClassTaskQueue.TaskQueue.ObjectContext.ACChangesExecuted -= ACClassTaskQueue_ChangesSaved;
                 if (_NewAddedProgramLog != null)
                 {
+                    gip.core.datamodel.ACProgramLog newAddedProgramLog = _NewAddedProgramLog;
+                    Guid facilityBookingID = CurrentFacilityBooking.FacilityBookingID;
+
                     this.ApplicationManager.ApplicationQueue.Add(() =>
                     //ThreadPool.QueueUserWorkItem((object state) =>
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
-                            orderLog.FacilityBookingID = CurrentFacilityBooking.FacilityBookingID;
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
+                            orderLog.FacilityBookingID = facilityBookingID;
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();
                         }

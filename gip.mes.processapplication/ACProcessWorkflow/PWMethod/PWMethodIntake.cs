@@ -234,15 +234,17 @@ namespace gip.mes.processapplication
             if (CurrentDeliveryNotePos != null)
             {
                 ACClassTaskQueue.TaskQueue.ObjectContext.ACChangesExecuted -= ACClassTaskQueue_ChangesSaved;
-                if (_NewAddedProgramLog != null)
+                gip.core.datamodel.ACProgramLog newAddedProgramLog = _NewAddedProgramLog;
+                Guid deliveryNotePosID = CurrentDeliveryNotePos.DeliveryNotePosID;
+                if (newAddedProgramLog != null)
                 {
                     this.ApplicationManager.ApplicationQueue.Add(() =>
                     //ThreadPool.QueueUserWorkItem((object state) =>
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
-                            orderLog.DeliveryNotePosID = CurrentDeliveryNotePos.DeliveryNotePosID;
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
+                            orderLog.DeliveryNotePosID = deliveryNotePosID;
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();
                         }

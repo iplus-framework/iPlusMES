@@ -1202,33 +1202,43 @@ namespace gip.mes.processapplication
             {
                 if (CurrentDisEntityID.ValueT != Guid.Empty)
                 {
+                    Guid currentDisEntityID = CurrentDisEntityID.ValueT;
+                    gip.core.datamodel.ACProgramLog newAddedProgramLog = _NewAddedProgramLog;
+                    short propertyToSet = 0;
+                    if (IsIntake)
+                    {
+                        if (ParentPWMethod<PWMethodIntake>().CurrentPicking != null)
+                            propertyToSet = 1;
+                        else if (ParentPWMethod<PWMethodIntake>().CurrentDeliveryNotePos != null)
+                            propertyToSet = 2;
+                    }
+                    else if (IsRelocation)
+                    {
+                        if (ParentPWMethod<PWMethodRelocation>().CurrentPicking != null)
+                            propertyToSet = 1;
+                        else if (ParentPWMethod<PWMethodRelocation>().CurrentFacilityBooking != null)
+                            propertyToSet = 3;
+                    }
+                    else if (IsLoading)
+                    {
+                        if (ParentPWMethod<PWMethodLoading>().CurrentPicking != null)
+                            propertyToSet = 1;
+                        else if (ParentPWMethod<PWMethodLoading>().CurrentDeliveryNotePos != null)
+                            propertyToSet = 2;
+                    }
+
                     this.ApplicationManager.ApplicationQueue.Add(() =>
                     //System.Threading.ThreadPool.QueueUserWorkItem((object state) =>
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
-                            if (IsIntake)
-                            {
-                                if (ParentPWMethod<PWMethodIntake>().CurrentPicking != null)
-                                    orderLog.PickingPosID = CurrentDisEntityID.ValueT;
-                                else if (ParentPWMethod<PWMethodIntake>().CurrentDeliveryNotePos != null)
-                                    orderLog.DeliveryNotePosID = CurrentDisEntityID.ValueT;
-                            }
-                            else if (IsRelocation)
-                            {
-                                if (ParentPWMethod<PWMethodRelocation>().CurrentPicking != null)
-                                    orderLog.PickingPosID = CurrentDisEntityID.ValueT;
-                                else if (ParentPWMethod<PWMethodRelocation>().CurrentFacilityBooking != null)
-                                    orderLog.FacilityBookingID = CurrentDisEntityID.ValueT;
-                            }
-                            else if (IsLoading)
-                            {
-                                if (ParentPWMethod<PWMethodLoading>().CurrentPicking != null)
-                                    orderLog.PickingPosID = CurrentDisEntityID.ValueT;
-                                else if (ParentPWMethod<PWMethodLoading>().CurrentDeliveryNotePos != null)
-                                    orderLog.DeliveryNotePosID = CurrentDisEntityID.ValueT;
-                            }
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
+                            if (propertyToSet == 1)
+                                orderLog.PickingPosID = currentDisEntityID;
+                            else if (propertyToSet == 2)
+                                orderLog.DeliveryNotePosID = currentDisEntityID;
+                            else if (propertyToSet == 3)
+                                orderLog.FacilityBookingID = currentDisEntityID;
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();
                         }

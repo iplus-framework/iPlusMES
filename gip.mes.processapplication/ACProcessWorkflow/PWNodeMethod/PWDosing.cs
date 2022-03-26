@@ -1052,18 +1052,20 @@ namespace gip.mes.processapplication
             ACClassTaskQueue.TaskQueue.ObjectContext.ACChangesExecuted -= ACClassTaskQueue_ChangesSaved;
             if (_NewAddedProgramLog != null)
             {
-                if (CurrentDosingPos.ValueT != Guid.Empty)
+                Guid dosingPosId = CurrentDosingPos.ValueT;
+                gip.core.datamodel.ACProgramLog newAddedProgramLog = _NewAddedProgramLog;
+                if (dosingPosId != Guid.Empty)
                 {
                     this.ApplicationManager.ApplicationQueue.Add(() =>
                     //ThreadPool.QueueUserWorkItem((object state) =>
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            OrderLog orderLog = OrderLog.NewACObject(dbApp, _NewAddedProgramLog);
+                            OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             if (IsProduction)
-                                orderLog.ProdOrderPartslistPosRelationID = CurrentDosingPos.ValueT;
+                                orderLog.ProdOrderPartslistPosRelationID = dosingPosId;
                             if (IsTransport)
-                                orderLog.PickingPosID = CurrentDosingPos.ValueT;
+                                orderLog.PickingPosID = dosingPosId;
                             dbApp.OrderLog.AddObject(orderLog);
                             dbApp.ACSaveChanges();
                         }
