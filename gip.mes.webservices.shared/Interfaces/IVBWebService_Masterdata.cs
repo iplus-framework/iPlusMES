@@ -49,6 +49,14 @@ namespace gip.mes.webservices
         Task<WSResponse<Material>> GetMaterialByBarcodeAsync(string barcodeID);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriSuggestedMaterialsID, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<Material>> GetSuggestedMaterials(string materialID);
+#elif NETSTANDARD
+        Task<WSResponse<List<Material>>> GetSuggestedMaterialsAsync(string materialID);
+#endif
+
         #endregion
 
 

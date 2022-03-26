@@ -28,6 +28,8 @@ namespace gip.mes.webservices
         public const string UriMaterial = "Materials";
         public const string UriMaterialID = "Materials/{materialID}";
         public const string UriMaterialID_F = "Materials/{0}";
+        public const string UriSuggestedMaterialsID = "SuggestedMaterials/{materialID}";
+        public const string UriSuggestedMaterialsID_F = "SuggestedMaterials/{0}";
         public const string UriMaterial_Search = "Materials/term/{term}";
         public const string UriMaterial_Search_F = "Materials/term/{0}";
         public const string UriMaterial_BarcodeID = "Materials/barcode/{barcodeID}";

@@ -83,6 +83,57 @@ namespace gip.mes.webservices
             }
         }
 
+        public WSResponse<List<Material>> GetSuggestedMaterials(string materialID)
+        {
+            if (string.IsNullOrEmpty(materialID))
+                return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "materialID is empty"));
+
+            Guid guid;
+            if (!Guid.TryParse(materialID, out guid))
+                return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "materialID is invalid"));
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    if (myServiceHost == null)
+                        return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+                    FacilityManager facilityManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                    if (facilityManager == null)
+                        return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                    datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == guid);
+                    IEnumerable<datamodel.Material> suggestedMaterials = facilityManager.GetSuggestedReassignmentMaterials(dbApp, material);
+
+                    if (suggestedMaterials == null || !suggestedMaterials.Any())
+                        return new WSResponse<List<Material>>(new List<Material>());
+
+                    return new WSResponse<List<Material>>(suggestedMaterials.Select(c => new gip.mes.webservices.Material()
+                                                                                         {
+                                                                                            MaterialID = c.MaterialID,
+                                                                                            MaterialNo = c.MaterialNo,
+                                                                                            MaterialName1 = c.MaterialName1,
+                                                                                            OptStockQuantity = c.OptStockQuantity,
+                                                                                            MinStockQuantity = c.MinStockQuantity,
+                                                                                            BaseMDUnit = new gip.mes.webservices.MDUnit()
+                                                                                            {
+                                                                                                MDUnitID = c.BaseMDUnit.MDUnitID,
+                                                                                                MDUnitNameTrans = c.BaseMDUnit.MDUnitNameTrans
+                                                                                            }
+                                                                                         }).ToList());
+                }
+                catch (Exception e)
+                {
+                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+                    if (myServiceHost != null)
+                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterial(10)", e);
+                    return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+            }
+        }
+
 
         public WSResponse<List<Material>> SearchMaterial(string term)
         {
