@@ -627,7 +627,8 @@ namespace gip.mes.facility
             TMP.ParameterValueList.Add(new ACValue("OutwardFacilityCharge", typeof(FacilityCharge), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardMaterial", typeof(Material), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardPartslist", typeof(Partslist), null, Global.ParamOption.Optional));
-            TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), false, Global.ParamOption.Fix));
+            TMP.ParameterValueList.Add(new ACValue("OutwardQuantity", typeof(Nullable<double>), null, Global.ParamOption.Optional));
+            //TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), false, Global.ParamOption.Fix));
             TMP.ParameterValueList.Add(new ACValue("Comment", typeof(string), null, Global.ParamOption.Optional));
             TMP.ResultValueList.Add(new ACValue("BookingResult", typeof(ACMethodEventArgs), null, Global.ParamOption.Required));
 

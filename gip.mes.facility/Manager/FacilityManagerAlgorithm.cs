@@ -903,6 +903,7 @@ namespace gip.mes.facility
                         inwardFacilityCharge = FacilityCharge.NewACObject(BP.DatabaseApp, null);
                         inwardFacilityCharge.CloneFrom(BP.ParamsAdjusted.OutwardFacilityCharge, false);
                         inwardFacilityCharge.Material = BP.InwardMaterial;
+                        inwardFacilityCharge.MDUnit = inwardFacilityCharge.Material.BaseMDUnit;
                         inwardFacilityCharge.NotAvailable = false;
                         if (BP.InwardPartslist != null)
                             inwardFacilityCharge.Partslist = BP.InwardPartslist;
@@ -915,9 +916,12 @@ namespace gip.mes.facility
                     else
                         inwardFacilityCharge.Partslist = null;
 
+                    if (inwardFacilityCharge.MDUnit != BP.OutwardFacilityCharge.MDUnit)
+                        quantityToBook = BP.OutwardFacilityCharge.Material.ConvertQuantity(quantityToBook, BP.OutwardFacilityCharge.MDUnit, inwardFacilityCharge.MDUnit);
+
                     bookingResult = InitFacilityBookingCharge_FromFacilityCharge_Inward(BP, FBC, inwardFacilityCharge,
                         false,
-                        quantityToBook, quantityToBook, BP.OutwardFacilityCharge.MDUnit);
+                        quantityToBook, quantityToBook, inwardFacilityCharge.MDUnit);
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
 

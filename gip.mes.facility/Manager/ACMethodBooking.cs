@@ -2750,8 +2750,24 @@ namespace gip.mes.facility
                 if (!AreQuantityParamsNeeded)
                     return true;
             }
+
+            if (this.BookingType == GlobalApp.FacilityBookingType.Reassign_FacilityCharge)
+            {
+                if (ParamsAdjusted.OutwardFacilityCharge != null)
+                {
+                    if (   ParamsAdjusted.InwardMaterial != null 
+                        && ParamsAdjusted.InwardMaterial.BaseMDUnit != ParamsAdjusted.OutwardFacilityCharge.MDUnit
+                        && !ParamsAdjusted.OutwardFacilityCharge.Material.IsConvertableToUnit(ParamsAdjusted.OutwardFacilityCharge.MDUnit, ParamsAdjusted.InwardMaterial.BaseMDUnit))
+                    {
+                        AddBookingMessage(eResultCodes.DependingParamsHasWrongValue, Root.Environment.TranslateMessage(CurrentFacilityManager, "Error00053"));
+                        return false;
+                    }
+                }
+            }
+
+
             // Runde Zahlen ab. Nötig wenn z.B. Sack als Einheit und Nachkommastellen = 0 sein sollen und eine Menge mit Nachkommastellen übergeben worden ist
-            else if (ParamsAdjusted.MDUnit.Rounding >= 0)
+            if (ParamsAdjusted.MDUnit != null && ParamsAdjusted.MDUnit.Rounding >= 0)
             {
                 if (ParamsAdjusted.InwardQuantity.HasValue)
                     ParamsAdjusted.InwardQuantity = ParamsAdjusted.MDUnit.GetRoundedValue(ParamsAdjusted.InwardQuantity.Value);
