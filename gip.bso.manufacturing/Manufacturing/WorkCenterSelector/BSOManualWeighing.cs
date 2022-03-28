@@ -39,6 +39,8 @@ namespace gip.bso.manufacturing
         {
             DeactivateManualWeighingModel();
             _DefaultMaterialIcon = null;
+            ReworkInfoItems = null;
+            SelectedReworkInfo = null;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -777,6 +779,30 @@ namespace gip.bso.manufacturing
         #region Properties => Rework
 
         protected bool IsReworkEnabled = false;
+
+        private ReworkInfo _SelectedReworkInfo;
+        [ACPropertySelected(800, "ReworkInfo", "en{''}de{''}")]
+        public ReworkInfo SelectedReworkInfo
+        {
+            get => _SelectedReworkInfo;
+            set
+            {
+                _SelectedReworkInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ReworkInfoList _ReworkInfoItems;
+        [ACPropertyList(800, "ReworkInfo")]
+        public ReworkInfoList ReworkInfoItems
+        {
+            get => _ReworkInfoItems;
+            set
+            {
+                _ReworkInfoItems = value;
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -2879,6 +2905,20 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700)]
         public void OpenReworkDialog()
         {
+            ACRef<IACComponentPWNode> pwNode;
+
+            using (ACMonitor.Lock(_70500_ComponentPWNodeLock))
+            {
+                pwNode = ComponentPWNodesList?.FirstOrDefault()?.ComponentPWNode;
+            }
+
+            if (pwNode == null)
+                return;
+
+            SelectedReworkInfo = null;
+            IACComponentPWNode compPWNode = pwNode.ValueT;
+            ReworkInfoItems = compPWNode.ExecuteMethod(nameof(PWManualWeighing.GetReworkStatus)) as ReworkInfoList;
+
             ShowDialog(this, "ReworkDialog");
         }
 
@@ -2887,8 +2927,8 @@ namespace gip.bso.manufacturing
             return IsReworkEnabled;
         }
 
-        [ACMethodInfo("", "en{'Turn on rework'}de{'Turn on rework'}", 701)]
-        public void TurnOnRework()
+        [ACMethodInfo("", "en{'Add rework material'}de{'Rework-Material hinzufügen'}", 701)]
+        public void AddReworkMaterial()
         {
             ManualWeighingPWNode pwNode = null;
 
@@ -2903,7 +2943,7 @@ namespace gip.bso.manufacturing
             pwNode.ComponentPWNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.ActivateRework));
         }
 
-        public bool IsEnabledTurnOnRework()
+        public bool IsEnabledAddReworkMaterial()
         {
             return true;
         }
