@@ -2623,7 +2623,7 @@ namespace gip.bso.manufacturing
                        );
         }
 
-        [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New)]
+        [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New, true)]
         public void New()
         {
             if (!PreExecute("New"))
@@ -2649,7 +2649,7 @@ namespace gip.bso.manufacturing
                 && SelectedScheduleForPWNode != null;
         }
 
-        [ACMethodInfo("DeleteBatch", "en{'Delete'}de{'Löschen'}", 503)]
+        [ACMethodInfo("DeleteBatch", "en{'Delete'}de{'Löschen'}", 503, true)]
         public void DeleteBatch()
         {
             ProdOrderBatchPlan batchPlan = SelectedProdOrderBatchPlan;
@@ -2674,7 +2674,7 @@ namespace gip.bso.manufacturing
                 && SelectedProdOrderBatchPlan.BatchActualCount <= 0;
         }
 
-        [ACMethodInfo("BatchPlanEdit", "en{'Edit'}de{'Bearbeiten'}", 503)]
+        [ACMethodInfo("BatchPlanEdit", "en{'Edit'}de{'Bearbeiten'}", 503, true)]
         public void BatchPlanEdit()
         {
             if (!IsEnabledBatchPlanEdit())
@@ -2693,7 +2693,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> Interaction
 
-        [ACMethodInfo("ItemDrag", "en{'Cancel'}de{'Abbrechen'}", 506)]
+        [ACMethodInfo("ItemDrag", "en{'Cancel'}de{'Abbrechen'}", 506, true)]
         public void ItemDrag(Dictionary<int, string> newOrder)
         {
             if (!IsEnabledItemDrag()) return;
@@ -2934,7 +2934,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> BatchState
 
-        [ACMethodCommand("SetBatchStateReadyToStart", "en{'Switch to Readiness'}de{'Startbereit setzen'}", (short)MISort.Start)]
+        [ACMethodCommand("SetBatchStateReadyToStart", "en{'Switch to Readiness'}de{'Startbereit setzen'}", (short)MISort.Start, true)]
         public void SetBatchStateReadyToStart()
         {
             if (!IsEnabledSetBatchStateReadyToStart())
@@ -2954,7 +2954,7 @@ namespace gip.bso.manufacturing
             return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.Created);
         }
 
-        [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508)]
+        [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
         public void SetBatchStateCreated()
         {
             if (!IsEnabledSetBatchStateCreated()) return;
@@ -2978,7 +2978,7 @@ namespace gip.bso.manufacturing
             return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && (c.PlanState == GlobalApp.BatchPlanState.ReadyToStart || c.PlanState == GlobalApp.BatchPlanState.AutoStart));
         }
 
-        [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
+        [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
         public void SetBatchStateCancelled()
         {
             ClearMessages();
