@@ -97,6 +97,7 @@
     <Compile Include="Model\WorkCenter\ManualWeighingPWNode.cs" />
     <Compile Include="Model\WorkCenter\MessageItem.cs" />
     <Compile Include="Model\WorkCenter\SingleDosingConfigItem.cs" />
+    <Compile Include="Model\WorkCenter\UserRuleItem.cs" />
     <Compile Include="Model\WorkCenter\WeighingMaterial.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterItem.cs" />
     <Compile Include="Model\WorkCenter\WorkCenterItemFunction.cs" />
@@ -343,6 +344,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-03-27 18-37_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-03-31 19-35_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

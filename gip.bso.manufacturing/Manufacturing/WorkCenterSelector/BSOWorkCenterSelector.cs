@@ -134,8 +134,12 @@ namespace gip.bso.manufacturing
 
             _MainSyncContext = null;
 
-            _timer.Stop();
-            _timer = null;
+            if (_timer != null)
+            {
+                _timer.Tick -= _timer_Tick;
+                _timer.Stop();
+                _timer = null;
+            }
 
             return base.ACDeInit(deleteACClassTask);
         }

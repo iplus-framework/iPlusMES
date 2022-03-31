@@ -10,9 +10,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Objects;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using vd = gip.mes.datamodel;
+using System.Xml;
 
 namespace gip.bso.manufacturing
 {
@@ -215,6 +218,7 @@ namespace gip.bso.manufacturing
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, "PABatchPlanSchedulerURL", "");
+            _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
             //_ConfigPreselectedLine = new ACPropertyConfigValue<string>(this, "ConfigPreselectedLine", "");
         }
 
@@ -635,6 +639,30 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledRemoveSuggestion):
                     result = IsEnabledRemoveSuggestion();
                     return true;
+                case nameof(ApplyRulesAndClose):
+                    ApplyRulesAndClose();
+                    return true;
+                case nameof(IsEnabledApplyRulesAndClose):
+                    result = IsEnabledApplyRulesAndClose();
+                    return true;
+                case nameof(AddRule):
+                    AddRule();
+                    return true;
+                case nameof(IsEnabledAddRule):
+                    result = IsEnabledAddRule();
+                    return true;
+                case nameof(RemoveRule):
+                    RemoveRule();
+                    return true;
+                case nameof(IsEnabledRemoveRule):
+                    result = IsEnabledRemoveRule();
+                    return true;
+                case nameof(ConfigureBSO):
+                    ConfigureBSO();
+                    return true;
+                case nameof(IsEnabledConfigureBSO):
+                    result = IsEnabledConfigureBSO();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -870,6 +898,15 @@ namespace gip.bso.manufacturing
                     if (!_SchedulingGroupValidated && _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).Any())
                         Messages.Error(this, "A Scheduling-Group was removed. Invoke Reset on Scheduler");
                     _SchedulingGroupValidated = true;
+
+                    _RulesForCurrentUser = GetRulesForCurrentUser();
+
+                    if (_RulesForCurrentUser != null && _RulesForCurrentUser.Any() && !Root.Environment.User.IsSuperuser)
+                    {
+                        return _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup != null && _RulesForCurrentUser.Any(r => r.RuleParamID == c.MDSchedulingGroupID))
+                                                     .OrderBy(c => c.MDSchedulingGroup.SortIndex)
+                                                     .ThenBy(c => c.MDSchedulingGroup.MDSchedulingGroupName);
+                    }
 
                     return _ScheduleForPWNodeList
                         .Where(c => c.MDSchedulingGroup != null)
@@ -2134,6 +2171,97 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+
+        #endregion
+
+        #region Properties => Configuration Rules
+
+        private ACPropertyConfigValue<string> _BSOBatchPlanSchedulerRules;
+        [ACPropertyConfig("en{'Work center rules'}de{'Work center rules'}")]
+        public string BSOBatchPlanSchedulerRules
+        {
+            get => _BSOBatchPlanSchedulerRules.ValueT;
+            set
+            {
+                _BSOBatchPlanSchedulerRules.ValueT = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private List<UserRuleItem> _TempRules;
+
+        private List<UserRuleItem> _RulesForCurrentUser;
+
+        private core.datamodel.VBUser _SelectedVBUser;
+        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}")]
+        public core.datamodel.VBUser SelectedVBUser
+        {
+            get => _SelectedVBUser;
+            set
+            {
+                _SelectedVBUser = value;
+                OnPropertyChanged("SelectedVBUser");
+            }
+        }
+
+        [ACPropertyList(605, "VBUser")]
+        public IEnumerable<core.datamodel.VBUser> VBUserList
+        {
+            get
+            {
+                return DatabaseApp.ContextIPlus.VBUser/*.Where(c => !c.IsSuperuser)*/.ToArray();
+            }
+        }
+
+        private UserRuleItem _SelectedAssignedUserRule;
+        [ACPropertySelected(606, "UserRelatedRules", "en{'Assigned user rule'}de{'Assigned user rule'}")]
+        public UserRuleItem SelectedAssignedUserRule
+        {
+            get => _SelectedAssignedUserRule;
+            set
+            {
+
+
+                _SelectedAssignedUserRule = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IEnumerable<UserRuleItem> _AssignedUserRules;
+        [ACPropertyList(607, "UserRelatedRules")]
+        public IEnumerable<UserRuleItem> AssignedUserRules
+        {
+            get => _AssignedUserRules;
+            set
+            {
+                _AssignedUserRules = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private MDSchedulingGroup _SelectedAvailableSchedulingGroup;
+        [ACPropertySelected(608, "AvailableRules", "en{'Available scheduling groups'}de{'Available scheduling groups'}")]
+        public MDSchedulingGroup SelectedAvailableSchedulingGroup
+        {
+            get => _SelectedAvailableSchedulingGroup;
+            set
+            {
+                _SelectedAvailableSchedulingGroup = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private List<MDSchedulingGroup> _AvailableSchedulingGroupsList;
+        [ACPropertyList(609, "AvailableRules")]
+        public List<MDSchedulingGroup> AvailableSchedulingGroupsList
+        {
+            get => _AvailableSchedulingGroupsList;
+            set
+            {
+                _AvailableSchedulingGroupsList = value;
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -4529,6 +4657,134 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #endregion
+
+        #region Methods => Configuration
+
+        [ACMethodInteraction("", "en{'Configure scheduler rules'}de{'Konfigurieren Regeln für den Zeitplaner'}", 601, true)]
+        public void ConfigureBSO()
+        {
+            _TempRules = GetStoredRules();
+            AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption);
+
+            if (AvailableSchedulingGroupsList == null)
+                AvailableSchedulingGroupsList = DatabaseApp.MDSchedulingGroup.ToArray().OrderBy(c => c.ACCaption).ToList();
+
+            ShowDialog(this, "ConfigurationDialog");
+        }
+
+        public bool IsEnabledConfigureBSO()
+        {
+            return true;//Root.Environment.User.IsSuperuser;
+        }
+
+        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
+        public void AddRule()
+        {
+            UserRuleItem existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID 
+                                                                           && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+
+            if (existingRule != null)
+                return;
+
+            UserRuleItem rule = new UserRuleItem()
+            {
+                VBUserID = SelectedVBUser.VBUserID,
+                VBUserName = SelectedVBUser.VBUserName,
+                RuleParamID = SelectedAvailableSchedulingGroup.MDSchedulingGroupID,
+                RuleParamCaption = SelectedAvailableSchedulingGroup.ACCaption
+            };
+
+            _TempRules.Add(rule);
+            AssignedUserRules = _TempRules.ToList();
+        }
+
+        public bool IsEnabledAddRule()
+        {
+            return SelectedVBUser != null && SelectedAvailableSchedulingGroup != null;
+        }
+
+        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
+        public void RemoveRule()
+        {
+            UserRuleItem rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedUserRule);
+            if (rule != null)
+            {
+                _TempRules.Remove(rule);
+                AssignedUserRules = _TempRules.ToList();
+                SelectedAssignedUserRule = null;
+            }
+        }
+
+        public bool IsEnabledRemoveRule()
+        {
+            return SelectedAssignedUserRule != null;
+        }
+
+        [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604)]
+        public void ApplyRulesAndClose()
+        {
+            string xml = "";
+            StringBuilder sb = new StringBuilder();
+            using (StringWriter sw = new StringWriter(sb))
+            using (XmlTextWriter xmlWriter = new XmlTextWriter(sw))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(List<UserRuleItem>));
+                serializer.WriteObject(xmlWriter, _TempRules);
+                xml = sw.ToString();
+            }
+            BSOBatchPlanSchedulerRules = xml;
+            var msg = DatabaseApp.ACSaveChanges();
+
+            if (msg != null)
+                Messages.Msg(msg);
+
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledApplyRulesAndClose()
+        {
+            return true;
+        }
+
+        private List<UserRuleItem> GetRulesForCurrentUser()
+        {
+            var result = GetStoredRules();
+            return result.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
+        }
+
+        private List<UserRuleItem> GetStoredRules()
+        {
+            if (string.IsNullOrEmpty(BSOBatchPlanSchedulerRules))
+                return new List<UserRuleItem>();
+
+            using (StringReader ms = new StringReader(BSOBatchPlanSchedulerRules))
+            using (XmlTextReader xmlReader = new XmlTextReader(ms))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(List<UserRuleItem>));
+                List<UserRuleItem> result = serializer.ReadObject(xmlReader) as List<UserRuleItem>;
+                if (result == null)
+                    return new List<UserRuleItem>();
+
+                foreach (UserRuleItem item in result)
+                {
+                    core.datamodel.VBUser vbUser = DatabaseApp.ContextIPlus.VBUser.FirstOrDefault(c => c.VBUserID == item.VBUserID);
+                    if (vbUser == null)
+                        continue;
+
+                    item.VBUserName = vbUser.VBUserName;
+
+                    MDSchedulingGroup group = DatabaseApp.MDSchedulingGroup.FirstOrDefault(c => c.MDSchedulingGroupID == item.RuleParamID);
+                    if (group == null)
+                        continue;
+
+                    item.RuleParamCaption = group.ACCaption;
+                }
+
+                return result;
+            }
+        }
 
         #endregion
 
