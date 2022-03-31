@@ -2922,7 +2922,7 @@ namespace gip.bso.manufacturing
             ShowDialog(this, "ReworkDialog");
         }
 
-        public bool IsEnabledOpetReworkDialog()
+        public bool IsEnabledOpenReworkDialog()
         {
             return IsReworkEnabled;
         }
@@ -3079,7 +3079,18 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledCompleteInterdischarging):
                     result = IsEnabledCompleteInterdischarging();
                     return true;
-
+                case nameof(OpenReworkDialog):
+                    OpenReworkDialog();
+                    return true;
+                case nameof(IsEnabledOpenReworkDialog):
+                    result = IsEnabledOpenReworkDialog();
+                    return true;
+                case nameof(AddReworkMaterial):
+                    AddReworkMaterial();
+                    return true;
+                case nameof(IsEnabledAddReworkMaterial):
+                    result = IsEnabledAddReworkMaterial();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
