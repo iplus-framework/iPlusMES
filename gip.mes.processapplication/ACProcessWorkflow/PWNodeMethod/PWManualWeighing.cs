@@ -3330,6 +3330,12 @@ namespace gip.mes.processapplication
                 case nameof(GetPWParametersInfo):
                     result = GetPWParametersInfo();
                     return true;
+                case nameof(ActivateRework):
+                    result = ActivateRework();
+                    return true;
+                case nameof(GetReworkStatus):
+                    result = GetReworkStatus();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }

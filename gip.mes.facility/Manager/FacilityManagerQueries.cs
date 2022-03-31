@@ -793,7 +793,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
         );
         #endregion
 
-        #region MaterialReassignment and Rework
+        #region MaterialReassignment
 
         public virtual IEnumerable<Material> GetSuggestedReassignmentMaterials(DatabaseApp dbApp, Material forMaterial)
         {
@@ -803,9 +803,9 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
             return dbApp.Material.Where(c => c.MDMaterialGroup.MDMaterialGroupIndex == (short)MDMaterialGroup.MaterialGroupTypes.Rework);
         }
 
-        public virtual bool IsReworkMaterialCompatible(DatabaseApp dbApp, Material reworkMaterial, Material targetMaterial)
+        public virtual Msg IsAllowedReassignMaterial(DatabaseApp dbApp, Material currentMaterial, Material newMaterial)
         {
-            return true;
+            return null;
         }
 
         #endregion

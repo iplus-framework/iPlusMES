@@ -761,7 +761,7 @@ namespace gip.mes.facility
             {
                 if (!invoiceDate.HasValue)
                     invoiceDate = DateTime.Now;
-                msg = ValidateCurrencyAndExchangeRate(outOrder);
+                msg = ValidateCurrencyAndExchangeRate(outOrder, invoiceDate.Value);
                 if (msg != null)
                     return msg;
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
@@ -809,7 +809,7 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public Msg ValidateCurrencyAndExchangeRate(OutOrder outOrder)
+        public Msg ValidateCurrencyAndExchangeRate(OutOrder outOrder, DateTime invoiceDate)
         {
             if (outOrder.IssuerCompanyAddress == null)
             {
@@ -857,7 +857,7 @@ namespace gip.mes.facility
             }
             if (outOrder.IssuerCompanyAddress.MDCountry.MDCurrencyID == outOrder.MDCurrencyID.Value)
                 return null;
-            var exchangeRate = outOrder.IssuerCompanyAddress.MDCountry.MDCurrency.GetExchangeRate(outOrder.MDCurrency, DateTime.Now);
+            var exchangeRate = outOrder.IssuerCompanyAddress.MDCountry.MDCurrency.GetExchangeRate(outOrder.MDCurrency, invoiceDate);
             if (exchangeRate == null)
             {
                 // There is no valid exchange rate for today. Please open the businesss object for exchange rates and add a exchange rate for this invoice date.

@@ -121,6 +121,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(999)]
         public PickingStateEnum PickingState
         {
             get

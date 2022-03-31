@@ -871,6 +871,14 @@ namespace gip.mes.facility
                 // Umbuchung auf eine andere Materialnummer
                 else if (BP.InwardMaterial != null && BP.BookingType == GlobalApp.FacilityBookingType.Reassign_FacilityCharge)
                 {
+                    Msg isReassignAllowed = IsAllowedReassignMaterial(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacilityCharge.Material, BP.InwardMaterial);
+                    if (isReassignAllowed != null)
+                    {
+                        BP.AddBookingMessage(ACMethodBooking.eResultCodes.WrongParameterCombinations, isReassignAllowed.Message);
+                        bookingResult = Global.ACMethodResultState.Notpossible;
+                        return bookingResult;
+                    }
+
                     // Auslagerungsbuchung auf altem Material
                     FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
 
