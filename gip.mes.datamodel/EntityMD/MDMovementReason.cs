@@ -135,6 +135,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region enums
+        [ACPropertyInfo(37, "", ConstApp.ESMovementReason, Const.ContextDatabase + "\\MovementReasonsList", true)]
         public MovementReasonsEnum MovementReason
         {
             get
