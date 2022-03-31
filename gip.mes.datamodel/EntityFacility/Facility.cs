@@ -872,6 +872,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [ACPropertyInfo(37, "", "en{'Posting behaviour'}de{'Buchungsverhalten'}", Const.ContextDatabase + "\\PostingBehaviourEnumList", true)]
         public PostingBehaviourEnum PostingBehaviour
         {
             get
