@@ -101,10 +101,82 @@ namespace gip.mes.processapplication
             return null;
         }
 
+        public bool OccupyWithPModuleOnScan(PAProcessModule processModule, PAFWorkTaskScanBase invoker)
+        {
+            bool occupied = ParentPWGroup.OccupyWithPModuleOnScan(processModule);
+            if (occupied)
+            {
+                var acMethod = this.CurrentACMethod.ValueT;
+                //OnNewProgramLogAddedToQueue
+                core.datamodel.ACProgramLog currentProgramLog = GetCurrentProgramLog(true);
+
+                if (currentProgramLog != null)
+                {
+                    core.datamodel.ACProgram acProgram = null;
+                    ACClassTaskQueue.TaskQueue.ProcessAction(() =>
+                    {
+                        acProgram = currentProgramLog.ACProgram;
+                    });
+
+                    core.datamodel.ACProgramLog subProgramLog = null;
+                    Guid componentClassID = invoker.ComponentClass.ACClassID;
+                    ACClassTaskQueue.TaskQueue.ProcessAction(() =>
+                    {
+                        subProgramLog = core.datamodel.ACProgramLog.NewACObject(ACClassTaskQueue.TaskQueue.Context, acProgram);
+                        subProgramLog.ACProgramLog1_ParentACProgramLog = currentProgramLog;
+                        subProgramLog.ACProgram = acProgram;
+                        subProgramLog.ACUrl = invoker.GetACUrl();
+                        subProgramLog.ACClassID = componentClassID;
+                        if (acMethod != null)
+                            subProgramLog.XMLConfig = ACConvert.ObjectToXML(acMethod, true);
+                        else
+                            subProgramLog.XMLConfig = "";
+                        subProgramLog.StartDate = DateTime.Now;
+                    }
+                    );
+
+                    //ACClassTaskQueue.TaskQueue.ProgramCache.AddProgramLog(subProgramLog);
+
+                    // Eintrag in Queue, Speicherung kann verzögert erfolgen.
+                    ACClassTaskQueue.TaskQueue.Add(() =>
+                    {
+                        acProgram.ACProgramLog_ACProgram.Add(subProgramLog);
+                        if (currentProgramLog != null)
+                            currentProgramLog.ACProgramLog_ParentACProgramLog.Add(subProgramLog);
+                        OnNewProgramLogAddedToQueue(acMethod, subProgramLog);
+                    }
+                    );
+                }
+
+            }
+            return occupied;
+        }
+
         public bool ReleaseProcessModuleOnScan(PAFWorkTaskScanBase invoker)
         {
             if (invoker == null || ParentPWGroup == null)
                 return false;
+            string invokerACUrl = invoker.GetACUrl();
+            core.datamodel.ACProgramLog currentProgramLog = GetCurrentProgramLog(true);
+
+            if (currentProgramLog != null)
+            {
+                ACClassTaskQueue.TaskQueue.Add(() =>
+                {
+                    core.datamodel.ACProgramLog subProgramLog = ACClassTaskQueue.TaskQueue.Context.ACProgramLog.Where(c => c.ParentACProgramLogID == currentProgramLog.ACProgramLogID && c.ACUrl == invokerACUrl).OrderByDescending(c => c.InsertDate).FirstOrDefault();
+                    if (subProgramLog != null)
+                    {
+                        subProgramLog.EndDate = DateTime.Now;
+                        if (subProgramLog.StartDate.HasValue)
+                            subProgramLog.Duration = subProgramLog.EndDate.Value - subProgramLog.StartDate.Value;
+                        subProgramLog.UpdateDate = DateTime.Now;
+                        //subProgramLog.StartDatePlan = GetValidDateTime(PlannedTimes.StartTime);
+                        //subProgramLog.DurationPlan = PlannedTimes.Duration;
+                        //subProgramLog.EndDatePlan = GetValidDateTime(PlannedTimes.EndTime);
+                    }
+                });
+            }
+
             PAProcessModule processModule = invoker.ParentACComponent as PAProcessModule;
             if (ParentPWGroup.TrySemaphore.ConnectionListCount > 1)
                 return ParentPWGroup.ReleaseProcessModule(processModule);

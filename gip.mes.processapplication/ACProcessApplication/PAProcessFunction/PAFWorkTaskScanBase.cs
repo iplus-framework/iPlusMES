@@ -455,7 +455,7 @@ namespace gip.mes.processapplication
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
             Msg wfMsg = null;
             Msg actionMsg = null;
-            if (pwNode.ParentPWGroup.OccupyWithPModuleOnScan(parentPM))
+            if (pwNode.OccupyWithPModuleOnScan(parentPM, this))
             {
                 wfMsg = pwNode.OnGetMessageAfterOccupyingProcessModule(this);
                 // Info50058: The order has been registered on the machine.
