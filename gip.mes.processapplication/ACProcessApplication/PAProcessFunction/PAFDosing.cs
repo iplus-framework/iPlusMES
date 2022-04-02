@@ -2042,7 +2042,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public static double RecalcAbsoluteTolerance(double tolValue, double targetQ)
+        public static double RecalcAbsoluteTolerance(double tolValue, double targetQ, double? forceDefaultPerc = 0.05)
         {
             // Falls Toleranz negativ, dann ist die Toleranz in % angegeben
             if (tolValue < -0.0000001)
@@ -2052,10 +2052,10 @@ namespace gip.mes.processapplication
                 else
                     tolValue = 0.001;
             }
-            else if (Math.Abs(tolValue) <= Double.Epsilon)
+            else if (Math.Abs(tolValue) <= Double.Epsilon && forceDefaultPerc.HasValue)
             {
                 if (Math.Abs(targetQ) > Double.Epsilon)
-                    tolValue = targetQ * 0.05;
+                    tolValue = targetQ * forceDefaultPerc.Value;
                 else
                     tolValue = 0.001;
             }

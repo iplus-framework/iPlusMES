@@ -483,6 +483,42 @@ namespace gip.mes.processapplication
             scanResult.Result.Message = actionMsg;
             return scanResult;
         }
+
+        public override void OnOrderInfoRefreshed()
+        {
+            HandleACStateOfWorkTask();
+        }
+
+        protected virtual void HandleACStateOfWorkTask()
+        {
+            if (Root == null || !Root.Initialized)
+                return;
+            
+            PAProcessModule parentPM = ParentACComponent as PAProcessModule;
+            if (parentPM == null)
+            {
+                if (CurrentACState != ACStateEnum.SMIdle)
+                    CurrentACState = ACStateEnum.SMIdle;
+                return;
+            }
+            if (parentPM.Semaphore.ConnectionListCount <= 0)
+            {
+                if (CurrentACState != ACStateEnum.SMIdle)
+                    CurrentACState = ACStateEnum.SMIdle;
+                return;
+            }
+            else
+            {
+                if (CurrentACState == ACStateEnum.SMIdle)
+                    CurrentACState = ACStateEnum.SMRunning;
+            }
+        }
+
+        public override void SMRunning()
+        {
+            UnSubscribeToProjectWorkCycle();
+            //base.SMRunning();
+        }
         #endregion
 
         #endregion
