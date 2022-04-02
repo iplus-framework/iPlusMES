@@ -1515,13 +1515,15 @@ namespace gip.mes.facility
                         pPos.MDDelivPosLoadState = posState;
                     }
 
-                    if (picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.InternalRelocation)
+                    if (picking.MDPickingType != null && picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.InternalRelocation)
                     {
                         IEnumerable<FacilityCharge> facilityCharges = pPos.FacilityBooking_PickingPos.SelectMany(f => f.FacilityBookingCharge_FacilityBooking)
-                                                                          .Where(x => x.InwardFacility != null
+                                                                          .Where(x => x.InwardFacilityCharge != null 
+                                                                                   && x.InwardFacility != null
                                                                                    && x.InwardFacility.PostingBehaviourIndex == (short)PostingBehaviourEnum.BlockOnRelocation)
                                                                           .Select(c => c.InwardFacilityCharge)
-                                                                          .Where(fc => fc.MDReleaseState.MDReleaseStateIndex != (short)MDReleaseState.ReleaseStates.Free);
+                                                                          .Where(fc => fc.MDReleaseState != null && 
+                                                                                       fc.MDReleaseState.MDReleaseStateIndex != (short)MDReleaseState.ReleaseStates.Free);
 
                         foreach (FacilityCharge fc in facilityCharges)
                         {
