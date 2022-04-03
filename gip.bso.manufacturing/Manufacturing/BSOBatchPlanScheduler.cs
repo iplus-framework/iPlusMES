@@ -3125,7 +3125,7 @@ namespace gip.bso.manufacturing
                 foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
                 {
                     batchPlan.AutoRefresh();
-                    batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoLoad();
+                    batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
                 }
                 bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
                                                     && AutoRemoveMDSGroupTo > 0
@@ -3199,11 +3199,11 @@ namespace gip.bso.manufacturing
                             RefreshServerState(mdSchedulingGroupID);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string msg = "";
                 Exception tmpEx = ex;
-                while(tmpEx != null)
+                while (tmpEx != null)
                 {
                     msg += tmpEx.Message;
                     tmpEx = tmpEx.InnerException;
@@ -3216,7 +3216,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSetBatchStateCancelled()
         {
-            return 
+            return
                 ProdOrderBatchPlanList != null
                 && ProdOrderBatchPlanList.Any(c => c.IsSelected && (c.PlanState <= vd.GlobalApp.BatchPlanState.Created || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused) && !c.ProdOrderBatch_ProdOrderBatchPlan.Any());
         }
@@ -4653,7 +4653,12 @@ namespace gip.bso.manufacturing
                                     DatabaseApp.FacilityBooking.Where(c => (c.ProdOrderPartslistPosID.HasValue && c.ProdOrderPartslistPos.ProdOrderPartslistID == partslist.ProdOrderPartslistID)
                                                 || (c.ProdOrderPartslistPosRelationID.HasValue && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID == partslist.ProdOrderPartslistID))
                                     .Any();
-                if (hasAnyPostings)
+
+                bool hasOrderLog =
+                        partslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(c => c.OrderLog_ProdOrderPartslistPos).Any()
+                        || partslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos).SelectMany(c => c.OrderLog_ProdOrderPartslistPosRelation).Any();
+
+                if (hasAnyPostings || hasOrderLog)
                     partslist.MDProdOrderState = mDProdOrderStateCancelled;
                 else
                 {
@@ -4698,7 +4703,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
         public void AddRule()
         {
-            UserRuleItem existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID 
+            UserRuleItem existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID
                                                                            && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
 
             if (existingRule != null)
