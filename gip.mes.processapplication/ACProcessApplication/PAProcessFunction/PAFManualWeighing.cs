@@ -302,41 +302,15 @@ namespace gip.mes.processapplication
                 double tolPlus = newACMethod.ParameterValueList.GetDouble("TolerancePlus");
                 if (Math.Abs(tolPlus) <= Double.Epsilon)
                     tolPlus = configACMethod.ParameterValueList.GetDouble("TolerancePlus");
-                // Falls Toleranz negativ, dann ist die Toleranz in % angegeben
-                if (tolPlus < -0.0000001)
-                {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolPlus = targetQ * tolPlus * -0.01;
-                    else
-                        tolPlus = 0.001;
-                }
-                else if (Math.Abs(tolPlus) <= Double.Epsilon)
-                {
-                    //if (Math.Abs(targetQ) > Double.Epsilon)
-                    //    tolPlus = targetQ * 0.05;
-                    //else
-                    //    tolPlus = 0.001;
-                }
+
+                tolPlus = PAFDosing.RecalcAbsoluteTolerance(tolPlus, targetQ, null);
                 newACMethod["TolerancePlus"] = tolPlus;
 
                 double tolMinus = newACMethod.ParameterValueList.GetDouble("ToleranceMinus");
                 if (Math.Abs(tolMinus) <= Double.Epsilon)
                     tolMinus = configACMethod.ParameterValueList.GetDouble("ToleranceMinus");
-                // Falls Toleranz negativ, dann ist die Toleranz in % angegeben
-                if (tolMinus < -0.0000001)
-                {
-                    if (Math.Abs(targetQ) > Double.Epsilon)
-                        tolMinus = targetQ * tolMinus * -0.01;
-                    else
-                        tolMinus = 0.001;
-                }
-                else if (Math.Abs(tolMinus) <= Double.Epsilon)
-                {
-                    //if (Math.Abs(targetQ) > Double.Epsilon)
-                    //    tolMinus = targetQ * 0.05;
-                    //else
-                    //    tolMinus = 0.001;
-                }
+
+                tolMinus = PAFDosing.RecalcAbsoluteTolerance(tolMinus, targetQ, null);
                 newACMethod["ToleranceMinus"] = tolMinus;
             }
         }
@@ -671,7 +645,27 @@ namespace gip.mes.processapplication
             {
                 IEnumerable<PAEScaleGravimetric> scalesGravimetric = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>();
                 if (scalesGravimetric.Any())
-                    OccupyAndSetActiveScaleObject(scalesGravimetric.FirstOrDefault());
+                {
+                    var scale = scalesGravimetric.FirstOrDefault();
+
+                    bool isOccupied = OccupyAndSetActiveScaleObject(scale);
+                    if (!isOccupied)
+                    {
+                        //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        OnNewAlarmOccurred(FunctionError, msg, true);
+                        if (IsAlarmActive(FunctionError, msg.Message) == null)
+                            Messages.LogMessageMsg(msg);
+                    }
+                    else
+                    {
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        if (IsAlarmActive(FunctionError, msg.Message) != null)
+                        {
+                            AcknowledgeAlarms();
+                        }
+                    }
+                }
                 else
                 {
                     var scale = ParentACComponent as IPAMContScale;
@@ -712,7 +706,24 @@ namespace gip.mes.processapplication
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
                 }
-                OccupyAndSetActiveScaleObject(scale);
+                bool isOccupied = OccupyAndSetActiveScaleObject(scale);
+                if (!isOccupied)
+                {
+                    //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                    OnNewAlarmOccurred(FunctionError, msg, true);
+                    if (IsAlarmActive(FunctionError, msg.Message) == null)
+                        Messages.LogMessageMsg(msg);
+                }
+                else
+                {
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                    if (IsAlarmActive(FunctionError, msg.Message) != null)
+                    {
+                        AcknowledgeAlarms();
+                    }
+                }
+
                 return;
             }
 
@@ -723,30 +734,30 @@ namespace gip.mes.processapplication
 
             if (targetQuantity > 0)
             {
+                IEnumerable<PAEScaleGravimetric> possibleScales;
+                if (ScaleMappingHelper.AssignedScales.Any())
+                {
+                    possibleScales = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>();
+                }
+                else
+                {
+                    possibleScales = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric);
+                }
+
                 PAEScaleGravimetric scale = null;
 
                 if (ScaleMappingHelper.AssignedScales.Any())
                 {
-                    scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>()
-                                                             .Where(c => c.MinDosingWeight.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT)
-                                                             .FirstOrDefault();
+                    scale = possibleScales.Where(c => c.MinDosingWeight.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT).FirstOrDefault();
 
                     if (scale == null)
-                    {
-                        scale = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
-                    }
+                        scale = possibleScales.OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
                 }
                 else
                 {
-                    scale = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                              .Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT)
-                                              .FirstOrDefault();
+                    scale = possibleScales.Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT).FirstOrDefault();
                     if (scale == null)
-                    {
-                        scale = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric)
-                                                  .OrderByDescending(c => c.MaxScaleWeight.ValueT)
-                                                  .FirstOrDefault();
-                    }
+                        scale = possibleScales.OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
                 }
                 if (scale == null)
                 {
@@ -755,8 +766,47 @@ namespace gip.mes.processapplication
                     OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
+
+                    return;
                 }
-                OccupyAndSetActiveScaleObject(scale);
+                bool isOccupied = OccupyAndSetActiveScaleObject(scale);
+                if (!isOccupied)
+                {
+                    scale = possibleScales.FirstOrDefault(c => c.ACUrl != scale.ACUrl && c.MinDosingWeight.ValueT <= targetQuantity);
+                    if (scale == null)
+                    {
+                        //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        OnNewAlarmOccurred(FunctionError, msg, true);
+                        if (IsAlarmActive(FunctionError, msg.Message) == null)
+                            Messages.LogMessageMsg(msg);
+
+                        return;
+                    }
+
+                    isOccupied = OccupyAndSetActiveScaleObject(scale);
+                    if (!isOccupied)
+                    {
+                        //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        OnNewAlarmOccurred(FunctionError, msg, true);
+                        if (IsAlarmActive(FunctionError, msg.Message) == null)
+                            Messages.LogMessageMsg(msg);
+
+                        return;
+                    }
+                }
+
+                if (isOccupied)
+                {
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                    if (IsAlarmActive(FunctionError, msg.Message) != null)
+                    {
+                        AcknowledgeAlarms();
+                    }
+
+                    CurrentACMethod.ValueT.ParameterValueList["TargetScaleACIdentifier"] = scale.ACIdentifier;
+                }
             }
         }
 
@@ -890,63 +940,67 @@ namespace gip.mes.processapplication
             double targetQuantity = 0;
             if (targetQ != null)
                 targetQuantity = targetQ.ParamAsDouble;
-            double? tolPlus = CurrentACMethod.ValueT["TolerancePlus"] as double?;
-            double? tolMinus = CurrentACMethod.ValueT["ToleranceMinus"] as double?;
-            if (!tolPlus.HasValue)
-                tolPlus = 0;
-            if (!tolMinus.HasValue)
-                tolMinus = 0;
+            double tolPlus = (double)CurrentACMethod.ValueT["TolerancePlus"];
+            double tolMinus = (double)CurrentACMethod.ValueT["ToleranceMinus"];
+
 
             if (scale != null)
             {
-                if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
+                if (Math.Abs(tolPlus) <= Double.Epsilon)
                 {
                     tolPlus = scale.TolerancePlus;
-                    if (tolPlus < -0.0000001)
-                    {
-                        if (Math.Abs(targetQuantity) > Double.Epsilon)
-                            tolPlus = targetQuantity * tolPlus * -0.01;
-                        else
-                            tolPlus = 0.001;
-                    }
-                    else if (Math.Abs(tolPlus.Value) <= Double.Epsilon)
-                    {
-                        if (Math.Abs(targetQuantity) > Double.Epsilon)
-                            tolPlus = targetQuantity * 0.05;
-                        else
-                            tolPlus = 0.001;
-                    }
+                    tolPlus = PAFDosing.RecalcAbsoluteTolerance(tolPlus, targetQuantity);
 
+
+                    //if (tolPlus < -0.0000001)
+                    //{
+                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                    //        tolPlus = targetQuantity * tolPlus * -0.01;
+                    //    else
+                    //        tolPlus = 0.001;
+                    //}
+                    //else if (Math.Abs(tolPlus) <= Double.Epsilon)
+                    //{
+                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                    //        tolPlus = targetQuantity * 0.05;
+                    //    else
+                    //        tolPlus = 0.001;
+                    //}
+
+                    tolPlus = scale.VerifyScaleTolerance(tolPlus);
                     CurrentACMethod.ValueT["TolerancePlus"] = tolPlus;
                 }
 
-                if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
+                if (Math.Abs(tolMinus) <= Double.Epsilon)
                 {
                     tolMinus = scale.ToleranceMinus;
-                    if (tolMinus < -0.0000001)
-                    {
-                        if (Math.Abs(targetQuantity) > Double.Epsilon)
-                            tolMinus = targetQuantity * tolMinus * -0.01;
-                        else
-                            tolMinus = 0.001;
-                    }
-                    else if (Math.Abs(tolMinus.Value) <= Double.Epsilon)
-                    {
-                        if (Math.Abs(targetQuantity) > Double.Epsilon)
-                            tolMinus = targetQuantity * 0.05;
-                        else
-                            tolMinus = 0.001;
-                    }
+                    tolMinus = PAFDosing.RecalcAbsoluteTolerance(tolMinus, targetQuantity);
 
+                    //if (tolMinus < -0.0000001)
+                    //{
+                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                    //        tolMinus = targetQuantity * tolMinus * -0.01;
+                    //    else
+                    //        tolMinus = 0.001;
+                    //}
+                    //else if (Math.Abs(tolMinus) <= Double.Epsilon)
+                    //{
+                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
+                    //        tolMinus = targetQuantity * 0.05;
+                    //    else
+                    //        tolMinus = 0.001;
+                    //}
+
+                    tolMinus = scale.VerifyScaleTolerance(tolMinus);
                     CurrentACMethod.ValueT["ToleranceMinus"] = tolMinus;
                 }
             }
 
             double actWeight = Math.Round(checkQuantity, 5);
 
-            if (actWeight >= Math.Round(targetQuantity - tolMinus.Value, 5))
+            if (actWeight >= Math.Round(targetQuantity - tolMinus, 5))
             {
-                if (actWeight <= Math.Round(targetQuantity + tolPlus.Value, 5))
+                if (actWeight <= Math.Round(targetQuantity + tolPlus, 5))
                     result = true;
             }
             return result;
@@ -1113,8 +1167,6 @@ namespace gip.mes.processapplication
             }
             return resultSequence;
         }
-
-
 
         #endregion
 

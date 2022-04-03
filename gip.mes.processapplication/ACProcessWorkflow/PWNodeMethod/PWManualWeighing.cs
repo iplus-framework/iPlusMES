@@ -2481,7 +2481,7 @@ namespace gip.mes.processapplication
                                     if (actWeight > 0.000001)
                                     {
                                         bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
-                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge, false, scaleOtherComp);
+                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge, false, scaleOtherComp, targetQuantity);
                                         _ScaleComp = false;
                                     }
 
@@ -2629,7 +2629,7 @@ namespace gip.mes.processapplication
         }
 
         public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, 
-                                           bool isForInterdischarge = false, bool scaleOtherCompAfterAbort = false)
+                                           bool isForInterdischarge = false, bool scaleOtherCompAfterAbort = false, double? tQuantityFromPAF = null)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -2708,11 +2708,11 @@ namespace gip.mes.processapplication
 
                         double actualQuantity = actualWeight.HasValue ? weighingPosRelation.SourceProdOrderPartslistPos.Material.ConvertBaseWeightToBaseUnit(actualWeight.Value) : 0;
                         double targetQuantity = weighingPosRelation.TargetQuantityUOM;
-                        WeighingComponent comp = GetWeighingComponent(weighingPosRelation.ParentProdOrderPartslistPosRelationID);  //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == weighingPosRelation.ProdOrderPartslistPosRelationID);
+                        WeighingComponent comp = GetWeighingComponent(weighingPosRelation.ParentProdOrderPartslistPosRelationID);
                         if (comp != null)
                             targetQuantity = weighingPosRelation.SourceProdOrderPartslistPos.Material.ConvertBaseWeightToBaseUnit(comp.TargetWeight);
 
-                        if (!isForInterdischarge)
+                        if (!isForInterdischarge && (!tQuantityFromPAF.HasValue || tQuantityFromPAF == targetQuantity))
                         {
                             double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
                             if (actualQuantity > calcActualQuantity)
