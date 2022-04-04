@@ -1652,7 +1652,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("ConnectSourceProdOrderPartslist", "en{'Connect production order lines'}de{'Produktionsauftragszeilen verbinden'}", 605, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ConnectSourceProdOrderPartslist", "en{'Connect production order lines'}de{'Produktionsauftragszeilen verbinden'}", 606, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
         public void ConnectSourceProdOrderPartslist()
         {
             if(!IsEnabledConnectSourceProdOrderPartslist())
