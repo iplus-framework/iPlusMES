@@ -1267,6 +1267,25 @@ namespace gip.mes.facility
                 }
             }
         }
+
+        public virtual void ConnectSourceProdOrderPartslist(ProdOrder prodOrder)
+        {
+            Guid[] producedMaterialIDs = prodOrder.ProdOrderPartslist_ProdOrder.Select(c => c.Partslist.MaterialID).Distinct().ToArray();
+            ProdOrderPartslist[] partslists = prodOrder.ProdOrderPartslist_ProdOrder.ToArray();
+            ProdOrderPartslistPos[] allComponents =
+                prodOrder
+                .ProdOrderPartslist_ProdOrder
+                .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && producedMaterialIDs.Contains(c.MaterialID ?? Guid.Empty))
+                .ToArray();
+
+            foreach (ProdOrderPartslistPos pos in allComponents)
+            {
+                ProdOrderPartslist pl = partslists.FirstOrDefault(c => c.Partslist != null && c.Partslist.MaterialID == pos.MaterialID);
+                pos.SourceProdOrderPartslist = pl;
+            }
+        }
+
         #endregion
 
         #region BookingOutward

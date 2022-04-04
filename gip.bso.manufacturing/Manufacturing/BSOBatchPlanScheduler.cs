@@ -3581,8 +3581,6 @@ namespace gip.bso.manufacturing
                 }
                 else
                 {
-                    if (rootPartslistExpand != null && AllWizardSchedulerPartslistList != null)
-                        ConnectSourceProdOrderPartslist(rootPartslistExpand, AllWizardSchedulerPartslistList);
                     rootPartslistExpand = null;
                     if (WizardFinish())
                         WizardClean();
@@ -3974,6 +3972,7 @@ namespace gip.bso.manufacturing
 
         private bool WizardFinish()
         {
+            ConnectSourceProdOrderPartslist();
             bool success = ACSaveChanges();
             if (success)
             {
@@ -3983,6 +3982,13 @@ namespace gip.bso.manufacturing
                 Search();
             }
             return success;
+        }
+
+        private void ConnectSourceProdOrderPartslist()
+        {
+            ProdOrder prodorder = DefaultWizardSchedulerPartslist?.ProdOrderPartslistPos?.ProdOrderPartslist?.ProdOrder;
+            if (prodorder != null)
+                ProdOrderManager.ConnectSourceProdOrderPartslist(prodorder);
         }
 
         private void LoadNewWizardSchedulerPartslistList()
@@ -4003,34 +4009,34 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void ConnectSourceProdOrderPartslist(PartslistExpand rootPartslistExpand, List<WizardSchedulerPartslist> wizardSchedulerPartslistList)
-        {
-            List<ExpandResult> treeResult = rootPartslistExpand.BuildTreeList();
-            foreach (ExpandResult item in treeResult)
-            {
-                PartslistExpand consumerItem = item.Item?.Parent;
-                PartslistExpand providerItem = item.Item; // item what is expanded
+        //private void ConnectSourceProdOrderPartslist(PartslistExpand rootPartslistExpand, List<WizardSchedulerPartslist> wizardSchedulerPartslistList)
+        //{
+        //    List<ExpandResult> treeResult = rootPartslistExpand.BuildTreeList();
+        //    foreach (ExpandResult item in treeResult)
+        //    {
+        //        PartslistExpand consumerItem = item.Item?.Parent;
+        //        PartslistExpand providerItem = item.Item; // item what is expanded
 
-                if (providerItem != null && consumerItem != null)
-                {
-                    ProdOrderPartslist sourcePl =
-                        wizardSchedulerPartslistList
-                        .Where(c => c.PartslistNo == providerItem.PartslistNo && c.ProdOrderPartslistPos != null)
-                        .Select(c => c.ProdOrderPartslistPos.ProdOrderPartslist)
-                        .FirstOrDefault();
-                    ProdOrderPartslistPos consumer =
-                         wizardSchedulerPartslistList
-                        .Where(c => c.PartslistNo == consumerItem.PartslistNo && c.ProdOrderPartslistPos != null)
-                        .Select(c => c.ProdOrderPartslistPos.ProdOrderPartslist)
-                        .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-                        .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.MaterialID == sourcePl.Partslist.MaterialID)
-                        .FirstOrDefault();
+        //        if (providerItem != null && consumerItem != null)
+        //        {
+        //            ProdOrderPartslist sourcePl =
+        //                wizardSchedulerPartslistList
+        //                .Where(c => c.PartslistNo == providerItem.PartslistNo && c.ProdOrderPartslistPos != null)
+        //                .Select(c => c.ProdOrderPartslistPos.ProdOrderPartslist)
+        //                .FirstOrDefault();
+        //            ProdOrderPartslistPos consumer =
+        //                 wizardSchedulerPartslistList
+        //                .Where(c => c.PartslistNo == consumerItem.PartslistNo && c.ProdOrderPartslistPos != null)
+        //                .Select(c => c.ProdOrderPartslistPos.ProdOrderPartslist)
+        //                .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+        //                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.MaterialID == sourcePl.Partslist.MaterialID)
+        //                .FirstOrDefault();
 
-                    if (consumer != null && sourcePl != null)
-                        consumer.SourceProdOrderPartslist = sourcePl;
-                }
-            }
-        }
+        //            if (consumer != null && sourcePl != null)
+        //                consumer.SourceProdOrderPartslist = sourcePl;
+        //        }
+        //    }
+        //}
 
         private void LoadExistingWizardSchedulerPartslistList()
         {
@@ -4098,6 +4104,10 @@ namespace gip.bso.manufacturing
         {
             IsWizard = false;
             ACUndoChanges();
+
+            ConnectSourceProdOrderPartslist();
+            ACSaveChanges();
+
             WizardClean();
             OnPropertyChanged("CurrentLayout");
             LoadProdOrderBatchPlanList();

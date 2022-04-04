@@ -1651,6 +1651,24 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderPartslist != null;
         }
 
+
+        [ACMethodInteraction("ConnectSourceProdOrderPartslist", "en{'Connect production order lines'}de{'Produktionsauftragszeilen verbinden'}", 605, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
+        public void ConnectSourceProdOrderPartslist()
+        {
+            if(!IsEnabledConnectSourceProdOrderPartslist())
+                return;
+            ProdOrderManager.ConnectSourceProdOrderPartslist(SelectedProdOrder);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsEnabledConnectSourceProdOrderPartslist()
+        {
+            return SelectedProdOrder != null;
+        }
+
         [ACMethodInteraction("ProdOrderPartListExpand", "en{'OK'}de{'OK'}", (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void BOMExplosionDlgOk()
         {
@@ -1672,6 +1690,7 @@ namespace gip.bso.manufacturing
                     Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, SelectedProdOrder, item.Item.PartslistForPosition, selectedSequence, item.Item.TargetQuantityUOM, out prodOrderPartslist);
                     selectedSequence--;
                 }
+                ProdOrderManager.ConnectSourceProdOrderPartslist(SelectedProdOrder);
                 Save();
                 SearchProdOrderPartslist();
             }
