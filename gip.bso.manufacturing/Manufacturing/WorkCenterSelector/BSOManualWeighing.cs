@@ -278,6 +278,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private string _ScalePrecisionFormat = "F3";
+        [ACPropertyInfo(605)]
+        public string ScalePrecisionFormat
+        {
+            get => _ScalePrecisionFormat;
+            set
+            {
+                _ScalePrecisionFormat = value;
+                OnPropertyChanged();
+            }
+        }
+
         public double? MaxScaleWeight
         {
             get;
@@ -1384,6 +1396,29 @@ namespace gip.bso.manufacturing
                 return;
             }
 
+            double digitWeight = 1.0;
+            var digitWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.DigitWeight));
+            if (digitWeightProp != null)
+            {
+                digitWeight = (digitWeightProp as IACContainerTNet<double>).ValueT;
+                if (digitWeight <= double.Epsilon)
+                    digitWeight = 1.0;
+            }
+            if (digitWeight >= 999.99999)
+                ScalePrecisionFormat = "F0";
+            else if (digitWeight >= 99.99999)
+                ScalePrecisionFormat = "F1";
+            else if (digitWeight >= 9.99999)
+                ScalePrecisionFormat = "F2";
+            else if (digitWeight >= 0.99999)
+                ScalePrecisionFormat = "F3";
+            else if (digitWeight >= 0.09999)
+                ScalePrecisionFormat = "F4";
+            else if (digitWeight >= 0.00999)
+                ScalePrecisionFormat = "F5";
+            else if (digitWeight >= 0.00099)
+                ScalePrecisionFormat = "F6";
+
             _ScaleActualValue = actValProp;
 
             _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
@@ -1391,7 +1426,8 @@ namespace gip.bso.manufacturing
             (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
             ScaleRealWeight = _ScaleActualWeight.ValueT;
             ScaleGrossWeight = _ScaleActualValue.ValueT;
-
+            OnPropertyChanged("TargetWeight");
+            OnPropertyChanged("ScaleDifferenceWeight");
 
             if (CurrentPAFManualWeighing != null && scale != null )
             {
@@ -1399,6 +1435,12 @@ namespace gip.bso.manufacturing
             }
 
             OnPropertyChanged(nameof(CurrentScaleObject));
+        }
+
+        [ACMethodInfo("", "en{'ConvertWeightToUIText'}de{'ConvertWeightToUIText'}", 998)]
+        public string ConvertWeightToUIText(double value)
+        {
+            return value.ToString(ScalePrecisionFormat);
         }
 
         private void LoadWFNode(ACComponent currentProcessModule, string orderInfo)
@@ -3090,6 +3132,9 @@ namespace gip.bso.manufacturing
                     return true;
                 case nameof(IsEnabledAddReworkMaterial):
                     result = IsEnabledAddReworkMaterial();
+                    return true;
+                case nameof(ConvertWeightToUIText):
+                    result = ConvertWeightToUIText((double) acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

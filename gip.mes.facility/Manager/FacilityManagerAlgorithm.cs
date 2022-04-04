@@ -2416,7 +2416,7 @@ namespace gip.mes.facility
                         if (facilityReservation != null 
                             && (!posForInwardPosting.BookingMaterial.IsLotManaged || posForInwardPosting.FacilityLot != null))
                         {
-                            ACMethodBooking inwardMethod = NewBookParamInwardMovement(BP, posForInwardPosting, anterogradeInwardQuantityUOM, facilityReservation.Facility, posForInwardPosting.FacilityLot);
+                            ACMethodBooking inwardMethod = NewBookParamInwardMovement(BP, BP.DatabaseApp, posForInwardPosting, anterogradeInwardQuantityUOM, facilityReservation.Facility, posForInwardPosting.FacilityLot);
                             //FacilityBooking fbInward = NewFacilityBooking(inwardMethod);
 
                             // Mache Stackbuchung
@@ -2517,7 +2517,7 @@ namespace gip.mes.facility
             return false;
         }
 
-        public ACMethodBooking NewBookParamInwardMovement(ACMethodBooking BP, ProdOrderPartslistPos batchPos, 
+        public ACMethodBooking NewBookParamInwardMovement(ACMethodBooking BP, DatabaseApp dbApp, ProdOrderPartslistPos batchPos, 
                                                         double postingQuantity, Facility inwardFacility, FacilityLot facilityLot)
         {
             ACMethodBooking inwardMethod = GetBookParamInwardMovementClone();
@@ -2529,8 +2529,8 @@ namespace gip.mes.facility
             inwardMethod.InwardQuantity = postingQuantity;
             inwardMethod.InwardFacility = inwardFacility;
             inwardMethod.InwardFacilityLot = facilityLot;
-            inwardMethod.Database = BP.DatabaseApp;
-            inwardMethod.CheckAndAdjustPropertiesForBooking(BP.DatabaseApp);
+            inwardMethod.Database = dbApp;
+            inwardMethod.CheckAndAdjustPropertiesForBooking(dbApp);
             return inwardMethod;
         }
 

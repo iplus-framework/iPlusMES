@@ -387,7 +387,9 @@ namespace gip.mes.processapplication
 
         private bool CanSend()
         {
-            return Client != null && !String.IsNullOrEmpty(Client.ServiceUrl);
+            return     Client != null 
+                    && !String.IsNullOrEmpty(Client.ServiceUrl) 
+                    && !Client.ConnectionDisabled;
         }
 
         private static bool _ExtPropInitialized = false;

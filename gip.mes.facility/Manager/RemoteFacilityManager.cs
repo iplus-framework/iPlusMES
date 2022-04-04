@@ -30,7 +30,7 @@ namespace gip.mes.facility
             if (_PickingManager == null)
                 throw new Exception("PickingManager not configured");
 
-            _DelegateQueue = new ACDelegateQueue(ACIdentifier);
+            _DelegateQueue = new ACDelegateQueue(this.GetACUrl());
             _DelegateQueue.StartWorkerThread();
             return result;
         }
