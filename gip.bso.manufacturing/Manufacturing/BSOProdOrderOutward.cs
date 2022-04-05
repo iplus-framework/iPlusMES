@@ -79,10 +79,6 @@ namespace gip.bso.manufacturing
             if (!PreExecute("NewOutwardPartslistPos"))
                 return;
 
-            _AvailableMaterialsOutwardRoot = null;
-            if (_SelectedProdOrderPartslist != null)
-                _AvailableMaterialsOutwardRoot = SearchAvailableMaterialsOutwardRoot(_SelectedProdOrderPartslist.ProdOrderPartslistID);
-            OnPropertyChanged("AvailableMaterialsOutwardRoot");
 
             ProdOrderPartslistPosRelation newRelation = ProdOrderPartslistPosRelation.NewACObject(DatabaseApp, null);
             DatabaseApp.ProdOrderPartslistPosRelation.AddObject(newRelation);
@@ -95,17 +91,51 @@ namespace gip.bso.manufacturing
             else
                 newRelation.SourceProdOrderPartslistPos = ProdOrderPartslistPosList.FirstOrDefault();
             newRelation.Sequence = 1;
+            newRelation.TargetQuantityUOM = newRelation.SourceProdOrderPartslistPos.RemainingCallQuantityUOM;
+            ProdOrderManager.RecalcRemainingOutwardQuantity(newRelation.SourceProdOrderPartslistPos);
             if (OutwardPartslistPosList.Any())
                 newRelation.Sequence = OutwardPartslistPosList.Max(x => x.Sequence) + 1;
             PreselecteRelationID = newRelation?.ProdOrderPartslistPosRelationID;
             SearchOutwardPartslistPos();
             ACState = Const.SMNew;
+
+            newRelation.PropertyChanged += NewRelation_PropertyChanged;
+
+            SelectedOutwardPartslistPos = newRelation;
             PostExecute("NewOutwardPartslistPos");
         }
-
         public bool IsEnabledNewOutwardPartslistPos()
         {
             return SelectedIntermediate != null && ProdOrderPartslistPosList != null && ProdOrderPartslistPosList.Any();
+        }
+
+
+        private bool disableNewRelation_PropertyChanged;
+        private void NewRelation_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            bool recalc = false;
+            if (disableNewRelation_PropertyChanged)
+                return;
+
+            ProdOrderPartslistPosRelation item = sender as ProdOrderPartslistPosRelation;
+
+            switch (e.PropertyName)
+            {
+                case nameof(ProdOrderPartslistPosRelation.SourceProdOrderPartslistPosID):
+                    disableNewRelation_PropertyChanged = true;
+                    item.TargetQuantityUOM = item.SourceProdOrderPartslistPos.RemainingCallQuantityUOM;
+                    recalc = true;
+                    break;
+                case nameof(ProdOrderPartslistPosRelation.TargetQuantityUOM):
+                    recalc = true;
+                    break;
+            }
+            if (recalc)
+            {
+                if (item.SourceProdOrderPartslistPos != null)
+                    ProdOrderManager.RecalcRemainingOutwardQuantity(item.SourceProdOrderPartslistPos);
+            }
+            disableNewRelation_PropertyChanged = false;
         }
 
         [ACMethodCommand("OutwardPartslistPos", "en{'Delete Input'}de{'Lösche Einsatz'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
@@ -121,6 +151,7 @@ namespace gip.bso.manufacturing
             {
                 SearchOutwardPartslistPos();
                 ACState = Const.CmdDeleteData;
+                RecalculateComponentRemainingQuantity();
             }
             OnPropertyChanged("OutwardPartslistPosList");
             PostExecute("DeleteOutwardPartslistPos");
@@ -150,7 +181,13 @@ namespace gip.bso.manufacturing
         }
 
 
-
+        public void RecalculateComponentRemainingQuantity()
+        {
+            if (ProdOrderPartslistPosList != null)
+                foreach (ProdOrderPartslistPos pos in ProdOrderPartslistPosList)
+                    ProdOrderManager.RecalcRemainingOutwardQuantity(pos);
+            OnPropertyChanged(nameof(ProdOrderPartslistPosList));
+        }
         #endregion
 
         #region OutwardPartslistPos -> Search

@@ -9,6 +9,7 @@ using gip.mes.facility;
 using gip.mes.manager;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
@@ -88,7 +89,6 @@ namespace gip.bso.manufacturing
             _AddPartslistTargetQuantity = null;
             _AlternativeProdOrderPartslistPosList = null;
             _AlternativeSelectedProdOrderPartslistPos = null;
-            _AvailableMaterialsOutwardRoot = null;
             _BatchList = null;
             _BookingFacilityLotNo = null;
             _CurrentProdOrderPartListExpand = null;
@@ -1285,14 +1285,11 @@ namespace gip.bso.manufacturing
                 {
                     _SelectedProdOrderPartslist = value;
 
-                    _AvailableMaterialsOutwardRoot = null;
-                    if (_SelectedProdOrderPartslist != null)
-                        _AvailableMaterialsOutwardRoot = SearchAvailableMaterialsOutwardRoot(_SelectedProdOrderPartslist.ProdOrderPartslistID);
-
                     SearchProdOrderPartslistPos();
                     SearchIntermediate();
                     SearchBatch();
 
+                    RecalculateComponentRemainingQuantity();
 
                     this.LoadProcessWorkflows();
                     LoadMaterialWorkflows();
@@ -1472,6 +1469,7 @@ namespace gip.bso.manufacturing
                     .OrderBy(x => x.Sequence)
                     .AutoMergeOption()
                     .ToList();
+
                 if (PreselectedProdorderPartslistID == null)
                     SelectedProdOrderPartslist = _ProdOrderPartslistList.FirstOrDefault();
                 else
@@ -1762,18 +1760,18 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistPos> _ProdOrderPartslistPosList;
+        private ObservableCollection<ProdOrderPartslistPos> _ProdOrderPartslistPosList;
         /// <summary>
         /// Production order parts list
         /// </summary>
         /// <value>The production order list.</value>
         [ACPropertyList(609, ProdOrderPartslistPos.ClassName)]
-        public List<ProdOrderPartslistPos> ProdOrderPartslistPosList
+        public ObservableCollection<ProdOrderPartslistPos> ProdOrderPartslistPosList
         {
             get
             {
                 if (_ProdOrderPartslistPosList == null)
-                    _ProdOrderPartslistPosList = new List<ProdOrderPartslistPos>();
+                    _ProdOrderPartslistPosList = new ObservableCollection<ProdOrderPartslistPos>();
                 return _ProdOrderPartslistPosList;
             }
         }
@@ -2141,7 +2139,8 @@ namespace gip.bso.manufacturing
                 .OrderBy(x => x.Sequence)
                 .ToList();
 
-                _ProdOrderPartslistPosList = baseItems.Union(localItems).ToList();
+                var list = baseItems.Union(localItems).ToList();
+                _ProdOrderPartslistPosList = new ObservableCollection<ProdOrderPartslistPos>(list);
                 if (_ProdOrderPartslistPosList != null && _ProdOrderPartslistPosList.Any())
                 {
                     foreach (var outwardRootPosItem in _ProdOrderPartslistPosList)
@@ -2249,49 +2248,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
-        private List<ProdOrderPartslistPos> _AvailableMaterialsOutwardRoot;
-        /// <summary>
-        /// Available materials for production order mixure input
-        /// </summary>
-        public List<ProdOrderPartslistPos> AvailableMaterialsOutwardRoot
-        {
-            get
-            {
-                if (_AvailableMaterialsOutwardRoot == null)
-                    _AvailableMaterialsOutwardRoot = new List<ProdOrderPartslistPos>();
-                return _AvailableMaterialsOutwardRoot;
-            }
-        }
-
-        protected List<ProdOrderPartslistPos> SearchAvailableMaterialsOutwardRoot(Guid prodorderPartslistID)
-        {
-            List<ProdOrderPartslistPos> result =
-                 ProdOrderPartslistPosList
-                .Where(x => x.ProdOrderPartslistID == prodorderPartslistID && x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
-                .OrderBy(x => ((x.Material == null) ? "" : x.Material.MaterialNo))
-                .ToList();
-
-
-            // calculate Rest quantity
-            foreach (var item in result)
-            {
-                item.RestQuantity = 0;
-                item.RestQuantityUOM = 0;
-                item.PositionUsedCount = item.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-                if (ProdOrderPartslistPosList != null)
-                    item.RestQuantityUOM = ProdOrderPartslistPosList.Where(x =>
-                    x.MaterialID == item.MaterialID
-                    &&
-                    x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
-                    ).Sum(x => x.TargetQuantityUOM);
-                // TODO: Implement calculation of used material i production order mixures
-                //if (IntermediateList != null)
-                //item.RestQuantity = item.RestQuantity -
-                //    IntermediateList.Where(x => x..MaterialID == item.MaterialID).Sum(x => x.Quantity);
-            }
-            return result;
-        }
         #endregion
 
         #endregion
