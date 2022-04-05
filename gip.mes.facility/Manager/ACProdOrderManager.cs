@@ -1639,6 +1639,33 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
+        /// <summary>
+        /// Recalculate rest quantity
+        /// </summary>
+        /// <param name="partslist"></param>
+        /// <returns></returns>
+        public MsgWithDetails RecalcRemainingOutwardQuantity(ProdOrderPartslistPos outwardItem)
+        {
+            MsgWithDetails msgWithDetails = null;
+            try
+            {
+                var relations = outwardItem.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos;
+                outwardItem.PositionUsedCount = relations.Count();
+                outwardItem.RestQuantity = outwardItem.TargetQuantity;
+                outwardItem.RestQuantityUOM = outwardItem.TargetQuantityUOM;
+                foreach (var rel in relations)
+                {
+                    outwardItem.RestQuantity -= rel.TargetQuantity;
+                    outwardItem.RestQuantityUOM -= rel.TargetQuantityUOM;
+                }
+            }
+            catch (Exception ec)
+            {
+                msgWithDetails = new MsgWithDetails() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+            }
+            return msgWithDetails;
+        }
+
         #endregion
 
         #region CalcProducedBatchWeight
