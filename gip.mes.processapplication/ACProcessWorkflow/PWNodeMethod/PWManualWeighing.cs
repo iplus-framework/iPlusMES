@@ -531,12 +531,6 @@ namespace gip.mes.processapplication
             set;
         }
 
-        protected ProdOrderPartslistPos IntermediateChildPos
-        {
-            get;
-            set;
-        }
-
         protected Guid? _LastOpenMaterial;
 
         private Guid? _CurrentOpetMaterial;
@@ -1552,8 +1546,6 @@ namespace gip.mes.processapplication
                         ActivateProcessAlarmWithLog(msg, false);
                         return StartNextCompResult.CycleWait;
                     }
-
-                    IntermediateChildPos = intermediateChildPos;
 
                     ProdOrderPartslistPosRelation[] queryOpenMaterials = OnGetAllMaterials(dbIPlus, dbApp, intermediateChildPos);
                     if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && queryOpenMaterials != null && queryOpenMaterials.Any())
