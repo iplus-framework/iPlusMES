@@ -143,7 +143,7 @@ namespace gip.bso.manufacturing
 
                         AddKg();
                     }
-                    else if (_SelFacilityCharge != null && value == null)
+                    else if (_SelFacilityCharge != null && value == null && SelectedWeighingMaterial == null)
                     {
                         _SelFacilityCharge = null;
                     }
