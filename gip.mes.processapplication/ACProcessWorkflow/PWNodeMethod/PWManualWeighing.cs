@@ -113,6 +113,7 @@ namespace gip.mes.processapplication
             //_WeighingComponentsInfo = null;
             CurrentEndBatchPosKey = null;
             _LastOpenMaterial = null;
+            IntermediateChildPos = null;
             _ZeroBookingFacilityCharge = null;
             return base.ACDeInit(deleteACClassTask);
         }
@@ -123,6 +124,7 @@ namespace gip.mes.processapplication
             CurrentEndBatchPosKey = null;
             CurrentOpenMaterial = null;
             _LastOpenMaterial = null;
+            IntermediateChildPos = null;
             using (ACMonitor.Lock(_65050_WeighingCompLock))
             {
                 WeighingComponents = null;
@@ -575,6 +577,12 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected ProdOrderPartslistPos IntermediateChildPos
+        {
+            get;
+            set;
+        }
+
         private Guid? _CurrentFacility;
         [ACPropertyInfo(999, IsPersistable = true)]
         public Guid? CurrentFacility
@@ -705,6 +713,7 @@ namespace gip.mes.processapplication
         public override void SMIdle()
         {
             CurrentOpenMaterial = null;
+            IntermediateChildPos = null;
             CurrentFacility = null;
             CurrentFacilityCharge = null;
             CurrentACMethod.ValueT = null;
@@ -1539,6 +1548,10 @@ namespace gip.mes.processapplication
                                 endBatchPos.FacilityLot = endBatchPos.FacilityLot;
                         }
                     }
+
+                    using (ACMonitor.Lock(_20015_LockValue))
+                        IntermediateChildPos = intermediateChildPos;
+
                     if (intermediateChildPos == null)
                     {
                         //Error50279:intermediateChildPos is null.
@@ -1609,7 +1622,7 @@ namespace gip.mes.processapplication
                                                 .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
                                                 .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID)
                                                 .ToArray()
-                                                .Where(c => c.RemainingDosingWeight < (MinWeightQuantity * -1) && c.MDProdOrderPartslistPosState != null
+                                                .Where(c => c.RemainingDosingWeight < (MinWeightQuantity * -1) && c.MDProdOrderPartslistPosState != null 
                                                         && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
                                                          && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
                                                 .OrderBy(c => c.Sequence)
@@ -1620,33 +1633,40 @@ namespace gip.mes.processapplication
         private bool RefreshCompStateFromDBAndCheckIsAllCompleted()
         {
             bool result = true;
+            ProdOrderPartslistPos intermediateChildPos = null;
 
-            using (ACMonitor.Lock(_65050_WeighingCompLock))
+            using (ACMonitor.Lock(_20015_LockValue))
             {
-                if (WeighingComponents == null)
-                    return result;
+                intermediateChildPos = IntermediateChildPos;
+            }
 
-                using (DatabaseApp dbApp = new DatabaseApp())
+            if (intermediateChildPos == null)
+                return true;
+
+            using (Database db = new core.datamodel.Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
+            {
+                var allRelations = OnGetAllMaterials(db, dbApp, intermediateChildPos);
+                using (ACMonitor.Lock(_65050_WeighingCompLock))
                 {
-                    foreach (WeighingComponent comp in WeighingComponents)
+                    foreach (ProdOrderPartslistPosRelation rel in allRelations)
                     {
-                        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(s => s.MDProdOrderPartslistPosState)
-                                                                                               .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == comp.PLPosRelation);
-                        if (rel != null)
+                        WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == rel.ProdOrderPartslistPosRelationID);
+                        if (comp == null)
+                            continue;
+
+                        short newState = DetermineWeighingComponentState(rel.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex);
+                        if (newState == (short)WeighingComponentState.ReadyToWeighing)
                         {
-                            short newState = DetermineWeighingComponentState(rel.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex);
-                            if (newState == (short)WeighingComponentState.ReadyToWeighing)
-                            {
-                                comp.SwitchState((WeighingComponentState)newState);
+                            comp.SwitchState((WeighingComponentState)newState);
 
-                                //comp.WeighState = newState;
-                                comp.TargetWeight = Math.Abs(rel.RemainingDosingWeight);
-                                //if(_WeighingComponentsInfo != null && _WeighingComponentsInfo.ContainsKey(comp.PLPosRelation.ToString()))
-                                //    _WeighingComponentsInfo[comp.PLPosRelation.ToString()] = newState.ToString();
-                                SetInfo(comp, WeighingComponentInfoType.State, null, null);
-                            }
+                            //comp.WeighState = newState;
+                            comp.TargetWeight = Math.Abs(rel.RemainingDosingWeight);
+                            //if(_WeighingComponentsInfo != null && _WeighingComponentsInfo.ContainsKey(comp.PLPosRelation.ToString()))
+                            //    _WeighingComponentsInfo[comp.PLPosRelation.ToString()] = newState.ToString();
+                            SetInfo(comp, WeighingComponentInfoType.State, null, null);
                         }
-
+                        
                         if (comp.WeighState != (short)WeighingComponentState.WeighingCompleted && comp.WeighState != (short)WeighingComponentState.Aborted)
                         {
                             result = false;
@@ -1656,6 +1676,37 @@ namespace gip.mes.processapplication
             }
 
             return result;
+        }
+
+        private void RefreshCompWeighingList()
+        {
+            ProdOrderPartslistPos intermediateChildPos = null;
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                intermediateChildPos = IntermediateChildPos;
+            }
+
+            if (intermediateChildPos == null)
+                return;
+
+            using (Database db = new core.datamodel.Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
+            {
+                var result = OnGetAllMaterials(db, dbApp, intermediateChildPos);
+                using (ACMonitor.Lock(_65050_WeighingCompLock))
+                {
+                    foreach (ProdOrderPartslistPosRelation rel in result)
+                    {
+                        WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == rel.ProdOrderPartslistPosRelationID);
+                        if (comp == null)
+                            continue;
+
+                        comp.RefreshComponent(rel);
+                    }
+                }
+
+            }
         }
 
         #endregion
@@ -2564,6 +2615,8 @@ namespace gip.mes.processapplication
                                 {
                                     comp.SwitchState(WeighingComponentState.InWeighing);
 
+                                    SetRelationState(comp.PLPosRelation, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess);
+
                                     WeighingComponentInfoType infoType = WeighingComponentInfoType.StateSelectCompAndFC_F;
                                     if (!FreeSelectionMode && !AutoSelectLot)
                                         infoType = WeighingComponentInfoType.StateSelectFC_F;
@@ -2820,9 +2873,11 @@ namespace gip.mes.processapplication
                                                         }
                                                     }
                                                     SetInfo(null, WeighingComponentInfoType.RefreshCompTargetQ, null, null);
-                                                }
 
-                                                msg = dbApp.ACSaveChanges();
+                                                    msg = dbApp.ACSaveChanges();
+
+                                                    RefreshActiveNodesOnScaleComponent();
+                                                }
                                             }
                                         }
                                     }
@@ -3250,6 +3305,35 @@ namespace gip.mes.processapplication
 
             return null;
         }
+
+        private void RefreshActiveNodesOnScaleComponent()
+        {
+            var root = ParentPWGroup?.RootPW;
+
+            var activeManualWeighings = root.FindChildComponents<PWManualWeighing>(c => c is PWManualWeighing && c != this)
+                                           .Where(x => x.CurrentACState == ACStateEnum.SMRunning || x.CurrentACState == ACStateEnum.SMPaused);
+
+            if (activeManualWeighings != null && activeManualWeighings.Any())
+            {
+                foreach (PWManualWeighing manWeigh in activeManualWeighings)
+                {
+                    manWeigh.RefreshCompWeighingList();
+
+                    PAFManualWeighing manualWeighing = manWeigh.CurrentExecutingFunction<PAFManualWeighing>();
+
+                    if (manualWeighing != null)
+                    {
+                        WeighingComponent wcomp = manWeigh.GetWeighingComponent(manWeigh.CurrentOpenMaterial);
+                        if (wcomp != null)
+                        {
+                            manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = wcomp.TargetWeight;
+                            manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
+                        }
+                    }
+                }
+            }
+        }
+
 
         #endregion
 

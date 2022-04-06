@@ -332,8 +332,12 @@ namespace gip.mes.processapplication
             RouteItem sourceRouteItem = route.FirstOrDefault();
             if (sourceRouteItem == null)
             {
-                MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Last RouteItem is null." };
-                return msg;
+                if (CurrentACState == ACStateEnum.SMRunning)
+                {
+                    MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Last RouteItem is null." };
+                    return msg;
+                }
+                return null;
             }
 
             using (var db = new Database())

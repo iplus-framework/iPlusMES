@@ -1103,9 +1103,9 @@ namespace gip.bso.manufacturing
                 if (_AbortMode == AbortModeEnum.AbortComponent)
                 {
                     ShowSelectFacilityLotInfo = false;
-                    //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
-                    // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
-                    if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
+                    //Question50049: Do you still want to weigh this material in the following batches? 
+                    // Möchten Sie diese Komponente in den nachfolgenden Batchen weiter verwiegen?
+                    if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
                     {
                         componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
                         return;
@@ -1116,7 +1116,7 @@ namespace gip.bso.manufacturing
                 else if (_AbortMode == AbortModeEnum.AbortComponentScaleOtherComponents)
                 {
                     ShowSelectFacilityLotInfo = false;
-                    if (Messages.Question(this, "Question50049") == Global.MsgResult.Yes)
+                    if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
                     {
                         componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, true);
                         return;
@@ -1133,7 +1133,7 @@ namespace gip.bso.manufacturing
 
                     ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
 
-                    if (msgResult == Global.MsgResult.Yes)
+                    if (msgResult == Global.MsgResult.No)
                     {
                         componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
                         return;
@@ -1690,6 +1690,14 @@ namespace gip.bso.manufacturing
                                                                              .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
                             if (posRelation != null)
                             {
+                                try
+                                {
+                                    posRelation.AutoRefresh();
+                                }
+                                catch (Exception e)
+                                {
+                                    Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                }
                                 weihgingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                             }
                         }
