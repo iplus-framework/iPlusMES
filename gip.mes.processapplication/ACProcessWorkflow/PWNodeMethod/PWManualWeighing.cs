@@ -5,6 +5,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Objects;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -606,6 +607,17 @@ namespace gip.mes.processapplication
                 {
                     if (WeighingComponents != null)
                         weighingComponentsInfo = WeighingComponents.ToDictionary(c => c.PLPosRelation.ToString(), c => c.WeighState.ToString());
+                }
+
+                ProdOrderPartslistPos intermediateChildPos = null;
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    intermediateChildPos = IntermediateChildPos;
+                }
+
+                if (intermediateChildPos != null)
+                {
+                    weighingComponentsInfo.Add(intermediateChildPos.ProdOrderPartslistPosID.ToString(), null);
                 }
 
                 return new ACValue("WM", weighingComponentsInfo);
@@ -1617,18 +1629,27 @@ namespace gip.mes.processapplication
         //TODO:Get component only for pwnode, in bso get from database directy in one query
         protected virtual ProdOrderPartslistPosRelation[] OnGetAllMaterials(Database dbIPlus, DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos)
         {
-            ProdOrderPartslistPosRelation[] queryOpenDosings = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
-                                                .Include(c => c.SourceProdOrderPartslistPos.Material)
-                                                .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
-                                                .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID)
-                                                .ToArray()
-                                                .Where(c => c.RemainingDosingWeight < (MinWeightQuantity * -1) && c.MDProdOrderPartslistPosState != null 
-                                                        && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
-                                                         && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
-                                                .OrderBy(c => c.Sequence)
-                                                .ToArray();
+            ProdOrderPartslistPosRelation[] queryOpenDosings = Qry_WeighMaterials(dbApp, intermediateChildPos.ProdOrderPartslistPosID);
             return queryOpenDosings;
         }
+
+        public static ProdOrderPartslistPosRelation[] Qry_WeighMaterials(DatabaseApp dbApp, Guid intermediateChildPosPOPartslistPosID)
+        {
+            return dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                        .Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                        .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
+                                                        .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPosPOPartslistPosID)
+                                                        .ToArray()
+                                                        .Where(c => c.MDProdOrderPartslistPosState != null
+                                                                && c.TopParentPartslistPosRelation != null && c.TopParentPartslistPosRelation.MDProdOrderPartslistPosState != null
+                                                                && c.TopParentPartslistPosRelation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                && c.TopParentPartslistPosRelation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled
+                                                                && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
+                                                                 && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
+                                                        .OrderBy(c => c.Sequence)
+                                                        .ToArray();
+        }
+
 
         private bool RefreshCompStateFromDBAndCheckIsAllCompleted()
         {

@@ -1679,31 +1679,63 @@ namespace gip.bso.manufacturing
 
             if (valueList != null && valueList.Any())
             {
-                List<WeighingMaterial> weihgingMaterials = new List<WeighingMaterial>();
-                foreach (var valueItem in valueList.ToArray())
+                List<WeighingMaterial> weighingMaterials = new List<WeighingMaterial>();
+
+                var intermediateChildPos = valueList.FirstOrDefault(c => c.Value == null);
+                Guid intermediateChildPosPOPartslistID;
+                if (intermediateChildPos.Key != null && Guid.TryParse(intermediateChildPos.Key, out intermediateChildPosPOPartslistID))
                 {
-                    if (Guid.TryParse(valueItem.Key, out Guid PLPosRel))
+                    vd.ProdOrderPartslistPosRelation[] queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(DatabaseApp, intermediateChildPosPOPartslistID);
+                    
+                    foreach (vd.ProdOrderPartslistPosRelation rel in queryOpenDosings)
                     {
+                        try
+                        {
+                            rel.AutoRefresh();
+                        }
+                        catch (Exception e)
+                        {
+                            Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                        }
+
+                        var valueItem = valueList.FirstOrDefault(c => c.Key == rel.ProdOrderPartslistPosRelationID.ToString());
+                        if (valueItem.Key == null)
+                            continue;
+
                         if (short.TryParse(valueItem.Value, out short weighingState))
                         {
-                            vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
-                                                                             .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
-                            if (posRelation != null)
+                            weighingMaterials.Add(new WeighingMaterial(rel, (WeighingComponentState)weighingState, iconDesign, this));
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var valueItem in valueList.ToArray())
+                    {
+                        if (Guid.TryParse(valueItem.Key, out Guid PLPosRel))
+                        {
+                            if (short.TryParse(valueItem.Value, out short weighingState))
                             {
-                                try
+                                vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
+                                                                                 .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
+                                if (posRelation != null)
                                 {
-                                    posRelation.AutoRefresh();
+                                    try
+                                    {
+                                        posRelation.AutoRefresh();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                    }
+                                    weighingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                                 }
-                                catch (Exception e)
-                                {
-                                    Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
-                                }
-                                weihgingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                             }
                         }
                     }
                 }
-                return weihgingMaterials.OrderBy(c => c.PosRelation.Sequence).ToList();
+                
+                return weighingMaterials.OrderBy(c => c.PosRelation.Sequence).ToList();
             }
             return null;
         }
