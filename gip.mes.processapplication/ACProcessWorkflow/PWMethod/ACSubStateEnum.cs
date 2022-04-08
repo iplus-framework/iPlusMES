@@ -51,7 +51,7 @@ namespace gip.mes.processapplication
 
         SMAllowFollowingNode2Start = 0x00000080,
 
-        Res00000100 = 0x00000100,
+        SMRepeatGroup = 0x00000100,
         Res00000200 = 0x00000200,
         Res00000400 = 0x00000400,
         Res00000800 = 0x00000800,
