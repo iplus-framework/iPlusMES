@@ -322,6 +322,7 @@ namespace gip.bso.manufacturing
             SelectedProdOrderBatchPlan = null;
             IsWizard = false;
 
+            _TempRules = null;
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -2204,12 +2205,20 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private core.datamodel.VBUser[] _VBUserList;
         [ACPropertyList(605, "VBUser")]
         public IEnumerable<core.datamodel.VBUser> VBUserList
         {
             get
             {
-                return DatabaseApp.ContextIPlus.VBUser/*.Where(c => !c.IsSuperuser)*/.ToArray();
+                if (_VBUserList == null)
+                {
+                    using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                    {
+                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.ToArray();
+                    }
+                }
+                return _VBUserList;
             }
         }
 
@@ -4698,7 +4707,8 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("", "en{'Configure scheduler rules'}de{'Konfigurieren Regeln für den Zeitplaner'}", 601, true)]
         public void ConfigureBSO()
         {
-            _TempRules = GetStoredRules();
+            if (_TempRules == null)
+                _TempRules = GetStoredRules();
             AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption);
 
             if (AvailableSchedulingGroupsList == null)
@@ -4773,6 +4783,8 @@ namespace gip.bso.manufacturing
             if (msg != null)
                 Messages.Msg(msg);
 
+            _TempRules = GetStoredRules();
+
             CloseTopDialog();
         }
 
@@ -4783,8 +4795,9 @@ namespace gip.bso.manufacturing
 
         private List<UserRuleItem> GetRulesForCurrentUser()
         {
-            var result = GetStoredRules();
-            return result.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
+            if (_TempRules == null)
+                _TempRules = GetStoredRules();
+            return _TempRules.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
         }
 
         private List<UserRuleItem> GetStoredRules()
@@ -4792,30 +4805,41 @@ namespace gip.bso.manufacturing
             if (string.IsNullOrEmpty(BSOBatchPlanSchedulerRules))
                 return new List<UserRuleItem>();
 
-            using (StringReader ms = new StringReader(BSOBatchPlanSchedulerRules))
-            using (XmlTextReader xmlReader = new XmlTextReader(ms))
+            try
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<UserRuleItem>));
-                List<UserRuleItem> result = serializer.ReadObject(xmlReader) as List<UserRuleItem>;
-                if (result == null)
-                    return new List<UserRuleItem>();
-
-                foreach (UserRuleItem item in result)
+                using (StringReader ms = new StringReader(BSOBatchPlanSchedulerRules))
+                using (XmlTextReader xmlReader = new XmlTextReader(ms))
                 {
-                    core.datamodel.VBUser vbUser = DatabaseApp.ContextIPlus.VBUser.FirstOrDefault(c => c.VBUserID == item.VBUserID);
-                    if (vbUser == null)
-                        continue;
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<UserRuleItem>));
+                    List<UserRuleItem> result = serializer.ReadObject(xmlReader) as List<UserRuleItem>;
+                    if (result == null)
+                        return new List<UserRuleItem>();
 
-                    item.VBUserName = vbUser.VBUserName;
+                    using (Database db = new core.datamodel.Database())
+                    {
+                        foreach (UserRuleItem item in result)
+                        {
+                            core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserID == item.VBUserID);
+                            if (vbUser == null)
+                                continue;
 
-                    MDSchedulingGroup group = DatabaseApp.MDSchedulingGroup.FirstOrDefault(c => c.MDSchedulingGroupID == item.RuleParamID);
-                    if (group == null)
-                        continue;
+                            item.VBUserName = vbUser.VBUserName;
 
-                    item.RuleParamCaption = group.ACCaption;
+                            MDSchedulingGroup group = DatabaseApp.MDSchedulingGroup.FirstOrDefault(c => c.MDSchedulingGroupID == item.RuleParamID);
+                            if (group == null)
+                                continue;
+
+                            item.RuleParamCaption = group.ACCaption;
+                        }
+                    }
+
+                    return result;
                 }
-
-                return result;
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(GetStoredRules), e);
+                return new List<UserRuleItem>();
             }
         }
 
