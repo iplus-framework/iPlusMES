@@ -306,7 +306,7 @@ namespace gip.mes.processapplication
                     DateTime stamp;
                     if (!DateTime.TryParseExact(valArr[2], "dd/MM/yyyy HH:mm:ss", cultureInfo, System.Globalization.DateTimeStyles.None, out stamp))
                         continue;
-                    stamp = stamp.ToLocalTime();
+                    //stamp = stamp.ToLocalTime();
                     SamplePiValue piValue = new SamplePiValue() { DTStamp = stamp, Value = weight };
                     if (valArr[1] == "Above")
                         piValue.TolState = 1;

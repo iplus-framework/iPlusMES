@@ -776,6 +776,17 @@ namespace gip.mes.processapplication
             }
         }
 
+        public override bool MustRepeatGroupAtEnd
+        {
+            get
+            {
+                var rootPW = RootPW;
+                if (rootPW == null)
+                    return false;
+                return ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMRepeatGroup);
+            }
+        }
+
         #endregion
 
         #endregion
