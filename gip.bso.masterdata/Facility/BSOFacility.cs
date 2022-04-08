@@ -64,6 +64,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Methods
+
         #region Mehtods ->  BSO -> ACMethod
 
         /// <summary>
@@ -84,6 +85,49 @@ namespace gip.bso.masterdata
         {
             return OnIsEnabledSave();
         }
+
+        /// <summary>
+        /// Loads this instance.
+        /// </summary>
+        [ACMethodInteraction(nameof(Facility), "en{'Load'}de{'Laden'}", (short)MISort.Load, false, nameof(SelectedFacility), Global.ACKinds.MSMethodPrePost)]
+        public void Load(bool requery = false)
+        {
+            LoadEntity<Facility>(requery, () => SelectedFacility, () => SelectedFacility, c => SelectedFacility = c,
+                        DatabaseApp.Facility
+                         .Include(c => c.Material)
+                         .Include(c => c.MDFacilityType)
+                       
+                        .Where(c => c.FacilityID == SelectedFacility.FacilityID));
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled load].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled load]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledLoad()
+        {
+            return SelectedFacility != null;
+        }
+
+        /// <summary>
+        /// Undoes the save.
+        /// </summary>
+        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        public void UndoSave()
+        {
+            OnUndoSave();
+            Load();
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled undo save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
+        }
+
 
         #region Mehtods ->  BSO -> ACMethod -> Tree operation
 

@@ -139,6 +139,11 @@ namespace gip.bso.masterdata
                     return CurrentFacility.ACObject as Facility;
                 return null;
             }
+            set
+            {
+                if(CurrentFacility != null)
+                    CurrentFacility.ACObject = value;
+            }
         }
 
         /// <summary>
