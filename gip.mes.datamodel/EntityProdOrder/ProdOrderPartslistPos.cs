@@ -213,10 +213,10 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return 
-                    this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern 
-                    && Material != null
-                    && !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
+                return this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                    && !ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any();
+                    //&& Material != null
+                    //&& !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
             }
         }
 
