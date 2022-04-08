@@ -3218,7 +3218,9 @@ namespace gip.bso.manufacturing
         {
             return
                 ProdOrderBatchPlanList != null
-                && ProdOrderBatchPlanList.Any(c => c.IsSelected && (c.PlanState <= vd.GlobalApp.BatchPlanState.Created || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused) && !c.ProdOrderBatch_ProdOrderBatchPlan.Any());
+                && ProdOrderBatchPlanList.Any(c => 
+                                                    c.IsSelected 
+                                                    && (c.PlanState <= vd.GlobalApp.BatchPlanState.Created || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused));
         }
 
         #endregion
