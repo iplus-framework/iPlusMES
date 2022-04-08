@@ -1286,10 +1286,10 @@ namespace gip.bso.manufacturing
                     _SelectedProdOrderPartslist = value;
 
                     SearchProdOrderPartslistPos();
+                    RecalculateComponentRemainingQuantity();
+
                     SearchIntermediate();
                     SearchBatch();
-
-                    RecalculateComponentRemainingQuantity();
 
                     this.LoadProcessWorkflows();
                     LoadMaterialWorkflows();

@@ -17,6 +17,34 @@ namespace gip.bso.manufacturing
 
         #region OutwardPartslistPos -> Select, (Current,) List
 
+
+        [ACPropertyInfo(777, "SelectedComponent", "en{'Selected component'}de{'Ausgewählte Komponente'}")]
+        public ProdOrderPartslistPos SelectedComponent
+        {
+            get
+            {
+                if (SelectedOutwardPartslistPos == null)
+                    return null;
+                return SelectedOutwardPartslistPos.SourceProdOrderPartslistPos;
+            }
+            set
+            {
+                if (
+                    SelectedOutwardPartslistPos != null
+                    && SelectedOutwardPartslistPos.TargetProdOrderPartslistPos != null
+                    && (
+                         (value == null && SelectedOutwardPartslistPos.SourceProdOrderPartslistPos == null)
+                        ||  (value != null && SelectedOutwardPartslistPos.TargetProdOrderPartslistPos.ProdOrderPartslistID == value.ProdOrderPartslistID)
+                       )
+                    )
+                {
+                    if (SelectedOutwardPartslistPos.SourceProdOrderPartslistPos == null || SelectedOutwardPartslistPos.SourceProdOrderPartslistPosID != value.ProdOrderPartslistPosID)
+                        SelectedOutwardPartslistPos.SourceProdOrderPartslistPos = value;
+                }
+                OnPropertyChanged(nameof(SelectedComponent));
+            }
+        }
+
         ProdOrderPartslistPosRelation _SelectedOutwardPartslistPos;
         /// <summary>
         /// Gets or sets the current in order pos.
@@ -36,10 +64,13 @@ namespace gip.bso.manufacturing
                     if (_SelectedOutwardPartslistPos != null)
                         _SelectedOutwardPartslistPos.PropertyChanged -= _SelectedOutwardPartslistPos_PropertyChanged;
                     _SelectedOutwardPartslistPos = value;
-                    if (_SelectedOutwardPartslistPos != null && _SelectedOutwardPartslistPos.EntityState != EntityState.Added)
-                        SearchOutwardFacilityPreBooking();
                     if (_SelectedOutwardPartslistPos != null)
+                    {
+                        if (_SelectedOutwardPartslistPos.EntityState != EntityState.Added)
+                            SearchOutwardFacilityPreBooking();
                         _SelectedOutwardPartslistPos.PropertyChanged += _SelectedOutwardPartslistPos_PropertyChanged;
+                    }
+                    SelectedComponent = value?.SourceProdOrderPartslistPos;
                     OnPropertyChanged("SelectedOutwardPartslistPos");
                     OnPropertyChanged("OutwardFacilityBookingList");
                 }
@@ -76,9 +107,7 @@ namespace gip.bso.manufacturing
         [ACMethodCommand("OutwardPartslistPos", "en{'New Input'}de{'Neuer Einsatz'}", (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
         public void NewOutwardPartslistPos()
         {
-            if (!PreExecute("NewOutwardPartslistPos"))
-                return;
-
+            SearchOutwardPartslistPos();
 
             ProdOrderPartslistPosRelation newRelation = ProdOrderPartslistPosRelation.NewACObject(DatabaseApp, null);
             DatabaseApp.ProdOrderPartslistPosRelation.AddObject(newRelation);
@@ -86,23 +115,16 @@ namespace gip.bso.manufacturing
                 newRelation.TargetProdOrderPartslistPos = SelectedProdOrderIntermediateBatch;
             else
                 newRelation.TargetProdOrderPartslistPos = SelectedIntermediate;
-            if (SelectedProdOrderPartslistPos != null)
-                newRelation.SourceProdOrderPartslistPos = SelectedProdOrderPartslistPos;
-            else
-                newRelation.SourceProdOrderPartslistPos = ProdOrderPartslistPosList.FirstOrDefault();
             newRelation.Sequence = 1;
-            newRelation.TargetQuantityUOM = newRelation.SourceProdOrderPartslistPos.RemainingCallQuantityUOM;
-            ProdOrderManager.RecalcRemainingOutwardQuantity(newRelation.SourceProdOrderPartslistPos);
             if (OutwardPartslistPosList.Any())
                 newRelation.Sequence = OutwardPartslistPosList.Max(x => x.Sequence) + 1;
             PreselecteRelationID = newRelation?.ProdOrderPartslistPosRelationID;
-            SearchOutwardPartslistPos();
             ACState = Const.SMNew;
 
             newRelation.PropertyChanged += NewRelation_PropertyChanged;
-
+            OutwardPartslistPosList.Add(newRelation);
             SelectedOutwardPartslistPos = newRelation;
-            PostExecute("NewOutwardPartslistPos");
+            OnPropertyChanged(nameof(OutwardPartslistPosList));
         }
         public bool IsEnabledNewOutwardPartslistPos()
         {
