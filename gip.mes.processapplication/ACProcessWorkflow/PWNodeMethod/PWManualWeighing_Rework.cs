@@ -13,20 +13,22 @@ namespace gip.mes.processapplication
     public partial class PWManualWeighing
     {
         [ACMethodInfo("", "", 9999)]
-        public Msg ActivateRework()
+        public ReworkInfoList ActivateRework()
         {
             IEnumerable<PWManualWeighing> manualWeighingsForRework = ParentACComponent?.FindChildComponents<PWManualWeighing>(c => c is PWManualWeighing).Where(c => !string.IsNullOrEmpty(c.ReworkMaterialNo) && c.ReworkQuantityPercentage > 0);
             if (manualWeighingsForRework == null)
             {
-                return new Msg(eMsgLevel.Error, "There is no any manual weighing node that is configured for rework.");
+                return null;
             }
 
             foreach (PWManualWeighing manualWeighing in manualWeighingsForRework)
             {
                 manualWeighing.AdjustProdOrderForRework();
+
+
             }
 
-            return null;
+            return GetReworkStatus();
         }
 
         private void AdjustProdOrderForRework()

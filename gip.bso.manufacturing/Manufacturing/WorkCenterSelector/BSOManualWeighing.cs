@@ -3022,7 +3022,7 @@ namespace gip.bso.manufacturing
             if (pwNode == null)
                 return;
 
-            pwNode.ComponentPWNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.ActivateRework));
+            ReworkInfoItems = pwNode.ComponentPWNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.ActivateRework)) as ReworkInfoList;
         }
 
         public bool IsEnabledAddReworkMaterial()

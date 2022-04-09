@@ -151,10 +151,14 @@ namespace gip.mes.processapplication
             return occupied;
         }
 
-        public bool ReleaseProcessModuleOnScan(PAFWorkTaskScanBase invoker)
+        public bool ReleaseProcessModuleOnScan(PAFWorkTaskScanBase invoker, bool pause)
         {
             if (invoker == null || ParentPWGroup == null)
                 return false;
+
+            if (pause)
+                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMRepeatGroup;
+
             string invokerACUrl = invoker.GetACUrl();
             core.datamodel.ACProgramLog currentProgramLog = GetCurrentProgramLog(true);
 

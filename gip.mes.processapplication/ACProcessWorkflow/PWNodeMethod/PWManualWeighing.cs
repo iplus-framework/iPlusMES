@@ -1579,10 +1579,6 @@ namespace gip.mes.processapplication
                                                             .ToArray();
                     if (queryOpenMaterials == null || !queryOpenMaterials.Any())
                     {
-                        //Error50280: queryOpenMaterials is null or does not contain any material.
-                        //msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(80)", 834, "Error50280");
-                        //Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.Message);
-                        //OnNewAlarmOccurred(ProcessAlarm, msg, false);
                         return StartNextCompResult.Done;
                     }
 
@@ -1590,19 +1586,9 @@ namespace gip.mes.processapplication
                     {
                         WeighingComponents = queryOpenMaterials.Select(c => new WeighingComponent(c, DetermineWeighingComponentState(c.MDProdOrderPartslistPosState
                                                                                                                                       .MDProdOrderPartslistPosStateIndex))).ToList();
-
-                        //_WeighingComponentsInfo = WeighingComponents.ToDictionary(c => c.PLPosRelation.ToString(), c => c.WeighState.ToString());
                     }
 
-                    //Route[] routes;
                     AvailableRoutes = GetAvailableStorages(module);
-                    //AvailableRoutes = routes;
-                    //if (AvailableStorages == null || !AvailableStorages.Any())
-                    //{
-                    //    //Error50271: No source storage bins have been defined for this workcenter {0}!
-                    //    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeihgingProd", 1268, "Error50271", module.GetACUrl());
-                    //    ActivateProcessAlarmWithLog(msg);
-                    //}
                 }
             }
 
@@ -1626,7 +1612,6 @@ namespace gip.mes.processapplication
             acMethod[Material.ClassName] = "";
         }
 
-        //TODO:Get component only for pwnode, in bso get from database directy in one query
         protected virtual ProdOrderPartslistPosRelation[] OnGetAllMaterials(Database dbIPlus, DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos)
         {
             ProdOrderPartslistPosRelation[] queryOpenDosings = Qry_WeighMaterials(dbApp, intermediateChildPos.ProdOrderPartslistPosID);
@@ -1721,9 +1706,13 @@ namespace gip.mes.processapplication
                     {
                         WeighingComponent comp = WeighingComponents.FirstOrDefault(c => c.PLPosRelation == rel.ProdOrderPartslistPosRelationID);
                         if (comp == null)
-                            continue;
-
-                        comp.RefreshComponent(rel);
+                        {
+                            WeighingComponents.Add(new WeighingComponent(rel, DetermineWeighingComponentState(rel.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex)));
+                        }
+                        else if (comp != null)
+                        {
+                            comp.RefreshComponent(rel);
+                        }
                     }
                 }
 

@@ -80,7 +80,7 @@ namespace gip.mes.webservices
         }
 
         [DataMember]
-        public bool ForRelease
+        public POPartslistInfoState InfoState
         {
             get; set;
         }
@@ -90,5 +90,16 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+    }
+
+    [DataContract(Name = "POPLInfoState")]
+    public enum POPartslistInfoState : short 
+    {
+        [EnumMember]
+        None = 0,
+        [EnumMember]
+        Release = 10,
+        [EnumMember]
+        Pause = 20
     }
 }

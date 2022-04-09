@@ -78,6 +78,12 @@ namespace gip.mes.processapplication
             get; set;
         }
 
+        [DataMember]
+        public bool Pause
+        {
+            get; set;
+        }
+
         [DataMember(Name="WFMSD")]
         public DateTime? WFMethodStartDate
         {
@@ -394,7 +400,7 @@ namespace gip.mes.processapplication
                 ForRelease = forRelease,
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
                 WFMethod = pwNode.CurrentACMethod.ValueT,
-            });
+            }); 
         }
 
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
@@ -424,7 +430,7 @@ namespace gip.mes.processapplication
             Msg wfMsg = pwNode.OnGetMessageOnReleasingProcessModule(this);
             if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
             {
-                if (pwNode.ReleaseProcessModuleOnScan(this))
+                if (pwNode.ReleaseProcessModuleOnScan(this, selectedPOLWf.Pause))
                 {
                     // Info50057: The order has been deregistered on the machine.
                     // Der Auftrag wurde an der Maschine abgemeldet.

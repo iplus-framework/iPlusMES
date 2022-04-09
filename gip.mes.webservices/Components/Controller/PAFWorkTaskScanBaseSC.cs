@@ -45,7 +45,7 @@ namespace gip.mes.webservices
             Guid facilityID, facilityChargeID;
             ParentDecoder.GetGuidFromFacilityEntities(entityFacility, entityCharge, out facilityID, out facilityChargeID);
 
-            WorkTaskScanResult result = component.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + PAFWorkTaskScanBase.MN_OnScanEvent,
+            WorkTaskScanResult result = component.ExecuteMethod(nameof(PAFWorkTaskScanBase.OnScanEvent),
                 new BarcodeSequenceBase() { State = sequence.State, Message = sequence.Message, QuestionSequence = sequence.QuestionSequence },
                 sequence.State == BarcodeSequenceBase.ActionState.Selection ? ConvertWFInfoToPA(sequence.Sequence.LastOrDefault().SelectedOrderWF) : null,
                 facilityChargeID, 
@@ -90,7 +90,8 @@ namespace gip.mes.webservices
                 IntermPOPPosId = wfInfo.Intermediate != null ? wfInfo.Intermediate.ProdOrderPartslistPosID : Guid.Empty,
                 IntermChildPOPPosId = wfInfo.IntermediateBatch != null ? wfInfo.IntermediateBatch.ProdOrderPartslistPosID : Guid.Empty,
                 ACUrlWF = wfInfo.ACUrlWF,
-                ForRelease = wfInfo.ForRelease
+                ForRelease = wfInfo.InfoState > POPartslistInfoState.None,
+                Pause = wfInfo.InfoState == POPartslistInfoState.Pause
             };
         }
 
@@ -107,7 +108,13 @@ namespace gip.mes.webservices
                     {
                         if (orderWFInfo.POPId == Guid.Empty)
                             continue;
-                        ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { ForRelease = orderWFInfo.ForRelease, ACUrlWF = orderWFInfo.ACUrlWF };
+                        POPartslistInfoState infoState = POPartslistInfoState.None;
+                        if (orderWFInfo.ForRelease)
+                        {
+                            infoState = POPartslistInfoState.Release;
+                        }
+
+                        ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { InfoState = infoState, ACUrlWF = orderWFInfo.ACUrlWF };
                         if (orderWFInfo.WFMethod != null)
                         {
                             pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;
