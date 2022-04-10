@@ -3926,11 +3926,15 @@ namespace gip.bso.manufacturing
 
         private List<MDSchedulingGroup> GetSchedulingGroups(Partslist partslist)
         {
+            var assignedProcessWF = partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            if (assignedProcessWF == null)
+                return new List<MDSchedulingGroup>();
+            Guid acClassMethodID = assignedProcessWF.MaterialWFACClassMethod.ACClassMethodID;
             List<MDSchedulingGroup> schedulingGroups =
                     PartslistMDSchedulerGroupConnections
-                    .Where(c =>
-                    c.PartslistID == partslist.PartslistID)
+                    .Where(c => c.PartslistID == partslist.PartslistID)
                     .SelectMany(c => c.SchedulingGroups)
+                    .Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(d => d.ACClassWF.ACClassMethodID == acClassMethodID))
                     .OrderBy(c => c.SortIndex)
                     .ToList();
             IEnumerable<Tuple<int, Guid>> items =
