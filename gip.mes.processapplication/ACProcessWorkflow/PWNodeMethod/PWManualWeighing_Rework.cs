@@ -25,7 +25,10 @@ namespace gip.mes.processapplication
             {
                 manualWeighing.AdjustProdOrderForRework();
 
-
+                if (manualWeighing.CurrentACState == core.autocomponent.ACStateEnum.SMRunning)
+                {
+                    manualWeighing.RefreshCompWeighingList();
+                }
             }
 
             return GetReworkStatus();
@@ -244,6 +247,7 @@ namespace gip.mes.processapplication
                 batchRelation.ProdOrderBatch = batch;
             }
 
+            batchRelation.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created).FirstOrDefault();
             batchRelation.TargetQuantityUOM = batchQuantity;
 
             var msg = dbApp.ACSaveChanges();

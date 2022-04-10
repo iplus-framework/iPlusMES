@@ -328,12 +328,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private IEnumerable<core.datamodel.VBUser> _VBUserList;
         [ACPropertyList(605, "VBUser")]
         public IEnumerable<core.datamodel.VBUser> VBUserList
         {
             get
             {
-                return DatabaseApp.ContextIPlus.VBUser/*.Where(c => !c.IsSuperuser)*/.ToArray();
+                if (_VBUserList == null)
+                {
+                    using(ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.ToArray();
+                }
+                return _VBUserList;
             }
         }
 
@@ -764,12 +770,12 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("", "en{'Configure work center'}de{'Arbeitsplatz konfigurieren'}", 601, true)]
         public void ConfigureBSO()
         {
-            _TempRules = GetStoredRules();
+            if (_TempRules == null)
+                _TempRules = GetStoredRules();
             AssignedProcessModulesList = new List<ACValueItem>(_TempRules.Select(x => new ACValueItem(x.VBUserName + " => " + x.ProcessModuleACUrl, x, null)).OrderBy(c => c.ACCaption));
 
             var availablePAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray();
             AvailableProcessModulesList = availablePAFs.Select(c => c.ACClass1_ParentACClass).Distinct().Select(x => new ACValueItem(x.ACUrlComponent, x.ACUrlComponent, null)).OrderBy(c => c.ACCaption).ToList();
-
 
             ShowDialog(this, "ConfigurationDialog");
         }
@@ -862,8 +868,9 @@ namespace gip.bso.manufacturing
 
         private List<WorkCenterRule> GetRulesByCurrentUser()
         {
-            var result = GetStoredRules();
-            return result.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
+            if (_TempRules == null)
+                _TempRules = GetStoredRules();
+            return _TempRules.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
         }
 
         private List<WorkCenterRule> GetStoredRules()
