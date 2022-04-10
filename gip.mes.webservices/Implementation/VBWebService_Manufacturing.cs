@@ -713,7 +713,8 @@ namespace gip.mes.webservices
                                                           FacilityID = c.Facility.FacilityID,
                                                           FacilityNo = c.Facility.FacilityNo,
                                                           FacilityName = c.Facility.FacilityName,
-                                                          ParentFacilityID = c.Facility.ParentFacilityID
+                                                          ParentFacilityID = c.Facility.ParentFacilityID,
+                                                          SkipPrintQuestion = c.Facility.SkipPrintQuestion
                                                       })
                                                       .ToList();
                 }
