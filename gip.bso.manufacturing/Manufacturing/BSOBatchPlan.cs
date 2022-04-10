@@ -1427,7 +1427,12 @@ namespace gip.bso.manufacturing
             }
 
             // TODO: Benutzerauswahl, mit welchem Steuerrezept gefahren werden soll (nicht .FirstOrDefault()):
-            MaterialWFACClassMethod materialWFACClassMethod = currentProdOrderPartslist.Partslist.MaterialWF.MaterialWFACClassMethod_MaterialWF.FirstOrDefault();
+            var selectedProcessWF = currentProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            if (selectedProcessWF == null)
+                return null;
+
+            MaterialWFACClassMethod materialWFACClassMethod = selectedProcessWF.MaterialWFACClassMethod;
+            //MaterialWFACClassMethod materialWFACClassMethod = currentProdOrderPartslist.Partslist.MaterialWF.MaterialWFACClassMethod_MaterialWF.FirstOrDefault();
             if (materialWFACClassMethod == null)
             {
                 return null;
