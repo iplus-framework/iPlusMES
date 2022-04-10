@@ -212,7 +212,8 @@ namespace gip.mes.webservices
                         MDNameTrans = c.MDFacilityType.MDNameTrans,
                         MDFacilityTypeIndex = c.MDFacilityType.MDFacilityTypeIndex
                     },
-                    ParentFacilityID = c.ParentFacilityID
+                    ParentFacilityID = c.ParentFacilityID,
+                    SkipPrintQuestion = c.SkipPrintQuestion
                 }
              )
         );

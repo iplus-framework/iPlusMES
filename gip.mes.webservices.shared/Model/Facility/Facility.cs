@@ -47,6 +47,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "SPQ")]
+        public bool SkipPrintQuestion
+        {
+            get; set;
+        }
+
         public override string ToString()
         {
             if (!string.IsNullOrEmpty(FacilityName))

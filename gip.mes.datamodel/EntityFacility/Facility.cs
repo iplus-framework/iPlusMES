@@ -60,6 +60,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(33, "OptStockQuantity", ConstApp.OptStockQuantity, "", "", true)]
     [ACPropertyEntity(34, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(35, "DisabledForMobile", "en{'Disabled for mobile application'}de{'Deaktiviert für mobile Anwendung'}")]
+    [ACPropertyEntity(36, nameof(SkipPrintQuestion), "en{'Skip print question'}de{'Druckfrage überspringen'}")]
     [ACPropertyEntity(36, "OrderPostingOnEmptying", "en{'Post remaining quantity to order on emptying'}de{'Restmenge bei Entleerung in Auftrag buchen'}", "", "", true)]
     [ACPropertyEntity(37, "PostingBehaviourIndex", "en{'Posting behaviour'}de{'Buchungsverhalten'}", typeof(PostingBehaviourEnum), Const.ContextDatabase + "\\PostingBehaviourEnumList", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
