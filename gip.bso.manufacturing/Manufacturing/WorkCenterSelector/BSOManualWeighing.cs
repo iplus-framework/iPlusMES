@@ -2288,7 +2288,6 @@ namespace gip.bso.manufacturing
             if (SelectedWeighingMaterial != null)
             {
                 _FacilityChargeList = null;
-                //_FacilityList = null;
                 OnPropertyChanged("FacilityChargeList");
             }
         }
