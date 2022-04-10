@@ -1728,7 +1728,9 @@ namespace gip.mes.facility
             return
             databaseApp
                    .Partslist
-                   .Where(c => c.MaterialWFID != null && (partslistNoListComaSep == null || partslistNoListComaSep.Contains(c.PartslistNo)))
+                   .Where(c => c.MaterialWFID != null 
+                            && !c.DeleteDate.HasValue
+                            && (partslistNoListComaSep == null || partslistNoListComaSep.Contains(c.PartslistNo)))
                    .Select(c => new { c.PartslistID, pl = c })
                    .AsEnumerable()
                    .Select(c =>
