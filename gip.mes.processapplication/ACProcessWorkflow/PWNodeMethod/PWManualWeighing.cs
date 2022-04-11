@@ -2824,11 +2824,11 @@ namespace gip.mes.processapplication
                                             ActivateProcessAlarmWithLog(msg, false);
                                         }
 
-                                        Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - changePosState value: " + changePosState.ToString());
+                                        //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - changePosState value: " + changePosState.ToString());
 
                                         if (changePosState)
                                         {
-                                            Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - posState value: " + posState.ToString());
+                                            //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - posState value: " + posState.ToString());
 
                                             weighingPosRelation.MDProdOrderPartslistPosState = posState;
                                             if(posState != null && posState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
@@ -2836,12 +2836,12 @@ namespace gip.mes.processapplication
                                                 var unconfirmedBookings = weighingPosRelation.FacilityBooking_ProdOrderPartslistPosRelation
                                                                                              .Where(c => c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New);
 
-                                                Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Bookings count with state new:" + unconfirmedBookings?.Count().ToString());
+                                                //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Bookings count with state new:" + unconfirmedBookings?.Count().ToString());
 
                                                 foreach (var booking in unconfirmedBookings)
                                                 {
                                                     booking.MaterialProcessState = GlobalApp.MaterialProcessState.Processed;
-                                                    Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Booking change state");
+                                                    //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Booking change state");
                                                 }
                                             }
                                         }
