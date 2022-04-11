@@ -810,6 +810,10 @@ namespace gip.bso.facility
 
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
+                // facilityInventoryNoFilter
+                ACFilterItem facilityInventoryNoFilter = new ACFilterItem(Global.FilterTypes.filter, "FacilityInventoryNo", Global.LogicalOperators.equal, Global.Operators.and, null, true, true);
+                aCFilterItems.Add(facilityInventoryNoFilter);
+
                 // MDFacilityInventoryStateID
                 ACFilterItem stateFilter = new ACFilterItem(Global.FilterTypes.filter, "MDFacilityInventoryState\\MDKey", Global.LogicalOperators.equal, Global.Operators.and, null, true);
                 aCFilterItems.Add(stateFilter);

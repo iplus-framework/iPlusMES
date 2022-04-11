@@ -40,8 +40,8 @@ namespace gip.mes.facility
         #endregion
 
         #region const
-        public static string[] S_Partslist_Change_Fields = new string[] { "IsEnabled", "MaterialID", "MaterialWFID", "MDUnitID" };
-        public static string[] S_PartslistPosRelation_Change_Fields = new string[] {"MaterialPosTypeIndex","MaterialID","TargetQuantityUOM","MDUnitID", "SourceProdOrderPartslistPosID" };
+        public static string[] S_Partslist_Change_Fields = new string[] { nameof(Partslist.IsEnabled), nameof(Partslist.MaterialID), nameof(Partslist.MaterialWFID), nameof(Partslist.MDUnitID), nameof(Partslist.TargetQuantityUOM) };
+        public static string[] S_PartslistPosRelation_Change_Fields = new string[] { nameof(PartslistPos.MaterialPosTypeIndex), nameof(PartslistPos.MaterialID), nameof(PartslistPos.TargetQuantityUOM), nameof(PartslistPos.MDUnitID), nameof(PartslistPosRelation.SourcePartslistPosID) };
         #endregion
 
         #region Attach / Deattach
