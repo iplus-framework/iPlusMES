@@ -36,6 +36,11 @@ namespace gip.mes.processapplication
             return base.ACDeInit(deleteACClassTask);
         }
 
+        public override uint OnGetSemaphoreCapacity()
+        {
+            return 0; //infinite
+        }
+
         #region Points
         PAPoint _PAPointMatIn1;
         [ACPropertyConnectionPoint(9999, "PointMaterial")]
