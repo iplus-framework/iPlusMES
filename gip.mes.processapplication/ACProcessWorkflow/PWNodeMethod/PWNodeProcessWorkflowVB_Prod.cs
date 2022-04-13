@@ -237,7 +237,7 @@ namespace gip.mes.processapplication
                 var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
                 ReCreateBatchPlanningTimes(uncompletedBatchPlans);
 
-                var startableBatchPlans = uncompletedBatchPlans.Where(c =>     c.PlanState >= GlobalApp.BatchPlanState.AutoStart 
+                var startableBatchPlans = uncompletedBatchPlans.Where(c => c.PlanState >= GlobalApp.BatchPlanState.AutoStart
                                                                             && c.PlanState <= GlobalApp.BatchPlanState.InProcess)
                                                                     .OrderByDescending(c => c.PlanStateIndex)
                                                                     .ThenBy(c => c.PlannedStartDate);
@@ -257,8 +257,8 @@ namespace gip.mes.processapplication
                         // then complete this node
                         if (_NoBatchPlanFoundCounter > 0
                             && stats.AreOtherParallelNodesCompletable)
-                            //&& stats.ActiveParallelNodesCount <= 0
-                            //&& (stats.WaitingParallelNodesCount == stats.CountParallelNodes - stats.IdleParallelNodesCount))
+                        //&& stats.ActiveParallelNodesCount <= 0
+                        //&& (stats.WaitingParallelNodesCount == stats.CountParallelNodes - stats.IdleParallelNodesCount))
                         {
                             _NoBatchPlanFoundCounter = 0;
                             return StartNextBatchResult.Done;
@@ -410,7 +410,7 @@ namespace gip.mes.processapplication
                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     }
 
-                    if (   (totalSizeReached && EndProdOrderPartslistMode == EndPListMode.OrderSizeReached)
+                    if ((totalSizeReached && EndProdOrderPartslistMode == EndPListMode.OrderSizeReached)
                         || (!uncompletedBatchPlans.Where(c => c.PlanState < GlobalApp.BatchPlanState.Completed).Any() && EndProdOrderPartslistMode == EndPListMode.AllBatchPlansCompleted))
                     {
                         // Complete this ProdorderPartslist
@@ -436,7 +436,7 @@ namespace gip.mes.processapplication
                                                                                 .Include(c => c.MDProdOrderState)
                                                                                 .Include(c => c.ProdOrder)
                                                                                 .Where(c => c.ProdOrderID == intermediatePosition.ProdOrderPartslist.ProdOrderID).ToArray();
-                        if (   allProdOrderPartslists != null
+                        if (allProdOrderPartslists != null
                             && !allProdOrderPartslists.Where(c => c.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished).Any())
                         {
                             intermediatePosition.ProdOrderPartslist.ProdOrder.MDProdOrderState = finishedState;
@@ -448,7 +448,7 @@ namespace gip.mes.processapplication
 
                     OnBatchplanCompleted(dbApp, intermediatePosition, batchPlanEntry);
                 }
-                else if (    nbResult == NextBatchState.NoPlanEntryFound 
+                else if (nbResult == NextBatchState.NoPlanEntryFound
                           && uncompletedBatchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created || c.PlanState == GlobalApp.BatchPlanState.Paused).Any())
                 {
                     //// Error00123: No batchplan found for this intermediate material
@@ -615,7 +615,7 @@ namespace gip.mes.processapplication
                 MsgWithDetails saveMsg = dbApp.ACSaveChanges();
                 if (saveMsg != null)
                 {
-                    Messages.LogError (this.GetACUrl(), "ReadAndStartNextBatch(5)", saveMsg.InnerMessage);
+                    Messages.LogError(this.GetACUrl(), "ReadAndStartNextBatch(5)", saveMsg.InnerMessage);
                     OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Exception, PWClassName, MN_ReadAndStartNextBatch, 1210), true);
                     dbApp.ACUndoChanges();
                     return StartNextBatchResult.CycleWait;
@@ -626,6 +626,67 @@ namespace gip.mes.processapplication
             }
 
             //queryBatchPlans.Where();
+        }
+
+        protected virtual void StartPOListOfNextStage(ProdOrderBatch nextBatch, ProdOrderPartslistPos newChildPosForBatch)
+        {
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                ProdOrderPartslist poPL = null;
+                if (newChildPosForBatch == null)
+                {
+                    if (CurrentProdOrderPartslist == null)
+                        return;
+                    poPL = CurrentProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
+                }
+                else
+                    poPL = dbApp.ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == newChildPosForBatch.ProdOrderPartslistID).FirstOrDefault();
+                if (poPL == null)
+                    return;
+                int countBatches = poPL.ProdOrderBatch_ProdOrderPartslist.Count();
+                if (   (StartNextStage == StartNextStageMode.StartImmediately && countBatches > 1)
+                    || (StartNextStage == StartNextStageMode.StartOnStartSecondBatch && countBatches > 2))
+                    return;
+                else if (StartNextStage == StartNextStageMode.StartOnFirstBatchCompleted)
+                {
+                    countBatches = poPL.ProdOrderBatch_ProdOrderPartslist
+                                        .Where(c => c.MDProdOrderState != null 
+                                                && c.MDProdOrderState.MDProdOrderStateIndex >= (short) MDProdOrderState.ProdOrderStates.ProdFinished)
+                                        .Count();
+                    if (countBatches != 1)
+                        return;
+                }
+
+                List<ProdOrderBatchPlan> batchPlans = ProdOrderManager.GetBatchplansOfNextStages(dbApp, poPL);
+                bool anyActivePlans = batchPlans.Any(c => c.PlanState >= GlobalApp.BatchPlanState.ReadyToStart && c.PlanState < GlobalApp.BatchPlanState.Paused);
+                if (anyActivePlans)
+                    return;
+                ProdOrderBatchPlan nextBatchPlanToStart = batchPlans.FirstOrDefault(c => c.PlanState == GlobalApp.BatchPlanState.Created);
+                if (nextBatchPlanToStart == null)
+                    return;
+                PABatchPlanScheduler scheduler = GetScheduler();
+                if (scheduler != null
+                    && nextBatchPlanToStart.VBiACClassWF != null
+                    && nextBatchPlanToStart.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
+                {
+                    nextBatchPlanToStart.PlanState = GlobalApp.BatchPlanState.ReadyToStart;
+                    dbApp.ACSaveChanges();
+                }
+                // Start directly
+                else if (nextBatchPlanToStart.MaterialWFACClassMethod != null)
+                {
+                    Guid acclassMethodID = nextBatchPlanToStart.MaterialWFACClassMethod.ACClassMethodID;
+                    core.datamodel.ACClassMethod aCClassMethod = null;
+                    using (ACMonitor.Lock(dbApp.ContextIPlus.QueryLock_1X000))
+                    {
+                        aCClassMethod = dbApp.ContextIPlus.ACClassMethod.Where(c => c.ACClassMethodID == acclassMethodID).FirstOrDefault();
+                    }
+                    nextBatchPlanToStart.PlanState = GlobalApp.BatchPlanState.AutoStart;
+                    Msg saveMessage = dbApp.ACSaveChanges();
+                    if (saveMessage == null)
+                        saveMessage = ProdOrderManager.StartBatchPlan(this.ApplicationManager, dbApp, aCClassMethod, nextBatchPlanToStart.VBiACClassWF, nextBatchPlanToStart, false);
+                }
+            }
         }
 
         protected bool WillReadAndStartNextBatchCompleteNode_Prod()

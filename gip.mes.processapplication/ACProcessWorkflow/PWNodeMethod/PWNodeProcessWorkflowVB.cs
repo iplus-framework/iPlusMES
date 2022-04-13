@@ -913,13 +913,17 @@ namespace gip.mes.processapplication
 
         protected void InformSchedulerOnStateChange()
         {
+            PABatchPlanScheduler scheduler = GetScheduler();
+            if (scheduler != null)
+                scheduler.OnACStateChangedOfPWNode(this);
+        }
+
+        protected PABatchPlanScheduler GetScheduler()
+        {
             var appManager = this.ApplicationManager;
-            if (appManager != null)
-            {
-                PABatchPlanScheduler scheduler = appManager.FindChildComponents<PABatchPlanScheduler>(c => c is PABatchPlanScheduler, null, 1).FirstOrDefault();
-                if (scheduler != null)
-                    scheduler.OnACStateChangedOfPWNode(this);
-            }
+            if (appManager == null)
+                return null;
+            return appManager.FindChildComponents<PABatchPlanScheduler>(c => c is PABatchPlanScheduler, null, 1).FirstOrDefault();
         }
         #endregion
 
@@ -1463,6 +1467,14 @@ namespace gip.mes.processapplication
                         CurrentACState = ACStateEnum.SMRunning;
                     else
                         InformSchedulerOnStateChange();
+
+                    if (   (StartNextStage == StartNextStageMode.StartImmediately && this.IterationCount.ValueT == 1)
+                        || (StartNextStage == StartNextStageMode.StartOnStartSecondBatch && this.IterationCount.ValueT == 2)
+                        || (StartNextStage == StartNextStageMode.StartOnFirstBatchCompleted && _LastCallbackResult != null && this.IterationCount.ValueT == 2)
+                        )
+                    {
+                        StartPOListOfNextStage(nextBatch, newChildPosForBatch);
+                    }
                     return;
                 }
                 else
@@ -1495,6 +1507,17 @@ namespace gip.mes.processapplication
             }
             else if (result == StartNextBatchResult.Done)
             {
+                // _LastCallbackResult
+                if (   (   StartNextStage == StartNextStageMode.StartOnLastBatchCompleted
+                        && !HasActiveSubworkflows 
+                        && (BatchPlanningTimes == null || !BatchPlanningTimes.Any()))
+                    || (    StartNextStage == StartNextStageMode.StartOnFirstBatchCompleted
+                        && _LastCallbackResult != null)
+                    )
+                {
+                    StartPOListOfNextStage(null, null);
+                }
+
                 if (HasActiveSubworkflows && (BatchPlanningTimes == null || !BatchPlanningTimes.Any()))
                 {
                     if (IsEnabledStopp())
