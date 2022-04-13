@@ -423,8 +423,8 @@ namespace gip.bso.facility
                 .Include(c => c.Facility)
                 .Include(c => c.FacilityLot)
                 .Include(c => c.Material)
-                .Include(c => c.FacilityBooking_InwardFacilityCharge)
-                .Include(c => c.FacilityBookingCharge_InwardFacilityCharge)
+                //.Include(c => c.FacilityBooking_InwardFacilityCharge)
+                //.Include(c => c.FacilityBookingCharge_InwardFacilityCharge)
                 ;
             return query;
         }
