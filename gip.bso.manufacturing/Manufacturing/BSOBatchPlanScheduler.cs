@@ -136,7 +136,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _CreatedBatchState.ValueT = value;
-                OnPropertyChanged("CreatedBatchState");
+                OnPropertyChanged(nameof(CreatedBatchState));
             }
         }
 
@@ -699,7 +699,7 @@ namespace gip.bso.manufacturing
         {
             if (e.PropertyName == "SelectedPartslist")
             {
-                OnPropertyChanged("UnitConvertList");
+                OnPropertyChanged(nameof(WizardSchedulerPartslist.UnitConvertList));
                 if (BSOPartslistExplorer_Child.Value.SelectedPartslist != null
                     && BSOPartslistExplorer_Child.Value.SelectedPartslist.Material != null)
                 {
@@ -858,14 +858,14 @@ namespace gip.bso.manufacturing
                 if (_SelectedScheduleForPWNode != value)
                 {
                     _SelectedScheduleForPWNode = value;
-                    OnPropertyChanged("SelectedScheduleForPWNode");
+                    OnPropertyChanged(nameof(SelectedScheduleForPWNode));
                     if (_SelectedScheduleForPWNode != null)
                         SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
                     else
                         SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == BatchPlanStartModeEnum.Off).FirstOrDefault();
                     LoadProdOrderBatchPlanList();
 
-                    OnPropertyChanged("TargetScheduleForPWNodeList");
+                    OnPropertyChanged(nameof(TargetScheduleForPWNodeList));
                     if (TargetScheduleForPWNodeList != null)
                         SelectedTargetScheduleForPWNode = TargetScheduleForPWNodeList.FirstOrDefault();
                     else
@@ -933,7 +933,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedFilterBatchPlanStartMode = value;
-                OnPropertyChanged("SelectedFilterBatchPlanStartMode");
+                OnPropertyChanged(nameof(SelectedFilterBatchPlanStartMode));
             }
         }
 
@@ -965,7 +965,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedTargetScheduleForPWNode != value)
                 {
                     _SelectedTargetScheduleForPWNode = value;
-                    OnPropertyChanged("SelectedTargetScheduleForPWNode");
+                    OnPropertyChanged(nameof(SelectedTargetScheduleForPWNode));
                 }
             }
         }
@@ -1004,7 +1004,7 @@ namespace gip.bso.manufacturing
                 if (_FilterStartTime != value)
                 {
                     _FilterStartTime = value;
-                    OnPropertyChanged("FilterStartTime");
+                    OnPropertyChanged(nameof(FilterStartTime));
                 }
             }
         }
@@ -1022,7 +1022,7 @@ namespace gip.bso.manufacturing
                 if (_FilterEndTime != value)
                 {
                     _FilterEndTime = value;
-                    OnPropertyChanged("FilterEndTime");
+                    OnPropertyChanged(nameof(FilterEndTime));
                 }
             }
         }
@@ -1047,7 +1047,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterConnectedLine != value)
                 {
                     _SelectedFilterConnectedLine = value;
-                    OnPropertyChanged("SelectedFilterConnectedLine");
+                    OnPropertyChanged(nameof(SelectedFilterConnectedLine));
                 }
             }
         }
@@ -1103,7 +1103,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterBatchPlanGroup != value)
                 {
                     _SelectedFilterBatchPlanGroup = value;
-                    OnPropertyChanged("SelectedFilterBatchPlanGroup");
+                    OnPropertyChanged(nameof(SelectedFilterBatchPlanGroup));
                 }
             }
         }
@@ -1149,7 +1149,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOnlyOnThisLine != value)
                 {
                     _FilterOnlyOnThisLine = value;
-                    OnPropertyChanged("FilterOnlyOnThisLine");
+                    OnPropertyChanged(nameof(FilterOnlyOnThisLine));
                 }
             }
         }
@@ -1176,7 +1176,7 @@ namespace gip.bso.manufacturing
                 _SelectedProdOrderBatchPlan = value;
                 if (changed && _SelectedProdOrderBatchPlan != null)
                     _SelectedProdOrderBatchPlan.PropertyChanged += _SelectedProdOrderBatchPlan_PropertyChanged;
-                OnPropertyChanged("SelectedProdOrderBatchPlan");
+                OnPropertyChanged(nameof(SelectedProdOrderBatchPlan));
             }
         }
 
@@ -1216,7 +1216,7 @@ namespace gip.bso.manufacturing
             protected set
             {
                 _ProdOrderBatchPlanList = value;
-                OnPropertyChanged("ProdOrderBatchPlanList");
+                OnPropertyChanged(nameof(ProdOrderBatchPlanList));
             }
         }
 
@@ -1295,7 +1295,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScheduledStartDate = value;
-                OnPropertyChanged("ScheduledStartDate");
+                OnPropertyChanged(nameof(ScheduledStartDate));
             }
         }
 
@@ -1311,7 +1311,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScheduledEndDate = value;
-                OnPropertyChanged("ScheduledEndDate");
+                OnPropertyChanged(nameof(ScheduledEndDate));
             }
         }
 
@@ -1348,7 +1348,7 @@ namespace gip.bso.manufacturing
                 {
                     _FilterPlanningMR = value;
                     LoadProdOrderBatchPlanList();
-                    OnPropertyChanged("FilterPlanningMR");
+                    OnPropertyChanged(nameof(FilterPlanningMR));
                 }
             }
         }
@@ -1377,8 +1377,8 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderStartTime != value)
                 {
                     _FilterOrderStartTime = value;
-                    OnPropertyChanged("FilterOrderStartTime");
-                    OnPropertyChanged("FilterOrderEndTime");
+                    OnPropertyChanged(nameof(FilterOrderStartTime));
+                    OnPropertyChanged(nameof(FilterOrderEndTime));
                 }
             }
         }
@@ -1400,8 +1400,8 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderEndTime != value)
                 {
                     _FilterOrderEndTime = value;
-                    OnPropertyChanged("FilterOrderStartTime");
-                    OnPropertyChanged("FilterOrderEndTime");
+                    OnPropertyChanged(nameof(FilterOrderStartTime));
+                    OnPropertyChanged(nameof(FilterOrderEndTime));
                 }
             }
         }
@@ -1423,9 +1423,9 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderIsCompleted != value)
                 {
                     _FilterOrderIsCompleted = value;
-                    OnPropertyChanged("FilterOrderIsCompleted");
-                    OnPropertyChanged("FilterOrderStartTime");
-                    OnPropertyChanged("FilterOrderEndTime");
+                    OnPropertyChanged(nameof(FilterOrderIsCompleted));
+                    OnPropertyChanged(nameof(FilterOrderStartTime));
+                    OnPropertyChanged(nameof(FilterOrderEndTime));
                 }
             }
         }
@@ -1442,7 +1442,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedProdOrderPartslist = value;
-                OnPropertyChanged("SelectedProdOrderPartslist");
+                OnPropertyChanged(nameof(SelectedProdOrderPartslist));
             }
         }
 
@@ -1459,7 +1459,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ProdOrderPartslistList = value;
-                OnPropertyChanged("ProdOrderPartslistList");
+                OnPropertyChanged(nameof(ProdOrderPartslistList));
             }
         }
 
@@ -1588,7 +1588,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _CurrentMsg = value;
-                OnPropertyChanged("CurrentMsg");
+                OnPropertyChanged(nameof(CurrentMsg));
             }
         }
 
@@ -1611,13 +1611,13 @@ namespace gip.bso.manufacturing
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
-            OnPropertyChanged("MsgList");
+            OnPropertyChanged(nameof(MsgList));
         }
 
         public void ClearMessages()
         {
             MsgList.Clear();
-            OnPropertyChanged("MsgList");
+            OnPropertyChanged(nameof(MsgList));
         }
         #endregion
 
@@ -1638,10 +1638,10 @@ namespace gip.bso.manufacturing
                 if (_WizardPhase != value)
                 {
                     _WizardPhase = value;
-                    OnPropertyChanged("WizardPhase");
-                    OnPropertyChanged("WizardPhaseTitle");
-                    OnPropertyChanged("WizardPhaseSubTitle");
-                    OnPropertyChanged("WizardDesign");
+                    OnPropertyChanged(nameof(WizardPhase));
+                    OnPropertyChanged(nameof(WizardPhaseTitle));
+                    //OnPropertyChanged(nameof(WizardPhaseSubTitle));
+                    //OnPropertyChanged(nameof(WizardDesign));
                 }
             }
         }
@@ -1710,7 +1710,7 @@ namespace gip.bso.manufacturing
                 if (_WizardPhaseErrorMessage != value)
                 {
                     _WizardPhaseErrorMessage = value;
-                    OnPropertyChanged("WizardPhaseErrorMessage");
+                    OnPropertyChanged(nameof(WizardPhaseErrorMessage));
                 }
             }
         }
@@ -1745,7 +1745,7 @@ namespace gip.bso.manufacturing
 
         public void OnSelectedWizardSchedulerPartslistChanged()
         {
-            OnPropertyChanged("SelectedWizardSchedulerPartslist");
+            OnPropertyChanged(nameof(SelectedWizardSchedulerPartslist));
             OnPropertyChanged("SelectedWizardSchedulerPartslist\\TargetQuantity");
             OnPropertyChanged("SelectedWizardSchedulerPartslist\\TargetQuantityUOM");
         }
@@ -1781,15 +1781,15 @@ namespace gip.bso.manufacturing
             ClearMessages();
             WizardSchedulerPartslist item = sender as WizardSchedulerPartslist;
             if (item != null)
-                if (e.PropertyName == WizardSchedulerPartslist.Const_SelectedMDSchedulingGroup)
+                if (e.PropertyName == nameof(WizardSchedulerPartslist.SelectedMDSchedulingGroup))
                 {
                     LoadConfiguration(item);
                 }
-                else if (e.PropertyName == WizardSchedulerPartslist.Const_NewTargetQuantityUOM)
+                else if (e.PropertyName == nameof(WizardSchedulerPartslist.NewTargetQuantityUOM))
                 {
                     // do nothing
                 }
-                else if (e.PropertyName == WizardSchedulerPartslist.Const_NewSyncTargetQuantityUOM)
+                else if (e.PropertyName == nameof(WizardSchedulerPartslist.NewSyncTargetQuantityUOM))
                 {
                     if (item.NewSyncTargetQuantityUOM != null)
                     {
@@ -1830,7 +1830,7 @@ namespace gip.bso.manufacturing
                             if (saveMsg != null)
                                 SendMessage(saveMsg);
                         }
-                        OnPropertyChanged("WizardSchedulerPartslistList");
+                        OnPropertyChanged(nameof(WizardSchedulerPartslistList));
                     }
                 }
         }
@@ -1869,7 +1869,7 @@ namespace gip.bso.manufacturing
                 if (_CurrentPartListExpand != value)
                 {
                     _CurrentPartListExpand = value;
-                    OnPropertyChanged("CurrentPartListExpand");
+                    OnPropertyChanged(nameof(CurrentPartListExpand));
                 }
             }
         }
@@ -1927,7 +1927,7 @@ namespace gip.bso.manufacturing
                     else
                         SelectedWizardSchedulerPartslist.BatchSuggestionMode = null;
                 }
-                OnPropertyChanged("SelectedFilterBatchplanSuggestionMode");
+                OnPropertyChanged(nameof(SelectedFilterBatchplanSuggestionMode));
             }
         }
 
@@ -2062,7 +2062,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _BatchPlanTimelineItemsRoot = value;
-                OnPropertyChanged("BatchPlanTimelineItemsRoot");
+                OnPropertyChanged(nameof(BatchPlanTimelineItemsRoot));
             }
         }
 
@@ -2080,7 +2080,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedBatchPlanTimelineItemRoot = value;
-                OnPropertyChanged("SelectedBatchPlanTimelineItemRoot");
+                OnPropertyChanged(nameof(SelectedBatchPlanTimelineItemRoot));
             }
         }
 
@@ -2099,7 +2099,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _BatchPlanTimelineItems = value;
-                OnPropertyChanged("BatchPlanTimelineItems");
+                OnPropertyChanged(nameof(BatchPlanTimelineItems));
             }
         }
 
@@ -2117,7 +2117,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedBatchPlanTimelineItem = value;
-                OnPropertyChanged("SelectedBatchPlanTimelineItem");
+                OnPropertyChanged(nameof(SelectedBatchPlanTimelineItem));
             }
         }
 
@@ -2144,7 +2144,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedMDBatchPlanGroup != value)
                 {
                     _SelectedMDBatchPlanGroup = value;
-                    OnPropertyChanged("SelectedMDBatchPlanGroup");
+                    OnPropertyChanged(nameof(SelectedMDBatchPlanGroup));
                 }
             }
         }
@@ -2201,7 +2201,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedVBUser = value;
-                OnPropertyChanged("SelectedVBUser");
+                OnPropertyChanged(nameof(SelectedVBUser));
             }
         }
 
@@ -2340,7 +2340,7 @@ namespace gip.bso.manufacturing
         {
             if (requery)
             {
-                OnPropertyChanged("ScheduleForPWNodeList");
+                OnPropertyChanged(nameof(ScheduleForPWNodeList));
                 LoadProdOrderBatchPlanList();
             }
         }
@@ -2518,7 +2518,7 @@ namespace gip.bso.manufacturing
                         RefreshServerState(SelectedTargetScheduleForPWNode.MDSchedulingGroupID);
                     }
                     SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault();
-                    OnPropertyChanged("ProdOrderBatchPlanList");
+                    OnPropertyChanged(nameof(ProdOrderBatchPlanList));
                 }
             }
         }
@@ -2744,7 +2744,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledSearch())
                 return;
-            OnPropertyChanged("ScheduleForPWNodeList");
+            OnPropertyChanged(nameof(ScheduleForPWNodeList));
             LoadProdOrderBatchPlanList();
         }
 
@@ -2763,8 +2763,6 @@ namespace gip.bso.manufacturing
         [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New, true)]
         public void New()
         {
-            if (!PreExecute("New"))
-                return;
             if (!IsEnabledNew())
                 return;
             ClearMessages();
@@ -2772,8 +2770,7 @@ namespace gip.bso.manufacturing
             WizardPhase = NewScheduledBatchWizardPhaseEnum.SelectMaterial;
             WizardForwardAction(WizardPhase);
             IsWizard = true;
-            OnPropertyChanged("CurrentLayout");
-            PostExecute("New");
+            OnPropertyChanged(nameof(CurrentLayout));
         }
 
         public bool IsEnabledNew()
@@ -2795,7 +2792,7 @@ namespace gip.bso.manufacturing
             {
                 if (_ProdOrderBatchPlanList != null)
                     _ProdOrderBatchPlanList.Remove(batchPlan);
-                OnPropertyChanged("ProdOrderBatchPlanList");
+                OnPropertyChanged(nameof(ProdOrderBatchPlanList));
                 Save();
             }
             else
@@ -2845,7 +2842,7 @@ namespace gip.bso.manufacturing
                     prodOrderBatchPlan.OnEntityPropertyChanged("ScheduledOrder");
                 }
             }
-            OnPropertyChanged("ProdOrderBatchPlanList");
+            OnPropertyChanged(nameof(ProdOrderBatchPlanList));
         }
 
         public bool IsEnabledItemDrag()
@@ -3083,7 +3080,7 @@ namespace gip.bso.manufacturing
                     batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
             }
             Save();
-            OnPropertyChanged("ProdOrderBatchPlanList");
+            OnPropertyChanged(nameof(ProdOrderBatchPlanList));
         }
 
         public bool IsEnabledSetBatchStateReadyToStart()
@@ -3107,7 +3104,7 @@ namespace gip.bso.manufacturing
                 }
             }
             Save();
-            OnPropertyChanged("ProdOrderBatchPlanList");
+            OnPropertyChanged(nameof(ProdOrderBatchPlanList));
         }
 
         public bool IsEnabledSetBatchStateCreated()
@@ -3199,8 +3196,8 @@ namespace gip.bso.manufacturing
                     SendMessage(saveMsg);
 
                 LoadProdOrderBatchPlanList();
-                OnPropertyChanged("ProdOrderBatchPlanList");
-                OnPropertyChanged("ProdOrderPartslistList");
+                OnPropertyChanged(nameof(ProdOrderBatchPlanList));
+                OnPropertyChanged(nameof(ProdOrderPartslistList));
                 if (!IsBSOTemplateScheduleParent)
                 {
                     if (groupsForRefresh.Any())
@@ -3227,8 +3224,8 @@ namespace gip.bso.manufacturing
         {
             return
                 ProdOrderBatchPlanList != null
-                && ProdOrderBatchPlanList.Any(c => 
-                                                    c.IsSelected 
+                && ProdOrderBatchPlanList.Any(c =>
+                                                    c.IsSelected
                                                     && (c.PlanState <= vd.GlobalApp.BatchPlanState.Created || c.PlanState >= vd.GlobalApp.BatchPlanState.Paused));
         }
 
@@ -3355,7 +3352,7 @@ namespace gip.bso.manufacturing
                 IsWizard = false;
                 throw ex;
             }
-            OnPropertyChanged("CurrentLayout");
+            OnPropertyChanged(nameof(CurrentLayout));
         }
 
         public bool IsEnabledAddBatchPlan()
@@ -3586,7 +3583,7 @@ namespace gip.bso.manufacturing
                             SendMessage(saveMsg);
                     }
                     WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
-                    OnPropertyChanged("WizardSchedulerPartslistList");
+                    OnPropertyChanged(nameof(WizardSchedulerPartslistList));
                     if (WizardSchedulerPartslistList != null)
                         SelectedWizardSchedulerPartslist = WizardSchedulerPartslistList.FirstOrDefault();
                 }
@@ -3676,7 +3673,7 @@ namespace gip.bso.manufacturing
                 SendMessage(msg);
             }
 
-            OnPropertyChanged("CurrentLayout");
+            OnPropertyChanged(nameof(CurrentLayout));
         }
 
         public bool IsWizardExistingBatch { get; set; }
@@ -3800,7 +3797,7 @@ namespace gip.bso.manufacturing
                         _PartListExpandList = new List<PartslistExpand>();
                         _PartListExpandList.Add(rootPartslistExpand);
                         CurrentPartListExpand = rootPartslistExpand;
-                        OnPropertyChanged("PartListExpandList");
+                        OnPropertyChanged(nameof(PartListExpandList));
                         success = true;
                         WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.BOMExplosion);
                         break;
@@ -3819,7 +3816,7 @@ namespace gip.bso.manufacturing
                                 LoadConfiguration(item);
                         success = SelectedWizardSchedulerPartslist != null;
                         var tmp = _SelectedWizardSchedulerPartslist;
-                        OnPropertyChanged("WizardSchedulerPartslistList");
+                        OnPropertyChanged(nameof(WizardSchedulerPartslistList));
                         _SelectedWizardSchedulerPartslist = tmp;
                         WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.PartslistForDefinition);
                         break;
@@ -3844,6 +3841,15 @@ namespace gip.bso.manufacturing
                         success = SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > Double.Epsilon && SelectedWizardSchedulerPartslist.BatchPlanSuggestion != null;
                         if (success)
                         {
+                            // Update prod PL TargetQuantityUOM if is changed in Define batch wizard phase
+                            if (SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null 
+                                && Math.Abs(SelectedWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.TargetQuantity - SelectedWizardSchedulerPartslist.TargetQuantityUOM) > 0.1)
+                            {
+                                Msg changeMsg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, SelectedWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist, SelectedWizardSchedulerPartslist.TargetQuantityUOM);
+                                if (changeMsg != null)
+                                    SendMessage(changeMsg);
+                            }
+
                             string programNo = SelectedWizardSchedulerPartslist.ProgramNo;
 
                             if (SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null)
@@ -3992,7 +3998,7 @@ namespace gip.bso.manufacturing
             if (success)
             {
                 IsWizard = false;
-                OnPropertyChanged("CurrentLayout");
+                OnPropertyChanged(nameof(CurrentLayout));
                 OnPostSave();
                 Search();
             }
@@ -4124,9 +4130,9 @@ namespace gip.bso.manufacturing
             ACSaveChanges();
 
             WizardClean();
-            OnPropertyChanged("CurrentLayout");
+            OnPropertyChanged(nameof(CurrentLayout));
             LoadProdOrderBatchPlanList();
-            OnPropertyChanged("SelectedProdOrderBatchPlan");
+            OnPropertyChanged(nameof(SelectedProdOrderBatchPlan));
         }
 
         public void WizardClean()
@@ -4397,12 +4403,12 @@ namespace gip.bso.manufacturing
                     && !diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.NewPWNodesDetected)
                     && !diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.PWNodesRemoved))
                 {
-                    OnPropertyChanged("SelectedScheduleForPWNode");
+                    OnPropertyChanged(nameof(SelectedScheduleForPWNode));
                 }
                 else
                 {
                     var selected = SelectedScheduleForPWNode;
-                    OnPropertyChanged("ScheduleForPWNodeList");
+                    OnPropertyChanged(nameof(ScheduleForPWNodeList));
                     SelectedScheduleForPWNode = selected;
                     if (SelectedScheduleForPWNode != null)
                         SelectedFilterBatchPlanStartMode = FilterBatchPlanStartModeList.Where(c => (BatchPlanStartModeEnum)c.Value == _SelectedScheduleForPWNode.StartMode).FirstOrDefault();
@@ -4482,13 +4488,15 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out prodOrderPartslist);
+                Msg msg = null;
+                prodOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == wizardSchedulerPartslist.Partslist.PartslistID);
+                if(prodOrderPartslist == null)
+                    msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out prodOrderPartslist);
+
                 success = msg == null || msg.IsSucceded();
 
                 if (FilterPlanningMR != null && success)
                 {
-
-
                     PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == FilterPlanningMR.PlanningMRID);
                     PlanningMRProposal proposal = PlanningMRProposal.NewACObject(DatabaseApp, planningMR);
                     proposal.ProdOrder = prodOrderPartslist.ProdOrder;
@@ -4646,7 +4654,7 @@ namespace gip.bso.manufacturing
             if (Math.Abs(LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM - targetQuantityUOM) > Double.Epsilon)
                 LocalBSOBatchPlan.SelectedIntermediate.TargetQuantityUOM = targetQuantityUOM;
 
-            LocalBSOBatchPlan.OnPropertyChanged("IsVisibleInCurrentContext");
+            LocalBSOBatchPlan.OnPropertyChanged(nameof(BSOBatchPlan.IsVisibleInCurrentContext));
         }
 
         #endregion
@@ -4974,7 +4982,7 @@ namespace gip.bso.manufacturing
                     databaseApp.MDSchedulingGroup.AddObject(group);
                 }
                 databaseApp.ACSaveChanges();
-                OnPropertyChanged("ScheduleForPWNodeList");
+                OnPropertyChanged(nameof(ScheduleForPWNodeList));
             }
         }
 
