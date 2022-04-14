@@ -1430,6 +1430,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private string _FilterDepartmentUserName;
+        /// <summary>
+        /// Selected property for 
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, "FilterDepartmentUserName", "en{'Completed'}de{'Erledigt'}")]
+        public string FilterDepartmentUserName
+        {
+            get
+            {
+                return _FilterDepartmentUserName;
+            }
+            set
+            {
+                if (_FilterDepartmentUserName != value)
+                {
+                    _FilterDepartmentUserName = value;
+                    OnPropertyChanged(nameof(FilterDepartmentUserName));
+                }
+            }
+        }
+
         #endregion
 
         #region Properties -> (Tab)ProdOrder -> ProdOrderPartslist
@@ -1463,7 +1485,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public IEnumerable<ProdOrderPartslistPlanWrapper> GetProdOrderPartslistList()
+        public virtual IEnumerable<ProdOrderPartslistPlanWrapper> GetProdOrderPartslistList()
         {
             if (SelectedScheduleForPWNode == null)
                 return new List<ProdOrderPartslistPlanWrapper>();
@@ -1487,14 +1509,15 @@ namespace gip.bso.manufacturing
                     FilterOrderEndTime,
                     (short?)minProdOrderState,
                     (short?)maxProdOrderState,
-                    FilterOnlyOnThisLine) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+                    FilterOnlyOnThisLine,
+                    FilterDepartmentUserName) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return batchQuery.Take(Const_MaxResultSize).ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine) =>
+        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName) =>
                 ctx
                 .ProdOrderPartslist
                 .Include("MDProdOrderState")
@@ -1545,6 +1568,7 @@ namespace gip.bso.manufacturing
                                     .Any()
                             ).Any())
                         )
+                    && (departmentUserName == null || c.DepartmentUserName.Contains(departmentUserName))
                 )
                 .OrderByDescending(c => c.ProdOrder.ProgramNo)
                 .Select(c => new ProdOrderPartslistPlanWrapper()
