@@ -152,6 +152,7 @@ namespace gip.bso.manufacturing
             return aCConfig;
         }
 
+
         public void LoadConfiguration(WizardSchedulerPartslist schedulerPartslist)
         {
             Partslist partslist = schedulerPartslist.Partslist;
@@ -3626,6 +3627,7 @@ namespace gip.bso.manufacturing
             WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
             if (
                     wizardSchedulerPartslist != null
+                    && wizardSchedulerPartslist.WFNodeMES != null
                     && (
                             !wizardSchedulerPartslist.IsSolved
                             ||
@@ -3834,7 +3836,7 @@ namespace gip.bso.manufacturing
                         {
                             LoadNewWizardSchedulerPartslistList();
                         }
-                        //rootPartslistExpand = null;
+                        
                         foreach (var item in AllWizardSchedulerPartslistList)
                             if (item.SelectedMDSchedulingGroup != null)
                                 LoadConfiguration(item);

@@ -4014,7 +4014,7 @@
           <Property Name="ProdUserEndDate" Type="datetime" />
           <Property Name="ProdUserEndName" Type="varchar" MaxLength="20" />
           <Property Name="DepartmentUserDate" Type="datetime" />
-          <Property Name="DepartmentUserName" Type="varchar" MaxLength="20" />
+          <Property Name="DepartmentUserName" Type="varchar" MaxLength="40" />
           <Property Name="StartDate" Type="datetime" />
           <Property Name="EndDate" Type="datetime" />
           <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
@@ -25120,7 +25120,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <Property Name="ProdUserEndDate" Type="DateTime" Precision="3" />
           <Property Name="ProdUserEndName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="DepartmentUserDate" Type="DateTime" Precision="3" />
-          <Property Name="DepartmentUserName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DepartmentUserName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="StartDate" Type="DateTime" Precision="3" />
           <Property Name="EndDate" Type="DateTime" Precision="3" />
           <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />

@@ -148,6 +148,7 @@ namespace gip.bso.manufacturing
         public List<MDSchedulingGroup> MDSchedulingGroupList { get; set; }
 
         gip.mes.datamodel.ACClassWF _WFNodeMES;
+        [ACPropertyInfo(522, "WFNodeMES", "en{'WFNodeMES'}de{'WFNodeMES'}")]
         public gip.mes.datamodel.ACClassWF WFNodeMES
         {
             get
