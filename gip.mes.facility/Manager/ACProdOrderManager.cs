@@ -898,6 +898,59 @@ namespace gip.mes.facility
             return msg;
         }
 
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, List<ProdOrderPartslist> plsForBatchGenerate)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            foreach(ProdOrderPartslist item in plsForBatchGenerate)
+            {
+                MsgWithDetails tmp = GenerateBatchPlans(databaseApp, item);
+                if(tmp != null && tmp.MsgDetails.Any())
+                    foreach(Msg msg in tmp.MsgDetails)
+                        msgWithDetails.AddDetailMessage(msg);
+            }
+            return msgWithDetails;
+        }
+
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ProdOrderPartslist plForBatchGenerate)
+        {
+            MsgWithDetails msgWithDetails = null;
+
+            ProdOrder prodOrder = plForBatchGenerate.ProdOrder;
+
+            // 1.0 make BOM - create partslists
+            double treeQuantityRatio = plForBatchGenerate.TargetQuantity / plForBatchGenerate.Partslist.TargetQuantityUOM;
+            PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist, treeQuantityRatio);
+            rootPartslistExpand.IsChecked = true;
+            rootPartslistExpand.LoadTree();
+
+            // 2.0 Extract suggestion
+            List<ExpandResult> treeResult = rootPartslistExpand.BuildTreeList();
+            treeResult =
+                treeResult
+                .Where(x =>
+                    x.Item.IsChecked
+                    && x.Item.IsEnabled)
+                .OrderByDescending(x => x.TreeVersion)
+                .ToList();
+
+            int sn = 0;
+            foreach (ExpandResult expand in treeResult)
+            {
+                sn++;
+                ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c=>c.PartslistID == expand.Item.PartslistForPosition.PartslistID);
+                if(pl == null)
+                    PartslistAdd(databaseApp, prodOrder, expand.Item.PartslistForPosition, sn, expand.Item.TargetQuantityUOM, out pl);
+                pl.Sequence = sn;
+            }
+
+            // 3.0 generate batches
+
+            // 4.0 define targets
+
+            // 5.1 If many target - select first and remind
+
+            return msgWithDetails;
+        }
         #endregion
 
         #region ProdOrder -> Batch

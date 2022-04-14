@@ -26,6 +26,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoBackwardScheduling = @"DoBackwardScheduling";
         public const string BGWorkerMehtod_DoForwardScheduling = @"DoForwardScheduling";
         public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
+        public const string BGWorkerMehtod_DoGenerateBatchPlans = @"DoGenerateBatchPlans";
         public const int Const_MaxFilterDaySpan = 10;
         public const int Const_MaxResultSize = 500;
         #endregion
@@ -3382,17 +3383,22 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledAddBatchPlan()
         {
+            return IsEnabledForBatchPlan(SelectedProdOrderPartslist);
+        }
+
+        private bool IsEnabledForBatchPlan(ProdOrderPartslistPlanWrapper plWrapper)
+        {
             return
-                !IsWizard
+                 !IsWizard
                 && SelectedScheduleForPWNode != null
-                && SelectedProdOrderPartslist != null
-                && SelectedProdOrderPartslist.ProdOrderPartslist != null
-                && SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState != null
-                && SelectedProdOrderPartslist.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
-                && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder != null
-                && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.MDProdOrderState != null
-                && SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
-                && SelectedProdOrderPartslist.UnPlannedQuantityUOM > Double.Epsilon;
+                && plWrapper != null
+                && plWrapper.ProdOrderPartslist != null
+                && plWrapper.ProdOrderPartslist.MDProdOrderState != null
+                && plWrapper.ProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
+                && plWrapper.ProdOrderPartslist.ProdOrder != null
+                && plWrapper.ProdOrderPartslist.ProdOrder.MDProdOrderState != null
+                && plWrapper.ProdOrderPartslist.ProdOrder.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
+                && plWrapper.UnPlannedQuantityUOM > Double.Epsilon;
         }
 
         [ACMethodCommand("RemoveSelectedProdorderPartslist", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start)]
@@ -3704,6 +3710,31 @@ namespace gip.bso.manufacturing
 
         public bool IsWizardExistingBatch { get; set; }
 
+
+        /// <summary>
+        /// Source Property: GenerateBatchPlans
+        /// </summary>
+        [ACMethodInfo("GenerateBatchPlans", "en{'Generate batch plans'}de{'Batchplan generieren'}", 999)]
+        public void GenerateBatchPlans()
+        {
+            if (!IsEnabledGenerateBatchPlans())
+                return;
+            if (Messages.Question(this, "Question50084", Global.MsgResult.No) == Global.MsgResult.Yes)
+            {
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public bool IsEnabledGenerateBatchPlans()
+        {
+            return
+                ProdOrderPartslistList != null
+                && ProdOrderPartslistList.Any(c => c.IsSelected)
+                && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
+        }
+
+
         #endregion
 
         #region Methods -> Wizard -> Execute
@@ -3836,7 +3867,7 @@ namespace gip.bso.manufacturing
                         {
                             LoadNewWizardSchedulerPartslistList();
                         }
-                        
+
                         foreach (var item in AllWizardSchedulerPartslistList)
                             if (item.SelectedMDSchedulingGroup != null)
                                 LoadConfiguration(item);
@@ -3868,7 +3899,7 @@ namespace gip.bso.manufacturing
                         if (success)
                         {
                             // Update prod PL TargetQuantityUOM if is changed in Define batch wizard phase
-                            if (SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null 
+                            if (SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null
                                 && Math.Abs(SelectedWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.TargetQuantity - SelectedWizardSchedulerPartslist.TargetQuantityUOM) > 0.1)
                             {
                                 Msg changeMsg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, SelectedWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist, SelectedWizardSchedulerPartslist.TargetQuantityUOM);
@@ -4516,7 +4547,7 @@ namespace gip.bso.manufacturing
             {
                 Msg msg = null;
                 prodOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == wizardSchedulerPartslist.Partslist.PartslistID);
-                if(prodOrderPartslist == null)
+                if (prodOrderPartslist == null)
                     msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out prodOrderPartslist);
 
                 success = msg == null || msg.IsSucceded();
@@ -4925,6 +4956,10 @@ namespace gip.bso.manufacturing
                     break;
                 case BGWorkerMehtod_DoCalculateAll:
                     SchedulingForecastManager.UpdateAllBatchPlanDurations(Root.Environment.User.Initials);
+                    break;
+                case BGWorkerMehtod_DoGenerateBatchPlans:
+                    List<ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
+                    ProdOrderManager.GenerateBatchPlans(plForBatchGenerate);
                     break;
             }
         }
