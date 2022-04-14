@@ -96,11 +96,13 @@ namespace gip.bso.manufacturing
             List<ProdOrderPartslistPos> components = new List<ProdOrderPartslistPos>();
             // detect batch
             ProdOrderBatchPlan batchPlan = DatabaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
-
-            // get list
-            components =
-                DatabaseApp 
+            using(DatabaseApp databaseApp = new DatabaseApp())
+            {
+                components =
+                databaseApp
                 .ProdOrderPartslistPos
+               .Include(x => x.ProdOrderPartslist)
+               .Include(x => x.ProdOrderPartslist.ProdOrder)
                .Include(x => x.Material)
                .Include(x => x.Material.BaseMDUnit)
                .Include(x => x.MDUnit)
@@ -113,12 +115,15 @@ namespace gip.bso.manufacturing
                 .OrderBy(x => x.Sequence)
                 .ToList();
 
-            double quantityIndex = batchPlan.BatchSize / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
-            foreach(ProdOrderPartslistPos pos in components)
-            {
-                pos.TargetQuantityUOM *= quantityIndex;
-                DatabaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
-            }      
+                double quantityIndex = batchPlan.BatchSize / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
+                foreach (ProdOrderPartslistPos pos in components)
+                {
+                    pos.TargetQuantityUOM *= quantityIndex;
+                    databaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
+                }
+            }
+            // get list
+            
 
             return components;
         }
