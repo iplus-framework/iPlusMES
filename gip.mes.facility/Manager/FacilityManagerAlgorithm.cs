@@ -2416,6 +2416,7 @@ namespace gip.mes.facility
                         if (facilityReservation != null 
                             && (!posForInwardPosting.BookingMaterial.IsLotManaged || posForInwardPosting.FacilityLot != null))
                         {
+                            //PerformAnterogradePosting
                             ACMethodBooking inwardMethod = NewBookParamInwardMovement(BP, BP.DatabaseApp, posForInwardPosting, anterogradeInwardQuantityUOM, facilityReservation.Facility, posForInwardPosting.FacilityLot);
                             //FacilityBooking fbInward = NewFacilityBooking(inwardMethod);
 
@@ -2436,6 +2437,12 @@ namespace gip.mes.facility
 
             }
             return Global.ACMethodResultState.Succeeded;
+        }
+
+        protected virtual ACMethodBooking OnAntergradeNewBookParamInwardMovement(ACMethodBooking BP, FacilityBookingCharge FBC, List<FacilityCharge> facilityCharges,
+            ProdOrderPartslistPos posForInwardPosting, double anterogradeInwardQuantityUOM, FacilityReservation facilityReservation)
+        {
+            return NewBookParamInwardMovement(BP, BP.DatabaseApp, posForInwardPosting, anterogradeInwardQuantityUOM, facilityReservation.Facility, posForInwardPosting.FacilityLot);
         }
 
         public virtual FacilityReservation GetNextFreeDestination(IList<FacilityReservation> plannedSilos, ProdOrderPartslistPos batchPos,
