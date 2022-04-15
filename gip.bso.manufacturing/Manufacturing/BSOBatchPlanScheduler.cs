@@ -4959,7 +4959,7 @@ namespace gip.bso.manufacturing
                     break;
                 case BGWorkerMehtod_DoGenerateBatchPlans:
                     List<ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
-                    ProdOrderManager.GenerateBatchPlans(plForBatchGenerate);
+                    ProdOrderManager.GenerateBatchPlans(DatabaseApp, plForBatchGenerate);
                     break;
             }
         }
