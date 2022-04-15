@@ -127,6 +127,29 @@ namespace gip.mes.processapplication
                         }
                     }
                 }
+                else
+                {
+                    batchEntry = pAOrderInfo.Entities.Where(c => c.EntityName == Picking.ClassName).FirstOrDefault();
+                    if (batchEntry != null)
+                    {
+                        using (DatabaseApp dbApp = new DatabaseApp())
+                        {
+                            Guid? facilityChargeID =
+                            dbApp.FacilityBookingCharge
+                                .Where(c => c.PickingPosID.HasValue
+                                            && c.PickingPos.PickingID == batchEntry.EntityID
+                                            && c.InwardFacilityChargeID.HasValue)
+                                .OrderByDescending(c => c.FacilityBookingChargeNo)
+                                .Select(c => c.InwardFacilityChargeID)
+                                .FirstOrDefault();
+                            if (facilityChargeID.HasValue)
+                            {
+                                pAOrderInfo.Entities.Remove(batchEntry);
+                                pAOrderInfo.Entities.Insert(0, new PAOrderInfoEntry(FacilityCharge.ClassName, facilityChargeID.Value));
+                            }
+                        }
+                    }
+                }
             }
             return base.OnResolveBSOForOrderInfo(pAOrderInfo);
         }
