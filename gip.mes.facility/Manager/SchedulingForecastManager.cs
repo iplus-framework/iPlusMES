@@ -92,6 +92,7 @@ namespace gip.mes.facility
                     null,
                     null,
                     null).ToList();
+                batchPlans = batchPlans.Where(c => c.IsSelected).ToList();
                 if (isBackward)
                     batchPlans = batchPlans.OrderByDescending(c => c.ScheduledOrder).ToList();
 
@@ -483,7 +484,7 @@ namespace gip.mes.facility
             {
                 foreach (var item in configStore.ConfigurationEntries)
                 {
-                    if (item.ConfigACUrl.EndsWith(propertyName))
+                    if (item.ConfigACUrl != null && item.ConfigACUrl.EndsWith(propertyName))
                     {
                         config = item;
                         break;
