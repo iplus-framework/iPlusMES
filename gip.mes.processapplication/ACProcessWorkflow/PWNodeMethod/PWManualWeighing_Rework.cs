@@ -201,8 +201,8 @@ namespace gip.mes.processapplication
                     if (ComponentsSeqTo > 0)
                         existingRelations = existingRelations.Where(c => c.Sequence <= ComponentsSeqTo);
 
-                    nextSeq = existingRelations.Max(c => c.Sequence);
-                    if (nextSeq < ComponentsSeqTo)
+                    nextSeq = CompSequenceNo <= 0 ? existingRelations.Max(x => x.Sequence) + 1 : CompSequenceNo;
+                    if (nextSeq < ComponentsSeqTo && CompSequenceNo <= 0)
                         nextSeq++;
                 }
 
@@ -382,8 +382,8 @@ namespace gip.mes.processapplication
                     var factor = batchPlan.BatchSize / poPartslist.TargetQuantity;
                     double batchQuantity = reworkQuantity * factor;
 
-                    reworkInfo.ReworkQuantityPerOrder = reworkQuantity;
-                    reworkInfo.ReworkQuantityPerBatch = batchQuantity;
+                    reworkInfo.ReworkQuantityPerOrder = Math.Round(reworkQuantity,3);
+                    reworkInfo.ReworkQuantityPerBatch = Math.Round(batchQuantity, 3);
 
                     var components = poPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialID.HasValue
                                                                                                   && c.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot);
@@ -435,7 +435,6 @@ namespace gip.mes.processapplication
             reworkInfo.IsReworkActivated = true;
             return null;
         }
-
     }
 
     [ACSerializeableInfo]

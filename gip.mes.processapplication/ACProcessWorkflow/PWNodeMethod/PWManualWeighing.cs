@@ -78,6 +78,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("ReworkQuantity", typeof(int), 0, Global.ParamOption.Optional));
             paramTranslation.Add("ReworkQuantity", "en{'Rework quantity [%]'}de{'Nachbearbeitungsmenge [%]'}");
 
+            method.ParameterValueList.Add(new ACValue("CompSequenceNo", typeof(int), (int)0, Global.ParamOption.Optional));
+            paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding into BOM'}de{'Folgenummer beim Hinzufügen in die Rezeptur'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWManualWeighing), HandleExecuteACMethod_PWManualWeighing);
@@ -518,6 +521,23 @@ namespace gip.mes.processapplication
                     var acValue = method.ParameterValueList.GetACValue("ReworkQuantity");
                     if (acValue != null)
                         return acValue.ParamAsInt32;
+                }
+                return 0;
+            }
+        }
+
+        internal int CompSequenceNo
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("CompSequenceNo");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt32;
+                    }
                 }
                 return 0;
             }
