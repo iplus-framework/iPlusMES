@@ -122,62 +122,90 @@ namespace gip.bso.manufacturing
             }
         }
 
-
+        private double? _TargetQuantity;
         [ACPropertyInfo(9, "", "en{'Target Quantity)'}de{'Sollmenge'}")]
         public double TargetQuantity
         {
             get
             {
-                if (Material == null || AltMDUnit == Material.BaseMDUnit)
-                    return TargetQuantityUOM;
-                return Material.ConvertQuantity(TargetQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                if (_TargetQuantity == null)
+                {
+                    if (Material == null || AltMDUnit == Material.BaseMDUnit)
+                        _TargetQuantity = TargetQuantityUOM;
+                    else
+                        _TargetQuantity = Material.ConvertQuantity(TargetQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                }
+                return _TargetQuantity ?? 0;
             }
         }
 
+        private double? _ActualQuantity;
         [ACPropertyInfo(10, "", "en{'Actual Quantity'}de{'Ist-Menge'}")]
         public double ActualQuantity
         {
             get
             {
-                if (Material == null || AltMDUnit == Material.BaseMDUnit)
-                    return ActualQuantityUOM;
-                return Material.ConvertQuantity(ActualQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                if (_ActualQuantity == null)
+                {
+                    if (Material == null || AltMDUnit == Material.BaseMDUnit)
+                        _ActualQuantity = ActualQuantityUOM;
+                    else
+                        _ActualQuantity = Material.ConvertQuantity(ActualQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                }
+                return _ActualQuantity ?? 0;
             }
         }
 
+        private double? _PlannedQuantity;
         [ACPropertyInfo(11, "", "en{'Planned Quantity'}de{'Verplante Menge'}")]
         public double PlannedQuantity
         {
             get
             {
-                if (Material == null || AltMDUnit == Material.BaseMDUnit)
-                    return PlannedQuantityUOM;
-                return Material.ConvertQuantity(PlannedQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                if (_PlannedQuantity == null)
+                {
+                    if (Material == null || AltMDUnit == Material.BaseMDUnit)
+                        _PlannedQuantity = PlannedQuantityUOM;
+                    else
+                        _PlannedQuantity = Material.ConvertQuantity(PlannedQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                }
+                return _PlannedQuantity ?? 0;
             }
         }
 
+        private double? _UnPlannedQuantity;
         [ACPropertyInfo(12, "", "en{'Open Planning Quantity'}de{'Offene Planmenge'}")]
         public double UnPlannedQuantity
         {
             get
             {
-                if (Material == null || AltMDUnit == Material.BaseMDUnit)
-                    return UnPlannedQuantityUOM;
-                return Material.ConvertQuantity(UnPlannedQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                if (_UnPlannedQuantity == null)
+                {
+                    if (Material == null || AltMDUnit == Material.BaseMDUnit)
+                        _UnPlannedQuantity = UnPlannedQuantityUOM;
+                    else
+                        return Material.ConvertQuantity(UnPlannedQuantityUOM, Material.BaseMDUnit, AltMDUnit);
+                }
+                return _UnPlannedQuantity ?? 0;
             }
         }
 
+        private PlanningStateEnum? _PlanningState;
         public PlanningStateEnum PlanningState
         {
             get
             {
-                if ((ActualQuantityUOM + 1) >= TargetQuantityUOM && TargetQuantityUOM > 1)
-                    return PlanningStateEnum.TargetQuantityReached;
-                else if (UnPlannedQuantityUOM <= 1)
-                    return PlanningStateEnum.Planned;
-                else if (UnPlannedQuantityUOM > 1 && PlannedQuantityUOM > 1)
-                    return PlanningStateEnum.PartiallyPlanned;
-                return PlanningStateEnum.UnPlanned;
+                if (_PlanningState == null)
+                {
+                    if ((ActualQuantityUOM + 1) >= TargetQuantityUOM && TargetQuantityUOM > 1)
+                        _PlanningState = PlanningStateEnum.TargetQuantityReached;
+                    else if (UnPlannedQuantityUOM <= 1)
+                        _PlanningState = PlanningStateEnum.Planned;
+                    else if (UnPlannedQuantityUOM > 1 && PlannedQuantityUOM > 1)
+                        _PlanningState = PlanningStateEnum.PartiallyPlanned;
+                    return PlanningStateEnum.UnPlanned;
+                }
+                return _PlanningState ?? PlanningStateEnum.UnPlanned;
             }
         }
 

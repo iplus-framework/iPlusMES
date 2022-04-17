@@ -141,64 +141,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private IACConfig GetConfig(string propertyName, Partslist partslist, core.datamodel.ACClassWF aCClassWF, vd.ACClassWF vbACClassWF)
-        {
-            int priorityLevel = 0;
-            var mandatoryConfigStores = LocalBSOBatchPlan.GetCurrentConfigStores(aCClassWF, vbACClassWF, partslist.MaterialWFID, partslist, null);
-            foreach (var item in mandatoryConfigStores)
-                item.ClearCacheOfConfigurationEntries();
-            string preValueACUrl = null; //(LocalBSOBatchPlan.CurrentPWInfo as IACConfigURL).PreValueACUrl
-            string localConfigACUrl = aCClassWF.ConfigACUrl + @"\" + ACStateConst.SMStarting.ToString() + @"\" + propertyName;
-            IACConfig aCConfig = LocalBSOBatchPlan.VarioConfigManager.GetConfiguration(mandatoryConfigStores, preValueACUrl, localConfigACUrl, null, out priorityLevel);
-            return aCConfig;
-        }
-
-
-        public void LoadConfiguration(WizardSchedulerPartslist schedulerPartslist)
-        {
-            Partslist partslist = schedulerPartslist.Partslist;
-            core.datamodel.ACClassWF aCClassWF = schedulerPartslist.WFNode;
-            if (aCClassWF == null)
-                return;
-            vd.ACClassWF vbACClassWF = schedulerPartslist.WFNodeMES;
-
-            IACConfig batchSizeMin = GetConfig("BatchSizeMin", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSizeMax = GetConfig("BatchSizeMax", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSizeStandard = GetConfig("BatchSizeStandard", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchPlanMode = GetConfig("PlanMode", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSuggestionMode = GetConfig("BatchSuggestionMode", partslist, aCClassWF, vbACClassWF);
-            IACConfig durationSecAVG = GetConfig("DurationSecAVG", partslist, aCClassWF, vbACClassWF);
-            IACConfig startOffsetSecAVG = GetConfig("StartOffsetSecAVG", partslist, aCClassWF, vbACClassWF);
-            IACConfig offsetToEndTime = GetConfig("OffsetToEndTime", partslist, aCClassWF, vbACClassWF);
-
-            if (batchSizeMin != null && batchSizeMin.Value != null)
-                schedulerPartslist.BatchSizeMinUOM = (double)batchSizeMin.Value;
-
-            if (batchSizeMax != null && batchSizeMax.Value != null)
-                schedulerPartslist.BatchSizeMaxUOM = (double)batchSizeMax.Value;
-
-            if (batchSizeStandard != null && batchSizeStandard.Value != null)
-                schedulerPartslist.BatchSizeStandardUOM = (double)batchSizeStandard.Value;
-
-            if (batchPlanMode != null && batchPlanMode.Value != null)
-            {
-                schedulerPartslist.PlanMode = (BatchPlanMode)batchPlanMode.Value;
-                schedulerPartslist.PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)schedulerPartslist.PlanMode).ACCaption;
-            }
-
-            if (batchSuggestionMode != null && batchSuggestionMode.Value != null)
-                schedulerPartslist.BatchSuggestionMode = (BatchSuggestionCommandModeEnum)batchSuggestionMode.Value;
-
-            if (durationSecAVG != null)
-                schedulerPartslist.DurationSecAVG = (int)durationSecAVG.Value;
-
-            if (startOffsetSecAVG != null)
-                schedulerPartslist.StartOffsetSecAVG = (int)startOffsetSecAVG.Value;
-
-            if (offsetToEndTime != null)
-                schedulerPartslist.OffsetToEndTime = (TimeSpan)offsetToEndTime.Value;
-            schedulerPartslist.SelectFirstConversionUnit();
-        }
 
         private TimeSpan? GetExpectedBatchEndTime(WizardSchedulerPartslist wizardSchedulerPartslist)
         {
@@ -1527,8 +1469,8 @@ namespace gip.bso.manufacturing
                 .Include("Partslist")
                 .Include("Partslist.Material")
                 .Include("Partslist.Material.BaseMDUnit")
-                .Include("Partslist.Material.MaterialUnit_Material")
-                .Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
+                //.Include("Partslist.Material.MaterialUnit_Material")
+                //.Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
                 .Where(c =>
                         (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
                         && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
@@ -1809,7 +1751,7 @@ namespace gip.bso.manufacturing
             if (item != null)
                 if (e.PropertyName == nameof(WizardSchedulerPartslist.SelectedMDSchedulingGroup))
                 {
-                    LoadConfiguration(item);
+                    item.LoadConfiguration();
                 }
                 else if (e.PropertyName == nameof(WizardSchedulerPartslist.NewTargetQuantityUOM))
                 {
@@ -2602,11 +2544,13 @@ namespace gip.bso.manufacturing
         {
             double totalSize = moveBatchCount * prodOrderBatchPlan.BatchSize;
             int sn = 1;
-            WizardSchedulerPartslist wizardSchedulerPartslist = GetWizardSchedulerPartslist(prodOrderBatchPlan.ProdOrderPartslist.Partslist, totalSize, sn, new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
+            WizardSchedulerPartslist wizardSchedulerPartslist = new WizardSchedulerPartslist(
+                DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
+                prodOrderBatchPlan.ProdOrderPartslist.Partslist, totalSize, sn, new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
             wizardSchedulerPartslist.MDProdOrderState = prodOrderBatchPlan.ProdOrderPartslist.MDProdOrderState;
             wizardSchedulerPartslist.ProdOrderPartslistPos = prodOrderBatchPlan.ProdOrderPartslistPos;
             if (wizardSchedulerPartslist.SelectedMDSchedulingGroup != null)
-                LoadConfiguration(wizardSchedulerPartslist);
+                wizardSchedulerPartslist.LoadConfiguration();
             wizardSchedulerPartslist.BatchPlanSuggestion =
                new BatchPlanSuggestion(wizardSchedulerPartslist)
                {
@@ -2624,9 +2568,11 @@ namespace gip.bso.manufacturing
         private void CreateNewBatchWithSize(ProdOrderBatchPlan prodOrderBatchPlan, double moveQuantity, PAScheduleForPWNode selectedTargetScheduleForPWNode, out List<vd.ProdOrderBatchPlan> generatedBatchPlans)
         {
             int sn = 1;
-            WizardSchedulerPartslist wizardSchedulerPartslist = GetWizardSchedulerPartslist(prodOrderBatchPlan.ProdOrderPartslist.Partslist, moveQuantity, sn, new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
+            WizardSchedulerPartslist wizardSchedulerPartslist = new WizardSchedulerPartslist(
+                DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
+                prodOrderBatchPlan.ProdOrderPartslist.Partslist, moveQuantity, sn, new List<MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
             if (wizardSchedulerPartslist.SelectedMDSchedulingGroup != null)
-                LoadConfiguration(wizardSchedulerPartslist);
+                wizardSchedulerPartslist.LoadConfiguration();
 
             wizardSchedulerPartslist.BatchPlanSuggestion =
                 new BatchPlanSuggestion(wizardSchedulerPartslist)
@@ -2693,9 +2639,11 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                WizardSchedulerPartslist tmpWizardPl = GetWizardSchedulerPartslist(partslist, moveQuantity, 1, new List<MDSchedulingGroup>() { SelectedTargetScheduleForPWNode.MDSchedulingGroup });
+                WizardSchedulerPartslist tmpWizardPl =
+                    new WizardSchedulerPartslist(DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
+                        partslist, moveQuantity, 1, new List<MDSchedulingGroup>() { SelectedTargetScheduleForPWNode.MDSchedulingGroup });
                 if (tmpWizardPl.SelectedMDSchedulingGroup != null)
-                    LoadConfiguration(tmpWizardPl);
+                    tmpWizardPl.LoadConfiguration();
                 if (tmpWizardPl.BatchSizeMin > 0)
                 {
                     if (moveQuantity < tmpWizardPl.BatchSizeMin)
@@ -3459,7 +3407,7 @@ namespace gip.bso.manufacturing
                     batchPlan2Remove.DeleteACObject(this.DatabaseApp, true);
                     partslist.ProdOrderBatchPlan_ProdOrderPartslist.Remove(batchPlan2Remove);
                 }
-                if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any() && string.IsNullOrEmpty(partslist.ProdOrder.KeyOfExtSys))
+                if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
                     RemovePartslist(partslist, mDProdOrderStateCancelled, mDProdOrderStateCompleted);
                 else if (!IsBSOTemplateScheduleParent)
                 {
@@ -3870,7 +3818,7 @@ namespace gip.bso.manufacturing
 
                         foreach (var item in AllWizardSchedulerPartslistList)
                             if (item.SelectedMDSchedulingGroup != null)
-                                LoadConfiguration(item);
+                                item.LoadConfiguration();
                         success = SelectedWizardSchedulerPartslist != null;
                         var tmp = _SelectedWizardSchedulerPartslist;
                         OnPropertyChanged(nameof(WizardSchedulerPartslistList));
@@ -3961,31 +3909,14 @@ namespace gip.bso.manufacturing
             {
                 sn++;
                 List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(expand.Item.PartslistForPosition);
-                WizardSchedulerPartslist wizardSchedulerPartslist = GetWizardSchedulerPartslist(expand.Item.PartslistForPosition, expand.Item.TargetQuantityUOM, sn, schedulingGroups);
+                WizardSchedulerPartslist wizardSchedulerPartslist = new WizardSchedulerPartslist(
+                    DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
+                    expand.Item.PartslistForPosition, expand.Item.TargetQuantityUOM, sn, schedulingGroups);
                 wizardSchedulerPartslists.Add(wizardSchedulerPartslist);
             }
             return wizardSchedulerPartslists;
         }
 
-        private WizardSchedulerPartslist GetWizardSchedulerPartslist(Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups)
-        {
-            WizardSchedulerPartslist item = new WizardSchedulerPartslist(DatabaseApp, ProdOrderManager);
-            item.Partslist = partslist;
-            item.PartslistNo = partslist.PartslistNo;
-            item.PartslistName = partslist.PartslistName;
-            item.SelectFirstConversionUnit();
-            item.Sn = sn;
-            if (targetQuantityUOM > Double.Epsilon)
-            {
-                item.TargetQuantityUOM = targetQuantityUOM;
-                if (partslist.MDUnitID.HasValue && partslist.Material.BaseMDUnitID != partslist.MDUnitID)
-                    item.TargetQuantity = partslist.Material.ConvertQuantity(item.TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
-            }
-            item.MDSchedulingGroupList = schedulingGroups;
-            item.SelectedMDSchedulingGroup = item.MDSchedulingGroupList.FirstOrDefault();
-            item.ProductionUnitsUOM = partslist.ProductionUnits;
-            return item;
-        }
 
         private List<MDSchedulingGroup> GetSchedulingGroups(Partslist partslist)
         {
@@ -4120,33 +4051,17 @@ namespace gip.bso.manufacturing
         {
             AllWizardSchedulerPartslistList = new List<WizardSchedulerPartslist>();
             List<ProdOrderPartslist> partslists = SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
-            foreach (ProdOrderPartslist partslist in partslists)
+            foreach (ProdOrderPartslist prodOrderPartslist in partslists)
             {
-                List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(partslist.Partslist);
-                WizardSchedulerPartslist item = GetWizardSchedulerPartslist(partslist.Partslist, partslist.TargetQuantity, partslist.Sequence, schedulingGroups);
-                item.ProgramNo = partslist.ProdOrder.ProgramNo;
-                item.MDProdOrderState = partslist.MDProdOrderState;
-                vd.ACClassWF tempACClassWFItem = item.WFNodeMES;
-                ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(partslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
-                // Read selected MDSchedulingGroup
-                if (finalMix != null && finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
-                {
-                    ProdOrderBatchPlan bp = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
-                    MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
-                    vd.ACClassWF vbACClassWf = bp.VBiACClassWF;
-                    vd.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
-                    if (mDSchedulingGroup != null)
-                        item.SelectedMDSchedulingGroup = mDSchedulingGroup;
-                    item.SelectedBatchPlanGroup = gr;
-                }
+                List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(prodOrderPartslist.Partslist);
+                WizardSchedulerPartslist item = new WizardSchedulerPartslist(
+                    DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
+                    prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups,
+                    prodOrderPartslist);
 
-                item.ProdOrderPartslistPos = finalMix;
-                if (finalMix.MDUnit == null)
-                    item.SelectedUnitConvert = null;
-                else
-                    item.SelectedUnitConvert = finalMix.MDUnit;
+
                 AddWizardSchedulerPartslistList(item);
-                if (SelectedProdOrderBatchPlan.ProdOrderPartslistID == partslist.ProdOrderPartslistID)
+                if (SelectedProdOrderBatchPlan.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
                     SelectedWizardSchedulerPartslist = item;
             }
             DefaultWizardSchedulerPartslist = AllWizardSchedulerPartslistList.LastOrDefault();
@@ -4170,7 +4085,9 @@ namespace gip.bso.manufacturing
         public void WizardDefineDefaultPartslist(MDSchedulingGroup schedulingGroup, Partslist partslist, double targetQuantity)
         {
             List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(partslist);
-            DefaultWizardSchedulerPartslist = GetWizardSchedulerPartslist(partslist, targetQuantity, 1, schedulingGroups);
+            DefaultWizardSchedulerPartslist = new WizardSchedulerPartslist(
+                DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
+                partslist, targetQuantity, 1, schedulingGroups);
             DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup = schedulingGroup;
             AllWizardSchedulerPartslistList.Clear();
             AddWizardSchedulerPartslistList(DefaultWizardSchedulerPartslist);
@@ -4581,6 +4498,7 @@ namespace gip.bso.manufacturing
                         .Select(c => c.MaxScheduledOrder)
                         .DefaultIfEmpty()
                         .Max();
+
                 foreach (var item in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
                 {
                     nr++;
@@ -4640,7 +4558,7 @@ namespace gip.bso.manufacturing
                 schedulingOrder++;
             }
 
-            schedulingOrder = existingMinIndex;
+            // schedulingOrder = existingMinIndex;
 
             foreach (BatchPlanSuggestionItem suggestionItem in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
             {
@@ -4748,7 +4666,7 @@ namespace gip.bso.manufacturing
                         partslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(c => c.OrderLog_ProdOrderPartslistPos).Any()
                         || partslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos).SelectMany(c => c.OrderLog_ProdOrderPartslistPosRelation).Any();
 
-                if (hasAnyPostings || hasOrderLog)
+                if (hasAnyPostings || hasOrderLog || !string.IsNullOrEmpty(partslist.ProdOrder.KeyOfExtSys))
                     partslist.MDProdOrderState = mDProdOrderStateCancelled;
                 else
                 {

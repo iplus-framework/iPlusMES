@@ -12,16 +12,9 @@ using System.Linq;
 namespace gip.bso.manufacturing
 {
 
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'SchedulerPartslist'}de{'SchedulerPartslist.'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'WizardSchedulerPartslist'}de{'WizardSchedulerPartslist'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class WizardSchedulerPartslist : INotifyPropertyChanged
     {
-
-        #region const
-        public const string Const_SelectedMDSchedulingGroup = @"SelectedMDSchedulingGroup";
-        public const string Const_TargetQuantityUOM = @"TargetQuantityUOM";
-        public const string Const_NewTargetQuantityUOM = @"NewTargetQuantityUOM";
-        public const string Const_NewSyncTargetQuantityUOM = @"NewSyncTargetQuantityUOM";
-        #endregion
 
         #region event
 
@@ -33,26 +26,73 @@ namespace gip.bso.manufacturing
 
         public DatabaseApp DatabaseApp { get; private set; }
         public ACProdOrderManager ProdOrderManager { get; private set; }
-
+        public ConfigManagerIPlus VarioConfigManager { get; private set; }
         #endregion
 
 
         #region ctor's
-        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager)
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager)
         {
             DatabaseApp = databaseApp;
             ProdOrderManager = prodOrderManager;
+            VarioConfigManager = configManager;
+        }
+
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager,
+            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups) : this(databaseApp, prodOrderManager, configManager)
+        {
+            Partslist = partslist;
+            PartslistNo = partslist.PartslistNo;
+            PartslistName = partslist.PartslistName;
+            SelectFirstConversionUnit();
+            Sn = sn;
+            if (targetQuantityUOM > Double.Epsilon)
+            {
+                TargetQuantityUOM = targetQuantityUOM;
+                if (partslist.MDUnitID.HasValue && partslist.Material.BaseMDUnitID != partslist.MDUnitID)
+                    TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
+            }
+            MDSchedulingGroupList = schedulingGroups;
+            SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
+            ProductionUnitsUOM = partslist.ProductionUnits;
+        }
+
+        public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager,
+            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups,
+            ProdOrderPartslist prodOrderPartslist) : this(databaseApp, prodOrderManager, configManager, partslist, targetQuantityUOM, sn, schedulingGroups)
+        {
+            ProgramNo = prodOrderPartslist.ProdOrder.ProgramNo;
+            MDProdOrderState = prodOrderPartslist.MDProdOrderState;
+            gip.mes.datamodel.ACClassWF tempACClassWFItem = WFNodeMES;
+            ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
+            // Read selected MDSchedulingGroup
+            if (finalMix != null && finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
+            {
+                ProdOrderBatchPlan bp = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
+                MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
+                gip.mes.datamodel.ACClassWF vbACClassWf = bp.VBiACClassWF;
+                gip.mes.datamodel.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
+                if (mDSchedulingGroup != null)
+                    SelectedMDSchedulingGroup = mDSchedulingGroup;
+                SelectedBatchPlanGroup = gr;
+            }
+
+            ProdOrderPartslistPos = finalMix;
+            if (finalMix.MDUnit == null)
+                SelectedUnitConvert = null;
+            else
+                SelectedUnitConvert = finalMix.MDUnit;
         }
         #endregion
 
-        #region Properties
+            #region Properties
 
-        #region Properties -> Not marked (private)
+            #region Properties -> Not marked (private)
 
         public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
         private Partslist _Partslist;
-        [ACPropertyInfo(519, "BatchPlanSuggestion" , "en{'BOM'}de{'Stückliste.'}")]
+        [ACPropertyInfo(519, "BatchPlanSuggestion", "en{'BOM'}de{'Stückliste.'}")]
         public Partslist Partslist
         {
             get
@@ -155,7 +195,7 @@ namespace gip.bso.manufacturing
             {
                 if (_WFNodeMES != null)
                     return _WFNodeMES;
-                if (   this.Partslist == null
+                if (this.Partslist == null
                     || SelectedMDSchedulingGroup == null)
                     return null;
                 PartslistACClassMethod method = this.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
@@ -397,7 +437,7 @@ namespace gip.bso.manufacturing
                 _NewSyncTargetQuantityUOM = CorrectQuantityWithProductionUnits(value.Value);
             else
                 _NewSyncTargetQuantityUOM = null;
-            
+
             if (raisePropChanged)
                 OnPropertyChanged("NewSyncTargetQuantityUOM");
             _NewSyncTargetQuantity = ConvertQuantity(_NewSyncTargetQuantityUOM.HasValue ? _NewSyncTargetQuantityUOM.Value : 0.0, false);
@@ -477,7 +517,7 @@ namespace gip.bso.manufacturing
 
         public double CorrectQuantityWithProductionUnits(double valueUOM)
         {
-            if (   !ProductionUnitsUOM.HasValue 
+            if (!ProductionUnitsUOM.HasValue
                 || ProductionUnitsUOM.Value < 0.000001
                 || valueUOM < 0.000001)
                 return valueUOM;
@@ -697,7 +737,7 @@ namespace gip.bso.manufacturing
             int nr = 0;
             foreach (ProdOrderBatchPlan batchPlan in ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
             {
-                if (   this.WFNodeMES == null 
+                if (this.WFNodeMES == null
                     || batchPlan.VBiACClassWFID != this.WFNodeMES.ACClassWFID)
                     continue;
                 nr++;
@@ -784,6 +824,79 @@ namespace gip.bso.manufacturing
             gip.mes.datamodel.ACClassWF vbACClassWF = WFNodeMES;
             var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(vbACClassWF, Partslist.MaterialWFID);
             return ProdOrderManager.GetCalculatedBatchPlanDuration(DatabaseApp, materialWFConnection.MaterialWFACClassMethodID, vbACClassWF.ACClassWFID);
+        }
+
+        public void LoadConfiguration()
+        {
+            Partslist partslist = Partslist;
+            core.datamodel.ACClassWF aCClassWF = WFNode;
+            if (aCClassWF == null)
+                return;
+            gip.mes.datamodel.ACClassWF vbACClassWF = WFNodeMES;
+
+            IACConfig batchSizeMin = GetConfig("BatchSizeMin", partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSizeMax = GetConfig("BatchSizeMax", partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSizeStandard = GetConfig("BatchSizeStandard", partslist, aCClassWF, vbACClassWF);
+            IACConfig batchPlanMode = GetConfig("PlanMode", partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSuggestionMode = GetConfig("BatchSuggestionMode", partslist, aCClassWF, vbACClassWF);
+            IACConfig durationSecAVG = GetConfig("DurationSecAVG", partslist, aCClassWF, vbACClassWF);
+            IACConfig startOffsetSecAVG = GetConfig("StartOffsetSecAVG", partslist, aCClassWF, vbACClassWF);
+            IACConfig offsetToEndTime = GetConfig("OffsetToEndTime", partslist, aCClassWF, vbACClassWF);
+
+            if (batchSizeMin != null && batchSizeMin.Value != null)
+                BatchSizeMinUOM = (double)batchSizeMin.Value;
+
+            if (batchSizeMax != null && batchSizeMax.Value != null)
+                BatchSizeMaxUOM = (double)batchSizeMax.Value;
+
+            if (batchSizeStandard != null && batchSizeStandard.Value != null)
+                BatchSizeStandardUOM = (double)batchSizeStandard.Value;
+
+            if (batchPlanMode != null && batchPlanMode.Value != null)
+            {
+                PlanMode = (BatchPlanMode)batchPlanMode.Value;
+                PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)PlanMode).ACCaption;
+            }
+
+            if (batchSuggestionMode != null && batchSuggestionMode.Value != null)
+                BatchSuggestionMode = (BatchSuggestionCommandModeEnum)batchSuggestionMode.Value;
+
+            if (durationSecAVG != null)
+                DurationSecAVG = (int)durationSecAVG.Value;
+
+            if (startOffsetSecAVG != null)
+                StartOffsetSecAVG = (int)startOffsetSecAVG.Value;
+
+            if (offsetToEndTime != null)
+                OffsetToEndTime = (TimeSpan)offsetToEndTime.Value;
+            SelectFirstConversionUnit();
+        }
+
+        public List<IACConfigStore> GetCurrentConfigStores()
+        {
+            List<IACConfigStore> configStores = new List<IACConfigStore>();
+            if (Partslist != null)
+            {
+                configStores.Add(Partslist);
+                MaterialWFConnection matWFConnection = ProdOrderManager.GetMaterialWFConnection(WFNodeMES, Partslist.MaterialWFID);
+                configStores.Add(matWFConnection.MaterialWFACClassMethod);
+                configStores.Add(WFNode.ACClassMethod);
+                if (WFNode.RefPAACClassMethod != null)
+                    configStores.Add(WFNode.RefPAACClassMethod);
+            }
+            return configStores;
+        }
+
+        private IACConfig GetConfig(string propertyName, Partslist partslist, core.datamodel.ACClassWF aCClassWF, gip.mes.datamodel.ACClassWF vbACClassWF)
+        {
+            int priorityLevel = 0;
+            List<IACConfigStore> mandatoryConfigStores = GetCurrentConfigStores();
+            foreach (var item in mandatoryConfigStores)
+                item.ClearCacheOfConfigurationEntries();
+            string preValueACUrl = null; //(LocalBSOBatchPlan.CurrentPWInfo as IACConfigURL).PreValueACUrl
+            string localConfigACUrl = aCClassWF.ConfigACUrl + @"\" + ACStateConst.SMStarting.ToString() + @"\" + propertyName;
+            IACConfig aCConfig = VarioConfigManager.GetConfiguration(mandatoryConfigStores, preValueACUrl, localConfigACUrl, null, out priorityLevel);
+            return aCConfig;
         }
 
         #endregion
