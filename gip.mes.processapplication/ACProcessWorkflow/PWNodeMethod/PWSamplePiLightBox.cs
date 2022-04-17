@@ -60,6 +60,17 @@ namespace gip.mes.processapplication
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
 
+        public override bool ACPostInit()
+        {
+            if (    Root != null
+                && !Root.Initialized
+                && ParentPWGroup != null)
+            {
+                ParentPWGroup.ProcessModuleChanged += ParentPWGroup_ProcessModuleChanged;
+            }
+            return base.ACPostInit();
+        }
+
         #endregion
 
         #region Public
@@ -184,22 +195,107 @@ namespace gip.mes.processapplication
                 ParentPWGroup.ProcessModuleChanged -= ParentPWGroup_ProcessModuleChanged;
                 return;
             }
-            HandleProcessModuleMapping(e.Module, e.Removed);
+            try
+            {
+                HandleProcessModuleMapping(e.Module, e.Removed);
+            }
+            catch (Exception ex)
+            {
+                Messages.LogException(this.GetACUrl(), "ParentPWGroup_ProcessModuleChanged", ex);
+            }
         }
 
-        private void HandleProcessModuleMapping(PAProcessModule paModule, bool removed)
-        { 
+        private class Nodes2Stop
+        {
+            public Nodes2Stop(PWSamplePiLightBox node)
+            {
+                Node = node;
+            }
+
+            public PWSamplePiLightBox Node { get; private set; }
+
+            private List<PAESamplePiLightBox> _Boxes = new List<PAESamplePiLightBox>();
+            public List<PAESamplePiLightBox> Boxes
+            {
+                get
+                {
+                    return _Boxes;
+                }
+            }
+        }
+
+        private void HandleProcessModuleMapping(PAProcessModule paModule, bool pmReleased)
+        {
+            bool occupyPM = !pmReleased;
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
                 return;
             List<PAESamplePiLightBox> boxes = paModule.FindChildComponents<PAESamplePiLightBox>();
-            if (boxes == null || !boxes.Any())
+            if (boxes == null
+                || !boxes.Any()
+                || !boxes.Where(c => c.IsEnabledGetValues()).Any())
                 return;
 
+            List<Nodes2Stop> otherActiveNodesToStop = new List<Nodes2Stop>();
+            List<PAESamplePiLightBox> boxesToStopMyself = new List<PAESamplePiLightBox>();
+            List<PAESamplePiLightBox> boxesToStartMyself = new List<PAESamplePiLightBox>();
+            foreach (PAESamplePiLightBox lightBox in boxes)
+            {
+                // If other workflow has this Box in usage
+                if (!String.IsNullOrEmpty(lightBox.PWSampleNode)
+                    && lightBox.PWSampleNode != this.GetACUrl())
+                {
+                    if (occupyPM)
+                    {
+                        PWSamplePiLightBox otherNode = ACUrlCommand(lightBox.PWSampleNode) as PWSamplePiLightBox;
+                        if (otherNode != null)
+                        {
+                            Nodes2Stop nodeToStop = otherActiveNodesToStop.FirstOrDefault(c => c.Node == otherNode);
+                            if (nodeToStop == null)
+                            {
+                                nodeToStop = new Nodes2Stop(otherNode);
+                                otherActiveNodesToStop.Add(nodeToStop);
+                            }
+                            nodeToStop.Boxes.Add(lightBox);
+                        }
+                        boxesToStartMyself.Add(lightBox);
+                    }
+                    else
+                    {
+                        // Do nothing, because already unsubscribed through a another node that has occupied process module
+                    }
+                }
+                // This box is occupied from me
+                else
+                {
+                    if (pmReleased)
+                        boxesToStopMyself.Add(lightBox);
+                    else
+                        boxesToStartMyself.Add(lightBox);
+                }
+            }
+
+            foreach (Nodes2Stop nodeToStop in otherActiveNodesToStop)
+            {
+                nodeToStop.Node.StartAndStopLightBoxes(false, nodeToStop.Boxes);
+            }
+            if (boxesToStopMyself.Any())
+                StartAndStopLightBoxes(false, boxesToStopMyself);
+            if (boxesToStartMyself.Any())
+                StartAndStopLightBoxes(true, boxesToStartMyself);
+        }
+
+        internal virtual void StartAndStopLightBoxes(bool startOrder, List<PAESamplePiLightBox> boxes)
+        {
+            bool stopOrder = !startOrder;
+            PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
+            if (pwMethodProduction == null)
+                return;
             if (   ParentPWGroup.TimeInfo.ValueT.ActualTimes == null
                 || ParentPWGroup.TimeInfo.ValueT.ActualTimes.IsNull
                 || !ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.HasValue)
                 return;
+
             DateTime startTimeFrom = ParentPWGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue.Value;
 
             double tolPlus = 0;
@@ -219,7 +315,11 @@ namespace gip.mes.processapplication
                     out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
                 if (!posFound)
                     return;
-                Material material = intermediatePosition.BookingMaterial;
+                Material material = null;
+                if (endBatchPos != null)
+                    material = endBatchPos.BookingMaterial;
+                if (material == null)
+                    material = intermediatePosition.BookingMaterial;
                 if (material == null)
                 {
                     // TODO Error:
@@ -248,9 +348,10 @@ namespace gip.mes.processapplication
             var labOrderManager = LabOrderManager;
             if (labOrderManager == null)
                 return;
+
             this.ApplicationManager.ApplicationQueue.Add(() =>
             {
-                if (removed)
+                if (stopOrder)
                 {
                     using (var dbIPlus = new Database())
                     using (var dbApp = new DatabaseApp(dbIPlus))
@@ -299,7 +400,7 @@ namespace gip.mes.processapplication
                 {
                     foreach (PAESamplePiLightBox box in boxes)
                     {
-                        if (!box.SetParamsAndStartOrder(setPoint, tolPlus, tolMinus))
+                        if (!box.SetParamsAndStartOrder(setPoint, tolPlus, tolMinus, this.GetACUrl()))
                         {
                             // TODO: Error
                         }
@@ -308,12 +409,38 @@ namespace gip.mes.processapplication
             });
         }
 
+        public void ReadLogsAndStopFromLightBoxes()
+        {
+        }
+
         private void AddAlarm(Msg msg, bool autoAck)
         {
             OnNewAlarmOccurred(ProcessAlarm, msg, autoAck);
             ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
             if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                 Messages.LogMessageMsg(msg);
+        }
+
+
+        [ACMethodInteraction("", "en{'Reactivate orders on light box'}de{'Aufträge auf Ampelbox reaktivieren'}", 650, true)]
+        public void ReactivateOrderOnBox()
+        {
+            if (!IsEnabledReactivateOrderOnBox())
+                return;
+            HandleProcessModuleMapping(ParentPWGroup.AccessedProcessModule, false);
+        }
+
+        public bool IsEnabledReactivateOrderOnBox()
+        {
+            if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null)
+                return false;
+            PAProcessModule paModule = ParentPWGroup.AccessedProcessModule;
+            List<PAESamplePiLightBox> boxes = paModule.FindChildComponents<PAESamplePiLightBox>();
+            if (    boxes == null
+                || !boxes.Any()
+                || !boxes.Where(c => c.IsEnabledGetValues()).Any())
+                return false;
+            return true;
         }
 
 
@@ -331,6 +458,21 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Protected
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(ReactivateOrderOnBox):
+                    ReactivateOrderOnBox();
+                    return true;
+                case nameof(IsEnabledReactivateOrderOnBox):
+                    result = IsEnabledReactivateOrderOnBox();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
 
         protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
         {

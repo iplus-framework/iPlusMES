@@ -147,6 +147,22 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(208, "Values", "en{'Average-State'}de{'Mittelwert-Status'}", "", false, true)]
         public IACContainerTNet<short> AverageState { get; set; }
 
+
+        private string _PWSampleNode;
+        [ACPropertyInfo(true, 201, "", "en{'Actual Workflownode'}de{'Aktueller Workflowknoten'}", "", false)]
+        public string PWSampleNode
+        {
+            get
+            {
+                return _PWSampleNode;
+            }
+            set
+            {
+                _PWSampleNode = value;
+                OnPropertyChanged("PWSampleNode");
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -160,7 +176,7 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "en{'Send paramas an start order'}de{'Sende Parameter und starte Auftrag'}", 200)]
-        public bool SetParamsAndStartOrder(double setPoint, double tolPlus, double tolMinus)
+        public bool SetParamsAndStartOrder(double setPoint, double tolPlus, double tolMinus, string pwSampleNode)
         {
             if (!IsEnabledStartOrder())
                 return false;
@@ -174,7 +190,10 @@ namespace gip.mes.processapplication
             SetPoint.ValueT = setPoint;
             TolPlus.ValueT = tolPlus;
             TolMinus.ValueT = tolMinus;
-            return StartOrder();
+            bool started = StartOrder();
+            if (started)
+                PWSampleNode = pwSampleNode;
+            return started;
         }
 
         [ACMethodCommand("", "en{'Start order'}de{'Auftrag starten'}", 201, true)]
@@ -220,6 +239,7 @@ namespace gip.mes.processapplication
             if (!response.Suceeded)
                 return false;
             IsRecording.ValueT = false;
+            PWSampleNode = null;
             return true;
         }
 
@@ -456,7 +476,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(SetParamsAndStartOrder):
-                    result = SetParamsAndStartOrder((double)acParameter[0], (double)acParameter[1], (double)acParameter[2]);
+                    result = SetParamsAndStartOrder((double)acParameter[0], (double)acParameter[1], (double)acParameter[2], (string)acParameter[3]);
                     return true;
                 case nameof(StartOrder):
                     result = StartOrder();
