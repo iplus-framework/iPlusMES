@@ -891,7 +891,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledDelete()
         {
-            return SelectedProdOrder != null && string.IsNullOrEmpty(SelectedProdOrder.KeyOfExtSys);
+            return SelectedProdOrder != null;
         }
 
         /// <summary>
@@ -1425,7 +1425,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledDeleteProdOrderPartslist()
         {
-            return SelectedProdOrderPartslist != null && string.IsNullOrEmpty(SelectedProdOrderPartslist.ProdOrder.KeyOfExtSys);
+            return SelectedProdOrderPartslist != null;
         }
 
         #endregion
