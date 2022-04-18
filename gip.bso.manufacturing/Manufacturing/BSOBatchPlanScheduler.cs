@@ -1481,12 +1481,12 @@ namespace gip.bso.manufacturing
                         && (
                             filterStartTime == null
                             ||
-                            c.InsertDate >= filterStartTime
+                            c.StartDate >= filterStartTime
                         )
                         && (
                             filterEndTime == null
                             ||
-                            c.InsertDate < filterEndTime
+                            c.StartDate < filterEndTime
                         )
 
                         &&
