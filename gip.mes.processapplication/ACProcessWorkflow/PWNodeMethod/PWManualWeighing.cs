@@ -2557,6 +2557,10 @@ namespace gip.mes.processapplication
                                         msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge, false, scaleOtherComp, targetQuantity);
                                         _ScaleComp = false;
                                     }
+                                    else if (isWeighingInTol)
+                                    {
+                                        SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
+                                    }
 
                                     if (isComponentConsumed)
                                     {
