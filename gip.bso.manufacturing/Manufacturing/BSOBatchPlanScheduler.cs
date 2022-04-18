@@ -1747,6 +1747,7 @@ namespace gip.bso.manufacturing
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             ClearMessages();
+            
             WizardSchedulerPartslist item = sender as WizardSchedulerPartslist;
             if (item != null)
                 if (e.PropertyName == nameof(WizardSchedulerPartslist.SelectedMDSchedulingGroup))
@@ -1755,7 +1756,12 @@ namespace gip.bso.manufacturing
                 }
                 else if (e.PropertyName == nameof(WizardSchedulerPartslist.NewTargetQuantityUOM))
                 {
-                    // do nothing
+                    if (item.NewTargetQuantityUOM > 0 && item.ProdOrderPartslistPos != null)
+                    {
+                        Msg changeMsg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, item.ProdOrderPartslistPos.ProdOrderPartslist, item.NewTargetQuantityUOM);
+                        if (changeMsg != null)
+                            SendMessage(changeMsg);
+                    }
                 }
                 else if (e.PropertyName == nameof(WizardSchedulerPartslist.NewSyncTargetQuantityUOM))
                 {
@@ -1771,13 +1777,13 @@ namespace gip.bso.manufacturing
                             {
                                 otherItem.ChangeNewTargetQuantityUOM(otherItem.NewTargetQuantityUOM * factor, false);
                                 otherItem._NewSyncTargetQuantityUOM = null;
-                                item._NewSyncTargetQuantity = null;
                             }
                         }
 
                         // setup value to null
                         item._NewSyncTargetQuantityUOM = null;
                         item._NewSyncTargetQuantity = null;
+
                         foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
                         {
                             if (wizardItem.ProdOrderPartslistPos != null)
@@ -1787,20 +1793,26 @@ namespace gip.bso.manufacturing
                                     SendMessage(changeMsg);
                             }
                         }
-                        if (DatabaseApp.IsChanged)
-                        {
-                            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
-                            foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
-                            {
-                                if (!IsBSOTemplateScheduleParent && wizardItem.SelectedMDSchedulingGroup != null)
-                                    RefreshServerState(wizardItem.SelectedMDSchedulingGroup.MDSchedulingGroupID);
-                            }
-                            if (saveMsg != null)
-                                SendMessage(saveMsg);
-                        }
-                        OnPropertyChanged(nameof(WizardSchedulerPartslistList));
                     }
                 }
+
+            if (DatabaseApp.IsChanged)
+            {
+                MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+                foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
+                {
+                    if (!IsBSOTemplateScheduleParent && wizardItem.SelectedMDSchedulingGroup != null)
+                        RefreshServerState(wizardItem.SelectedMDSchedulingGroup.MDSchedulingGroupID);
+                }
+                if (saveMsg != null)
+                    SendMessage(saveMsg);
+                OnPropertyChanged(nameof(WizardSchedulerPartslistList));
+            }
+        }
+
+        public void Item_PropertyChanged_Common()
+        {
+
         }
 
         /// <summary>
@@ -3727,7 +3739,10 @@ namespace gip.bso.manufacturing
                         BSOBatchPlanChild != null &&
                         BSOBatchPlanChild.Value != null;
                     if (isEnabled)
-                        isEnabled = BSOBatchPlanChild.Value.SelectedBatchPlanForIntermediate != null && SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > Double.Epsilon;
+                        isEnabled =
+                            BSOBatchPlanChild.Value.SelectedBatchPlanForIntermediate != null
+                            && SelectedWizardSchedulerPartslist != null
+                            && SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > Double.Epsilon;
                     break;
             }
             return isEnabled;
