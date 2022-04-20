@@ -3173,7 +3173,11 @@ namespace gip.bso.manufacturing
             foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
             {
                 if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
-                    batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
+                {
+                    bool isBatchReadyToStart = ACProdOrderManager.IsEnabledStartBatchPlan(batchPlan, batchPlan.ProdOrderPartslist, batchPlan.ProdOrderPartslistPos);
+                    if (isBatchReadyToStart)
+                        batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
+                }
             }
             Save();
             OnPropertyChanged(nameof(ProdOrderBatchPlanList));
@@ -3181,7 +3185,9 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSetBatchStateReadyToStart()
         {
-            return ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.Created);
+            return
+                ProdOrderBatchPlanList != null
+                && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.Created);
         }
 
         [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
@@ -3460,7 +3466,8 @@ namespace gip.bso.manufacturing
             try
             {
                 IsWizard = true;
-                WizardPhase = NewScheduledBatchWizardPhaseEnum.BOMExplosion;
+                bool isForExpand = finalMix.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.Count() == 1;
+                WizardPhase = isForExpand ? NewScheduledBatchWizardPhaseEnum.BOMExplosion : NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
                 bool success = WizardForwardAction(WizardPhase);
             }
             catch (Exception ex)
