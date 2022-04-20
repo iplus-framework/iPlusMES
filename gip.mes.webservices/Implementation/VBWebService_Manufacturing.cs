@@ -39,6 +39,7 @@ namespace gip.mes.webservices
                 TargetQuantity = c.TargetQuantity,
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
+                Comment = c.DepartmentUserName,
                 ProdOrder = new ProdOrder()
                 {
                     ProdOrderID = c.ProdOrder.ProdOrderID,

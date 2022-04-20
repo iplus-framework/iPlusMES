@@ -50,6 +50,12 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+
+        [DataMember]
+        public string Comment
+        {
+            get; set;
+        }
     }
 
     [DataContract(Name = "cPOPLWF")]

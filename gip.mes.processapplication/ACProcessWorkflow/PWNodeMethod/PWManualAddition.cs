@@ -64,6 +64,15 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
 
+            method.ParameterValueList.Add(new ACValue("ReworkMaterialNo", typeof(string), "", Global.ParamOption.Optional));
+            paramTranslation.Add("ReworkMaterialNo", "en{'Material number for rework'}de{'Materialnummer für Nacharbeit'}");
+
+            method.ParameterValueList.Add(new ACValue("ReworkQuantity", typeof(int), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("ReworkQuantity", "en{'Rework quantity [%]'}de{'Nachbearbeitungsmenge [%]'}");
+
+            method.ParameterValueList.Add(new ACValue("CompSequenceNo", typeof(int), (int)0, Global.ParamOption.Optional));
+            paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding rework into BOM'}de{'Folgenummer beim Hinzufügen Rework in die Rezeptur'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualAddition), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualAddition), ACStateConst.SMStarting, wrapper);
 
