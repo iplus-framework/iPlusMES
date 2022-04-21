@@ -79,7 +79,7 @@ namespace gip.mes.processapplication
             paramTranslation.Add("ReworkQuantity", "en{'Rework quantity [%]'}de{'Nachbearbeitungsmenge [%]'}");
 
             method.ParameterValueList.Add(new ACValue("CompSequenceNo", typeof(int), (int)0, Global.ParamOption.Optional));
-            paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding into BOM'}de{'Folgenummer beim Hinzufügen in die Rezeptur'}");
+            paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding rework into BOM'}de{'Folgenummer beim Hinzufügen Rework in die Rezeptur'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);

@@ -39,6 +39,7 @@ namespace gip.mes.webservices
                 TargetQuantity = c.TargetQuantity,
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
+                Comment = c.DepartmentUserName,
                 ProdOrder = new ProdOrder()
                 {
                     ProdOrderID = c.ProdOrder.ProdOrderID,
@@ -394,6 +395,7 @@ namespace gip.mes.webservices
                 TargetQuantity = c.TargetQuantity,
                 TargetQuantityUOM = c.TargetQuantityUOM,
                 BookingMaterialID = c.BookingMaterial?.MaterialID,
+                BookingMaterialInfo = c.BookingMaterial?.ACCaption,
                 FacilityLotID = c.FacilityLotID,
                 IsFinalMixure = c.IsFinalMixure || c.IsFinalMixureBatch,
                 HasInputMaterials = c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Where(x => !x.SourceProdOrderPartslistPos.Material.IsIntermediate).Any(),

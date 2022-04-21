@@ -233,7 +233,7 @@ namespace gip.mes.webservices
 
                 if (registeredChargesID != null && registeredChargesID.Any())
                 {
-                    var charges = dbApp.FacilityCharge.Where(c => registeredChargesID.Any(x => x == c.FacilityChargeID))
+                    var charges = dbApp.FacilityCharge.Where(c => registeredChargesID.Contains(c.FacilityChargeID))
                                                         .ToArray()
                                                         .Select(c => ConvertFacilityCharge(c))
                                                         .ToList();
@@ -1448,6 +1448,8 @@ namespace gip.mes.webservices
                 else if (acParam.PartslistPos != null)
                 {
                     acParam.PartslistPos.RecalcActualQuantity();
+                    if (acParam.PartslistPos.ProdOrderPartslist != null)
+                        acParam.PartslistPos.ProdOrderPartslist.RecalcActualQuantitySP(dbApp);
                     msgWithDetails = dbApp.ACSaveChangesWithRetry();
                 }
                 else if (acParam.PartslistPosRelation != null)
