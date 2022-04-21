@@ -98,5 +98,12 @@ namespace gip.mes.webservices
         {
             get; set;
         }
+
+        [DataMember(Name = "BMI")]
+        public string BookingMaterialInfo
+        {
+            get;
+            set;
+        }
     }
 }
