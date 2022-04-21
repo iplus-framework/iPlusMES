@@ -1269,7 +1269,7 @@ namespace gip.mes.webservices
             return new WSResponse<MsgWithDetails>(msg);
         }
 
-        private MsgWithDetails Book(ACMethodBooking bpParam, DatabaseApp dbApp, FacilityManager facManager, PAJsonServiceHostVB myServiceHost)
+        protected virtual MsgWithDetails Book(ACMethodBooking bpParam, DatabaseApp dbApp, FacilityManager facManager, PAJsonServiceHostVB myServiceHost)
         {
             if (bpParam == null)
                 return new MsgWithDetails("Booking parameter is null", null, eMsgLevel.Error, "VBWebService", "Book", 1060);
@@ -1280,7 +1280,6 @@ namespace gip.mes.webservices
             MsgWithDetails msgWithDetails = null;
             try
             {
-                FacilityManager facilityManager = null;
                 datamodel.PickingPos pickingPos = null;
                 if (bpParam.PickingPosID.HasValue)
                     pickingPos = dbApp.PickingPos
@@ -1292,7 +1291,6 @@ namespace gip.mes.webservices
                 FacilityPreBooking preBooking = null;
                 if (pickingPos != null)
                 {
-                    facilityManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     preBooking = pickingPos.FacilityPreBooking_PickingPos.FirstOrDefault();
                     if (preBooking == null && pickingPos.InOrderPos != null)
                         preBooking = pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.FirstOrDefault();
@@ -1305,8 +1303,8 @@ namespace gip.mes.webservices
                 if (acParam == null)
                 {
                     acParam = facManager.ACUrlACTypeSignature("!" + bpParam.VirtualMethodName, gip.core.datamodel.Database.GlobalDatabase) as facility.ACMethodBooking;
-                    if (pickingPos != null && facilityManager != null)
-                        facilityManager.InitBookingParamsFromTemplate(acParam, pickingPos, preBooking);
+                    if (pickingPos != null && facManager != null)
+                        facManager.InitBookingParamsFromTemplate(acParam, pickingPos, preBooking);
                 }
 
                 if (pickingPos != null)
@@ -1400,48 +1398,7 @@ namespace gip.mes.webservices
                 acParam.RecipeOrFactoryInfo = bpParam.RecipeOrFactoryInfo;
                 acParam.PropertyACUrl = bpParam.PropertyACUrl;
 
-                var resultBooking = facManager.BookFacilityWithRetry(ref acParam, dbApp, false);
-                if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
-                {
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogError(myServiceHost.GetACUrl(), "BookFacility(10)", acParam.ValidMessage.InnerMessage);
-                    dbApp.ACUndoChanges();
-                    msgWithDetails = acParam.ValidMessage;
-                    return msgWithDetails;
-                }
-                else
-                {
-                    if (acParam.PickingPos != null && facilityManager != null)
-                    {
-                        double postedQuantity = 0;
-                        if (acParam.OutwardQuantity.HasValue)
-                            postedQuantity = acParam.OutwardQuantity.Value;
-                        else if (acParam.InwardQuantity.HasValue)
-                            postedQuantity = acParam.InwardQuantity.Value;
-                        facilityManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
-                        msgWithDetails = dbApp.ACSaveChangesWithRetry();
-
-                        if (msgWithDetails == null)
-                        {
-                            datamodel.FacilityCharge outwardFC = acParam.OutwardFacilityCharge;
-                            if (outwardFC != null)
-                            {
-                                msgWithDetails = facilityManager.IsQuantStockConsumed(outwardFC, dbApp);
-                                return msgWithDetails;
-                            }
-                        }
-                    }
-                    else if (acParam.PartslistPos != null)
-                    {
-                        acParam.PartslistPos.RecalcActualQuantity();
-                        msgWithDetails = dbApp.ACSaveChangesWithRetry();
-                    }
-                    else if (acParam.PartslistPosRelation != null)
-                    {
-                        acParam.PartslistPosRelation.RecalcActualQuantity();
-                        msgWithDetails = dbApp.ACSaveChangesWithRetry();
-                    }
-                }
+                msgWithDetails = OnBookWithFacilityManager(bpParam, acParam, dbApp, facManager, myServiceHost);
             }
             catch (Exception e)
             {
@@ -1450,6 +1407,54 @@ namespace gip.mes.webservices
                 msgWithDetails = new MsgWithDetails();
                 msgWithDetails.AddDetailMessage(new Msg(eMsgLevel.Exception, e.Message));
                 return msgWithDetails;
+            }
+            return msgWithDetails;
+        }
+
+        protected virtual MsgWithDetails OnBookWithFacilityManager(ACMethodBooking bpParam, facility.ACMethodBooking acParam, DatabaseApp dbApp, FacilityManager facManager, PAJsonServiceHostVB myServiceHost)
+        {
+            MsgWithDetails msgWithDetails = null;
+            var resultBooking = facManager.BookFacilityWithRetry(ref acParam, dbApp, false);
+            if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (myServiceHost != null)
+                    myServiceHost.Messages.LogError(myServiceHost.GetACUrl(), "BookFacility(10)", acParam.ValidMessage.InnerMessage);
+                dbApp.ACUndoChanges();
+                msgWithDetails = acParam.ValidMessage;
+                return msgWithDetails;
+            }
+            else
+            {
+                if (acParam.PickingPos != null && facManager != null)
+                {
+                    double postedQuantity = 0;
+                    if (acParam.OutwardQuantity.HasValue)
+                        postedQuantity = acParam.OutwardQuantity.Value;
+                    else if (acParam.InwardQuantity.HasValue)
+                        postedQuantity = acParam.InwardQuantity.Value;
+                    facManager.RecalcAfterPosting(dbApp, acParam.PickingPos, postedQuantity, false, true);
+                    msgWithDetails = dbApp.ACSaveChangesWithRetry();
+
+                    if (msgWithDetails == null)
+                    {
+                        datamodel.FacilityCharge outwardFC = acParam.OutwardFacilityCharge;
+                        if (outwardFC != null)
+                        {
+                            msgWithDetails = facManager.IsQuantStockConsumed(outwardFC, dbApp);
+                            return msgWithDetails;
+                        }
+                    }
+                }
+                else if (acParam.PartslistPos != null)
+                {
+                    acParam.PartslistPos.RecalcActualQuantity();
+                    msgWithDetails = dbApp.ACSaveChangesWithRetry();
+                }
+                else if (acParam.PartslistPosRelation != null)
+                {
+                    acParam.PartslistPosRelation.RecalcActualQuantity();
+                    msgWithDetails = dbApp.ACSaveChangesWithRetry();
+                }
             }
             return msgWithDetails;
         }
