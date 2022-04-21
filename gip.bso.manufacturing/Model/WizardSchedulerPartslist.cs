@@ -85,9 +85,9 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
-            #region Properties
+        #region Properties
 
-            #region Properties -> Not marked (private)
+        #region Properties -> Not marked (private)
 
         public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
@@ -724,6 +724,14 @@ namespace gip.bso.manufacturing
             OnPropertyChanged("BatchSizeStandard");
         }
 
+
+        public void LoadBatchSuggestion(BatchSuggestionCommandModeEnum? suggestionMode)
+        {
+            if (ProdOrderPartslistPos != null)
+                LoadExistingBatchSuggestion();
+            else
+                LoadNewBatchSuggestion(suggestionMode);
+        }
 
         public void LoadExistingBatchSuggestion()
         {
