@@ -777,7 +777,7 @@ namespace gip.mes.facility
                             (oldValue != null && newValue != null && IsValuesEquals(oldValue, newValue));
                         isChangedProperty = !isValuesEqual;
                         if (isChangedProperty)
-                            break;
+                            return isChangedProperty;
                     }
                 }
             }

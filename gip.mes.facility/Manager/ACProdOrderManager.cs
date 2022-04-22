@@ -276,8 +276,11 @@ namespace gip.mes.facility
             foreach (PartslistPosRelation posRelation in partsListPosRelationItems)
             {
                 ProdOrderPartslistPosRelation prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
-                prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
-                prodOrderPartsListPosRelationItems.Add(prodRelationItem);
+                if (prodRelationItem != null)
+                {
+                    prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
+                    prodOrderPartsListPosRelationItems.Add(prodRelationItem);
+                }
             }
 
             // Think is not 
@@ -323,15 +326,30 @@ namespace gip.mes.facility
             return prodPos;
         }
 
+
         public ProdOrderPartslistPosRelation GetProdOrderPartslistPosRelation(DatabaseApp dbApp, List<ProdOrderPartslistPos> prodOrderPartsListPosItems, PartslistPosRelation posRelation)
+        {
+            ProdOrderPartslistPosRelation prodRelationItem = null;
+            ProdOrderPartslistPos sourcePos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);
+            ProdOrderPartslistPos targetPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);// ToSetup
+
+            if (sourcePos != null && targetPos != null)
+            {
+                prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation, sourcePos, targetPos);
+            }
+            else
+                Root.Messages.LogError(GetACUrl(), "", "Unable to build relation");
+            return prodRelationItem;
+        }
+        public ProdOrderPartslistPosRelation GetProdOrderPartslistPosRelation(DatabaseApp dbApp, List<ProdOrderPartslistPos> prodOrderPartsListPosItems, PartslistPosRelation posRelation, ProdOrderPartslistPos sourcePos, ProdOrderPartslistPos targetPos)
         {
             ProdOrderPartslistPosRelation prodRelationItem = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
             prodRelationItem.Sequence = posRelation.Sequence;
             prodRelationItem.TargetQuantityUOM = posRelation.TargetQuantityUOM;
             prodRelationItem.RetrogradeFIFO = posRelation.RetrogradeFIFO;
             // build relation same to PartslistPosRelation
-            prodRelationItem.TargetProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);
-            prodRelationItem.SourceProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);// ToSetup
+            prodRelationItem.SourceProdOrderPartslistPos = sourcePos;
+            prodRelationItem.TargetProdOrderPartslistPos = targetPos;
 
             return prodRelationItem;
         }
@@ -507,7 +525,8 @@ namespace gip.mes.facility
                 if (prodRelationItem == null)
                 {
                     prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
-                    prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
+                    if (prodRelationItem != null)
+                        prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
                 }
             }
 
@@ -568,11 +587,11 @@ namespace gip.mes.facility
             foreach (ProdOrderPartslistPosRelation relation in relationForDelete)
                 relation.DeleteACObject(dbApp, false);
 
+            // Delete Positions no final mixures
             ProdOrderPartslistPos[] posForDelete = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.AsEnumerable().Where(c => !c.IsFinalMixure).ToArray();
             foreach (ProdOrderPartslistPos pos in posForDelete)
                 pos.DeleteACObject(dbApp, false);
 
-            ProdOrderPartslistPos finalMixure = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault();
 
             // Positions without relations will be not recreated
             PartslistPos[] plPos = partslist.PartslistPos_Partslist.Where(c => c.PartslistPosRelation_SourcePartslistPos.Any()).ToArray();
@@ -581,12 +600,22 @@ namespace gip.mes.facility
             double quantityFactor = prodOrderPartslist.TargetQuantity / partslist.TargetQuantityUOM;
 
             List<ProdOrderPartslistPos> prodOrderPartsListPosItems = new List<ProdOrderPartslistPos>();
-            prodOrderPartsListPosItems.Add(finalMixure);
+            prodOrderPartsListPosItems.AddRange(prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist);
+            foreach (ProdOrderPartslistPos prodPos in prodOrderPartsListPosItems)
+            {
+                PartslistPos pos = plPos.FirstOrDefault(c => c.MaterialID == prodPos.MaterialID);
+                if (pos != null && prodPos.BasedOnPartslistPosID != pos.PartslistPosID)
+                    prodPos.BasedOnPartslistPosID = pos.PartslistPosID;
+            }
+
             foreach (var pos in plPos)
             {
-                ProdOrderPartslistPos prodPos = GetProdOrderPartslistPos(dbApp, prodOrderPartslist, pos);
-                prodOrderPartsListPosItems.Add(prodPos);
-                prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Add(prodPos);
+                if (!prodOrderPartsListPosItems.Any(c => c.BasedOnPartslistPosID == pos.PartslistPosID))
+                {
+                    ProdOrderPartslistPos prodPos = GetProdOrderPartslistPos(dbApp, prodOrderPartslist, pos);
+                    prodOrderPartsListPosItems.Add(prodPos);
+                    prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Add(prodPos);
+                }
             }
 
             // update alternative relations
@@ -602,12 +631,11 @@ namespace gip.mes.facility
             foreach (PartslistPosRelation posRelation in plRel)
             {
                 ProdOrderPartslistPosRelation prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
-                prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
-                prodOrderPartsListPosRelationItems.Add(prodRelationItem);
+                if (prodRelationItem != null)
+                    prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
             }
 
             prodOrderPartslist.TargetQuantity = partslist.TargetQuantityUOM;
-            finalMixure.TargetQuantityUOM = partslist.TargetQuantityUOM;
 
             // Resize quantity
             BatchLinearResize(prodOrderPartslist, quantityFactor);

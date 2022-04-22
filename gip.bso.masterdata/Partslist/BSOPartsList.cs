@@ -216,11 +216,11 @@ namespace gip.bso.masterdata
                 if (PartslistManager != null)
                 {
                     //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
-                    MsgWithDetails recalcMessate = PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
+                    MsgWithDetails recalcMessage = PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
                     //if (calculationMessage != null)
                     //    return calculationMessage;
-                    if (recalcMessate != null)
-                        return recalcMessate;
+                    if (recalcMessage != null)
+                        return recalcMessage;
                 }
                 // @aagincic: Turn off validation of partslist for a moment
                 // result = PartslistManager.Validation(CurrentPartslist);
