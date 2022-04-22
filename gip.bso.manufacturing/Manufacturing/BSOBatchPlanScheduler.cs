@@ -3187,21 +3187,18 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
-                if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
+                bool isBatchReadyToStart = batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
+                if (isBatchReadyToStart)
+                    batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
+                else
                 {
-                    bool isBatchReadyToStart = ACProdOrderManager.IsEnabledStartBatchPlan(batchPlan, batchPlan.ProdOrderPartslist, batchPlan.ProdOrderPartslistPos);
-                    if (isBatchReadyToStart)
-                        batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
-                    else
-                    {
-                        // Error50559
-                        // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
-                        //  9   New 8401    NADJEV SIR ZA BUREK 1   0            
-                        Msg msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "SetBatchStateReadyToStart()", 3184, "Error50559",
-                            batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
-                            batchPlan.BatchTargetCount, batchPlan.BatchSize);
-                        msgWithDetails.AddDetailMessage(msg);
-                    }
+                    // Error50559
+                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
+                    //  9   New 8401    NADJEV SIR ZA BUREK 1   0            
+                    Msg msg = new Msg(this, eMsgLevel.Error, "BSOBatchPlanScheduler", "SetBatchStateReadyToStart()", 3184, "Error50559",
+                        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                        batchPlan.BatchTargetCount, batchPlan.BatchSize);
+                    msgWithDetails.AddDetailMessage(msg);
                 }
             }
             if (msgWithDetails.MsgDetails.Any())
