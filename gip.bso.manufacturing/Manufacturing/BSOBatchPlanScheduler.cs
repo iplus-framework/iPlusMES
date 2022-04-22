@@ -1163,15 +1163,17 @@ namespace gip.bso.manufacturing
                 {
                     if (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
                         || SelectedProdOrderBatchPlan.PlanState >= GlobalApp.BatchPlanState.Paused)
-                        SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.ReadyToStart;
+                        SetReadyToStart(new ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
                 }
                 else if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount <= 0)
                 {
                     SelectedProdOrderBatchPlan.PartialTargetCount = null;
                     if (SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.ReadyToStart)
+                    {
                         SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.Paused;
+                        Save();
+                    }
                 }
-                Save();
             }
         }
 
@@ -3168,9 +3170,22 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledSetBatchStateReadyToStart())
                 return;
-            List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            ProdOrderBatchPlan[] selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToArray();
+            SetReadyToStart(selectedBatches);
+        }
+
+        public bool IsEnabledSetBatchStateReadyToStart()
+        {
+            return
+                ProdOrderBatchPlanList != null
+                && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.Created);
+        }
+
+
+        private void SetReadyToStart(ProdOrderBatchPlan[] batchPlans)
+        {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
-            foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
+            foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
                 if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
                 {
@@ -3189,17 +3204,10 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            if(msgWithDetails.MsgDetails.Any())
+            if (msgWithDetails.MsgDetails.Any())
                 Messages.Msg(msgWithDetails);
             Save();
             OnPropertyChanged(nameof(ProdOrderBatchPlanList));
-        }
-
-        public bool IsEnabledSetBatchStateReadyToStart()
-        {
-            return
-                ProdOrderBatchPlanList != null
-                && ProdOrderBatchPlanList.Any(c => c.IsSelected && c.PlanState == vd.GlobalApp.BatchPlanState.Created);
         }
 
         [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
