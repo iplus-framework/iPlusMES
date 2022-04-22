@@ -901,11 +901,11 @@ namespace gip.mes.facility
         public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, List<ProdOrderPartslist> plsForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
-            foreach(ProdOrderPartslist item in plsForBatchGenerate)
+            foreach (ProdOrderPartslist item in plsForBatchGenerate)
             {
                 MsgWithDetails tmp = GenerateBatchPlans(databaseApp, item);
-                if(tmp != null && tmp.MsgDetails.Any())
-                    foreach(Msg msg in tmp.MsgDetails)
+                if (tmp != null && tmp.MsgDetails.Any())
+                    foreach (Msg msg in tmp.MsgDetails)
                         msgWithDetails.AddDetailMessage(msg);
             }
             return msgWithDetails;
@@ -937,8 +937,8 @@ namespace gip.mes.facility
             foreach (ExpandResult expand in treeResult)
             {
                 sn++;
-                ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c=>c.PartslistID == expand.Item.PartslistForPosition.PartslistID);
-                if(pl == null)
+                ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == expand.Item.PartslistForPosition.PartslistID);
+                if (pl == null)
                     PartslistAdd(databaseApp, prodOrder, expand.Item.PartslistForPosition, sn, expand.Item.TargetQuantityUOM, out pl);
                 pl.Sequence = sn;
             }
@@ -1336,6 +1336,34 @@ namespace gip.mes.facility
             {
                 ProdOrderPartslist pl = partslists.FirstOrDefault(c => c.Partslist != null && c.Partslist.MaterialID == pos.MaterialID);
                 pos.SourceProdOrderPartslist = pl;
+            }
+        }
+
+        public void CorrectSortOrder(ProdOrder prodOrder)
+        {
+            int sequence = 1;
+            ProdOrderPartslist[] partslists =
+                prodOrder
+                .ProdOrderPartslist_ProdOrder
+                .Where(c => !c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID != null)).ToArray();
+            foreach (ProdOrderPartslist pl in partslists)
+            {
+                pl.Sequence = sequence;
+                CorrectSortOrder(sequence, prodOrder, pl);
+            }
+        }
+
+        private void CorrectSortOrder(int sequence, ProdOrder prodOrder, ProdOrderPartslist prodOrderPartslist)
+        {
+            sequence++;
+            ProdOrderPartslist[] partslists =
+               prodOrder
+               .ProdOrderPartslist_ProdOrder
+               .Where(c => c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)).ToArray();
+            foreach (ProdOrderPartslist pl in partslists)
+            {
+                pl.Sequence = sequence;
+                CorrectSortOrder(sequence, prodOrder, pl);
             }
         }
 
@@ -1781,7 +1809,7 @@ namespace gip.mes.facility
             return
             databaseApp
                    .Partslist
-                   .Where(c => c.MaterialWFID != null 
+                   .Where(c => c.MaterialWFID != null
                             && !c.DeleteDate.HasValue
                             && (partslistNoListComaSep == null || partslistNoListComaSep.Contains(c.PartslistNo)))
                    .Select(c => new { c.PartslistID, pl = c })

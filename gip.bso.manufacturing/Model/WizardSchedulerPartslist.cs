@@ -731,6 +731,14 @@ namespace gip.bso.manufacturing
                 LoadExistingBatchSuggestion();
             else
                 LoadNewBatchSuggestion(suggestionMode);
+
+            if(BatchPlanSuggestion.ItemsList == null)
+                BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
+            if(!BatchPlanSuggestion.ItemsList.Any())
+            {
+                BatchPlanSuggestionItem oneItem = new BatchPlanSuggestionItem(this, 1, TargetQuantityUOM, 1, TargetQuantityUOM);
+                BatchPlanSuggestion.ItemsList.Add(oneItem);
+            }
         }
 
         public void LoadExistingBatchSuggestion()

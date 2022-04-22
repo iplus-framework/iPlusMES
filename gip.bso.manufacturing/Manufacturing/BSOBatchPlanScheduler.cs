@@ -4168,6 +4168,8 @@ namespace gip.bso.manufacturing
             ProdOrder prodorder = DefaultWizardSchedulerPartslist?.ProdOrderPartslistPos?.ProdOrderPartslist?.ProdOrder;
             if (prodorder != null)
                 ProdOrderManager.ConnectSourceProdOrderPartslist(prodorder);
+
+            ProdOrderManager.CorrectSortOrder(prodorder);
         }
 
         private void LoadBOMExplosionItems(ProdOrder prodOrder)
