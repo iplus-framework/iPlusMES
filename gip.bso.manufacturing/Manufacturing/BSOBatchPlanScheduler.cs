@@ -3504,6 +3504,7 @@ namespace gip.bso.manufacturing
 
                     WizardDefineDefaultPartslist(schedulingGroup, prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist);
 
+
                     //double targetQuantity = SelectedProdOrderPartslist.UnPlannedQuantityUOM;
                     //if (targetQuantity < double.Epsilon)
                     //    targetQuantity = SelectedProdOrderPartslist.TargetQuantityUOM;

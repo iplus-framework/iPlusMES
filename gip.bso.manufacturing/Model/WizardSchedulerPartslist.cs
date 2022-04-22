@@ -82,6 +82,9 @@ namespace gip.bso.manufacturing
                 SelectedUnitConvert = null;
             else
                 SelectedUnitConvert = finalMix.MDUnit;
+
+            if(SelectedMDSchedulingGroup == null)
+                SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
         }
         #endregion
 
@@ -727,7 +730,7 @@ namespace gip.bso.manufacturing
 
         public void LoadBatchSuggestion(BatchSuggestionCommandModeEnum? suggestionMode)
         {
-            if (ProdOrderPartslistPos != null)
+            if (ProdOrderPartslistPos != null && ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
                 LoadExistingBatchSuggestion();
             else
                 LoadNewBatchSuggestion(suggestionMode);
