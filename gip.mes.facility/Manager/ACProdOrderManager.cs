@@ -1268,6 +1268,7 @@ namespace gip.mes.facility
                                     .Include("ProdOrderPartslist.MDProdOrderState")
                                     .Include("ProdOrderPartslist.ProdOrder")
                                     .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
+                                    .Include("ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder")
                                     .Include("ProdOrderPartslist.Partslist")
                                     .Include("ProdOrderPartslist.Partslist.Material")
                                     .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
