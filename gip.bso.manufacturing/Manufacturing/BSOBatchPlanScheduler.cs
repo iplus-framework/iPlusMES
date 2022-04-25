@@ -2307,7 +2307,7 @@ namespace gip.bso.manufacturing
                 {
                     using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
                     {
-                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.ToArray();
+                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.OrderBy(c => c.VBUserName).ToArray();
                     }
                 }
                 return _VBUserList;
@@ -4937,7 +4937,7 @@ namespace gip.bso.manufacturing
             };
 
             _TempRules.Add(rule);
-            AssignedUserRules = _TempRules.ToList();
+            AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption).ToList();
         }
 
         public bool IsEnabledAddRule()
@@ -4952,7 +4952,7 @@ namespace gip.bso.manufacturing
             if (rule != null)
             {
                 _TempRules.Remove(rule);
-                AssignedUserRules = _TempRules.ToList();
+                AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption).ToList();
                 SelectedAssignedUserRule = null;
             }
         }
