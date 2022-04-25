@@ -1161,7 +1161,7 @@ namespace gip.bso.manufacturing
             {
                 if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount > 0)
                 {
-                    if (   SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
+                    if (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
                         || SelectedProdOrderBatchPlan.PlanState >= GlobalApp.BatchPlanState.Paused)
                         SetReadyToStart(new ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
                 }
@@ -3170,8 +3170,8 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledSetBatchStateReadyToStart())
                 return;
-            ProdOrderBatchPlan[] selectedBatches = ProdOrderBatchPlanList.Where(c =>   c.IsSelected 
-                                                                                    && (   c.PlanState <= GlobalApp.BatchPlanState.Created
+            ProdOrderBatchPlan[] selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected
+                                                                                    && (c.PlanState <= GlobalApp.BatchPlanState.Created
                                                                                         || c.PlanState >= GlobalApp.BatchPlanState.Paused))
                                                                          .ToArray();
             SetReadyToStart(selectedBatches);
@@ -3180,8 +3180,8 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSetBatchStateReadyToStart()
         {
             return ProdOrderBatchPlanList != null
-                && ProdOrderBatchPlanList.Any(c => c.IsSelected 
-                                                && (   c.PlanState <= GlobalApp.BatchPlanState.Created
+                && ProdOrderBatchPlanList.Any(c => c.IsSelected
+                                                && (c.PlanState <= GlobalApp.BatchPlanState.Created
                                                     || c.PlanState >= GlobalApp.BatchPlanState.Paused));
         }
 
@@ -3367,7 +3367,7 @@ namespace gip.bso.manufacturing
             return
                 ProdOrderBatchPlanList != null
                 && ProdOrderBatchPlanList.Any(c => c.IsSelected)
-                && !ProdOrderBatchPlanList.Any(c =>
+                && !ProdOrderBatchPlanList.Where(c => c.IsSelected).Any(c =>
                       NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
                 );
         }
@@ -4800,7 +4800,10 @@ namespace gip.bso.manufacturing
             ProdOrderBatchPlan[] tmp = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.OrderByDescending(c => c.ScheduledOrder).ToArray();
             foreach (ProdOrderBatchPlan bp in tmp)
                 LoadGeneratedBatchInCurrentLine(bp, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM);
-            // wizardSchedulerPartslist.IsSolved = success;
+            if (
+                !AllWizardSchedulerPartslistList.Any(c => c.ProdOrderPartslistPos != null && c.PartslistNo != wizardSchedulerPartslist.PartslistNo)
+                || AllWizardSchedulerPartslistList.Where(c => !c.IsSolved).Count() == 1)
+                wizardSchedulerPartslist.IsSolved = success;
             return success;
         }
 
