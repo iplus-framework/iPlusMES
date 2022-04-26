@@ -64,6 +64,7 @@
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
     <Compile Include="Manufacturing\BSOProdOrderBatchComponents.cs" />
     <Compile Include="Manufacturing\BSOProdOrderOpenPositions.cs" />
+    <Compile Include="Manufacturing\BSOProdOrderOverview.cs" />
     <Compile Include="Manufacturing\BSOTemplateSchedule.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOBinDischarging.cs" />
     <Compile Include="Manufacturing\BSOComponentReservation.cs" />

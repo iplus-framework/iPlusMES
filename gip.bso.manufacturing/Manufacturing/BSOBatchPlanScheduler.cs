@@ -551,9 +551,9 @@ namespace gip.bso.manufacturing
                 case nameof(WizardForwardSelectLinie):
                     WizardForwardSelectLinie((System.Object)acParameter[0]);
                     return true;
-                case nameof(ChangeBatchPlan):
-                    ChangeBatchPlan((gip.mes.datamodel.ProdOrderBatchPlan)acParameter[0]);
-                    return true;
+                //case nameof(ChangeBatchPlan):
+                //    ChangeBatchPlan((gip.mes.datamodel.ProdOrderBatchPlan)acParameter[0]);
+                //    return true;
                 case nameof(IsEnabledWizardForward):
                     result = IsEnabledWizardForward();
                     return true;
@@ -4783,13 +4783,17 @@ namespace gip.bso.manufacturing
                                 && !existingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
                 ).ToList();
             int schedulingOrder = 0;
-            foreach (ProdOrderBatchPlan plan in otherBatchPlans)
+            if (existingMinIndex > 0)
             {
-                plan.ScheduledOrder = schedulingOrder + movingStep + existingMinIndex;
-                schedulingOrder++;
+                foreach (ProdOrderBatchPlan plan in otherBatchPlans)
+                {
+                    plan.ScheduledOrder = schedulingOrder + movingStep + existingMinIndex;
+                    schedulingOrder++;
+                }
+                schedulingOrder = existingMinIndex;
             }
-
-            // schedulingOrder = existingMinIndex;
+            else
+                schedulingOrder = otherBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Max() + 1;
 
             foreach (BatchPlanSuggestionItem suggestionItem in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
             {
@@ -4809,7 +4813,7 @@ namespace gip.bso.manufacturing
                     batchPlan.ScheduledStartDate = batchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
 
 
-                batchPlan.ScheduledOrder = schedulingOrder + existingMinIndex;
+                batchPlan.ScheduledOrder = schedulingOrder;
                 //batchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
                 schedulingOrder++;
             }
