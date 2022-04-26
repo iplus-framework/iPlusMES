@@ -4522,8 +4522,15 @@ namespace gip.bso.manufacturing
 
         private void LoadProdOrderBatchPlanList()
         {
-            ProdOrderBatchPlanList = GetProdOrderBatchPlanList(SelectedScheduleForPWNode?.MDSchedulingGroupID);
-            ProdOrderPartslistList = GetProdOrderPartslistList();
+            try
+            {
+                ProdOrderBatchPlanList = GetProdOrderBatchPlanList(SelectedScheduleForPWNode?.MDSchedulingGroupID);
+                ProdOrderPartslistList = GetProdOrderPartslistList();
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(LoadProdOrderBatchPlanList), e);
+            }
         }
 
         private void LoadScheduleListForPWNodes(string schedulingGroupMDKey)
