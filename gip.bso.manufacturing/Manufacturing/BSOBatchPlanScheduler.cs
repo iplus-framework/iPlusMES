@@ -1736,7 +1736,7 @@ namespace gip.bso.manufacturing
             {
                 if (wizardPhaseTitleList == null)
                     wizardPhaseTitleList = LoadWizardPhaseTitleList();
-                return wizardPhaseTitleList.FirstOrDefault(c => ((short)c.Value) == (short)WizardPhase).ACCaption;
+                return wizardPhaseTitleList.FirstOrDefault(c => ((short)c.Value) == (short)WizardPhase)?.ACCaption;
             }
         }
 
@@ -1752,8 +1752,26 @@ namespace gip.bso.manufacturing
             return wizardPhaseTitleList;
         }
 
-
-        public bool IsWizard { get; set; }
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _IsWizard;
+        [ACPropertySelected(999, "IsWizard", "en{'TODO:IsWizard'}de{'TODO:IsWizard'}")]
+        public bool IsWizard
+        {
+            get
+            {
+                return _IsWizard;
+            }
+            set
+            {
+                if (_IsWizard != value)
+                {
+                    _IsWizard = value;
+                    OnPropertyChanged(nameof(IsWizard));
+                }
+            }
+        }
 
         [ACPropertyInfo(515, "CurrentLayout")]
         public string CurrentLayout
