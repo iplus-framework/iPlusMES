@@ -14,9 +14,9 @@ namespace gip.mes.facility
     public enum PostingQuantitySuggestionMode : short
     {
         [EnumMember]
-        None = 0,
+        OrderQuantity = 0, 
         [EnumMember]
-        OrderQuantity = 10,
+        None = 10,
         [EnumMember]
         ForceQuantQuantity = 20,
         ProportionallyAnotherComp = 30

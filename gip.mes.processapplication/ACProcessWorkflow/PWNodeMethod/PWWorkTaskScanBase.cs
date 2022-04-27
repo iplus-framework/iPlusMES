@@ -51,6 +51,21 @@ namespace gip.mes.processapplication
             }
         }
 
+        public string ValidSeqNoForPostingQSMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ValidSeqNoPostingQSMode");
+                    if (acValue != null)
+                        return acValue.Value as string;
+                }
+                return null;
+            }
+        }
+
         public bool OrderQuantityOnInwardPosting
         {
             get

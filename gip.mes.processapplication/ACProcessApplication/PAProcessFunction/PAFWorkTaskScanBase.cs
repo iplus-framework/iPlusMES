@@ -105,6 +105,13 @@ namespace gip.mes.processapplication
             set;
         }
 
+        [DataMember(Name = "VSNPQSM")]
+        public string ValidSeqNoForPostingQSMode
+        {
+            get;
+            set;
+        }
+
         [DataMember(Name = "OQOIP")]
         public bool OrderQuantityOnInwardPosting
         {
@@ -416,8 +423,9 @@ namespace gip.mes.processapplication
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
                 WFMethod = pwNode.CurrentACMethod.ValueT,
                 PostingQSuggestionMode = pwNode.PostingQuantitySuggestionMode.HasValue ? pwNode.PostingQuantitySuggestionMode.Value : PostingQuantitySuggestionMode.OrderQuantity,
+                ValidSeqNoForPostingQSMode = String.IsNullOrEmpty(pwNode.ValidSeqNoForPostingQSMode) ? null : pwNode.ValidSeqNoForPostingQSMode,
                 OrderQuantityOnInwardPosting = pwNode.OrderQuantityOnInwardPosting
-            }); 
+            }) ; 
         }
 
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)

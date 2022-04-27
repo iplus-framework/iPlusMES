@@ -29,6 +29,10 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("PostingQuantitySuggestionMode", typeof(PostingQuantitySuggestionMode), facility.PostingQuantitySuggestionMode.OrderQuantity, Global.ParamOption.Optional));
             paramTranslation.Add("PostingQuantitySuggestionMode", "en{'Posting quantity suggestion mode'}de{'Buchungsmengen-Vorschlagsmodus'}");
 
+            //example: 1,2,3 or 1-3,4,5,
+            method.ParameterValueList.Add(new ACValue("ValidSeqNoPostingQSMode", typeof(string), "", Global.ParamOption.Optional));
+            paramTranslation.Add("ValidSeqNoPostingQSMode", "en{'Valid sequence no. on posting quantity suggestion'}de{'Gültige laufende Nummer auf Buchungsmengenvorschlag'}");
+
             method.ParameterValueList.Add(new ACValue("OrderQuantityOnInwardPosting", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("OrderQuantityOnInwardPosting", "en{'Order quantity on inward posting'}de{'Order quantity on inward posting'}");
 
