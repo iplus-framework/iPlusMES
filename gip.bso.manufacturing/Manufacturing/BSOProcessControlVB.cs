@@ -90,6 +90,53 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+        #region Filter
+        // OrderInfo1,OrderInfo2,OrderInfo3,ProgramNo,ACIdentifier,InsertDate
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterOrderNo;
+        [ACPropertySelected(999, "FilterOrderNo", "en{'ProgramNo.'}de{'AuftragNo.'}")]
+        public string FilterOrderNo
+        {
+            get
+            {
+                return _FilterOrderNo;
+            }
+            set
+            {
+                if (_FilterOrderNo != value)
+                {
+                    _FilterOrderNo = value;
+                    OnPropertyChanged(nameof(FilterOrderNo));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterMaterialNo;
+        [ACPropertySelected(999, "FilterMaterialNo", "en{'Material'}de{'Material'}")]
+        public string FilterMaterialNo
+        {
+            get
+            {
+                return _FilterMaterialNo;
+            }
+            set
+            {
+                if (_FilterMaterialNo != value)
+                {
+                    _FilterMaterialNo = value;
+                    OnPropertyChanged(nameof(FilterMaterialNo));
+                }
+            }
+        }
+
+        #endregion
+
         #region Workflows
         /// <summary>
         /// The _ selected AC task
@@ -150,9 +197,9 @@ namespace gip.bso.manufacturing
         #region Methods
 
         #region Refresh Tasklist
-        static readonly Func<DatabaseApp, Guid, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByTaskID =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<ACClassTaskWrapperVB>>(
-                (db, rootACClassTaskID) =>
+        static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByTaskID =
+            CompiledQuery.Compile<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>>(
+                (db, rootACClassTaskID, orderNo, materialNo) =>
                     db.ACClassTask
                     .Include("TaskTypeACClass")
                     .Include("ContentACClassWF")
@@ -164,7 +211,10 @@ namespace gip.bso.manufacturing
                     .Include("ACProgram.ProdOrderPartslist_VBiACProgram.Partslist.Material")
                     .Where(c => c.ParentACClassTaskID.HasValue && c.ParentACClassTaskID == rootACClassTaskID
                         && c.IsDynamic
-                        && c.ACTaskTypeIndex == (short)Global.ACTaskTypes.WorkflowTask)
+                        && c.ACTaskTypeIndex == (short)Global.ACTaskTypes.WorkflowTask
+                        && (string.IsNullOrEmpty(orderNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.ProdOrder).Where(x => x.ProgramNo.Contains(orderNo)).Any())
+                        && (string.IsNullOrEmpty(materialNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.Partslist.Material).Where(x => x.MaterialNo.Contains(materialNo) || x.MaterialName1.Contains(materialNo)).Any())
+                    )
                     .OrderBy(c => c.ACProgram.ProgramNo)
                     .ThenByDescending(c => c.InsertDate)
                     .Select(c => new ACClassTaskWrapperVB()
@@ -184,9 +234,9 @@ namespace gip.bso.manufacturing
                     })
             );
 
-        static readonly Func<DatabaseApp, Guid, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByPWClassID =
-            CompiledQuery.Compile<DatabaseApp, Guid, IEnumerable<ACClassTaskWrapperVB>>(
-                (db, pwACClassID) =>
+        static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<ACClassTaskWrapperVB>> s_cQry_TasklistByPWClassID =
+            CompiledQuery.Compile<DatabaseApp, Guid, string,string, IEnumerable<ACClassTaskWrapperVB>>(
+                (db, pwACClassID, orderNo, materialNo) =>
                     db.ACClassTask
                         .Include("TaskTypeACClass")
                         .Include("ContentACClassWF")
@@ -201,7 +251,10 @@ namespace gip.bso.manufacturing
                                 && c.ACTaskTypeIndex == (short)Global.ACTaskTypes.WorkflowTask
                                 && c.ParentACClassTaskID.HasValue && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACKindIndex == (short)Global.ACKinds.TACApplicationManager
                                 && c.ACClassTask1_ParentACClassTask.TaskTypeACClass.ACProject.IsWorkflowEnabled
-                                && c.ContentACClassWFID.HasValue && c.ContentACClassWF.PWACClass.ACClassID == pwACClassID)
+                                && c.ContentACClassWFID.HasValue && c.ContentACClassWF.PWACClass.ACClassID == pwACClassID
+                                && (string.IsNullOrEmpty(orderNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.ProdOrder).Where(x => x.ProgramNo.Contains(orderNo)).Any())
+                                && (string.IsNullOrEmpty(materialNo) || c.ProdOrderPartslistPos_ACClassTask.Select(x => x.ProdOrderPartslist.Partslist.Material).Where(x => x.MaterialNo.Contains(materialNo) || x.MaterialName1.Contains(materialNo)).Any())
+                        )
                         .OrderBy(c => c.ACProgram.ProgramNo)
                         .ThenByDescending(c => c.InsertDate)
                         .Select(c => new ACClassTaskWrapperVB()
@@ -277,7 +330,7 @@ namespace gip.bso.manufacturing
                     return taskListChanged;
                 }
 
-                newTaskList = s_cQry_TasklistByTaskID(this.DatabaseApp, rootTaskAppManger.ACClassTaskID).ToArray();
+                newTaskList = s_cQry_TasklistByTaskID(this.DatabaseApp, rootTaskAppManger.ACClassTaskID, FilterOrderNo, FilterMaterialNo).ToArray();
             }
             else
             {
@@ -291,7 +344,7 @@ namespace gip.bso.manufacturing
                 if (CurrentProgramType.ACObject is gip.core.datamodel.ACClass)
                 {
                     gip.core.datamodel.ACClass pwACClass = CurrentProgramType.ACObject as gip.core.datamodel.ACClass;
-                    newTaskList = s_cQry_TasklistByPWClassID(this.DatabaseApp, pwACClass.ACClassID).ToArray();
+                    newTaskList = s_cQry_TasklistByPWClassID(this.DatabaseApp, pwACClass.ACClassID, FilterOrderNo, FilterMaterialNo).ToArray();
                 }
                 else
                 {
@@ -364,7 +417,6 @@ namespace gip.bso.manufacturing
                 pos.ACClassTaskID = null;
             }
         }
-
 
         #endregion
 
