@@ -492,9 +492,9 @@ namespace gip.bso.manufacturing
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo) =>
                ctx
                .ProdOrderPartslist
-               //.Include(c => c.Partslist)
-               //.Include(c => c.Partslist.Material)
-               //.Include(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+               .Include("Partslist")
+               .Include("Partslist.Material")
+               .Include("ProdOrderPartslistPos_ProdOrderPartslist")
 
                .Where(c =>
                         (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
@@ -524,12 +524,12 @@ namespace gip.bso.manufacturing
             (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo) =>
                 ctx
                 .ProdOrderPartslist
-                //.Include(c => c.Partslist)
-                //.Include(c => c.Partslist.Material)
-                //.Include(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-                //.Include("ProdOrderPartslistPos_ProdOrderPartslist.FacilityBooking_ProdOrderPartslistPos")
-                //.Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
-                //.Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+                .Include("Partslist")
+                .Include("Partslist.Material")
+                .Include("ProdOrderPartslistPos_ProdOrderPartslist")
+                .Include("ProdOrderPartslistPos_ProdOrderPartslist.FacilityBooking_ProdOrderPartslistPos")
+                .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
+                .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
 
                 .Where(c =>
                     (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
