@@ -3039,6 +3039,9 @@ namespace gip.bso.manufacturing
         {
             var currentProcessModule = CurrentProcessModule;
 
+            if (currentProcessModule == null)
+                return;
+
             Guid acClassID;
 
             using (ACMonitor.Lock(core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
