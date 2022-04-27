@@ -43,6 +43,11 @@ namespace gip.mes.webservices
             }
         }
 
+        public override object GetWebServiceInstance()
+        {
+            return new VBWebService();
+        }
+
         #endregion
     }
 }

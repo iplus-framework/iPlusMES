@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -95,6 +96,20 @@ namespace gip.mes.webservices
         public ACMethod WFMethod
         {
             get; set;
+        }
+
+        [DataMember(Name = "PQSM")]
+        public PostingQuantitySuggestionMode PostingQSuggestionMode
+        {
+            get;
+            set;
+        }
+
+        [DataMember(Name = "OQOIP")]
+        public bool OrderQuantityOnInwardPosting
+        {
+            get;
+            set;
         }
     }
 

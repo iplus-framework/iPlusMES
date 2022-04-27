@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,6 +96,20 @@ namespace gip.mes.processapplication
         public ACMethod WFMethod
         {
             get; set;
+        }
+
+        [DataMember(Name = "PQSM")]
+        public PostingQuantitySuggestionMode PostingQSuggestionMode
+        {
+            get;
+            set;
+        }
+
+        [DataMember(Name = "OQOIP")]
+        public bool OrderQuantityOnInwardPosting
+        {
+            get;
+            set;
         }
     }
 
@@ -400,6 +415,8 @@ namespace gip.mes.processapplication
                 ForRelease = forRelease,
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
                 WFMethod = pwNode.CurrentACMethod.ValueT,
+                PostingQSuggestionMode = pwNode.PostingQuantitySuggestionMode.HasValue ? pwNode.PostingQuantitySuggestionMode.Value : PostingQuantitySuggestionMode.OrderQuantity,
+                OrderQuantityOnInwardPosting = pwNode.OrderQuantityOnInwardPosting
             }); 
         }
 

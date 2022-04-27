@@ -5,13 +5,14 @@ using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Xml;
+using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Generic work task'}de{'Allgemeine Arbeitsaufgabe'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWWorkTaskGeneric : PWWorkTaskScanBase
     {
-        new public const string PWClassName = nameof(PWWorkTaskScanBase);
+        new public const string PWClassName = nameof(PWWorkTaskGeneric);
 
         #region Constructors
 
@@ -24,6 +25,13 @@ namespace gip.mes.processapplication
             //paramTranslation.Add("PiecesPerRack", "en{'Capacity: Pieces per oven rack'}de{'Kapazität: Stücke pro Stikkenwagen'}");
             method.ParameterValueList.Add(new ACValue("AutoComplete", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoComplete", "en{'Auto complete'}de{'Autovervollständigung'}");
+
+            method.ParameterValueList.Add(new ACValue("PostingQuantitySuggestionMode", typeof(PostingQuantitySuggestionMode), facility.PostingQuantitySuggestionMode.OrderQuantity, Global.ParamOption.Optional));
+            paramTranslation.Add("PostingQuantitySuggestionMode", "en{'Posting quantity suggestion mode'}de{'Buchungsmengen-Vorschlagsmodus'}");
+
+            method.ParameterValueList.Add(new ACValue("OrderQuantityOnInwardPosting", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("OrderQuantityOnInwardPosting", "en{'Order quantity on inward posting'}de{'Order quantity on inward posting'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWWorkTaskGeneric), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWWorkTaskGeneric), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWWorkTaskGeneric), HandleExecuteACMethod_PWWorkTaskGeneric);

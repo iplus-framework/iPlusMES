@@ -91,7 +91,7 @@ namespace gip.mes.webservices
                 IntermChildPOPPosId = wfInfo.IntermediateBatch != null ? wfInfo.IntermediateBatch.ProdOrderPartslistPosID : Guid.Empty,
                 ACUrlWF = wfInfo.ACUrlWF,
                 ForRelease = wfInfo.InfoState > POPartslistInfoState.None,
-                Pause = wfInfo.InfoState == POPartslistInfoState.Pause
+                Pause = wfInfo.InfoState == POPartslistInfoState.Pause,
             };
         }
 
@@ -99,11 +99,77 @@ namespace gip.mes.webservices
         {
             if (paOrderWFInfos == null || !paOrderWFInfos.Any())
                 return;
-            VBWebService vbWebService = new VBWebService();
+            VBWebService vbWebService = null;
+
+            PAJsonServiceHostVB jsonHost = FindParentComponent<PAJsonServiceHostVB>(c => c is PAJsonServiceHostVB);
+            if (jsonHost != null)
+                vbWebService = jsonHost.GetWebServiceInstance() as VBWebService;
+                
+            if (vbWebService == null)
+                vbWebService = new VBWebService();
+
             try
             {
                 using (var dbApp = new DatabaseApp())
                 {
+                    var poPLIDs = paOrderWFInfos.Select(c => c.POPId);
+                    var intermPoPLPosIDs = paOrderWFInfos.Select(c => c.IntermPOPPosId);
+                    var intermChildPoPLPosIDs = paOrderWFInfos.Select(c => c.IntermChildPOPPosId);
+
+                    var intermChildPLPos = dbApp.ProdOrderPartslistPos.Include("Material")
+                                                       .Include("ProdOrderBatch")
+                                                       .Include("ProdOrderPartslist")
+                                                       .Include("ProdOrderPartslist.ProdOrder")
+                                                       .Include("ProdOrderPartslist.Partslist.Material")
+                                                       .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                                                       .Include("MDUnit")
+                                                       .Include("ProdOrderPartslistPos1_ParentProdOrderPartslistPos")
+                                                       .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
+                                                       .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos")
+                                                       .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos.Material")
+                                                       .Include("Material.MaterialWFRelation_SourceMaterial")
+                                                       .Where(c => (        c.ProdOrderBatch != null
+                                                                        && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                            || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
+                                                                        && intermChildPoPLPosIDs.Contains(c.ProdOrderPartslistPosID)
+                                                       )
+                                                       .OrderBy(x => x.Sequence)
+                                                       .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "").ToArray();
+
+                    var poPartslist = intermChildPLPos.Select(c => c.ProdOrderPartslist).ToList();
+                    var missingPOPartslist = poPLIDs.Except(poPartslist.Select(c => c.ProdOrderPartslistID));
+                    if (missingPOPartslist != null && missingPOPartslist.Any())
+                    {
+                        var missingPOPL = dbApp.ProdOrderPartslist.Include("ProdOrder")
+                                                                   .Include("Partslist")
+                                                                   .Include("Partslist.Material")
+                                                                   .Include("Partslist.Material.BaseMDUnit")
+                                                                   .Where(c => missingPOPartslist.Contains(c.ProdOrderPartslistID))
+                                                                   .OrderByDescending(x => x.UpdateDate).ToArray();
+                        poPartslist.AddRange(missingPOPL);
+                    }
+
+
+                    var intermPOPLPos = intermChildPLPos.Select(c => c.TopParentPartslistPos).ToList();
+                    var missingintermPOPLPos = intermPoPLPosIDs.Except(intermPOPLPos.Select(c => c.ProdOrderPartslistPosID));
+                    if (missingintermPOPLPos != null && missingintermPOPLPos.Any())
+                    {
+                        var missingPOPLPos = dbApp.ProdOrderPartslistPos.Include("Material")
+                                                                   .Include("Material.BaseMDUnit")
+                                                                   .Include("ProdOrderPartslist")
+                                                                   .Include("ProdOrderPartslist.ProdOrder")
+                                                                   .Include("ProdOrderPartslist.Partslist")
+                                                                   .Include("ProdOrderPartslist.Partslist.Material")
+                                                                   .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                                                                   .Include("ProdOrderPartslistPos1_ParentProdOrderPartslistPos")
+                                                                   .Include("Material.MaterialWFRelation_SourceMaterial")
+                                                                   .Where(c => (missingintermPOPLPos.Contains(c.ProdOrderPartslistPosID)))
+                                                                   .OrderBy(x => x.Sequence)
+                                                                   .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "").ToArray();
+
+                        intermPOPLPos.AddRange(missingPOPLPos);
+                    }
+
                     foreach (PAProdOrderPartslistWFInfo orderWFInfo in paOrderWFInfos)
                     {
                         if (orderWFInfo.POPId == Guid.Empty)
@@ -119,15 +185,24 @@ namespace gip.mes.webservices
                         {
                             pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;
                             pwInfo.WFMethod.FullSerialization = true;
-                            pwInfo.WFMethod.ResultValueList.RemoveAll(c => !c.IsPrimitiveType);
-                            pwInfo.WFMethod.ParameterValueList.RemoveAll(c => !c.IsPrimitiveType);
+
+                            var resultToRemoveList = pwInfo.WFMethod.ResultValueList.Where(c => !c.IsPrimitiveType).ToArray();
+                            foreach (var resultToRemove in resultToRemoveList)
+                                pwInfo.WFMethod.ResultValueList.Remove(resultToRemove);
+
+                            var paramToRemoveList = pwInfo.WFMethod.ParameterValueList.Where(c => !c.IsPrimitiveType).ToArray();
+                            foreach (var paramToRemove in paramToRemoveList)
+                                pwInfo.WFMethod.ParameterValueList.Remove(paramToRemove);
                         }
 
-                        pwInfo.ProdOrderPartslist = vbWebService.ConvertToWSProdOrderPartslists(VBWebService.s_cQry_GetProdOrderPartslist(dbApp, orderWFInfo.POPId)).FirstOrDefault();
+                        pwInfo.OrderQuantityOnInwardPosting = orderWFInfo.OrderQuantityOnInwardPosting;
+                        pwInfo.PostingQSuggestionMode = orderWFInfo.PostingQSuggestionMode;
+
+                        pwInfo.ProdOrderPartslist = vbWebService.ConvertToWSProdOrderPartslists(poPartslist.Where(c => c.ProdOrderPartslistID == orderWFInfo.POPId).AsQueryable()).FirstOrDefault();
                         if (orderWFInfo.IntermPOPPosId != Guid.Empty)
-                            pwInfo.Intermediate = vbWebService.ConvertToWSProdOrderPLIntermediates(VBWebService.s_cQry_GetProdOrderPLIntermediates(dbApp, null, orderWFInfo.IntermPOPPosId)).FirstOrDefault();
+                            pwInfo.Intermediate = vbWebService.ConvertToWSProdOrderPLIntermediates(intermPOPLPos.Where(c => c.ProdOrderPartslistPosID == orderWFInfo.IntermPOPPosId).AsQueryable()).FirstOrDefault();
                         if (orderWFInfo.IntermChildPOPPosId != Guid.Empty)
-                            pwInfo.IntermediateBatch = vbWebService.ConvertToWSProdOrderIntermBatches(VBWebService.s_cQry_GetProdOrderIntermBatches(dbApp, null, orderWFInfo.IntermChildPOPPosId)).FirstOrDefault();
+                            pwInfo.IntermediateBatch = vbWebService.ConvertToWSProdOrderIntermBatches(intermChildPLPos.Where(c => c.ProdOrderPartslistPosID == orderWFInfo.IntermChildPOPPosId).AsQueryable()).FirstOrDefault();
                         orderWFList2Fill.Add(pwInfo);
                     }
                 }

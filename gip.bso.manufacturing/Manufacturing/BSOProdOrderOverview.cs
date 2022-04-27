@@ -36,6 +36,9 @@ namespace gip.bso.manufacturing
             if (!base.ACInit(startChildMode))
                 return false;
 
+            // Default filter values
+            FilterEndDate = DateTime.Now.Date.AddDays(1);
+            FilterStartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month ,1);
 
             return true;
         }
