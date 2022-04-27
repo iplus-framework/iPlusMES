@@ -13,6 +13,7 @@ using System.Data;
 using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
+using gip.core.reporthandler;
 
 namespace gip.bso.manufacturing
 {
@@ -3027,6 +3028,43 @@ namespace gip.bso.manufacturing
         public bool IsEnabledAddReworkMaterial()
         {
             return true;
+        }
+
+        #endregion
+
+        #region Methods => Print
+
+        [ACMethodInfo("", "en{'Print last quant'}de{'Letztes Quant drucken'}", 9999, true)]
+        public void PrintLastQuant()
+        {
+            var currentProcessModule = CurrentProcessModule;
+
+            Guid acClassID;
+
+            using (ACMonitor.Lock(core.datamodel.Database.GlobalDatabase.QueryLock_1X000))
+                acClassID = currentProcessModule.ComponentClass.ACClassID;
+
+            if (_ACFacilityManager == null)
+            {
+                _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+                if (_ACFacilityManager == null)
+                {
+                    //Error50432: The facility manager is null.
+                    Messages.Error(this, "Error50432");
+                    return;
+                }
+            }
+
+            MsgWithDetails msg = ACFacilityManager.PrintLastQuant(currentProcessModule.ACUrl, acClassID);
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+            }
+        }
+
+        public bool IsEnabledPrintLastQuant()
+        {
+            return !IsCurrentProcessModuleNull;
         }
 
         #endregion

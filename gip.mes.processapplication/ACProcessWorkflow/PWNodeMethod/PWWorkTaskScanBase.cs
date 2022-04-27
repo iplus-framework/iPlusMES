@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using System.Diagnostics;
+using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {
@@ -31,6 +32,40 @@ namespace gip.mes.processapplication
                 return false;
             return true;
         }
+        #endregion
+
+        #region Properties
+
+        public PostingQuantitySuggestionMode? PostingQuantitySuggestionMode
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("PostingQuantitySuggestionMode");
+                    if (acValue != null)
+                        return acValue.Value as PostingQuantitySuggestionMode?;
+                }
+                return null;
+            }
+        }
+
+        public bool OrderQuantityOnInwardPosting
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("OrderQuantityOnInwardPosting");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

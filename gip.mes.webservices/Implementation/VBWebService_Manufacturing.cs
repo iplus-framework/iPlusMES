@@ -24,13 +24,27 @@ namespace gip.mes.webservices
                                    .Include("Partslist")
                                    .Include("Partslist.Material")
                                    .Include("Partslist.Material.BaseMDUnit")
-                                   .Where(c => (prodOrderPartslistID.HasValue && c.ProdOrderPartslistID == prodOrderPartslistID.Value)
-                                               || (!prodOrderPartslistID.HasValue && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex == (short)MDProdOrderState.ProdOrderStates.InProduction)
+                                   .Where(c => (prodOrderPartslistID != null && c.ProdOrderPartslistID == prodOrderPartslistID)
+                                               || (prodOrderPartslistID == null && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex == (short)MDProdOrderState.ProdOrderStates.InProduction)
                                    )
                                    .OrderByDescending(x => x.UpdateDate)
             );
 
-        public IEnumerable<ProdOrderPartslist> ConvertToWSProdOrderPartslists(IQueryable<gip.mes.datamodel.ProdOrderPartslist> query)
+        public static readonly Func<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslist>> s_cQry_GetProdOrderPartslists =
+            CompiledQuery.Compile<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslist>>(
+                (dbApp, prodOrderPartslistID) =>
+                    dbApp.ProdOrderPartslist
+                                   .Include("ProdOrder")
+                                   .Include("Partslist")
+                                   .Include("Partslist.Material")
+                                   .Include("Partslist.Material.BaseMDUnit")
+                                   .Where(c => (prodOrderPartslistID != null && prodOrderPartslistID.Contains(c.ProdOrderPartslistID))
+                                               || (prodOrderPartslistID == null && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex == (short)MDProdOrderState.ProdOrderStates.InProduction)
+                                   )
+                                   .OrderByDescending(x => x.UpdateDate)
+            );
+
+        public virtual IEnumerable<ProdOrderPartslist> ConvertToWSProdOrderPartslists(IQueryable<gip.mes.datamodel.ProdOrderPartslist> query)
         {
             return query.AsEnumerable().Select(c => new ProdOrderPartslist()
             {
@@ -132,6 +146,25 @@ namespace gip.mes.webservices
                                                                  )
                                                            .OrderBy(x => x.Sequence)
                                                            .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
+                        );
+
+        public static readonly Func<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderPLIntermediatesFromArray =
+                        CompiledQuery.Compile<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>>(
+                            (dbApp, prodOrderPartslistPosID) =>
+                                    dbApp.ProdOrderPartslistPos.Include("Material")
+                                                               .Include("Material.BaseMDUnit")
+                                                               .Include("ProdOrderPartslist")
+                                                               .Include("ProdOrderPartslist.ProdOrder")
+                                                               .Include("ProdOrderPartslist.Partslist")
+                                                               .Include("ProdOrderPartslist.Partslist.Material")
+                                                               .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                                                               .Include("ProdOrderPartslistPos1_ParentProdOrderPartslistPos")
+                                                               .Include("Material.MaterialWFRelation_SourceMaterial")
+                                                               .Where(c => (prodOrderPartslistPosID != null
+                                                                              && prodOrderPartslistPosID.Contains(c.ProdOrderPartslistPosID))
+                                                                     )
+                                                               .OrderBy(x => x.Sequence)
+                                                               .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
                         );
 
         public IEnumerable<ProdOrderPartslistPos> ConvertToWSProdOrderPLIntermediates(IQueryable<gip.mes.datamodel.ProdOrderPartslistPos> query)
@@ -259,7 +292,10 @@ namespace gip.mes.webservices
                                                            .Include("SourceProdOrderPartslistPos.ProdOrderPartslist.Partslist")
                                                            .Include("SourceProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material")
                                                            .Include("SourceProdOrderPartslistPos.MDUnit")
-                                                           .Where(c => targetProdOrderPLPosID.HasValue && c.TargetProdOrderPartslistPosID == targetProdOrderPLPosID)
+                                                           .Where(c => targetProdOrderPLPosID.HasValue && c.TargetProdOrderPartslistPosID == targetProdOrderPLPosID
+                                                                                                       && c.SourceProdOrderPartslistPos != null
+                                                                                                       && c.SourceProdOrderPartslistPos.Material != null
+                                                                                                       && !c.SourceProdOrderPartslistPos.Material.IsIntermediate)
                                                            .OrderBy(x => x.Sequence)
                 );
 
@@ -379,6 +415,29 @@ namespace gip.mes.webservices
                                                                         || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
                                                             || (batchIntermediateID.HasValue
                                                                     && c.ProdOrderPartslistPosID == batchIntermediateID)
+                                                   )
+                                                   .OrderBy(x => x.Sequence)
+                                                   .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
+                );
+
+        public static readonly Func<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>> s_cQry_GetProdOrderIntermBatchesFromArray =
+                CompiledQuery.Compile<DatabaseApp, Guid[], IQueryable<gip.mes.datamodel.ProdOrderPartslistPos>>(
+                    (dbApp, batchIntermediateID) =>
+                        dbApp.ProdOrderPartslistPos.Include("Material")
+                                                   .Include("ProdOrderBatch")
+                                                   .Include("ProdOrderPartslist")
+                                                   .Include("ProdOrderPartslist.ProdOrder")
+                                                   .Include("MDUnit")
+                                                   .Include("ProdOrderPartslistPos1_ParentProdOrderPartslistPos")
+                                                   .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
+                                                   .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos")
+                                                   .Include("ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos.Material")
+                                                   .Include("Material.MaterialWFRelation_SourceMaterial")
+                                                   .Where(c => (        c.ProdOrderBatch != null
+                                                                    && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                        || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex > (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
+                                                            || (batchIntermediateID != null
+                                                                    && batchIntermediateID.Contains(c.ProdOrderPartslistPosID))
                                                    )
                                                    .OrderBy(x => x.Sequence)
                                                    .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")

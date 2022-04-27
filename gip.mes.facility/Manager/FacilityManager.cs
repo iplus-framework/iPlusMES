@@ -7,6 +7,7 @@ using System.Threading;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
+using gip.core.reporthandler;
 
 namespace gip.mes.facility
 {
@@ -1072,7 +1073,53 @@ namespace gip.mes.facility
 
         #endregion
 
+        #region Print
 
+        public MsgWithDetails PrintLastQuant(string processModuleACUrl, Guid processModuleACClassID)
+        {
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                var booking = dbApp.FacilityBooking.Include(i => i.FacilityBookingCharge_FacilityBooking)
+                                                   .Where(c => c.InwardFacilityID.HasValue && c.InwardMaterialID.HasValue && c.PropertyACUrl == processModuleACUrl)
+                                                   .OrderByDescending(c => c.InsertDate)
+                                                   .FirstOrDefault();
+
+                if (booking != null)
+                {
+                    ACPrintManager printManager = ACPrintManager.GetServiceInstance(this);
+                    if (printManager == null)
+                    {
+                        Messages.Error(this, "Print manager is null!");
+                        return new MsgWithDetails();
+                    }
+
+                    MsgWithDetails msg = null;
+
+                    foreach (var bookingCharge in booking.FacilityBookingCharge_FacilityBooking)
+                    {
+                        if (!bookingCharge.InwardFacilityChargeID.HasValue)
+                            continue;
+
+                        PAOrderInfo orderInfo = new PAOrderInfo();
+                        orderInfo.Add(nameof(FacilityCharge), bookingCharge.InwardFacilityChargeID.Value);
+                        orderInfo.Add(nameof(core.datamodel.ACClass), processModuleACClassID);
+                        Msg m = printManager.Print(orderInfo, 1, Root.Environment.User.VBUserName);
+                        if (m != null && m.MessageLevel > eMsgLevel.Info)
+                        {
+                            if (msg == null)
+                                msg = new MsgWithDetails();
+
+                            msg.AddDetailMessage(m);
+                        }
+                    }
+
+                    return msg;
+                }
+            }
+            return null;
+        }
+
+        #endregion
     }
 }
 
