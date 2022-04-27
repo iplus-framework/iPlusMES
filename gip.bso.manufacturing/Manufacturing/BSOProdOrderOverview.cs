@@ -38,7 +38,7 @@ namespace gip.bso.manufacturing
 
             // Default filter values
             FilterEndDate = DateTime.Now.Date.AddDays(1);
-            FilterStartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month ,1);
+            FilterStartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
             return true;
         }
@@ -315,7 +315,10 @@ namespace gip.bso.manufacturing
 
             List<OverviewProdOrderPartslist> list = s_cQry_OverviewProdOrderPartslist(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo).ToList();
             foreach (OverviewProdOrderPartslist item in list)
+            {
                 item.RestQuantityUOM = item.TargetActualQuantityUOM - item.SumComponentsActualQuantity;
+                item.DifferentInputUOM = item.ActualInputUOM - item.TargetInputUOM;
+            }
             return list;
         }
 
@@ -517,7 +520,23 @@ namespace gip.bso.manufacturing
                    TargetActualQuantityUOM = c.ActualQuantity,
                    DifferenceQuantityUOM = c.ActualQuantity - c.TargetQuantity,
                    SumComponentsActualQuantity = c.ProdOrderPartslistPos_ProdOrderPartslist.Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).Select(x => x.ActualQuantityUOM).DefaultIfEmpty().Sum(),
-                   RestQuantityUOM = 0
+                   RestQuantityUOM = 0,
+                   TargetInputUOM =
+                            c.ProdOrderPartslistPos_ProdOrderPartslist
+                            .Select(x => x.SourceProdOrderPartslist)
+                            .SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
+                            .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                            .Select(x => x.TargetQuantityUOM)
+                            .DefaultIfEmpty()
+                            .Sum(),
+                   ActualInputUOM =
+                            c.ProdOrderPartslistPos_ProdOrderPartslist
+                            .Select(x => x.SourceProdOrderPartslist)
+                            .SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
+                            .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                            .Select(x => x.ActualQuantityUOM)
+                            .DefaultIfEmpty()
+                            .Sum()
                })
                .OrderBy(c => c.OrderNo)
             );
@@ -550,12 +569,14 @@ namespace gip.bso.manufacturing
                     MaterialName = c.Key.MaterialName1,
                     SumOutwardTargetQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
+                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                                     .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                                     .Select(x => x.TargetQuantityUOM)
                                     .DefaultIfEmpty()
                                     .Sum(),
                     SumOutwardActualQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
+                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                                     .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                                     .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
                                     .Select(x => x.OutwardQuantity)
