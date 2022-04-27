@@ -27,8 +27,17 @@ namespace gip.mes.facility
         [ACPropertyInfo(106, "SumComponentsActualQuantity", "en{'Sum Inputs'}de{'Summe Einsatz'}")]
         public double SumComponentsActualQuantity { get; set; }
 
-        [ACPropertyInfo(107, "RestQuantityUOM", "en{'Diff. Input/Output'}de{'Differenz Einsatz/Ergebnis'}")]
+        [ACPropertyInfo(107, "TargetInputUOM", "en{'Diff. Input/Output'}de{'Differenz Einsatz/Ergebnis'}")]
         public double RestQuantityUOM { get; set; }
+
+        [ACPropertyInfo(108, "RestQuantityUOM", "en{'Target input'}de{'Zieleingabe'}")]
+        public double TargetInputUOM { get; set; }
+
+        [ACPropertyInfo(109, "ActualInput", "en{'Actual input'}de{'Stromeingang'}")]
+        public double ActualInputUOM { get; set; }
+
+        [ACPropertyInfo(110, "DifferentInput", "en{'Diff. input'}de{'Diff. Eingang'}")]
+        public double DifferentInputUOM { get; set; }
 
     }
 }

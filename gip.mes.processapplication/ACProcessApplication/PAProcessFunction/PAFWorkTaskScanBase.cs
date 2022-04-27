@@ -452,7 +452,7 @@ namespace gip.mes.processapplication
         {
             Msg actionMsg = null;
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
-            Msg wfMsg = pwNode.OnGetMessageOnReleasingProcessModule(this);
+            Msg wfMsg = pwNode.OnGetMessageOnReleasingProcessModule(this, selectedPOLWf.Pause);
             if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
             {
                 if (pwNode.ReleaseProcessModuleOnScan(this, selectedPOLWf.Pause))
