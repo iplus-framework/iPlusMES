@@ -4,6 +4,8 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data.Objects;
 using System.Linq;
 using System.Text;
@@ -11,9 +13,15 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Material Preparation'}de{'Bereitstellung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder overview'}de{'Auftrag Überblick'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOProdOrderOverview : ACBSOvb
     {
+        #region const
+
+        public const string BGWorkerMehtod_Search = "Search";
+
+        #endregion
+
         #region ctor's
 
         public BSOProdOrderOverview(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -50,7 +58,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private DateTime? _FilterStartDate;
-        [ACPropertySelected(999, "FilterStartDate", "en{'Prod. start from'}de{'Auftrag Start von'}")]
+        [ACPropertySelected(999, "FilterStartDate", "en{'From'}de{'Von'}")]
         public DateTime? FilterStartDate
         {
             get
@@ -88,7 +96,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        
+
         /// <summary>
         /// Source Property: 
         /// </summary>
@@ -131,6 +139,133 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties -> Filter -> FilterTimeFilterType (TimeFilterTypeEnum)
+
+
+        public TimeFilterTypeEnum? FilterTimeFilterType
+        {
+            get
+            {
+                if (SelectedFilterTimeFilterType == null)
+                    return null;
+                return (TimeFilterTypeEnum)SelectedFilterTimeFilterType.Value;
+            }
+        }
+
+
+        private ACValueItem _SelectedFilterTimeFilterType;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected TimeFilterType</value>
+        [ACPropertySelected(305, "FilterTimeFilterType", "en{'Time filter'}de{'Zeitfilter'}")]
+        public ACValueItem SelectedFilterTimeFilterType
+        {
+            get
+            {
+                return _SelectedFilterTimeFilterType;
+            }
+            set
+            {
+                if (_SelectedFilterTimeFilterType != value)
+                {
+                    _SelectedFilterTimeFilterType = value;
+                    OnPropertyChanged(nameof(SelectedFilterTimeFilterType));
+                }
+            }
+        }
+
+        private List<ACValueItem> _FilterTimeFilterTypeList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The FilterPickingState list</value>
+        [ACPropertyList(306, "FilterTimeFilterType")]
+        public List<ACValueItem> FilterTimeFilterTypeList
+        {
+            get
+            {
+                if (_FilterTimeFilterTypeList == null)
+                    _FilterTimeFilterTypeList = LoadFilterTimeFilterTypeList();
+                return _FilterTimeFilterTypeList;
+            }
+        }
+
+        public ACValueItemList LoadFilterTimeFilterTypeList()
+        {
+            ACValueItemList list = null;
+            gip.core.datamodel.ACClass enumClass = Database.ContextIPlus.GetACType(typeof(TimeFilterTypeEnum));
+            if (enumClass != null && enumClass.ACValueListForEnum != null)
+                list = enumClass.ACValueListForEnum;
+            else
+                list = new ACValueListTimeFilterTypeEnum();
+            return list;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Properties -> Messages
+
+        public void SendMessage(object result)
+        {
+            Msg msg = result as Msg;
+            if (msg != null)
+            {
+                SendMessage(msg);
+            }
+        }
+
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged(nameof(CurrentMsg));
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged(nameof(MsgList));
+        }
         #endregion
 
         #region Properties -> OverviewProdOrderPartslist
@@ -243,63 +378,168 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search", "en{'TODO:MethodName'}de{'TODO:MethodName'}", 999)]
+        [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", 999)]
         public void Search()
         {
             if (!IsEnabledSearch())
                 return;
 
-            _OverviewProdOrderPartslistList = LoadOverviewProdOrderPartslistList(DatabaseApp, FilterStartDate, FilterEndDate, FilterStartDate, FilterEndDate,
-                FilterProgramNo, FilterMaterialNo);
-            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
-
-            _OverviewMaterialList = LoadOverviewMaterialList(DatabaseApp, FilterStartDate, FilterEndDate, FilterStartDate, FilterEndDate,
-               FilterProgramNo, FilterMaterialNo);
-            OnPropertyChanged(nameof(OverviewMaterialList));
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_Search);
+            ShowDialog(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearch()
         {
-            return true;
+            return FilterStartDate != null && FilterEndDate != null;
         }
 
+        public Tuple<List<OverviewProdOrderPartslist>, List<OverviewMaterial>> GetSearch()
+        {
+            DateTime? startProdTime = FilterStartDate;
+            DateTime? endProdTime = FilterEndDate;
+
+            DateTime? startBookingTime = null;
+            DateTime? endBookingTime = null;
+
+            if (FilterTimeFilterType != null && FilterTimeFilterType == TimeFilterTypeEnum.BookingTime)
+            {
+                startBookingTime = FilterStartDate;
+                endBookingTime = FilterEndDate;
+
+                startProdTime = null;
+                endProdTime = null;
+            }
+
+            List<OverviewProdOrderPartslist> item1 = LoadOverviewProdOrderPartslistList(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime,
+                FilterProgramNo, FilterMaterialNo);
+            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
+
+            List<OverviewMaterial> item2 = LoadOverviewMaterialList(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime,
+               FilterProgramNo, FilterMaterialNo);
+
+            return new Tuple<List<OverviewProdOrderPartslist>, List<OverviewMaterial>>(item1, item2);
+        }
+
+        #endregion
+
+        #region Background worker
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            string updateName = Root.Environment.User.Initials;
+            switch (command)
+            {
+                case BGWorkerMehtod_Search:
+                    e.Result = GetSearch();
+                    break;
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ClearMessages();
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                switch (command)
+                {
+                    case BGWorkerMehtod_Search:
+                        Tuple<List<OverviewProdOrderPartslist>, List<OverviewMaterial>> result = e.Result as Tuple<List<OverviewProdOrderPartslist>, List<OverviewMaterial>>;
+                        if (result != null)
+                        {
+                            _OverviewProdOrderPartslistList = result.Item1;
+                            _OverviewMaterialList = result.Item2;
+
+                            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
+                            OnPropertyChanged(nameof(OverviewMaterialList));
+                        }
+                        break;
+                }
+            }
+        }
 
         #endregion
 
         #region Precompiled queries
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, IQueryable<OverviewProdOrderPartslist>> s_cQry_OverviewProdOrderPartslist =
-   CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, IQueryable<OverviewProdOrderPartslist>>(
-       (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo) =>
-           ctx
-           .ProdOrderPartslist
-           .Include(c => c.Partslist)
-           .Include(c => c.Partslist.Material)
-           .Include(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-           .Select(c => new OverviewProdOrderPartslist()
-           {
-               OrderNo = c.ProdOrder.ProgramNo,
-               MaterialNo = c.Partslist.Material.MaterialNo,
-               MaterialName = c.Partslist.Material.MaterialName1,
-               TargetInwardQuantityUOM = c.TargetQuantity,
-               TargetActualQuantityUOM = c.ActualQuantity,
-               DifferenceQuantityUOM = c.ActualQuantity - c.TargetQuantity,
-               SumComponentsActualQuantity = c.ProdOrderPartslistPos_ProdOrderPartslist.Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).Sum(x => x.ActualQuantityUOM),
-               RestQuantityUOM = 0
-           })
-        );
+        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, IQueryable<OverviewProdOrderPartslist>>(
+           (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo) =>
+               ctx
+               .ProdOrderPartslist
+               //.Include(c => c.Partslist)
+               //.Include(c => c.Partslist.Material)
+               //.Include(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+
+               .Where(c =>
+                        (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
+                        && (filterProdEndDate == null || c.StartDate < filterProdEndDate)
+                        && (filterStartBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                        && (filterEndBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
+                        && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrder.ProgramNo.Contains(filterProgramNo))
+                        && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
+               )
+
+               .Select(c => new OverviewProdOrderPartslist()
+               {
+                   OrderNo = c.ProdOrder.ProgramNo,
+                   MaterialNo = c.Partslist.Material.MaterialNo,
+                   MaterialName = c.Partslist.Material.MaterialName1,
+                   TargetInwardQuantityUOM = c.TargetQuantity,
+                   TargetActualQuantityUOM = c.ActualQuantity,
+                   DifferenceQuantityUOM = c.ActualQuantity - c.TargetQuantity,
+                   SumComponentsActualQuantity = c.ProdOrderPartslistPos_ProdOrderPartslist.Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).Select(x => x.ActualQuantityUOM).DefaultIfEmpty().Sum(),
+                   RestQuantityUOM = 0
+               })
+               .OrderBy(c => c.OrderNo)
+            );
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, IQueryable<OverviewMaterial>> s_cQry_OverviewMaterial =
         CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, IQueryable<OverviewMaterial>>(
             (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo) =>
                 ctx
                 .ProdOrderPartslist
-                .Include(c => c.Partslist)
-                .Include(c => c.Partslist.Material)
-                .Include(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-                .Include("ProdOrderPartslistPos_ProdOrderPartslist.FacilityBooking_ProdOrderPartslistPos")
-                .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
-                .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+                //.Include(c => c.Partslist)
+                //.Include(c => c.Partslist.Material)
+                //.Include(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+                //.Include("ProdOrderPartslistPos_ProdOrderPartslist.FacilityBooking_ProdOrderPartslistPos")
+                //.Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
+                //.Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+
+                .Where(c =>
+                    (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
+                    && (filterProdEndDate == null || c.StartDate < filterProdEndDate)
+                    && (filterStartBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                    && (filterEndBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
+                    && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrder.ProgramNo.Contains(filterProgramNo))
+                    && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
+                )
+
                 .GroupBy(c => new { c.Partslist.Material.MaterialNo, c.Partslist.Material.MaterialName1 })
                 .Select(c => new OverviewMaterial()
                 {
@@ -308,25 +548,34 @@ namespace gip.bso.manufacturing
                     SumOutwardTargetQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
                                     .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-                                    .Sum(x => x.TargetQuantityUOM),
+                                    .Select(x => x.TargetQuantityUOM)
+                                    .DefaultIfEmpty()
+                                    .Sum(),
                     SumOutwardActualQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
                                     .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                                     .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
-                                    .Sum(x => x.OutwardQuantity),
+                                    .Select(x => x.OutwardQuantity)
+                                    .DefaultIfEmpty()
+                                    .Sum(),
                     DifferenceOutwardQuantityUOM = 0,
                     SumInwardTargetQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
                                     .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
-                                    .Sum(x => x.TargetQuantityUOM),
+                                    .Select(x => x.TargetQuantityUOM)
+                                    .DefaultIfEmpty()
+                                    .Sum(),
                     SumInwardActualQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
                                     .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                                     .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos)
-                                    .Sum(x => x.InwardQuantity),
+                                    .Select(x => x.InwardQuantity)
+                                    .DefaultIfEmpty()
+                                    .Sum(),
                     DifferenceInwardQuantityUOM = 0,
                     RestQuantityUOM = 0
                 })
+                .OrderBy(c => c.MaterialNo)
         );
         #endregion
     }

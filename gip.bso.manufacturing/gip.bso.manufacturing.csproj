@@ -58,7 +58,8 @@
     <Compile Include="Command\BatchSuggestionCommand.cs" />
     <Compile Include="Command\KeepEqualBatchSizes.cs" />
     <Compile Include="Command\KeepStandardBatchSizeAndDivideRest.cs" />
-    <Compile Include="Manufacturing\BatchPlanProdOrderSortFilterEnum.cs" />
+    <Compile Include="Model\TimeFilterTypeEnum.cs" />
+    <Compile Include="Model\BatchPlanProdOrderSortFilterEnum.cs" />
     <Compile Include="Manufacturing\BSOLabOrderMES.cs" />
     <Compile Include="Manufacturing\BSOBatchPlan.cs" />
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
@@ -376,6 +377,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-04-26 11-22_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-04-27 09-51_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
