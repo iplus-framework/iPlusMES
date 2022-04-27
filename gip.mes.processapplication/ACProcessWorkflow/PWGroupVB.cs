@@ -968,6 +968,14 @@ namespace gip.mes.processapplication
         }
         #endregion
 
+
+        #region Scan-Task
+        public virtual Msg OnGetMessageOnReleasingProcessModule(PAFWorkTaskScanBase invoker, bool pause)
+        {
+            return null;
+        }
+        #endregion
+
         #endregion
 
 

@@ -189,8 +189,11 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public virtual Msg OnGetMessageOnReleasingProcessModule(PAFWorkTaskScanBase invoker)
+        public virtual Msg OnGetMessageOnReleasingProcessModule(PAFWorkTaskScanBase invoker, bool pause)
         {
+            PWGroupVB parentPwGroupVB = ParentPWGroup as PWGroupVB;
+            if (parentPwGroupVB != null)
+                return parentPwGroupVB.OnGetMessageOnReleasingProcessModule(invoker, pause);
             return null;
         }
 
