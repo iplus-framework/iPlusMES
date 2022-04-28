@@ -2996,7 +2996,7 @@ namespace gip.bso.logistics
                         {
                             //return fbtZeroBooking.ValidMessage;
                         }
-                        else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+                        else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                         {
                             if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                 result.ValidMessage.Message = result.ResultState.ToString();

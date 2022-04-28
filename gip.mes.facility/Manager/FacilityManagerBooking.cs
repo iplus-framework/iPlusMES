@@ -1652,7 +1652,7 @@ namespace gip.mes.facility
 
         public MsgWithDetails IsQuantStockConsumed(FacilityCharge fc, DatabaseApp dbApp)
         {
-            if (fc != null && fc.StockQuantity <= 0.00001)
+            if (fc != null && fc.StockQuantity <= 0.001)
             {
                 //Question50079 :The quant stock is negative. Is quant spent?
                 return new MsgWithDetails(this, eMsgLevel.Question, "ACPickingManager", "IsQauntStockConsumed", 1647, "Question50079", eMsgButton.YesNo);

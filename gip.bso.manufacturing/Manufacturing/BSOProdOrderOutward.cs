@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
@@ -948,6 +949,74 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        [ACMethodInteraction("", "en{'Correct posting'}de{'Korrekte Buchung'}", 660, true, nameof(SelectedOutwardFacilityBookingCharge))]
+        public void CorrectBooking()
+        {
+            if (SelectedOutwardFacilityBookingCharge == null)
+                return;
+
+            FacilityCharge outwardFacilityCharge = SelectedOutwardFacilityBookingCharge.OutwardFacilityCharge;
+
+            if (outwardFacilityCharge == null)
+                return;
+
+            NewOutwardFacilityPreBooking();
+
+            if (SelectedOutwardACMethodBooking == null)
+            {
+                //todo error
+                return;
+            }
+
+            SelectedOutwardACMethodBooking.OutwardFacility = outwardFacilityCharge.Facility;
+            SelectedOutwardACMethodBooking.OutwardFacilityCharge = outwardFacilityCharge;
+            SelectedOutwardACMethodBooking.OutwardQuantity = outwardFacilityCharge.StockQuantity < 0.00001 ? outwardFacilityCharge.StockQuantity : 0;
+
+            ShowDialog(this, "CorrectBookingDialog");
+
+            if (ACFacilityManager != null)
+            {
+                Msg msg = ACFacilityManager.IsQuantStockConsumed(outwardFacilityCharge, DatabaseApp);
+                if (msg != null)
+                {
+                    if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                    {
+                        ACMethodBooking fbtZeroBookingClone = ACFacilityManager.GetBookParamNotAvailableClone();
+
+                        fbtZeroBookingClone.InwardFacilityCharge = outwardFacilityCharge;
+                        fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                        ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, DatabaseApp);
+                        if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                        {
+                            //return fbtZeroBooking.ValidMessage;
+                        }
+                        else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                        {
+                            if (String.IsNullOrEmpty(resultZeroBook.ValidMessage.Message))
+                                resultZeroBook.ValidMessage.Message = resultZeroBook.ResultState.ToString();
+
+                            //return result.ValidMessage;
+                        }
+
+                        Msg msgSave = DatabaseApp.ACSaveChanges();
+                        if (msgSave != null)
+                            Messages.Msg(msgSave);
+                    }
+                }
+            }
+
+            if (SelectedOutwardFacilityPreBooking != null)
+            {
+                DeleteOutwardFacilityPreBooking();
+            }
+        }
+
+        public bool IsEnabledCorrectBooking()
+        {
+            return SelectedOutwardFacilityBookingCharge != null;
+        }
 
         #endregion
 
