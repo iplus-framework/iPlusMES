@@ -3216,6 +3216,12 @@ namespace gip.bso.manufacturing
                 case nameof(ConvertWeightToUIText):
                     result = ConvertWeightToUIText((double) acParameter[0]);
                     return true;
+                case nameof(PrintLastQuant):
+                    PrintLastQuant();
+                    return true;
+                case nameof(IsEnabledPrintLastQuant):
+                    result = IsEnabledPrintLastQuant();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
