@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using gip.bso.masterdata;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -20,6 +21,7 @@ namespace gip.bso.facility
     {
         #region contants
         public const string BGWorkerMehtod_DoNewInventory = @"DoNewInventory";
+        public const string BGWorkerMehtod_DoGeneratePositions = @"DoGeneratePositions";
         public const string BGWorkerMehtod_DoInventoryClosing = @"DoInventoryClosing";
 
         #endregion
@@ -95,6 +97,23 @@ namespace gip.bso.facility
                 if (_ACFacilityManager == null)
                     return null;
                 return _ACFacilityManager.ValueT as FacilityManager;
+            }
+        }
+
+        #endregion
+
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
             }
         }
 
@@ -190,6 +209,48 @@ namespace gip.bso.facility
 
         #endregion
 
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _GenerateInventoryPosition;
+        [ACPropertySelected(999, "GenerateInventoryPosition", "en{'TODO:GenerateInventoryPosition'}de{'TODO:GenerateInventoryPosition'}")]
+        public bool GenerateInventoryPosition
+        {
+            get
+            {
+                return _GenerateInventoryPosition;
+            }
+            set
+            {
+                if (_GenerateInventoryPosition != value)
+                {
+                    _GenerateInventoryPosition = value;
+                    OnPropertyChanged(nameof(GenerateInventoryPosition));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private Facility _NewInventoryFacility;
+        [ACPropertySelected(999, "NewInventoryFacility", ConstApp.Facility)]
+        public Facility NewInventoryFacility
+        {
+            get
+            {
+                return _NewInventoryFacility;
+            }
+            set
+            {
+                if (_NewInventoryFacility != value)
+                {
+                    _NewInventoryFacility = value;
+                    OnPropertyChanged(nameof(NewInventoryFacility));
+                }
+            }
+        }
 
         #endregion
 
@@ -1095,7 +1156,6 @@ namespace gip.bso.facility
 
         #endregion
 
-
         #region Property -> FilterNotUsedCharge
 
         private string _FilterNotUsedChargeMaterial;
@@ -1768,6 +1828,64 @@ namespace gip.bso.facility
             CloseTopDialog();
         }
 
+        [ACMethodInfo("ShowFaciltiyDialog", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowFaciltiyDialog()
+        {
+            if (!IsEnabledShowFaciltiyDialog())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(NewInventoryFacility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                NewInventoryFacility = facility;
+            }
+        }
+
+        public bool IsEnabledShowFaciltiyDialog()
+        {
+            return true;
+        }
+
+        [ACMethodInfo("ChangeInventoryFacility", "en{'Change facility'}de{'Lager wechseln'}", 999)]
+        public void ChangeInventoryFacility()
+        {
+            if (!IsEnabledChangeInventoryFacility())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFacilityInventory);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                SelectedFacilityInventory.Facility = facility;
+                OnPropertyChanged(nameof(SelectedFacilityInventory));
+            }
+        }
+
+        public bool IsEnabledChangeInventoryFacility()
+        {
+            return SelectedFacilityInventory != null && !SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any();
+        }
+
+        /// <summary>
+        /// Source Property: GeneratePositions
+        /// </summary>
+        [ACMethodInfo("GeneratePositions", "en{'Generate positions'}de{'Positionen generieren'}", 999)]
+        public void GeneratePositions()
+        {
+            if (!IsEnabledGeneratePositions())
+                return;
+
+            CloseTopDialog();
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGeneratePositions);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledGeneratePositions()
+        {
+            return SelectedFacilityInventory != null && !SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any();
+        }
+
         #endregion
 
         #region Methods -> ACvbBSO -> Delete
@@ -2225,7 +2343,10 @@ namespace gip.bso.facility
             switch (command)
             {
                 case BGWorkerMehtod_DoNewInventory:
-                    e.Result = ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName, null, DoNewInventoryProgressCallback);
+                    e.Result = ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName, NewInventoryFacility?.FacilityID, GenerateInventoryPosition, DoNewInventoryProgressCallback);
+                    break;
+                case BGWorkerMehtod_DoGeneratePositions:
+                    DoGeneratePositions(SelectedFacilityInventory);
                     break;
                 case BGWorkerMehtod_DoInventoryClosing:
                     e.Result = ACFacilityManager.InventoryClosing(SelectedFacilityInventory.FacilityInventoryNo, DoInventoryClosingProgressCallback);
@@ -2239,6 +2360,18 @@ namespace gip.bso.facility
                 BackgroundWorker.ProgressInfo.AddSubTask("DoNewInventory", 0, count);
             BackgroundWorker.ProgressInfo.ReportProgress("DoNewInventory", current);
             BackgroundWorker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"DoNewInventory: [{0}] | Progress: {1} / {2} steps...", NewFaciltiyInventoryNo, current, count);
+        }
+
+        public MsgWithDetails DoGeneratePositions(FacilityInventory facilityInventory)
+        {
+            MsgWithDetails msg = null;
+            using (DatabaseApp databaseApp = new DatabaseApp())
+            {
+                FacilityInventory tmpInventory = databaseApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityInventory.FacilityInventoryID);
+                ACFacilityManager.InventoryGeneratePositions(databaseApp, tmpInventory, null);
+                msg = databaseApp.ACSaveChanges();
+            }
+            return msg;
         }
 
         private void DoInventoryClosingProgressCallback(int current, int count)
@@ -2278,15 +2411,17 @@ namespace gip.bso.facility
                         else
                             SendMessage(creatingMessage);
                         break;
+                    case BGWorkerMehtod_DoGeneratePositions:
+                        MsgWithDetails msgAddPositions = e.Result as MsgWithDetails;
+                        if (msgAddPositions == null || msgAddPositions.IsSucceded())
+                            RefreshInventory(true);
+                        else
+                            SendMessage(msgAddPositions);
+                        break;
                     case BGWorkerMehtod_DoInventoryClosing:
                         MsgWithDetails closingMessage = e.Result as MsgWithDetails;
                         if (closingMessage.IsSucceded())
-                        {
-                            SelectedFacilityInventory.AutoRefresh();
-                            OnPropertyChanged("SelectedFacilityInventory");
-                            OnPropertyChanged("FacilityInventoryList");
-                            SetInventoryPosFacilityBookingList();
-                        }
+                            RefreshInventory(false);
                         else
                         {
                             if (closingMessage.MsgDetails.Any(c => c.MessageLevel == eMsgLevel.Error && c.ACIdentifier == FacilityManager.Const_Inventory_NotAllowedClosing))
@@ -2300,6 +2435,21 @@ namespace gip.bso.facility
                         break;
                 }
             }
+        }
+
+        private void RefreshInventory(bool refreshPos)
+        {
+            SelectedFacilityInventory.AutoRefresh();
+            OnPropertyChanged(nameof(SelectedFacilityInventory));
+            OnPropertyChanged(nameof(FacilityInventoryList));
+
+            if(refreshPos)
+            {
+                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
+                SetFacilityInventoryPosList();
+            }
+
+            SetInventoryPosFacilityBookingList();
         }
 
         #endregion

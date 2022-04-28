@@ -22,7 +22,7 @@ namespace gip.mes.facility
             return Root.NoManager.GetNewNo(Database, typeof(FacilityInventory), FacilityInventory.NoColumnName, FacilityInventory.FormatNewNo, this);
         }
 
-        public MsgWithDetails InventoryGenerate(string facilityInventoryNo, string facilityInventoryName, Guid? facilityID, Action<int, int> progressCallback)
+        public MsgWithDetails InventoryGenerate(string facilityInventoryNo, string facilityInventoryName, Guid? facilityID, bool generatePositions, Action<int, int> progressCallback)
         {
             MsgWithDetails msgWithDetails = null;
 
@@ -30,40 +30,46 @@ namespace gip.mes.facility
             {
                 FacilityInventory facilityInventory = FacilityInventory.NewACObject(databaseApp, null, facilityInventoryNo);
                 facilityInventory.FacilityInventoryName = facilityInventoryName;
+                facilityInventory.FacilityID = facilityID;
+                if (generatePositions)
+                    InventoryGeneratePositions(databaseApp, facilityInventory, progressCallback);
+                msgWithDetails = databaseApp.ACSaveChanges();
+            }
 
-                List<FacilityCharge> facilityCharges =
+            return msgWithDetails;
+        }
+
+        public void InventoryGeneratePositions(DatabaseApp databaseApp, FacilityInventory facilityInventory, Action<int, int> progressCallback)
+        {
+            List<FacilityCharge> facilityCharges =
                     databaseApp
                     .FacilityCharge
                     .Where(c =>
                             !c.NotAvailable
-                            && (!facilityID.HasValue
-                                || c.FacilityID == facilityID.Value
+                            && (facilityInventory.FacilityID == null
+                                || c.FacilityID == facilityInventory.FacilityID
                                 || (c.Facility.Facility1_ParentFacility != null
-                                    && (c.Facility.Facility1_ParentFacility.FacilityID == facilityID.Value
-                                         || (c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityID == facilityID.Value))))
+                                    && (c.Facility.Facility1_ParentFacility.FacilityID == facilityInventory.FacilityID
+                                         || (c.Facility.Facility1_ParentFacility.Facility1_ParentFacility != null && c.Facility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityID == facilityInventory.FacilityID))))
                     )
                     // TODO: @aagincic remove limit
                     // .Take(10)
                     .OrderBy(c => c.FacilityLot.LotNo)
                    .ToList();
-                int count = facilityCharges.Count();
+            int count = facilityCharges.Count();
+            if (progressCallback != null)
+                progressCallback(0, count);
+            List<FacilityInventoryPos> positions = new List<FacilityInventoryPos>();
+            int nr = 0;
+            foreach (FacilityCharge facilityCharge in facilityCharges)
+            {
+                nr++;
+                FacilityInventoryPos inventoryPos = FacilityInventoryPos.NewACObject(databaseApp, facilityInventory);
+                inventoryPos.FacilityCharge = facilityCharge;
+                inventoryPos.StockQuantity = facilityCharge.StockQuantity;
                 if (progressCallback != null)
-                    progressCallback(0, count);
-                List<FacilityInventoryPos> positions = new List<FacilityInventoryPos>();
-                int nr = 0;
-                foreach (FacilityCharge facilityCharge in facilityCharges)
-                {
-                    nr++;
-                    FacilityInventoryPos inventoryPos = FacilityInventoryPos.NewACObject(databaseApp, facilityInventory);
-                    inventoryPos.FacilityCharge = facilityCharge;
-                    inventoryPos.StockQuantity = facilityCharge.StockQuantity;
-                    if (progressCallback != null)
-                        progressCallback(nr, count);
-                }
-                msgWithDetails = databaseApp.ACSaveChanges();
+                    progressCallback(nr, count);
             }
-
-            return msgWithDetails;
         }
 
 

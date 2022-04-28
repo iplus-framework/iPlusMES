@@ -3277,7 +3277,7 @@ namespace gip.bso.manufacturing
             {
                 List<Guid> groupsForRefresh = new List<Guid>();
                 List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-                if (selectedBatches.Count() <= 3 || Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
+                if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
                 {
                     List<ProdOrderBatchPlan> notSelected =
                     ProdOrderBatchPlanList

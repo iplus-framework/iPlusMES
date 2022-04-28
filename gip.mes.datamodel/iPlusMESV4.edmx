@@ -1272,6 +1272,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="FacilityID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="FacilityInventoryPos">
           <Key>
@@ -7756,6 +7757,18 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
             </Principal>
             <Dependent Role="FacilityHistory">
               <PropertyRef Name="HistoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityInventory_Facility">
+          <End Role="Facility" Type="Self.Facility" Multiplicity="0..1" />
+          <End Role="FacilityInventory" Type="Self.FacilityInventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Facility">
+              <PropertyRef Name="FacilityID" />
+            </Principal>
+            <Dependent Role="FacilityInventory">
+              <PropertyRef Name="FacilityID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -15044,6 +15057,10 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
             <End Role="History" EntitySet="History" />
             <End Role="FacilityHistory" EntitySet="FacilityHistory" />
           </AssociationSet>
+          <AssociationSet Name="FK_FacilityInventory_Facility" Association="Self.FK_FacilityInventory_Facility">
+            <End Role="Facility" EntitySet="Facility" />
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+          </AssociationSet>
           <AssociationSet Name="FK_FacilityInventory_MDFacilityInventoryStateID" Association="Self.FK_FacilityInventory_MDFacilityInventoryStateID">
             <End Role="MDFacilityInventoryState" EntitySet="MDFacilityInventoryState" />
             <End Role="FacilityInventory" EntitySet="FacilityInventory" />
@@ -17071,7 +17088,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <EntitySet Name="FacilityBookingCharge" EntityType="iPlusMESV4_Model.FacilityBookingCharge" />
           <EntitySet Name="FacilityCharge" EntityType="iPlusMESV4_Model.FacilityCharge" />
           <EntitySet Name="FacilityHistory" EntityType="iPlusMESV4_Model.FacilityHistory" />
-          <EntitySet Name="FacilityInventory" EntityType="iPlusMESV4_Model.FacilityInventory" />
           <EntitySet Name="FacilityInventoryPos" EntityType="iPlusMESV4_Model.FacilityInventoryPos" />
           <EntitySet Name="FacilityLot" EntityType="iPlusMESV4_Model.FacilityLot" />
           <EntitySet Name="FacilityLotStock" EntityType="iPlusMESV4_Model.FacilityLotStock" />
@@ -18508,14 +18524,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <AssociationSet Name="FK_FacilityHistory_HistoryID" Association="iPlusMESV4_Model.FK_FacilityHistory_HistoryID">
             <End Role="History" EntitySet="History" />
             <End Role="FacilityHistory" EntitySet="FacilityHistory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityInventory_MDFacilityInventoryStateID" Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID">
-            <End Role="MDFacilityInventoryState" EntitySet="MDFacilityInventoryState" />
-            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityInventoryPos_FacilityInventoryID" Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID">
-            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
-            <End Role="FacilityInventoryPos" EntitySet="FacilityInventoryPos" />
           </AssociationSet>
           <AssociationSet Name="FK_FacilityInventoryPos_MDFacilityInventoryPosStateID" Association="iPlusMESV4_Model.FK_FacilityInventoryPos_MDFacilityInventoryPosStateID">
             <End Role="MDFacilityInventoryPosState" EntitySet="MDFacilityInventoryPosState" />
@@ -20058,6 +20066,19 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <AssociationSet Name="FK_VisitorVoucher_VehicleFacilityID" Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID">
             <End Role="Facility" EntitySet="Facility" />
             <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
+          </AssociationSet>
+          <EntitySet Name="FacilityInventory" EntityType="iPlusMESV4_Model.FacilityInventory" />
+          <AssociationSet Name="FK_FacilityInventory_Facility" Association="iPlusMESV4_Model.FK_FacilityInventory_Facility">
+            <End Role="Facility" EntitySet="Facility" />
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityInventory_MDFacilityInventoryStateID" Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID">
+            <End Role="MDFacilityInventoryState" EntitySet="MDFacilityInventoryState" />
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityInventoryPos_FacilityInventoryID" Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID">
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+            <End Role="FacilityInventoryPos" EntitySet="FacilityInventoryPos" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -21699,22 +21720,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="History" Relationship="iPlusMESV4_Model.FK_FacilityHistory_HistoryID" FromRole="FacilityHistory" ToRole="History" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityHistory_FacilityID" FromRole="FacilityHistory" ToRole="Facility" />
         </EntityType>
-        <EntityType Name="FacilityInventory">
-          <Key>
-            <PropertyRef Name="FacilityInventoryID" />
-          </Key>
-          <Property Name="FacilityInventoryID" Type="Guid" Nullable="false" />
-          <Property Name="FacilityInventoryNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="FacilityInventoryName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="MDFacilityInventoryStateID" Type="Guid" Nullable="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="MDFacilityInventoryState" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="FacilityInventory" ToRole="MDFacilityInventoryState" />
-          <NavigationProperty Name="FacilityInventoryPos_FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventory" ToRole="FacilityInventoryPos" />
-        </EntityType>
         <EntityType Name="FacilityInventoryPos">
           <Key>
             <PropertyRef Name="FacilityInventoryPosID" />
@@ -21736,8 +21741,8 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="FacilityBooking_FacilityInventoryPos" Relationship="iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID" FromRole="FacilityInventoryPos" ToRole="FacilityBooking" />
           <NavigationProperty Name="FacilityBookingCharge_FacilityInventoryPos" Relationship="iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID" FromRole="FacilityInventoryPos" ToRole="FacilityBookingCharge" />
           <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID" FromRole="FacilityInventoryPos" ToRole="FacilityCharge" />
-          <NavigationProperty Name="FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventoryPos" ToRole="FacilityInventory" />
           <NavigationProperty Name="MDFacilityInventoryPosState" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_MDFacilityInventoryPosStateID" FromRole="FacilityInventoryPos" ToRole="MDFacilityInventoryPosState" />
+          <NavigationProperty Name="FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventoryPos" ToRole="FacilityInventory" />
         </EntityType>
         <EntityType Name="FacilityLot">
           <Key>
@@ -30005,32 +30010,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_FacilityInventory_MDFacilityInventoryStateID">
-          <End Type="iPlusMESV4_Model.MDFacilityInventoryState" Role="MDFacilityInventoryState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDFacilityInventoryState">
-              <PropertyRef Name="MDFacilityInventoryStateID" />
-            </Principal>
-            <Dependent Role="FacilityInventory">
-              <PropertyRef Name="MDFacilityInventoryStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityInventoryPos_FacilityInventoryID">
-          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.FacilityInventoryPos" Role="FacilityInventoryPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="FacilityInventory">
-              <PropertyRef Name="FacilityInventoryID" />
-            </Principal>
-            <Dependent Role="FacilityInventoryPos">
-              <PropertyRef Name="FacilityInventoryID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_FacilityInventoryPos_MDFacilityInventoryPosStateID">
           <End Type="iPlusMESV4_Model.MDFacilityInventoryPosState" Role="MDFacilityInventoryPosState" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.FacilityInventoryPos" Role="FacilityInventoryPos" Multiplicity="*" />
@@ -34679,6 +34658,7 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
           <NavigationProperty Name="Visitor_VehicleFacility" Relationship="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID" FromRole="Facility" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_TrailerFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" FromRole="Facility" ToRole="VisitorVoucher" />
           <NavigationProperty Name="VisitorVoucher_VehicleFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" FromRole="Facility" ToRole="VisitorVoucher" />
+          <NavigationProperty Name="FacilityInventory_Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="Facility" ToRole="FacilityInventory" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -35125,6 +35105,62 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
             </Principal>
             <Dependent Role="VisitorVoucher">
               <PropertyRef Name="VehicleFacilityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="FacilityInventory">
+          <Key>
+            <PropertyRef Name="FacilityInventoryID" />
+          </Key>
+          <Property Name="FacilityInventoryID" Type="Guid" Nullable="false" />
+          <Property Name="FacilityInventoryNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="FacilityInventoryName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="MDFacilityInventoryStateID" Type="Guid" Nullable="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FacilityID" Type="Guid" />
+          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="FacilityInventory" ToRole="Facility" />
+          <NavigationProperty Name="MDFacilityInventoryState" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="FacilityInventory" ToRole="MDFacilityInventoryState" />
+          <NavigationProperty Name="FacilityInventoryPos_FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventory" ToRole="FacilityInventoryPos" />
+        </EntityType>
+        <Association Name="FK_FacilityInventory_Facility">
+          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Facility">
+              <PropertyRef Name="FacilityID" />
+            </Principal>
+            <Dependent Role="FacilityInventory">
+              <PropertyRef Name="FacilityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityInventory_MDFacilityInventoryStateID">
+          <End Type="iPlusMESV4_Model.MDFacilityInventoryState" Role="MDFacilityInventoryState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDFacilityInventoryState">
+              <PropertyRef Name="MDFacilityInventoryStateID" />
+            </Principal>
+            <Dependent Role="FacilityInventory">
+              <PropertyRef Name="MDFacilityInventoryStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityInventoryPos_FacilityInventoryID">
+          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.FacilityInventoryPos" Role="FacilityInventoryPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FacilityInventory">
+              <PropertyRef Name="FacilityInventoryID" />
+            </Principal>
+            <Dependent Role="FacilityInventoryPos">
+              <PropertyRef Name="FacilityInventoryID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -36386,21 +36422,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
                 <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
                 <ScalarProperty Name="HistoryID" ColumnName="HistoryID" />
                 <ScalarProperty Name="FacilityHistoryID" ColumnName="FacilityHistoryID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="FacilityInventory">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityInventory">
-              <MappingFragment StoreEntitySet="FacilityInventory">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="MDFacilityInventoryStateID" ColumnName="MDFacilityInventoryStateID" />
-                <ScalarProperty Name="FacilityInventoryName" ColumnName="FacilityInventoryName" />
-                <ScalarProperty Name="FacilityInventoryNo" ColumnName="FacilityInventoryNo" />
-                <ScalarProperty Name="FacilityInventoryID" ColumnName="FacilityInventoryID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -40408,6 +40429,22 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="FacilityInventory">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityInventory">
+              <MappingFragment StoreEntitySet="FacilityInventory">
+                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="MDFacilityInventoryStateID" ColumnName="MDFacilityInventoryStateID" />
+                <ScalarProperty Name="FacilityInventoryName" ColumnName="FacilityInventoryName" />
+                <ScalarProperty Name="FacilityInventoryNo" ColumnName="FacilityInventoryNo" />
+                <ScalarProperty Name="FacilityInventoryID" ColumnName="FacilityInventoryID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -40479,7 +40516,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityBookingCharge" Width="1.5" PointX="51.75" PointY="310.5" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityCharge" Width="1.5" PointX="26.25" PointY="322.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityHistory" Width="1.5" PointX="33.5" PointY="303.125" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityInventory" Width="1.5" PointX="34.25" PointY="353.625" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityInventoryPos" Width="1.5" PointX="36.5" PointY="325.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityLot" Width="1.5" PointX="59.75" PointY="315.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityLotStock" Width="1.5" PointX="65" PointY="316.125" />
@@ -40984,8 +41020,6 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_FacilityChargeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityHistory_HistoryID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventoryPos_MDFacilityInventoryPosStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityLot_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityLot_MDReleaseStateID" />
@@ -41382,6 +41416,10 @@ warning 6002: The table/view 'PanPekZGV4_Test.dbo.VBTranslationView' does not ha
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityInventory" Width="1.5" PointX="79.25" PointY="325.5" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_Facility" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" />
       </Diagram>
     </Diagrams>
   </Designer>
