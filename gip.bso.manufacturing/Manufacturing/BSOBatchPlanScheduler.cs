@@ -2883,8 +2883,9 @@ namespace gip.bso.manufacturing
             ClearMessages();
             ClearAndResetChildBSOLists(SelectedScheduleForPWNode.MDSchedulingGroup);
             WizardPhase = NewScheduledBatchWizardPhaseEnum.SelectMaterial;
-            WizardForwardAction(WizardPhase);
             IsWizard = true;
+            WizardForwardAction(WizardPhase);
+            OnPropertyChanged(nameof(WizardPhase));
             OnPropertyChanged(nameof(CurrentLayout));
         }
 
