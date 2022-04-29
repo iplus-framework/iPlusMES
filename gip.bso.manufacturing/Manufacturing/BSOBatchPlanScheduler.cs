@@ -551,9 +551,10 @@ namespace gip.bso.manufacturing
                 case nameof(WizardForwardSelectLinie):
                     WizardForwardSelectLinie((System.Object)acParameter[0]);
                     return true;
-                //case nameof(ChangeBatchPlan):
-                //    ChangeBatchPlan((gip.mes.datamodel.ProdOrderBatchPlan)acParameter[0]);
-                //    return true;
+                case nameof(ChangeBatchPlan):
+                    if (acParameter != null && acParameter.Count() > 0)
+                        ChangeBatchPlan(acParameter[0] as ProdOrderBatchPlan);
+                    return true;
                 case nameof(IsEnabledWizardForward):
                     result = IsEnabledWizardForward();
                     return true;
@@ -1238,6 +1239,11 @@ namespace gip.bso.manufacturing
                    .Select(c => c.ProdOrderPartslist.ProdOrderID);
                     prodOrderBatchPlans = new ObservableCollection<ProdOrderBatchPlan>(prodOrderBatchPlans.Where(c => includedProductionOrders.Contains(c.ProdOrderPartslist.ProdOrderID)));
                 }
+            }
+            catch (Exception ex)
+            {
+                this.Messages.LogException(this.GetACUrl(), "GetProdOrderBatchPlanList(10)", ex);
+                this.Messages.LogException(this.GetACUrl(), "GetProdOrderBatchPlanList(10)", ex.StackTrace);
             }
             finally
             {
@@ -3829,6 +3835,11 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("ChangeBatchPlan", "en{'Change'}de{'Bearbeiten'}", 600)]
         public void ChangeBatchPlan(ProdOrderBatchPlan batchPlan)
         {
+            if (batchPlan == null)
+            {
+                Messages.LogError(this.GetACUrl(), "ChangeBatchPlan(10)", "batchPlan is null");
+                return;
+            }
             ChangeBatchPlanForSchedule(batchPlan, SelectedScheduleForPWNode);
         }
 
@@ -4543,6 +4554,7 @@ namespace gip.bso.manufacturing
             catch (Exception e)
             {
                 Messages.LogException(this.GetACUrl(), nameof(LoadProdOrderBatchPlanList), e);
+                Messages.LogException(this.GetACUrl(), nameof(LoadProdOrderBatchPlanList), e.StackTrace);
             }
         }
 
