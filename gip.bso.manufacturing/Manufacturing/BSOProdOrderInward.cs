@@ -92,6 +92,12 @@ namespace gip.bso.manufacturing
                 SelectedInwardACMethodBooking.InwardFacilityLot = SelectedIntermediate.FacilityLot;
             }
 
+            if (SelectedInwardACMethodBooking.FacilityBooking != null)
+            {
+                if (SelectedInwardACMethodBooking.FacilityBooking.ProdOrderPartslistPos != SelectedInwardACMethodBooking.PartslistPos)
+                    SelectedInwardACMethodBooking.FacilityBooking.ProdOrderPartslistPos = SelectedInwardACMethodBooking.PartslistPos;
+            }
+
             //if (CurrentProdOrder.CPartnerCompany != null && SelectedInwardACMethodBooking.CPartnerCompany != CurrentProdOrder.CPartnerCompany)
             SelectedInwardACMethodBooking.CPartnerCompany = CurrentProdOrder.CPartnerCompany;
 

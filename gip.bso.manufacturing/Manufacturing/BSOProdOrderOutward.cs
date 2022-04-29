@@ -393,6 +393,18 @@ namespace gip.bso.manufacturing
             if (CurrentProdOrder.CPartnerCompany != null && SelectedOutwardACMethodBooking.CPartnerCompany != CurrentProdOrder.CPartnerCompany)
                 SelectedOutwardACMethodBooking.CPartnerCompany = CurrentProdOrder.CPartnerCompany;
 
+            if (SelectedOutwardACMethodBooking.FacilityBooking != null)
+            {
+                if (SelectedOutwardACMethodBooking.FacilityBooking.ProdOrderPartslistPosRelation != SelectedOutwardACMethodBooking.PartslistPosRelation)
+                    SelectedOutwardACMethodBooking.FacilityBooking.ProdOrderPartslistPosRelation = SelectedOutwardACMethodBooking.PartslistPosRelation;
+
+                if (SelectedOutwardACMethodBooking.FacilityBooking.OutwardMaterial != SelectedOutwardACMethodBooking.OutwardMaterial)
+                    SelectedOutwardACMethodBooking.FacilityBooking.OutwardMaterial = SelectedOutwardACMethodBooking.OutwardMaterial;
+
+                if (SelectedOutwardACMethodBooking.FacilityBooking.OutwardFacility != SelectedOutwardACMethodBooking.OutwardFacility)
+                    SelectedOutwardACMethodBooking.FacilityBooking.OutwardFacility = SelectedOutwardACMethodBooking.OutwardFacility;
+            }
+
             bool isCancellation = SelectedOutwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel || SelectedOutwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 
             Save();
@@ -1015,7 +1027,11 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledCorrectBooking()
         {
-            return SelectedOutwardFacilityBookingCharge != null;
+            return SelectedOutwardFacilityBookingCharge != null
+                && SelectedOutwardFacilityBookingCharge.OutwardFacilityCharge != null
+                && SelectedOutwardFacilityBookingCharge.OutwardFacilityCharge.Facility != null
+                && SelectedOutwardFacilityBookingCharge.OutwardFacilityCharge.Facility.MDFacilityType != null
+                && SelectedOutwardFacilityBookingCharge.OutwardFacilityCharge.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer;
         }
 
         #endregion
