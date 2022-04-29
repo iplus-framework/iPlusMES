@@ -613,6 +613,7 @@ namespace gip.mes.facility
                 if (!prodOrderPartsListPosItems.Any(c => c.BasedOnPartslistPosID == pos.PartslistPosID))
                 {
                     ProdOrderPartslistPos prodPos = GetProdOrderPartslistPos(dbApp, prodOrderPartslist, pos);
+                    BatchLinearResize(prodPos, quantityFactor);
                     prodOrderPartsListPosItems.Add(prodPos);
                     prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Add(prodPos);
                 }
@@ -632,16 +633,13 @@ namespace gip.mes.facility
             {
                 ProdOrderPartslistPosRelation prodRelationItem = GetProdOrderPartslistPosRelation(dbApp, prodOrderPartsListPosItems, posRelation);
                 if (prodRelationItem != null)
+                {
                     prodRelationItem.TargetProdOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Add(prodRelationItem);
+                    BatchLinearResize(prodRelationItem, quantityFactor);
+                }
             }
 
-            prodOrderPartslist.TargetQuantity = partslist.TargetQuantityUOM;
-
-            // Resize quantity
-            BatchLinearResize(prodOrderPartslist, quantityFactor);
-            BatchLinearResize(prodOrderPartsListPosItems, quantityFactor);
-            BatchLinearResize(prodOrderPartsListPosRelationItems, quantityFactor);
-
+            prodOrderPartslist.RecalcActualQuantity();
             prodOrderPartslist.LastFormulaChange = partslist.LastFormulaChange;
 
             return msg;

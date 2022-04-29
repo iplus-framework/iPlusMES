@@ -992,7 +992,7 @@ namespace gip.bso.manufacturing
 
         public virtual bool IsEnabledFinishOrder()
         {
-            if (CurrentProdOrder == null)
+            if (CurrentProdOrder == null || CurrentProdOrder.MDProdOrderState == null)
                 return false;
             if (CurrentProdOrder.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished)
                 return false;
