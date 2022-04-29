@@ -745,8 +745,7 @@ namespace gip.mes.datamodel
         {
             string name = "";
             name = ProdOrderPartslist.Partslist.Material.MaterialName1.Trim();
-            //ProdOrderPartslist pl = ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).FirstOrDefault();
-            ProdOrderPartslist pl = ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.InsertDate).FirstOrDefault();
+            ProdOrderPartslist pl = ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).FirstOrDefault();
             if (pl.ProdOrderPartslistID != ProdOrderPartslist.ProdOrderPartslistID)
             {
                 name += Environment.NewLine

@@ -1954,7 +1954,10 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return AllWizardSchedulerPartslistList.Where(c => !c.IsSolved).ToList();
+                return AllWizardSchedulerPartslistList
+                    .Where(c => !c.IsSolved)
+                    .OrderBy(c => c.Sn)
+                    .ToList();
             }
         }
 
@@ -4241,19 +4244,10 @@ namespace gip.bso.manufacturing
                 if (prodOrder != null && string.IsNullOrEmpty(wizardSchedulerPartslist.ProgramNo))
                     wizardSchedulerPartslist.ProgramNo = prodOrder.ProgramNo;
             }
-            //if (wizardSchedulerPartslists.Any())
-            //{
-            //    int nr = 0;
-            //    foreach (WizardSchedulerPartslist item in wizardSchedulerPartslists)
-            //    {
-            //        AddWizardSchedulerPartslistList(item, nr);
-            //        ++nr;
-            //    }
-            //    DefaultWizardSchedulerPartslist.Sn = wizardSchedulerPartslists.Count() + 1;
-
-            //    foreach (WizardSchedulerPartslist item in wizardSchedulerPartslists)
-            //        item.ProgramNo = DefaultWizardSchedulerPartslist.ProgramNo;
-            //}
+            if (AllWizardSchedulerPartslistList.Any())
+            {
+                DefaultWizardSchedulerPartslist.Sn = AllWizardSchedulerPartslistList.Count();
+            }
         }
 
         private void LoadExistingWizardSchedulerPartslistList(ProdOrder prodOrder)
