@@ -393,11 +393,17 @@ namespace gip.bso.manufacturing
             if (CurrentProdOrder.CPartnerCompany != null && SelectedOutwardACMethodBooking.CPartnerCompany != CurrentProdOrder.CPartnerCompany)
                 SelectedOutwardACMethodBooking.CPartnerCompany = CurrentProdOrder.CPartnerCompany;
 
-            //if (SelectedOutwardACMethodBooking.FacilityBooking != null)
-            //{
-            //    if (SelectedOutwardACMethodBooking.FacilityBooking.ProdOrderPartslistPosRelation != SelectedOutwardACMethodBooking.PartslistPosRelation)
-            //        SelectedOutwardACMethodBooking.FacilityBooking.ProdOrderPartslistPosRelation = SelectedOutwardACMethodBooking.PartslistPosRelation;
-            //}
+            if (SelectedOutwardACMethodBooking.FacilityBooking != null)
+            {
+                if (SelectedOutwardACMethodBooking.FacilityBooking.ProdOrderPartslistPosRelation != SelectedOutwardACMethodBooking.PartslistPosRelation)
+                    SelectedOutwardACMethodBooking.FacilityBooking.ProdOrderPartslistPosRelation = SelectedOutwardACMethodBooking.PartslistPosRelation;
+
+                if (SelectedOutwardACMethodBooking.FacilityBooking.OutwardMaterial != SelectedOutwardACMethodBooking.OutwardMaterial)
+                    SelectedOutwardACMethodBooking.FacilityBooking.OutwardMaterial = SelectedOutwardACMethodBooking.OutwardMaterial;
+
+                if (SelectedOutwardACMethodBooking.FacilityBooking.OutwardFacility != SelectedOutwardACMethodBooking.OutwardFacility)
+                    SelectedOutwardACMethodBooking.FacilityBooking.OutwardFacility = SelectedOutwardACMethodBooking.OutwardFacility;
+            }
 
             bool isCancellation = SelectedOutwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel || SelectedOutwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 

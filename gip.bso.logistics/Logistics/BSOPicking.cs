@@ -2938,6 +2938,31 @@ namespace gip.bso.logistics
                 if (CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany != null && CurrentACMethodBooking.CPartnerCompany != CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany)
                     CurrentACMethodBooking.CPartnerCompany = CurrentPickingPos.InOrderPos.InOrder.CPartnerCompany;
             }
+
+            if (CurrentACMethodBooking.FacilityBooking != null)
+            {
+                if (CurrentACMethodBooking.FacilityBooking.OutOrderPos != CurrentACMethodBooking.OutOrderPos)
+                    CurrentACMethodBooking.FacilityBooking.OutOrderPos = CurrentACMethodBooking.OutOrderPos;
+
+                if (CurrentACMethodBooking.FacilityBooking.InOrderPos != CurrentACMethodBooking.InOrderPos)
+                    CurrentACMethodBooking.FacilityBooking.InOrderPos = CurrentACMethodBooking.InOrderPos;
+
+                if (CurrentACMethodBooking.FacilityBooking.PickingPos != CurrentACMethodBooking.PickingPos)
+                    CurrentACMethodBooking.FacilityBooking.PickingPos = CurrentACMethodBooking.PickingPos;
+
+                if (CurrentACMethodBooking.FacilityBooking.InwardMaterial != CurrentACMethodBooking.InwardMaterial)
+                    CurrentACMethodBooking.FacilityBooking.InwardMaterial = CurrentACMethodBooking.InwardMaterial;
+
+                if (CurrentACMethodBooking.FacilityBooking.OutwardMaterial != CurrentACMethodBooking.OutwardMaterial)
+                    CurrentACMethodBooking.FacilityBooking.OutwardMaterial = CurrentACMethodBooking.OutwardMaterial;
+
+                if (CurrentACMethodBooking.FacilityBooking.OutwardFacility != CurrentACMethodBooking.OutwardFacility)
+                    CurrentACMethodBooking.FacilityBooking.OutwardFacility = CurrentACMethodBooking.OutwardFacility;
+
+                if (CurrentACMethodBooking.FacilityBooking.InwardFacility != CurrentACMethodBooking.InwardFacility)
+                    CurrentACMethodBooking.FacilityBooking.InwardFacility = CurrentACMethodBooking.InwardFacility;
+            }
+
             OnValidateBookingParams();
 
             bool isCancellation = CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
