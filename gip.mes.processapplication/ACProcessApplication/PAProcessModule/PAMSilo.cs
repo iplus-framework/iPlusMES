@@ -28,6 +28,7 @@ namespace gip.mes.processapplication
         }
 
         public const string SelRuleID_Silo = "PAMSilo";
+        public const string SelRuleID_SiloDirect = "PAMSiloDirect";
         public const string SelRuleID_Storage = "Storage";
         public const string SelRuleID_Silo_Deselector = "PAMSilo.Deselector";
         public const string SelRuleID_DosingFunc = "PAMSilo.DosingFunc";
@@ -40,6 +41,7 @@ namespace gip.mes.processapplication
         {
             RegisterExecuteHandler(typeof(PAMSilo), HandleExecuteACMethod_PAMSilo);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo, (c, p) => c.Component.ValueT is PAMSilo, null);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_SiloDirect, (c, p) => c.Component.ValueT is PAMSilo, (c, p) => c.Component.ValueT is PAProcessModule);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Storage, (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace || c.Component.ValueT is PAMIntermediatebin, null);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo_Deselector, null, (c, p) => c.Component.ValueT is PAMSilo || c.Component.ValueT is PAMParkingspace);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_DosingFunc,

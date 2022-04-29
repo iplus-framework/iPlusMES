@@ -12,9 +12,12 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Hopperscale'}de{'Behälterwaage'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
     public class PAMHopperscale : PAProcessModuleVB, IPAMContScale
     {
+        public const string SelRuleID_Hopperscale = nameof(PAMHopperscale);
+
         static PAMHopperscale()
         {
             RegisterExecuteHandler(typeof(PAMHopperscale), HandleExecuteACMethod_PAMHopperscale);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_Hopperscale, (c, p) => c.Component.ValueT is PAMHopperscale, null);
         }
 
         public PAMHopperscale(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
