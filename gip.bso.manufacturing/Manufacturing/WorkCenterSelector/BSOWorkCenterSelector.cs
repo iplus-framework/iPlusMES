@@ -1075,14 +1075,18 @@ namespace gip.bso.manufacturing
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
                     if (entry != null)
                     {
-                        var pb = DatabaseApp.ProdOrderBatch.FirstOrDefault(c => c.ProdOrderBatchID == entry.EntityID);
-                        if (pb != null)
+                        using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            CurrentBatch = pb;
-                            EndBatchPos = pb.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault(c => c.IsFinalMixureBatch);
+                            var pb = dbApp.ProdOrderBatch.Include(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                                                               .FirstOrDefault(c => c.ProdOrderBatchID == entry.EntityID);
+                            if (pb != null)
+                            {
+                                CurrentBatch = pb;
+                                EndBatchPos = pb.ProdOrderPartslistPos_ProdOrderBatch.FirstOrDefault(c => c.IsFinalMixureBatch);
 
-                            if (EndBatchPos == null)
-                                EndBatchPos = pb.ProdOrderPartslistPos_ProdOrderBatch.OrderByDescending(c => c.Sequence).FirstOrDefault();
+                                if (EndBatchPos == null)
+                                    EndBatchPos = pb.ProdOrderPartslistPos_ProdOrderBatch.OrderByDescending(c => c.Sequence).FirstOrDefault();
+                            }
                         }
                     }
                     else
@@ -1093,11 +1097,14 @@ namespace gip.bso.manufacturing
                         {
                             CurrentBatch = null;
 
-                            var picking = DatabaseApp.Picking.FirstOrDefault(c => c.PickingID == entry.EntityID);
-                            if (picking != null)
+                            using (DatabaseApp dbApp = new DatabaseApp())
                             {
-                                ProdOrderProgramNo = picking.ACCaption;
-                                CurrentPicking = picking;
+                                var picking = dbApp.Picking.Include(c => c.PickingPos_Picking).FirstOrDefault(c => c.PickingID == entry.EntityID);
+                                if (picking != null)
+                                {
+                                    ProdOrderProgramNo = picking.ACCaption;
+                                    CurrentPicking = picking;
+                                }
                             }
                         }
                     }
@@ -1273,59 +1280,70 @@ namespace gip.bso.manufacturing
         {
             if (_CurrentBatch != null)
             {
-                try
-                {
-                    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoLoad();
-                    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
-                }
-                catch (Exception e)
-                {
-                    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist), e);
-                }
-                var inputList = _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
-                                                    .Where(c => c.SourceProdOrderPartslistPos != null
-                                                            && c.TopParentPartslistPosRelation != null
-                                                            && c.TargetProdOrderPartslistPos != null
-                                                            && c.TargetProdOrderPartslistPos.TopParentPartslistPos != null
-                                                            && c.MDProdOrderPartslistPosState != null
-                                                            && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
-                                                            && c.TargetQuantityUOM > 0.00001)
-                                                    .OrderBy(p => p.TargetProdOrderPartslistPos.TopParentPartslistPos.Sequence)
-                                                    .ThenBy(s => s.TopParentPartslistPosRelation.Sequence);
+                //try
+                //{
+                //    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoLoad();
+                //    _CurrentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch.AutoRefresh();
+                //}
+                //catch (Exception e)
+                //{
+                //    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist), e);
+                //}
 
-                List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
-                foreach (var relation in inputList)
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    InputComponentItem compItem = new InputComponentItem(relation);
-                    OnInputComponentCreated(compItem, relation, DatabaseApp);
-                    inputComponentsList.Add(compItem);
-                }
+                    var currentBatch = _CurrentBatch.FromAppContext<ProdOrderBatch>(dbApp);
 
-                InputComponentList = inputComponentsList;
+                    var inputList = currentBatch.ProdOrderPartslistPosRelation_ProdOrderBatch
+                                                        .Where(c => c.SourceProdOrderPartslistPos != null
+                                                                && c.TopParentPartslistPosRelation != null
+                                                                && c.TargetProdOrderPartslistPos != null
+                                                                && c.TargetProdOrderPartslistPos.TopParentPartslistPos != null
+                                                                && c.MDProdOrderPartslistPosState != null
+                                                                && c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                                                && c.TargetQuantityUOM > 0.00001)
+                                                        .OrderBy(p => p.TargetProdOrderPartslistPos.TopParentPartslistPos.Sequence)
+                                                        .ThenBy(s => s.TopParentPartslistPosRelation.Sequence);
+
+                    List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
+                    foreach (var relation in inputList)
+                    {
+                        InputComponentItem compItem = new InputComponentItem(relation);
+                        OnInputComponentCreated(compItem, relation, dbApp);
+                        inputComponentsList.Add(compItem);
+                    }
+
+                    InputComponentList = inputComponentsList;
+                }
             }
             else if (_CurrentPicking != null)
             {
-                try
-                {
-                    _CurrentPicking.PickingPos_Picking.AutoLoad();
-                    _CurrentPicking.PickingPos_Picking.AutoRefresh();
-                }
-                catch (Exception e)
-                {
-                    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist) + "10", e);
-                }
+                //try
+                //{
+                //    _CurrentPicking.PickingPos_Picking.AutoLoad();
+                //    _CurrentPicking.PickingPos_Picking.AutoRefresh();
+                //}
+                //catch (Exception e)
+                //{
+                //    Messages.LogException(this.GetACUrl(), nameof(LoadPartslist) + "10", e);
+                //}
 
-                var inputList = _CurrentPicking.PickingPos_Picking.OrderBy(c => c.Sequence);
-
-                List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
-                foreach (var picking in inputList)
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    InputComponentItem compItem = new InputComponentItem(picking);
-                    //OnInputComponentCreated(compItem, relation, DatabaseApp);
-                    inputComponentsList.Add(compItem);
-                }
+                    var currentPicking = _CurrentPicking.FromAppContext<Picking>(dbApp);
 
-                InputComponentList = inputComponentsList;
+                    var inputList = currentPicking.PickingPos_Picking.OrderBy(c => c.Sequence);
+
+                    List<InputComponentItem> inputComponentsList = new List<InputComponentItem>();
+                    foreach (var picking in inputList)
+                    {
+                        InputComponentItem compItem = new InputComponentItem(picking);
+                        //OnInputComponentCreated(compItem, relation, DatabaseApp);
+                        inputComponentsList.Add(compItem);
+                    }
+
+                    InputComponentList = inputComponentsList;
+                }
             }
             else
             {
