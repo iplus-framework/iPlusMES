@@ -123,7 +123,7 @@ namespace gip.bso.facility
 
         #region Properties -> Filter
 
-        #region Properties -> Filter-> Inventory
+        #region Properties -> Filter -> Inventory
 
         private DateTime _FilterInventoryStartDate;
         [ACPropertyInfo(90, "FilterInventoryStartDate", "en{'From'}de{'Von'}")]
@@ -138,7 +138,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryStartDate != value)
                 {
                     _FilterInventoryStartDate = value;
-                    OnPropertyChanged("FilterInventoryStartDate");
+                    OnPropertyChanged(nameof(FilterInventoryStartDate));
                 }
             }
         }
@@ -156,7 +156,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryEndDate != value)
                 {
                     _FilterInventoryEndDate = value;
-                    OnPropertyChanged("FilterInventoryEndDate");
+                    OnPropertyChanged(nameof(FilterInventoryEndDate));
                 }
             }
         }
@@ -180,7 +180,7 @@ namespace gip.bso.facility
                 if (_SelectedFilterInventoryState != value)
                 {
                     _SelectedFilterInventoryState = value;
-                    OnPropertyChanged("SelectedFilterInventoryState");
+                    OnPropertyChanged(nameof(SelectedFilterInventoryState));
                 }
             }
         }
@@ -214,7 +214,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private bool _GenerateInventoryPosition;
-        [ACPropertySelected(999, "GenerateInventoryPosition", "en{'TODO:GenerateInventoryPosition'}de{'TODO:GenerateInventoryPosition'}")]
+        [ACPropertySelected(999, "GenerateInventoryPosition", "en{'Generate positions'}de{'Positionen generieren'}")]
         public bool GenerateInventoryPosition
         {
             get
@@ -231,26 +231,48 @@ namespace gip.bso.facility
             }
         }
 
+
+        #region Properties -> Filter -> NewInventoryFacility
+
+        private Facility _SelectedNewInventoryFacility;
         /// <summary>
-        /// Source Property: 
+        /// Selected property for Facility
         /// </summary>
-        private Facility _NewInventoryFacility;
-        [ACPropertySelected(999, "NewInventoryFacility", ConstApp.Facility)]
-        public Facility NewInventoryFacility
+        /// <value>The selected NewInventoryFacility</value>
+        [ACPropertySelected(9999, "NewInventoryFacility", ConstApp.Facility)]
+        public Facility SelectedNewInventoryFacility
         {
             get
             {
-                return _NewInventoryFacility;
+                return _SelectedNewInventoryFacility;
             }
             set
             {
-                if (_NewInventoryFacility != value)
+                if (_SelectedNewInventoryFacility != value)
                 {
-                    _NewInventoryFacility = value;
-                    OnPropertyChanged(nameof(NewInventoryFacility));
+                    _SelectedNewInventoryFacility = value;
+                    OnPropertyChanged(nameof(SelectedNewInventoryFacility));
                 }
             }
         }
+
+        private List<Facility> _NewInventoryFacilityList;
+        /// <summary>
+        /// List property for Facility
+        /// </summary>
+        /// <value>The NewInventoryFacility list</value>
+        [ACPropertyList(9999, "NewInventoryFacility")]
+        public List<Facility> NewInventoryFacilityList
+        {
+            get
+            {
+                if (_NewInventoryFacilityList == null)
+                    _NewInventoryFacilityList = DatabaseApp.Facility.OrderBy(c => c.FacilityNo).ToList();
+                return _NewInventoryFacilityList;
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -328,12 +350,12 @@ namespace gip.bso.facility
                 if (AccessFilterInventoryPosStorageLocation.Selected != value)
                 {
                     AccessFilterInventoryPosStorageLocation.Selected = value;
-                    OnPropertyChanged("SelectedFilterInventoryPosStorageLocation");
+                    OnPropertyChanged(nameof(SelectedFilterInventoryPosStorageLocation));
 
                     if (FilterParentFacilityNo != null)
                         FilterParentFacilityNo.SearchWord = value != null ? value.FacilityNo : null;
                     AccessFilterInventoryPosFacility.NavSearch();
-                    OnPropertyChanged("FilterInventoryPosFacilityList");
+                    OnPropertyChanged(nameof(FilterInventoryPosFacilityList));
                     SelectedFilterInventoryPosFacility = null;
 
                     SearchPos();
@@ -440,7 +462,7 @@ namespace gip.bso.facility
                 if (AccessFilterInventoryPosFacility.Selected != value)
                 {
                     AccessFilterInventoryPosFacility.Selected = value;
-                    OnPropertyChanged("SelectedFilterInventoryPosFacility");
+                    OnPropertyChanged(nameof(SelectedFilterInventoryPosFacility));
                     SearchPos();
                 }
             }
@@ -499,7 +521,7 @@ namespace gip.bso.facility
                 if (AccessFilterInventoryPosMaterial == null)
                     return;
                 AccessFilterInventoryPosMaterial.Selected = value;
-                OnPropertyChanged("SelectedFilterInventoryPosMaterial");
+                OnPropertyChanged(nameof(SelectedFilterInventoryPosMaterial));
                 SearchPos();
             }
         }
@@ -536,7 +558,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryPosLotNo != value)
                 {
                     _FilterInventoryPosLotNo = value;
-                    OnPropertyChanged("FilterInventoryPosLotNo");
+                    OnPropertyChanged(nameof(FilterInventoryPosLotNo));
                     SearchPos();
                 }
             }
@@ -555,7 +577,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryPosNotAvailable != value)
                 {
                     _FilterInventoryPosNotAvailable = value;
-                    OnPropertyChanged("_FilterInventoryPosNotAvailable");
+                    OnPropertyChanged(nameof(FilterInventoryPosNotAvailable));
                     SearchPos();
                 }
             }
@@ -574,7 +596,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryPosZeroQuantity != value)
                 {
                     _FilterInventoryPosZeroQuantity = value;
-                    OnPropertyChanged("FilterInventoryPosZeroQuantity");
+                    OnPropertyChanged(nameof(FilterInventoryPosZeroQuantity));
                     SearchPos();
                 }
             }
@@ -593,7 +615,7 @@ namespace gip.bso.facility
                 if (_FilterOpenLines != value)
                 {
                     _FilterOpenLines = value;
-                    OnPropertyChanged("FilterOpenLines");
+                    OnPropertyChanged(nameof(FilterOpenLines));
                     SearchPos();
                 }
             }
@@ -620,7 +642,7 @@ namespace gip.bso.facility
                 if (_SelectedFilterInventoryPosState != value)
                 {
                     _SelectedFilterInventoryPosState = value;
-                    OnPropertyChanged("SelectedFilterInventoryPosState");
+                    OnPropertyChanged(nameof(SelectedFilterInventoryPosState));
                     SearchPos();
                 }
             }
@@ -663,7 +685,7 @@ namespace gip.bso.facility
                 if (_FilterPosPageSize != value)
                 {
                     _FilterPosPageSize = value;
-                    OnPropertyChanged("FilterPosPageSize");
+                    OnPropertyChanged(nameof(FilterPosPageSize));
                 }
             }
         }
@@ -688,7 +710,7 @@ namespace gip.bso.facility
                 if (_IsEnabledInventoryEdit != value)
                 {
                     _IsEnabledInventoryEdit = value;
-                    OnPropertyChanged("IsEnabledInventoryEdit");
+                    OnPropertyChanged(nameof(IsEnabledInventoryEdit));
                     InventoryDisabledModes = IsEnabledInventoryEdit ? "" : "Disabled";
                 }
             }
@@ -704,7 +726,7 @@ namespace gip.bso.facility
             set
             {
                 _IsEnabledInventoryPosEdit = value;
-                OnPropertyChanged("IsEnabledInventoryPosEdit");
+                OnPropertyChanged(nameof(IsEnabledInventoryPosEdit));
                 InventoryPosDisabledModes = IsEnabledInventoryPosEdit ? "" : "Disabled";
             }
         }
@@ -719,7 +741,7 @@ namespace gip.bso.facility
             set
             {
                 _InventoryDisabledModes = value;
-                OnPropertyChanged("InventoryDisabledModes");
+                OnPropertyChanged(nameof(InventoryDisabledModes));
             }
         }
 
@@ -736,7 +758,7 @@ namespace gip.bso.facility
                 if (_InventoryPosDisabledModes != value)
                 {
                     _InventoryPosDisabledModes = value;
-                    OnPropertyChanged("InventoryPosDisabledModes");
+                    OnPropertyChanged(nameof(InventoryPosDisabledModes));
                 }
             }
         }
@@ -763,7 +785,7 @@ namespace gip.bso.facility
                 if (_InputCode != value)
                 {
                     _InputCode = value;
-                    OnPropertyChanged("InputCode");
+                    OnPropertyChanged(nameof(InputCode));
                     SearchPos();
                 }
             }
@@ -787,7 +809,7 @@ namespace gip.bso.facility
                 if (_NewFaciltiyInventoryNo != value)
                 {
                     _NewFaciltiyInventoryNo = value;
-                    OnPropertyChanged("NewFaciltiyInventoryNo");
+                    OnPropertyChanged(nameof(NewFaciltiyInventoryNo));
                 }
             }
         }
@@ -810,7 +832,7 @@ namespace gip.bso.facility
                 if (_NewFaciltiyInventoryName != value)
                 {
                     _NewFaciltiyInventoryName = value;
-                    OnPropertyChanged("NewFaciltiyInventoryName");
+                    OnPropertyChanged(nameof(NewFaciltiyInventoryName));
                 }
             }
         }
@@ -949,7 +971,7 @@ namespace gip.bso.facility
                     else
                         IsEnabledInventoryEdit = false;
 
-                    OnPropertyChanged("SelectedFacilityInventory");
+                    OnPropertyChanged(nameof(SelectedFacilityInventory));
 
                     SetFacilityInventoryPosList();
 
@@ -1026,7 +1048,7 @@ namespace gip.bso.facility
                         _SelectedFacilityInventoryPos.PropertyChanged += _SelectedFacilityInventoryPos_PropertyChanged;
                     }
                     IsEnabledInventoryPosEdit = IsInventoryPosEnabledEdit();
-                    OnPropertyChanged("SelectedFacilityInventoryPos");
+                    OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
 
                     if (SelectedFacilityInventoryPos != null)
                     {
@@ -1084,7 +1106,7 @@ namespace gip.bso.facility
             if (e.PropertyName == "MDFacilityInventoryPosStateID")
             {
                 IsEnabledInventoryPosEdit = IsInventoryPosEnabledEdit();
-                OnPropertyChanged("SelectedFacilityInventoryPos");
+                OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
             }
         }
 
@@ -1147,7 +1169,7 @@ namespace gip.bso.facility
         public void SetFacilityInventoryPosList()
         {
             _FacilityInventoryPosList = LoadFacilityInventoryPosList();
-            OnPropertyChanged("FacilityInventoryPosList");
+            OnPropertyChanged(nameof(FacilityInventoryPosList));
             if (_FacilityInventoryPosList != null)
                 SelectedFacilityInventoryPos = _FacilityInventoryPosList.FirstOrDefault();
             else
@@ -1175,7 +1197,7 @@ namespace gip.bso.facility
                 if (_FilterNotUsedChargeMaterial != value)
                 {
                     _FilterNotUsedChargeMaterial = value;
-                    OnPropertyChanged("FilterNotUsedChargeMaterial");
+                    OnPropertyChanged(nameof(FilterNotUsedChargeMaterial));
                 }
             }
         }
@@ -1197,7 +1219,7 @@ namespace gip.bso.facility
                 if (_FilterNotUsedChargeFacility != value)
                 {
                     _FilterNotUsedChargeFacility = value;
-                    OnPropertyChanged("FilterNotUsedChargeFacility");
+                    OnPropertyChanged(nameof(FilterNotUsedChargeFacility));
                 }
             }
         }
@@ -1219,7 +1241,7 @@ namespace gip.bso.facility
                 if (_FilterNotUsedChargeLotNo != value)
                 {
                     _FilterNotUsedChargeLotNo = value;
-                    OnPropertyChanged("FilterNotUsedChargeLotNo");
+                    OnPropertyChanged(nameof(FilterNotUsedChargeLotNo));
                 }
             }
         }
@@ -1237,7 +1259,7 @@ namespace gip.bso.facility
                 if (_FilterNotUsedChargePageSize != value)
                 {
                     _FilterNotUsedChargePageSize = value;
-                    OnPropertyChanged("FilterNotUsedChargePageSize");
+                    OnPropertyChanged(nameof(FilterNotUsedChargePageSize));
                 }
             }
         }
@@ -1264,7 +1286,7 @@ namespace gip.bso.facility
                 if (_SelectedNotUsedFacilityCharge != value)
                 {
                     _SelectedNotUsedFacilityCharge = value;
-                    OnPropertyChanged("SelectedNotUsedFacilityCharge");
+                    OnPropertyChanged(nameof(SelectedNotUsedFacilityCharge));
                 }
             }
         }
@@ -1308,7 +1330,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryFaciltiyBookingChargeMaterial != value)
                 {
                     _FilterInventoryFaciltiyBookingChargeMaterial = value;
-                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargeMaterial");
+                    OnPropertyChanged(nameof(FilterInventoryFaciltiyBookingChargeMaterial));
                 }
             }
         }
@@ -1330,7 +1352,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryFaciltiyBookingChargeFacility != value)
                 {
                     _FilterInventoryFaciltiyBookingChargeFacility = value;
-                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargeFacility");
+                    OnPropertyChanged(nameof(FilterInventoryFaciltiyBookingChargeFacility));
                 }
             }
         }
@@ -1352,7 +1374,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryFaciltiyBookingChargeLotNo != value)
                 {
                     _FilterInventoryFaciltiyBookingChargeLotNo = value;
-                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargeLotNo");
+                    OnPropertyChanged(nameof(FilterInventoryFaciltiyBookingChargeLotNo));
                 }
             }
         }
@@ -1370,7 +1392,7 @@ namespace gip.bso.facility
                 if (_FilterInventoryFaciltiyBookingChargePageSize != value)
                 {
                     _FilterInventoryFaciltiyBookingChargePageSize = value;
-                    OnPropertyChanged("FilterInventoryFaciltiyBookingChargePageSize");
+                    OnPropertyChanged(nameof(FilterInventoryFaciltiyBookingChargePageSize));
                 }
             }
         }
@@ -1395,7 +1417,7 @@ namespace gip.bso.facility
                 if (_SelectedInventoryFacilityBookingCharge != value)
                 {
                     _SelectedInventoryFacilityBookingCharge = value;
-                    OnPropertyChanged("SelectedInventoryFacilityBookingCharge");
+                    OnPropertyChanged(nameof(SelectedInventoryFacilityBookingCharge));
                 }
             }
         }
@@ -1435,10 +1457,10 @@ namespace gip.bso.facility
                 if (_SelectedInventoryPosFacilityBooking != value)
                 {
                     _SelectedInventoryPosFacilityBooking = value;
-                    OnPropertyChanged("SelectedInventoryPosFacilityBooking");
+                    OnPropertyChanged(nameof(SelectedInventoryPosFacilityBooking));
 
                     _InventoryPosFacilityBookingChargeList = LoadInventoryPosFacilityBookingChargeList();
-                    OnPropertyChanged("InventoryPosFacilityBookingChargeList");
+                    OnPropertyChanged(nameof(InventoryPosFacilityBookingChargeList));
                     if (_InventoryPosFacilityBookingChargeList != null)
                         SelectedInventoryPosFacilityBookingCharge = _InventoryPosFacilityBookingChargeList.FirstOrDefault();
                     else
@@ -1475,7 +1497,7 @@ namespace gip.bso.facility
         public void SetInventoryPosFacilityBookingList()
         {
             _InventoryPosFacilityBookingList = GetInventoryPosFacilityBookingList();
-            OnPropertyChanged("InventoryPosFacilityBookingList");
+            OnPropertyChanged(nameof(InventoryPosFacilityBookingList));
             if (_InventoryPosFacilityBookingList != null)
                 SelectedInventoryPosFacilityBooking = _InventoryPosFacilityBookingList.FirstOrDefault();
             else
@@ -1501,7 +1523,7 @@ namespace gip.bso.facility
                 if (_SelectedInventoryPosFacilityBookingCharge != value)
                 {
                     _SelectedInventoryPosFacilityBookingCharge = value;
-                    OnPropertyChanged("SelectedInventoryPosFacilityBookingCharge");
+                    OnPropertyChanged(nameof(SelectedInventoryPosFacilityBookingCharge));
                 }
             }
         }
@@ -1598,7 +1620,7 @@ namespace gip.bso.facility
         public void SearchFacilityInventoryFacilityBookingCharge()
         {
             _InventoryFacilityBookingChargeList = LoadInventoryFacilityBookingChargeList();
-            OnPropertyChanged("InventoryFacilityBookingChargeList");
+            OnPropertyChanged(nameof(InventoryFacilityBookingChargeList));
             if (_InventoryFacilityBookingChargeList != null)
                 SelectedInventoryFacilityBookingCharge = _InventoryFacilityBookingChargeList.FirstOrDefault();
             else
@@ -1608,7 +1630,7 @@ namespace gip.bso.facility
         private void ClearInventoryFacilityBookingCharge()
         {
             _InventoryFacilityBookingChargeList = null;
-            OnPropertyChanged("InventoryFacilityBookingChargeList");
+            OnPropertyChanged(nameof(InventoryFacilityBookingChargeList));
         }
 
         private void ClearFilterInventoryFacilityBookingCharge()
@@ -1671,7 +1693,7 @@ namespace gip.bso.facility
         public void SearchNotUsedFaciltiyCharge()
         {
             _NotUsedFacilityChargeList = LoadNotUsedFacilityChargeList();
-            OnPropertyChanged("NotUsedFacilityChargeList");
+            OnPropertyChanged(nameof(NotUsedFacilityChargeList));
             if (_FacilityInventoryPosList != null)
                 SelectedNotUsedFacilityCharge = _NotUsedFacilityChargeList.FirstOrDefault();
             else
@@ -1681,7 +1703,7 @@ namespace gip.bso.facility
         private void ClearNotUserdFaciltiyChargeList()
         {
             _NotUsedFacilityChargeList = null;
-            OnPropertyChanged("NotUsedFacilityChargeList");
+            OnPropertyChanged(nameof(NotUsedFacilityChargeList));
         }
 
         private void ClearFilterNotUsedCharge()
@@ -1706,7 +1728,7 @@ namespace gip.bso.facility
         {
             AccessNav.NavSearch();
             _FacilityInventoryList = LoadFacilityInventoryList();
-            OnPropertyChanged("FacilityInventoryList");
+            OnPropertyChanged(nameof(FacilityInventoryList));
             if (_FacilityInventoryList != null)
                 SelectedFacilityInventory = _FacilityInventoryList.FirstOrDefault();
             else
@@ -1727,7 +1749,7 @@ namespace gip.bso.facility
             if (requery)
             {
                 SelectedFacilityInventory.AutoRefresh();
-                OnPropertyChanged("SelectedFacilityInventory");
+                OnPropertyChanged(nameof(SelectedFacilityInventory));
                 SetFacilityInventoryPosList();
             }
         }
@@ -1756,7 +1778,7 @@ namespace gip.bso.facility
             if (!IsEnabledClearSearchPos())
                 return;
             _InputCode = "";
-            OnPropertyChanged("InputCode");
+            OnPropertyChanged(nameof(InputCode));
             SelectedFilterInventoryPosFacility = null;
             FilterInventoryPosLotNo = null;
             SelectedFilterInventoryPosMaterial = null;
@@ -1813,9 +1835,12 @@ namespace gip.bso.facility
         {
             if (!IsEnabledNewDlgOk())
                 return;
-            CloseTopDialog();
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoNewInventory);
-            ShowDialog(this, DesignNameProgressBar);
+            if (SelectedNewInventoryFacility != null || Messages.Question(this, "Question50085") == MsgResult.Yes)
+            {
+                CloseTopDialog();
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoNewInventory);
+                ShowDialog(this, DesignNameProgressBar);
+            }
         }
         public bool IsEnabledNewDlgOk()
         {
@@ -1834,11 +1859,11 @@ namespace gip.bso.facility
             if (!IsEnabledShowFaciltiyDialog())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(NewInventoryFacility);
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedNewInventoryFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
-                NewInventoryFacility = facility;
+                SelectedNewInventoryFacility = facility;
             }
         }
 
@@ -1905,7 +1930,7 @@ namespace gip.bso.facility
                 SelectedFacilityInventory.DeleteACObject(Database, false);
                 SelectedFacilityInventory = FacilityInventoryList.FirstOrDefault();
                 _FacilityInventoryList = null;
-                OnPropertyChanged("FacilityInventoryList");
+                OnPropertyChanged(nameof(FacilityInventoryList));
             }
         }
 
@@ -1935,7 +1960,7 @@ namespace gip.bso.facility
         #region Methods -> Inventory Lifecycle -> Inventory
         // StartInventory
 
-        [ACMethodInfo("StartInventory", "en{'Start inventory'}de{'Inventur beginnen'}", 101)]
+        [ACMethodInfo("StartInventory", "en{'1.) Start inventory'}de{'1.) Inventur beginnen'}", 101)]
         public void StartInventory()
         {
             if (!IsEnabledStartInventory())
@@ -1943,8 +1968,8 @@ namespace gip.bso.facility
             MDFacilityInventoryState inProgressState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress);
             SelectedFacilityInventory.MDFacilityInventoryState = inProgressState;
             DatabaseApp.ACSaveChanges();
-            OnPropertyChanged("SelectedFacilityInventory");
-            OnPropertyChanged("SelectedFacilityInventoryPos");
+            OnPropertyChanged(nameof(SelectedFacilityInventory));
+            OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
             IsEnabledInventoryEdit = true;
             IsEnabledInventoryPosEdit = IsInventoryPosEnabledEdit();
         }
@@ -1958,7 +1983,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo("ClosingInventory", "en{'Post and complete inventory'}de{'Buchen und Inventur beenden'}", 100)]
+        [ACMethodInfo("ClosingInventory", "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 100)]
         public void ClosingInventory()
         {
             if (!IsEnabledClosingInventory())
@@ -1990,7 +2015,7 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
-        [ACMethodInfo("CloseAllPositions", "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 100)]
+        [ACMethodInfo("CloseAllPositions", "en{'2.) Close filtered inventory lines'}de{'2.) Gefilterte Inventurpositionen abschließen'}", 100)]
         public void CloseAllPositions()
         {
             // Question50055.
@@ -2003,7 +2028,7 @@ namespace gip.bso.facility
                     item.MDFacilityInventoryPosState = finishedState;
                 }
                 ACSaveChanges();
-                OnPropertyChanged("FacilityInventoryPosList");
+                OnPropertyChanged(nameof(FacilityInventoryPosList));
             }
         }
 
@@ -2043,7 +2068,7 @@ namespace gip.bso.facility
             if (!IsEnabledStartInventoryPos())
                 return;
             SetInventoryPosState(SelectedFacilityInventoryPos, FacilityInventoryPosStateEnum.InProgress);
-            OnPropertyChanged("SelectedFacilityInventoryPos");
+            OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
         }
 
         public bool IsEnabledStartInventoryPos()
@@ -2062,7 +2087,7 @@ namespace gip.bso.facility
             if (!IsEnabledClosingInventoryPos())
                 return;
             SetInventoryPosState(SelectedFacilityInventoryPos, FacilityInventoryPosStateEnum.Finished);
-            OnPropertyChanged("SelectedFacilityInventoryPos");
+            OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
         }
 
         public bool IsEnabledClosingInventoryPos()
@@ -2128,16 +2153,24 @@ namespace gip.bso.facility
             if (SelectedNotUsedFacilityCharge.NotAvailable)
                 SelectedNotUsedFacilityCharge.NotAvailable = false;
 
-            FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
-            facilityInventoryPos.FacilityCharge = SelectedNotUsedFacilityCharge;
-            DatabaseApp.FacilityInventoryPos.AddObject(facilityInventoryPos);
-            FacilityInventoryPosList.Add(facilityInventoryPos);
-            SelectedFacilityInventoryPos = facilityInventoryPos;
-            OnPropertyChanged("FacilityInventoryPosList");
+            if (SelectedFacilityInventory.IsFaciltiyMatch(SelectedNotUsedFacilityCharge.Facility))
+            {
+                FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
+                facilityInventoryPos.FacilityCharge = SelectedNotUsedFacilityCharge;
+                DatabaseApp.FacilityInventoryPos.AddObject(facilityInventoryPos);
+                FacilityInventoryPosList.Add(facilityInventoryPos);
+                SelectedFacilityInventoryPos = facilityInventoryPos;
+                OnPropertyChanged(nameof(FacilityInventoryPosList));
 
-            NotUsedFacilityChargeList.Remove(SelectedNotUsedFacilityCharge);
-            SelectedNotUsedFacilityCharge = NotUsedFacilityChargeList.FirstOrDefault();
-            OnPropertyChanged("NotUsedFacilityChargeList");
+                NotUsedFacilityChargeList.Remove(SelectedNotUsedFacilityCharge);
+                SelectedNotUsedFacilityCharge = NotUsedFacilityChargeList.FirstOrDefault();
+                OnPropertyChanged(nameof(NotUsedFacilityChargeList));
+            }
+            else
+            {
+                Messages.Error(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
+                    SelectedNotUsedFacilityCharge.Facility?.FacilityNo, SelectedNotUsedFacilityCharge.Facility?.FacilityName);
+            }
         }
 
         public bool IsEnabledAddFacilityCharge()
@@ -2176,6 +2209,8 @@ namespace gip.bso.facility
                         && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex <= (short)FacilityInventoryPosStateEnum.Finished
 
                         ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
+                case "SelectedFacilityInventory\\Facility":
+                    return IsEnabledChangeInventoryFacility() ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
             }
 
             return result;
@@ -2343,7 +2378,7 @@ namespace gip.bso.facility
             switch (command)
             {
                 case BGWorkerMehtod_DoNewInventory:
-                    e.Result = ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName, NewInventoryFacility?.FacilityID, GenerateInventoryPosition, DoNewInventoryProgressCallback);
+                    e.Result = ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName, SelectedNewInventoryFacility?.FacilityID, GenerateInventoryPosition, DoNewInventoryProgressCallback);
                     break;
                 case BGWorkerMehtod_DoGeneratePositions:
                     DoGeneratePositions(SelectedFacilityInventory);
@@ -2443,7 +2478,7 @@ namespace gip.bso.facility
             OnPropertyChanged(nameof(SelectedFacilityInventory));
             OnPropertyChanged(nameof(FacilityInventoryList));
 
-            if(refreshPos)
+            if (refreshPos)
             {
                 SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
                 SetFacilityInventoryPosList();
@@ -2463,7 +2498,7 @@ namespace gip.bso.facility
         public void SendMessage(Msg msg)
         {
             MsgList.Add(msg);
-            OnPropertyChanged("MsgList");
+            OnPropertyChanged(nameof(MsgList));
         }
 
         #endregion
@@ -2488,7 +2523,7 @@ namespace gip.bso.facility
             set
             {
                 _CurrentMsg = value;
-                OnPropertyChanged("CurrentMsg");
+                OnPropertyChanged(nameof(CurrentMsg));
             }
         }
 
