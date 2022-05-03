@@ -97,6 +97,23 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Child (Local BSOs)
+
+        ACChildItem<BSOTandTFastView> _BSOTandTFastView_Child;
+        [ACPropertyInfo(590)]
+        [ACChildInfo("BSOTandTFastView_Child", typeof(BSOTandTFastView))]
+        public ACChildItem<BSOTandTFastView> BSOTandTFastView_Child
+        {
+            get
+            {
+                if (_BSOTandTFastView_Child == null)
+                    _BSOTandTFastView_Child = new ACChildItem<BSOTandTFastView>(this, "BSOTandTFastView_Child");
+                return _BSOTandTFastView_Child;
+            }
+        }
+
+        #endregion
+
         #region BSO->ACProperty
 
         #region BSO->ACPropertyPrimary->FacilityLot
@@ -193,6 +210,10 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Current = value;
+
+                if (BSOTandTFastView_Child != null && BSOTandTFastView_Child.Value != null && BSOTandTFastView_Child.Value.FilterFacilityLot != value)
+                    BSOTandTFastView_Child.Value.SetFaciltiyLot(value);
+
                 OnPropertyChanged("CurrentFacilityLot");
                 CleanMovements();
                 RefreshRelatedData();
@@ -623,29 +644,29 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case "Save":
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case "IsEnabledSave":
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case "UndoSave":
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case "IsEnabledUndoSave":
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
+                case "Load":
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case "IsEnabledLoad":
                     result = IsEnabledLoad();
                     return true;
-                case"Search":
+                case "Search":
                     Search();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

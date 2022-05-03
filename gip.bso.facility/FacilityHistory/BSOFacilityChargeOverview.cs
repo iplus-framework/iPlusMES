@@ -68,6 +68,7 @@ namespace gip.bso.facility
         {
             if (!base.ACInit(startChildMode))
                 return false;
+
             Search();
             return true;
         }
@@ -86,6 +87,23 @@ namespace gip.bso.facility
                 _AccessPrimary = null;
             }
             return b;
+        }
+
+        #endregion
+
+        #region Child (Local BSOs)
+
+        ACChildItem<BSOTandTFastView> _BSOTandTFastView_Child;
+        [ACPropertyInfo(590)]
+        [ACChildInfo("BSOTandTFastView_Child", typeof(BSOTandTFastView))]
+        public ACChildItem<BSOTandTFastView> BSOTandTFastView_Child
+        {
+            get
+            {
+                if (_BSOTandTFastView_Child == null)
+                    _BSOTandTFastView_Child = new ACChildItem<BSOTandTFastView>(this, "BSOTandTFastView_Child");
+                return _BSOTandTFastView_Child;
+            }
         }
 
         #endregion
@@ -113,7 +131,7 @@ namespace gip.bso.facility
                     OnPropertyChanged("ShowNotAvailable");
                     return;
                 }
-                if (   String.IsNullOrEmpty(tmp)
+                if (String.IsNullOrEmpty(tmp)
                     || AccessPrimary.NavACQueryDefinition.GetSearchValue<bool>(_CNotAvailableProperty) != value)
                 {
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<bool>(_CNotAvailableProperty, value.Value);
@@ -187,7 +205,6 @@ namespace gip.bso.facility
         }
 
         #endregion
-
 
         #region Primary
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -298,6 +315,10 @@ namespace gip.bso.facility
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Current = value;
+
+                if (BSOTandTFastView_Child != null && BSOTandTFastView_Child.Value != null && BSOTandTFastView_Child.Value.FilterFacilityCharge != value)
+                    BSOTandTFastView_Child.Value.SetFaciltiyCharge(value);
+
                 OnPropertyChanged("CurrentFacilityCharge");
                 CleanMovements();
                 OnPropertyChanged("FacilityChargeSumLocationHelperList");
@@ -487,6 +508,7 @@ namespace gip.bso.facility
             }
         }
         #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -579,7 +601,7 @@ namespace gip.bso.facility
         public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
-            if (   name == "ShowNotAvailable"
+            if (name == "ShowNotAvailable"
                 || name == "FilterMaterial"
                 || name == "FilterFacility"
                 || name == "FilterLot")
