@@ -609,7 +609,8 @@ namespace gip.mes.processapplication
                 CurrentProdOrderBatchPlanID = batchPlanEntry.ProdOrderBatchPlanID;
                 if (batchPlanEntry.BatchActualCount == 1)
                 {
-                    newChildPosForBatch.ProdOrderPartslist.StartDate = DateTime.Now;
+                    if (newChildPosForBatch.ProdOrderPartslist.StartDate == null)
+                        newChildPosForBatch.ProdOrderPartslist.StartDate = DateTime.Now;
                 }
 
                 MsgWithDetails saveMsg = dbApp.ACSaveChanges();
@@ -644,14 +645,14 @@ namespace gip.mes.processapplication
                 if (poPL == null)
                     return;
                 int countBatches = poPL.ProdOrderBatch_ProdOrderPartslist.Count();
-                if (   (StartNextStage == StartNextStageMode.StartImmediately && countBatches > 1)
+                if ((StartNextStage == StartNextStageMode.StartImmediately && countBatches > 1)
                     || (StartNextStage == StartNextStageMode.StartOnStartSecondBatch && countBatches > 2))
                     return;
                 else if (StartNextStage == StartNextStageMode.StartOnFirstBatchCompleted)
                 {
                     countBatches = poPL.ProdOrderBatch_ProdOrderPartslist
-                                        .Where(c => c.MDProdOrderState != null 
-                                                && c.MDProdOrderState.MDProdOrderStateIndex >= (short) MDProdOrderState.ProdOrderStates.ProdFinished)
+                                        .Where(c => c.MDProdOrderState != null
+                                                && c.MDProdOrderState.MDProdOrderStateIndex >= (short)MDProdOrderState.ProdOrderStates.ProdFinished)
                                         .Count();
                     if (countBatches != 1)
                         return;
@@ -809,7 +810,7 @@ namespace gip.mes.processapplication
                 {
                     NextBatchState nextBatchState = NextBatchState.CompletedNoNewEntry;
                     if (batchPlanEntry.PlanMode != BatchPlanMode.UseBatchCount
-                        || isLastBatch 
+                        || isLastBatch
                         || totalSizeReached)
                     {
                         if ((isLastBatch
@@ -827,7 +828,7 @@ namespace gip.mes.processapplication
                         batchPlanEntry.PartialTargetCount = null;
                         batchPlanEntry.PartialActualCount = null;
                     }
-                    else if (  (batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
+                    else if ((batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.DiffPartialCount <= 0)
                             || (!batchPlanEntry.DiffPartialCount.HasValue && batchPlanEntry.PartialActualCount.HasValue))
                     {
                         nextBatchState = NextBatchState.UncompletedButPartialQuantityReached;
@@ -927,9 +928,9 @@ namespace gip.mes.processapplication
             }
         }
 
-#endregion
+        #endregion
 
-#region Interaction
+        #region Interaction
         public void ReloadBatchPlans()
         {
             using (DatabaseApp dbApp = new DatabaseApp())
@@ -943,10 +944,10 @@ namespace gip.mes.processapplication
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
-                    _PlanningWait = null;
+                _PlanningWait = null;
             }
         }
-#endregion
-#endregion
+        #endregion
+        #endregion
     }
 }

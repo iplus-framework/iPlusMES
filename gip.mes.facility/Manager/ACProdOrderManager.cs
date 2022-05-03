@@ -1114,7 +1114,8 @@ namespace gip.mes.facility
             MDProdOrderState mDProdOrderStateInProduction = DatabaseApp.s_cQry_GetMDProdOrderState(databaseApp, MDProdOrderState.ProdOrderStates.InProduction).FirstOrDefault();
             prodOrderPartslist.ProdOrder.MDProdOrderState = mDProdOrderStateInProduction;
             prodOrderPartslist.MDProdOrderState = prodOrderPartslist.ProdOrder.MDProdOrderState;
-            prodOrderPartslist.StartDate = DateTime.Now;
+            if (prodOrderPartslist.StartDate == null)
+                prodOrderPartslist.StartDate = DateTime.Now;
             intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
             if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
                 prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
