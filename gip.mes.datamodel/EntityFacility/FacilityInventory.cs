@@ -132,5 +132,18 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Other methods
+
+        public bool IsFaciltiyMatch(Facility facility)
+        {
+            return
+                FacilityID == null
+                || facility == null
+                || FacilityID == facility.FacilityID
+                || facility.IsLocatedIn(FacilityID ?? Guid.Empty);
+        }
+
+        #endregion
+
     }
 }
