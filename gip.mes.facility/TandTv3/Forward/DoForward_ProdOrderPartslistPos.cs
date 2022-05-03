@@ -51,7 +51,8 @@ namespace gip.mes.facility.TandTv3
                         c.OutwardFacilityCharge.FacilityLotID != null &&
                         Result.Lots.Contains(c.OutwardFacilityCharge.FacilityLot.LotNo)
                      )
-                    .Select(c => c.ProdOrderPartslistPosRelation).ToList();
+                    .Select(c => c.ProdOrderPartslistPosRelation)
+                    .ToList();
             sameStepItems.AddRange(relations);
             return sameStepItems;
         }

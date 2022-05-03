@@ -37,7 +37,18 @@ namespace gip.mes.facility.TandTv3
                     .ToList();
 
                 Guid[] fbcIds = nextFbcIds.Select(c => c.FacilityBookingChargeID).ToArray();
-                List<FacilityBookingCharge> nextFbc = DatabaseApp.FacilityBookingCharge.Where(c => fbcIds.Contains(c.FacilityBookingChargeID)).ToList();
+                List<FacilityBookingCharge> nextFbc =
+                    DatabaseApp
+                    .FacilityBookingCharge
+                    .Include(c => c.InwardFacilityCharge)
+                    .Include(c => c.InwardFacilityCharge.FacilityLot)
+                    .Include(c => c.ProdOrderPartslistPosRelation)
+                    .Include(c => c.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos)
+                    .Include(c => c.ProdOrderPartslistPos)
+                    .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos)
+                    //.Include(c => c.OutwardFacilityCharge)
+                    //.Include(c => c.OutwardFacilityCharge.FacilityLot)
+                    .Where(c => fbcIds.Contains(c.FacilityBookingChargeID)).ToList();
                 nextStepItems.AddRange(nextFbc);
             }
             if (Item.FacilityInventoryPos != null)

@@ -1224,6 +1224,7 @@ namespace gip.mes.facility.TandTv3
 
         public void ConnectMixPoints(DatabaseApp databaseApp, TandTResult result)
         {
+            Dictionary<Guid, ProdOrderPartslistPos> finalMixures = new Dictionary<Guid, ProdOrderPartslistPos>();
             foreach (var mixPoint in result.MixPoints)
             {
                 if (mixPoint.ProductionPositions != null)
@@ -1253,7 +1254,20 @@ namespace gip.mes.facility.TandTv3
                                 if (rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot
                                     && rel.SourceProdOrderPartslistPos.SourceProdOrderPartslistID != null)
                                 {
-                                    ProdOrderPartslistPos finalMixure = TandTv3Query.s_cQry_GetFinalMixure(databaseApp, rel.SourceProdOrderPartslistPos.SourceProdOrderPartslistID ?? Guid.Empty);
+                                    ProdOrderPartslistPos finalMixure = null; //TandTv3Query.s_cQry_GetFinalMixure(databaseApp, rel.SourceProdOrderPartslistPos.SourceProdOrderPartslistID ?? Guid.Empty);
+                                    if (finalMixures.Keys.Contains(rel.SourceProdOrderPartslistPos.ProdOrderPartslistID))
+                                        finalMixure = finalMixures[rel.SourceProdOrderPartslistPos.ProdOrderPartslistID];
+                                    else
+                                    {
+                                        finalMixure = rel.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(p =>
+                                            //p.ProdOrderPartslistID == sourceProdOrderPartslistID &&
+                                            p.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern &&
+                                            !p.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any() &&
+                                            !p.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any()
+                                        ).FirstOrDefault();
+                                        finalMixures.Add(rel.SourceProdOrderPartslistPos.ProdOrderPartslistID, finalMixure);
+                                    }
+
                                     if (finalMixure != null)
                                     {
                                         if (mixPoint.ProductionPositions.Select(c => c.ProdOrderPartslistPosID).Contains(finalMixure.ProdOrderPartslistPosID))

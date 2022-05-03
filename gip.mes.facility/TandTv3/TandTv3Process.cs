@@ -416,10 +416,10 @@ namespace gip.mes.facility.TandTv3
                 trackItemSameStep.Step = TandTResult.CurrentStep;
             }
 
-            trackSameStepItems =
-                trackSameStepItems
-                .OrderBy(c => c.Item, new IACObjectEntityComparer())
-                .ToList();
+            //trackSameStepItems =
+            //    trackSameStepItems
+            //    .OrderBy(c => c.Item, new IACObjectEntityComparer())
+            //    .ToList();
 
             #region T&Tv3 Log
             if (TandTResult.LogWritter != null)
@@ -465,10 +465,10 @@ namespace gip.mes.facility.TandTv3
                 }
             }
 
-            trackNextStepItems =
-                trackNextStepItems
-                 .OrderBy(c => c.Item, new IACObjectEntityComparer())
-                .ToList();
+            //trackNextStepItems =
+            //    trackNextStepItems
+            //     .OrderBy(c => c.Item, new IACObjectEntityComparer())
+            //    .ToList();
 
             bool breakTracking = TandTResult.Filter.BreakTrackingCondition != null && TandTResult.Filter.BreakTrackingCondition.Invoke(TandTResult.CurrentStep);
 
