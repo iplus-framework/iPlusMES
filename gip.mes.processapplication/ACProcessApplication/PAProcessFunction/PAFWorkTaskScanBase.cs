@@ -140,7 +140,6 @@ namespace gip.mes.processapplication
 
         #endregion
 
-
         #region Methods
 
         #region Abstract
@@ -160,8 +159,11 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case PAFWorkTaskScanBase.MN_OnScanEvent:
+                case nameof(OnScanEvent):
                     result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], acParameter[5] as ACMethod);
+                    return true;
+                case nameof(GetOrderInfos):
+                    result = GetOrderInfos();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

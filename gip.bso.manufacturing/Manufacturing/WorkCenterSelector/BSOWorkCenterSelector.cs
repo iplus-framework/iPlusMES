@@ -785,7 +785,7 @@ namespace gip.bso.manufacturing
             return true;//Root.Environment.User.IsSuperuser;
         }
 
-        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
+        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602, true)]
         public void AddRule()
         {
             //Tuple<string, string> ruleValue = SelectedAvailableProcessModule.Value as Tuple<string, string>;
@@ -821,7 +821,7 @@ namespace gip.bso.manufacturing
             return SelectedVBUser != null && SelectedAvailableProcessModule != null;
         }
 
-        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
+        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603, true)]
         public void RemoveRule()
         {
             WorkCenterRule rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule.Value);
@@ -840,7 +840,7 @@ namespace gip.bso.manufacturing
             return SelectedAssignedProcessModule != null;
         }
 
-        [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604)]
+        [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604, true)]
         public void ApplyRulesAndClose()
         {
             string xml = "";
@@ -1246,7 +1246,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Show/Refresh workflow'}de{'Workflow anzeigen/aktualisieren'}", 610)]
+        [ACMethodInfo("", "en{'Show/Refresh workflow'}de{'Workflow anzeigen/aktualisieren'}", 610, true)]
         public void ShowWorkflow()
         {
             string[] accessArr = (string[])CurrentWorkCenterItem?.ProcessModule?.ExecuteMethod(nameof(PAProcessModule.SemaphoreAccessedFrom));
@@ -1710,6 +1710,9 @@ namespace gip.bso.manufacturing
                     return true;
                 case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
+                    return true;
+                case nameof(IsEnabledSwitchPWGroupToEmptyingMode):
+                    result = IsEnabledSwitchPWGroupToEmptyingMode();
                     return true;
             }
 

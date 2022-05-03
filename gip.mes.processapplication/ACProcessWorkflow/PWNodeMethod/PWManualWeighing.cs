@@ -127,6 +127,7 @@ namespace gip.mes.processapplication
             //_WeighingComponentsInfo = null;
             CurrentEndBatchPosKey = null;
             CurrentOpenMaterial = null;
+            CurrentFacilityCharge = null;
             _LastOpenMaterial = null;
             IntermediateChildPos = null;
             using (ACMonitor.Lock(_65050_WeighingCompLock))
@@ -604,19 +605,6 @@ namespace gip.mes.processapplication
             set;
         }
 
-        private Guid? _CurrentFacility;
-        [ACPropertyInfo(999, IsPersistable = true)]
-        public Guid? CurrentFacility
-        {
-            get => _CurrentFacility;
-            set
-            {
-                _CurrentFacility = value;
-                OnPropertyChanged("CurrentFacility");
-            }
-        }
-
-        //Dictionary<string, string> _WeighingComponentsInfo;
         [ACPropertyInfo(999)]
         public ACValue WeighingComponentsInfo
         {
@@ -746,7 +734,6 @@ namespace gip.mes.processapplication
         {
             CurrentOpenMaterial = null;
             IntermediateChildPos = null;
-            CurrentFacility = null;
             CurrentFacilityCharge = null;
             CurrentACMethod.ValueT = null;
             ClearMyConfiguration();
@@ -936,12 +923,12 @@ namespace gip.mes.processapplication
                         {
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
                             comp.SwitchState(WeighingComponentState.InWeighing);
-                            SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, facilityCharge.ParamAsGuid, null);
+                            SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, facilityCharge.ParamAsGuid);
                         }
                         else
                         {
                             //_ExitFromWaitForFC = false;
-                            SetInfo(comp, WeighingComponentInfoType.SelectCompReturnFC_F, null, null);
+                            SetInfo(comp, WeighingComponentInfoType.SelectCompReturnFC_F, null);
                         }
                     }
                 }
@@ -999,10 +986,10 @@ namespace gip.mes.processapplication
 
                         Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-                        if (!currentFacilityCharge.HasValue && !CurrentFacility.HasValue)
+                        if (!currentFacilityCharge.HasValue)
                         {
                             //_ExitFromWaitForFC = false;
-                            SetInfo(nextComp, WeighingComponentInfoType.SelectCompReturnFC_F, currentFacilityCharge, CurrentFacility);
+                            SetInfo(nextComp, WeighingComponentInfoType.SelectCompReturnFC_F, currentFacilityCharge);
                             //ThreadPool.QueueUserWorkItem((object state) => WaitForFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State)); //Auto Comp && Man Lot
                         }
                     }
@@ -1020,7 +1007,7 @@ namespace gip.mes.processapplication
 
                     Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-                    if (CurrentFacility != null || currentFacilityCharge != null)
+                    if (currentFacilityCharge != null)
                     {
                         StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, null); //Man Comp && Auto Lot || ManLot
                         UnSubscribeToProjectWorkCycle();
@@ -1028,7 +1015,7 @@ namespace gip.mes.processapplication
                     else if (AutoSelectLot)
                     {
                         bool hasQuants = TryAutoSelectFacilityCharge(currentOpenMaterial);
-                        if (CurrentFacility != null || currentFacilityCharge != null)
+                        if (currentFacilityCharge != null)
                         {
                             StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, hasQuants); //Man Comp && Auto Lot || ManLot
                             UnSubscribeToProjectWorkCycle();
@@ -1106,7 +1093,6 @@ namespace gip.mes.processapplication
         {
             CurrentOpenMaterial = null;
             CurrentFacilityCharge = null;
-            CurrentFacility = null;
             //_WeighingComponentsInfo = null;
             using (ACMonitor.Lock(_65050_WeighingCompLock))
             {
@@ -1184,23 +1170,23 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            else if (facility.HasValue)
-            {
-                Msg msg = SetFacility(facility, prodOrderPartslistPosRelation);
-                if(msg != null)
-                {
-                    SetCanStartFromBSO(true);
-                    return msg;
-                }
+            //else if (facility.HasValue)
+            //{
+            //    Msg msg = SetFacility(facility, prodOrderPartslistPosRelation);
+            //    if(msg != null)
+            //    {
+            //        SetCanStartFromBSO(true);
+            //        return msg;
+            //    }
 
-                if (!FreeSelectionMode)
-                {
-                    if (ApplicationManager != null && ApplicationManager.ApplicationQueue != null && !ApplicationManager.ApplicationQueue.IsBusy)
-                        ApplicationManager.ApplicationQueue.Add(() => SelectFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State));
-                    else
-                        SelectFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State);
-                }
-            }
+            //    if (!FreeSelectionMode)
+            //    {
+            //        if (ApplicationManager != null && ApplicationManager.ApplicationQueue != null && !ApplicationManager.ApplicationQueue.IsBusy)
+            //            ApplicationManager.ApplicationQueue.Add(() => SelectFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State));
+            //        else
+            //            SelectFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State);
+            //    }
+            //}
             else
                 SetCanStartFromBSO(true);
 
@@ -1215,7 +1201,8 @@ namespace gip.mes.processapplication
 
             if (bookAndWeighRest && manualWeighing != null)
             {
-                var targetQ = CurrentACMethod.ValueT.ParameterValueList.GetACValue("TargetQuantity");
+                ACMethod currentACMethod = CurrentACMethod.ValueT;
+                var targetQ = currentACMethod.ParameterValueList.GetACValue("TargetQuantity");
                 double targetWeight = 0;
                 if (targetQ != null)
                     targetWeight = targetQ.ParamAsDouble;
@@ -1230,6 +1217,12 @@ namespace gip.mes.processapplication
                         _IsLotChanged = false;
                     }
 
+                    Guid? currentOpenMaterial = CurrentOpenMaterial;
+
+                    Guid? correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, currentACMethod);
+                    if (correctedFc.HasValue)
+                        currentFacilityCharge = correctedFc;
+
                     var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentFacilityCharge, isForInterdischarge);
                     if (msgBooking != null)
                     {
@@ -1243,7 +1236,7 @@ namespace gip.mes.processapplication
                     manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = rest;
                     manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
 
-                    Guid? currentOpenMaterial = CurrentOpenMaterial;
+                   
 
                     WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial); //TODO:lock currentOpenMaterial
                     if (comp == null)
@@ -1252,9 +1245,9 @@ namespace gip.mes.processapplication
                     }
 
                     comp.SwitchState(WeighingComponentState.PartialCompleted);
-                    SetInfo(comp, WeighingComponentInfoType.State, null, null);
+                    SetInfo(comp, WeighingComponentInfoType.State, null);
                     comp.SwitchState(WeighingComponentState.InWeighing);
-                    SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, currentFacilityCharge, null);
+                    SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, currentFacilityCharge);
                 }
             }
             else if (manualWeighing != null)
@@ -1284,7 +1277,7 @@ namespace gip.mes.processapplication
 
             Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-            if (!currentFacilityCharge.HasValue && !CurrentFacility.HasValue)
+            if (!currentFacilityCharge.HasValue)
             {
                 using (Database db = new core.datamodel.Database())
                 using (DatabaseApp dbApp = new DatabaseApp(db))
@@ -1337,6 +1330,8 @@ namespace gip.mes.processapplication
             Guid? currentOpenMaterial = CurrentOpenMaterial;
             Guid? currentFacilityCharge = CurrentFacilityCharge;
 
+            ACMethod currentACMethod = CurrentACMethod.ValueT.Clone() as ACMethod;
+
             using (ACMonitor.Lock(_65500_LotChangeLock))
             {
                 if (currentFacilityCharge == newFacilityCharge)
@@ -1344,8 +1339,12 @@ namespace gip.mes.processapplication
 
                 facilityCharge = currentFacilityCharge;
 
-                msgSet = SetFacilityCharge(newFacilityCharge, currentOpenMaterial, forceSetFC_F);
+                msgSet = SetFacilityCharge(newFacilityCharge, currentOpenMaterial, forceSetFC_F, true);
             }
+
+            Guid? correctedFc = IsCurrentFacilityChargeCorrect(facilityCharge, currentOpenMaterial, currentACMethod);
+            if (correctedFc.HasValue)
+                facilityCharge = correctedFc;
 
             if (actualWeight > 0.000001)
             {
@@ -1368,7 +1367,7 @@ namespace gip.mes.processapplication
             {
                 SaveLastUsedLot(newFacilityCharge, currentOpenMaterial);
                 WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
-                SetInfo(comp, WeighingComponentInfoType.SelectFC_F, newFacilityCharge, null, true, true);
+                SetInfo(comp, WeighingComponentInfoType.SelectFC_F, newFacilityCharge, true, true);
                 _IsLotChanged = true;
             }
 
@@ -1690,7 +1689,7 @@ namespace gip.mes.processapplication
                             comp.TargetWeight = Math.Abs(rel.RemainingDosingWeight);
                             //if(_WeighingComponentsInfo != null && _WeighingComponentsInfo.ContainsKey(comp.PLPosRelation.ToString()))
                             //    _WeighingComponentsInfo[comp.PLPosRelation.ToString()] = newState.ToString();
-                            SetInfo(comp, WeighingComponentInfoType.State, null, null);
+                            SetInfo(comp, WeighingComponentInfoType.State, null);
                         }
                         
                         if (comp.WeighState != (short)WeighingComponentState.WeighingCompleted && comp.WeighState != (short)WeighingComponentState.Aborted)
@@ -1743,7 +1742,7 @@ namespace gip.mes.processapplication
 
         #region Methods => FacilityCharge
 
-        public Msg SetFacilityCharge(Guid? facilityChargeID, Guid? plPosRelationID, bool forceSet = false)
+        public Msg SetFacilityCharge(Guid? facilityChargeID, Guid? plPosRelationID, bool forceSet = false, bool changeOnPAF = false)
         {
             if (!facilityChargeID.HasValue)
             {
@@ -1765,6 +1764,20 @@ namespace gip.mes.processapplication
             }
 
             CurrentFacilityCharge = facilityChargeID;
+            if (changeOnPAF)
+            {
+                PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+                if (manualWeighing != null && manualWeighing.CurrentACMethod != null)
+                {
+                    ACMethod temp = manualWeighing.CurrentACMethod.ValueT;
+                    if (temp != null)
+                    {
+                        temp.ParameterValueList[nameof(FacilityCharge)] = facilityChargeID;
+                        manualWeighing.ReSendACMethod(temp);
+                    }
+                }
+            }
+
             return null;
         }
 
@@ -1853,21 +1866,21 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        public Msg SetFacility(Guid? facilityID, Guid? plPosRelationID)
-        {
-            if(!facilityID.HasValue)
-            {
-                CurrentFacility = facilityID;
-                return null;
-            }
+        //public Msg SetFacility(Guid? facilityID, Guid? plPosRelationID)
+        //{
+        //    if(!facilityID.HasValue)
+        //    {
+        //        CurrentFacility = facilityID;
+        //        return null;
+        //    }
 
-            Msg msg = OnSetFacility(facilityID, plPosRelationID);
-            if (msg != null)
-                return msg;
+        //    Msg msg = OnSetFacility(facilityID, plPosRelationID);
+        //    if (msg != null)
+        //        return msg;
 
-            CurrentFacility = facilityID;
-            return null;
-        }
+        //    CurrentFacility = facilityID;
+        //    return null;
+        //}
 
         public virtual Msg OnSetFacility(Guid? facilityID, Guid? plPosRelationID)
         {
@@ -2297,7 +2310,7 @@ namespace gip.mes.processapplication
 
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-                if (currentFacilityCharge.HasValue || CurrentFacility.HasValue)
+                if (currentFacilityCharge.HasValue)
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
 
                 bool isLast;
@@ -2332,8 +2345,8 @@ namespace gip.mes.processapplication
                     //}
                     facility = fc.Facility;
                 }
-                else if (CurrentFacility.HasValue)
-                    facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == CurrentFacility);
+                //else if (CurrentFacility.HasValue)
+                //    facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == CurrentFacility);
 
                 if (facility == null || facility.VBiFacilityACClass == null)
                 {
@@ -2351,8 +2364,8 @@ namespace gip.mes.processapplication
             }
             if (currentFacilityCharge.HasValue)
                 acMethod.ParameterValueList["FacilityCharge"] = currentFacilityCharge.Value;
-            else if (CurrentFacility.HasValue)
-                acMethod.ParameterValueList["Facility"] = CurrentFacility.Value;
+            //else if (CurrentFacility.HasValue)
+            //    acMethod.ParameterValueList["Facility"] = CurrentFacility.Value;
 
 
             return null;
@@ -2422,7 +2435,7 @@ namespace gip.mes.processapplication
                 acMethod["Route"] = new Route();
 
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
-                if (currentFacilityCharge.HasValue || CurrentFacility.HasValue)
+                if (currentFacilityCharge.HasValue)
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
 
                 bool isLast;
@@ -2531,13 +2544,16 @@ namespace gip.mes.processapplication
                                     if (isCC != null)
                                         isComponentConsumed = isCC.ParamAsBoolean;
 
+                                    ACMethod parentACMethod = e.ParentACMethod;
+
                                     double? actWeight = e.GetDouble("ActualQuantity");
                                     //double? tolerancePlus = (double)e.ParentACMethod["TolerancePlus"];
-                                    double? toleranceMinus = (double)e.ParentACMethod["ToleranceMinus"];
-                                    double? targetQuantity = (double)e.ParentACMethod["TargetQuantity"];
+                                    double? toleranceMinus = (double)parentACMethod["ToleranceMinus"];
+                                    double? targetQuantity = (double)parentACMethod["TargetQuantity"];
+
+
 
                                     bool isWeighingInTol = true;
-
 
                                     if (targetQuantity.HasValue && actWeight.HasValue && toleranceMinus.HasValue)
                                     {
@@ -2548,8 +2564,9 @@ namespace gip.mes.processapplication
                                         }
                                     }
 
-                                    //if (targetQuantity.HasValue && toleranceMinus.HasValue && actWeight.HasValue && (actWeight < (targetQuantity - toleranceMinus)))
-                                    //    isWeighingInTol = false;
+                                    var correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, parentACMethod);
+                                    if (correctedFc.HasValue)
+                                        currentFacilityCharge = correctedFc;
 
                                     if (actWeight > 0.000001)
                                     {
@@ -2606,7 +2623,7 @@ namespace gip.mes.processapplication
                                     if (weighingComp != null)
                                     {
                                         weighingComp.SwitchState(state);
-                                        SetInfo(weighingComp, WeighingComponentInfoType.State, currentFacilityCharge, CurrentFacility);
+                                        SetInfo(weighingComp, WeighingComponentInfoType.State, currentFacilityCharge);
                                     }
                                 }
                             }
@@ -2620,7 +2637,7 @@ namespace gip.mes.processapplication
                     {
                         SetCanStartFromBSO(true);
                         CurrentOpenMaterial = null;
-                        CurrentFacility = null;
+                        //CurrentFacility = null;
                         CurrentFacilityCharge = null;
                         SubscribeToProjectWorkCycle();
                     }
@@ -2656,7 +2673,7 @@ namespace gip.mes.processapplication
                                         infoType = WeighingComponentInfoType.StateSelectFC_F;
 
                                     Guid? currentFacilityCharge = CurrentFacilityCharge;
-                                    SetInfo(comp, infoType, currentFacilityCharge.Value, CurrentFacility);
+                                    SetInfo(comp, infoType, currentFacilityCharge.Value);
                                     SaveLastUsedLot(currentFacilityCharge, currentOpenMaterial);
                                 }
                             }
@@ -2744,12 +2761,14 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    ProdOrderPartslistPosRelation weighingPosRelation = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
+                    ProdOrderPartslistPosRelation weighingPosRelation = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                                                                           .Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                                                                           .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
                     if (weighingPosRelation != null)
                     {
                         bool changePosState = false;
 
-                        if (currentFacilityCharge == null && CurrentFacility == null)
+                        if (currentFacilityCharge == null)
                         {
                             // Error50373: Manual weighing error, the property {0} is null!
                             // Fehler bei Handverwiegung, die Eigenschaft {0} ist null!
@@ -2773,16 +2792,26 @@ namespace gip.mes.processapplication
                             }
                             facility = facilityCharge.Facility;
                         }
-                        else
-                        {
-                            facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == CurrentFacility);
+                        //else
+                        //{
+                        //    facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == CurrentFacility);
                             if (facility == null)
                             {
                                 //Error50378: Can't get the Facility from database with FacilityID: {0}
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(31)", 1686, "Error50378", CurrentFacility);
+                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(31)", 1686, "Error50378", "from quant!");
                                 ActivateProcessAlarmWithLog(msg, false);
                                 return msg;
                             }
+                        //}
+
+                        if (facilityCharge != null && facilityCharge.MaterialID != weighingPosRelation.SourceProdOrderPartslistPos.MaterialID)
+                        {
+                            msg = new Msg(this, eMsgLevel.Error, nameof(PWManualWeighing), nameof(DoManualWeighingBooking) + "(32)", 2801, 
+                                           "The material of quant is different than weighing material");
+
+                            ActivateProcessAlarmWithLog(msg, false);
+
+                            return msg;
                         }
 
                         double actualQuantity = actualWeight.HasValue ? weighingPosRelation.SourceProdOrderPartslistPos.Material.ConvertBaseWeightToBaseUnit(actualWeight.Value) : 0;
@@ -2906,7 +2935,7 @@ namespace gip.mes.processapplication
 
                                                         }
                                                     }
-                                                    SetInfo(null, WeighingComponentInfoType.RefreshCompTargetQ, null, null);
+                                                    SetInfo(null, WeighingComponentInfoType.RefreshCompTargetQ, null);
 
                                                     msg = dbApp.ACSaveChanges();
 
@@ -3023,7 +3052,7 @@ namespace gip.mes.processapplication
         //    return null;
         //}
 
-        public void SetInfo(WeighingComponent weighingComp, WeighingComponentInfoType infoType, Guid? facilityCharge, Guid? facility, bool dbAutoRefresh = false, 
+        public void SetInfo(WeighingComponent weighingComp, WeighingComponentInfoType infoType, Guid? facilityCharge, bool dbAutoRefresh = false, 
                             bool lotChange = false)
         {
             using (ACMonitor.Lock(_65000_CurrentWeighingComponentInfoLock))
@@ -3047,8 +3076,6 @@ namespace gip.mes.processapplication
                             compInfo.WeighingComponentState = weighingComp.WeighState;
                             if (facilityCharge != null)
                                 compInfo.FacilityCharge = facilityCharge;
-                            else if (facility == null)
-                                compInfo.Facility = facility;
                             break;
                         }
                     case WeighingComponentInfoType.SelectCompReturnFC_F:
@@ -3060,8 +3087,6 @@ namespace gip.mes.processapplication
                         {
                             if (facilityCharge != null)
                                 compInfo.FacilityCharge = facilityCharge;
-                            else if (facility == null)
-                                compInfo.Facility = facility;
 
                             compInfo.FC_FAutoRefresh = dbAutoRefresh;
                             compInfo.IsLotChange = lotChange;
@@ -3368,6 +3393,50 @@ namespace gip.mes.processapplication
             }
         }
 
+        private Guid? IsCurrentFacilityChargeCorrect(Guid? currentFc, Guid? currentOpenMaterial, ACMethod pafACMethod)
+        {
+            if (currentFc == null || currentOpenMaterial == null || pafACMethod == null)
+                return null;
+
+            try
+            {
+                Guid? fcFromMethod = null;
+                ACValue fcFromMethodVal = pafACMethod.ParameterValueList.GetACValue(nameof(FacilityCharge));
+                if (fcFromMethodVal != null && fcFromMethodVal.Value is Guid)
+                    fcFromMethod = fcFromMethodVal.ParamAsGuid;
+
+                if (fcFromMethod.HasValue && fcFromMethod.Value != currentFc)
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(IsCurrentFacilityChargeCorrect) + "(10)", String.Format("CurrentFacilityCharge: {0} is different than from method: {1}", currentFc, fcFromMethod.Value));
+
+                    using (DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        var fcFromPAF = dbApp.FacilityCharge.Include(c => c.Material).FirstOrDefault(c => c.FacilityChargeID == fcFromMethod.Value);
+                        var fcFromPW = dbApp.FacilityCharge.Include(c => c.Material).FirstOrDefault(c => c.FacilityChargeID == currentFc);
+
+                        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos).FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
+                        if (rel != null)
+                        {
+                            if (rel.SourceProdOrderPartslistPos.MaterialID == fcFromPAF.MaterialID && rel.SourceProdOrderPartslistPos.MaterialID != fcFromPW.MaterialID)
+                            {
+                                Messages.LogError(this.GetACUrl(), nameof(IsCurrentFacilityChargeCorrect) + "(20)", String.Format("FacilityCharge is sync from method: {0}", fcFromMethod.Value));
+                                return fcFromMethod.Value;
+                            }
+                            else if (rel.SourceProdOrderPartslistPos.MaterialID == currentFc)
+                            {
+                                Messages.LogError(this.GetACUrl(), nameof(IsCurrentFacilityChargeCorrect) + "(30)", String.Format("FacilityCharge from method is wrong: {0}, CurrentFacilityCharge: {1}", fcFromMethod.Value, currentFc));
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(IsCurrentFacilityChargeCorrect) + "(40)", e);
+            }
+
+            return null;
+        }
 
         #endregion
 
