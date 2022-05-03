@@ -83,7 +83,7 @@ namespace gip.bso.manufacturing
             else
                 SelectedUnitConvert = finalMix.MDUnit;
 
-            if(SelectedMDSchedulingGroup == null)
+            if (SelectedMDSchedulingGroup == null)
                 SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
         }
         #endregion
@@ -735,13 +735,15 @@ namespace gip.bso.manufacturing
             else
                 LoadNewBatchSuggestion(suggestionMode);
 
-            if(BatchPlanSuggestion.ItemsList == null)
+            if (BatchPlanSuggestion.ItemsList == null)
                 BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
-            if(!BatchPlanSuggestion.ItemsList.Any())
-            {
-                BatchPlanSuggestionItem oneItem = new BatchPlanSuggestionItem(this, 1, TargetQuantityUOM, 1, TargetQuantityUOM);
-                BatchPlanSuggestion.ItemsList.Add(oneItem);
-            }
+
+            // TODO: @aagincic: ? Some scenaro when any suggestion is not availabile
+            //if(!BatchPlanSuggestion.ItemsList.Any())
+            //{
+            //    BatchPlanSuggestionItem oneItem = new BatchPlanSuggestionItem(this, 1, TargetQuantityUOM, 1, TargetQuantityUOM);
+            //    BatchPlanSuggestion.ItemsList.Add(oneItem);
+            //}
         }
 
         public void LoadExistingBatchSuggestion()
