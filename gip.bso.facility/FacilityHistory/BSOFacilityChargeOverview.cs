@@ -186,7 +186,7 @@ namespace gip.bso.facility
 
 
         public const string _CLotNoProperty = FacilityLot.ClassName + "\\LotNo";
-        [ACPropertyInfo(806, "Filter", "en{'Lot'}de{'Los'}")]
+        [ACPropertyInfo(806, "Filter", ConstApp.LotNo)]
         public string FilterLot
         {
             get
@@ -199,7 +199,26 @@ namespace gip.bso.facility
                 if (tmp != value)
                 {
                     _AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CLotNoProperty, value);
-                    OnPropertyChanged("FilterLot");
+                    OnPropertyChanged(nameof(FilterLot));
+                }
+            }
+        }
+
+        public const string _CExternLotNoProperty = FacilityLot.ClassName + "\\ExternLotNo";
+        [ACPropertyInfo(816, "Filter", ConstApp.ExternLotNo)]
+        public string FilterExternLotNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(_CExternLotNoProperty);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(_CExternLotNoProperty);
+                if (tmp != value)
+                {
+                    _AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(_CExternLotNoProperty, value);
+                    OnPropertyChanged(nameof(FilterExternLotNo));
                 }
             }
         }
@@ -269,7 +288,8 @@ namespace gip.bso.facility
                     new ACFilterItem(Global.FilterTypes.filter, _CFacilityNameProperty, Global.LogicalOperators.contains, Global.Operators.or, "", true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
 
-                    new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, _CExternLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true)
                 };
             }
         }
@@ -601,10 +621,11 @@ namespace gip.bso.facility
         public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
-            if (name == "ShowNotAvailable"
-                || name == "FilterMaterial"
-                || name == "FilterFacility"
-                || name == "FilterLot")
+            if (name == nameof(ShowNotAvailable)
+                || name == nameof(FilterMaterial)
+                || name == nameof(FilterFacility)
+                || name == nameof(FilterLot)
+                || name == nameof(FilterExternLotNo))
             {
                 Search();
             }
