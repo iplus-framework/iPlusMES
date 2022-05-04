@@ -68,7 +68,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private FacilityCharge _FilterFacilityCharge;
-        [ACPropertySelected(999, "FilterFacilityCharge", "en{'TODO:FilterFacilityCharge'}de{'TODO:FilterFacilityCharge'}")]
+        [ACPropertyInfo(999, "FilterFacilityCharge", "en{'TODO:FilterFacilityCharge'}de{'TODO:FilterFacilityCharge'}")]
         public FacilityCharge FilterFacilityCharge
         {
             get
@@ -89,7 +89,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private FacilityLot _FilterFacilityLot;
-        [ACPropertySelected(999, "FilterFacilityLot", "en{'TODO:FilterFacilityLot'}de{'TODO:FilterFacilityLot'}")]
+        [ACPropertyInfo(999, "FilterFacilityLot", "en{'TODO:FilterFacilityLot'}de{'TODO:FilterFacilityLot'}")]
         public FacilityLot FilterFacilityLot
         {
             get
