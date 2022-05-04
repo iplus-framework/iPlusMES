@@ -68,7 +68,7 @@ namespace gip.bso.facility
         {
             if (!base.ACInit(startChildMode))
                 return false;
-
+            _ = BSOTandTFastView_Child;
             Search();
             return true;
         }
