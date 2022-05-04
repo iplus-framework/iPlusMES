@@ -401,12 +401,26 @@ namespace gip.mes.facility
 
         public void AddInwardFacility(FacilityBookingCharge facilityBookingCharge, double quantity)
         {
-            AddFacility(InwardFacilities, facilityBookingCharge.InwardFacility, facilityBookingCharge.InwardMaterial, quantity);
+            Material material = null;
+            if (facilityBookingCharge.InwardFacility != null
+                && facilityBookingCharge.InwardFacility.MDFacilityType != null
+                && facilityBookingCharge.InwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+            {
+                material = facilityBookingCharge.InwardMaterial;
+            }
+            AddFacility(InwardFacilities, facilityBookingCharge.InwardFacility, material, quantity);
         }
 
         public void AddOutwardFacility(FacilityBookingCharge facilityBookingCharge, double quantity)
         {
-            AddFacility(OutwardFacilities, facilityBookingCharge.OutwardFacility, facilityBookingCharge.OutwardMaterial, quantity);
+            Material material = null;
+            if(facilityBookingCharge.OutwardFacility != null
+                && facilityBookingCharge.OutwardFacility.MDFacilityType != null
+                && facilityBookingCharge.OutwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
+            {
+                material = facilityBookingCharge.OutwardMaterial;
+            }
+            AddFacility(OutwardFacilities, facilityBookingCharge.OutwardFacility, material, quantity);
         }
 
         public void AddFacility(Dictionary<string, FacilityPreview> list, Facility facility, Material material, double quantity)
@@ -421,10 +435,15 @@ namespace gip.mes.facility
                     FacilityNo = facility.FacilityNo,
                     FacilityID = facility.FacilityID,
                     VBiFacilityACClassID = facility.VBiFacilityACClassID,
-                    FacilityName = facility.FacilityName,
-                    MaterialNo = material.MaterialNo,
-                    MaterialName1 = material.MaterialName1
+                    FacilityName = facility.FacilityName
                 };
+
+                if(material != null)
+                {
+                    facilityPreview.MaterialNo = material.MaterialNo;
+                    facilityPreview.MaterialName1 = material.MaterialName1;
+                }
+
                 list.Add(facility.FacilityNo, facilityPreview);
             }
             facilityPreview.StockQuantityUOM += quantity;
