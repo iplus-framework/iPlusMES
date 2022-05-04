@@ -624,6 +624,8 @@ namespace gip.bso.manufacturing
             }
         }
 
+
+        //TODO: take it in one query from db
         FacilityChargeItem[] _FacilityChargeList;
         [ACPropertyList(629, "FacilityCharge")]
         public virtual IEnumerable<FacilityChargeItem> FacilityChargeList
@@ -849,7 +851,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => Commands
 
-        [ACMethodInfo("", "en{'Weigh'}de{'Wiegen'}", 601)]
+        [ACMethodInfo("", "en{'Weigh'}de{'Wiegen'}", 601, true)]
         public virtual void Weigh()
         {
             var result = StartWeighing(false);
@@ -899,7 +901,7 @@ namespace gip.bso.manufacturing
             return new Msg(this, eMsgLevel.Error, "ManualWeihgingModel", "StartWeighing", 908, "Info50037");
         }
 
-        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602)]
+        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
         public virtual void Acknowledge()
         {
             if (!IsEnabledAcknowledge())
@@ -952,7 +954,7 @@ namespace gip.bso.manufacturing
                                                                                             || ScaleBckgrState == ScaleBackgroundState.InTolerance);
         }
 
-        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602)]
+        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
         public void AcknowledgeMsg(MessageItem item)
         {
             if (item != null)
@@ -968,7 +970,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Yes'}de{'Ja'}", 602)]
+        [ACMethodInfo("", "en{'Yes'}de{'Ja'}", 602, true)]
         public void QuestionYes(MessageItem item)
         {
             if (item != null)
@@ -984,7 +986,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'No'}de{'Nein'}", 602)]
+        [ACMethodInfo("", "en{'No'}de{'Nein'}", 602, true)]
         public void QuestionNo(MessageItem item)
         {
             if (item != null)
@@ -1000,7 +1002,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603)]
+        [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603, true)]
         public void Tare()
         {
             if (!IsEnabledTare())
@@ -1014,7 +1016,7 @@ namespace gip.bso.manufacturing
             return true; //TODO
         }
 
-        [ACMethodInfo("", "en{'Lot change'}de{'Chargenwechsel'}", 604)]
+        [ACMethodInfo("", "en{'Lot change'}de{'Chargenwechsel'}", 604, true)]
         public virtual void LotChange()
         {
             if (!IsEnabledLotChange())
@@ -1069,7 +1071,7 @@ namespace gip.bso.manufacturing
             return ScaleActualWeight;
         }
 
-        [ACMethodInfo("", "en{'Bin change'}de{'Eimerwechsel'}", 605)]
+        [ACMethodInfo("", "en{'Bin change'}de{'Eimerwechsel'}", 605, true)]
         public virtual void BinChange()
         {
             if (!IsEnabledBinChange())
@@ -1086,7 +1088,7 @@ namespace gip.bso.manufacturing
             return IsBinChangeAvailable;
         }
 
-        [ACMethodInfo("", "en{'Abort'}de{'Abbrechen'}", 606)]
+        [ACMethodInfo("", "en{'Abort'}de{'Abbrechen'}", 606, true)]
         public virtual void Abort()
         {
             if (!IsEnabledAbort())
@@ -1157,7 +1159,7 @@ namespace gip.bso.manufacturing
             return true; //ComponentPWNode != null;
         }
 
-        [ACMethodInfo("", "en{'Apply charge/lot'}de{'Charge/Los anwenden'}", 607)]
+        [ACMethodInfo("", "en{'Apply charge/lot'}de{'Charge/Los anwenden'}", 607, true)]
         public virtual void ApplyLot()
         {
             if (!IsEnabledApplyLot())
@@ -2282,7 +2284,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => Misc.
 
-        [ACMethodInfo("", "en{'Refresh material and lots'}de{'Refresh material and lots'}", 650)]
+        [ACMethodInfo("", "en{'Refresh material and lots'}de{'Refresh material and lots'}", 650, true)]
         public void RefreshMaterialOrFC_F()
         {
             OnPropertyChanged("WeighingMaterialList");
@@ -2451,7 +2453,7 @@ namespace gip.bso.manufacturing
             return !IsCurrentProcessModuleNull;
         }
 
-        [ACMethodInfo("", "en{'Remove last used lot suggestion'}de{'Zuletzt verwendeten Chargenvorschlag entfernen'}", 691)]
+        [ACMethodInfo("", "en{'Remove last used lot suggestion'}de{'Zuletzt verwendeten Chargenvorschlag entfernen'}", 691, true)]
         public void RemoveLastUsedLot()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
@@ -2505,7 +2507,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => SingleDosing
 
-        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660)]
+        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660, true)]
         public virtual void ShowSingleDosingDialog()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
@@ -2596,7 +2598,7 @@ namespace gip.bso.manufacturing
             return new SingleDosingItems(items.OrderBy(c => c.MaterialName != null ? c.MaterialName : ""));
         }
 
-        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661)]
+        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661, true)]
         public virtual void SingleDosingStart()
         {
             if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
@@ -2805,7 +2807,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => AbortDialog
 
-        [ACMethodInfo("", "en{'Yes -> Abort'}de{'Ja -> Abbrechen'}", 695)]
+        [ACMethodInfo("", "en{'Yes -> Abort'}de{'Ja -> Abbrechen'}", 695, true)]
         public void AbortComponent()
         {
             _AbortMode = AbortModeEnum.AbortComponent;
@@ -2814,7 +2816,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Abort and scale other comp.'}de{'Abbrechen und Restliche Komp. anpassen'}", 695)]
+        [ACMethodInfo("", "en{'Abort and scale other comp.'}de{'Abbrechen und Restliche Komp. anpassen'}", 695, true)]
         public void AbortComponentScaleOther()
         {
             _AbortMode = AbortModeEnum.AbortComponentScaleOtherComponents;
@@ -2828,7 +2830,7 @@ namespace gip.bso.manufacturing
             return ScaleOtherComponentOnAbort;
         }
 
-        [ACMethodInfo("", "en{'Abort and emptying mode'}de{'Abbrechen und Leerfahren'}", 695)]
+        [ACMethodInfo("", "en{'Abort and emptying mode'}de{'Abbrechen und Leerfahren'}", 695, true)]
         public void AbortComponentEmptyingMode()
         {
             _AbortMode = AbortModeEnum.AbortComponentSwitchToEmptyingMode;
@@ -2837,14 +2839,14 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695)]
+        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695, true)]
         public void SwitchEmptyingMode()
         {
             _AbortMode = AbortModeEnum.SwitchToEmptyingMode;
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Close'}de{'Schließen'}", 696)]
+        [ACMethodInfo("", "en{'Close'}de{'Schließen'}", 696, true)]
         public void CloseAbortDialog()
         {
             CloseTopDialog();
@@ -2855,7 +2857,7 @@ namespace gip.bso.manufacturing
             return InInterdischargingQ.HasValue ? false : true;
         }
 
-        [ACMethodInfo("", "en{'Interdischarge'}de{'Interdischarge'}", 696)]
+        [ACMethodInfo("", "en{'Interdischarge'}de{'Interdischarge'}", 696, true)]
         public void Interdischarge()
         {
             IACComponentPWNode currentPWNode = ComponentPWNodeLocked;
@@ -2933,7 +2935,7 @@ namespace gip.bso.manufacturing
             return InInterdischargingQ.HasValue ? false : true;
         }
 
-        [ACMethodInfo("", "en{'Interdischarging complete'}de{'Interdischarging complete'}", 696)]
+        [ACMethodInfo("", "en{'Interdischarging complete'}de{'Interdischarging complete'}", 696, true)]
         public void CompleteInterdischarging()
         {
             IACComponentPWNode currentPWNode = CurrentComponentPWNode;
@@ -2984,7 +2986,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700)]
+        [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700, true)]
         public void OpenReworkDialog()
         {
             ACRef<IACComponentPWNode> pwNode;
@@ -3009,7 +3011,7 @@ namespace gip.bso.manufacturing
             return IsReworkEnabled;
         }
 
-        [ACMethodInfo("", "en{'Add rework material'}de{'Rework-Material hinzufügen'}", 701)]
+        [ACMethodInfo("", "en{'Add rework material'}de{'Rework-Material hinzufügen'}", 701, true)]
         public void AddReworkMaterial()
         {
             ManualWeighingPWNode pwNode = null;
@@ -3221,6 +3223,9 @@ namespace gip.bso.manufacturing
                     return true;
                 case nameof(IsEnabledPrintLastQuant):
                     result = IsEnabledPrintLastQuant();
+                    return true;
+                case nameof(IsEnabledAbortComponentScaleOther):
+                    result = IsEnabledAbortComponentScaleOther();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
