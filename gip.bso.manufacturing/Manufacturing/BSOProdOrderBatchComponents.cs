@@ -49,9 +49,10 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Component
+        #region Properties
 
-        #region Component
+        #region Properties -> Component
+
         private ProdOrderPartslistPos _SelectedComponent;
         /// <summary>
         /// Selected property for ProdOrderPartslistPosRelation
@@ -74,7 +75,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         private List<ProdOrderPartslistPos> _ComponentList;
         /// <summary>
         /// List property for ProdOrderPartslistPosRelation
@@ -91,48 +91,74 @@ namespace gip.bso.manufacturing
             }
         }
 
+
+        #endregion
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private ProdOrderBatchPlan _BatchPlan;
+        [ACPropertyInfo(999, "BatchPlan", "en{'Batch Size'}de{'Batchgröße'}")]
+        public ProdOrderBatchPlan BatchPlan
+        {
+            get
+            {
+                return _BatchPlan;
+            }
+            set
+            {
+                if (_BatchPlan != value)
+                {
+                    _BatchPlan = value;
+                    OnPropertyChanged(nameof(BatchPlan));
+                }
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
         private List<ProdOrderPartslistPos> LoadComponentList(Guid prodOrderBatchPlanID)
         {
             List<ProdOrderPartslistPos> components = new List<ProdOrderPartslistPos>();
+            BatchPlan = null;
             using (DatabaseApp databaseApp = new DatabaseApp())
             {
-                ProdOrderBatchPlan batchPlan = databaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
-                if (batchPlan == null)
+                BatchPlan = databaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
+                if (BatchPlan == null)
                 {
                     Messages.LogError(this.GetACUrl(), "LoadComponentList()", "batchPlan is null");
                     return components;
                 }
 
                 components =
-                databaseApp
-                .ProdOrderPartslistPos
-               .Include(x => x.ProdOrderPartslist)
-               .Include(x => x.ProdOrderPartslist.ProdOrder)
-               .Include(x => x.Material)
-               .Include(x => x.Material.BaseMDUnit)
-               .Include(x => x.MDUnit)
-               .Where(x =>
-                       x.ProdOrderPartslistID == batchPlan.ProdOrderPartslistID
-                    && x.AlternativeProdOrderPartslistPosID == null
-                    && x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot)
-                    && x.ParentProdOrderPartslistPosID == null
-                    && x.AlternativeProdOrderPartslistPosID == null)
-                .OrderBy(x => x.Sequence)
-                .ToList();
+                    databaseApp
+                    .ProdOrderPartslistPos
+                   .Include(x => x.ProdOrderPartslist)
+                   .Include(x => x.ProdOrderPartslist.ProdOrder)
+                   .Include(x => x.Material)
+                   .Include(x => x.Material.BaseMDUnit)
+                   .Include(x => x.MDUnit)
+                   .Where(x =>
+                           x.ProdOrderPartslistID == BatchPlan.ProdOrderPartslistID
+                        && x.AlternativeProdOrderPartslistPosID == null
+                        && x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot)
+                        && x.ParentProdOrderPartslistPosID == null
+                        && x.AlternativeProdOrderPartslistPosID == null)
+                    .OrderBy(x => x.Sequence)
+                    .ToList();
 
-                double quantityIndex = batchPlan.BatchSize / batchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
+                double quantityIndex = BatchPlan.BatchSize / BatchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
                 foreach (ProdOrderPartslistPos pos in components)
                 {
                     pos.TargetQuantityUOM *= quantityIndex;
                     databaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
                 }
             }
-            // get list
-            
 
             return components;
         }
-        #endregion
 
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
         public void ShowDialogComponent(PAOrderInfo paOrderInfo)
@@ -148,7 +174,6 @@ namespace gip.bso.manufacturing
                 this.ParentACComponent.StopComponent(this);
             }
         }
-
 
         #endregion
 
