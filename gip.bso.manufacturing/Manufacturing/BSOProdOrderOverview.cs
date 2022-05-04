@@ -522,18 +522,12 @@ namespace gip.bso.manufacturing
                    SumComponentsActualQuantity = c.ProdOrderPartslistPos_ProdOrderPartslist.Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).Select(x => x.ActualQuantityUOM).DefaultIfEmpty().Sum(),
                    RestQuantityUOM = 0,
                    TargetInputUOM =
-                            c.ProdOrderPartslistPos_ProdOrderPartslist
-                            .Select(x => x.SourceProdOrderPartslist)
-                            .SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
-                            .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                            c.ProdOrderPartslistPos_SourceProdOrderPartslist
                             .Select(x => x.TargetQuantityUOM)
                             .DefaultIfEmpty()
                             .Sum(),
                    ActualInputUOM =
-                            c.ProdOrderPartslistPos_ProdOrderPartslist
-                            .Select(x => x.SourceProdOrderPartslist)
-                            .SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
-                            .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                            c.ProdOrderPartslistPos_SourceProdOrderPartslist
                             .Select(x => x.ActualQuantityUOM)
                             .DefaultIfEmpty()
                             .Sum()
