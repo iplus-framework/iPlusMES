@@ -94,10 +94,15 @@ namespace gip.bso.manufacturing
         private List<ProdOrderPartslistPos> LoadComponentList(Guid prodOrderBatchPlanID)
         {
             List<ProdOrderPartslistPos> components = new List<ProdOrderPartslistPos>();
-            // detect batch
-            ProdOrderBatchPlan batchPlan = DatabaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
-            using(DatabaseApp databaseApp = new DatabaseApp())
+            using (DatabaseApp databaseApp = new DatabaseApp())
             {
+                ProdOrderBatchPlan batchPlan = databaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
+                if (batchPlan == null)
+                {
+                    Messages.LogError(this.GetACUrl(), "LoadComponentList()", "batchPlan is null");
+                    return components;
+                }
+
                 components =
                 databaseApp
                 .ProdOrderPartslistPos
@@ -107,11 +112,11 @@ namespace gip.bso.manufacturing
                .Include(x => x.Material.BaseMDUnit)
                .Include(x => x.MDUnit)
                .Where(x =>
-                    x.ProdOrderPartslistID == batchPlan.ProdOrderPartslistID &&
-                    x.AlternativeProdOrderPartslistPosID == null &&
-                    x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot) &&
-                    x.ParentProdOrderPartslistPosID == null &&
-                    x.AlternativeProdOrderPartslistPosID == null)
+                       x.ProdOrderPartslistID == batchPlan.ProdOrderPartslistID
+                    && x.AlternativeProdOrderPartslistPosID == null
+                    && x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot)
+                    && x.ParentProdOrderPartslistPosID == null
+                    && x.AlternativeProdOrderPartslistPosID == null)
                 .OrderBy(x => x.Sequence)
                 .ToList();
 
@@ -132,6 +137,8 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
         public void ShowDialogComponent(PAOrderInfo paOrderInfo)
         {
+            if (paOrderInfo == null)
+                return;
             PAOrderInfoEntry entry = paOrderInfo.Entities.FirstOrDefault(c => c.EntityName == nameof(ProdOrderBatchPlan));
             if (entry != null)
             {
