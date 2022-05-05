@@ -39,5 +39,8 @@ namespace gip.mes.facility
         [ACPropertyInfo(110, "DifferentInput", "en{'Diff. input'}de{'Diff. Eingang'}")]
         public double DifferentInputUOM { get; set; }
 
+        [ACPropertyInfo(111, "DepartmentUserName", "en{'Department'}de{'Abteilung.'}")]
+        public string DepartmentUserName { get; set; }
+
     }
 }

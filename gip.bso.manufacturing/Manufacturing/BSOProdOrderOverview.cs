@@ -513,6 +513,7 @@ namespace gip.bso.manufacturing
 
                .Select(c => new OverviewProdOrderPartslist()
                {
+                   DepartmentUserName = c.DepartmentUserName,
                    OrderNo = c.ProdOrder.ProgramNo,
                    MaterialNo = c.Partslist.Material.MaterialNo,
                    MaterialName = c.Partslist.Material.MaterialName1,
