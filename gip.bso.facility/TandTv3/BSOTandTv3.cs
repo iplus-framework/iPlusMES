@@ -1610,37 +1610,40 @@ namespace gip.bso.facility
         {
             DoItemsClear();
             Result = result;
-            if (result.Success)
+            if (result != null)
             {
-                TandTv3FilterTracking tmpFilterTracking = DatabaseApp.TandTv3FilterTracking.FirstOrDefault(c => c.TandTv3FilterTrackingID == result.Filter.TandTv3FilterTrackingID);
-                WriteFilter(tmpFilterTracking);
-
-                if (result.Filter.RecalcAgain)
-                    AccessPrimary.NavList.Remove(tmpFilterTracking);
-                bool addToList = !AccessPrimary.NavList.Any(c => c.MDTrackingDirectionEnum == tmpFilterTracking.MDTrackingDirectionEnum && c.ItemSystemNo == tmpFilterTracking.ItemSystemNo);
-                if (addToList)
-                    AccessPrimary.NavList.Add(tmpFilterTracking);
-                if (result.Filter.RecalcAgain || addToList)
+                if (result.Success)
                 {
-                    AccessPrimary.NavSearch();
-                    OnPropertyChanged("FilterList");
+                    TandTv3FilterTracking tmpFilterTracking = DatabaseApp.TandTv3FilterTracking.FirstOrDefault(c => c.TandTv3FilterTrackingID == result.Filter.TandTv3FilterTrackingID);
+                    WriteFilter(tmpFilterTracking);
+
+                    if (result.Filter.RecalcAgain)
+                        AccessPrimary.NavList.Remove(tmpFilterTracking);
+                    bool addToList = !AccessPrimary.NavList.Any(c => c.MDTrackingDirectionEnum == tmpFilterTracking.MDTrackingDirectionEnum && c.ItemSystemNo == tmpFilterTracking.ItemSystemNo);
+                    if (addToList)
+                        AccessPrimary.NavList.Add(tmpFilterTracking);
+                    if (result.Filter.RecalcAgain || addToList)
+                    {
+                        AccessPrimary.NavSearch();
+                        OnPropertyChanged("FilterList");
+                    }
+                    SelectedFilter = tmpFilterTracking;
+                    var graphModel = GraphCommand.BuildGraphResult(result, IncludedGraphItems, GetGraphModel());
+                    ProcessGraph(graphModel);
+                    SelectedGraphAction = GraphAction.InitGraphSurface;
+                    SelectedTandTMixPoint = result.MixPoints.FirstOrDefault(c => c.ExistLabOrder);
                 }
-                SelectedFilter = tmpFilterTracking;
-                var graphModel = GraphCommand.BuildGraphResult(result, IncludedGraphItems, GetGraphModel());
-                ProcessGraph(graphModel);
-                SelectedGraphAction = GraphAction.InitGraphSurface;
-                SelectedTandTMixPoint = result.MixPoints.FirstOrDefault(c => c.ExistLabOrder);
-            }
-            else
-            {
-                SelectedGraphAction = GraphAction.CleanUpGraph;
-            }
-            if (result.ErrorMsg != null)
-            {
-                SendMessage(result.ErrorMsg);
-                if (result.ErrorMsg.MsgDetails != null)
-                    foreach (var subMessage in result.ErrorMsg.MsgDetails)
-                        SendMessage(subMessage);
+                else
+                {
+                    SelectedGraphAction = GraphAction.CleanUpGraph;
+                }
+                if (result.ErrorMsg != null)
+                {
+                    SendMessage(result.ErrorMsg);
+                    if (result.ErrorMsg.MsgDetails != null)
+                        foreach (var subMessage in result.ErrorMsg.MsgDetails)
+                            SendMessage(subMessage);
+                }
             }
             DoItemsOnPropertyChanged();
         }

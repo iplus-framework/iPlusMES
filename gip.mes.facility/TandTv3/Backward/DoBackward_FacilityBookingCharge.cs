@@ -13,6 +13,9 @@ namespace gip.mes.facility.TandTv3
         public DoBackward_FacilityBookingCharge(DatabaseApp databaseApp, TandTResult result, FacilityBookingCharge item) : base(databaseApp, result, item)
         {
             ItemTypeName = "FacilityBookingCharge";
+            if (item.ProdOrderPartslistPos != null)
+                if (!item.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo.Contains("2022-015170"))
+                    System.Diagnostics.Debugger.Break();
             if (!Result.Ids.Keys.Contains(item.FacilityBookingChargeID))
                 Result.Ids.Add(item.FacilityBookingChargeID, ItemTypeName);
         }
@@ -60,20 +63,23 @@ namespace gip.mes.facility.TandTv3
                     fc
                     .FacilityLot
                     .FacilityBookingCharge_InwardFacilityLot
-                    //.Where(c => c.InwardMaterialID == Item.OutwardMaterialID) // disabled for rework orders
+                    .Where(c => c.InwardMaterialID == Item.OutwardMaterialID) // disabled for rework orders
                     .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter))
                     .OrderBy(c => c.FacilityBookingChargeNo)
                     .ToList();
 
                 nextStepItems.AddRange(nextFbcs);
             }
-            if (Item.FacilityInventoryPos != null)
-            {
-                var inwardCharges = Item.InwardFacilityCharge.FacilityBookingCharge_InwardFacilityCharge.Where(c => c.FacilityBookingChargeNo != Item.FacilityBookingChargeNo);
-                var outwardCharges = Item.InwardFacilityCharge.FacilityBookingCharge_OutwardFacilityCharge.Where(c => c.FacilityBookingChargeNo != Item.FacilityBookingChargeNo);
-                var nextFbcs = inwardCharges.Union(outwardCharges);
-                nextStepItems.AddRange(nextFbcs);
-            }
+            // TODO: @aagincic: define bookings important for tracking -> (one lot transformed to another etc)
+            //if (Item.FacilityInventoryPos != null)
+            //{
+            //    var inwardCharges = Item.InwardFacilityCharge.FacilityBookingCharge_InwardFacilityCharge.Where(c => c.FacilityBookingChargeNo != Item.FacilityBookingChargeNo);
+            //    var outwardCharges = //        Item
+            //        .InwardFacilityCharge
+            //        .FacilityBookingCharge_OutwardFacilityCharge.Where(c => c.FacilityBookingChargeNo != Item.FacilityBookingChargeNo);
+            //    var nextFbcs = inwardCharges.Union(outwardCharges);
+            //    nextStepItems.AddRange(nextFbcs);
+            //}
 
             return nextStepItems;
         }
