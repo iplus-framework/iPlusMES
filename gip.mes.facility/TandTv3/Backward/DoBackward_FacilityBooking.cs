@@ -22,13 +22,13 @@ namespace gip.mes.facility.TandTv3
         {
             return Item
                 .FacilityBookingCharge_FacilityBooking
-                .Where(c=>
+                .Where(c =>
                     TandTv3Query.s_cQry_FBCOutwardQuery(c, Result.Filter) ||
-                    TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter)
+                    TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null)
                 )
-                .OrderBy(c=>c.FacilityBookingChargeNo)
+                .OrderBy(c => c.FacilityBookingChargeNo)
                 .ToList()
-                .Select(c=>(IACObjectEntity)c)
+                .Select(c => (IACObjectEntity)c)
                 .ToList();
         }
 
