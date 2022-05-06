@@ -614,8 +614,8 @@ namespace gip.bso.facility
                 if (_TrackingStyleList == null)
                 {
                     _TrackingStyleList = new ACValueItemList("TrackingStyleList");
-                    _TrackingStyleList.AddEntry((short)MDTrackingDirectionEnum.Backward, "en{'Backward'}de{'Zurück '}");
-                    _TrackingStyleList.AddEntry((short)MDTrackingDirectionEnum.Forward, "en{'Forward'}de{'Vorwärts'}");
+                    _TrackingStyleList.AddEntry((short)MDTrackingDirectionEnum.Backward, ConstApp.Backward);
+                    _TrackingStyleList.AddEntry((short)MDTrackingDirectionEnum.Forward, ConstApp.Forward);
                 }
                 return _TrackingStyleList;
             }
@@ -699,7 +699,7 @@ namespace gip.bso.facility
         }
 
         private DateTime? _FilterDateFrom;
-        [ACPropertyInfo(9999, "FilterDateFrom", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(9999, "FilterDateFrom", Const.From)]
         public DateTime? FilterDateFrom
         {
             get
@@ -717,7 +717,7 @@ namespace gip.bso.facility
         }
 
         private DateTime? _FilterDateTo;
-        [ACPropertyInfo(9999, "FilterDateTo", "en{'To'}de{'Bis'}")]
+        [ACPropertyInfo(9999, "FilterDateTo", Const.To)]
         public DateTime? FilterDateTo
         {
             get

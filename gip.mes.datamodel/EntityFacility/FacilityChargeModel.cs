@@ -12,7 +12,7 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(5, "FacilityName", ConstApp.Facility)]
         public string FacilityName { get; set; }
-       
+
         [ACPropertyInfo(8, "ProdOrderProgramNo", ConstApp.ProdOrderProgramNo)]
         public string ProdOrderProgramNo { get; set; }
 
@@ -27,6 +27,9 @@ namespace gip.mes.datamodel
 
         [ACPropertyInfo(9999, "DosedQuantity", "en{'Dosed quantity'}de{'Dosierte Menge'}", "", false)]
         public double DosedQuantity { get; set; }
+
+        [ACPropertyInfo(9999, "DosedQuantity", ConstApp.StockQuantity, "", false)]
+        public double StockQuantity { get; set; }
 
         [ACPropertyInfo(9999, "MDUnitName", "en{'Unit'}de{'Einheit'}")]
         public string MDUnitName { get; set; }

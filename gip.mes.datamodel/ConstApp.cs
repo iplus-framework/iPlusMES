@@ -272,6 +272,10 @@
         public const string PlanningMR = "en{'Template schedules'}de{'Vorlagepläne'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
+        public const string PickingNo = "en{'Picking-No.'}de{'Kommissions-Nr.'}";
+
+        public const string Backward = "en{'Backward'}de{'Zurück '}";
+        public const string Forward = "en{'Forward'}de{'Vorwärts'}";
 
 
         public const string KeyOfExtSys = "KeyOfExtSys";

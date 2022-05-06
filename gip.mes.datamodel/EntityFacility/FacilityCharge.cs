@@ -781,7 +781,8 @@ namespace gip.mes.datamodel
                     ProdOrderProgramNo = "",
                     BatchNo = "",
                     MachineName = " ",
-                    IsFinalOutput = false
+                    IsFinalOutput = false,
+                    StockQuantity = c.fc.StockQuantity
                 });
 
             var queryStep2 =
@@ -808,7 +809,8 @@ namespace gip.mes.datamodel
                     .OrderBy(fr => fr.Sequence)
                     .Select(fr => fr.VBiACClass.ACIdentifier)
                     .FirstOrDefault()
-                    : ""
+                    : "",
+                StockQuantity = c.StockQuantity
             });
 
 
