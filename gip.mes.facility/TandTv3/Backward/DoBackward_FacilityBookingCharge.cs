@@ -13,16 +13,6 @@ namespace gip.mes.facility.TandTv3
         public DoBackward_FacilityBookingCharge(DatabaseApp databaseApp, TandTResult result, FacilityBookingCharge item) : base(databaseApp, result, item)
         {
             ItemTypeName = "FacilityBookingCharge";
-            //if(
-            //      (item.OutwardFacility != null && item.OutwardFacility.FacilityNo == "103 Z01")
-            //    || (item.InwardFacility != null && item.InwardFacility.FacilityNo == "103 Z01")
-            //    )
-            //    System.Diagnostics.Debugger.Break();
-            if(item.FacilityBookingChargeNo == "ZGFBC00064652")
-                System.Diagnostics.Debugger.Break();
-            if (item.ProdOrderPartslistPos != null)
-                if (!item.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo.Contains("2022-015170"))
-                    System.Diagnostics.Debugger.Break();
             if (!Result.Ids.Keys.Contains(item.FacilityBookingChargeID))
                 Result.Ids.Add(item.FacilityBookingChargeID, ItemTypeName);
         }
