@@ -52,12 +52,18 @@ namespace gip.mes.facility.TandTv3
                 fc = Item.OutwardFacilityCharge;
             if (fc != null && Item.OutwardMaterial != null)
             {
+                Guid? materialID = null;
+                if (!Result.Filter.IsDisableReworkTracking && Item.OutwardMaterial != null)
+                    materialID = Item.OutwardMaterial.MaterialID;
+
+                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+
                 var nextFbcs =
                     fc
                     .FacilityLot
                     .FacilityBookingCharge_InwardFacilityLot
                     .Where(c => c.InwardMaterialID == Item.OutwardMaterial.MaterialID)
-                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, Item.OutwardMaterial?.MaterialID, Item.OutwardFacility?.FacilityID))
+                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, Item.OutwardFacility?.FacilityID, isOrderTrackingActive))
                     .OrderBy(c => c.FacilityBookingChargeNo)
                     .ToList();
 

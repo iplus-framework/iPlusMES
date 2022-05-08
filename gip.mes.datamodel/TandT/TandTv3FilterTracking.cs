@@ -193,8 +193,11 @@ namespace gip.mes.datamodel
         public bool IsDynamic { get; set; }
 
         public bool IsNew { get; set; }
+        public bool IsDisableReworkTracking { get; set; }
 
         public StreamWriter LogFileStream { get; set; }
+
+        public int? OrderDepth { get; set; }
 
         #endregion
 

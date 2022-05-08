@@ -193,12 +193,14 @@ namespace gip.mes.facility.TandTv3
                         .ToArray();
 
                 // Inward bookings
+                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+
                 fbcs = Item
                         .ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos
                         .Where(c => fcLotIDs.Contains(c.ProdOrderPartslistPosFacilityLotID))
                         .SelectMany(c => c.FacilityBooking_ProdOrderPartslistPosFacilityLot)
                         .SelectMany(c => c.FacilityBookingCharge_FacilityBooking)
-                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null))
+                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, isOrderTrackingActive))
                         .ToList();
 
                 // Outward bookings
@@ -208,9 +210,11 @@ namespace gip.mes.facility.TandTv3
             }
             else
             {
+                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+
                 fbcs = Item
                         .FacilityBookingCharge_ProdOrderPartslistPos
-                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null))
+                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, isOrderTrackingActive))
                         .ToList();
             }
             return fbcs;

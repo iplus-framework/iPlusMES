@@ -91,6 +91,13 @@ namespace gip.mes.facility.TandTv3
             }
         }
 
+        public bool IsOrderTrackingActive()
+        {
+            return
+                Filter.OrderDepth == null 
+                || ProgramNos.Count() < (Filter.OrderDepth ?? 0);
+        }
+
         #endregion
 
         #region Add Mix Point
