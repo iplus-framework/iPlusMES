@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace gip.mes.facility.TandTv3
 {
@@ -91,12 +92,7 @@ namespace gip.mes.facility.TandTv3
             }
         }
 
-        public bool IsOrderTrackingActive()
-        {
-            return
-                Filter.OrderDepth == null 
-                || ProgramNos.Count() < (Filter.OrderDepth ?? 0);
-        }
+
 
         #endregion
 
@@ -344,6 +340,68 @@ namespace gip.mes.facility.TandTv3
 
 
             return null;
+        }
+        #endregion
+
+        #region Order Depth
+
+
+        private List<string> _OrderConnections;
+        public List<string> OrderConnections
+        {
+            get
+            {
+                if (_OrderConnections == null)
+                    _OrderConnections = new List<string>();
+                return _OrderConnections;
+            }
+        }
+
+        public void AddOrderConnection(string programNo1, string programNo2)
+        {
+            string connection = string.Format(@"\{0}\{1}", programNo1, programNo2);
+            if (!OrderConnections.Contains(connection))
+            {
+                string programNo1Start = string.Format(@"\{0}", programNo1);
+                string prevConnection = OrderConnections.FirstOrDefault(c => c.Contains(programNo1Start));
+                if (!string.IsNullOrEmpty(prevConnection))
+                {
+                    prevConnection = prevConnection.Substring(0, prevConnection.IndexOf(programNo1Start));
+                    prevConnection += connection;
+                    OrderConnections.Add(prevConnection);
+                }
+            }
+            else
+                OrderConnections.Add(connection);
+        }
+
+        public void AddOrderConnection(FacilityBookingCharge source, FacilityBookingCharge target)
+        {
+            if (target.ProdOrderPartslistPosRelationID != null)
+            {
+                if (source.ProdOrderPartslistPosID != null)
+                {
+                    string programNo1 = source.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    string programNo2 = target.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    AddOrderConnection(programNo1, programNo2);
+                }
+            }
+        }
+
+        public int GetOrderMaxDepth()
+        {
+            return
+                OrderConnections
+                .Select(c => Regex.Matches(c, Regex.Escape(@"\")).Count)
+                .DefaultIfEmpty()
+                .Max();
+        }
+
+        public bool IsOrderTrackingActive()
+        {
+            return
+                Filter.OrderDepth == null
+                || GetOrderMaxDepth() < (Filter.OrderDepth ?? 0);
         }
         #endregion
 

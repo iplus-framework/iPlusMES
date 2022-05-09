@@ -27,29 +27,53 @@ namespace gip.mes.facility.TandTv3
                 fc = Item.InwardFacilityCharge;
             if (fc != null && Item.InwardMaterialID != null)
             {
-                var nextFbcIds =
-                    fc
-                    .FacilityLot
-                    .FacilityBookingCharge_OutwardFacilityLot
-                    .Where(c => c.OutwardMaterialID == Item.InwardMaterialID)
-                    .OrderBy(c => c.FacilityBookingChargeNo)
-                    .Select(c => new { c.FacilityBookingChargeID, c.ProdOrderPartslistPosID, c.ProdOrderPartslistPosRelationID, c.InOrderPosID })
-                    .ToList();
+                //var nextFbcIds =
+                //    fc
+                //    .FacilityLot
+                //    .FacilityBookingCharge_OutwardFacilityLot
+                //    .Where(c => c.OutwardMaterialID == Item.InwardMaterialID)
+                //    .OrderBy(c => c.FacilityBookingChargeNo)
+                //    .Select(c => new { c.FacilityBookingChargeID, c.ProdOrderPartslistPosID, c.ProdOrderPartslistPosRelationID, c.InOrderPosID })
+                //    .ToList();
 
-                Guid[] fbcIds = nextFbcIds.Select(c => c.FacilityBookingChargeID).ToArray();
-                List<FacilityBookingCharge> nextFbc =
-                    DatabaseApp
-                    .FacilityBookingCharge
-                    .Include(c => c.InwardFacilityCharge)
-                    .Include(c => c.InwardFacilityCharge.FacilityLot)
-                    .Include(c => c.ProdOrderPartslistPosRelation)
-                    .Include(c => c.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos)
-                    .Include(c => c.ProdOrderPartslistPos)
-                    .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos)
-                    //.Include(c => c.OutwardFacilityCharge)
-                    //.Include(c => c.OutwardFacilityCharge.FacilityLot)
-                    .Where(c => fbcIds.Contains(c.FacilityBookingChargeID)).ToList();
-                nextStepItems.AddRange(nextFbc);
+                //Guid[] fbcIds = nextFbcIds.Select(c => c.FacilityBookingChargeID).ToArray();
+                //List<FacilityBookingCharge> nextFbc =
+                //    DatabaseApp
+                //    .FacilityBookingCharge
+                //    .Include(c => c.InwardFacilityCharge)
+                //    .Include(c => c.InwardFacilityCharge.FacilityLot)
+                //    .Include(c => c.ProdOrderPartslistPosRelation)
+                //    .Include(c => c.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos)
+                //    .Include(c => c.ProdOrderPartslistPos)
+                //    .Include(c => c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos)
+                //    //.Include(c => c.OutwardFacilityCharge)
+                //    //.Include(c => c.OutwardFacilityCharge.FacilityLot)
+                //    .Where(c => fbcIds.Contains(c.FacilityBookingChargeID)).ToList();
+
+
+                List<FacilityBookingCharge> nextFbcs = new List<FacilityBookingCharge>();
+                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+
+                nextFbcs =
+                fc
+                .FacilityLot
+                .FacilityBookingCharge_OutwardFacilityLot
+                .Where(c =>
+                            c.OutwardMaterialID == Item.InwardMaterialID
+                            && c.OutwardFacilityID == Item.InwardFacilityID
+                            && (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
+                .OrderBy(c => c.FacilityBookingChargeNo)
+                .ToList();
+
+                if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosID != null)
+                {
+                    foreach (FacilityBookingCharge fbc in nextFbcs)
+                    {
+                        Result.AddOrderConnection(Item, fbc);
+                    }
+                }
+
+                nextStepItems.AddRange(nextFbcs);
             }
 
             // TODO: @aagincic: define bookings important for tracking -> (one lot transformed to another etc)

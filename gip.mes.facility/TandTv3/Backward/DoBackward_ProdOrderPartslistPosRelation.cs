@@ -39,7 +39,7 @@ namespace gip.mes.facility.TandTv3
            .Where(c => TandTv3Query.s_cQry_FBCOutwardQuery(c, Result.Filter))
            .OrderBy(c => c.FacilityBookingChargeNo)
            .ToList();
-            if(IsUseLotCheck)
+            if (IsUseLotCheck)
             {
                 fbc = fbc.Where(c => Result.Lots.Contains(c.OutwardFacilityCharge.FacilityLot.LotNo)).ToList();
             }

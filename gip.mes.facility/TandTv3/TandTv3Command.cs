@@ -802,7 +802,8 @@ namespace gip.mes.facility.TandTv3
                     IsDynamic = filter.IsDynamic,
                     IsReport = filter.IsReport,
                     MaterialIDs = new List<Guid>(),
-                    RecalcAgain = filter.RecalcAgain
+                    RecalcAgain = filter.RecalcAgain,
+                    OrderDepth = filter.OrderDepth
                 };
 
                 if (filter.MaterialIDs != null && filter.MaterialIDs.Any())

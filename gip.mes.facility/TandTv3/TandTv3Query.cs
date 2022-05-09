@@ -39,12 +39,12 @@ namespace gip.mes.facility.TandTv3
        );
 
 
-        public static readonly Func<FacilityBookingCharge, TandTv3FilterTracking, Guid?, Guid?,bool, bool> s_cQry_FBCInwardQuery = (c, filter, materialID, facilityID, stopTrackingOrders) =>
+        public static readonly Func<FacilityBookingCharge, TandTv3FilterTracking, Guid?, Guid?,bool, bool> s_cQry_FBCInwardQuery = (c, filter, materialID, facilityID, isTrackingOrderActive) =>
                             c.InwardFacilityChargeID != null 
                             && c.InwardFacilityCharge.FacilityLotID != null
                             && (materialID == null || c.InwardMaterialID == materialID)
                             && (facilityID == null || c.InwardFacilityID == facilityID)
-                            && (!stopTrackingOrders || c.ProdOrderPartslistPosID == null);
+                            && (isTrackingOrderActive || c.ProdOrderPartslistPosID == null);
 
         public static readonly Func<FacilityBookingCharge, TandTv3FilterTracking, bool> s_cQry_FBCOutwardQuery = (c, filter) =>
                                c.OutwardMaterialID != null 

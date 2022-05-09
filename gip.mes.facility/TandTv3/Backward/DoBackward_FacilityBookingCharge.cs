@@ -70,6 +70,14 @@ namespace gip.mes.facility.TandTv3
                     .OrderBy(c => c.FacilityBookingChargeNo)
                     .ToList();
 
+                if(Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
+                {
+                    foreach (FacilityBookingCharge fbc in nextFbcs)
+                    {
+                       Result.AddOrderConnection(fbc, Item);
+                    }
+                }
+
                 nextStepItems.AddRange(nextFbcs);
             }
             // TODO: @aagincic: define bookings important for tracking -> (one lot transformed to another etc)

@@ -115,6 +115,11 @@ namespace gip.mes.facility.TandTv3
                 }
                 sameStepItems.AddRange(childPositions);
             }
+            else
+            {
+                List<ProdOrderPartslistPos> childInBatch = Item.ProdOrderPartslistPos_ParentProdOrderPartslistPos.Where(c=>c.FacilityLotID!= null && Result.Lots.Contains(c.FacilityLot.LotNo)).ToList();
+                sameStepItems.AddRange(childInBatch);
+            }
             #endregion
             return sameStepItems;
         }
@@ -182,7 +187,7 @@ namespace gip.mes.facility.TandTv3
         public virtual List<FacilityBookingCharge> GetFacilityBookingCharges(bool useLotCheck)
         {
             List<FacilityBookingCharge> fbcs = null;
-            if (IsUseLotCheck)
+            if (useLotCheck)
             {
 
                 Guid[] fcLotIDs =
@@ -191,6 +196,7 @@ namespace gip.mes.facility.TandTv3
                         .Where(c => Result.Lots.Contains(c.FacilityLot.LotNo))
                         .Select(c => c.ProdOrderPartslistPosFacilityLotID)
                         .ToArray();
+
 
                 // Inward bookings
                 bool isOrderTrackingActive = Result.IsOrderTrackingActive();
