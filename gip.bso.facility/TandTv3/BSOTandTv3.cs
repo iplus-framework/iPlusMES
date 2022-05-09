@@ -1615,23 +1615,26 @@ namespace gip.bso.facility
                 if (result.Success)
                 {
                     TandTv3FilterTracking tmpFilterTracking = DatabaseApp.TandTv3FilterTracking.FirstOrDefault(c => c.TandTv3FilterTrackingID == result.Filter.TandTv3FilterTrackingID);
-                    WriteFilter(tmpFilterTracking);
-
-                    if (result.Filter.RecalcAgain)
-                        AccessPrimary.NavList.Remove(tmpFilterTracking);
-                    bool addToList = !AccessPrimary.NavList.Any(c => c.MDTrackingDirectionEnum == tmpFilterTracking.MDTrackingDirectionEnum && c.ItemSystemNo == tmpFilterTracking.ItemSystemNo);
-                    if (addToList)
-                        AccessPrimary.NavList.Add(tmpFilterTracking);
-                    if (result.Filter.RecalcAgain || addToList)
+                    if (tmpFilterTracking != null)
                     {
-                        AccessPrimary.NavSearch();
-                        OnPropertyChanged("FilterList");
+                        WriteFilter(tmpFilterTracking);
+
+                        if (result.Filter.RecalcAgain)
+                            AccessPrimary.NavList.Remove(tmpFilterTracking);
+                        bool addToList = !AccessPrimary.NavList.Any(c => c.MDTrackingDirectionEnum == tmpFilterTracking.MDTrackingDirectionEnum && c.ItemSystemNo == tmpFilterTracking.ItemSystemNo);
+                        if (addToList)
+                            AccessPrimary.NavList.Add(tmpFilterTracking);
+                        if (result.Filter.RecalcAgain || addToList)
+                        {
+                            AccessPrimary.NavSearch();
+                            OnPropertyChanged(nameof(FilterList));
+                        }
+                        SelectedFilter = tmpFilterTracking;
+                        var graphModel = GraphCommand.BuildGraphResult(result, IncludedGraphItems, GetGraphModel());
+                        ProcessGraph(graphModel);
+                        SelectedGraphAction = GraphAction.InitGraphSurface;
+                        SelectedTandTMixPoint = result.MixPoints.FirstOrDefault(c => c.ExistLabOrder);
                     }
-                    SelectedFilter = tmpFilterTracking;
-                    var graphModel = GraphCommand.BuildGraphResult(result, IncludedGraphItems, GetGraphModel());
-                    ProcessGraph(graphModel);
-                    SelectedGraphAction = GraphAction.InitGraphSurface;
-                    SelectedTandTMixPoint = result.MixPoints.FirstOrDefault(c => c.ExistLabOrder);
                 }
                 else
                 {
