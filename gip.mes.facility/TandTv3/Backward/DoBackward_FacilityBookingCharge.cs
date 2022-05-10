@@ -54,10 +54,10 @@ namespace gip.mes.facility.TandTv3
             FacilityCharge fc = null;
             if (Item.OutwardFacilityChargeID != null)
                 fc = Item.OutwardFacilityCharge;
-            if (fc != null && Item.OutwardMaterialID != null)
+            if (fc != null && fc.FacilityLot != null && Item.OutwardMaterialID != null)
             {
                 Guid? materialID = null;
-                if(!Result.Filter.IsDisableReworkTracking)
+                if (!Result.Filter.IsDisableReworkTracking)
                     materialID = Item.OutwardMaterialID;
 
                 bool isOrderTrackingActive = Result.IsOrderTrackingActive();
@@ -70,15 +70,16 @@ namespace gip.mes.facility.TandTv3
                     .OrderBy(c => c.FacilityBookingChargeNo)
                     .ToList();
 
-                if(Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
+                if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
                 {
                     foreach (FacilityBookingCharge fbc in nextFbcs)
                     {
-                       Result.AddOrderConnection(fbc, Item);
+                        Result.AddOrderConnection(fbc, Item);
                     }
                 }
 
-                nextStepItems.AddRange(nextFbcs);
+                if ((!isOrderTrackingActive || Result.IsOrderTrackingActive()) && nextFbcs.Any())
+                    nextStepItems.AddRange(nextFbcs);
             }
             // TODO: @aagincic: define bookings important for tracking -> (one lot transformed to another etc)
             //if (Item.FacilityInventoryPos != null)

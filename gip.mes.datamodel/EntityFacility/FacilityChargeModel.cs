@@ -42,6 +42,13 @@ namespace gip.mes.datamodel
 
         public int StepNo { get; set; }
 
+        #region overrides
+        public override string ToString()
+        {
+            return string.Format(@"{0} | {1} {2} | {3} {4}", LotNo, MaterialNo, MaterialName1, FacilityNo, FacilityName);
+        }
+        #endregion
+
 
     }
 }

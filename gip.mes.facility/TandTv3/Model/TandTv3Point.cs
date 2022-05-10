@@ -206,7 +206,11 @@ namespace gip.mes.facility
         public void AddOutwardLotQuantity(FacilityBookingCharge fbc)
         {
             FacilityLot facilityLot = fbc.OutwardFacilityCharge.FacilityLot;
-            FacilityLotModel facilityLotModel = AddOutwardLot(facilityLot);
+            FacilityLotModel facilityLotModel = null;
+            if (facilityLot != null)
+                facilityLotModel = AddOutwardLot(facilityLot);
+            else
+                facilityLotModel = new FacilityLotModel();
             if (string.IsNullOrEmpty(facilityLotModel.MaterialNo))
             {
                 facilityLotModel.MaterialNo = fbc.OutwardMaterial.MaterialNo;
@@ -414,7 +418,7 @@ namespace gip.mes.facility
         public void AddOutwardFacility(FacilityBookingCharge facilityBookingCharge, double quantity)
         {
             Material material = null;
-            if(facilityBookingCharge.OutwardFacility != null
+            if (facilityBookingCharge.OutwardFacility != null
                 && facilityBookingCharge.OutwardFacility.MDFacilityType != null
                 && facilityBookingCharge.OutwardFacility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
             {
@@ -438,7 +442,7 @@ namespace gip.mes.facility
                     FacilityName = facility.FacilityName
                 };
 
-                if(material != null)
+                if (material != null)
                 {
                     facilityPreview.MaterialNo = material.MaterialNo;
                     facilityPreview.MaterialName1 = material.MaterialName1;

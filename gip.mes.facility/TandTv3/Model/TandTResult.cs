@@ -360,11 +360,11 @@ namespace gip.mes.facility.TandTv3
         public void AddOrderConnection(string programNo1, string programNo2)
         {
             string connection = string.Format(@"\{0}\{1}", programNo1, programNo2);
-            if (!OrderConnections.Contains(connection))
+            if (OrderConnections.Contains(connection))
             {
                 string programNo1Start = string.Format(@"\{0}", programNo1);
                 string prevConnection = OrderConnections.FirstOrDefault(c => c.Contains(programNo1Start));
-                if (!string.IsNullOrEmpty(prevConnection))
+                if (!string.IsNullOrEmpty(prevConnection) && prevConnection != connection)
                 {
                     prevConnection = prevConnection.Substring(0, prevConnection.IndexOf(programNo1Start));
                     prevConnection += connection;

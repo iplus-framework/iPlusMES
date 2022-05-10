@@ -50,7 +50,7 @@ namespace gip.mes.facility.TandTv3
         public static readonly Func<FacilityBookingCharge, TandTv3FilterTracking, bool> s_cQry_FBCOutwardQuery = (c, filter) =>
                                c.OutwardMaterialID != null 
                             && c.OutwardFacilityChargeID != null 
-                            && c.OutwardFacilityCharge.FacilityLotID != null 
+                            //&& c.OutwardFacilityCharge.FacilityLotID != null 
                             &&
                             (
                                 (
