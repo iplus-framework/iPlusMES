@@ -122,21 +122,35 @@ namespace gip.bso.masterdata
             if (FilterMDSchedulingGroupID != null)
             {
                 Guid[] linieMaterials = DatabaseApp
-               .MDSchedulingGroup
-               .Where(c => c.MDSchedulingGroupID == FilterMDSchedulingGroupID)
-               .SelectMany(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
-               .Select(c => c.VBiACClassWF)
-               .SelectMany(c => c.MaterialWFConnection_ACClassWF)
-               .Select(c => c.Material)
-               .SelectMany(c => c.PartslistPos_Material)
-               .Select(c => c.Partslist)
-               .Select(c => c.MaterialID)
-               .Distinct()
-               .ToArray();
+                   .MDSchedulingGroup
+                   .Where(c => c.MDSchedulingGroupID == FilterMDSchedulingGroupID)
+                   .SelectMany(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
+                   .Select(c => c.VBiACClassWF.ACClassMethod)
+                   .SelectMany(c => c.MaterialWFACClassMethod_ACClassMethod)
+                   .SelectMany(c => c.PartslistACClassMethod_MaterialWFACClassMethod)
+                   //.Where(c => c.Partslist.IsEnabled)
+                   .Select(c => c.Partslist.MaterialID)
+                    .Distinct()
+                    .ToArray();
+
+                //Guid[] linieMaterials = DatabaseApp
+                //                       .MDSchedulingGroup
+                //                       .Where(c => c.MDSchedulingGroupID == FilterMDSchedulingGroupID)
+                //                       .SelectMany(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
+                //                       .Select(c => c.VBiACClassWF)
+                //                       .SelectMany(c => c.MaterialWFConnection_ACClassWF)
+                //                       .Select(c => c.Material)
+                //                       .SelectMany(c => c.PartslistPos_Material)
+                //                       .Select(c => c.Partslist)
+                //                       .Select(c => c.MaterialID)
+                //                       .Distinct()
+                //                       .ToArray();
                 query = query
                     .Where(c =>
                         c.Partslist_Material.Any(x => x.IsEnabled)
-                        && linieMaterials.Contains(c.MaterialID)) as ObjectQuery<Material>;
+                        //&& x.PartslistACClassMethod_Partslist.FirstOrDefault().MaterialWFACClassMethod.ACClassMethod.ACClassWF_ACClassMethod)
+                        && linieMaterials.Contains(c.MaterialID)
+                        ) as ObjectQuery<Material>;
             }
 
             if (FilterIsNotDeleted != null)
