@@ -2205,7 +2205,7 @@ namespace gip.mes.webservices
                              })
                 );
 
-        public WSResponse<List<MDMovementReason>> GetMovementReasons()
+        public virtual WSResponse<List<MDMovementReason>> GetMovementReasons()
         {
             using (DatabaseApp dbApp = new DatabaseApp())
             {

@@ -141,7 +141,19 @@ namespace gip.bso.manufacturing
                             SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.InWeighing, DatabaseApp);
                         }
 
-                        AddKg();
+                        if (diff > 0.00001)
+                        {
+                            var paf = CurrentPAFManualWeighing;
+                            if (paf != null)
+                            {
+                                double newQuantity = SelectedWeighingMaterial.AddKg(_PAFManuallyAddedQuantity.ValueT);
+                                paf.ExecuteMethod(nameof(PAFManualAddition.ChangeManuallyAddedQuantity), newQuantity, value.FacilityChargeID);
+                            }
+                        }
+                        else
+                        {
+                            AddKg();
+                        }
                     }
                     else if (_SelFacilityCharge != null && value == null && SelectedWeighingMaterial == null)
                     {

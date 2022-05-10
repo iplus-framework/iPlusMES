@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using System;
 
 namespace gip.mes.processapplication
 {
@@ -21,6 +22,18 @@ namespace gip.mes.processapplication
         public PAFManualAddition(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+        }
+
+        public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        {
+            base.Recycle(content, parentACObject, parameter, acIdentifier);
+            _QuantityChangedFromQuant = null;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            _QuantityChangedFromQuant = null;
+            return base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -52,13 +65,38 @@ namespace gip.mes.processapplication
             return base.Start(acMethod);
         }
 
+        public override void SMIdle()
+        {
+            base.SMIdle();
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _QuantityChangedFromQuant = null;
+            }
+        }
+
         public override bool TareCheck => false;
 
         public override bool CheckInToleranceOnlyManuallyAddedQuantity => true;
 
         public override bool SimulateWeightIfSimulationOn => false;
 
-        #endregion
+        private Guid? _QuantityChangedFromQuant;
 
+        [ACMethodInfo("","",9999)]
+        public void ChangeManuallyAddedQuantity(double newQuantity, Guid quantID)
+        {
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                if (_QuantityChangedFromQuant.HasValue && quantID == _QuantityChangedFromQuant.Value)
+                    return;
+
+                _QuantityChangedFromQuant = quantID;
+            }
+
+            ManuallyAddedQuantity.ValueT = newQuantity;
+        }
+
+        #endregion
     }
 }
