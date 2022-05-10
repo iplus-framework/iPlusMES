@@ -24,7 +24,7 @@ namespace gip.mes.facility.TandTv3
                 .FacilityBookingCharge_FacilityBooking
                 .Where(c =>
                     TandTv3Query.s_cQry_FBCOutwardQuery(c, Result.Filter) ||
-                    TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, true)
+                    TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, true, new short[] { })
                 )
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .ToList()

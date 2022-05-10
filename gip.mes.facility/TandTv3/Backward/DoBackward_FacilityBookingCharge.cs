@@ -66,7 +66,7 @@ namespace gip.mes.facility.TandTv3
                     fc
                     .FacilityLot
                     .FacilityBookingCharge_InwardFacilityLot
-                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, Item.OutwardFacilityID, isOrderTrackingActive))
+                    .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, materialID, Item.OutwardFacilityID, isOrderTrackingActive, Result.Filter.FilteredBookingTypes))
                     .OrderBy(c => c.FacilityBookingChargeNo)
                     .ToList();
 

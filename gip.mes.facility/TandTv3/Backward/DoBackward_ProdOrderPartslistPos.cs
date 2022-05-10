@@ -206,7 +206,7 @@ namespace gip.mes.facility.TandTv3
                         .Where(c => fcLotIDs.Contains(c.ProdOrderPartslistPosFacilityLotID))
                         .SelectMany(c => c.FacilityBooking_ProdOrderPartslistPosFacilityLot)
                         .SelectMany(c => c.FacilityBookingCharge_FacilityBooking)
-                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, isOrderTrackingActive))
+                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, isOrderTrackingActive, Result.Filter.FilteredBookingTypes))
                         .ToList();
 
                 // Outward bookings
@@ -220,7 +220,7 @@ namespace gip.mes.facility.TandTv3
 
                 fbcs = Item
                         .FacilityBookingCharge_ProdOrderPartslistPos
-                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, isOrderTrackingActive))
+                        .Where(c => TandTv3Query.s_cQry_FBCInwardQuery(c, Result.Filter, null, null, isOrderTrackingActive, new short[] { }))
                         .ToList();
             }
             return fbcs;
