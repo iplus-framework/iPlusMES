@@ -425,7 +425,7 @@ namespace gip.mes.facility.TandTv3
             if (TandTResult.LogWritter != null)
             {
                 TandTResult.LogWritter.WriteLine(new String('=', 20));
-                TandTResult.LogWritter.WriteLine("Same step items:");
+                TandTResult.LogWritter.WriteLine("Step items:");
                 TandTResult.LogWritter.WriteLine(new String('-', 20));
                 foreach (var item in trackSameStepItems)
                 {
@@ -476,20 +476,20 @@ namespace gip.mes.facility.TandTv3
             {
                 if (trackNextStepItems.Any())
                 {
-                    #region T&Tv3 Log
-                    if (TandTResult.LogWritter != null)
-                    {
-                        TandTResult.LogWritter.WriteLine("Item Next Step Items:");
-                        TandTResult.LogWritter.WriteLine(new String('>', 20));
-                        foreach (var nextStepItem in trackNextStepItems)
-                        {
-                            TandTResult.LogWritter.WriteLine(nextStepItem);
-                            TandTResult.LogWritter.WriteLine("");
-                        }
-                        TandTResult.LogWritter.WriteLine(new String('<', 20));
-                        TandTResult.LogWritter.WriteLine("");
-                    }
-                    #endregion
+                    //#region T&Tv3 Log
+                    //if (TandTResult.LogWritter != null)
+                    //{
+                    //    TandTResult.LogWritter.WriteLine("Item Next Step Items:");
+                    //    TandTResult.LogWritter.WriteLine(new String('>', 20));
+                    //    foreach (var nextStepItem in trackNextStepItems)
+                    //    {
+                    //        TandTResult.LogWritter.WriteLine(nextStepItem);
+                    //        TandTResult.LogWritter.WriteLine("");
+                    //    }
+                    //    TandTResult.LogWritter.WriteLine(new String('<', 20));
+                    //    TandTResult.LogWritter.WriteLine("");
+                    //}
+                    //#endregion
                     Process(trackingDirection, trackNextStepItems);
                 }
             }

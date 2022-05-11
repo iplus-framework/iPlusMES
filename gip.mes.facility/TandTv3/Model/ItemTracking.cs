@@ -60,6 +60,7 @@ namespace gip.mes.facility.TandTv3
         {
             string toString = TrackingDirection.ToString() + "|";
             toString += "[" + Item.ToString() + "]";
+            toString += "| " + GetItemNo();
             if(!string.IsNullOrEmpty(SameStepParent))
             {
                 toString += Environment.NewLine;

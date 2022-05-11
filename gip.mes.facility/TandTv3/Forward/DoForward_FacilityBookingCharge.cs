@@ -76,6 +76,42 @@ namespace gip.mes.facility.TandTv3
                 nextStepItems.AddRange(nextFbcs);
             }
 
+            if (Item.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.PickingRelocation)
+            {
+                List<FacilityBookingCharge> nextFbcs = new List<FacilityBookingCharge>();
+                bool isOrderTrackingActive = Result.IsOrderTrackingActive();
+
+                FacilityBookingCharge relocatedCharge
+                    = Item
+                      .PickingPos
+                      .FacilityBookingCharge_PickingPos
+                      .Where(c => c.InwardFacilityCharge != null)
+                      .FirstOrDefault();
+
+                if (relocatedCharge != null)
+                {
+                    nextFbcs =
+                        relocatedCharge
+                        .InwardFacilityCharge
+                        .FacilityBookingCharge_OutwardFacilityCharge
+                           .Where(c =>
+                                c.OutwardMaterialID == relocatedCharge.InwardMaterialID
+                                && c.OutwardFacilityID == relocatedCharge.InwardFacilityID
+                                && (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
+                        .OrderBy(c => c.FacilityBookingChargeNo)
+                        .ToList();
+
+                    if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosID != null)
+                    {
+                        foreach (FacilityBookingCharge fbc in nextFbcs)
+                        {
+                            Result.AddOrderConnection(Item, fbc);
+                        }
+                    }
+                    nextStepItems.AddRange(nextFbcs);
+                }
+            }
+
             // TODO: @aagincic: define bookings important for tracking -> (one lot transformed to another etc)
             //if (Item.FacilityInventoryPos != null)
             //{
