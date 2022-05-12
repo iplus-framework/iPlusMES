@@ -1052,12 +1052,12 @@ namespace gip.mes.facility
         }
 
 
-        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, string pwClassName, ConfigManagerIPlus configManagerIPlus, List<ProdOrderPartslist> plsForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, List<ProdOrderPartslist> plsForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderPartslist item in plsForBatchGenerate)
             {
-                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, pwClassName, configManagerIPlus, item);
+                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, routingService, pwClassName, item);
                 if (tmp != null && tmp.MsgDetails.Any())
                     foreach (Msg msg in tmp.MsgDetails)
                         msgWithDetails.AddDetailMessage(msg);
@@ -1065,7 +1065,7 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, string pwClassName, ConfigManagerIPlus configManagerIPlus, ProdOrderPartslist plForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = null;
 
@@ -1100,7 +1100,11 @@ namespace gip.mes.facility
             // 3.0 generate batches
             List<PartslistMDSchedulerGroupConnection> schedulerConnections = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName, null);
 
-            ProdOrderPartslist[] prodOrderPartslists = prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToArray();
+            ProdOrderPartslist[] prodOrderPartslists = 
+                prodOrder
+                .ProdOrderPartslist_ProdOrder
+                .OrderBy(c => c.Sequence)
+                .ToArray();
             List<WizardSchedulerPartslist> wPls = new List<WizardSchedulerPartslist>();
 
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
@@ -1143,7 +1147,7 @@ namespace gip.mes.facility
                 foreach (ProdOrderBatchPlan bp in wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
                 {
                     string configUrl = "";
-                    BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
+                    BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
                         wPl.ProdOrderPartslistPos, bp, configUrl, true, true, true, true, true);
 
                     if (targets.Any(c => c.IsChecked))
@@ -1214,19 +1218,19 @@ namespace gip.mes.facility
             return acClassWFDischarging;
         }
 
-        public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, gip.mes.datamodel.ACClassWF vbACClassWF,
+        public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
             ProdOrderPartslist prodorderPartslist, ProdOrderPartslistPos intermediatePos, ProdOrderBatchPlan batchPlan, string configACUrl,
             bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation)
         {
             BindingList<POPartslistPosReservation> reservationCollection = new BindingList<POPartslistPosReservation>();
             gip.core.datamodel.ACClassWF acClassWFDischarging = GetACClassWFDischarging(databaseApp, prodorderPartslist, vbACClassWF, intermediatePos);
 
-            if (acClassWFDischarging == null)
+            if (acClassWFDischarging != null && batchPlan != null)
             {
                 List<Route> routes = new List<Route>();
                 foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
                 {
-                    RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, databaseApp.ContextIPlus, true,
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(routingService, databaseApp.ContextIPlus, true,
                                         instance, "Storage", RouteDirections.Forwards, new object[] { },
                                         (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
                                         null,
@@ -1239,7 +1243,15 @@ namespace gip.mes.facility
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
                 {
-                    List<IACConfigStore> mandatoryConfigStores = new List<IACConfigStore>();
+                    core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
+                    List<IACConfigStore> mandatoryConfigStores = 
+                    GetCurrentConfigStores(
+                        aCClassWF,
+                        vbACClassWF,
+                        prodorderPartslist.Partslist.MaterialWFID,
+                        prodorderPartslist.Partslist,
+                        prodorderPartslist
+                    );
 
                     int priorityLevel = 0;
                     IACConfig allowedInstancesOnRouteConfig =
@@ -1259,7 +1271,6 @@ namespace gip.mes.facility
                         }
                     }
                 }
-
                 #endregion
 
                 var availableModules = routes.Select(c => c.LastOrDefault())
@@ -1272,7 +1283,9 @@ namespace gip.mes.facility
                         && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged))
                     {
                         batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
-                        selectedModules = batchPlan.FacilityReservation_ProdOrderBatchPlan.CreateSourceQuery()
+                        selectedModules = batchPlan
+                            .FacilityReservation_ProdOrderBatchPlan
+                            .CreateSourceQuery()
                             .Include(c => c.Facility)
                             .Include(c => c.Facility.Material)
                             .AutoMergeOption()
@@ -1338,6 +1351,22 @@ namespace gip.mes.facility
                 }
             }
             return reservationCollection;
+        }
+
+        public List<IACConfigStore> GetCurrentConfigStores(gip.core.datamodel.ACClassWF currentACClassWF, gip.mes.datamodel.ACClassWF vbCurrentACClassWF, Guid? materialWFID, Partslist partslist, ProdOrderPartslist prodOrderPartslist)
+        {
+            List<IACConfigStore> configStores = new List<IACConfigStore>();
+            if (prodOrderPartslist != null)
+                configStores.Add(prodOrderPartslist);
+            if (partslist != null)
+                configStores.Add(partslist);
+            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
+            MaterialWFConnection matWFConnection = poManager.GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
+            configStores.Add(matWFConnection.MaterialWFACClassMethod);
+            configStores.Add(currentACClassWF.ACClassMethod);
+            if (currentACClassWF.RefPAACClassMethod != null)
+                configStores.Add(currentACClassWF.RefPAACClassMethod);
+            return configStores;
         }
 
         #endregion

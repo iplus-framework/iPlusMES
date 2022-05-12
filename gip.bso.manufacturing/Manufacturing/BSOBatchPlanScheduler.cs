@@ -4692,7 +4692,8 @@ namespace gip.bso.manufacturing
             if (prodOrderPartslist != null)
             {
                 LocalBSOBatchPlan.ExternProdOrderPartslist = prodOrderPartslist;
-                LocalBSOBatchPlan.MandatoryConfigStores = LocalBSOBatchPlan
+                LocalBSOBatchPlan.MandatoryConfigStores =
+                    ProdOrderManager
                     .GetCurrentConfigStores(
                     aCClassWF,
                     vbACClassWF,
@@ -4965,7 +4966,7 @@ namespace gip.bso.manufacturing
                     break;
                 case BGWorkerMehtod_DoGenerateBatchPlans:
                     List<ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
-                    ProdOrderManager.GenerateBatchPlans(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, LocalBSOBatchPlan.VarioConfigManager, plForBatchGenerate);
+                    ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
                     break;
             }
         }

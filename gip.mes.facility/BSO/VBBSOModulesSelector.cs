@@ -54,7 +54,7 @@ namespace gip.mes.facility
 
         #region BSO->ACProperty
         protected ACRef<ACComponent> _RoutingService = null;
-        protected ACComponent RoutingService
+        public ACComponent RoutingService
         {
             get
             {

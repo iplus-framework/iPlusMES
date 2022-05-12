@@ -33,6 +33,10 @@ namespace gip.bso.manufacturing
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
+            _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
+            if (_ProdOrderManager == null)
+                throw new Exception("ProdOrderManager not configured");
+
             _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
             if (_VarioConfigManager == null)
                 throw new Exception("VarioConfigManager not configured");
@@ -57,6 +61,10 @@ namespace gip.bso.manufacturing
             this._CurrentACClassWF = null;
             this._CurrentPWInfo = null;
 
+            if (_ProdOrderManager != null)
+                ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
+            _ProdOrderManager = null;
+
             if (_VarioConfigManager != null)
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
             _VarioConfigManager = null;
@@ -67,6 +75,17 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Managers
+
+        protected ACRef<ACProdOrderManager> _ProdOrderManager = null;
+        public ACProdOrderManager ProdOrderManager
+        {
+            get
+            {
+                if (_ProdOrderManager == null)
+                    return null;
+                return _ProdOrderManager.ValueT;
+            }
+        }
 
         protected ACRef<ConfigManagerIPlus> _VarioConfigManager = null;
         public ConfigManagerIPlus VarioConfigManager
@@ -523,21 +542,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public List<IACConfigStore> GetCurrentConfigStores(gip.core.datamodel.ACClassWF currentACClassWF, gip.mes.datamodel.ACClassWF vbCurrentACClassWF, Guid? materialWFID, Partslist partslist, ProdOrderPartslist prodOrderPartslist)
-        {
-            List<IACConfigStore> configStores = new List<IACConfigStore>();
-            if (prodOrderPartslist != null)
-                configStores.Add(prodOrderPartslist);
-            if (partslist != null)
-                configStores.Add(partslist);
-            ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
-            MaterialWFConnection matWFConnection = poManager.GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
-            configStores.Add(matWFConnection.MaterialWFACClassMethod);
-            configStores.Add(currentACClassWF.ACClassMethod);
-            if (currentACClassWF.RefPAACClassMethod != null)
-                configStores.Add(currentACClassWF.RefPAACClassMethod);
-            return configStores;
-        }
 
         public IACConfigStore CurrentConfigStore
         {
@@ -648,7 +652,7 @@ namespace gip.bso.manufacturing
                     return;
                 }
 
-                _MandatoryConfigStores = GetCurrentConfigStores(_CurrentACClassWF, VBCurrentACClassWF, currentProdOrderPartslist.Partslist.MaterialWFID, currentProdOrderPartslist.Partslist, currentProdOrderPartslist);
+                _MandatoryConfigStores = ProdOrderManager.GetCurrentConfigStores(_CurrentACClassWF, VBCurrentACClassWF, currentProdOrderPartslist.Partslist.MaterialWFID, currentProdOrderPartslist.Partslist, currentProdOrderPartslist);
 
                 SelectedIntermediate = poManager.GetIntermediate(currentProdOrderPartslist, matWFConnection);
                 if (SelectedIntermediate == null)
@@ -712,7 +716,16 @@ namespace gip.bso.manufacturing
         {
         }
 
+
+
         override protected void RefreshTargets()
+        {
+            RefreshTargets_Local();
+            //RefreshTargets_ProdOrderManager();
+        }
+
+
+        private void RefreshTargets_Local()
         {
             gip.core.datamodel.ACClassWF acClassWFDischarging = GetACClassWFDischarging();
 
@@ -838,6 +851,17 @@ namespace gip.bso.manufacturing
                 reservationCollection[0].IsChecked = true;
 
             TargetsList = reservationCollection;
+            SelectedTarget = TargetsList.FirstOrDefault();
+        }
+
+        private void RefreshTargets_ProdOrderManager()
+        {
+            var currentProdOrderPartslist = CurrentProdOrderPartslist != null ? CurrentProdOrderPartslist : ExternProdOrderPartslist;
+
+            BindingList<POPartslistPosReservation> result = ProdOrderManager.GetTargets(DatabaseApp, VarioConfigManager, RoutingService, VBCurrentACClassWF, currentProdOrderPartslist,
+                SelectedIntermediate, SelectedBatchPlanForIntermediate, CurrentConfigACUrl,
+                ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
+            TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
         }
 
@@ -1466,7 +1490,7 @@ namespace gip.bso.manufacturing
                 }
 
                 Type typeOfDis = acClassOfPWDischarging.ObjectType;
-                if (  !typeof(IPWNodeDeliverMaterial).IsAssignableFrom(typeOfDis)
+                if (!typeof(IPWNodeDeliverMaterial).IsAssignableFrom(typeOfDis)
                     || acClassWFDischarging.ACClassMethodID != VBCurrentACClassWF.RefPAACClassMethodID)
                 {
                     acClassOfPWDischarging = null;
