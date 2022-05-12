@@ -1326,8 +1326,12 @@ namespace gip.mes.webservices
                     acParam.MDReleaseState = dbApp.MDReleaseState.Where(c => c.MDReleaseStateIndex == bpParam.ReleaseStateIndex).FirstOrDefault();
                 if (bpParam.ReservationModeIndex.HasValue)
                     acParam.MDReservationMode = dbApp.MDReservationMode.Where(c => c.MDReservationModeIndex == bpParam.ReservationModeIndex).FirstOrDefault();
-                if (bpParam.MovementReasonIndex.HasValue)
+                
+                if (bpParam.MovementReasonID.HasValue)
+                    acParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonID == bpParam.MovementReasonID).FirstOrDefault();
+                else if (bpParam.MovementReasonIndex.HasValue)
                     acParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonIndex == bpParam.MovementReasonIndex).FirstOrDefault();
+                
                 acParam.IgnoreIsEnabled = bpParam.IgnoreIsEnabled;
                 acParam.SetCompleted = bpParam.SetCompleted;
 

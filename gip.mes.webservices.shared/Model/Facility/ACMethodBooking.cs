@@ -127,6 +127,14 @@ namespace gip.mes.webservices
             set { SetProperty<short?>(ref _MovementReasonIndex, value); }
         }
 
+        private Guid? _MovementReasonID;
+        [DataMember(Name = "MoRID")]
+        public Guid? MovementReasonID
+        {
+            get => _MovementReasonID;
+            set => SetProperty(ref _MovementReasonID, value);
+        }
+
         #endregion
 
         #region Inward
