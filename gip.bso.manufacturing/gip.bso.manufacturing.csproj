@@ -55,9 +55,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command\BatchSuggestionCommand.cs" />
-    <Compile Include="Command\KeepEqualBatchSizes.cs" />
-    <Compile Include="Command\KeepStandardBatchSizeAndDivideRest.cs" />
     <Compile Include="Model\TimeFilterTypeEnum.cs" />
     <Compile Include="Model\BatchPlanProdOrderSortFilterEnum.cs" />
     <Compile Include="Manufacturing\BSOLabOrderMES.cs" />
@@ -86,14 +83,11 @@
     <Compile Include="Manufacturing\WorkCenterSelector\BSOWorkCenterSelector.cs" />
     <Compile Include="Manufacturing\OpenPostingsWrapper.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOWorkTaskOnHold.cs" />
-    <Compile Include="Model\BatchPlanSuggestion.cs" />
-    <Compile Include="Model\BatchPlanSuggestionItem.cs" />
     <Compile Include="Model\BatchPlanTimelineItem.cs" />
     <Compile Include="Model\PickingRelationTypeEnum.cs" />
     <Compile Include="Model\PreparedMaterial.cs" />
     <Compile Include="Model\ProdOrderPartslistPlanWrapper.cs" />
     <Compile Include="Model\ProductionOpenPosition.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist.cs" />
     <Compile Include="Model\SearchBatchMaterialModel.cs" />
     <Compile Include="Model\WorkCenter\FacilityChargeItem.cs" />
     <Compile Include="Model\WorkCenter\InputComponentItem.cs" />

@@ -119,7 +119,6 @@
     <Compile Include="Model\SamplePiCommand.cs" />
     <Compile Include="Model\EndPListMode.cs" />
     <Compile Include="Model\StartNextStageMode.cs" />
-    <Compile Include="Model\BatchSuggestionCommandModeEnum.cs" />
     <Compile Include="Model\BinSelectionItem.cs" />
     <Compile Include="Model\ManualPreparationSourceInfoType.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWBinChangeLoop.cs" />

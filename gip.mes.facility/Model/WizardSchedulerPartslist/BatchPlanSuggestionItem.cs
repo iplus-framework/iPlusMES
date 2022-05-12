@@ -1,9 +1,8 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
-using System.ComponentModel;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'BatchPlanSuggestionItem'}de{'BatchPlanSuggestionItem'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class BatchPlanSuggestionItem : EntityBase

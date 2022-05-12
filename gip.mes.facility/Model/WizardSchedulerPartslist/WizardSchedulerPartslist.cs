@@ -2,14 +2,12 @@
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
-using gip.mes.facility;
-using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
 
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'WizardSchedulerPartslist'}de{'WizardSchedulerPartslist'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
@@ -28,7 +26,6 @@ namespace gip.bso.manufacturing
         public ACProdOrderManager ProdOrderManager { get; private set; }
         public ConfigManagerIPlus VarioConfigManager { get; private set; }
         #endregion
-
 
         #region ctor's
         public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager)

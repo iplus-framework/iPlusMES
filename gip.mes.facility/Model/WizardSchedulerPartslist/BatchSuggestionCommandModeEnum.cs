@@ -1,11 +1,10 @@
 ﻿using gip.core.datamodel;
-using System.Runtime.Serialization;
 
-namespace gip.mes.processapplication
+namespace gip.mes.facility
 {
     //[DataContract]
     [ACSerializeableInfo]
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Batch suggestion mode'}de{'Batch-Vorschlagsmodus'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.processapplication.ACValueListBatchSuggestionCommandModeEnum")]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Batch suggestion mode'}de{'Batch-Vorschlagsmodus'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.facility.ACValueListBatchSuggestionCommandModeEnum")]
     public enum BatchSuggestionCommandModeEnum : short
     {
         KeepEqualBatchSizes = 0,

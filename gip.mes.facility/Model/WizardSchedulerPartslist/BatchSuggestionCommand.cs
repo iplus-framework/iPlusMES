@@ -1,8 +1,6 @@
-﻿using gip.mes.processapplication;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     public class BatchSuggestionCommand
     {

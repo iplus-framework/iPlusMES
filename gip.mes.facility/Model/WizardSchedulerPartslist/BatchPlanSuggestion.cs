@@ -1,11 +1,9 @@
 ﻿using gip.core.datamodel;
-using gip.mes.datamodel;
-using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'BatchPlanSuggestion'}de{'BatchPlanSuggestion'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class BatchPlanSuggestion : INotifyPropertyChanged

@@ -1,7 +1,6 @@
-﻿using gip.mes.datamodel;
-using System;
+﻿using System;
 
-namespace gip.bso.manufacturing
+namespace gip.mes.facility
 {
     public class KeepEqualBatchSizes
     {

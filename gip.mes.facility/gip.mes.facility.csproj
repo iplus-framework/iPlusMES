@@ -168,6 +168,13 @@
     <Compile Include="Model\TandTStartPointEnum.cs" />
     <Compile Include="Model\TrackingAndTracingPoint.cs" />
     <Compile Include="Model\TrackingAndTracingResult.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\BatchPlanSuggestion.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\BatchPlanSuggestionItem.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommand.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommandModeEnum.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\KeepEqualBatchSizes.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest.cs" />
+    <Compile Include="Model\WizardSchedulerPartslist\WizardSchedulerPartslist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stackbooking\ACStackCalculatorBase.cs" />
     <Compile Include="Stackbooking\LiquidsCalculator.cs" />
