@@ -4,6 +4,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Objects;
 using System.Data.SqlClient;
@@ -924,12 +925,139 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, List<ProdOrderPartslist> plsForBatchGenerate)
+        public ProdOrderBatchPlan FactoryBatchPlan(DatabaseApp databaseApp, gip.mes.datamodel.ACClassWF vbACClassWF, Partslist partslist, ProdOrderPartslist prodOrderPartslist, GlobalApp.BatchPlanState startMode, int scheduledOrder, DateTime? scheduledEndDate, WizardSchedulerPartslist wizardSchedulerPartslist)
+        {
+            ProdOrderBatchPlan prodOrderBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, prodOrderPartslist);
+            prodOrderBatchPlan.PlanState = startMode;
+            prodOrderBatchPlan.ScheduledOrder = scheduledOrder;
+            prodOrderBatchPlan.VBiACClassWF = vbACClassWF;
+
+
+            var materialWFConnection = GetMaterialWFConnection(vbACClassWF, prodOrderPartslist.Partslist.MaterialWFID);
+            var test = materialWFConnection.MaterialWFACClassMethod;
+            prodOrderBatchPlan.MaterialWFACClassMethod = partslist.PartslistACClassMethod_Partslist
+                                               .Where(c => c.MaterialWFACClassMethod.ACClassMethodID == vbACClassWF.ACClassMethodID)
+                                               .Select(c => c.MaterialWFACClassMethod)
+                                               .FirstOrDefault();
+            prodOrderBatchPlan.ProdOrderPartslistPos = GetIntermediate(prodOrderPartslist, materialWFConnection);
+
+            //WritePosMDUnit(prodOrderBatchPlan, wizardSchedulerPartslist);
+
+            prodOrderBatchPlan.ScheduledEndDate = scheduledEndDate;
+            if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
+                prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
+
+            //prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
+
+            return prodOrderBatchPlan;
+        }
+
+        public bool FactoryBatchPlans(DatabaseApp databaseApp, PlanningMR filterPlanningMR, GlobalApp.BatchPlanState createdBatchState, 
+            WizardSchedulerPartslist wizardSchedulerPartslist, WizardSchedulerPartslist defaultWizardSchedulerPartslist, ref string programNo, out List<ProdOrderBatchPlan> generatedBatchPlans)
+        {
+            bool success = false;
+            ProdOrderBatchPlan firstBatchPlan = null;
+            ProdOrderPartslist prodOrderPartslist = null;
+            ProdOrder prodOrder = null;
+            generatedBatchPlans = null;
+            if (string.IsNullOrEmpty(programNo))
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
+                programNo = secondaryKey;
+                prodOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
+                ACSaveChanges();
+            }
+            else
+            {
+                string tmpProgramNo = programNo;
+                prodOrder = databaseApp.ProdOrder.FirstOrDefault(c => c.ProgramNo == tmpProgramNo);
+            }
+
+            if (wizardSchedulerPartslist.ProdOrderPartslistPos != null)
+            {
+                success = true;
+                prodOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist;
+            }
+            else
+            {
+                Msg msg = null;
+                prodOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == wizardSchedulerPartslist.Partslist.PartslistID);
+                if (prodOrderPartslist == null)
+                    msg = PartslistAdd(databaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out prodOrderPartslist);
+
+                if (prodOrderPartslist != null && defaultWizardSchedulerPartslist.ProdOrderPartslistPos != null)
+                {
+                    prodOrderPartslist.DepartmentUserName = defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.DepartmentUserName;
+                    prodOrderPartslist.StartDate = defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.StartDate;
+                    prodOrderPartslist.EndDate = defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.EndDate;
+                }
+
+                success = msg == null || msg.IsSucceded();
+
+                if (filterPlanningMR != null && success)
+                {
+                    PlanningMR planningMR = databaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == filterPlanningMR.PlanningMRID);
+                    PlanningMRProposal proposal = PlanningMRProposal.NewACObject(databaseApp, planningMR);
+                    proposal.ProdOrder = prodOrderPartslist.ProdOrder;
+                    proposal.ProdOrderPartslist = prodOrderPartslist;
+                    planningMR.PlanningMRProposal_PlanningMR.Add(proposal);
+                }
+            }
+
+            if (success)
+            {
+
+                MDProdOrderPartslistPosState mDProdOrderPartslistPosState = databaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
+
+                generatedBatchPlans = new List<ProdOrderBatchPlan>();
+                int nr = 0;
+                gip.mes.datamodel.ACClassWF vbACClassWF = wizardSchedulerPartslist.WFNodeMES;
+                List<SchedulingMaxBPOrder> maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, filterPlanningMR?.PlanningMRNo);
+                int scheduledOrder = 0;
+                if (vbACClassWF != null)
+                    scheduledOrder =
+                        maxSchedulerOrders
+                        .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID)
+                        .SelectMany(c => c.WFs)
+                        .Where(c => c.ACClassWF.ACClassWFID == vbACClassWF.ACClassWFID)
+                        .Select(c => c.MaxScheduledOrder)
+                        .DefaultIfEmpty()
+                        .Max();
+
+                foreach (var item in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
+                {
+                    nr++;
+                    scheduledOrder++;
+                    ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, prodOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                    batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
+                    wizardSchedulerPartslist.ProdOrderPartslistPos = batchPlan.ProdOrderPartslistPos;
+                    WriteBatchPlanQuantities(item, batchPlan);
+                    batchPlan.Sequence = nr;
+                    if (firstBatchPlan == null)
+                        firstBatchPlan = batchPlan;
+                    generatedBatchPlans.Add(batchPlan);
+                }
+                wizardSchedulerPartslist.IsSolved = true;
+                wizardSchedulerPartslist.ProgramNo = prodOrder.ProgramNo;
+
+            }
+            return success;
+        }
+
+        public void WriteBatchPlanQuantities(BatchPlanSuggestionItem suggestionItem, ProdOrderBatchPlan batchPlan)
+        {
+            batchPlan.TotalSize = suggestionItem.TotalBatchSizeUOM;
+            batchPlan.BatchSize = suggestionItem.BatchSizeUOM;
+            batchPlan.BatchTargetCount = suggestionItem.BatchTargetCount;
+        }
+
+
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, string pwClassName, ConfigManagerIPlus configManagerIPlus, List<ProdOrderPartslist> plsForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderPartslist item in plsForBatchGenerate)
             {
-                MsgWithDetails tmp = GenerateBatchPlans(databaseApp, item);
+                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, pwClassName, configManagerIPlus, item);
                 if (tmp != null && tmp.MsgDetails.Any())
                     foreach (Msg msg in tmp.MsgDetails)
                         msgWithDetails.AddDetailMessage(msg);
@@ -937,7 +1065,7 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ProdOrderPartslist plForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, string pwClassName, ConfigManagerIPlus configManagerIPlus, ProdOrderPartslist plForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = null;
 
@@ -970,13 +1098,248 @@ namespace gip.mes.facility
             }
 
             // 3.0 generate batches
+            List<PartslistMDSchedulerGroupConnection> schedulerConnections = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName, null);
 
+            ProdOrderPartslist[] prodOrderPartslists = prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToArray();
+            List<WizardSchedulerPartslist> wPls = new List<WizardSchedulerPartslist>();
+
+            foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
+            {
+                List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
+                WizardSchedulerPartslist item = new WizardSchedulerPartslist(
+                    databaseApp, this, configManagerIPlus,
+                    prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups,
+                    prodOrderPartslist);
+
+                item.LoadConfiguration();
+                item.LoadNewBatchSuggestion(item.BatchSuggestionMode);
+
+                // add one batch if there no suggestion
+                if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
+                {
+                    item.BatchPlanSuggestion.ItemsList = new System.ComponentModel.BindingList<BatchPlanSuggestionItem>();
+                    BatchPlanSuggestionItem suggestionItem = new BatchPlanSuggestionItem(item, 1, item.TargetQuantityUOM, 1, 0);
+                    item.BatchPlanSuggestion.ItemsList.Add(suggestionItem);
+                }
+
+                wPls.Add(item);
+            }
+
+            WizardSchedulerPartslist defaultWizardPl = wPls.Where(c=>c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
+
+            string programNo = prodOrder.ProgramNo;
             // 4.0 define targets
+            List<ProdOrderBatchPlan> prodOrderBatchPlans = new List<ProdOrderBatchPlan>();
+            foreach (WizardSchedulerPartslist wPl in wPls)
+            {
+                FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
+            }
 
             // 5.1 If many target - select first and remind
+            foreach (WizardSchedulerPartslist wPl in wPls)
+            {
+                //gip.core.datamodel.ACClassWF wf = GetACClassWFDischarging(databaseApp, wPl.ProdOrderPartslistPos.ProdOrderPartslist, wPl.WFNodeMES, wPl.ProdOrderPartslistPos);
+
+                foreach (ProdOrderBatchPlan bp in wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
+                {
+                    string configUrl = "";
+                    BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
+                        wPl.ProdOrderPartslistPos, bp, configUrl, true, true, true, true, true);
+
+                    if (targets.Any(c => c.IsChecked))
+                    {
+                        POPartslistPosReservation selectedReservation = targets.Where(c => c.IsChecked).FirstOrDefault();
+                        bp.FacilityReservation_ProdOrderBatchPlan.Add(selectedReservation.SelectedReservation);
+                    }
+                }
+            }
 
             return msgWithDetails;
         }
+
+        public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, gip.mes.datamodel.ACClassWF vbACClassWF, ProdOrderPartslistPos intermediatePos)
+        {
+
+            // TODO: Benutzerauswahl, mit welchem Steuerrezept gefahren werden soll (nicht .FirstOrDefault()):
+            var selectedProcessWF = prodOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            if (selectedProcessWF == null)
+                return null;
+
+            MaterialWFACClassMethod materialWFACClassMethod = selectedProcessWF.MaterialWFACClassMethod;
+            //MaterialWFACClassMethod materialWFACClassMethod = currentProdOrderPartslist.Partslist.MaterialWF.MaterialWFACClassMethod_MaterialWF.FirstOrDefault();
+            if (materialWFACClassMethod == null)
+            {
+                return null;
+            }
+            gip.core.datamodel.ACClass acClassOfPWDischarging = null;
+            gip.core.datamodel.ACClassWF acClassWFDischarging = null;
+
+            var matWFConnections = intermediatePos.Material.MaterialWFConnection_Material
+                .Where(c => c.MaterialWFACClassMethodID == materialWFACClassMethod.MaterialWFACClassMethodID
+                            && c.ACClassWFID != vbACClassWF.ACClassWFID);
+            if (!matWFConnections.Any())
+            {
+                // TODO: Show Message
+                return null;
+            }
+
+            foreach (MaterialWFConnection matWFConnection in matWFConnections)
+            {
+                acClassWFDischarging = matWFConnection.ACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
+                if (acClassWFDischarging == null)
+                {
+                    continue;
+                }
+
+                acClassOfPWDischarging = acClassWFDischarging.PWACClass;
+                if (acClassOfPWDischarging == null)
+                {
+                    acClassWFDischarging = null;
+                    // TODO: Show Message
+                    continue;
+                }
+
+                Type typeOfDis = acClassOfPWDischarging.ObjectType;
+                if (!typeof(IPWNodeDeliverMaterial).IsAssignableFrom(typeOfDis)
+                    || acClassWFDischarging.ACClassMethodID != vbACClassWF.RefPAACClassMethodID)
+                {
+                    acClassOfPWDischarging = null;
+                    acClassWFDischarging = null;
+                    // TODO: Show Message
+                    continue;
+                }
+                break;
+            }
+
+            return acClassWFDischarging;
+        }
+
+        public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, gip.mes.datamodel.ACClassWF vbACClassWF,
+            ProdOrderPartslist prodorderPartslist, ProdOrderPartslistPos intermediatePos, ProdOrderBatchPlan batchPlan, string configACUrl,
+            bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation)
+        {
+            BindingList<POPartslistPosReservation> reservationCollection = new BindingList<POPartslistPosReservation>();
+            gip.core.datamodel.ACClassWF acClassWFDischarging = GetACClassWFDischarging(databaseApp, prodorderPartslist, vbACClassWF, intermediatePos);
+
+            if (acClassWFDischarging == null)
+            {
+                List<Route> routes = new List<Route>();
+                foreach (gip.core.datamodel.ACClass instance in acClassWFDischarging.ParentACClass.DerivedClassesInProjects)
+                {
+                    RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, databaseApp.ContextIPlus, true,
+                                        instance, "Storage", RouteDirections.Forwards, new object[] { },
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule,
+                                        null,
+                                        0, true, true, false);
+                    if (rResult.Routes != null && rResult.Routes.Any())
+                        routes.AddRange(rResult.Routes);
+                }
+
+                #region Filter routes if is selected    ShowCellsInRoute
+                bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
+                if (checkShowCellsInRoute)
+                {
+                    List<IACConfigStore> mandatoryConfigStores = new List<IACConfigStore>();
+
+                    int priorityLevel = 0;
+                    IACConfig allowedInstancesOnRouteConfig =
+                        configManager.GetConfiguration(
+                            mandatoryConfigStores,
+                            configACUrl + "\\",
+                            acClassWFDischarging.ACClassWF1_ParentACClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString(),
+                            null,
+                            out priorityLevel);
+                    if (allowedInstancesOnRouteConfig != null)
+                    {
+                        List<RuleValue> allowedInstancesRuleValueList = RulesCommand.ReadIACConfig(allowedInstancesOnRouteConfig);
+                        List<string> classes = allowedInstancesRuleValueList.SelectMany(c => c.ACClassACUrl).Distinct().ToList();
+                        if (classes.Any())
+                        {
+                            routes = routes.Where(c => c.Items.Select(x => x.Source.GetACUrl()).Intersect(classes).Any()).ToList();
+                        }
+                    }
+                }
+
+                #endregion
+
+                var availableModules = routes.Select(c => c.LastOrDefault())
+                    .Distinct(new TargetEqualityComparer())
+                    .OrderBy(c => c.Target.ACIdentifier);
+                if (availableModules.Any())
+                {
+                    FacilityReservation[] selectedModules = new FacilityReservation[] { };
+                    if (batchPlan.EntityState != System.Data.EntityState.Added
+                        && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged))
+                    {
+                        batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
+                        selectedModules = batchPlan.FacilityReservation_ProdOrderBatchPlan.CreateSourceQuery()
+                            .Include(c => c.Facility)
+                            .Include(c => c.Facility.Material)
+                            .AutoMergeOption()
+                            .ToArray();
+                    }
+                    else
+                    {
+                        selectedModules = batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray();
+                    }
+
+
+                    if (availableModules != null)
+                    {
+                        List<Guid> notSelected = new List<Guid>();
+                        foreach (var routeItem in availableModules)
+                        {
+                            //FacilityReservation selectedModule = selectedModules.Where(c => c.VBiACClassID == acClass.ACClassID).FirstOrDefault();
+                            //if (selectedModule == null)
+                            notSelected.Add(routeItem.Target.ACClassID);
+                        }
+                        var queryUnselFacilities =
+                            databaseApp
+                            .Facility
+                            .Include(c => c.Material)
+                            .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))
+                            .AutoMergeOption()
+                            .ToArray();
+
+                        foreach (var routeItem in availableModules)
+                        {
+                            //if (OnFilterTarget(routeItem))
+                            //    continue;
+                            Facility unselFacility = null;
+                            FacilityReservation selectedReservationForModule = selectedModules.Where(c => c.VBiACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                            if (selectedReservationForModule == null)
+                            {
+                                if (showSelectedCells)
+                                    continue;
+                                unselFacility = queryUnselFacilities.Where(c => c.VBiFacilityACClassID == routeItem.Target.ACClassID).FirstOrDefault();
+                                if (showEnabledCells && unselFacility != null && !unselFacility.InwardEnabled)
+                                    continue;
+                                bool ifMaterialMatch =
+                                        unselFacility != null &&
+                                        unselFacility.Material != null &&
+                                        (
+                                            intermediatePos.BookingMaterial != null &&
+                                            unselFacility.MaterialID == intermediatePos.BookingMaterial.MaterialID
+                                         );
+                                if (showSameMaterialCells && !ifMaterialMatch)
+                                    continue;
+                            }
+                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, intermediatePos, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
+                        }
+                    }
+
+                    // select first if only one is present
+                    if (preselectFirstReservation
+                        && ((batchPlan.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
+                            || ((batchPlan.EntityState == System.Data.EntityState.Unchanged || batchPlan.EntityState == System.Data.EntityState.Modified)
+                                    && reservationCollection.Count() == 1
+                                    && !reservationCollection.Any(c => c.IsChecked))))
+                        reservationCollection[0].IsChecked = true;
+                }
+            }
+            return reservationCollection;
+        }
+
         #endregion
 
         #region ProdOrder -> Batch
@@ -1875,6 +2238,50 @@ namespace gip.mes.facility
                    .ToList();
         }
 
+        public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp, string pwClassName, Partslist partslist, List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
+        {
+            if (schedulingGroupConnection == null)
+                schedulingGroupConnection = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName);
+
+            var assignedProcessWF = partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            if (assignedProcessWF == null)
+                return new List<MDSchedulingGroup>();
+            Guid acClassMethodID = assignedProcessWF.MaterialWFACClassMethod.ACClassMethodID;
+            List<MDSchedulingGroup> schedulingGroups =
+                    schedulingGroupConnection
+                    .Where(c => c.PartslistID == partslist.PartslistID)
+                    .SelectMany(c => c.SchedulingGroups)
+                    .Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(d => d.ACClassWF.ACClassMethodID == acClassMethodID))
+                    .OrderBy(c => c.SortIndex)
+                    .ToList();
+            IEnumerable<Tuple<int, Guid>> items =
+                partslist
+                .PartslistConfig_Partslist
+                .Where(c => !string.IsNullOrEmpty(c.LocalConfigACUrl) && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
+                .ToArray()
+                .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
+                .OrderBy(c => c.Item1)
+                .ToArray();
+            if (items != null && items.Any())
+            {
+                List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
+                if (schedulingGroups != null && schedulingGroups.Any())
+                    foreach (Tuple<int, Guid> item in items)
+                    {
+                        MDSchedulingGroup mDSchedulingGroup = schedulingGroups.Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == item.Item2)).FirstOrDefault();
+                        if (mDSchedulingGroup != null)
+                            tmpSchedulingGroups.Add(mDSchedulingGroup);
+                    }
+
+                tmpSchedulingGroups.AddRange(
+                    schedulingGroups
+                    .Where(c => !tmpSchedulingGroups.Select(x => x.MDSchedulingGroupID).Contains(c.MDSchedulingGroupID))
+                    .OrderBy(c => c.SortIndex)
+                );
+                schedulingGroups = tmpSchedulingGroups;
+            }
+            return schedulingGroups;
+        }
 
         public List<SchedulingMaxBPOrder> GetMaxScheduledOrder(DatabaseApp databaseApp, string planningMRNo)
         {

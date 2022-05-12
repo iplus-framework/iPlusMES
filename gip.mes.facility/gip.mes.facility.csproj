@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BSO\TargetEqualityComparer.cs" />
     <Compile Include="BSO\VBBSOModulesSelector.cs" />
     <Compile Include="Helperclasses\FacilityChargeList.cs" />
     <Compile Include="Helperclasses\FacilityReservationData.cs" />
