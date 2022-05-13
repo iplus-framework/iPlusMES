@@ -1116,7 +1116,7 @@ namespace gip.mes.facility
                     prodOrderPartslist);
 
                 item.LoadConfiguration();
-                item.LoadNewBatchSuggestion(item.BatchSuggestionMode);
+                item.LoadNewBatchSuggestion();
 
                 // add one batch if there no suggestion
                 if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)

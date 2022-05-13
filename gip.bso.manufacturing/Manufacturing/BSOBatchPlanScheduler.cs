@@ -2017,34 +2017,30 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private ACValueItem _SelectedFilterBatchplanSuggestionMode;
         [ACPropertySelected(516, "FilterBatchplanSuggestionMode", "en{'Calculation formula'}de{'Berechnungsformel'}")]
         public ACValueItem SelectedFilterBatchplanSuggestionMode
         {
             get
             {
+                ACValueItem itemValue = null;
                 if (SelectedWizardSchedulerPartslist != null
                     && FilterBatchplanSuggestionModeList != null
                     && SelectedWizardSchedulerPartslist.BatchSuggestionMode.HasValue)
                 {
-                    var item = FilterBatchplanSuggestionModeList.Where(c => (BatchSuggestionCommandModeEnum)c.Value == SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value).FirstOrDefault();
-                    if (item != null)
-                        _SelectedFilterBatchplanSuggestionMode = item;
+                    itemValue = FilterBatchplanSuggestionModeList.Where(c => (BatchSuggestionCommandModeEnum)c.Value == SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value).FirstOrDefault();
                 }
-                return _SelectedFilterBatchplanSuggestionMode;
+                return itemValue;
             }
             set
             {
-                if (_SelectedFilterBatchplanSuggestionMode != value)
+                BatchSuggestionCommandModeEnum? itemValue = null;
+                if(value != null)
                 {
-                    _SelectedFilterBatchplanSuggestionMode = value;
+                    itemValue = (BatchSuggestionCommandModeEnum)value.Value;
                 }
-                if (SelectedWizardSchedulerPartslist != null)
+                if(SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.BatchSuggestionMode != itemValue)
                 {
-                    if (_SelectedFilterBatchplanSuggestionMode != null)
-                        SelectedWizardSchedulerPartslist.BatchSuggestionMode = (BatchSuggestionCommandModeEnum)_SelectedFilterBatchplanSuggestionMode.Value;
-                    else
-                        SelectedWizardSchedulerPartslist.BatchSuggestionMode = null;
+                    SelectedWizardSchedulerPartslist.BatchSuggestionMode = itemValue;
                 }
                 OnPropertyChanged(nameof(SelectedFilterBatchplanSuggestionMode));
             }
@@ -2073,11 +2069,14 @@ namespace gip.bso.manufacturing
                 return;
             if (SelectedWizardSchedulerPartslist.PlanMode == BatchPlanMode.UseTotalSize)
             {
-                SelectedWizardSchedulerPartslist.LoadNewBatchSuggestion(FilterBatchplanSuggestionMode);
+                SelectedWizardSchedulerPartslist.LoadNewBatchSuggestion();
             }
             else
             {
-                BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, FilterBatchplanSuggestionMode.Value, ProdOrderManager.TolRemainingCallQ);
+                if (SelectedWizardSchedulerPartslist.BatchSuggestionMode != null)
+                {
+                    BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value, ProdOrderManager.TolRemainingCallQ);
+                }
             }
         }
 
@@ -4061,7 +4060,7 @@ namespace gip.bso.manufacturing
                         WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.PartslistForDefinition);
                         break;
                     case NewScheduledBatchWizardPhaseEnum.DefineBatch:
-                        SelectedWizardSchedulerPartslist.LoadBatchSuggestion(FilterBatchplanSuggestionMode);
+                        SelectedWizardSchedulerPartslist.LoadBatchSuggestion();
                         if (
                                 SelectedWizardSchedulerPartslist.BatchPlanSuggestion == null
                                 || SelectedWizardSchedulerPartslist.BatchPlanSuggestion.ItemsList == null
@@ -4073,6 +4072,7 @@ namespace gip.bso.manufacturing
                         }
                         WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineBatch);
                         success = true;
+                        OnPropertyChanged(nameof(SelectedFilterBatchplanSuggestionMode));
                         break;
                     case NewScheduledBatchWizardPhaseEnum.DefineTargets:
                         success = SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > Double.Epsilon && SelectedWizardSchedulerPartslist.BatchPlanSuggestion != null;
