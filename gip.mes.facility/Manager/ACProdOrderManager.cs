@@ -952,7 +952,7 @@ namespace gip.mes.facility
             return prodOrderBatchPlan;
         }
 
-        public bool FactoryBatchPlans(DatabaseApp databaseApp, PlanningMR filterPlanningMR, GlobalApp.BatchPlanState createdBatchState, 
+        public bool FactoryBatchPlans(DatabaseApp databaseApp, PlanningMR filterPlanningMR, GlobalApp.BatchPlanState createdBatchState,
             WizardSchedulerPartslist wizardSchedulerPartslist, WizardSchedulerPartslist defaultWizardSchedulerPartslist, ref string programNo, out List<ProdOrderBatchPlan> generatedBatchPlans)
         {
             bool success = false;
@@ -1100,7 +1100,7 @@ namespace gip.mes.facility
             // 3.0 generate batches
             List<PartslistMDSchedulerGroupConnection> schedulerConnections = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName, null);
 
-            ProdOrderPartslist[] prodOrderPartslists = 
+            ProdOrderPartslist[] prodOrderPartslists =
                 prodOrder
                 .ProdOrderPartslist_ProdOrder
                 .OrderBy(c => c.Sequence)
@@ -1129,7 +1129,7 @@ namespace gip.mes.facility
                 wPls.Add(item);
             }
 
-            WizardSchedulerPartslist defaultWizardPl = wPls.Where(c=>c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
+            WizardSchedulerPartslist defaultWizardPl = wPls.Where(c => c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
 
             string programNo = prodOrder.ProgramNo;
             // 4.0 define targets
@@ -1244,7 +1244,7 @@ namespace gip.mes.facility
                 if (checkShowCellsInRoute)
                 {
                     core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(databaseApp.ContextIPlus);
-                    List<IACConfigStore> mandatoryConfigStores = 
+                    List<IACConfigStore> mandatoryConfigStores =
                     GetCurrentConfigStores(
                         aCClassWF,
                         vbACClassWF,
@@ -1755,7 +1755,8 @@ namespace gip.mes.facility
             foreach (ProdOrderPartslistPos pos in allComponents)
             {
                 ProdOrderPartslist pl = partslists.FirstOrDefault(c => c.Partslist != null && c.Partslist.MaterialID == pos.MaterialID);
-                pos.SourceProdOrderPartslist = pl;
+                if (pl != null && pos.ProdOrderPartslistID != pl.ProdOrderPartslistID)
+                    pos.SourceProdOrderPartslist = pl;
             }
         }
 
