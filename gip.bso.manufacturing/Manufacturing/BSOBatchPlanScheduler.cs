@@ -2474,7 +2474,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Explorer -> ChangeMode
 
-        [ACMethodInfo("ChangeMode", "en{'Change Mode'}de{'Mode ändern'}", 501)]
+        [ACMethodCommand("ChangeMode", "en{'Change Mode'}de{'Mode ändern'}", 501, true)]
         public void ChangeMode()
         {
             if (!IsEnabledChangeMode())
@@ -3127,7 +3127,7 @@ namespace gip.bso.manufacturing
             return IsEnabledScheduling();
         }
 
-        [ACMethodInfo("BackwardSchedulingOk", "en{'Ok'}de{'Ok'}", 507)]
+        [ACMethodCommand("BackwardSchedulingOk", "en{'Ok'}de{'Ok'}", 507, true)]
         public void BackwardSchedulingOk()
         {
             if (!IsEnabledBackwardScheduling() || !IsEnabledBackwardSchedulingOk()) return;
@@ -3141,7 +3141,7 @@ namespace gip.bso.manufacturing
             return ScheduledEndDate != null && IsEnabledScheduling();
         }
 
-        [ACMethodInfo("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508)]
+        [ACMethodCommand("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508, true)]
         public void ForwardScheduling()
         {
             if (!IsEnabledForwardScheduling()) return;
