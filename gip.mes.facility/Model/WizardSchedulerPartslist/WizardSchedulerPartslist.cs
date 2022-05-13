@@ -159,7 +159,6 @@ namespace gip.mes.facility
 
         #endregion
 
-
         #region Properties -> MDSchedulingGroup
 
         private MDSchedulingGroup _SelectedMDSchedulingGroup;
@@ -232,7 +231,6 @@ namespace gip.mes.facility
         }
 
         #endregion
-
 
         #region Properties -> MDBatchPlanGroup
 
@@ -529,7 +527,6 @@ namespace gip.mes.facility
 
         #endregion
 
-
         #region Properties -> Batch
 
         #region Properties -> Batch -> BatchSizes
@@ -636,7 +633,6 @@ namespace gip.mes.facility
         public TimeSpan? OffsetToEndTime { get; set; }
 
         #endregion
-
 
         #endregion
 
@@ -794,7 +790,7 @@ namespace gip.mes.facility
                     )
                 { IsEditable = true });
             }
-            else
+            else if(BatchSuggestionMode != null)
             {
                 BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, BatchSuggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
             }

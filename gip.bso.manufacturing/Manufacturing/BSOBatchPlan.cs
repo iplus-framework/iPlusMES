@@ -721,7 +721,7 @@ namespace gip.bso.manufacturing
         override protected void RefreshTargets()
         {
             RefreshTargets_Local();
-            //RefreshTargets_ProdOrderManager();
+            RefreshTargets_ProdOrderManager();
         }
 
 

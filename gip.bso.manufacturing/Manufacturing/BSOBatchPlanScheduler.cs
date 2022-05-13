@@ -2007,16 +2007,6 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Wizard ->   BatchPlanSuggestion
 
-        public BatchSuggestionCommandModeEnum? FilterBatchplanSuggestionMode
-        {
-            get
-            {
-                if (SelectedFilterBatchplanSuggestionMode == null)
-                    return null;
-                return (BatchSuggestionCommandModeEnum)SelectedFilterBatchplanSuggestionMode.Value;
-            }
-        }
-
         [ACPropertySelected(516, "FilterBatchplanSuggestionMode", "en{'Calculation formula'}de{'Berechnungsformel'}")]
         public ACValueItem SelectedFilterBatchplanSuggestionMode
         {
@@ -2067,24 +2057,14 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledRecalculateBatchSuggestion())
                 return;
-            if (SelectedWizardSchedulerPartslist.PlanMode == BatchPlanMode.UseTotalSize)
-            {
-                SelectedWizardSchedulerPartslist.LoadNewBatchSuggestion();
-            }
-            else
-            {
-                if (SelectedWizardSchedulerPartslist.BatchSuggestionMode != null)
-                {
-                    BatchSuggestionCommand cmd = new BatchSuggestionCommand(SelectedWizardSchedulerPartslist, SelectedWizardSchedulerPartslist.BatchSuggestionMode.Value, ProdOrderManager.TolRemainingCallQ);
-                }
-            }
+            SelectedWizardSchedulerPartslist.LoadNewBatchSuggestion();
         }
 
         public bool IsEnabledRecalculateBatchSuggestion()
         {
             return
-                    FilterBatchplanSuggestionMode != null
-                    && SelectedWizardSchedulerPartslist != null
+                       SelectedWizardSchedulerPartslist != null
+                    && SelectedWizardSchedulerPartslist.BatchSuggestionMode != null
                     && SelectedWizardSchedulerPartslist.TargetQuantityUOM > Double.Epsilon
                     && SelectedWizardSchedulerPartslist.BatchPlanSuggestion != null
                     && (
