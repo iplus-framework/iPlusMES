@@ -396,7 +396,10 @@ namespace gip.bso.manufacturing
 
             using (ACMonitor.Lock(_70010_AlarmsLock))
             {
-                _AlarmsAsTextCache = _AlarmsAsText.ValueT;
+                if (_AlarmsAsText != null)
+                    _AlarmsAsTextCache = _AlarmsAsText.ValueT;
+                else
+                    _AlarmsAsTextCache = null;
             }
         }
 
