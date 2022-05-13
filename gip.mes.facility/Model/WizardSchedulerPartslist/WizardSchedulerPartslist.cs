@@ -725,12 +725,12 @@ namespace gip.mes.facility
         }
 
 
-        public void LoadBatchSuggestion(BatchSuggestionCommandModeEnum? suggestionMode)
+        public void LoadBatchSuggestion()
         {
             if (ProdOrderPartslistPos != null && ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
                 LoadExistingBatchSuggestion();
             else
-                LoadNewBatchSuggestion(suggestionMode);
+                LoadNewBatchSuggestion();
 
             if (BatchPlanSuggestion.ItemsList == null)
                 BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
@@ -775,7 +775,7 @@ namespace gip.mes.facility
             }
         }
 
-        public void LoadNewBatchSuggestion(BatchSuggestionCommandModeEnum? suggestionMode)
+        public void LoadNewBatchSuggestion()
         {
             if (PlanMode != null && PlanMode == BatchPlanMode.UseTotalSize)
             {
@@ -796,7 +796,7 @@ namespace gip.mes.facility
             }
             else
             {
-                BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, suggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
+                BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, BatchSuggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
             }
             if (
               BatchPlanSuggestion.ItemsList != null

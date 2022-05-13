@@ -22,7 +22,7 @@ namespace gip.mes.facility
 
         private void WizardSchedulerPartslist_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == "TargetQuantityUOM")
+            if (e.PropertyName == "TargetQuantityUOM")
             {
                 OnPropertyChanged("BatchSuggestionSumUOM");
                 OnPropertyChanged("DifferenceUOM");
@@ -218,7 +218,16 @@ namespace gip.mes.facility
             if (ItemsList == null || ItemsList.Any(c => c.BatchTargetCount == 0))
                 return false;
             double sumSize = ItemsList.Sum(c => c.BatchTargetCount * c.BatchSizeUOM);
-            return (sumSize - WizardSchedulerPartslist.GetTargetQuantityUOM()) < RestQuantityToleranceUOM;
+            bool sumSizeInTolerance = (sumSize - WizardSchedulerPartslist.GetTargetQuantityUOM()) < RestQuantityToleranceUOM;
+            bool batchInRange = false;
+            {
+                double minBatchSize = ItemsList.Select(c=>c.BatchSizeUOM).DefaultIfEmpty().Min();
+                double maxBatchSize = ItemsList.Select(c=>c.BatchSizeUOM).DefaultIfEmpty().Max();
+                batchInRange = 
+                        WizardSchedulerPartslist.BatchSizeMinUOM <= minBatchSize
+                    &&  (WizardSchedulerPartslist.BatchSizeMaxUOM == 0 || WizardSchedulerPartslist.BatchSizeMaxUOM >= maxBatchSize);
+            }
+            return sumSizeInTolerance && batchInRange;
         }
 
         #endregion
