@@ -939,6 +939,34 @@ namespace gip.bso.manufacturing
 
         #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search)
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _FilterBatchSelectAll;
+        [ACPropertyInfo(999, "FilterBatchSelectAll", "en{'Select all'}de{'Alles auswählen'}")]
+        public bool FilterBatchSelectAll
+        {
+            get
+            {
+                return _FilterBatchSelectAll;
+            }
+            set
+            {
+                if (_FilterBatchSelectAll != value)
+                {
+                    _FilterBatchSelectAll = value;
+                    OnPropertyChanged(nameof(FilterBatchSelectAll));
+
+                    foreach (var item in ProdOrderBatchPlanList)
+                        item.IsSelected = value;
+
+                    OnPropertyChanged(nameof(ProdOrderBatchPlanList));
+                }
+            }
+        }
+
+
+
         private DateTime? _FilterStartTime;
         [ACPropertyInfo(525, "FilterStartTime", "en{'From'}de{'Von'}")]
         public DateTime? FilterStartTime
@@ -1101,32 +1129,6 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-
-
-        /// <summary>
-        /// Source Property: 
-        /// </summary>
-        private bool _FilterSelectAll;
-        [ACPropertySelected(999, "FilterSelectAll", "en{'Select all'}de{'Alle auswählen'}")]
-        public bool FilterSelectAll
-        {
-            get
-            {
-                return _FilterSelectAll;
-            }
-            set
-            {
-                if (_FilterSelectAll != value)
-                {
-                    _FilterSelectAll = value;
-                    if (ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any())
-                        foreach (ProdOrderBatchPlan batchPlan in ProdOrderBatchPlanList)
-                            batchPlan.IsSelected = _FilterSelectAll;
-                    OnPropertyChanged(nameof(FilterSelectAll));
-                }
-            }
-        }
-
 
         #endregion
 
@@ -1340,6 +1342,33 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)ProdOrder
 
         #region Properties -> (Tab)ProdOrder -> Filter
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _FilterOrderSelectAll;
+        [ACPropertyInfo(999, "FilterOrderSelectAll", "en{'Select all'}de{'Alles auswählen'}")]
+        public bool FilterOrderSelectAll
+        {
+            get
+            {
+                return _FilterOrderSelectAll;
+            }
+            set
+            {
+                if (_FilterOrderSelectAll != value)
+                {
+                    _FilterOrderSelectAll = value;
+                    OnPropertyChanged(nameof(FilterOrderSelectAll));
+
+                    foreach (var item in ProdOrderPartslistList)
+                        item.IsSelected = value;
+
+                    OnPropertyChanged(nameof(ProdOrderPartslistList));
+                }
+            }
+        }
+
 
         private DateTime? _FilterOrderStartTime;
         /// <summary>
@@ -5017,9 +5046,9 @@ namespace gip.bso.manufacturing
                     }
                 }
 
-                if(resultMsg == null || resultMsg.IsSucceded())
+                if (resultMsg == null || resultMsg.IsSucceded())
                 {
-                    switch(command)
+                    switch (command)
                     {
                         case BGWorkerMehtod_DoGenerateBatchPlans:
                             LoadProdOrderBatchPlanList();
