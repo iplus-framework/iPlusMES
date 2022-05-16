@@ -3873,7 +3873,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledGenerateBatchPlans())
                 return;
-            if (Messages.Question(this, "Question50084", Global.MsgResult.No) == Global.MsgResult.Yes)
+                if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
                 ShowDialog(this, DesignNameProgressBar);
@@ -4921,6 +4921,7 @@ namespace gip.bso.manufacturing
             worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
 
             string updateName = Root.Environment.User.Initials;
+
             switch (command)
             {
                 case BGWorkerMehtod_DoBackwardScheduling:
@@ -4946,7 +4947,7 @@ namespace gip.bso.manufacturing
                     break;
                 case BGWorkerMehtod_DoGenerateBatchPlans:
                     List<ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
-                    ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
+                    e.Result = ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
                     break;
             }
         }
@@ -4958,7 +4959,7 @@ namespace gip.bso.manufacturing
             ClearMessages();
             ACBackgroundWorker worker = sender as ACBackgroundWorker;
             string command = worker.EventArgs.Argument.ToString();
-
+            ClearMessages();
             if (e.Cancelled)
             {
                 SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
@@ -4969,24 +4970,26 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Msg resultMsg = null;
+                MsgWithDetails resultMsg = null;
                 if (e.Result != null)
-                    resultMsg = (Msg)e.Result;
-                if (resultMsg == null || resultMsg.IsSucceded())
-                    LoadProdOrderBatchPlanList();
+                    resultMsg = (MsgWithDetails)e.Result;
 
                 if (resultMsg != null)
                 {
-                    //if (resultMsg is MsgWithDetails)
-                    //{
-                    //    MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
-                    //    if (msgWithDetails.MsgDetails.Any())
-                    //        foreach (Msg detailMsg in msgWithDetails.MsgDetails)
-                    //            SendMessage(detailMsg);
-                    //}
-                    //else
-                    //    SendMessage(resultMsg);
-                    //Root.Messages.Msg(resultMsg);
+                    if (resultMsg is MsgWithDetails)
+                    {
+                        MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
+                        if (msgWithDetails.MsgDetails.Any())
+                        {
+                            foreach (Msg detailMsg in msgWithDetails.MsgDetails)
+                                SendMessage(detailMsg);
+
+                            // Warning50049
+                            // 
+                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), command + "()", 4489, "Warning50049");
+                            Messages.Msg(msg);
+                        }
+                    }
                 }
 
             }

@@ -40,6 +40,9 @@ namespace gip.bso.manufacturing
             FilterEndDate = DateTime.Now.Date.AddDays(1);
             FilterStartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
+            _FilterTimeFilterTypeList = LoadFilterTimeFilterTypeList();
+            SelectedFilterTimeFilterType = _FilterTimeFilterTypeList.FirstOrDefault();
+
             return true;
         }
 

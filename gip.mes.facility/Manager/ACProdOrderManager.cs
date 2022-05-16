@@ -1067,7 +1067,7 @@ namespace gip.mes.facility
 
         public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
         {
-            MsgWithDetails msgWithDetails = null;
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
 
             ProdOrder prodOrder = plForBatchGenerate.ProdOrder;
 
@@ -1129,13 +1129,15 @@ namespace gip.mes.facility
                     item.LoadConfiguration();
                     item.LoadNewBatchSuggestion();
 
-                    // add one batch if there no suggestion
-                    //if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
-                    //{
-                    //    item.BatchPlanSuggestion.ItemsList = new System.ComponentModel.BindingList<BatchPlanSuggestionItem>();
-                    //    BatchPlanSuggestionItem suggestionItem = new BatchPlanSuggestionItem(item, 1, item.TargetQuantityUOM, 1, 0);
-                    //    item.BatchPlanSuggestion.ItemsList.Add(suggestionItem);
-                    //}
+                    // add message for not generated 
+                    if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
+                    {
+                        // Warning50047
+                        // For prodorder {0} recipe #{1} {2} {3} no batch plan generated!
+                        Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50047",
+                            prodOrderPartslist.ProdOrder.ProgramNo, prodOrderPartslist.Sequence, prodOrderPartslist.Partslist.Material.MaterialNo, prodOrderPartslist.Partslist.Material.MaterialName1);
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
 
                     wPls.Add(item);
                 }
@@ -1164,15 +1166,23 @@ namespace gip.mes.facility
 
                     if (!targets.Any(c => c.IsChecked))
                     {
-
                         POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
                         if (selectedReservation != null)
                             selectedReservation.IsChecked = true;
                     }
+                    if (!targets.Any(c => c.IsChecked))
+                    {
+                        Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50048",
+                            bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
                 }
             }
 
-            msgWithDetails = databaseApp.ACSaveChanges();
+            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+            if (saveMsg != null)
+                foreach (Msg tmMsg in saveMsg.MsgDetails)
+                    msgWithDetails.AddDetailMessage(tmMsg);
 
             return msgWithDetails;
         }
