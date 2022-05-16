@@ -17,6 +17,7 @@ namespace gip.mes.facility
             {
                 int nr = 1;
                 int i = 0;
+                KeepEqualBatchSizes suggestion2 = null;
                 switch (mode)
                 {
                     case BatchSuggestionCommandModeEnum.KeepStandardBatchSizeAndDivideRest:
@@ -33,14 +34,19 @@ namespace gip.mes.facility
                                 }
                                 rest = suggestion1.Rest;
                             }
-                            else
-                                rest = 0.0;
                             i++;
                         }
                         while (rest > double.Epsilon && i < 10);
+                        if(rest >  0.1)
+                        {
+                            suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
+                            if (suggestion2.Suggestion != null)
+                            {
+                                wizardSchedulerPartslist.BatchPlanSuggestion.AddItem(suggestion2.Suggestion);
+                            }
+                        }
                         break;
                     case BatchSuggestionCommandModeEnum.KeepEqualBatchSizes:
-                        KeepEqualBatchSizes suggestion2 = null;
                         do
                         {
                             suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);

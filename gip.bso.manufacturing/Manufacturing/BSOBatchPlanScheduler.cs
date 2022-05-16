@@ -5017,6 +5017,16 @@ namespace gip.bso.manufacturing
                     }
                 }
 
+                if(resultMsg == null || resultMsg.IsSucceded())
+                {
+                    switch(command)
+                    {
+                        case BGWorkerMehtod_DoGenerateBatchPlans:
+                            LoadProdOrderBatchPlanList();
+                            break;
+                    }
+                }
+
             }
         }
 
