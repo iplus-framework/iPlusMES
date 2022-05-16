@@ -1433,6 +1433,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterProgramNo;
+        [ACPropertyInfo(999, "FilterProgramNo", ConstApp.ProdOrderProgramNo)]
+        public string FilterProgramNo
+        {
+            get
+            {
+                return _FilterProgramNo;
+            }
+            set
+            {
+                if (_FilterProgramNo != value)
+                {
+                    _FilterProgramNo = value;
+                    OnPropertyChanged(nameof(FilterProgramNo));
+                }
+            }
+        }
+
+
 
         // FilterProdPartslistOrder
 
@@ -1559,7 +1581,9 @@ namespace gip.bso.manufacturing
                     (short?)minProdOrderState,
                     (short?)maxProdOrderState,
                     FilterOnlyOnThisLine,
-                    FilterDepartmentUserName) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+                    FilterDepartmentUserName,
+                    FilterProgramNo) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = null;
             if (FilterProdPartslistOrder != null)
@@ -1578,9 +1602,9 @@ namespace gip.bso.manufacturing
             return query.Take(Const_MaxResultSize).ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName) =>
+        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo) =>
                 ctx
                 .ProdOrderPartslist
                 .Include("MDProdOrderState")
@@ -1592,6 +1616,7 @@ namespace gip.bso.manufacturing
                 //.Include("Partslist.Material.MaterialUnit_Material.ToMDUnit")
                 .Where(c =>
                         (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
+                        && (programNo == null || (c.ProdOrder.ProgramNo.Contains(programNo)))
                         && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
                         && (
                                 (!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
@@ -2024,11 +2049,11 @@ namespace gip.bso.manufacturing
             set
             {
                 BatchSuggestionCommandModeEnum? itemValue = null;
-                if(value != null)
+                if (value != null)
                 {
                     itemValue = (BatchSuggestionCommandModeEnum)value.Value;
                 }
-                if(SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.BatchSuggestionMode != itemValue)
+                if (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.BatchSuggestionMode != itemValue)
                 {
                     SelectedWizardSchedulerPartslist.BatchSuggestionMode = itemValue;
                 }
@@ -3868,12 +3893,12 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: GenerateBatchPlans
         /// </summary>
-        [ACMethodInfo("GenerateBatchPlans", "en{'Generate batch plans'}de{'Batchplan generieren'}", 999)]
+        [ACMethodInfo("GenerateBatchPlans", "en{'Generate batch plans'}de{'Batchplan generieren'}", 999, true)]
         public void GenerateBatchPlans()
         {
             if (!IsEnabledGenerateBatchPlans())
                 return;
-                if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
+            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
                 ShowDialog(this, DesignNameProgressBar);

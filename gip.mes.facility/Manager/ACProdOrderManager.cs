@@ -1121,10 +1121,7 @@ namespace gip.mes.facility
                 if (!plHaveBatchPlanOrBatch)
                 {
                     List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(
-                        databaseApp, this, configManagerIPlus,
-                        prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups,
-                        prodOrderPartslist);
+                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups,                        prodOrderPartslist);
 
                     item.LoadConfiguration();
                     item.LoadNewBatchSuggestion();
@@ -1150,7 +1147,10 @@ namespace gip.mes.facility
             List<ProdOrderBatchPlan> prodOrderBatchPlans = new List<ProdOrderBatchPlan>();
             foreach (WizardSchedulerPartslist wPl in wPls)
             {
-                FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
+                if(!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
+                {
+                    FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
+                }
             }
 
             // 5.1 If many target - select first and remind
@@ -1160,21 +1160,24 @@ namespace gip.mes.facility
 
                 foreach (ProdOrderBatchPlan bp in wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
                 {
-                    string configUrl = "";
-                    BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
-                        wPl.ProdOrderPartslistPos, bp, configUrl, true, false, false, false, false);
+                    if(!bp.FacilityReservation_ProdOrderBatchPlan.Any())
+                    {
+                        string configUrl = "";
+                        BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
+                            wPl.ProdOrderPartslistPos, bp, configUrl, true, false, false, false, false);
 
-                    if (!targets.Any(c => c.IsChecked))
-                    {
-                        POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
-                        if (selectedReservation != null)
-                            selectedReservation.IsChecked = true;
-                    }
-                    if (!targets.Any(c => c.IsChecked))
-                    {
-                        Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50048",
-                            bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
-                        msgWithDetails.AddDetailMessage(msg);
+                        if (!targets.Any(c => c.IsChecked))
+                        {
+                            POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
+                            if (selectedReservation != null)
+                                selectedReservation.IsChecked = true;
+                        }
+                        if (!targets.Any(c => c.IsChecked))
+                        {
+                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50048",
+                                bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
+                            msgWithDetails.AddDetailMessage(msg);
+                        }
                     }
                 }
             }
