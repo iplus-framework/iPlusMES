@@ -14,5 +14,7 @@ namespace gip.mes.facility
         {
             return Math.Abs(value) < C_ZeroCompare;
         }
+
+        public const double C_MaxQuantityPerPosting = 100000000;
     }
 }
