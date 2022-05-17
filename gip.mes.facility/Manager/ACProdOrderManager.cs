@@ -1121,7 +1121,7 @@ namespace gip.mes.facility
                 if (!plHaveBatchPlanOrBatch)
                 {
                     List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups,                        prodOrderPartslist);
+                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups, prodOrderPartslist);
 
                     item.LoadConfiguration();
                     item.LoadNewBatchSuggestion();
@@ -1147,7 +1147,7 @@ namespace gip.mes.facility
             List<ProdOrderBatchPlan> prodOrderBatchPlans = new List<ProdOrderBatchPlan>();
             foreach (WizardSchedulerPartslist wPl in wPls)
             {
-                if(!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
+                if (!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
                 {
                     FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
                 }
@@ -1160,7 +1160,7 @@ namespace gip.mes.facility
 
                 foreach (ProdOrderBatchPlan bp in wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
                 {
-                    if(!bp.FacilityReservation_ProdOrderBatchPlan.Any())
+                    if (!bp.FacilityReservation_ProdOrderBatchPlan.Any())
                     {
                         string configUrl = "";
                         BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
@@ -1645,8 +1645,6 @@ namespace gip.mes.facility
             return saveMsg;
         }
 
-
-
         #endregion
 
         #region Public -> Batch -> Duration Calculation
@@ -1680,9 +1678,9 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup) =>
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
                                     .Include("ProdOrderPartslist.MDProdOrderState")
@@ -1696,6 +1694,11 @@ namespace gip.mes.facility
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
+                                            && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
+                                            && (
+                                                    string.IsNullOrEmpty(materialNo) 
+                                                    || (c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo) || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo))
+                                                )
                                             && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
@@ -1730,9 +1733,13 @@ namespace gip.mes.facility
             DateTime? filterEndTime,
             MDProdOrderState.ProdOrderStates? minProdOrderState,
             Guid? planningMRID,
-            Guid? mdBatchPlanGroup)
+            Guid? mdBatchPlanGroup,
+            string programNo,
+            string materialNo)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null, planningMRID, mdBatchPlanGroup) as ObjectQuery<ProdOrderBatchPlan>;
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, 
+                (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null, 
+                planningMRID, mdBatchPlanGroup, programNo, materialNo) as ObjectQuery<ProdOrderBatchPlan>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }

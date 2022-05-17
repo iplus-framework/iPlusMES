@@ -965,7 +965,47 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterBatchProgramNo;
+        [ACPropertyInfo(999, "FilterBatchProgramNo", ConstApp.ProdOrderProgramNo)]
+        public string FilterBatchProgramNo
+        {
+            get
+            {
+                return _FilterBatchProgramNo;
+            }
+            set
+            {
+                if (_FilterBatchProgramNo != value)
+                {
+                    _FilterBatchProgramNo = value;
+                    OnPropertyChanged(nameof(FilterBatchProgramNo));
+                }
+            }
+        }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterBatchMaterialNo;
+        [ACPropertyInfo(999, "FilterBatchMaterialNo", ConstApp.Material)]
+        public string FilterBatchMaterialNo
+        {
+            get
+            {
+                return _FilterBatchMaterialNo;
+            }
+            set
+            {
+                if (_FilterBatchMaterialNo != value)
+                {
+                    _FilterBatchMaterialNo = value;
+                    OnPropertyChanged(nameof(FilterBatchMaterialNo));
+                }
+            }
+        }
 
         private DateTime? _FilterStartTime;
         [ACPropertyInfo(525, "FilterStartTime", "en{'From'}de{'Von'}")]
@@ -1221,7 +1261,9 @@ namespace gip.bso.manufacturing
                         FilterEndTime,
                         minProdOrderState,
                         FilterPlanningMR?.PlanningMRID,
-                        SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID);
+                        SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
+                        FilterBatchProgramNo,
+                        FilterBatchMaterialNo);
 
                 // Filter list if SelectedFilterConnectedLine is selected: Only batch they have connection via ProdOrder with other line
                 if (SelectedFilterConnectedLine != null && SelectedFilterConnectedLine.MDSchedulingGroupID != Guid.Empty)
@@ -1237,7 +1279,9 @@ namespace gip.bso.manufacturing
                        FilterEndTime,
                        minProdOrderState,
                        FilterPlanningMR?.PlanningMRID,
-                       SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID)
+                       SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
+                       FilterBatchProgramNo,
+                       FilterBatchMaterialNo)
                    .Select(c => c.ProdOrderPartslist.ProdOrderID);
                     prodOrderBatchPlans = new ObservableCollection<ProdOrderBatchPlan>(prodOrderBatchPlans.Where(c => includedProductionOrders.Contains(c.ProdOrderPartslist.ProdOrderID)));
                 }
@@ -1369,7 +1413,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         private DateTime? _FilterOrderStartTime;
         /// <summary>
         /// Selected property for 
@@ -1445,7 +1488,7 @@ namespace gip.bso.manufacturing
         /// Selected property for 
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterDepartmentUserName", "en{'Completed'}de{'Erledigt'}")]
+        [ACPropertyInfo(999, "FilterDepartmentUserName", "en{'Department'}de{'Abteilung'}")]
         public string FilterDepartmentUserName
         {
             get
@@ -1465,20 +1508,40 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: 
         /// </summary>
-        private string _FilterProgramNo;
-        [ACPropertyInfo(999, "FilterProgramNo", ConstApp.ProdOrderProgramNo)]
-        public string FilterProgramNo
+        private string _FilterOrderProgramNo;
+        [ACPropertyInfo(999, "FilterOrderProgramNo", ConstApp.ProdOrderProgramNo)]
+        public string FilterOrderProgramNo
         {
             get
             {
-                return _FilterProgramNo;
+                return _FilterOrderProgramNo;
             }
             set
             {
-                if (_FilterProgramNo != value)
+                if (_FilterOrderProgramNo != value)
                 {
-                    _FilterProgramNo = value;
-                    OnPropertyChanged(nameof(FilterProgramNo));
+                    _FilterOrderProgramNo = value;
+                    OnPropertyChanged(nameof(FilterOrderProgramNo));
+                }
+            }
+        }
+
+        /// Source Property: 
+        /// </summary>
+        private string _FilterOrderMaterialNo;
+        [ACPropertyInfo(999, "FilterOrderMaterialNo", ConstApp.Material)]
+        public string FilterOrderMaterialNo
+        {
+            get
+            {
+                return _FilterOrderMaterialNo;
+            }
+            set
+            {
+                if (_FilterOrderMaterialNo != value)
+                {
+                    _FilterOrderMaterialNo = value;
+                    OnPropertyChanged(nameof(FilterOrderMaterialNo));
                 }
             }
         }
@@ -1611,7 +1674,8 @@ namespace gip.bso.manufacturing
                     (short?)maxProdOrderState,
                     FilterOnlyOnThisLine,
                     FilterDepartmentUserName,
-                    FilterProgramNo) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
+                    FilterOrderProgramNo,
+                    FilterOrderMaterialNo) as ObjectQuery<ProdOrderPartslistPlanWrapper>;
 
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             IOrderedQueryable<ProdOrderPartslistPlanWrapper> query = null;
@@ -1631,9 +1695,9 @@ namespace gip.bso.manufacturing
             return query.Take(Const_MaxResultSize).ToList();
         }
 
-        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
-            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo) =>
+        protected static readonly Func<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslistPlanWrapper>>(
+            (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo, materialNo) =>
                 ctx
                 .ProdOrderPartslist
                 .Include("MDProdOrderState")
@@ -1646,6 +1710,10 @@ namespace gip.bso.manufacturing
                 .Where(c =>
                         (minProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState))
                         && (programNo == null || (c.ProdOrder.ProgramNo.Contains(programNo)))
+                        && (
+                                string.IsNullOrEmpty(materialNo)
+                                || (c.Partslist.Material.MaterialNo.Contains(materialNo) || c.Partslist.Material.MaterialName1.Contains(materialNo))
+                            )
                         && (maxProdOrderState == null || (c.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState && c.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState))
                         && (
                                 (!planningMRID.HasValue && !c.PlanningMRProposal_ProdOrderPartslist.Any())
@@ -4370,7 +4438,9 @@ namespace gip.bso.manufacturing
                     FilterEndTime,
                     prodOrderState,
                     FilterPlanningMR?.PlanningMRID,
-                    SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID);
+                    SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
+                    FilterBatchProgramNo,
+                    FilterBatchMaterialNo);
 
             int displayOrder = 0;
 

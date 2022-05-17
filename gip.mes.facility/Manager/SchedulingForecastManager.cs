@@ -91,6 +91,8 @@ namespace gip.mes.facility
                     null,
                     null,
                     null,
+                    null,
+                    null,
                     null).ToList();
                 batchPlans = batchPlans.Where(c => c.IsSelected).ToList();
                 if (isBackward)
