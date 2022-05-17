@@ -373,6 +373,12 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public LotSelectionRuleEnum? MultipleLotsSelectionRule
+        {
+            get;
+            private set;
+        }
+
         protected bool ScaleOtherComponentOnAbort = false;
 
         #endregion
@@ -533,6 +539,7 @@ namespace gip.bso.manufacturing
                 {
                     _SelectedWeighingMaterial = value;
                     _FacilityChargeList = null;
+                    FacilityChargeListCount = 0;
                     OnPropertyChanged("SelectedWeighingMaterial");
                     OnPropertyChanged("FacilityChargeList");
                     FacilityChargeNo = null;
@@ -625,6 +632,12 @@ namespace gip.bso.manufacturing
         }
 
 
+        public int FacilityChargeListCount
+        {
+            get;
+            protected set;
+        }
+
         //TODO: take it in one query from db
         FacilityChargeItem[] _FacilityChargeList;
         [ACPropertyList(629, "FacilityCharge")]
@@ -643,8 +656,13 @@ namespace gip.bso.manufacturing
                         if (facilityCharges == null)
                             return null;
                         using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                        {
                             _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge.Include("FacilityLot").Include("MDUnit").Include("Material")
-                                                                                                             .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight)).ToArray();
+                                                                                                             .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
+                                                                 .ToArray();
+
+                            FacilityChargeListCount = _FacilityChargeList.Count();
+                        }
                     }
                     return _FacilityChargeList;
                 }
@@ -1766,6 +1784,10 @@ namespace gip.bso.manufacturing
             if (scaleOtherComp != null)
                 ScaleOtherComponentOnAbort = scaleOtherComp.ParamAsBoolean;
 
+            var multipleLotSelRule = acMethod.ParameterValueList.GetACValue("RuleForSelMulLots");
+            if (multipleLotSelRule != null)
+                MultipleLotsSelectionRule = multipleLotSelRule.Value as LotSelectionRuleEnum?;
+
             OnLoadPWConfiguration(acMethod);
 
             //TODO: lot order
@@ -2213,7 +2235,8 @@ namespace gip.bso.manufacturing
                                         {
                                             SelectedFacilityCharge = null; //check if this needed
                                             _FacilityChargeList = null;
-                                            OnPropertyChanged("FacilityChargeList");
+                                            FacilityChargeListCount = 0;
+                                            OnPropertyChanged(nameof(FacilityChargeList));
                                         }
 
                                         var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
@@ -2291,6 +2314,7 @@ namespace gip.bso.manufacturing
             if (SelectedWeighingMaterial != null)
             {
                 _FacilityChargeList = null;
+                FacilityChargeListCount = 0;
                 OnPropertyChanged("FacilityChargeList");
             }
         }
@@ -2784,7 +2808,8 @@ namespace gip.bso.manufacturing
             {
                 case nameof(SelectedFacilityCharge):
                     {
-                        if (ShowSelectFacilityLotInfo)
+                        if (ShowSelectFacilityLotInfo && (   !MultipleLotsSelectionRule.HasValue || FacilityChargeListCount < 2 
+                                                          || (MultipleLotsSelectionRule.Value  != LotSelectionRuleEnum.OnlyScan) ))
                             return Global.ControlModes.Enabled;
                         return Global.ControlModes.Disabled;
                     }

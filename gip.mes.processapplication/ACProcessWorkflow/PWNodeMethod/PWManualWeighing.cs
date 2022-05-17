@@ -81,6 +81,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("CompSequenceNo", typeof(int), (int)0, Global.ParamOption.Optional));
             paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding rework into BOM'}de{'Folgenummer beim Hinzufügen Rework in die Rezeptur'}");
 
+            method.ParameterValueList.Add(new ACValue("RuleForSelMulLots", typeof(LotSelectionRuleEnum), LotSelectionRuleEnum.None, Global.ParamOption.Optional));
+            paramTranslation.Add("RuleForSelMulLots", "en{'Rule for lot selection when multiple lots available'}de{'Rule for lot selection when multiple lots available'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWManualWeighing), HandleExecuteACMethod_PWManualWeighing);
@@ -157,7 +160,7 @@ namespace gip.mes.processapplication
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
-        
+
         //TODO: _IsAborted and _ScaleComp change with PAF paramter AbortType
         protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false, _ScaleComp = false;
 
@@ -363,7 +366,7 @@ namespace gip.mes.processapplication
         }
 
         public bool FreeSelectionMode
-        { 
+        {
             get
             {
                 var method = MyConfiguration;
@@ -542,6 +545,22 @@ namespace gip.mes.processapplication
                 }
                 return 0;
             }
+        }
+
+        public LotSelectionRuleEnum? MultipleLotsSelectionRule
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("RuleForSelMulLots");
+                    if (acValue != null)
+                        return acValue.Value as LotSelectionRuleEnum?;
+                }
+                return null;
+            }
+    
         }
 
         #endregion
@@ -2064,6 +2083,12 @@ namespace gip.mes.processapplication
 
                         if (mat.IsLotManaged)
                         {
+                            if (availableFC.Count() > 1 && MultipleLotsSelectionRule.HasValue)
+                            {
+                                if (MultipleLotsSelectionRule.Value != LotSelectionRuleEnum.None)
+                                    return availableFC.Any();
+                            }
+
                             switch (AutoSelectLotPriority)
                             {
                                 case LotUsageEnum.FIFO:
@@ -2087,19 +2112,6 @@ namespace gip.mes.processapplication
                             if (msg == null)
                                 return true;
                         }
-                        //}
-                        //else
-                        //{
-                        //    Msg msg = null;
-                        //    var availableFacilities = GetFacilitiesForMaterial(rel);
-
-                        //    foreach(var f in availableFacilities)
-                        //    {
-                        //        msg = SetFacility(f.FacilityID, materialID);
-                        //        if (msg == null)
-                        //            return;
-                        //    }
-                        //}
                     }
                 }
             }
