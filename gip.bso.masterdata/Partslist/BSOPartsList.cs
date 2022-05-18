@@ -2246,15 +2246,16 @@ namespace gip.bso.masterdata
                         pos.TargetQuantityUOM = 0;
                         isUpdated = true;
                     }
-                    PartslistPosRelation[] relations = pos.PartslistPosRelation_TargetPartslistPos.ToArray();
-                    foreach (PartslistPosRelation rel in relations)
-                    {
-                        if (rel.TargetQuantityUOM > double.Epsilon)
-                        {
-                            rel.TargetQuantityUOM = 0;
-                            isUpdated = true;
-                        }
-                    }
+                    // Relation Quantity should not be set to zero:
+                    //PartslistPosRelation[] relations = pos.PartslistPosRelation_TargetPartslistPos.ToArray();
+                    //foreach (PartslistPosRelation rel in relations)
+                    //{
+                    //    if (rel.TargetQuantityUOM > double.Epsilon)
+                    //    {
+                    //        rel.TargetQuantityUOM = 0;
+                    //        isUpdated = true;
+                    //    }
+                    //}
                 }
             }
             return isUpdated;

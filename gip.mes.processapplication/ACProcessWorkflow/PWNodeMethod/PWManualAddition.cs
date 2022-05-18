@@ -73,6 +73,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("CompSequenceNo", typeof(int), (int)0, Global.ParamOption.Optional));
             paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding rework into BOM'}de{'Folgenummer beim Hinzufügen Rework in die Rezeptur'}");
 
+            method.ParameterValueList.Add(new ACValue("AutoInterDis", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoInterDis", "en{'Auto inter discharging'}de{'Automatische Zwischenentleerung'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualAddition), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualAddition), ACStateConst.SMStarting, wrapper);
 

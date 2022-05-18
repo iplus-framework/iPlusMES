@@ -92,13 +92,13 @@ namespace gip.mes.processapplication
                 bool hasOpenDosings = false;
                 bool anyDosingNodeFound = false;
                 bool isOneActive = false;
-                List<PWDosing> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<PWDosing>(this);
+                List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this);
                 if (previousDosings != null)
                 {
                     foreach (var pwDosing in previousDosings)
                     {
-                        if (pwDosing.CurrentACState >= ACStateEnum.SMStarting
-                            && pwDosing.CurrentACState < ACStateEnum.SMCompleted)
+                        if ((pwDosing as PWBase).CurrentACState >= ACStateEnum.SMStarting
+                            && (pwDosing as PWBase).CurrentACState < ACStateEnum.SMCompleted)
                             isOneActive = true;
                     }
                     foreach (var pwDosing in previousDosings)
