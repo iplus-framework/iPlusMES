@@ -1616,7 +1616,7 @@ namespace gip.mes.processapplication
 
             if (actualWeight > 0.000001)
             {
-                var msgBooking = DoManualWeighingBooking(actualWeight, false, isConsumed, facilityCharge, true);
+                var msgBooking = DoManualWeighingBooking(actualWeight, false, isConsumed, facilityCharge);
                 if (msgBooking != null)
                 {
                     Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
