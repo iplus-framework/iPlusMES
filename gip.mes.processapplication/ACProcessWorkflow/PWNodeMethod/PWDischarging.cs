@@ -43,6 +43,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("NoPostingOnRelocation", "en{'No posting at relocation'}de{'Keine Buchung bei Umlagerung'}");
             method.ParameterValueList.Add(new ACValue("KeepPlannedDestOnEmptying", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("KeepPlannedDestOnEmptying", "en{'Keep planned destination on emptying mode'}de{'Geplantes Ziel im Entleerungsmodus beibehalten'}");
+            method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
 
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDischarging), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDischarging), ACStateConst.SMStarting, wrapper);
@@ -368,6 +370,24 @@ namespace gip.mes.processapplication
             }
         }
 
+
+        protected short SkipPredCount
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("SkipPredCount");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
+                    }
+                }
+                return 0;
+            }
+        }
+
         protected bool LimitToMaxCapOfDest
         {
             get
@@ -496,7 +516,7 @@ namespace gip.mes.processapplication
             if (SkipIfNoComp)
             {
                 bool hasRunSomeDosings = false;
-                List<PWDosing> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<PWDosing>(this);
+                List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this, SkipPredCount <= 0 ? 40 : SkipPredCount);
                 if (previousDosings != null)
                     hasRunSomeDosings = previousDosings.Where(c => c.HasRunSomeDosings).Any();
                 if (!hasRunSomeDosings)
@@ -1485,6 +1505,15 @@ namespace gip.mes.processapplication
                 xmlChild = doc.CreateElement("SkipIfNoComp");
                 if (xmlChild != null)
                     xmlChild.InnerText = SkipIfNoComp.ToString();
+                xmlACPropertyList.AppendChild(xmlChild);
+            }
+
+            xmlChild = xmlACPropertyList["SkipPredCount"];
+            if (xmlChild == null)
+            {
+                xmlChild = doc.CreateElement("SkipPredCount");
+                if (xmlChild != null)
+                    xmlChild.InnerText = SkipPredCount.ToString();
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 

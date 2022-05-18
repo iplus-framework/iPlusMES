@@ -84,6 +84,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("RuleForSelMulLots", typeof(LotSelectionRuleEnum), LotSelectionRuleEnum.None, Global.ParamOption.Optional));
             paramTranslation.Add("RuleForSelMulLots", "en{'Rule for lot selection when multiple lots available'}de{'Rule for lot selection when multiple lots available'}");
 
+            method.ParameterValueList.Add(new ACValue("AutoInterDis", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("AutoInterDis", "en{'Auto inter discharging'}de{'Automatische Zwischenentleerung'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWManualWeighing), HandleExecuteACMethod_PWManualWeighing);
@@ -500,6 +503,21 @@ namespace gip.mes.processapplication
             }
         }
 
+        public bool AutoInterDis
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("AutoInterDis");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
         public string ReworkMaterialNo
         {
             get
@@ -741,6 +759,237 @@ namespace gip.mes.processapplication
 
                 return true;
             }
+        }
+
+        public bool HasRunSomeDosings
+        {
+            get
+            {
+                var previousLogs = PreviousProgramLogs;
+                return previousLogs != null && previousLogs.Any();
+            }
+        }
+
+        public int CountRunDosings
+        {
+            get
+            {
+                var previousLogs = PreviousProgramLogs;
+                return previousLogs != null ? previousLogs.Count() : 0;
+            }
+        }
+
+        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale)
+        {
+            return new ScaleBoundaries(scale);
+        }
+
+        public virtual bool HasDosedComponents(out double sumQuantity)
+        {
+            using (var dbApp = new DatabaseApp())
+            {
+                return ManageDosingState(PWDosing.ManageDosingStatesMode.QueryDosedComponents, dbApp, out sumQuantity);
+            }
+        }
+
+        public virtual bool HasOpenDosings(out double sumQuantity)
+        {
+            using (var dbApp = new DatabaseApp())
+            {
+                return ManageDosingState(PWDosing.ManageDosingStatesMode.QueryOpenDosings, dbApp, out sumQuantity);
+            }
+        }
+
+        public virtual bool HasAnyDosings(out double sumQuantity)
+        {
+            using (var dbApp = new DatabaseApp())
+            {
+                return ManageDosingState(PWDosing.ManageDosingStatesMode.QueryHasAnyDosings, dbApp, out sumQuantity);
+            }
+        }
+
+        public virtual void OnDosingLoopDecision(IACComponentPWNode dosingloop, bool willRepeatDosing)
+        {
+        }
+
+        private bool ManageDosingState(PWDosing.ManageDosingStatesMode mode, DatabaseApp dbApp, out double sumQuantity)
+        {
+            sumQuantity = 0.0;
+            if (IsProduction)
+                return ManageDosingStateProd(mode, dbApp, out sumQuantity);
+            //else if (IsTransport)
+            //    return ManageDosingStatePicking(mode, dbApp, out sumQuantity);
+            return false;
+        }
+
+        private bool ManageDosingStateProd(PWDosing.ManageDosingStatesMode mode, DatabaseApp dbApp, out double sumQuantity)
+        {
+            sumQuantity = 0.0;
+            PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
+            if (pwMethodProduction == null)
+                return false;
+            ProdOrderPartslistPos endBatchPos = pwMethodProduction.CurrentProdOrderPartslistPos.FromAppContext<ProdOrderPartslistPos>(dbApp);
+            if (pwMethodProduction.CurrentProdOrderBatch == null)
+                return false;
+
+            var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
+            ProdOrderBatch batch = pwMethodProduction.CurrentProdOrderBatch.FromAppContext<ProdOrderBatch>(dbApp);
+            ProdOrderBatchPlan batchPlan = batch.ProdOrderBatchPlan;
+
+            MaterialWFConnection matWFConnection = null;
+            if (batchPlan != null && batchPlan.MaterialWFACClassMethodID.HasValue)
+            {
+                matWFConnection = dbApp.MaterialWFConnection
+                                        .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
+                                                && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
+                                        .FirstOrDefault();
+            }
+            else
+            {
+                PartslistACClassMethod plMethod = endBatchPos.ProdOrderPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                if (plMethod != null)
+                {
+                    matWFConnection = dbApp.MaterialWFConnection
+                                            .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
+                                                    && c.ACClassWFID == contentACClassWFVB.ACClassWFID)
+                                            .FirstOrDefault();
+                }
+                else
+                {
+                    matWFConnection = contentACClassWFVB.MaterialWFConnection_ACClassWF
+                        .Where(c => c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
+                                    && c.MaterialWFACClassMethod.PartslistACClassMethod_MaterialWFACClassMethod.Where(d => d.PartslistID == endBatchPos.ProdOrderPartslist.PartslistID).Any())
+                        .FirstOrDefault();
+                }
+            }
+
+
+            //MaterialWFConnection matWFConnection = contentACClassWFVB.MaterialWFConnection_ACClassWF
+            //    .Where(c => c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID)
+            //    .FirstOrDefault();
+            if (matWFConnection == null)
+                return false;
+
+            // Find intermediate position which is assigned to this Dosing-Workflownode
+            var currentProdOrderPartslist = endBatchPos.ProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
+            ProdOrderPartslistPos intermediatePosition = currentProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(c => c.MaterialID.HasValue && c.MaterialID == matWFConnection.MaterialID
+                    && c.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+                    && !c.ParentProdOrderPartslistPosID.HasValue).FirstOrDefault();
+            if (intermediatePosition == null)
+                return false;
+
+            ProdOrderPartslistPos intermediateChildPos = null;
+            // Lock, if a parallel Dosing also creates a child Position for this intermediate Position
+
+            using (ACMonitor.Lock(pwMethodProduction._62000_PWGroupLockObj))
+            {
+                // Find intermediate child position, which is assigned to this Batch
+                intermediateChildPos = intermediatePosition.ProdOrderPartslistPos_ParentProdOrderPartslistPos
+                    .Where(c => c.ProdOrderBatchID.HasValue
+                                && c.ProdOrderBatchID.Value == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID)
+                    .FirstOrDefault();
+
+                if (intermediateChildPos == null)
+                    return false;
+            }
+            if (intermediateChildPos == null)
+                return false;
+
+            // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
+            if (mode == PWDosing.ManageDosingStatesMode.ResetDosings || mode == PWDosing.ManageDosingStatesMode.SetDosingsCompleted)
+            {
+                if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null)
+                    return false;
+                string acUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+
+                bool changed = false;
+                var posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted).FirstOrDefault();
+                if (posState != null)
+                {
+                    var queryDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray();
+                    foreach (var childPos in queryDosings)
+                    {
+                        // Suche alle Dosierungen die auf DIESER Waage stattgefunden haben
+                        var unconfirmedBookings = childPos.FacilityBooking_ProdOrderPartslistPosRelation.Where(c => c.PropertyACUrl == acUrl && c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New);
+                        if (unconfirmedBookings.Any())
+                        {
+                            changed = true;
+                            // Falls alle Komponenten entleert, setze Status auf Succeeded
+                            foreach (var booking in unconfirmedBookings)
+                            {
+                                if (mode == PWDosing.ManageDosingStatesMode.SetDosingsCompleted)
+                                    booking.MaterialProcessState = GlobalApp.MaterialProcessState.Processed;
+                                else // (mode == ManageDosingStatesMode.ResetDosings)
+                                    booking.MaterialProcessState = GlobalApp.MaterialProcessState.Discarded;
+                                sumQuantity += booking.OutwardQuantity;
+                            }
+                            // Sonderentleerung, setze Status auf Teilerledigt
+                            if (mode == PWDosing.ManageDosingStatesMode.ResetDosings)
+                            {
+                                childPos.MDProdOrderPartslistPosState = posState;
+                            }
+                        }
+                    }
+                }
+                return changed;
+            }
+            else
+            {
+                if (mode == PWDosing.ManageDosingStatesMode.QueryOpenDosings)
+                {
+                    var queryOpenDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
+                                        .Where(c => c.RemainingDosingWeight < -1.0 // TODO: Unterdosierung ist Min-Dosiermenge auf Waage
+                                                    && c.MDProdOrderPartslistPosState != null
+                                                    && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
+                                                        || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
+                                        .OrderBy(c => c.Sequence);
+                    bool any = queryOpenDosings.Any();
+                    if (any)
+                        sumQuantity = queryOpenDosings.Sum(c => c.RemainingDosingQuantityUOM);
+                    return any;
+                }
+                else if (mode == PWDosing.ManageDosingStatesMode.QueryHasAnyDosings)
+                {
+                    bool any = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any();
+                    if (any)
+                        sumQuantity = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
+                    return any;
+                }
+                else //if (mode == ManageDosingStatesMode.QueryDosedComponents)
+                {
+                    if (ParentPWGroup == null)
+                        return false;
+
+                    PAProcessModule apm = ParentPWGroup.AccessedProcessModule != null ? ParentPWGroup.AccessedProcessModule : ParentPWGroup.PreviousAccessedPM;
+                    if (apm == null)
+                    {
+                        apm = HandleNotFoundPMOnManageDosingStateProd(mode, dbApp);
+                        if (apm == null)
+                            return false;
+                    }
+                    string acUrl = apm.GetACUrl();
+                    var queryDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray();
+                    bool hasDosings = false;
+                    foreach (var childPos in queryDosings)
+                    {
+                        var bookings = childPos.FacilityBooking_ProdOrderPartslistPosRelation.Where(c => c.PropertyACUrl == acUrl
+                                                        && (c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New
+                                                           || c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.Processed));
+                        if (bookings.Any())
+                        {
+                            sumQuantity += bookings.Sum(c => c.OutwardQuantity);
+                            hasDosings = true;
+                        }
+                    }
+                    return hasDosings;
+                }
+            }
+        }
+
+        protected virtual PAProcessModule HandleNotFoundPMOnManageDosingStateProd(PWDosing.ManageDosingStatesMode mode, DatabaseApp dbApp)
+        {
+            return null;
         }
 
         #endregion
@@ -1620,6 +1869,82 @@ namespace gip.mes.processapplication
                         return StartNextCompResult.Done;
                     }
 
+                    bool interDischargingNeeded = false;
+                    ProdOrderPartslistPosRelation relation = queryOpenMaterials.FirstOrDefault();
+                    if (relation != null && AutoInterDis)
+                    {
+                        double dosingWeight = relation.RemainingDosingWeight;
+                        IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
+                        ScaleBoundaries scaleBoundaries = null;
+                        if (scale != null)
+                            scaleBoundaries = OnGetScaleBoundariesForDosing(scale);
+                        if (scaleBoundaries != null && scaleBoundaries.MaxWeightCapacity > 0.00000001)
+                        {
+                            double? remainingWeight = null;
+                            if (scaleBoundaries.RemainingWeightCapacity.HasValue)
+                                remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
+                            else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
+                                remainingWeight = scaleBoundaries.MaxWeightCapacity;
+                            if (remainingWeight.HasValue)
+                            {
+                                // FALL A:
+                                if (Math.Abs(relation.RemainingDosingWeight) > remainingWeight.Value)
+                                {
+                                    // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
+                                    // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
+                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && relation.TargetWeight > scaleBoundaries.MaxWeightCapacity)
+                                    {
+                                        // Fall A.1:
+                                        interDischargingNeeded = true;
+                                        dosingWeight = remainingWeight.Value;
+                                    }
+                                    else
+                                    {
+                                        ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                        return StartNextCompResult.Done;
+                                    }
+                                }
+
+                                if (scaleBoundaries.RemainingVolumeCapacity.HasValue
+                                    && relation.SourceProdOrderPartslistPos.Material != null
+                                    && relation.SourceProdOrderPartslistPos.Material.IsDensityValid)
+                                {
+                                    double remainingDosingVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(Math.Abs(relation.RemainingDosingQuantityUOM));
+                                    if (remainingDosingVolume > scaleBoundaries.RemainingVolumeCapacity.Value)
+                                    {
+                                        double targetVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(relation.TargetQuantityUOM);
+                                        // FALL B:
+                                        // Falls die Komponentenvolumen größer als die maximale Volumenkapazität ist, dann muss die Komponente gesplittet werden, 
+                                        // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
+                                        if (scaleBoundaries.MaxVolumeCapacity > 0.00000001 && targetVolume > scaleBoundaries.MaxVolumeCapacity)
+                                        {
+                                            double dosingWeightAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
+                                            // Falls Dichte > 1000 g/dm³, dann kann das errechnete zu dosierende Teilgewicht größer als das Restgewicht in der Waage sein,
+                                            // dann muss das Restgewicht genommen werden (interDischargingNeeded ist true wenn weiter oben die Restgewichtermittlung durchgeführt wurde 
+                                            // und die komponentenmenge gesplittet werden musste. SIEHE FALL A.1)
+                                            if (!interDischargingNeeded || dosingWeightAccordingVolume < dosingWeight)
+                                            {
+                                                // FALL B.1:
+                                                dosingWeight = dosingWeightAccordingVolume;
+                                            }
+                                            // Prüfe erneut ob Restgewicht der Waage überschritten wird, falls ja reduziere die Restmenge
+                                            // Dieser Fall kommt dann vor, wenn die Dichte > 1000 g/dm³ ist, jedoch die zu dosierende Komponentenmenge kleiner war als das Restgewicht der Waage.
+                                            // Dann wurde interDischargingNeeded nicht gesetzt (FALL A ist nicht eingetreten).
+                                            if (!remainingWeight.HasValue && dosingWeight > remainingWeight.Value)
+                                                dosingWeight = remainingWeight.Value;
+                                            interDischargingNeeded = true;
+                                        }
+                                        else
+                                        {
+                                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                            return StartNextCompResult.Done;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     using (ACMonitor.Lock(_65050_WeighingCompLock))
                     {
                         WeighingComponents = queryOpenMaterials.Select(c => new WeighingComponent(c, DetermineWeighingComponentState(c.MDProdOrderPartslistPosState
@@ -2083,7 +2408,7 @@ namespace gip.mes.processapplication
 
                         if (mat.IsLotManaged)
                         {
-                            if (availableFC.Count() > 1 && MultipleLotsSelectionRule.HasValue)
+                            if (availableFC != null && availableFC.Count() > 1 && MultipleLotsSelectionRule.HasValue)
                             {
                                 if (MultipleLotsSelectionRule.Value != LotSelectionRuleEnum.None)
                                     return availableFC.Any();

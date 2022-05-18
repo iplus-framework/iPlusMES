@@ -1163,7 +1163,7 @@ namespace gip.mes.processapplication
             return new ScaleBoundaries(scale);
         }
 
-        protected enum ManageDosingStatesMode
+        public enum ManageDosingStatesMode
         {
             QueryOpenDosings = 0,
             QueryHasAnyDosings = 1,
@@ -1714,17 +1714,17 @@ namespace gip.mes.processapplication
         /// <param name="searchStartsFromNode"></param>
         /// <param name="stopSearchAtType">If null, then search stops at PWNodeOr</param>
         /// <returns></returns>
-        public static List<T> FindPreviousDosingsInPWGroup<T>(PWBase searchStartsFromNode) where T : PWDosing
+        public static List<T> FindPreviousDosingsInPWGroup<T>(PWBase searchStartsFromNode, int maxRecursionDepth = 40) where T : IPWNodeReceiveMaterial
         {
             if (searchStartsFromNode == null)
                 return new List<T>();
             return searchStartsFromNode.FindPredecessors<T>(true,
                                                     c => c is T,
-                                                    c => c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is PWDosingLoop).Any(),
-                                                    40);
+                                                    c => c is PWNodeOr && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any(),
+                                                    maxRecursionDepth);
         }
 
-        internal virtual void OnDosingLoopDecision(PWDosingLoop dosingloop, bool willRepeatDosing)
+        public virtual void OnDosingLoopDecision(IACComponentPWNode dosingloop, bool willRepeatDosing)
         {
             if (willRepeatDosing && IsTransport && ParentPWGroup != null)
             {

@@ -331,8 +331,8 @@ namespace gip.mes.facility
         public ProdOrderPartslistPosRelation GetProdOrderPartslistPosRelation(DatabaseApp dbApp, List<ProdOrderPartslistPos> prodOrderPartsListPosItems, PartslistPosRelation posRelation)
         {
             ProdOrderPartslistPosRelation prodRelationItem = null;
-            ProdOrderPartslistPos sourcePos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);
-            ProdOrderPartslistPos targetPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);// ToSetup
+            ProdOrderPartslistPos sourcePos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos != null && c.BasedOnPartslistPos.PartslistPosID == posRelation.SourcePartslistPosID);
+            ProdOrderPartslistPos targetPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos != null && c.BasedOnPartslistPos.PartslistPosID == posRelation.TargetPartslistPosID);// ToSetup
 
             if (sourcePos != null && targetPos != null)
             {
@@ -623,7 +623,7 @@ namespace gip.mes.facility
             // update alternative relations
             prodOrderPartsListPosItems.ForEach(x =>
             {
-                if (x.BasedOnPartslistPos.AlternativePartslistPosID != null)
+                if (x.BasedOnPartslistPos != null && x.BasedOnPartslistPos.AlternativePartslistPosID != null)
                 {
                     x.ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos = prodOrderPartsListPosItems.FirstOrDefault(c => c.BasedOnPartslistPos.PartslistPosID == x.BasedOnPartslistPos.AlternativePartslistPosID);
                 }
@@ -2196,66 +2196,74 @@ namespace gip.mes.facility
                    .Select(c => c.SourceProdOrderPartslistPos)
                    .ToList();
                 foreach (ProdOrderPartslistPos inputMixure in inputMixures)
-                    RecalcIntermediateItem(inputMixure, updateMixureRelations);
-
-
-                // fix child relations
-                double newTargetQuantityUOM = 0;
-                if (inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any())
-                    newTargetQuantityUOM = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
-                else
-                    newTargetQuantityUOM = 0;
-
-                bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
-                double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
-                inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
-
-                //mixure distrubutes it's quantity to target mixures
-                if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                 {
-                    double ratioInwardPosQuantityGrowth = 0;
-                    if (inwardPos.TargetQuantityUOM > 0)
-                        ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
-                    if (ratioInwardPosQuantityGrowth == 0 && !noChange && inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
-                        ratioInwardPosQuantityGrowth = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+                    RecalcIntermediateItem(inputMixure, updateMixureRelations);
+                }
 
-                    List<ProdOrderPartslistPosRelation> mixureDestinationRelations =
-                        inwardPos
-                        .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
-                        .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                        .ToList();
-                    foreach (var rel in mixureDestinationRelations)
+                if (inwardPos.Material.ExcludeFromSumCalc)
+                {
+                    inwardPos.TargetQuantityUOM = 0;
+                }
+                else
+                {
+                    // fix child relations
+                    double newTargetQuantityUOM = 0;
+                    if (inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any())
+                        newTargetQuantityUOM = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
+                    else
+                        newTargetQuantityUOM = 0;
+
+                    bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
+                    double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
+                    inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
+
+                    //mixure distrubutes it's quantity to target mixures
+                    if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                     {
-                        if (updateMixureRelations /*&& rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern*/)
+                        double ratioInwardPosQuantityGrowth = 0;
+                        if (inwardPos.TargetQuantityUOM > 0)
+                            ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
+                        if (ratioInwardPosQuantityGrowth == 0 && !noChange && inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                            ratioInwardPosQuantityGrowth = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+
+                        List<ProdOrderPartslistPosRelation> mixureDestinationRelations =
+                            inwardPos
+                            .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                            .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+                            .ToList();
+                        foreach (var rel in mixureDestinationRelations)
                         {
-                            // Find pos relation
-                            PartslistPosRelation plRel = null;
-                            if (inwardPos.BasedOnPartslistPos != null)
-                                plRel = inwardPos
-                                                   .BasedOnPartslistPos
-                                                   .PartslistPosRelation_SourcePartslistPos
-                                                   .Where(c =>
-                                                               c.TargetPartslistPos.MaterialID == rel.TargetProdOrderPartslistPos.MaterialID
-                                                         )
-                                                   .FirstOrDefault();
-
-                            // calculate ratio of relation quantity in source quantity of partslist
-                            double plRelQueryRatio = 0;
-                            if (plRel != null && plRel.SourcePartslistPos.TargetQuantityUOM > 0)
-                                plRelQueryRatio = plRel.TargetQuantityUOM / plRel.SourcePartslistPos.TargetQuantityUOM;
-                            if (plRel == null || plRelQueryRatio == 0)
+                            if (updateMixureRelations /*&& rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern*/)
                             {
-                                // if no pl connection or ratio -> quantity divide equally
-                                int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-                                plRelQueryRatio = 1 / count;
-                            }
+                                // Find pos relation
+                                PartslistPosRelation plRel = null;
+                                if (inwardPos.BasedOnPartslistPos != null)
+                                    plRel = inwardPos
+                                                       .BasedOnPartslistPos
+                                                       .PartslistPosRelation_SourcePartslistPos
+                                                       .Where(c =>
+                                                                   c.TargetPartslistPos.MaterialID == rel.TargetProdOrderPartslistPos.MaterialID
+                                                             )
+                                                       .FirstOrDefault();
 
-                            // Distribute new SourceProdOrderPartslistPos.TargetQuantityUOM with ratio from partslist
-                            if (plRelQueryRatio > 0)
-                                rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * plRelQueryRatio;
+                                // calculate ratio of relation quantity in source quantity of partslist
+                                double plRelQueryRatio = 0;
+                                if (plRel != null && plRel.SourcePartslistPos.TargetQuantityUOM > 0)
+                                    plRelQueryRatio = plRel.TargetQuantityUOM / plRel.SourcePartslistPos.TargetQuantityUOM;
+                                if (plRel == null || plRelQueryRatio == 0)
+                                {
+                                    // if no pl connection or ratio -> quantity divide equally
+                                    int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+                                    plRelQueryRatio = 1 / count;
+                                }
+
+                                // Distribute new SourceProdOrderPartslistPos.TargetQuantityUOM with ratio from partslist
+                                if (plRelQueryRatio > 0)
+                                    rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * plRelQueryRatio;
+                            }
+                            else
+                                rel.TargetQuantityUOM = rel.TargetQuantityUOM + ratioInwardPosQuantityGrowth * rel.TargetQuantityUOM;
                         }
-                        else
-                            rel.TargetQuantityUOM = rel.TargetQuantityUOM + ratioInwardPosQuantityGrowth * rel.TargetQuantityUOM;
                     }
                 }
             }

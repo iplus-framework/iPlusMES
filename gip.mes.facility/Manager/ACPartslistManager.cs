@@ -532,6 +532,12 @@ namespace gip.mes.facility
                 RecalcIntermediateItem(childMixItem, setDefaultValueAtIncompatibleUnits);
             }
 
+            if (mixItem.Material.ExcludeFromSumCalc)
+            {
+                mixItem.TargetQuantityUOM = 0;
+                return;
+            }
+
             int convertableUnits = mixItem.PartslistPosRelation_TargetPartslistPos.Where(c => c.SourcePartslistPos.Material.IsBaseUnitConvertableToUnit(mixItem.Material.BaseMDUnit)).Count();
             if (convertableUnits > 0)
             {
