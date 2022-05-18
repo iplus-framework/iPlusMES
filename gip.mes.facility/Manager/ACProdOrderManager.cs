@@ -1224,9 +1224,9 @@ namespace gip.mes.facility
                         // add message for not generated 
                         if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
                         {
-                            // Warning50047
+                            // Warning50050
                             // For prodorder {0} recipe #{1} {2} {3} no batch plan generated!
-                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50047",
+                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50050",
                                 prodOrderPartslist.ProdOrder.ProgramNo, prodOrderPartslist.Sequence, prodOrderPartslist.Partslist.Material.MaterialNo, prodOrderPartslist.Partslist.Material.MaterialName1);
                             msgWithDetails.AddDetailMessage(msg);
                         }
@@ -1297,7 +1297,9 @@ namespace gip.mes.facility
                         }
                         if (!targets.Any(c => c.IsChecked))
                         {
-                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50048",
+                            // Warning50051
+                            // For prodorder {0} recipe #{1} {2} {3} no target for batch plan!
+                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50051",
                                 bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
                             msgWithDetails.AddDetailMessage(msg);
                         }
