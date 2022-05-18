@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
@@ -599,6 +600,25 @@ namespace gip.bso.manufacturing
                 })
                 .OrderBy(c => c.MaterialNo)
         );
+        #endregion
+
+        #region Overrides
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(IsEnabledSearch):
+                    result = IsEnabledSearch();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
         #endregion
     }
 }

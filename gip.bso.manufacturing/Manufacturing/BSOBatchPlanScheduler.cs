@@ -27,6 +27,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoForwardScheduling = @"DoForwardScheduling";
         public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
         public const string BGWorkerMehtod_DoGenerateBatchPlans = @"DoGenerateBatchPlans";
+        public const string BGWorkerMehtod_DoMergeOrders = @"DoMergeOrders";
         public const int Const_MaxFilterDaySpan = 10;
         public const int Const_MaxResultSize = 500;
         #endregion
@@ -359,20 +360,41 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case nameof(Save):
-                    Save();
+                case nameof(WizardCancel):
+                    WizardCancel();
                     return true;
-                case nameof(IsEnabledSave):
-                    result = IsEnabledSave();
+                case nameof(ShowBatchPlansOnTimeline):
+                    ShowBatchPlansOnTimeline();
                     return true;
-                case nameof(UndoSave):
-                    UndoSave();
+                case nameof(ConfigureBSO):
+                    ConfigureBSO();
                     return true;
-                case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                case nameof(IsEnabledConfigureBSO):
+                    result = IsEnabledConfigureBSO();
                     return true;
-                case nameof(IsEnabledLoad):
-                    result = IsEnabledLoad();
+                case nameof(AddRule):
+                    AddRule();
+                    return true;
+                case nameof(IsEnabledAddRule):
+                    result = IsEnabledAddRule();
+                    return true;
+                case nameof(RemoveRule):
+                    RemoveRule();
+                    return true;
+                case nameof(IsEnabledRemoveRule):
+                    result = IsEnabledRemoveRule();
+                    return true;
+                case nameof(ApplyRulesAndClose):
+                    ApplyRulesAndClose();
+                    return true;
+                case nameof(IsEnabledApplyRulesAndClose):
+                    result = IsEnabledApplyRulesAndClose();
+                    return true;
+                case nameof(InitialBuildLines):
+                    InitialBuildLines();
+                    return true;
+                case nameof(IsEnabledInitialBuildLines):
+                    result = IsEnabledInitialBuildLines();
                     return true;
                 case nameof(ChangeMode):
                     ChangeMode();
@@ -451,6 +473,18 @@ namespace gip.bso.manufacturing
                     return true;
                 case nameof(IsEnabledShowComponents):
                     result = IsEnabledShowComponents();
+                    return true;
+                case nameof(ShowParslist):
+                    ShowParslist();
+                    return true;
+                case nameof(IsEnabledShowParslist):
+                    result = IsEnabledShowParslist();
+                    return true;
+                case nameof(ShowPartslistOK):
+                    ShowPartslistOK();
+                    return true;
+                case nameof(IsEnabledShowPartslistOK):
+                    result = IsEnabledShowPartslistOK();
                     return true;
                 case nameof(BackwardScheduling):
                     BackwardScheduling();
@@ -552,23 +586,22 @@ namespace gip.bso.manufacturing
                     WizardForwardSelectLinie((System.Object)acParameter[0]);
                     return true;
                 case nameof(ChangeBatchPlan):
-                    if (acParameter != null && acParameter.Count() > 0)
-                        ChangeBatchPlan(acParameter[0] as ProdOrderBatchPlan);
+                    ChangeBatchPlan((gip.mes.datamodel.ProdOrderBatchPlan)acParameter[0]);
+                    return true;
+                case nameof(GenerateBatchPlans):
+                    GenerateBatchPlans();
+                    return true;
+                case nameof(IsEnabledGenerateBatchPlans):
+                    result = IsEnabledGenerateBatchPlans();
+                    return true;
+                case nameof(MergeOrders):
+                    MergeOrders();
+                    return true;
+                case nameof(IsEnabledMergeOrders):
+                    result = IsEnabledMergeOrders();
                     return true;
                 case nameof(IsEnabledWizardForward):
                     result = IsEnabledWizardForward();
-                    return true;
-                case nameof(WizardCancel):
-                    WizardCancel();
-                    return true;
-                case nameof(ShowBatchPlansOnTimeline):
-                    ShowBatchPlansOnTimeline();
-                    return true;
-                case nameof(InitialBuildLines):
-                    InitialBuildLines();
-                    return true;
-                case nameof(IsEnabledInitialBuildLines):
-                    result = IsEnabledInitialBuildLines();
                     return true;
                 case nameof(RecalculateBatchSuggestion):
                     RecalculateBatchSuggestion();
@@ -588,29 +621,20 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledRemoveSuggestion):
                     result = IsEnabledRemoveSuggestion();
                     return true;
-                case nameof(ApplyRulesAndClose):
-                    ApplyRulesAndClose();
+                case nameof(Save):
+                    Save();
                     return true;
-                case nameof(IsEnabledApplyRulesAndClose):
-                    result = IsEnabledApplyRulesAndClose();
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
                     return true;
-                case nameof(AddRule):
-                    AddRule();
+                case nameof(UndoSave):
+                    UndoSave();
                     return true;
-                case nameof(IsEnabledAddRule):
-                    result = IsEnabledAddRule();
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
-                case nameof(RemoveRule):
-                    RemoveRule();
-                    return true;
-                case nameof(IsEnabledRemoveRule):
-                    result = IsEnabledRemoveRule();
-                    return true;
-                case nameof(ConfigureBSO):
-                    ConfigureBSO();
-                    return true;
-                case nameof(IsEnabledConfigureBSO):
-                    result = IsEnabledConfigureBSO();
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -4010,6 +4034,29 @@ namespace gip.bso.manufacturing
                 && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
         }
 
+        /// <summary>
+        /// Source Property: GenerateBatchPlans
+        /// </summary>
+        [ACMethodInfo("MergeOrders", "en{'Merge prodorders'}de{'Auftrag zusammenführen'}", 999, true)]
+        public void MergeOrders()
+        {
+            if (!IsEnabledMergeOrders())
+                return;
+            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
+            {
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoMergeOrders);
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public bool IsEnabledMergeOrders()
+        {
+            return
+                ProdOrderPartslistList != null
+                && ProdOrderPartslistList.Any(c => c.IsSelected)
+                && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
+        }
+
         #endregion
 
         #region Methods -> Wizard -> Execute
@@ -4711,72 +4758,13 @@ namespace gip.bso.manufacturing
 
         private bool UpdateBatchPlans(WizardSchedulerPartslist wizardSchedulerPartslist)
         {
-            bool success = true;
-            ProdOrderPartslist prodOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist;
-            vd.MDProdOrderPartslistPosState mDProdOrderPartslistPosState = DatabaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)vd.MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
-            PartslistACClassMethod method = wizardSchedulerPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-            vd.ACClassWF vbACClassWF = wizardSchedulerPartslist.WFNodeMES;
-
-            List<ProdOrderBatchPlan> existingBatchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
-            int existingMinIndex = existingBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Min();
-
-            Guid[] wizardBatchPlanIDs = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderBatchPlanID).ToArray();
-            List<ProdOrderBatchPlan> missingBatchPlans = existingBatchPlans.Where(c => !wizardBatchPlanIDs.Contains(c.ProdOrderBatchPlanID)).ToList();
-
-            int movingStep = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Count;
             List<ProdOrderBatchPlan> otherBatchPlans = GetProdOrderBatchPlanList(wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID).ToList();
-            otherBatchPlans =
-                otherBatchPlans
-                .Where(c => (
-                                c.ScheduledOrder >= existingMinIndex)
-                                && !missingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
-                                && !existingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
-                ).ToList();
-            int schedulingOrder = 0;
-            if (existingMinIndex > 0)
-            {
-                foreach (ProdOrderBatchPlan plan in otherBatchPlans)
-                {
-                    plan.ScheduledOrder = schedulingOrder + movingStep + existingMinIndex;
-                    schedulingOrder++;
-                }
-                schedulingOrder = existingMinIndex;
-            }
-            else
-                schedulingOrder = otherBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Max() + 1;
 
-            foreach (BatchPlanSuggestionItem suggestionItem in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
-            {
-                ProdOrderBatchPlan batchPlan = null;
-                if (suggestionItem.ProdOrderBatchPlan != null)
-                    batchPlan = existingBatchPlans.FirstOrDefault(c => c.ProdOrderBatchPlanID == suggestionItem.ProdOrderBatchPlan.ProdOrderBatchPlanID);
-                else
-                {
-                    batchPlan = ProdOrderManager.FactoryBatchPlan(DatabaseApp, vbACClassWF, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
-                    prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
-                    batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
-                }
-                ProdOrderManager.WriteBatchPlanQuantities(suggestionItem, batchPlan);
+            bool success = ProdOrderManager.UpdateBatchPlans(DatabaseApp, wizardSchedulerPartslist, otherBatchPlans);
 
-                batchPlan.ScheduledEndDate = suggestionItem.ExpectedBatchEndTime;
-                if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
-                    batchPlan.ScheduledStartDate = batchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
+            SetBSOBatchPlan_BatchParents(wizardSchedulerPartslist.WFNodeMES, wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
 
-
-                batchPlan.ScheduledOrder = schedulingOrder;
-                //batchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
-                schedulingOrder++;
-            }
-            foreach (ProdOrderBatchPlan missingBatchPlan in missingBatchPlans)
-                missingBatchPlan.DeleteACObject(DatabaseApp, false);
-
-            ProdOrderBatchPlan firstBatchPlan = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault();
-
-            //WritePosMDUnit(firstBatchPlan, wizardSchedulerPartslist);
-
-            SetBSOBatchPlan_BatchParents(vbACClassWF, prodOrderPartslist);
-
-            ProdOrderBatchPlan[] tmp = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.OrderByDescending(c => c.ScheduledOrder).ToArray();
+            ProdOrderBatchPlan[] tmp = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.OrderByDescending(c => c.ScheduledOrder).ToArray();
             foreach (ProdOrderBatchPlan bp in tmp)
                 LoadGeneratedBatchInCurrentLine(bp, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM);
             if (
@@ -5072,6 +5060,10 @@ namespace gip.bso.manufacturing
                 case BGWorkerMehtod_DoGenerateBatchPlans:
                     List<ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
                     e.Result = ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
+                    break;
+                case BGWorkerMehtod_DoMergeOrders:
+                    List<ProdOrderPartslist> plForMerge = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
+                    e.Result = ProdOrderManager.MergeOrders(DatabaseApp, plForMerge);
                     break;
             }
         }
