@@ -63,22 +63,27 @@ namespace gip.mes.facility
             gip.mes.datamodel.ACClassWF tempACClassWFItem = WFNodeMES;
             ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
             // Read selected MDSchedulingGroup
-            if (finalMix != null && finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
+            if (finalMix != null)
             {
-                ProdOrderBatchPlan bp = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
-                MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
-                gip.mes.datamodel.ACClassWF vbACClassWf = bp.VBiACClassWF;
-                gip.mes.datamodel.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
-                if (mDSchedulingGroup != null)
-                    SelectedMDSchedulingGroup = mDSchedulingGroup;
-                SelectedBatchPlanGroup = gr;
-            }
+                if (finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Any())
+                {
+                    ProdOrderBatchPlan bp = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
+                    gip.mes.datamodel.ACClassWF vbACClassWf = bp.VBiACClassWF;
+                    gip.mes.datamodel.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
+                    if (mDSchedulingGroup != null)
+                        SelectedMDSchedulingGroup = mDSchedulingGroup;
 
-            ProdOrderPartslistPos = finalMix;
-            if (finalMix.MDUnit == null)
-                SelectedUnitConvert = null;
-            else
-                SelectedUnitConvert = finalMix.MDUnit;
+                    MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
+                    SelectedBatchPlanGroup = gr;
+                }
+
+                ProdOrderPartslistPos = finalMix;
+                if (finalMix.MDUnit == null)
+                    SelectedUnitConvert = null;
+                else
+                    SelectedUnitConvert = finalMix.MDUnit;
+
+            }
 
             if (SelectedMDSchedulingGroup == null)
                 SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
@@ -159,7 +164,6 @@ namespace gip.mes.facility
 
         #endregion
 
-
         #region Properties -> MDSchedulingGroup
 
         private MDSchedulingGroup _SelectedMDSchedulingGroup;
@@ -232,7 +236,6 @@ namespace gip.mes.facility
         }
 
         #endregion
-
 
         #region Properties -> MDBatchPlanGroup
 
@@ -529,7 +532,6 @@ namespace gip.mes.facility
 
         #endregion
 
-
         #region Properties -> Batch
 
         #region Properties -> Batch -> BatchSizes
@@ -636,7 +638,6 @@ namespace gip.mes.facility
         public TimeSpan? OffsetToEndTime { get; set; }
 
         #endregion
-
 
         #endregion
 
@@ -794,7 +795,7 @@ namespace gip.mes.facility
                     )
                 { IsEditable = true });
             }
-            else
+            else if(BatchSuggestionMode != null)
             {
                 BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, BatchSuggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
             }

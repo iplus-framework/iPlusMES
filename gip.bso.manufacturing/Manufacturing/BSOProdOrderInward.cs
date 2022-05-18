@@ -96,6 +96,12 @@ namespace gip.bso.manufacturing
             {
                 if (SelectedInwardACMethodBooking.FacilityBooking.ProdOrderPartslistPos != SelectedInwardACMethodBooking.PartslistPos)
                     SelectedInwardACMethodBooking.FacilityBooking.ProdOrderPartslistPos = SelectedInwardACMethodBooking.PartslistPos;
+
+                if (SelectedInwardACMethodBooking.FacilityBooking.InwardMaterial != SelectedInwardACMethodBooking.InwardMaterial)
+                    SelectedInwardACMethodBooking.FacilityBooking.InwardMaterial = SelectedInwardACMethodBooking.InwardMaterial;
+
+                if (SelectedInwardACMethodBooking.FacilityBooking.MDUnit != SelectedInwardACMethodBooking.MDUnit)
+                    SelectedInwardACMethodBooking.FacilityBooking.MDUnit = SelectedInwardACMethodBooking.MDUnit;
             }
 
             //if (CurrentProdOrder.CPartnerCompany != null && SelectedInwardACMethodBooking.CPartnerCompany != CurrentProdOrder.CPartnerCompany)

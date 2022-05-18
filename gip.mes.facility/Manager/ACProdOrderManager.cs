@@ -1044,6 +1044,70 @@ namespace gip.mes.facility
             return success;
         }
 
+        public bool UpdateBatchPlans(DatabaseApp databaseApp, WizardSchedulerPartslist wizardSchedulerPartslist, List<ProdOrderBatchPlan> otherBatchPlans)
+        {
+            bool success = true;
+            ProdOrderPartslist prodOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist;
+            MDProdOrderPartslistPosState mDProdOrderPartslistPosState = databaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
+            PartslistACClassMethod method = wizardSchedulerPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+
+            List<ProdOrderBatchPlan> existingBatchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+            int existingMinIndex = existingBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Min();
+
+            Guid[] wizardBatchPlanIDs = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderBatchPlanID).ToArray();
+            List<ProdOrderBatchPlan> missingBatchPlans = existingBatchPlans.Where(c => !wizardBatchPlanIDs.Contains(c.ProdOrderBatchPlanID)).ToList();
+
+            int movingStep = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Count;
+            otherBatchPlans =
+                otherBatchPlans
+                .Where(c => (
+                                c.ScheduledOrder >= existingMinIndex)
+                                && !missingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
+                                && !existingBatchPlans.Select(x => x.ProdOrderBatchPlanID).Contains(c.ProdOrderBatchPlanID)
+                ).ToList();
+            int schedulingOrder = 0;
+            if (existingMinIndex > 0)
+            {
+                foreach (ProdOrderBatchPlan plan in otherBatchPlans)
+                {
+                    plan.ScheduledOrder = schedulingOrder + movingStep + existingMinIndex;
+                    schedulingOrder++;
+                }
+                schedulingOrder = existingMinIndex;
+            }
+            else
+                schedulingOrder = otherBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Max() + 1;
+
+            foreach (BatchPlanSuggestionItem suggestionItem in wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList)
+            {
+                ProdOrderBatchPlan batchPlan = null;
+                if (suggestionItem.ProdOrderBatchPlan != null)
+                    batchPlan = existingBatchPlans.FirstOrDefault(c => c.ProdOrderBatchPlanID == suggestionItem.ProdOrderBatchPlan.ProdOrderBatchPlanID);
+                else
+                {
+                    batchPlan = FactoryBatchPlan(databaseApp, wizardSchedulerPartslist.WFNodeMES, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                    prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
+                    batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
+                }
+                WriteBatchPlanQuantities(suggestionItem, batchPlan);
+
+                batchPlan.ScheduledEndDate = suggestionItem.ExpectedBatchEndTime;
+                if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
+                    batchPlan.ScheduledStartDate = batchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
+
+
+                batchPlan.ScheduledOrder = schedulingOrder;
+                batchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
+                schedulingOrder++;
+            }
+            foreach (ProdOrderBatchPlan missingBatchPlan in missingBatchPlans)
+                missingBatchPlan.DeleteACObject(databaseApp, false);
+
+            ProdOrderBatchPlan firstBatchPlan = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault();
+
+            return success;
+        }
+
         public void WriteBatchPlanQuantities(BatchPlanSuggestionItem suggestionItem, ProdOrderBatchPlan batchPlan)
         {
             batchPlan.TotalSize = suggestionItem.TotalBatchSizeUOM;
@@ -1051,6 +1115,33 @@ namespace gip.mes.facility
             batchPlan.BatchTargetCount = suggestionItem.BatchTargetCount;
         }
 
+
+        public MsgWithDetails MergeOrders(DatabaseApp databaseApp, List<ProdOrderPartslist> plsForMerge)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            ProdOrder[] prodOrders = plsForMerge.Select(c => c.ProdOrder).ToArray();
+
+            // 1.0 Define connections
+            // Target PL | OutwardRoot Input Pos | Source PL
+            List<Tuple<ProdOrderPartslist, ProdOrderPartslistPos, ProdOrderPartslist>> itemsForMerge = new List<Tuple<ProdOrderPartslist, ProdOrderPartslistPos, ProdOrderPartslist>>();
+            foreach (ProdOrderPartslist pl in plsForMerge)
+            {
+                ProdOrderPartslistPos[] components = pl.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToArray();
+                foreach (ProdOrderPartslistPos component in components)
+                {
+                    ProdOrderPartslist sourcePL = plsForMerge.Where(c => c.ProdOrderPartslistID != pl.ProdOrderPartslistID && c.Partslist.MaterialID == component.MaterialID).FirstOrDefault();
+                    if (sourcePL != null)
+                    {
+                        itemsForMerge.Add(new Tuple<ProdOrderPartslist, ProdOrderPartslistPos, ProdOrderPartslist>(pl, component, sourcePL));
+                    }
+                }
+            }
+
+            // 2.0 process connections: move partslist to order where beeing used>
+
+            return msgWithDetails;
+        }
 
         public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, List<ProdOrderPartslist> plsForBatchGenerate)
         {
@@ -1067,34 +1158,39 @@ namespace gip.mes.facility
 
         public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
         {
-            MsgWithDetails msgWithDetails = null;
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
 
             ProdOrder prodOrder = plForBatchGenerate.ProdOrder;
 
-            // 1.0 make BOM - create partslists
-            double treeQuantityRatio = plForBatchGenerate.TargetQuantity / plForBatchGenerate.Partslist.TargetQuantityUOM;
-            PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist, treeQuantityRatio);
-            rootPartslistExpand.IsChecked = true;
-            rootPartslistExpand.LoadTree();
+            int countOfPl = prodOrder.ProdOrderPartslist_ProdOrder.Count();
 
-            // 2.0 Extract suggestion
-            List<ExpandResult> treeResult = rootPartslistExpand.BuildTreeList();
-            treeResult =
-                treeResult
-                .Where(x =>
-                    x.Item.IsChecked
-                    && x.Item.IsEnabled)
-                .OrderByDescending(x => x.TreeVersion)
-                .ToList();
-
-            int sn = 0;
-            foreach (ExpandResult expand in treeResult)
+            if (countOfPl == 1)
             {
-                sn++;
-                ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == expand.Item.PartslistForPosition.PartslistID);
-                if (pl == null)
-                    PartslistAdd(databaseApp, prodOrder, expand.Item.PartslistForPosition, sn, expand.Item.TargetQuantityUOM, out pl);
-                pl.Sequence = sn;
+                // 1.0 make BOM - create partslists
+                double treeQuantityRatio = plForBatchGenerate.TargetQuantity / plForBatchGenerate.Partslist.TargetQuantityUOM;
+                PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist, treeQuantityRatio);
+                rootPartslistExpand.IsChecked = true;
+                rootPartslistExpand.LoadTree();
+
+                // 2.0 Extract suggestion
+                List<ExpandResult> treeResult = rootPartslistExpand.BuildTreeList();
+                treeResult =
+                    treeResult
+                    .Where(x =>
+                        x.Item.IsChecked
+                        && x.Item.IsEnabled)
+                    .OrderByDescending(x => x.TreeVersion)
+                    .ToList();
+
+                int sn = 0;
+                foreach (ExpandResult expand in treeResult)
+                {
+                    sn++;
+                    ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == expand.Item.PartslistForPosition.PartslistID);
+                    if (pl == null)
+                        PartslistAdd(databaseApp, prodOrder, expand.Item.PartslistForPosition, sn, expand.Item.TargetQuantityUOM, out pl);
+                    pl.Sequence = sn;
+                }
             }
 
             // 3.0 generate batches
@@ -1109,24 +1205,38 @@ namespace gip.mes.facility
 
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
             {
-                List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                WizardSchedulerPartslist item = new WizardSchedulerPartslist(
-                    databaseApp, this, configManagerIPlus,
-                    prodOrderPartslist.Partslist, prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups,
-                    prodOrderPartslist);
+                bool plHaveBatchPlanOrBatch = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Any();
+                double plannedBatchQuantity = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Select(c => c.TotalSize).DefaultIfEmpty().Sum();
+                bool differentQuantity = plannedBatchQuantity > 0 && Math.Abs(prodOrderPartslist.TargetQuantity - plannedBatchQuantity) > double.Epsilon;
 
-                item.LoadConfiguration();
-                item.LoadNewBatchSuggestion();
-
-                // add one batch if there no suggestion
-                if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
+                if (!plHaveBatchPlanOrBatch || differentQuantity)
                 {
-                    item.BatchPlanSuggestion.ItemsList = new System.ComponentModel.BindingList<BatchPlanSuggestionItem>();
-                    BatchPlanSuggestionItem suggestionItem = new BatchPlanSuggestionItem(item, 1, item.TargetQuantityUOM, 1, 0);
-                    item.BatchPlanSuggestion.ItemsList.Add(suggestionItem);
-                }
+                    List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
+                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, prodOrderPartslist.Partslist,
+                        prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups, prodOrderPartslist);
 
-                wPls.Add(item);
+                    item.LoadConfiguration();
+
+                    if (!plHaveBatchPlanOrBatch)
+                    {
+                        item.LoadNewBatchSuggestion();
+
+                        // add message for not generated 
+                        if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
+                        {
+                            // Warning50047
+                            // For prodorder {0} recipe #{1} {2} {3} no batch plan generated!
+                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50047",
+                                prodOrderPartslist.ProdOrder.ProgramNo, prodOrderPartslist.Sequence, prodOrderPartslist.Partslist.Material.MaterialNo, prodOrderPartslist.Partslist.Material.MaterialName1);
+                            msgWithDetails.AddDetailMessage(msg);
+                        }
+                    }
+                    else
+                    {
+                        item.LoadExistingBatchSuggestion();
+                    }
+                    wPls.Add(item);
+                }
             }
 
             WizardSchedulerPartslist defaultWizardPl = wPls.Where(c => c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
@@ -1136,7 +1246,34 @@ namespace gip.mes.facility
             List<ProdOrderBatchPlan> prodOrderBatchPlans = new List<ProdOrderBatchPlan>();
             foreach (WizardSchedulerPartslist wPl in wPls)
             {
-                FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
+                if (!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
+                {
+                    FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
+                }
+                else
+                {
+                    double exisingProducedQuantity =
+                        wPl
+                        .ProdOrderPartslistPos
+                        .ProdOrderPartslist
+                        .ProdOrderBatch_ProdOrderPartslist
+                        .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                        .Select(c => c.TargetQuantityUOM)
+                        .DefaultIfEmpty()
+                        .Sum();
+                    double diff = wPl.ProdOrderPartslistPos.ProdOrderPartslist.TargetQuantity - exisingProducedQuantity;
+
+                    if(diff > wPl.BatchSizeMinUOM)
+                    {
+                        wPl.NewTargetQuantityUOM = diff;
+                        wPl.LoadNewBatchSuggestion();
+                    }
+                    if (wPl.BatchPlanSuggestion.ItemsList.Any())
+                    {
+                        List<ProdOrderBatchPlan> otherBatchPlans = new List<ProdOrderBatchPlan>();
+                        UpdateBatchPlans(databaseApp, wPl, otherBatchPlans);
+                    }
+                }
             }
 
             // 5.1 If many target - select first and remind
@@ -1146,17 +1283,32 @@ namespace gip.mes.facility
 
                 foreach (ProdOrderBatchPlan bp in wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
                 {
-                    string configUrl = "";
-                    BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
-                        wPl.ProdOrderPartslistPos, bp, configUrl, true, true, true, true, true);
-
-                    if (targets.Any(c => c.IsChecked))
+                    if (!bp.FacilityReservation_ProdOrderBatchPlan.Any())
                     {
-                        POPartslistPosReservation selectedReservation = targets.Where(c => c.IsChecked).FirstOrDefault();
-                        bp.FacilityReservation_ProdOrderBatchPlan.Add(selectedReservation.SelectedReservation);
+                        string configUrl = "";
+                        BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
+                            wPl.ProdOrderPartslistPos, bp, configUrl, true, false, false, false, false);
+
+                        if (!targets.Any(c => c.IsChecked))
+                        {
+                            POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
+                            if (selectedReservation != null)
+                                selectedReservation.IsChecked = true;
+                        }
+                        if (!targets.Any(c => c.IsChecked))
+                        {
+                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50048",
+                                bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
+                            msgWithDetails.AddDetailMessage(msg);
+                        }
                     }
                 }
             }
+
+            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+            if (saveMsg != null)
+                foreach (Msg tmMsg in saveMsg.MsgDetails)
+                    msgWithDetails.AddDetailMessage(tmMsg);
 
             return msgWithDetails;
         }
@@ -1337,7 +1489,7 @@ namespace gip.mes.facility
                                 if (showSameMaterialCells && !ifMaterialMatch)
                                     continue;
                             }
-                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, intermediatePos, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
+                            reservationCollection.Add(new POPartslistPosReservation(routeItem.Target, batchPlan, null, selectedReservationForModule, unselFacility, acClassWFDischarging));
                         }
                     }
 
@@ -1616,8 +1768,6 @@ namespace gip.mes.facility
             return saveMsg;
         }
 
-
-
         #endregion
 
         #region Public -> Batch -> Duration Calculation
@@ -1651,9 +1801,9 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup) =>
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
                                     .Include("ProdOrderPartslist.MDProdOrderState")
@@ -1667,6 +1817,11 @@ namespace gip.mes.facility
                                     .Where(c => (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
+                                            && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
+                                            && (
+                                                    string.IsNullOrEmpty(materialNo)
+                                                    || (c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo) || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo))
+                                                )
                                             && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
@@ -1701,9 +1856,13 @@ namespace gip.mes.facility
             DateTime? filterEndTime,
             MDProdOrderState.ProdOrderStates? minProdOrderState,
             Guid? planningMRID,
-            Guid? mdBatchPlanGroup)
+            Guid? mdBatchPlanGroup,
+            string programNo,
+            string materialNo)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState, (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null, planningMRID, mdBatchPlanGroup) as ObjectQuery<ProdOrderBatchPlan>;
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState,
+                (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
+                planningMRID, mdBatchPlanGroup, programNo, materialNo) as ObjectQuery<ProdOrderBatchPlan>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
