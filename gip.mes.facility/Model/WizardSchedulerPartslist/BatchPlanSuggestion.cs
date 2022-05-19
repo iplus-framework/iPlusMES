@@ -251,7 +251,17 @@ namespace gip.mes.facility
         internal void UpdateBatchPlan()
         {
             if (WizardSchedulerPartslist.BatchSuggestionMode != null)
-                if (WizardSchedulerPartslist.BatchSuggestionMode == BatchSuggestionCommandModeEnum.KeepEqualBatchSizes)
+                if(WizardSchedulerPartslist.PlanMode == datamodel.BatchPlanMode.UseTotalSize && ItemsList.Count() == 1)
+                {
+                    BatchPlanSuggestionItem item = ItemsList.FirstOrDefault();
+                    if (item != null)
+                    {
+                        int batchCount = item.BatchTargetCount;
+                        item.BatchSizeUOM = WizardSchedulerPartslist.NewTargetQuantityUOM;
+                        item.BatchTargetCount = batchCount;
+                    }
+                }
+                else if (WizardSchedulerPartslist.BatchSuggestionMode == BatchSuggestionCommandModeEnum.KeepEqualBatchSizes)
                 {
                     IncreaseBatchCount();
                 }
@@ -282,8 +292,9 @@ namespace gip.mes.facility
             BatchPlanSuggestionItem item = ItemsList.FirstOrDefault();
             if (item != null)
             {
-                item.BatchSizeUOM = item.BatchSizeUOM;
+                double batchSize = item.BatchSizeUOM;
                 item.BatchTargetCount = (int)(WizardSchedulerPartslist.NewTargetQuantityUOM / item.BatchSizeUOM);
+                item.BatchSizeUOM = batchSize;
             }
         }
     }
