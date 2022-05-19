@@ -53,7 +53,7 @@ namespace gip.mes.facility
             calcBatchSize = wizardSchedulerPartslist.CorrectQuantityWithProductionUnits(calcBatchSize);
             if (calcBatchCount > 0 && calcBatchSize > Double.Epsilon)
             {
-                Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
+                Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount, null, true);
                 Rest = totalSize - (calcBatchCount * calcBatchSize);
             }
         }

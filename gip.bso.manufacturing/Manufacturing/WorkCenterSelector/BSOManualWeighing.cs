@@ -657,7 +657,8 @@ namespace gip.bso.manufacturing
                             return null;
                         using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
                         {
-                            _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge.Include("FacilityLot").Include("MDUnit").Include("Material")
+                            _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge
+                                                                                                            .Include(d => d.FacilityLot).Include(d => d.MDUnit).Include(d => d.Material).Include(d => d.Facility)
                                                                                                              .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
                                                                  .ToArray();
 

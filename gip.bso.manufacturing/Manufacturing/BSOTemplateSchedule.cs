@@ -435,8 +435,10 @@ namespace gip.bso.manufacturing
                         .Distinct()
                         .ToArray();
                     foreach (Guid prodOrderMdSchedulingGroupID in prodOrderMdSchedulingGroupIDs)
+                    {
                         if (!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
                             mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
+                    }
 
                     ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null, BatchPlanTermin, maxSchedulerOrders);
                     generated.Add(targetProdOrder);
@@ -452,7 +454,9 @@ namespace gip.bso.manufacturing
                     Root.Messages.Msg(msgWithDetails);
 
                 foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
+                {
                     ChildBSOBatchPlanScheduler.RefreshServerState(mdSchedulingGroupID);
+                }
             }
             catch (Exception ec)
             {

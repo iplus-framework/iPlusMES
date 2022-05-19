@@ -658,11 +658,8 @@ namespace gip.bso.manufacturing
 
         private void SchedulesForPWNodesProp_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (RefreshBatchListByRecieveChange)
-            {
-                string selectedLine = GetSelectedLine();
-                LoadScheduleListForPWNodes(selectedLine);
-            }
+            string selectedLine = GetSelectedLine();
+            LoadScheduleListForPWNodes(selectedLine, RefreshBatchListByRecieveChange);
         }
 
         #endregion
@@ -2230,8 +2227,7 @@ namespace gip.bso.manufacturing
                 nr = SelectedWizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Max(c => c.Nr);
             nr++;
             BatchPlanSuggestionItem newItem = new BatchPlanSuggestionItem(SelectedWizardSchedulerPartslist, nr, 0, 0,
-                SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > 0 ? SelectedWizardSchedulerPartslist.NewTargetQuantityUOM : SelectedWizardSchedulerPartslist.TargetQuantityUOM)
-            { IsEditable = true };
+                SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > 0 ? SelectedWizardSchedulerPartslist.NewTargetQuantityUOM : SelectedWizardSchedulerPartslist.TargetQuantityUOM, null, true);
             SelectedWizardSchedulerPartslist.BatchPlanSuggestion.AddItem(newItem);
             SelectedWizardSchedulerPartslist.BatchPlanSuggestion.SelectedItems = newItem;
             if (SelectedWizardSchedulerPartslist.OffsetToEndTime != null)
@@ -2833,7 +2829,7 @@ namespace gip.bso.manufacturing
                    RestNotUsedQuantityUOM = 0,
                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
                    {
-                        new BatchPlanSuggestionItem(wizardSchedulerPartslist,1, prodOrderBatchPlan.BatchSize, moveBatchCount, totalSize){IsEditable = true}
+                        new BatchPlanSuggestionItem(wizardSchedulerPartslist,1, prodOrderBatchPlan.BatchSize, moveBatchCount, totalSize, null, true)
                    }
                };
             string programNo = prodOrderBatchPlan.ProdOrderPartslist.ProdOrder.ProgramNo;
@@ -2856,7 +2852,7 @@ namespace gip.bso.manufacturing
                     RestNotUsedQuantityUOM = 0,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                     {
-                        new BatchPlanSuggestionItem(wizardSchedulerPartslist, 1, moveQuantity, 1, moveQuantity){IsEditable = true }
+                        new BatchPlanSuggestionItem(wizardSchedulerPartslist, 1, moveQuantity, 1, moveQuantity, null, true)
                     }
                 };
             string programNo = "";
@@ -3495,8 +3491,12 @@ namespace gip.bso.manufacturing
                     if (!IsBSOTemplateScheduleParent)
                     {
                         if (groupsForRefresh.Any())
+                        {
                             foreach (var mdSchedulingGroupID in groupsForRefresh)
+                            {
                                 RefreshServerState(mdSchedulingGroupID);
+                            }
+                        }
                     }
                 }
             }
@@ -3777,8 +3777,12 @@ namespace gip.bso.manufacturing
             if (!IsBSOTemplateScheduleParent)
             {
                 if (groupsForRefresh.Any())
+                {
                     foreach (var mdSchedulingGroupID in groupsForRefresh)
+                    {
                         RefreshServerState(mdSchedulingGroupID);
+                    }
+                }
             }
         }
 
@@ -4667,7 +4671,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void LoadScheduleListForPWNodes(string schedulingGroupMDKey)
+        private void LoadScheduleListForPWNodes(string schedulingGroupMDKey, bool reloadBatchPlanList = true)
         {
             PAScheduleForPWNodeList newScheduleForWFNodeList = null;
             if (_SchedulesForPWNodesProp != null && _SchedulesForPWNodesProp.ValueT != null)
@@ -4675,12 +4679,12 @@ namespace gip.bso.manufacturing
             else
                 newScheduleForWFNodeList = PABatchPlanScheduler.CreateScheduleListForPWNodes(this, DatabaseApp, null);
             //int removedCount = newScheduleForWFNodeList.RemoveAll(x => x.MDSchedulingGroupID == Guid.Empty);
-            UpdateScheduleForPWNodeList(newScheduleForWFNodeList);
+            UpdateScheduleForPWNodeList(newScheduleForWFNodeList, reloadBatchPlanList);
             if (!string.IsNullOrEmpty(schedulingGroupMDKey))
                 SelectedScheduleForPWNode = ScheduleForPWNodeList.FirstOrDefault(c => c.MDSchedulingGroup.MDKey == schedulingGroupMDKey);
         }
 
-        private void UpdateScheduleForPWNodeList(PAScheduleForPWNodeList newScheduleForWFNodeList)
+        private void UpdateScheduleForPWNodeList(PAScheduleForPWNodeList newScheduleForWFNodeList, bool reloadBatchPlanList = true)
         {
             PAScheduleForPWNodeList.DiffResult diffResult = PAScheduleForPWNodeList.DiffResult.Equal;
             if (_ScheduleForPWNodeList == null)
@@ -4726,8 +4730,9 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if (diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged)
-                || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
+            if (   (   diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged)
+                    || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
+                && reloadBatchPlanList)
                 LoadProdOrderBatchPlanList();
         }
 

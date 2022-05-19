@@ -72,7 +72,7 @@ namespace gip.mes.facility
 
             if (calcBatchSize > Double.Epsilon && calcBatchCount > 0)
             {
-                Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount) { IsEditable = true };
+                Suggestion = new BatchPlanSuggestionItem(wizardSchedulerPartslist, nr, calcBatchSize, calcBatchCount, calcBatchSize * calcBatchCount, null, true);
             }
         }
         #endregion

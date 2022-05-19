@@ -758,8 +758,7 @@ namespace gip.mes.facility
                     || batchPlan.VBiACClassWFID != this.WFNodeMES.ACClassWFID)
                     continue;
                 nr++;
-                BatchPlanSuggestionItem item = new BatchPlanSuggestionItem(this, nr, batchPlan.BatchSize, batchPlan.BatchTargetCount, batchPlan.TotalSize);
-                item.ProdOrderBatchPlan = batchPlan;
+                BatchPlanSuggestionItem item = new BatchPlanSuggestionItem(this, nr, batchPlan.BatchSize, batchPlan.BatchTargetCount, batchPlan.TotalSize, batchPlan, false);
                 item.ExpectedBatchEndTime = batchPlan.ScheduledEndDate;
                 item.IsEditable =
                     (
@@ -786,14 +785,7 @@ namespace gip.mes.facility
                     RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * targetQuantity,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
-                BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(
-                    this,
-                    1,
-                    targetQuantity,
-                    1,
-                    targetQuantity
-                    )
-                { IsEditable = true });
+                BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(this, 1, targetQuantity, 1, targetQuantity, null, true ));
             }
             else if(BatchSuggestionMode != null)
             {

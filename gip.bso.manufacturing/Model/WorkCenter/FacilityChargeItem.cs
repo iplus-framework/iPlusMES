@@ -21,6 +21,8 @@ namespace gip.bso.manufacturing
             ExpirationDate = facilityCharge.ExpirationDate;
             FillingDate = facilityCharge.FillingDate;
             MDUnit = facilityCharge.MDUnit;
+            FacilityNo = facilityCharge.Facility.FacilityNo;
+            FacilityName = facilityCharge.Facility.FacilityName;
 
             if (targetQuantity.HasValue && targetQuantity.Value > StockQuantityUOM)
             {
@@ -40,6 +42,21 @@ namespace gip.bso.manufacturing
             get;
             set;
         }
+
+        [ACPropertyInfo(9999)]
+        public string FacilityNo
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(9999)]
+        public string FacilityName
+        {
+            get;
+            set;
+        }
+
 
         [ACPropertyInfo(9999)]
         public double StockQuantityUOM

@@ -11,7 +11,7 @@ namespace gip.mes.facility
         public WizardSchedulerPartslist WizardSchedulerPartslist { get; private set; }
         #endregion
 
-        public BatchPlanSuggestionItem(WizardSchedulerPartslist wizardSchedulerPartslist, int nr, double batchSize, int batchTargetCount, double totalBatchSize)
+        public BatchPlanSuggestionItem(WizardSchedulerPartslist wizardSchedulerPartslist, int nr, double batchSize, int batchTargetCount, double totalBatchSize, ProdOrderBatchPlan prodOrderBatchPlan, bool isEditable)
         {
             WizardSchedulerPartslist = wizardSchedulerPartslist;
             Nr = nr;
@@ -35,6 +35,8 @@ namespace gip.mes.facility
                 _LastChanged = Field.TotalBatchSizeUOM;
                 _PrevChanged = Field.None;
             }
+            ProdOrderBatchPlan = prodOrderBatchPlan;
+            IsEditable = isEditable;
         }
 
         [ACPropertyInfo(100, "Nr", "en{'Batch-No.'}de{'Batch-Nr.'}")]
@@ -290,6 +292,11 @@ namespace gip.mes.facility
                 if (_ProdOrderBatchPlan != value)
                 {
                     _ProdOrderBatchPlan = value;
+                    if (_ProdOrderBatchPlan != null && _ProdOrderBatchPlan.EntityState != System.Data.EntityState.Added)
+                    {
+                        _PrevChanged = Field.BatchSizeUOM;
+                        _LastChanged = Field.BatchTargetCountUOM;
+                    }
                     OnPropertyChanged("ProdOrderBatchPlan");
                 }
             }
