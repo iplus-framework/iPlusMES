@@ -1234,6 +1234,7 @@ namespace gip.mes.facility
                     else
                     {
                         item.LoadExistingBatchSuggestion();
+                        item.NewTargetQuantityUOM = prodOrderPartslist.TargetQuantity;
                     }
                     wPls.Add(item);
                 }
@@ -1252,24 +1253,9 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    double exisingProducedQuantity =
-                        wPl
-                        .ProdOrderPartslistPos
-                        .ProdOrderPartslist
-                        .ProdOrderBatch_ProdOrderPartslist
-                        .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderBatch)
-                        .Select(c => c.TargetQuantityUOM)
-                        .DefaultIfEmpty()
-                        .Sum();
-                    double diff = wPl.ProdOrderPartslistPos.ProdOrderPartslist.TargetQuantity - exisingProducedQuantity;
-
-                    if(diff > wPl.BatchSizeMinUOM)
-                    {
-                        wPl.NewTargetQuantityUOM = diff;
-                        wPl.LoadNewBatchSuggestion();
-                    }
                     if (wPl.BatchPlanSuggestion.ItemsList.Any())
                     {
+                        wPl.BatchPlanSuggestion.UpdateBatchPlan();
                         List<ProdOrderBatchPlan> otherBatchPlans = new List<ProdOrderBatchPlan>();
                         UpdateBatchPlans(databaseApp, wPl, otherBatchPlans);
                     }
@@ -1285,7 +1271,7 @@ namespace gip.mes.facility
                 {
                     if (!bp.FacilityReservation_ProdOrderBatchPlan.Any())
                     {
-                        string configUrl = "";
+                        string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
                         BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
                             wPl.ProdOrderPartslistPos, bp, configUrl, true, false, false, false, false);
 

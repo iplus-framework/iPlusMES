@@ -12,14 +12,15 @@ namespace gip.mes.facility
         [ACPropertyInfo(101, "MaterialNo", "en{'MaterialNo'}de{'MaterialNo.'}")]
         public string MaterialNo { get; set; }
 
-        [ACPropertyInfo(102, "en{'Material name'}de{'Materialname'}")]
+        [ACPropertyInfo(102, "MaterialName", "en{'Material name'}de{'Materialname'}")]
         public string MaterialName { get; set; }
 
         [ACPropertyInfo(103, "TargetInwardQuantityUOM", "en{'Target Output'}de{'Soll Ergebnis'}")]
         public double TargetInwardQuantityUOM { get; set; }
 
-        [ACPropertyInfo(104, "TargetActualQuantityUOM", "en{'Actual Output'}de{'Ist Ergebnis'}")]
-        public double TargetActualQuantityUOM { get; set; }
+        // TargetActualQuantityUOM
+        [ACPropertyInfo(104, "ActualInwardQuantityUOM", "en{'Actual Output'}de{'Ist Ergebnis'}")]
+        public double ActualInwardQuantityUOM { get; set; }
 
         [ACPropertyInfo(105, "DifferenceQuantityUOM", "en{'Diff. Output'}de{'Diff. Ergebnis'}")]
         public double DifferenceQuantityUOM { get; set; }
@@ -27,10 +28,10 @@ namespace gip.mes.facility
         [ACPropertyInfo(106, "SumComponentsActualQuantity", "en{'Sum Inputs'}de{'Summe Einsatz'}")]
         public double SumComponentsActualQuantity { get; set; }
 
-        [ACPropertyInfo(107, "TargetInputUOM", "en{'Diff. Input/Output'}de{'Differenz Einsatz/Ergebnis'}")]
+        [ACPropertyInfo(107, "RestQuantityUOM", "en{'Diff. Input/Output'}de{'Differenz Einsatz/Ergebnis'}")]
         public double RestQuantityUOM { get; set; }
 
-        [ACPropertyInfo(108, "RestQuantityUOM", "en{'Target input'}de{'Zieleingabe'}")]
+        [ACPropertyInfo(108, "TargetInputUOM", "en{'Target input'}de{'Zieleingabe'}")]
         public double TargetInputUOM { get; set; }
 
         [ACPropertyInfo(109, "ActualInput", "en{'Actual input'}de{'Stromeingang'}")]

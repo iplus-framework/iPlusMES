@@ -8,7 +8,7 @@ namespace gip.mes.facility
         [ACPropertyInfo(101, "MaterialNo", "en{'MaterialNo'}de{'MaterialNo.'}")]
         public string MaterialNo { get; set; }
 
-        [ACPropertyInfo(102, "en{'Material name'}de{'Materialname'}")]
+        [ACPropertyInfo(102, "MaterialName", "en{'Material name'}de{'Materialname'}")]
         public string MaterialName { get; set; }
 
         [ACPropertyInfo(103, "SumOutwardTargetQuantityUOM", "en{'Target Outward'}de{'Soll Zugang'}")]
