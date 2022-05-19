@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -221,11 +222,11 @@ namespace gip.mes.facility
             bool sumSizeInTolerance = (sumSize - WizardSchedulerPartslist.GetTargetQuantityUOM()) < RestQuantityToleranceUOM;
             bool batchInRange = false;
             {
-                double minBatchSize = ItemsList.Select(c=>c.BatchSizeUOM).DefaultIfEmpty().Min();
-                double maxBatchSize = ItemsList.Select(c=>c.BatchSizeUOM).DefaultIfEmpty().Max();
-                batchInRange = 
+                double minBatchSize = ItemsList.Select(c => c.BatchSizeUOM).DefaultIfEmpty().Min();
+                double maxBatchSize = ItemsList.Select(c => c.BatchSizeUOM).DefaultIfEmpty().Max();
+                batchInRange =
                         WizardSchedulerPartslist.BatchSizeMinUOM <= minBatchSize
-                    &&  (WizardSchedulerPartslist.BatchSizeMaxUOM == 0 || WizardSchedulerPartslist.BatchSizeMaxUOM >= maxBatchSize);
+                    && (WizardSchedulerPartslist.BatchSizeMaxUOM == 0 || WizardSchedulerPartslist.BatchSizeMaxUOM >= maxBatchSize);
             }
             return sumSizeInTolerance && batchInRange;
         }
@@ -245,6 +246,45 @@ namespace gip.mes.facility
         public override string ToString()
         {
             return string.Format(@"{0} / {1}", WizardSchedulerPartslist.GetTargetQuantityUOM(), RestNotUsedQuantityUOM);
+        }
+
+        internal void UpdateBatchPlan()
+        {
+            if (WizardSchedulerPartslist.BatchSuggestionMode != null)
+                if (WizardSchedulerPartslist.BatchSuggestionMode == BatchSuggestionCommandModeEnum.KeepEqualBatchSizes)
+                {
+                    IncreaseBatchCount();
+                }
+                else if (WizardSchedulerPartslist.BatchSuggestionMode == BatchSuggestionCommandModeEnum.KeepStandardBatchSizeAndDivideRest)
+                {
+                    if (ItemsList.Count() == 1)
+                    {
+                        IncreaseBatchCount();
+                    }
+                    else if (ItemsList.Count() == 2)
+                    {
+                        BatchPlanSuggestionItem item = ItemsList.FirstOrDefault();
+                        if (item != null)
+                        {
+                            double diffQuantity = WizardSchedulerPartslist.NewTargetQuantityUOM - item.TotalBatchSizeUOM;
+                            BatchPlanSuggestionItem secondItem = ItemsList.Skip(1).FirstOrDefault();
+                            if (secondItem != null)
+                            {
+                                secondItem.BatchTargetCount = (int)(diffQuantity / item.BatchSizeUOM);
+                            }
+                        }
+                    }
+                }
+        }
+
+        private void IncreaseBatchCount()
+        {
+            BatchPlanSuggestionItem item = ItemsList.FirstOrDefault();
+            if (item != null)
+            {
+                item.BatchSizeUOM = item.BatchSizeUOM;
+                item.BatchTargetCount = (int)(WizardSchedulerPartslist.NewTargetQuantityUOM / item.BatchSizeUOM);
+            }
         }
     }
 }

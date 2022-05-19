@@ -733,15 +733,8 @@ namespace gip.mes.facility
             else
                 LoadNewBatchSuggestion();
 
-            if (BatchPlanSuggestion.ItemsList == null)
+            if (BatchPlanSuggestion != null && BatchPlanSuggestion.ItemsList == null)
                 BatchPlanSuggestion.ItemsList = new BindingList<BatchPlanSuggestionItem>();
-
-            // TODO: @aagincic: ? Some scenaro when any suggestion is not availabile
-            //if(!BatchPlanSuggestion.ItemsList.Any())
-            //{
-            //    BatchPlanSuggestionItem oneItem = new BatchPlanSuggestionItem(this, 1, TargetQuantityUOM, 1, TargetQuantityUOM);
-            //    BatchPlanSuggestion.ItemsList.Add(oneItem);
-            //}
         }
 
         public void LoadExistingBatchSuggestion()
@@ -795,12 +788,17 @@ namespace gip.mes.facility
                     )
                 { IsEditable = true });
             }
-            else if(BatchSuggestionMode != null)
+            else if (BatchSuggestionMode != null)
             {
                 BatchSuggestionCommand cmd = new BatchSuggestionCommand(this, BatchSuggestionMode ?? BatchSuggestionCommandModeEnum.KeepEqualBatchSizes, ProdOrderManager.TolRemainingCallQ);
             }
+            else
+            {
+                BatchPlanSuggestion = new BatchPlanSuggestion(this);
+            }
             if (
-              BatchPlanSuggestion.ItemsList != null
+                 BatchPlanSuggestion != null
+              && BatchPlanSuggestion.ItemsList != null
               && BatchPlanSuggestion.ItemsList.Any()
               && OffsetToEndTime != null)
                 LoadSuggestionItemExpectedBatchEndTime();
@@ -869,8 +867,7 @@ namespace gip.mes.facility
 
             if (batchPlanMode != null && batchPlanMode.Value != null)
             {
-                PlanMode = (BatchPlanMode)batchPlanMode.Value;
-                PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)PlanMode).ACCaption;
+                LoadPlanMode((BatchPlanMode)batchPlanMode.Value);
             }
 
             if (batchSuggestionMode != null && batchSuggestionMode.Value != null)
@@ -885,6 +882,25 @@ namespace gip.mes.facility
             if (offsetToEndTime != null)
                 OffsetToEndTime = (TimeSpan)offsetToEndTime.Value;
             SelectFirstConversionUnit();
+
+            LoadDefaultConfiguration();
+        }
+
+        public void LoadDefaultConfiguration()
+        {
+            if (PlanMode == null)
+                if (BatchSizeMaxUOM == 0 && BatchSizeMaxUOM == 0 && BatchSizeStandardUOM == 0)
+                    LoadPlanMode(BatchPlanMode.UseTotalSize);
+                else
+                    LoadPlanMode(BatchPlanMode.UseBatchCount);
+            if (BatchSuggestionMode == null)
+                BatchSuggestionMode = BatchSuggestionCommandModeEnum.KeepEqualBatchSizes;
+        }
+
+        public void LoadPlanMode(BatchPlanMode mode)
+        {
+            PlanMode = mode;
+            PlanModeName = DatabaseApp.BatchPlanModeList.FirstOrDefault(c => ((short)c.Value) == (short)mode).ACCaption;
         }
 
         public List<IACConfigStore> GetCurrentConfigStores()
