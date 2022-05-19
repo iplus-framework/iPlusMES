@@ -320,7 +320,7 @@ namespace gip.bso.manufacturing
             List<OverviewProdOrderPartslist> list = s_cQry_OverviewProdOrderPartslist(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo).ToList();
             foreach (OverviewProdOrderPartslist item in list)
             {
-                item.RestQuantityUOM = item.TargetActualQuantityUOM - item.SumComponentsActualQuantity;
+                item.RestQuantityUOM = item.ActualInwardQuantityUOM - item.SumComponentsActualQuantity;
                 item.DifferentInputUOM = item.ActualInputUOM - item.TargetInputUOM;
             }
             return list;
@@ -522,17 +522,19 @@ namespace gip.bso.manufacturing
                    MaterialNo = c.Partslist.Material.MaterialNo,
                    MaterialName = c.Partslist.Material.MaterialName1,
                    TargetInwardQuantityUOM = c.TargetQuantity,
-                   TargetActualQuantityUOM = c.ActualQuantity,
+                   ActualInwardQuantityUOM = c.ActualQuantity,
                    DifferenceQuantityUOM = c.ActualQuantity - c.TargetQuantity,
                    SumComponentsActualQuantity = c.ProdOrderPartslistPos_ProdOrderPartslist.Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).Select(x => x.ActualQuantityUOM).DefaultIfEmpty().Sum(),
                    RestQuantityUOM = 0,
                    TargetInputUOM =
                             c.ProdOrderPartslistPos_SourceProdOrderPartslist
+                            .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                             .Select(x => x.TargetQuantityUOM)
                             .DefaultIfEmpty()
                             .Sum(),
                    ActualInputUOM =
                             c.ProdOrderPartslistPos_SourceProdOrderPartslist
+                            .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                             .Select(x => x.ActualQuantityUOM)
                             .DefaultIfEmpty()
                             .Sum()

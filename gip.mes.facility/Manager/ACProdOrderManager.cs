@@ -1271,7 +1271,7 @@ namespace gip.mes.facility
                 {
                     if (!bp.FacilityReservation_ProdOrderBatchPlan.Any())
                     {
-                        string configUrl = "";
+                        string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
                         BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
                             wPl.ProdOrderPartslistPos, bp, configUrl, true, false, false, false, false);
 
