@@ -778,6 +778,7 @@ namespace gip.mes.datamodel
                     c.fc.Facility.FacilityName,
                     c.fc.Comment,
                     c.fc.InsertDate,
+                    c.fc.MDUnit.TechnicalSymbol,
                     ProdOrderProgramNo = "",
                     BatchNo = "",
                     MachineName = " ",
@@ -800,6 +801,7 @@ namespace gip.mes.datamodel
                 FacilityName = c.FacilityName,
                 Comment = c.Comment,
                 InsertDate = c.InsertDate,
+                MDUnitName = c.TechnicalSymbol,
 
                 ProdOrderProgramNo = (c.IntermediateItem != null) ? c.IntermediateItem.ProdOrderPartslist.ProdOrder.ProgramNo : "",
                 BatchNo = c.IntermediateItem != null && c.IntermediateItem.ProdOrderBatchID != null ? c.IntermediateItem.ProdOrderBatch.ProdOrderBatchNo : "",
