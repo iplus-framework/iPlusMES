@@ -1010,6 +1010,20 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+        public gip.core.datamodel.ACClassWF GetACClassWFDischarging()
+        {
+            ProdOrderPartslist currentProdOrderPartslist = CurrentProdOrderPartslist != null ? CurrentProdOrderPartslist : ExternProdOrderPartslist;
+            if (VBCurrentACClassWF == null 
+                || SelectedIntermediate == null 
+                || currentProdOrderPartslist == null 
+                || SelectedBatchPlanForIntermediate == null 
+                || currentProdOrderPartslist.Partslist.MaterialWF == null)
+            {
+                return null;
+            }
+            return ProdOrderManager.GetACClassWFDischarging(DatabaseApp, currentProdOrderPartslist, VBCurrentACClassWF, SelectedIntermediate);
+        }
+
         void AldiBSOPartslist_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "SelectedIntermediate")
