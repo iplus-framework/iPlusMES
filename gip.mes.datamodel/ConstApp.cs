@@ -281,6 +281,7 @@
         public const string KeyOfExtSys = "KeyOfExtSys";
         public const string EntityTranslateKeyOfExtSys = "en{'Key of ext. system'}de{'Schlüssel von ext. System'}";
 
+        public const string DeliveryNotePos = "en{'Indeliverynotepos'}de{'Eingangslieferscheinposition'}";
         #endregion
 
 

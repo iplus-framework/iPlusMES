@@ -6,7 +6,7 @@ using System.Text;
 using System.Transactions;
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Indeliverynotepos'}de{'Eingangslieferscheinposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.DeliveryNotePos, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
     [ACPropertyEntity(2, OutOrderPos.ClassName, "en{'Outorderpos'}de{'Auftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
     [ACPropertyEntity(3, InOrderPos.ClassName, "en{'Inorderpos'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
