@@ -272,6 +272,7 @@
         public const string PlanningMR = "en{'Template schedules'}de{'Vorlagepläne'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
+        public const string Select = "en{'Select'}de{'Auswahl'}";
         public const string PickingNo = "en{'Picking-No.'}de{'Kommissions-Nr.'}";
 
         public const string Backward = "en{'Backward'}de{'Zurück '}";

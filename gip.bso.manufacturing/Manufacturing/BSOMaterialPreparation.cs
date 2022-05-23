@@ -609,11 +609,11 @@ namespace gip.bso.manufacturing
 
         #region Loading Methods
 
-        public void LoadMaterialPlanFromPos(List<SearchBatchMaterialModel> researchedFacilities)
+        public void LoadMaterialPlanFromPos(List<PreparedMaterial> preparedMaterials)
         {
             CleanUp();
 
-            _PreparedMaterialList = GetPreparedMaterials(researchedFacilities);
+            _PreparedMaterialList = preparedMaterials;
             OnPropertyChanged("PreparedMaterialList");
             SelectedPreparedMaterial = _PreparedMaterialList.FirstOrDefault();
 
