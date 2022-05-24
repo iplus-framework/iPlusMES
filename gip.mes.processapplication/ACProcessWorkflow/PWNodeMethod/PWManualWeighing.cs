@@ -1986,7 +1986,8 @@ namespace gip.mes.processapplication
             return dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
                                                         .Include(c => c.SourceProdOrderPartslistPos.Material)
                                                         .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
-                                                        .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPosPOPartslistPosID)
+                                                        .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPosPOPartslistPosID
+                                                                    && c.TargetQuantityUOM > 0.00001)
                                                         .ToArray()
                                                         .Where(c => c.MDProdOrderPartslistPosState != null
                                                                 && c.TopParentPartslistPosRelation != null && c.TopParentPartslistPosRelation.MDProdOrderPartslistPosState != null
