@@ -92,6 +92,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("EndPList", typeof(EndPListMode), (short)EndPListMode.DoNothing, Global.ParamOption.Required));
             paramTranslation.Add("EndPList", "en{'Mode for ending BOM-State'}de{'Stücklistenstatus Beenden Modus'}");
 
+            method.ParameterValueList.Add(new ACValue("ValidationBehaviour", typeof(short), (short)PARole.ValidationBehaviour.Strict, Global.ParamOption.Optional));
+            paramTranslation.Add("ValidationBehaviour", "en{'Validationbehaviour'}de{'Validierungsverhalten'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWNodeProcessWorkflowVB), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWNodeProcessWorkflowVB), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWNodeProcessWorkflowVB), HandleExecuteACMethod_PWNodeProcessWorkflowVB);
@@ -410,6 +413,26 @@ namespace gip.mes.processapplication
                 return EndPListMode.DoNothing;
             }
         }
+
+        public PARole.ValidationBehaviour ValidationBehaviour
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("ValidationBehaviour");
+                    if (acValue != null)
+                    {
+                        short validBehv = acValue.ParamAsInt16;
+                        if (validBehv >= (short)PARole.ValidationBehaviour.Laxly && validBehv <= (short)PARole.ValidationBehaviour.Strict)
+                            return (PARole.ValidationBehaviour)validBehv;
+                    }
+                }
+                return PARole.ValidationBehaviour.Strict;
+            }
+        }
+        
 
         public bool AlarmOnCompleted
         {

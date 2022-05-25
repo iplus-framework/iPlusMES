@@ -96,7 +96,8 @@ namespace gip.mes.processapplication
                     validationSuccess = false;
                     return StartNextBatchResult.CycleWait;
                 }
-                MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, mandantoryConfigStores, PARole.ValidationBehaviour.Strict);
+
+                MsgWithDetails msg2 = PickingManager.ValidateStart(dbApp, dbiPlus, picking, mandantoryConfigStores, ValidationBehaviour);
                 if (msg2 != null)
                 {
                     if (!msg2.IsSucceded())

@@ -4204,8 +4204,10 @@ namespace gip.bso.manufacturing
                             LoadBOMExplosionItems(DefaultWizardSchedulerPartslist.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder);
 
                         foreach (var item in AllWizardSchedulerPartslistList)
+                        {
                             if (item.SelectedMDSchedulingGroup != null)
                                 item.LoadConfiguration();
+                        }
                         success = SelectedWizardSchedulerPartslist != null;
                         var tmp = _SelectedWizardSchedulerPartslist;
                         OnPropertyChanged(nameof(WizardSchedulerPartslistList));
@@ -4281,6 +4283,7 @@ namespace gip.bso.manufacturing
             BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.AccessPrimary.NavList.Clear();
             BSOPartslistExplorer_Child.Value.AccessPrimary.NavList.Clear();
             BSOPartslistExplorer_Child.Value.FilterMDSchedulingGroup = mdSchedulingGroup;
+            BSOPartslistExplorer_Child.Value.FilterIsEnabled = true;
         }
 
 
@@ -4424,6 +4427,10 @@ namespace gip.bso.manufacturing
             AllWizardSchedulerPartslistList.Clear();
             AddWizardSchedulerPartslistList(DefaultWizardSchedulerPartslist);
             SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
+            if (SelectedWizardSchedulerPartslist != null)
+            {
+                SelectedWizardSchedulerPartslist.LoadConfiguration();
+            }
         }
 
         [ACMethodInfo("Wizard", "en{'Close'}de{'Schließen'}", 511)]
@@ -4449,6 +4456,7 @@ namespace gip.bso.manufacturing
 
             BSOPartslistExplorer_Child.Value.SearchWord = "";
             BSOPartslistExplorer_Child.Value.SelectedPartslist = null;
+            BSOPartslistExplorer_Child.Value.FilterIsEnabled = true;
             BSOPartslistExplorer_Child.Value.AccessPrimary.NavList.Clear();
 
             DefaultWizardSchedulerPartslist = null;

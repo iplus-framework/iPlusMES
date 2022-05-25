@@ -164,7 +164,7 @@ namespace gip.bso.manufacturing
         #region Methods => Start workflow picking
 
         public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
-                                bool skipProcessModuleValidation = false)
+                                bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict)
         {
             bool wfRunsBatches = false;
             ACComponent appManager = null;
@@ -234,7 +234,7 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
+            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, validationBehaviour);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
                 Messages.Msg(msgDetails);

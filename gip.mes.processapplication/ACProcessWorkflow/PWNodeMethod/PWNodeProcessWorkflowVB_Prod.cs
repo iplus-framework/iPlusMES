@@ -492,7 +492,7 @@ namespace gip.mes.processapplication
                             }
                             MsgWithDetails msg2 = ProdOrderManager.ValidateStart(dbApp, dbIPlus, this,
                                                                         currentProdOrderPartslist, mandantoryConfigStores,
-                                                                        PARole.ValidationBehaviour.Strict, PartslistManager, MatReqManager);
+                                                                        ValidationBehaviour, PartslistManager, MatReqManager);
                             if (msg2 != null)
                             {
                                 if (!String.IsNullOrEmpty(msg2.InnerMessage))
