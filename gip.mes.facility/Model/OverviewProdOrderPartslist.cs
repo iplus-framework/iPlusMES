@@ -1,4 +1,6 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
+using System;
 
 namespace gip.mes.facility
 {
@@ -6,6 +8,8 @@ namespace gip.mes.facility
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'OverviewProdOrderPartslist'}de{'OverviewProdOrderPartslist'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class OverviewProdOrderPartslist
     {
+        public Guid ProdOrderPartslistID { get; set; }
+
         [ACPropertyInfo(100, "OrderNo", "en{'Program'}de{'AuftragNo.'}")]
         public string OrderNo { get; set; }
 
@@ -42,6 +46,9 @@ namespace gip.mes.facility
 
         [ACPropertyInfo(111, "DepartmentUserName", "en{'Department'}de{'Abteilung.'}")]
         public string DepartmentUserName { get; set; }
+
+        [ACPropertyInfo(112, "MDUnitName", ConstApp.MDUnit)]
+        public string MDUnitName { get; set; }
 
     }
 }

@@ -429,6 +429,11 @@ namespace gip.mes.webservices
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have material."));
             }
 
+            if (facilityCharge.Facility == null)
+            {
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have facility."));
+            }
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -449,6 +454,28 @@ namespace gip.mes.webservices
                     FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     if (facManager == null)
                         return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                    datamodel.FacilityInventory inventory = null;
+
+                    if (facilityCharge.ParamID != Guid.Empty)
+                    {
+                        inventory = dbApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityCharge.ParamID);
+                    }
+
+                    if (inventory != null && inventory.FacilityID.HasValue)
+                    {
+                        datamodel.Facility facilityToCheck = dbApp.Facility.Include(c => c.Facility1_ParentFacility)
+                                                                           .FirstOrDefault(c => c.FacilityID == facilityCharge.Facility.FacilityID);
+
+                        while (facilityToCheck.FacilityID != inventory.FacilityID)
+                        {
+                            facilityToCheck = facilityToCheck.Facility1_ParentFacility;
+                            if (facilityToCheck == null)
+                            {
+                                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "Quant can not be added to this facility because inventory is for another facility."));
+                            }
+                        }
+                    }
 
                     datamodel.FacilityLot lot = null;
                     if (material.IsLotManaged && facilityCharge.FacilityLot != null)
@@ -490,24 +517,21 @@ namespace gip.mes.webservices
                                                                     lot?.FacilityLotID, acMethodBooking.InwardSplitNo).FirstOrDefault();
 
                     Msg invMsg = null;
-                    if (facilityCharge.ParamID != Guid.Empty)
+                    if (inventory != null && fc != null)
                     {
-                        datamodel.FacilityInventory inv = dbApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityCharge.ParamID);
-                        if (inv != null && fc != null)
-                        {
-                            datamodel.FacilityInventoryPos iPos = datamodel.FacilityInventoryPos.NewACObject(dbApp, inv);
-                            iPos.FacilityChargeID = fc.FacilityChargeID;
-                            iPos.StockQuantity = fc.StockQuantity;
-                            iPos.NewStockQuantity = fc.StockQuantity;
+                        datamodel.FacilityInventoryPos iPos = datamodel.FacilityInventoryPos.NewACObject(dbApp, inventory);
+                        iPos.FacilityChargeID = fc.FacilityChargeID;
+                        iPos.StockQuantity = fc.StockQuantity;
+                        iPos.NewStockQuantity = fc.StockQuantity;
 
-                            datamodel.MDFacilityInventoryPosState posState = dbApp.MDFacilityInventoryPosState
-                                                                                  .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+                        datamodel.MDFacilityInventoryPosState posState = dbApp.MDFacilityInventoryPosState
+                                                                                .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
 
-                            if (posState != null)
-                                iPos.MDFacilityInventoryPosState = posState;
+                        if (posState != null)
+                            iPos.MDFacilityInventoryPosState = posState;
 
-                            invMsg = dbApp.ACSaveChanges();
-                        }
+                        invMsg = dbApp.ACSaveChanges();
+                        
                     }
 
                     return new WSResponse<FacilityCharge>(fc, invMsg);
@@ -1596,32 +1620,49 @@ namespace gip.mes.webservices
 
         #region Inventory -> Get
 
-        public static readonly Func<DatabaseApp, short?, DateTime, DateTime, IQueryable<FacilityInventory>> s_cQry_GetFacilityInventories =
-        CompiledQuery.Compile<DatabaseApp, short?, DateTime, DateTime, IQueryable<FacilityInventory>>(
+        public static readonly Func<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>> s_cQry_GetFacilityInventories =
+        CompiledQuery.Compile<DatabaseApp, short?, DateTime, DateTime, IQueryable<datamodel.FacilityInventory>>(
             (dbApp, inventoryState, dateFrom, dateTo) =>
                 dbApp.FacilityInventory
-                        .Where(c =>
-                             (inventoryState == null || c.MDFacilityInventoryState.MDFacilityInventoryStateIndex == inventoryState)
-                             && c.InsertDate >= dateFrom
-                             && c.InsertDate < dateTo
-                        )
-                        .Select(c => new FacilityInventory()
-                        {
-                            FacilityInventoryID = c.FacilityInventoryID,
-                            FacilityInventoryNo = c.FacilityInventoryNo,
-                            FacilityInventoryName = c.FacilityInventoryName,
-                            InsertName = c.InsertName,
-                            InsertDate = c.InsertDate,
-                            MDFacilityInventoryState = new gip.mes.webservices.MDFacilityInventoryState()
+                        .Where(c => (inventoryState == null || c.MDFacilityInventoryState.MDFacilityInventoryStateIndex == inventoryState)
+                                    && c.InsertDate >= dateFrom
+                                    && c.InsertDate < dateTo));
+
+        public List<FacilityInventory> ConvtertFacilityInventory(IEnumerable<datamodel.FacilityInventory> inventories)
+        {
+            return inventories.ToArray()
+                            .Select(c => new FacilityInventory()
                             {
-                                MDFacilityInventoryStateID = c.MDFacilityInventoryStateID,
-                                MDNameTrans = c.MDFacilityInventoryState.MDNameTrans,
-                                MDFacilityInventoryStateIndex = c.MDFacilityInventoryState.MDFacilityInventoryStateIndex,
-                                SortIndex = c.MDFacilityInventoryState.SortIndex,
-                                IsDefault = c.MDFacilityInventoryState.IsDefault
-                            }
-                        })
-        );
+                                FacilityInventoryID = c.FacilityInventoryID,
+                                FacilityInventoryNo = c.FacilityInventoryNo,
+                                FacilityInventoryName = c.FacilityInventoryName,
+                                InsertName = c.InsertName,
+                                InsertDate = c.InsertDate,
+                                MDFacilityInventoryState = new gip.mes.webservices.MDFacilityInventoryState()
+                                {
+                                    MDFacilityInventoryStateID = c.MDFacilityInventoryStateID,
+                                    MDNameTrans = c.MDFacilityInventoryState.MDNameTrans,
+                                    MDFacilityInventoryStateIndex = c.MDFacilityInventoryState.MDFacilityInventoryStateIndex,
+                                    SortIndex = c.MDFacilityInventoryState.SortIndex,
+                                    IsDefault = c.MDFacilityInventoryState.IsDefault
+                                },
+                                Facility = c.Facility == null ? null:
+                                                        new gip.mes.webservices.Facility()
+                                                        {
+                                                            FacilityID = c.Facility.FacilityID,
+                                                            FacilityNo = c.Facility.FacilityNo,
+                                                            FacilityName = c.Facility.FacilityName,
+                                                            MDFacilityType = new MDFacilityType()
+                                                            {
+                                                                MDFacilityTypeID = c.Facility.MDFacilityTypeID,
+                                                                MDNameTrans = c.Facility.MDFacilityType.MDNameTrans,
+                                                                MDFacilityTypeIndex = c.Facility.MDFacilityType.MDFacilityTypeIndex
+                                                            },
+                                                            ParentFacilityID = c.Facility.ParentFacilityID,
+                                                            SkipPrintQuestion = c.Facility.SkipPrintQuestion
+                                                        }
+                            }).ToList();
+        }
 
         public WSResponse<List<FacilityInventory>> GetFacilityInventories(string inventoryState, string dateFrom, string dateTo)
         {
@@ -1642,7 +1683,7 @@ namespace gip.mes.webservices
 
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
-                    response.Data = s_cQry_GetFacilityInventories(databaseApp, inventoryStateVal, dtFrom, dtTo).ToList();
+                    response.Data = ConvtertFacilityInventory(s_cQry_GetFacilityInventories(databaseApp, inventoryStateVal, dtFrom, dtTo));
                 }
             }
             catch (Exception e)

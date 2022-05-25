@@ -15,6 +15,9 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Schedule for WF-Batch-Manager'}de{'Zeitplan für WF-Batch-Manager'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class PAScheduleForPWNode : INotifyPropertyChanged, ICloneable, IACObject
     {
+
+        #region Properties
+
         private Guid _MDSchedulingGroupID;
         [DataMember]
         public Guid MDSchedulingGroupID
@@ -199,6 +202,28 @@ namespace gip.mes.processapplication
             }
         }
 
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -278,5 +303,7 @@ namespace gip.mes.processapplication
         {
             return false;
         }
+
+        #endregion
     }
 }

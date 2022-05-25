@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 
 namespace gip.mes.facility
 {
@@ -31,5 +32,8 @@ namespace gip.mes.facility
 
         [ACPropertyInfo(109, "RestQuantityUOM", "en{'Diff. Stock'}de{'Differenz Bestand'}")]
         public double RestQuantityUOM { get; set; }
+
+        [ACPropertyInfo(110, "MDUnitName", ConstApp.MDUnit)]
+        public string MDUnitName { get; set; }
     }
 }

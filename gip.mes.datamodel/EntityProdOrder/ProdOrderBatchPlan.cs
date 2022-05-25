@@ -308,7 +308,7 @@ namespace gip.mes.datamodel
         }
 
         private bool _IsSelected;
-        [ACPropertyInfo(999, "IsSelected", "en{'Select'}de{'Auswahl'}")]
+        [ACPropertyInfo(999, nameof(IsSelected), ConstApp.Select)]
         public bool IsSelected
         {
             get
@@ -320,7 +320,7 @@ namespace gip.mes.datamodel
                 if (_IsSelected != value)
                 {
                     _IsSelected = value;
-                    OnPropertyChanged("IsSelected");
+                    OnPropertyChanged(nameof(IsSelected));
                 }
             }
         }

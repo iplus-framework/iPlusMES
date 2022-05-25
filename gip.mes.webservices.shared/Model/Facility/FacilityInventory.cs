@@ -24,7 +24,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
-      
+        [DataMember(Name = "FIF")]
+        public Facility Facility
+        {
+            get;
+            set;
+        }
 
         [DataMember(Name = "MFIS")]
         public MDFacilityInventoryState MDFacilityInventoryState

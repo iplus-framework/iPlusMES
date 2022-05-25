@@ -140,10 +140,27 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(9999, "MDUnitName", "en{'Unit'}de{'Einheit'}")]
         public string MDUnitName { get; set; }
 
+        public List<string> ExternLotList { get; set; }
+
+        private string _ExternLots;
+        [ACPropertyInfo(9999, "ExternLots", ConstApp.ExternLotNo)]
+        public string ExternLots
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_ExternLots) && ExternLotList != null && ExternLotList.Any())
+                {
+                    _ExternLots = string.Join(", ", ExternLotList);
+                    _ExternLots = _ExternLots.TrimEnd();
+                }
+                return _ExternLots;
+            }
+        }
+
         public List<string> LotList { get; set; }
 
         private string _lots;
-        [ACPropertyInfo(9999, "TrackingAndTracingDeliveryNote", "en{'Lots'}de{'Loses'}")]
+        [ACPropertyInfo(9999, "Lots", ConstApp.LotNo)]
         public string Lots
         {
             get
@@ -157,7 +174,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(9999, "FacilityNo", "en{'Silo'}de{'Silo'}")]
+        [ACPropertyInfo(9999, "FacilityNo", ConstApp.FacilityNo)]
         public string FacilityNo { get; set; }
 
         /// <summary>

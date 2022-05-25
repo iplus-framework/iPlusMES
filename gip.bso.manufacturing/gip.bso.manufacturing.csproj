@@ -397,10 +397,16 @@
     <None Include="VBControlScripts\2022-05-17 09-26_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2022-05-19 10-18_aagincic.zip">
+    <None Include="VBControlScripts\2022-05-20 08-14_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2022-05-20 08-14_dlisak.zip">
+    <None Include="VBControlScripts\2022-05-22 21-43_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-05-23 20-59_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-05-24 09-37_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-05-25 07-56_dlisak.zip">

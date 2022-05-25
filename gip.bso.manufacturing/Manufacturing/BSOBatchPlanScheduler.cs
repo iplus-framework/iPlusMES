@@ -28,6 +28,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoCalculateAll = @"DoCalculateAll";
         public const string BGWorkerMehtod_DoGenerateBatchPlans = @"DoGenerateBatchPlans";
         public const string BGWorkerMehtod_DoMergeOrders = @"DoMergeOrders";
+        public const string BGWorkerMehtod_DoSearchStockMaterial = @"DoSearchStockMaterial";
         public const int Const_MaxFilterDaySpan = 10;
         public const int Const_MaxResultSize = 500;
         #endregion
@@ -303,56 +304,8 @@ namespace gip.bso.manufacturing
 
         private void Value_OnSearchStockMaterial(object sender, EventArgs e)
         {
-            if (ProdOrderBatchPlanList != null)
-            {
-                List<ProdOrderBatchPlan> selectedBatchPlans = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-                List<SearchBatchMaterialModel> searchModel = GetSearchBatchMaterialModels(selectedBatchPlans);
-                BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(searchModel);
-            }
-        }
-
-        private List<SearchBatchMaterialModel> GetSearchBatchMaterialModels(List<ProdOrderBatchPlan> batchPlans)
-        {
-            List<SearchBatchMaterialModel> searchResult = new List<SearchBatchMaterialModel>();
-            foreach (var batchPlan in batchPlans)
-            {
-                GetPositionsForBatchMaterialModel(searchResult, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
-            }
-            return searchResult;
-        }
-
-        private void GetPositionsForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
-        {
-            foreach (ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-            {
-                if (prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot)
-                {
-                    GetRelationForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation, posTargetQuantityUOM);
-                }
-                else
-                {
-                    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
-                    double subPosTargetQuantity = posTargetQuantityUOM * factor;
-                    GetPositionsForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
-                }
-            }
-        }
-
-        private double GetRelationForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
-        {
-            SearchBatchMaterialModel searchFacilityModel = new SearchBatchMaterialModel();
-            searchFacilityModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
-            searchFacilityModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
-            searchFacilityModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
-            searchFacilityModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
-            searchResult.Add(searchFacilityModel);
-
-            //if (posTargetQuantityUOM  > Double.Epsilon)
-            //{
-            //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
-            //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
-            //}
-            return searchFacilityModel.TargetQuantityUOM;
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchStockMaterial);
+            ShowDialog(this, DesignNameProgressBar);
         }
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
@@ -4738,7 +4691,7 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if (   (   diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged)
+            if ((diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged)
                     || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
                 && reloadBatchPlanList)
                 LoadProdOrderBatchPlanList();
@@ -5078,6 +5031,10 @@ namespace gip.bso.manufacturing
                     List<ProdOrderPartslist> plForMerge = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
                     e.Result = ProdOrderManager.MergeOrders(DatabaseApp, plForMerge);
                     break;
+                case BGWorkerMehtod_DoSearchStockMaterial:
+                    List<PreparedMaterial> preparedMaterials = DoSearchStockMaterial();
+                    e.Result = preparedMaterials;
+                    break;
             }
         }
 
@@ -5099,40 +5056,134 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                MsgWithDetails resultMsg = null;
-                if (e.Result != null)
-                    resultMsg = (MsgWithDetails)e.Result;
-
-                if (resultMsg != null)
+                if (command == BGWorkerMehtod_DoSearchStockMaterial)
                 {
-                    if (resultMsg is MsgWithDetails)
-                    {
-                        MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
-                        if (msgWithDetails.MsgDetails.Any())
-                        {
-                            foreach (Msg detailMsg in msgWithDetails.MsgDetails)
-                                SendMessage(detailMsg);
+                    List<PreparedMaterial> preparedMaterials = e.Result as List<PreparedMaterial>;
+                    DoSearchStockMaterialFinish(preparedMaterials);
+                }
+                else
+                {
+                    MsgWithDetails resultMsg = null;
+                    if (e.Result != null)
+                        resultMsg = (MsgWithDetails)e.Result;
 
-                            // Warning50049
-                            // 
-                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), command + "()", 4489, "Warning50049");
-                            Messages.Msg(msg);
+                    if (resultMsg != null)
+                    {
+                        if (resultMsg is MsgWithDetails)
+                        {
+                            MsgWithDetails msgWithDetails = resultMsg as MsgWithDetails;
+                            if (msgWithDetails.MsgDetails.Any())
+                            {
+                                foreach (Msg detailMsg in msgWithDetails.MsgDetails)
+                                    SendMessage(detailMsg);
+
+                                // Warning50049
+                                // 
+                                Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), command + "()", 4489, "Warning50049");
+                                Messages.Msg(msg);
+                            }
+                        }
+                    }
+
+                    if (resultMsg == null || resultMsg.IsSucceded())
+                    {
+                        switch (command)
+                        {
+                            case BGWorkerMehtod_DoGenerateBatchPlans:
+                                LoadProdOrderBatchPlanList();
+                                break;
                         }
                     }
                 }
-
-                if (resultMsg == null || resultMsg.IsSucceded())
-                {
-                    switch (command)
-                    {
-                        case BGWorkerMehtod_DoGenerateBatchPlans:
-                            LoadProdOrderBatchPlanList();
-                            break;
-                    }
-                }
-
             }
         }
+
+        #endregion
+
+        #region BackgroundWorker -> DoMehtods
+
+
+        #region BackgroundWorker -> DoMehtods -> SearchStockMaterial
+
+        private List<PreparedMaterial> DoSearchStockMaterial()
+        {
+            List<SearchBatchMaterialModel> searchModel = new List<SearchBatchMaterialModel>();
+            List<ProdOrderBatchPlan> selectedBatchPlans = new List<ProdOrderBatchPlan>();
+            if (TargetScheduleForPWNodeList != null
+                && TargetScheduleForPWNodeList.Where(c => c.IsSelected).Any())
+            {
+                PAScheduleForPWNode[] selectedLines = TargetScheduleForPWNodeList.Where(c => c.IsSelected).ToArray();
+                foreach (PAScheduleForPWNode selectedLine in selectedLines)
+                {
+                    List<ProdOrderBatchPlan> lineItems = GetProdOrderBatchPlanList(selectedLine.MDSchedulingGroupID).ToList();
+                    selectedBatchPlans.AddRange(lineItems);
+                }
+            }
+            else if (ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Where(c => c.IsSelected).Any())
+            {
+                selectedBatchPlans = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+            }
+
+            List<PreparedMaterial> preparedMaterials = new List<PreparedMaterial>();
+            if (selectedBatchPlans.Any())
+            {
+                searchModel = GetSearchBatchMaterialModels(selectedBatchPlans);
+                preparedMaterials = BSOMaterialPreparationChild.Value.GetPreparedMaterials(searchModel);
+            }
+
+            return preparedMaterials;
+        }
+
+        private void DoSearchStockMaterialFinish(List<PreparedMaterial> preparedMaterials)
+        {
+            BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
+        }
+
+        private List<SearchBatchMaterialModel> GetSearchBatchMaterialModels(List<ProdOrderBatchPlan> batchPlans)
+        {
+            List<SearchBatchMaterialModel> searchResult = new List<SearchBatchMaterialModel>();
+            foreach (var batchPlan in batchPlans)
+            {
+                GetPositionsForBatchMaterialModel(searchResult, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
+            }
+            return searchResult;
+        }
+
+        private void GetPositionsForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
+        {
+            foreach (ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+            {
+                if (prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot)
+                {
+                    GetRelationForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation, posTargetQuantityUOM);
+                }
+                else
+                {
+                    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
+                    double subPosTargetQuantity = posTargetQuantityUOM * factor;
+                    GetPositionsForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
+                }
+            }
+        }
+
+        private double GetRelationForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
+        {
+            SearchBatchMaterialModel searchFacilityModel = new SearchBatchMaterialModel();
+            searchFacilityModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
+            searchFacilityModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
+            searchFacilityModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
+            searchFacilityModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
+            searchResult.Add(searchFacilityModel);
+
+            //if (posTargetQuantityUOM  > Double.Epsilon)
+            //{
+            //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
+            //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
+            //}
+            return searchFacilityModel.TargetQuantityUOM;
+        }
+
+        #endregion
 
         #endregion
 
