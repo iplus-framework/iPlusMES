@@ -24,6 +24,7 @@ namespace gip.mes.processapplication
             _PAPointMatIn1 = new PAPoint(this, "PAPointMatIn1");
             _PAPointMatIn2 = new PAPoint(this, "PAPointMatIn2");
             _PAPointMatIn3 = new PAPoint(this, "PAPointMatIn3");
+            _PAPointMatIn4 = new PAPoint(this, "PAPointMatIn4");
             _PAPointMatOut1 = new PAPoint(this, "PAPointMatOut1");
         }
 
@@ -69,6 +70,16 @@ namespace gip.mes.processapplication
             get
             {
                 return _PAPointMatIn3;
+            }
+        }
+
+        PAPoint _PAPointMatIn4;
+        [ACPropertyConnectionPoint(9999, "PointMaterial")]
+        public PAPoint PAPointMatIn4
+        {
+            get
+            {
+                return _PAPointMatIn4;
             }
         }
 
