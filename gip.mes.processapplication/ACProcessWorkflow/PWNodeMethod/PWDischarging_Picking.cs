@@ -341,7 +341,7 @@ namespace gip.mes.processapplication
                 {
                     // Error50074: Dischargingtask not startable Order {0}, Bill of material {1}, line {2}
                     msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(100)", 1210, "Error50074",
-                                picking.PickingNo, pickingPos.LineNumber, pickingPos.Material.MaterialName1);
+                                picking.PickingNo, pickingPos.LineNumber, pickingPos.Material != null ? pickingPos.Material.MaterialName1 : "");
 
                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
@@ -671,67 +671,81 @@ namespace gip.mes.processapplication
                 && ACFacilityManager != null && PickingManager != null
                 && !NoPostingOnRelocation)
             {
-                // 1. Bereite Buchung vor
-                FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, pickingPos.Material.ConvertBaseWeightToBaseUnit(actualWeight));
-                ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-                    bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-
-                OnInwardBookingPre(facilityPreBooking, collectedMessages, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd);
-
-                msg = dbApp.ACSaveChangesWithRetry();
-
-                // 2. Führe Buchung durch
-                if (msg != null)
+                if (pickingPos.Material == null)
                 {
-                    collectedMessages.AddDetailMessage(msg);
-                    Messages.LogError(this.GetACUrl(), "DoInwardBooking(5)", msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 100), true);
-                }
-                else if (facilityPreBooking != null)
-                {
-                    bookingParam.IgnoreIsEnabled = true;
-                    ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
-                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                    pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                    msg = dbApp.ACSaveChangesWithRetry();
+                    if (msg != null)
                     {
-                        OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1350), true);
+                        collectedMessages.AddDetailMessage(msg);
+                        Messages.LogError(this.GetACUrl(), "DoInwardBooking(0)", msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 100), true);
                     }
-                    else
+                }
+                else 
+                { 
+                    // 1. Bereite Buchung vor
+                    FacilityPreBooking facilityPreBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, pickingPos, pickingPos.Material.ConvertBaseWeightToBaseUnit(actualWeight));
+                    ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                    if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                        bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+
+                    OnInwardBookingPre(facilityPreBooking, collectedMessages, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd);
+
+                    msg = dbApp.ACSaveChangesWithRetry();
+
+                    // 2. Führe Buchung durch
+                    if (msg != null)
                     {
-                        if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
+                        collectedMessages.AddDetailMessage(msg);
+                        Messages.LogError(this.GetACUrl(), "DoInwardBooking(5)", msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 100), true);
+                    }
+                    else if (facilityPreBooking != null)
+                    {
+                        bookingParam.IgnoreIsEnabled = true;
+                        ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref bookingParam, dbApp);
+                        if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                         {
-                            Messages.LogError(this.GetACUrl(), "DoInwardBooking(6)", bookingParam.ValidMessage.InnerMessage);
-                            OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1340), true);
-                        }
-                        if (bookingParam.ValidMessage.IsSucceded())
-                        {
-                            facilityPreBooking.DeleteACObject(dbApp, true);
-                            ACFacilityManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false);
-                            //pickingPos.RecalcAfterPosting(dbApp, bookingParam.OutwardQuantity.Value, false);
-                            //pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
-                            //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
-                            //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
+                            OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1350), true);
                         }
                         else
                         {
-                            collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                        }
+                            if (!bookingParam.ValidMessage.IsSucceded() || bookingParam.ValidMessage.HasWarnings())
+                            {
+                                Messages.LogError(this.GetACUrl(), "DoInwardBooking(6)", bookingParam.ValidMessage.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1340), true);
+                            }
+                            if (bookingParam.ValidMessage.IsSucceded())
+                            {
+                                facilityPreBooking.DeleteACObject(dbApp, true);
+                                ACFacilityManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false);
+                                //pickingPos.RecalcAfterPosting(dbApp, bookingParam.OutwardQuantity.Value, false);
+                                //pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
+                                //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
+                                //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
+                            }
+                            else
+                            {
+                                collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                            }
 
-                        if (pickingPos.RemainingDosingQuantityUOM >= -1)
-                            pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                            if (pickingPos.RemainingDosingQuantityUOM >= -1)
+                                pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
 
-                        msg = dbApp.ACSaveChangesWithRetry();
-                        if (msg != null)
-                        {
-                            collectedMessages.AddDetailMessage(msg);
-                            Messages.LogError(this.GetACUrl(), "DoInwardBooking(8)", msg.InnerMessage);
-                            OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1360), true);
-                        }
-                        else
-                        {
-                            //pickingPos.RecalcActualQuantityFast();
-                            if (dbApp.IsChanged)
-                                dbApp.ACSaveChanges();
+                            msg = dbApp.ACSaveChangesWithRetry();
+                            if (msg != null)
+                            {
+                                collectedMessages.AddDetailMessage(msg);
+                                Messages.LogError(this.GetACUrl(), "DoInwardBooking(8)", msg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1360), true);
+                            }
+                            else
+                            {
+                                //pickingPos.RecalcActualQuantityFast();
+                                if (dbApp.IsChanged)
+                                    dbApp.ACSaveChanges();
+                            }
                         }
                     }
                 }
