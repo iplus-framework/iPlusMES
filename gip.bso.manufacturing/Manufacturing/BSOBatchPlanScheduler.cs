@@ -5243,6 +5243,9 @@ namespace gip.bso.manufacturing
 
     }
 
+    /// <summary>
+    /// State in Wizard
+    /// </summary>
     public enum NewScheduledBatchWizardPhaseEnum : short
     {
         SelectMaterial = 1,
