@@ -304,6 +304,11 @@ namespace gip.mes.processapplication
             return false;
         }
 
+        public override string ToString()
+        {
+            return ACCaption;
+        }
+
         #endregion
     }
 }
