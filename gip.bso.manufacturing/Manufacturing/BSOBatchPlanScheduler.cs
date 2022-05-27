@@ -898,7 +898,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-               if (SelectedScheduleForPWNode == null) return null;
+                if (SelectedScheduleForPWNode == null) return null;
                 var connections = PartslistMDSchedulerGroupConnections.Where(c => c.SchedulingGroups.Any(x => x.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID));
                 Guid[] mdSchedulerOtherGroups = connections.SelectMany(c => c.SchedulingGroups).Select(c => c.MDSchedulingGroupID).Where(c => c != SelectedScheduleForPWNode.MDSchedulingGroupID).Distinct().ToArray();
                 return
@@ -5245,7 +5245,11 @@ namespace gip.bso.manufacturing
         #region Test
         public void MyTestGit()
         {
-            bool testbool = false;        
+            bool testbool = false;
+        }
+
+        public void MyTestGit3()
+        { 
         }
 
         public void MyTestGit2()
