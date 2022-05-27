@@ -5241,6 +5241,7 @@ namespace gip.bso.manufacturing
 
     /// <summary>
     /// State in Wizard
+    /// git test
     /// </summary>
     public enum NewScheduledBatchWizardPhaseEnum : short
     {
