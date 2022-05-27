@@ -897,7 +897,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (SelectedScheduleForPWNode == null) return null;
+               if (SelectedScheduleForPWNode == null) return null;
                 var connections = PartslistMDSchedulerGroupConnections.Where(c => c.SchedulingGroups.Any(x => x.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID));
                 Guid[] mdSchedulerOtherGroups = connections.SelectMany(c => c.SchedulingGroups).Select(c => c.MDSchedulingGroupID).Where(c => c != SelectedScheduleForPWNode.MDSchedulingGroupID).Distinct().ToArray();
                 return
@@ -5107,10 +5107,10 @@ namespace gip.bso.manufacturing
         {
             List<SearchBatchMaterialModel> searchModel = new List<SearchBatchMaterialModel>();
             List<ProdOrderBatchPlan> selectedBatchPlans = new List<ProdOrderBatchPlan>();
-            if (TargetScheduleForPWNodeList != null
-                && TargetScheduleForPWNodeList.Where(c => c.IsSelected).Any())
+            if (ScheduleForPWNodeList != null
+                && ScheduleForPWNodeList.Where(c => c.IsSelected).Any())
             {
-                PAScheduleForPWNode[] selectedLines = TargetScheduleForPWNodeList.Where(c => c.IsSelected).ToArray();
+                PAScheduleForPWNode[] selectedLines = ScheduleForPWNodeList.Where(c => c.IsSelected).ToArray();
                 foreach (PAScheduleForPWNode selectedLine in selectedLines)
                 {
                     List<ProdOrderBatchPlan> lineItems = GetProdOrderBatchPlanList(selectedLine.MDSchedulingGroupID).ToList();
