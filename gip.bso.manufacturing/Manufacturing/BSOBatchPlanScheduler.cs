@@ -5243,18 +5243,16 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Test
-        public void MyTestGit3()
-        { 
-        }
-
         public void MyTestGit2()
         {
-
         }
 
         public void MyTestGit4()
         {
+        }
 
+        public void MyTestGit5()
+        {
         }
 
         public void MyTestGit6()
