@@ -5109,8 +5109,8 @@ namespace gip.bso.manufacturing
         {
             List<SearchBatchMaterialModel> searchModel = new List<SearchBatchMaterialModel>();
             List<ProdOrderBatchPlan> selectedBatchPlans = new List<ProdOrderBatchPlan>();
-            if (TargetScheduleForPWNodeList != null
-                && TargetScheduleForPWNodeList.Where(c => c.IsSelected).Any())
+            if (ScheduleForPWNodeList != null
+                && ScheduleForPWNodeList.Where(c => c.IsSelected).Any())
             {
                 PAScheduleForPWNode[] selectedLines = ScheduleForPWNodeList.Where(c => c.IsSelected).ToArray();
                 foreach (PAScheduleForPWNode selectedLine in selectedLines)
