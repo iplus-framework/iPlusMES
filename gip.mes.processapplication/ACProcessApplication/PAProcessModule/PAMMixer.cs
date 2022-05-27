@@ -21,11 +21,11 @@ namespace gip.mes.processapplication
         public PAMMixer(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _PAPointMatIn1 = new PAPoint(this, "PAPointMatIn1");
-            _PAPointMatIn2 = new PAPoint(this, "PAPointMatIn2");
-            _PAPointMatIn3 = new PAPoint(this, "PAPointMatIn3");
-            _PAPointMatIn4 = new PAPoint(this, "PAPointMatIn4");
-            _PAPointMatOut1 = new PAPoint(this, "PAPointMatOut1");
+            _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
+            _PAPointMatIn2 = new PAPoint(this, nameof(PAPointMatIn2));
+            _PAPointMatIn3 = new PAPoint(this, nameof(PAPointMatIn3));
+            _PAPointMatIn4 = new PAPoint(this, nameof(PAPointMatIn4));
+            _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)

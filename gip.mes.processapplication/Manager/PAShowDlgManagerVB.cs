@@ -68,7 +68,7 @@ namespace gip.mes.processapplication
                     {
                         //Error50170: Workflownode {0} is null.
                         Msg msg = new Msg(this, eMsgLevel.Error, ClassNameVB, "BuildAndSetOrderInfo(1)", 1010, "Error50170", "acUrl");
-
+                        msg.RedirectToOtherSource(pm);
                         pm.OrderInfo.ValueT = msg.Message;
                         if (pm.IsAlarmActive(pm.OrderInfo, msg.Message) == null)
                             Messages.LogError(pm.GetACUrl(), "BuildAndSetOrderInfo(1)", msg.Message);
@@ -83,7 +83,7 @@ namespace gip.mes.processapplication
                     {
                         //Error50171: Order of {0} not found.
                         Msg msg = new Msg(this, eMsgLevel.Error, ClassNameVB, "BuildAndSetOrderInfo(1)", 1020, "Error50171", pwNode.GetACUrl());
-
+                        msg.RedirectToOtherSource(pm);
                         pm.OrderInfo.ValueT = msg.Message;
                         if (pm.IsAlarmActive(pm.OrderInfo, msg.Message) == null)
                             Messages.LogError(pm.GetACUrl(), "BuildAndSetOrderInfo(1)", msg.Message);

@@ -1362,7 +1362,7 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)ProdOrder -> Filter
 
         /// <summary>
-        /// Source Property: 
+        /// Select all
         /// </summary>
         private bool _FilterOrderSelectAll;
         [ACPropertyInfo(999, "FilterOrderSelectAll", "en{'Select all'}de{'Alles auswählen'}")]
@@ -1389,7 +1389,7 @@ namespace gip.bso.manufacturing
 
         private DateTime? _FilterOrderStartTime;
         /// <summary>
-        /// Selected property for 
+        /// filter from date
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "FilterOrderStartTime", "en{'From'}de{'Von'}")]
@@ -1412,7 +1412,7 @@ namespace gip.bso.manufacturing
 
         private DateTime? _FilterOrderEndTime;
         /// <summary>
-        /// Selected property for 
+        /// Filter to date
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "FilterOrderEndTime", "en{'To'}de{'Bis'}")]
@@ -1435,7 +1435,7 @@ namespace gip.bso.manufacturing
 
         private bool? _FilterOrderIsCompleted = false;
         /// <summary>
-        /// Selected property for 
+        /// Filter for finshed orders
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "FilterOrderIsCompleted", "en{'Completed'}de{'Erledigt'}")]
@@ -1459,7 +1459,7 @@ namespace gip.bso.manufacturing
 
         private string _FilterDepartmentUserName;
         /// <summary>
-        /// Selected property for 
+        /// Filter departement
         /// </summary>
         /// <value>The selected </value>
         [ACPropertyInfo(999, "FilterDepartmentUserName", "en{'Department'}de{'Abteilung'}")]
@@ -1480,7 +1480,7 @@ namespace gip.bso.manufacturing
         }
 
         /// <summary>
-        /// Source Property: 
+        /// Filter Order numer
         /// </summary>
         private string _FilterOrderProgramNo;
         [ACPropertyInfo(999, "FilterOrderProgramNo", ConstApp.ProdOrderProgramNo)]
@@ -1500,7 +1500,8 @@ namespace gip.bso.manufacturing
             }
         }
 
-        /// Source Property: 
+        /// <summary>
+        /// Filter Material number
         /// </summary>
         private string _FilterOrderMaterialNo;
         [ACPropertyInfo(999, "FilterOrderMaterialNo", ConstApp.Material)]
@@ -1520,9 +1521,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
-
-        // FilterProdPartslistOrder
 
         #region Properties -> (Tab)ProdOrder -> Filter -> FilterProdPartslistOrder
 
