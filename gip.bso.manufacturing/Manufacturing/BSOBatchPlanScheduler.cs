@@ -5241,14 +5241,11 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        /// <summary>
-        /// Test method for test git merge
-        /// </summary>
-        public void Test_Merge()
+        #region Test
+        public void MyTestGit()
         {
-
         }
-
+        #endregion
     }
 
 
