@@ -62,8 +62,8 @@ namespace gip.mes.processapplication
         public PAMSilo(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _PAPointMatIn1 = new PAPoint(this, Const.PAPointMatIn1);
-            _PAPointMatOut1 = new PAPoint(this, Const.PAPointMatOut1);
+            _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
+            _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
             _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, "InvertMatSensorValue", true);
             _Dimensions = new ACPropertyConfigValue<string>(this, nameof(Dimensions), "");
         }

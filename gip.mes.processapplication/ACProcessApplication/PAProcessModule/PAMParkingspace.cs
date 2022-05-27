@@ -26,8 +26,8 @@ namespace gip.mes.processapplication
         public PAMParkingspace(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _PAPointMatIn1 = new PAPoint(this, Const.PAPointMatIn1);
-            _PAPointMatOut1 = new PAPoint(this, Const.PAPointMatOut1);
+            _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
+            _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)

@@ -24,8 +24,8 @@ namespace gip.mes.processapplication
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
 
-            _PAPointMatIn1 = new PAPoint(this, "PAPointMatIn1");
-            _PAPointMatOut1 = new PAPoint(this, "PAPointMatOut1");
+            _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
+            _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
 
             #region Damir Test
             /*
