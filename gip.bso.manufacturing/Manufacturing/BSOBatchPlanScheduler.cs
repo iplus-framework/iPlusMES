@@ -5249,6 +5249,7 @@ namespace gip.bso.manufacturing
         #endregion
     }
 
+
     /// <summary>
     /// State in Wizard
     /// </summary>
