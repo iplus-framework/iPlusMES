@@ -5187,6 +5187,10 @@ namespace gip.bso.manufacturing
 
         #region Transformation - WFsLines
 
+        /// <summary>
+        /// InitialBuildLines
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         [ACMethodInfo("InitialBuildLines", "en{'Initial build lines'}de{'Vorbereite Linien'}", 507)]
         public void InitialBuildLines()
         {
