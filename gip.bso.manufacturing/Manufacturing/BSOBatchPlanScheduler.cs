@@ -31,6 +31,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMehtod_DoSearchStockMaterial = @"DoSearchStockMaterial";
         public const int Const_MaxFilterDaySpan = 10;
         public const int Const_MaxResultSize = 500;
+        public const string test = "test";
         #endregion
 
         #region Configuration
@@ -5249,6 +5250,11 @@ namespace gip.bso.manufacturing
 
         public void MyTestGit3()
         { 
+        }
+
+        public void MyTestGit2()
+        {
+
         }
         #endregion
     }
