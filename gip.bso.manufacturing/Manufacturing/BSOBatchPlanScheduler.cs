@@ -5241,6 +5241,11 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Test
+        public void MyTestGit()
+        {
+        }
+        #endregion
     }
 
     /// <summary>
