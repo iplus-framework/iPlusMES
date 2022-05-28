@@ -4844,7 +4844,9 @@ namespace gip.bso.manufacturing
             AssignedUserRules = _TempRules.OrderBy(c => c.RuleParamCaption);
 
             if (AvailableSchedulingGroupsList == null)
-                AvailableSchedulingGroupsList = DatabaseApp.MDSchedulingGroup.ToArray().OrderBy(c => c.ACCaption).ToList();
+                AvailableSchedulingGroupsList =
+                    DatabaseApp
+                    .MDSchedulingGroup.ToArray().OrderBy(c => c.ACCaption).ToList();
 
             ShowDialog(this, "ConfigurationDialog");
         }
@@ -4965,6 +4967,8 @@ namespace gip.bso.manufacturing
                         }
                     }
 
+                    if (result != null)
+                        result = result.OrderBy(c => c.VBUserName).ToList();
                     return result;
                 }
             }

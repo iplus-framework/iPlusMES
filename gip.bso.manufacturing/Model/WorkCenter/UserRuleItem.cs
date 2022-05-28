@@ -8,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [DataContract]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'UserRuleItem'}de{'UserRuleItem'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     public class UserRuleItem : EntityBase
     {
         [DataMember]
@@ -18,11 +22,24 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [IgnoreDataMember]
+        private string _VBUserName;
+        //[IgnoreDataMember]
+        [ACPropertyInfo(100, "VBUserName", "en{'Name'}de{'Name'}")]
         public string VBUserName
         {
-            get;
-            set;
+            get
+            {
+                return _VBUserName;
+            }
+            set
+            {
+                if (_VBUserName != value)
+
+                {
+                    _VBUserName = value;
+                    OnPropertyChanged(nameof(VBUserName));
+                }
+            }
         }
 
         [DataMember]
@@ -32,11 +49,23 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [IgnoreDataMember]
+        private string _RuleParamCaption;
+        //[IgnoreDataMember]
+        [ACPropertyInfo(101, "RuleParamCaption", "en{'Param'}de{'Param'}")]
         public string RuleParamCaption
         {
-            get;
-            set;
+            get
+            {
+                return _RuleParamCaption;
+            }
+            set
+            {
+                if (_RuleParamCaption != value)
+                {
+                    _RuleParamCaption = value;
+                    OnPropertyChanged(nameof(RuleParamCaption));
+                }
+            }
         }
 
         public override string ToString()
