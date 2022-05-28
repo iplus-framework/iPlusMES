@@ -55,11 +55,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
     <Compile Include="Model\TimeFilterTypeEnum.cs" />
     <Compile Include="Model\BatchPlanProdOrderSortFilterEnum.cs" />
     <Compile Include="Manufacturing\BSOLabOrderMES.cs" />
     <Compile Include="Manufacturing\BSOBatchPlan.cs" />
-    <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
     <Compile Include="Manufacturing\BSOProdOrderBatchComponents.cs" />
     <Compile Include="Manufacturing\BSOProdOrderOpenPositions.cs" />
     <Compile Include="Manufacturing\BSOProdOrderOverview.cs" />
@@ -412,10 +412,10 @@
     <None Include="VBControlScripts\2022-05-25 07-56_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2022-05-28 13-05_aagincic.zip">
+    <None Include="VBControlScripts\2022-05-28 13-28_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2022-05-28 13-06_aagincic.zip">
+    <None Include="VBControlScripts\2022-05-28 13-29_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

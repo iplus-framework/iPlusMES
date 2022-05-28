@@ -343,9 +343,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private ACValueItem _SelectedAssignedProcessModule;
+        private WorkCenterRule _SelectedAssignedProcessModule;
         [ACPropertySelected(606, "ProcessModuleRules", "en{'Assigned process module'}de{'Assigned process module'}")]
-        public ACValueItem SelectedAssignedProcessModule
+        public WorkCenterRule SelectedAssignedProcessModule
         {
             get => _SelectedAssignedProcessModule;
             set
@@ -357,9 +357,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private IEnumerable<ACValueItem> _AssignedProcessModulesList;
+        private IEnumerable<WorkCenterRule> _AssignedProcessModulesList;
         [ACPropertyList(607, "ProcessModuleRules")]
-        public IEnumerable<ACValueItem> AssignedProcessModulesList
+        public IEnumerable<WorkCenterRule> AssignedProcessModulesList
         {
             get => _AssignedProcessModulesList;
             set
@@ -772,7 +772,7 @@ namespace gip.bso.manufacturing
         {
             if (_TempRules == null)
                 _TempRules = GetStoredRules();
-            AssignedProcessModulesList = new List<ACValueItem>(_TempRules.Select(x => new ACValueItem(x.VBUserName + " => " + x.ProcessModuleACUrl, x, null)).OrderBy(c => c.ACCaption));
+            AssignedProcessModulesList = _TempRules;
 
             var availablePAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray();
             AvailableProcessModulesList = availablePAFs.Select(c => c.ACClass1_ParentACClass).Distinct().Select(x => new ACValueItem(x.ACUrlComponent, x.ACUrlComponent, null)).OrderBy(c => c.ACCaption).ToList();
@@ -790,7 +790,7 @@ namespace gip.bso.manufacturing
         {
             //Tuple<string, string> ruleValue = SelectedAvailableProcessModule.Value as Tuple<string, string>;
 
-            WorkCenterRule existingRule = AssignedProcessModulesList.Select(x => x.Value as WorkCenterRule).FirstOrDefault(c => c.VBUserName == SelectedVBUser.VBUserName
+            WorkCenterRule existingRule = AssignedProcessModulesList.FirstOrDefault(c => c.VBUserName == SelectedVBUser.VBUserName
                                                                                                             && c.ProcessModuleACUrl == SelectedAvailableProcessModule.Value as string);
             if (existingRule != null)
             {
@@ -812,7 +812,7 @@ namespace gip.bso.manufacturing
             _TempRules.Add(rule);
 
             var tempRules = AssignedProcessModulesList.ToList();
-            tempRules.Add(new ACValueItem(string.Format("{0} => {1}", rule.VBUserName, rule.ProcessModuleACUrl), rule, null));
+            tempRules.AddRange(tempRules);
             AssignedProcessModulesList = tempRules.ToList();
         }
 
@@ -824,7 +824,7 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603, true)]
         public void RemoveRule()
         {
-            WorkCenterRule rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule.Value);
+            WorkCenterRule rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule);
             if (rule != null)
             {
                 _TempRules.Remove(rule);
