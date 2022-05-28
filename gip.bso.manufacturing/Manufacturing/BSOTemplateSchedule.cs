@@ -382,7 +382,13 @@ namespace gip.bso.manufacturing
 
             if (prodOrderPartslistsChanged.Any())
             {
-                UpdateChangedPartslist(prodOrderPartslistsChanged);
+                bool isUpdate = UpdateChangedPartslist(prodOrderPartslistsChanged);
+                if(isUpdate)
+                {
+                    foreach(ProdOrderPartslist pl in prodOrderPartslistsChanged)
+                        pl.LastFormulaChange = DateTime.Now;
+                    ACSaveChanges();
+                }
             }
 
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_GeneratePlan);
@@ -495,17 +501,20 @@ namespace gip.bso.manufacturing
                 .Any();
         }
 
-        public void UpdateChangedPartslist(List<ProdOrderPartslist> prodOrderPartslistsChanged)
+        public bool UpdateChangedPartslist(List<ProdOrderPartslist> prodOrderPartslistsChanged)
         {
+            bool isUpdate = false;
             string changedPlartslistNo = string.Join(",", prodOrderPartslistsChanged.Select(c => c.Partslist.PartslistNo).Distinct().OrderBy(c => c));
             MsgResult msgResult = Root.Messages.Question(this, "Question50066", MsgResult.Yes, false, changedPlartslistNo);
             if (msgResult == MsgResult.Yes)
             {
+                isUpdate = true;
                 foreach (ProdOrderPartslist prodOrderPartslistChanged in prodOrderPartslistsChanged)
                 {
                     ProdOrderManager.PartslistRebuild(DatabaseApp, prodOrderPartslistChanged.Partslist, prodOrderPartslistChanged);
                 }
             }
+            return isUpdate;
         }
 
         #endregion
