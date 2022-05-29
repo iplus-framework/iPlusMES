@@ -1482,7 +1482,10 @@ namespace gip.bso.manufacturing
         private void InitFunctionMonitor()
         {
             if (_AccessedProcessModulesProp != null)
+            {
+                Messages.LogError(this.GetACUrl(), nameof(InitFunctionMonitor) + "(5)", "The _AccessedProcessModulesProp is not null!");
                 return;
+            }
 
             IACComponentPWNode pwGroup = null;
             using (ACMonitor.Lock(_70050_MembersLock))
@@ -1493,14 +1496,14 @@ namespace gip.bso.manufacturing
             var rootPW = pwGroup?.ParentRootWFNode;
             if (rootPW == null)
             {
-                //error
+                Messages.LogError(this.GetACUrl(), nameof(InitFunctionMonitor) + "(10)", "The rootPW is null!");
                 return;
             }
 
             _AccessedProcessModulesProp = rootPW.GetPropertyNet(nameof(PWProcessFunction.AccessedProcessModules)) as IACContainerTNet<List<ACChildInstanceInfo>>;
             if (_AccessedProcessModulesProp == null)
             {
-                //TODO:error
+                Messages.LogError(this.GetACUrl(), nameof(InitFunctionMonitor) + "(20)", "The _AccessedProcessModulesProp is null!");
                 return;
             }
 

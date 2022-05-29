@@ -73,6 +73,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("CompSequenceNo", typeof(int), (int)0, Global.ParamOption.Optional));
             paramTranslation.Add("CompSequenceNo", "en{'Sequence-No. for adding rework into BOM'}de{'Folgenummer beim Hinzufügen Rework in die Rezeptur'}");
 
+            method.ParameterValueList.Add(new ACValue("RuleForSelMulLots", typeof(LotSelectionRuleEnum), LotSelectionRuleEnum.None, Global.ParamOption.Optional));
+            paramTranslation.Add("RuleForSelMulLots", "en{'Rule for lot selection when multiple lots available'}de{'Rule for lot selection when multiple lots available'}");
+
             method.ParameterValueList.Add(new ACValue("AutoInterDis", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoInterDis", "en{'Auto inter discharging'}de{'Automatische Zwischenentleerung'}");
 

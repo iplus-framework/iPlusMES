@@ -1296,10 +1296,25 @@ namespace gip.mes.webservices
         protected virtual MsgWithDetails Book(ACMethodBooking bpParam, DatabaseApp dbApp, FacilityManager facManager, PAJsonServiceHostVB myServiceHost)
         {
             if (bpParam == null)
-                return new MsgWithDetails("Booking parameter is null", null, eMsgLevel.Error, "VBWebService", "Book", 1060);
+            {
+                var error = new MsgWithDetails();
+                error.AddDetailMessage(new Msg(eMsgLevel.Error, "Error: Booking parameter is null"));
+                return error;
+            }
 
             if (String.IsNullOrEmpty(bpParam.VirtualMethodName))
-                return new MsgWithDetails("VirtualMethodName is empty", null, eMsgLevel.Error, "VBWebService", "Book", 1063);
+            {
+                var error = new MsgWithDetails();
+                error.AddDetailMessage(new Msg(eMsgLevel.Error, "Error: VirtualMethodName is empty"));
+                return error;
+            }
+
+            if (bpParam.InwardQuantity > 10000000 || bpParam.OutwardQuantity > 10000000 || bpParam.InwardQuantity < -10000000 || bpParam.OutwardQuantity < - 10000000)
+            {
+                var error = new MsgWithDetails();
+                error.AddDetailMessage(new Msg(eMsgLevel.Error, "Error: Booking quantity is not valid!!!"));
+                return error;
+            }
 
             MsgWithDetails msgWithDetails = null;
             try
