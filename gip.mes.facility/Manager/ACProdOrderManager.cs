@@ -1814,11 +1814,11 @@ namespace gip.mes.facility
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (filterStartTime == null
                                                  || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
-                                                 || (c.UpdateDate >= filterStartTime)
+                                                 || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
                                                 )
                                             && (filterEndTime == null
                                                  || (c.ScheduledEndDate != null && c.ScheduledEndDate < filterEndTime)
-                                                 || (c.UpdateDate <= filterEndTime)
+                                                 || (c.ScheduledStartDate == null && c.UpdateDate <= filterEndTime)
                                                 )
                                              && (
                                                     (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
