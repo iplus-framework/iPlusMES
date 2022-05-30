@@ -65,6 +65,7 @@ namespace gip.mes.processapplication
             _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
             _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
             _InvertMatSensorValue = new ACPropertyConfigValue<bool>(this, "InvertMatSensorValue", true);
+            _LeaveMaterialOccupation = new ACPropertyConfigValue<bool>(this, "LeaveMaterialOccupation", false);
             _Dimensions = new ACPropertyConfigValue<string>(this, nameof(Dimensions), "");
         }
 
@@ -88,6 +89,7 @@ namespace gip.mes.processapplication
 
             _ = InvertMatSensorValue;
             _ = Dimensions;
+            _ = LeaveMaterialOccupation;
             return true;
         }
 
@@ -232,6 +234,21 @@ namespace gip.mes.processapplication
                 _InvertMatSensorValue.ValueT = value;
             }
         }
+
+        private ACPropertyConfigValue<bool> _LeaveMaterialOccupation;
+        [ACPropertyConfig("en{'Leave Material Occupation on zero posting'}de{'Materialbelegung belassen bei Leerbuchung'}")]
+        public bool LeaveMaterialOccupation
+        {
+            get
+            {
+                return _LeaveMaterialOccupation.ValueT;
+            }
+            set
+            {
+                _LeaveMaterialOccupation.ValueT = value;
+            }
+        }
+
 
         public const string C_DimLength_1 = "L1";
         public const string C_DimWidth_1 = "W1";

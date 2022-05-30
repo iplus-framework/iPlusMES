@@ -1367,13 +1367,14 @@ namespace gip.mes.processapplication
                                 }
                                 if (!hasQuants || zeroBookSucceeded)
                                 {
+                                    PAMSilo sourceSilo = null;
                                     bool disChargingActive = false;
                                     if (outwardFacility.FacilityACClass != null)
                                     {
                                         string url = outwardFacility.FacilityACClass.GetACUrlComponent();
                                         if (!String.IsNullOrEmpty(url))
                                         {
-                                            PAMSilo sourceSilo = ACUrlCommand(url) as PAMSilo;
+                                            sourceSilo = ACUrlCommand(url) as PAMSilo;
                                             if (sourceSilo != null)
                                             {
                                                 IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
@@ -1381,7 +1382,8 @@ namespace gip.mes.processapplication
                                             }
                                         }
                                     }
-                                    if (!disChargingActive)
+                                    if (  !disChargingActive 
+                                        && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
                                     {
                                         outwardFacility.Material = null; // Automatisches Löschen der Belegung?
                                         outwardFacility.Partslist = null;
