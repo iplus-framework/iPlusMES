@@ -1181,15 +1181,15 @@ namespace gip.bso.manufacturing
                     if (SelectedProdOrderBatchPlan.PlanState <= GlobalApp.BatchPlanState.Created
                         || SelectedProdOrderBatchPlan.PlanState >= GlobalApp.BatchPlanState.Paused)
                         SetReadyToStart(new ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
+                    else
+                        Save();
                 }
                 else if (SelectedProdOrderBatchPlan.PartialTargetCount.HasValue && SelectedProdOrderBatchPlan.PartialTargetCount <= 0)
                 {
                     SelectedProdOrderBatchPlan.PartialTargetCount = null;
                     if (SelectedProdOrderBatchPlan.PlanState == GlobalApp.BatchPlanState.ReadyToStart)
-                    {
                         SelectedProdOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.Paused;
-                        Save();
-                    }
+                    Save();
                 }
             }
         }
@@ -3912,7 +3912,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInfo("ChangeBatchPlan", "en{'Change'}de{'Bearbeiten'}", 600)]
+        [ACMethodInfo("ChangeBatchPlan", "en{'Change'}de{'Bearbeiten'}", 600, true)]
         public void ChangeBatchPlan(ProdOrderBatchPlan batchPlan)
         {
             if (batchPlan == null)
