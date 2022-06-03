@@ -318,6 +318,32 @@ namespace gip.mes.processapplication
                 return _StopOnSourceChange.ValueT;
             }
         }
+
+        protected ACPropertyConfigValue<short> _AutoAbortActionOnBlockedSilo;
+        [ACPropertyConfig("en{'Automatic abort action on blocked source'}de{'Automatische Abbruchsaktion bei gesperrter Quelle'}")]
+        public short AutoAbortActionOnBlockedSilo
+        {
+            get
+            {
+                return _AutoAbortActionOnBlockedSilo.ValueT;
+            }
+        }
+
+        public PADosingAbortReason AutoAbortActionEnumOnBlockedSilo
+        {
+            get
+            {
+                try
+                {
+                    PADosingAbortReason reason = (PADosingAbortReason) AutoAbortActionOnBlockedSilo;
+                    return reason;
+                }
+                catch
+                {
+                    return PADosingAbortReason.NotSet;
+                }
+            }
+        }
         #endregion
 
         #region Constructors 
@@ -333,6 +359,7 @@ namespace gip.mes.processapplication
         {
             _FuncScaleConfig = new ACPropertyConfigValue<string>(this, PAScaleMappingHelper<IACComponent>.FuncScaleConfigName, "");
             _StopOnSourceChange = new ACPropertyConfigValue<bool>(this, "StopOnSourceChange", false);
+            _AutoAbortActionOnBlockedSilo = new ACPropertyConfigValue<short>(this, "AutoAbortActionOnBlockedSilo", 0);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -343,7 +370,8 @@ namespace gip.mes.processapplication
             StateLackOfMaterial.PropertyChanged += StateLackOfMaterial_PropertyChanged;
             StateDosingTime.PropertyChanged += StateDosingTime_PropertyChanged;
             _ = FuncScaleConfig;
-            _ = _StopOnSourceChange.ValueT;
+            _ = StopOnSourceChange;
+            _ = AutoAbortActionOnBlockedSilo;
             return true;
         }
 
@@ -478,6 +506,11 @@ namespace gip.mes.processapplication
         {
             if (!IsEnabledSetAbortReasonEmpty())
                 return;
+            SetAbortReasonEmptyForced();
+        }
+
+        public virtual void SetAbortReasonEmptyForced()
+        {
             DosingAbortReason.ValueT = PADosingAbortReason.EmptySourceNextSource;
             OnSourceChangeStoppOrAbort();
             AcknowledgeAlarms();
@@ -924,7 +957,31 @@ namespace gip.mes.processapplication
         public virtual void OnSiloStateChanged(PAMSilo silo, bool outwardEnabled)
         {
             if (IsDosingActiveFromSilo(silo))
+            {
                 this.ACStateConverter.OnProjSpecFunctionEvent(this, "OnSiloStateChanged", silo, outwardEnabled);
+                if (!outwardEnabled)
+                {
+                    PADosingAbortReason action = AutoAbortActionEnumOnBlockedSilo;
+                    if (action == PADosingAbortReason.CompCancelled)
+                        Abort();
+                    else if (action == PADosingAbortReason.EmptySourceEndBatchplan)
+                        EndDosEndOrderForced();
+                    else if (action == PADosingAbortReason.EmptySourceNextSource)
+                        SetAbortReasonEmptyForced();
+                    else if (action == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait)
+                        EndDosAdjustRestWaitForced();
+                    else if (action == PADosingAbortReason.MachineMalfunction)
+                        SetAbortReasonMalfunctionForced();
+                    else if (action == PADosingAbortReason.EndDosingThenDisThenNextComp)
+                        EndDosDisNextCompForced();
+                    else if (action == PADosingAbortReason.EndTolErrorDosingThenDisThenNextComp)
+                        EndDosDisNextCompOnTolForced();
+                    else if (action == PADosingAbortReason.EndDosingThenDisThenEnd)
+                        EndDosDisEndForced();
+                    else if (action == PADosingAbortReason.EndTolErrorDosingThenDisThenEnd)
+                        EndDosDisEndOnTolForced();
+                }
+            }
         }
 
         public bool IsTransportActive

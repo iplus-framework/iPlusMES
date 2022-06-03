@@ -855,7 +855,7 @@ namespace gip.mes.processapplication
         protected bool WillReadAndStartNextBatchCompleteNode()
         {
             if (IsTransport)
-                return WillReadAndStartNextBatchCompleteNode_Picking();
+                return WillReadAndStartNextBatchCompleteNode_Picking(10);
             else if (IsProduction)
                 return WillReadAndStartNextBatchCompleteNode_Prod();
             return false;
