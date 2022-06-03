@@ -4393,9 +4393,21 @@ namespace gip.bso.manufacturing
             ConnectSourceProdOrderPartslist();
             ACSaveChanges();
 
+            Guid? selectedProdOrderBatchPlanID = null;
+            if (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null)
+                selectedProdOrderBatchPlanID =
+                    SelectedWizardSchedulerPartslist
+                    .ProdOrderPartslistPos
+                    .ProdOrderBatchPlan_ProdOrderPartslistPos
+                    .Select(c => c.ProdOrderBatchPlanID)
+                    .DefaultIfEmpty()
+                    .FirstOrDefault();
+            if (selectedProdOrderBatchPlanID == null && SelectedProdOrderBatchPlan != null)
+                selectedProdOrderBatchPlanID = SelectedProdOrderBatchPlan.ProdOrderBatchPlanID;
+
             WizardClean();
             OnPropertyChanged(nameof(CurrentLayout));
-            LoadProdOrderBatchPlanList();
+            LoadProdOrderBatchPlanList(selectedProdOrderBatchPlanID);
             OnPropertyChanged(nameof(SelectedProdOrderBatchPlan));
         }
 
@@ -4616,11 +4628,15 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Private (Helper) Mehtods -> Load
 
-        private void LoadProdOrderBatchPlanList()
+        private void LoadProdOrderBatchPlanList(Guid? selectedProdOrderBatchPlanID = null)
         {
             try
             {
                 ProdOrderBatchPlanList = GetProdOrderBatchPlanList(SelectedScheduleForPWNode?.MDSchedulingGroupID);
+                if (selectedProdOrderBatchPlanID != null)
+                    SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault(c => c.ProdOrderBatchPlanID == selectedProdOrderBatchPlanID);
+                else
+                    SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault();
                 ProdOrderPartslistList = GetProdOrderPartslistList();
             }
             catch (Exception e)
