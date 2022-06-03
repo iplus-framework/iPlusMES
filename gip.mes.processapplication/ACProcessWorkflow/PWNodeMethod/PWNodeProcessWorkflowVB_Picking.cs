@@ -81,7 +81,7 @@ namespace gip.mes.processapplication
             if (!canBeStarted)
                 return StartNextBatchResult.WaitForNextEvent;
 
-            if (WillReadAndStartNextBatchCompleteNode_Picking())
+            if (WillReadAndStartNextBatchCompleteNode_Picking(20))
                 return StartNextBatchResult.Done;
 
             string message = "";
@@ -155,19 +155,21 @@ namespace gip.mes.processapplication
                     return StartNextBatchResult.Done;
                 }
 
-                if (WillReadAndStartNextBatchCompleteNode_Picking())
+                if (WillReadAndStartNextBatchCompleteNode_Picking(30))
                     return StartNextBatchResult.Done;
             }
             return StartNextBatchResult.StartNextBatch;
         }
 
-        protected bool WillReadAndStartNextBatchCompleteNode_Picking()
+        protected virtual bool WillReadAndStartNextBatchCompleteNode_Picking(short invokeID)
         {
             PWMethodSingleDosing singleDosing = ParentPWMethod<PWMethodSingleDosing>();
             Guid? selectedSingleDosingACClassWFID = singleDosing?.SelectedSingleDosingACClassWFID;
             if (singleDosing != null && selectedSingleDosingACClassWFID.HasValue && ContentACClassWF != null)
             {
                 if (ContentACClassWF.ACClassWFID != selectedSingleDosingACClassWFID.Value)
+                    return true;
+                if (invokeID >= 20 && BatchSizeLoss && CurrentACState >= ACStateEnum.SMRunning && this.IterationCount.ValueT > 0)
                     return true;
             }
             return false;
