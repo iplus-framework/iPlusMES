@@ -1688,6 +1688,40 @@ namespace gip.bso.facility
         }
         #endregion
 
+        #region ShowOrder
+
+        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 901, true, nameof(SelectedFacilityCharge))]
+        public void ShowOrder()
+        {
+            if (!IsEnabledShowOrder())
+                return;
+
+            ProdOrderPartslist poPL = DatabaseApp.ProdOrderPartslist.Include(c => c.ProdOrder)
+                                                                    .Include(c => c.Partslist)
+                                                                    .FirstOrDefault(c => c.Partslist.MaterialID == SelectedFacilityCharge.MaterialID
+                                                                                      && c.ProdOrder.ProgramNo == SelectedFacilityCharge.ProdOrderProgramNo);
+
+            if (poPL == null)
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslist), poPL.ProdOrderPartslistID));
+                service.ShowDialogOrder(this, info);
+            }
+            
+        }
+
+        public bool IsEnabledShowOrder()
+        {
+            if (SelectedFacilityCharge != null && !string.IsNullOrEmpty(SelectedFacilityCharge.ProdOrderProgramNo))
+                return true;
+            return false;
+        }
+
+        #endregion
 
         #endregion
 
