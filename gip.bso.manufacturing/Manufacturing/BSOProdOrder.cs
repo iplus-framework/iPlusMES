@@ -67,6 +67,7 @@ namespace gip.bso.manufacturing
 
             AccessFilterPlanningMR.NavSearch();
             SelectedFilterPlanningMR = null;
+            SelectedPOPosTimeFilterMode = POPosTimeFilterModeList?.FirstOrDefault();
             Search();
             return true;
         }
@@ -429,6 +430,67 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties => FilterProdOrderPosStartDate
+
+        private ACValueItem _SelectedPOPosTimeFilterMode;
+        [ACPropertySelected(9999, "POPosTimeFilterMode", "en{'Time filter mode'}de{'Time filter mode'}")]
+        public ACValueItem SelectedPOPosTimeFilterMode
+        {
+            get => _SelectedPOPosTimeFilterMode;
+            set
+            {
+                _SelectedPOPosTimeFilterMode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ACValueItemList _POPosTimeFilterModeList;
+        [ACPropertyList(9999, "POPosTimeFilterMode", "")]
+        public ACValueItemList POPosTimeFilterModeList
+        {
+            get
+            {
+                if (_POPosTimeFilterModeList == null)
+                {
+                    using (Database db = new core.datamodel.Database())
+                    {
+                        gip.core.datamodel.ACClass enumClass = db.GetACType(typeof(POPosTimeFilterTypeEnum));
+                        if (enumClass != null && enumClass.ACValueListForEnum != null)
+                            _POPosTimeFilterModeList = enumClass.ACValueListForEnum;
+                        else
+                            _POPosTimeFilterModeList = new ACValueListPOPosTimeFilterTypeEnum();
+                    }
+                }
+                return _POPosTimeFilterModeList;
+            }
+        }
+
+        private DateTime? _ProdOrderPosFilterFrom;
+        [ACPropertyInfo(9999, "", "en{'From'}de{'Von'}")]
+        public DateTime? ProdOrderPosFilterFrom
+        {
+            get => _ProdOrderPosFilterFrom;
+            set
+            {
+                _ProdOrderPosFilterFrom = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime? _ProdOrderPosFilterTo;
+        [ACPropertyInfo(9999, "", "en{'To'}de{'Nach'}")]
+        public DateTime? ProdOrderPosFilterTo
+        {
+            get => _ProdOrderPosFilterTo;
+            set
+            {
+                _ProdOrderPosFilterTo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Properties -> FilterPlanningMR
@@ -697,7 +759,36 @@ namespace gip.bso.manufacturing
                     p.Partslist.Material.MaterialName1.Contains(FilterMaterialNoName)
                 ));
 
+            result = FilterProdOrderByPOPosTime(result);
+
+
             return result;
+        }
+
+        private IQueryable<ProdOrder> FilterProdOrderByPOPosTime(IQueryable<ProdOrder> prodOrders)
+        {
+            if (ProdOrderPosFilterFrom.HasValue && ProdOrderPosFilterTo.HasValue && SelectedPOPosTimeFilterMode != null)
+            {
+                DateTime fromDT = ProdOrderPosFilterFrom.Value.Date;
+                DateTime toDT = ProdOrderPosFilterTo.Value.Date.AddDays(1).AddTicks(-1);
+
+                if ((POPosTimeFilterTypeEnum)SelectedPOPosTimeFilterMode.Value == POPosTimeFilterTypeEnum.ProdOrderPosStartTime)
+                {
+                    return prodOrders.Where(c => c.ProdOrderPartslist_ProdOrder.Any(x => x.StartDate >= fromDT && x.StartDate <= toDT));
+                }
+
+                if ((POPosTimeFilterTypeEnum)SelectedPOPosTimeFilterMode.Value == POPosTimeFilterTypeEnum.ProdOrderPosEndTime)
+                {
+                    return prodOrders.Where(c => c.ProdOrderPartslist_ProdOrder.Any(x => x.EndDate >= fromDT && x.EndDate <= toDT));
+                }
+
+                if ((POPosTimeFilterTypeEnum)SelectedPOPosTimeFilterMode.Value == POPosTimeFilterTypeEnum.ProdOrderPosStartEndTime)
+                {
+                    return prodOrders.Where(c => c.ProdOrderPartslist_ProdOrder.Any(x => x.StartDate >= fromDT && x.EndDate <= toDT));
+                }
+            }
+
+            return prodOrders;
         }
 
         public override IAccessNav AccessNav { get { return AccessPrimary; } }

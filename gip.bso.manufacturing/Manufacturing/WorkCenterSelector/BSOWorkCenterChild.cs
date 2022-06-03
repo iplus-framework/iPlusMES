@@ -163,7 +163,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => Start workflow picking
 
-        public bool RunWorkflow(core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
+        public bool RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
                                 bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict)
         {
             bool wfRunsBatches = false;
@@ -175,7 +175,7 @@ namespace gip.bso.manufacturing
 
             if (!skipProcessModuleValidation)
             {
-                string orderInfo = processModule.ACUrlCommand("OrderInfo") as string;
+                string orderInfo = processModule.ACUrlCommand(nameof(PAProcessModule.OrderInfo)) as string;
 
                 if (!string.IsNullOrEmpty(orderInfo))
                 {
@@ -186,7 +186,7 @@ namespace gip.bso.manufacturing
                     }
                 }
 
-                string orderReservationInfo = processModule.ACUrlCommand("OrderReservationInfo") as string;
+                string orderReservationInfo = processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo)) as string;
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
                     //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
@@ -211,7 +211,7 @@ namespace gip.bso.manufacturing
             }
 
             Picking picking = null;
-            MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(CurrentBookParamRelocation, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking);
+            MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(CurrentBookParamRelocation, acClassMethod, dbApp, dbApp.ContextIPlus, true, out picking);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
                 Messages.Msg(msgDetails);
@@ -227,14 +227,14 @@ namespace gip.bso.manufacturing
             }
             ACSaveChanges();
 
-            bool result = PreStartWorkflow(validRoute, workflow, picking);
+            bool result = PreStartWorkflow(dbApp, validRoute, workflow, picking);
             if (!result)
             {
                 ClearBookingData();
                 return false;
             }
 
-            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, validationBehaviour);
+            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
                 Messages.Msg(msgDetails);
@@ -444,7 +444,7 @@ namespace gip.bso.manufacturing
             return msg;
         }
 
-        protected virtual bool PreStartWorkflow(Route validRoute, gip.core.datamodel.ACClassWF rootWF, Picking picking)
+        protected virtual bool PreStartWorkflow(DatabaseApp dbApp, Route validRoute, gip.core.datamodel.ACClassWF rootWF, Picking picking)
         {
             List<Tuple<gip.core.datamodel.ACClassWF, string>> subWFs = new List<Tuple<gip.core.datamodel.ACClassWF, string>>();
 
@@ -464,11 +464,11 @@ namespace gip.bso.manufacturing
                                                                                      .Select(p => new SingleDosingConfigItem() { PreConfigACUrl = subWF.Item2, PWGroup = p }));
             }
 
-            return OnPreStartWorkflow(picking, configItems, validRoute, rootWF);
+            return OnPreStartWorkflow(dbApp, picking, configItems, validRoute, rootWF);
 
         }
 
-        public virtual bool OnPreStartWorkflow(Picking picking, List<SingleDosingConfigItem> configItems, Route validRoute, gip.core.datamodel.ACClassWF rootWF)
+        public virtual bool OnPreStartWorkflow(DatabaseApp dbApp, Picking picking, List<SingleDosingConfigItem> configItems, Route validRoute, gip.core.datamodel.ACClassWF rootWF)
         {
             return true;
         }

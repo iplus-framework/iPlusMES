@@ -1640,7 +1640,8 @@ namespace gip.bso.manufacturing
                 IsBinChangeAvailable = isBinChangeAvailable ?? false;
             }
 
-            var temp = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault();
+            using(ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
+                _= DatabaseApp.ProdOrderPartslistPos.FirstOrDefault();
 
             LoadPWConfiguration(pwNode?.ValueT);
 
@@ -1707,26 +1708,29 @@ namespace gip.bso.manufacturing
                 Guid intermediateChildPosPOPartslistID;
                 if (intermediateChildPos.Key != null && Guid.TryParse(intermediateChildPos.Key, out intermediateChildPosPOPartslistID))
                 {
-                    vd.ProdOrderPartslistPosRelation[] queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(DatabaseApp, intermediateChildPosPOPartslistID);
-                    
-                    foreach (vd.ProdOrderPartslistPosRelation rel in queryOpenDosings)
+                    using (ACMonitor.Lock(db.QueryLock_1X000))
                     {
-                        try
-                        {
-                            rel.AutoRefresh();
-                        }
-                        catch (Exception e)
-                        {
-                            Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
-                        }
+                        vd.ProdOrderPartslistPosRelation[] queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
 
-                        var valueItem = valueList.FirstOrDefault(c => c.Key == rel.ProdOrderPartslistPosRelationID.ToString());
-                        if (valueItem.Key == null)
-                            continue;
-
-                        if (short.TryParse(valueItem.Value, out short weighingState))
+                        foreach (vd.ProdOrderPartslistPosRelation rel in queryOpenDosings)
                         {
-                            weighingMaterials.Add(new WeighingMaterial(rel, (WeighingComponentState)weighingState, iconDesign, this));
+                            try
+                            {
+                                rel.AutoRefresh();
+                            }
+                            catch (Exception e)
+                            {
+                                Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                            }
+
+                            var valueItem = valueList.FirstOrDefault(c => c.Key == rel.ProdOrderPartslistPosRelationID.ToString());
+                            if (valueItem.Key == null)
+                                continue;
+
+                            if (short.TryParse(valueItem.Value, out short weighingState))
+                            {
+                                weighingMaterials.Add(new WeighingMaterial(rel, (WeighingComponentState)weighingState, iconDesign, this));
+                            }
                         }
                     }
                 }
@@ -2562,18 +2566,20 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, DatabaseApp.ContextIPlus, true, currentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace, 
-                                                                    RouteDirections.Forwards, null, null, null, 0, true, true);
-
-            if (rResult == null || rResult.Routes == null)
+            using (Database db = new core.datamodel.Database())
             {
-                //Error50431: Can not find any target storage for this station.
-                Messages.Error(this, "Error50431");
-                return;
+                RoutingResult rResult = ACRoutingService.FindSuccessors(RoutingService, db, true, currentProcessModule.ComponentClass, PAMParkingspace.SelRuleID_ParkingSpace,
+                                                                        RouteDirections.Forwards, null, null, null, 0, true, true);
+
+                if (rResult == null || rResult.Routes == null)
+                {
+                    //Error50431: Can not find any target storage for this station.
+                    Messages.Error(this, "Error50431");
+                    return;
+                }
+
+                SingleDosTargetStorageList = rResult.Routes.SelectMany(c => c.GetRouteTargets()).Select(x => x.Target);
             }
-
-            SingleDosTargetStorageList = rResult.Routes.SelectMany(c => c.GetRouteTargets()).Select(x => x.Target);
-
 
             if (_ACFacilityManager == null)
             {
@@ -2651,113 +2657,117 @@ namespace gip.bso.manufacturing
                 SelectedSingleDosTargetStorage = SingleDosTargetStorageList.FirstOrDefault();
             }
 
-            vd.Facility inwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.VBiFacilityACClassID == SelectedSingleDosTargetStorage.ACClassID);
-            
-            if (inwardFacility == null)
+            using (Database db = new core.datamodel.Database())
+            using (vd.DatabaseApp dbApp = new vd.DatabaseApp(db))
             {
-                //Error50434: Can not find any facility according target storage ID: {0}
-                Messages.Error(this, "Error50434", false, SelectedSingleDosTargetStorage.ACClassID);
-                return;
-            }
 
-            //vd.Facility outwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == SelectedSingleDosingItem.FacilityNo);
+                vd.Facility inwardFacility = dbApp.Facility.FirstOrDefault(c => c.VBiFacilityACClassID == SelectedSingleDosTargetStorage.ACClassID);
 
-            //if (outwardFacility == null)
-            //{
-            //    //Error50435: Can not find any outward facility with FacilityNo: {0}
-            //    Messages.Error(this, "Error50435",false, SelectedSingleDosingItem.FacilityNo);
-            //    return;
-            //}
-
-            vd.Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
-            if (material == null)
-            {
-                //Error50436: The material with MaterialNo: {0} can not be found in database.
-                Messages.Error(this, "Error50436", false, SelectedSingleDosingItem.MaterialNo);
-                return;
-            }
-
-            MsgWithDetails msg = ValidateSingleDosingStart(currentProcessModule);
-            if (msg != null)
-            {
-                Messages.Msg(msg);
-                return;
-            }
-
-            var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.PWMethodNodeConfigKeyACUrl);
-
-            if (wfConfigs == null || !wfConfigs.Any())
-            {
-                //Error50437: The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Material. 
-                Messages.Error(this, "Error50437");
-                return;
-            }
-
-            var wfConfig = wfConfigs.FirstOrDefault(c => c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
-            if (wfConfig == null)
-            {
-                wfConfig = wfConfigs.FirstOrDefault(c => !c.VBiACClassID.HasValue);
-            }
-
-            if (wfConfig == null)
-            {
-                //Error50438: The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station. 
-                Messages.Error(this, "Error50438");
-                return;
-            }
-
-            var workflow = wfConfig.VBiACClassWF.FromIPlusContext<ACClassWF>(DatabaseApp.ContextIPlus);
-            var acClassMethod = workflow.ACClassMethod;
-
-            CurrentBookParamRelocation.InwardFacility = inwardFacility;
-            //CurrentBookParamRelocation.OutwardFacility = outwardFacility;
-            CurrentBookParamRelocation.OutwardMaterial = material;
-            CurrentBookParamRelocation.InwardQuantity = SingleDosTargetQuantity;
-            CurrentBookParamRelocation.OutwardQuantity = SingleDosTargetQuantity;
-
-            ACComponent processModule = CurrentProcessModule;
-
-            bool runOnce = true;
-
-            if (SingleDosNumberOfRepetitions > 1)
-            {
-                int maxRep = MaxSingleDosNumOfRepetitions;
-                if (maxRep <= 0)
-                    maxRep = 50;
-
-
-                if (SingleDosNumberOfRepetitions > maxRep)
+                if (inwardFacility == null)
                 {
-                    runOnce = true;
+                    //Error50434: Can not find any facility according target storage ID: {0}
+                    Messages.Error(this, "Error50434", false, SelectedSingleDosTargetStorage.ACClassID);
+                    return;
                 }
-                else
-                {
-                    //Question50083: The number of repetitions is set to {0}. Are you sure that you want dose {0} times?
-                    if (Messages.Question(this, "Question50083", Global.MsgResult.No, false, SingleDosNumberOfRepetitions) == Global.MsgResult.Yes)
-                    {
-                        for (int i=0; i<SingleDosNumberOfRepetitions; i++)
-                        {
-                            RunWorkflow(workflow, acClassMethod, processModule, false, true);
-                        }
 
-                        runOnce = false;
-                    }
-                    else
+                //vd.Facility outwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == SelectedSingleDosingItem.FacilityNo);
+
+                //if (outwardFacility == null)
+                //{
+                //    //Error50435: Can not find any outward facility with FacilityNo: {0}
+                //    Messages.Error(this, "Error50435",false, SelectedSingleDosingItem.FacilityNo);
+                //    return;
+                //}
+
+                vd.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
+                if (material == null)
+                {
+                    //Error50436: The material with MaterialNo: {0} can not be found in database.
+                    Messages.Error(this, "Error50436", false, SelectedSingleDosingItem.MaterialNo);
+                    return;
+                }
+
+                MsgWithDetails msg = ValidateSingleDosingStart(currentProcessModule);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    return;
+                }
+
+                var wfConfigs = material.MaterialConfig_Material.Where(c => c.KeyACUrl == vd.MaterialConfig.PWMethodNodeConfigKeyACUrl);
+
+                if (wfConfigs == null || !wfConfigs.Any())
+                {
+                    //Error50437: The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Material. 
+                    Messages.Error(this, "Error50437");
+                    return;
+                }
+
+                var wfConfig = wfConfigs.FirstOrDefault(c => c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
+                if (wfConfig == null)
+                {
+                    wfConfig = wfConfigs.FirstOrDefault(c => !c.VBiACClassID.HasValue);
+                }
+
+                if (wfConfig == null)
+                {
+                    //Error50438: The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station. 
+                    Messages.Error(this, "Error50438");
+                    return;
+                }
+
+                var workflow = wfConfig.VBiACClassWF.FromIPlusContext<ACClassWF>(db);
+                var acClassMethod = workflow.ACClassMethod;
+
+                CurrentBookParamRelocation.InwardFacility = inwardFacility;
+                //CurrentBookParamRelocation.OutwardFacility = outwardFacility;
+                CurrentBookParamRelocation.OutwardMaterial = material;
+                CurrentBookParamRelocation.InwardQuantity = SingleDosTargetQuantity;
+                CurrentBookParamRelocation.OutwardQuantity = SingleDosTargetQuantity;
+
+                ACComponent processModule = CurrentProcessModule;
+
+                bool runOnce = true;
+
+                if (SingleDosNumberOfRepetitions > 1)
+                {
+                    int maxRep = MaxSingleDosNumOfRepetitions;
+                    if (maxRep <= 0)
+                        maxRep = 50;
+
+
+                    if (SingleDosNumberOfRepetitions > maxRep)
                     {
                         runOnce = true;
                     }
+                    else
+                    {
+                        //Question50083: The number of repetitions is set to {0}. Are you sure that you want dose {0} times?
+                        if (Messages.Question(this, "Question50083", Global.MsgResult.No, false, SingleDosNumberOfRepetitions) == Global.MsgResult.Yes)
+                        {
+                            for (int i = 0; i < SingleDosNumberOfRepetitions; i++)
+                            {
+                                RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true);
+                            }
+
+                            runOnce = false;
+                        }
+                        else
+                        {
+                            runOnce = true;
+                        }
+                    }
                 }
-            }
-            
-            if (runOnce)
-            {
-                RunWorkflow(workflow, acClassMethod, processModule, false);
-            }
 
-            SingleDosTargetQuantity = 0;
-            SingleDosNumberOfRepetitions = 0;
-            SelectedSingleDosTargetStorage = null;
+                if (runOnce)
+                {
+                    RunWorkflow(dbApp, workflow, acClassMethod, processModule, false);
+                }
 
+                SingleDosTargetQuantity = 0;
+                SingleDosNumberOfRepetitions = 0;
+                SelectedSingleDosTargetStorage = null;
+            }
             CloseTopDialog();
         }
 
@@ -2770,22 +2780,25 @@ namespace gip.bso.manufacturing
         {
             if (currentProcessModule != null)
             {
-                ACClass componentClass = currentProcessModule.ComponentClass?.FromIPlusContext<ACClass>(DatabaseApp.ContextIPlus);
-                if (componentClass == null)
-                    return null;
-
-                double maxWeight = 0;
-                ACClassProperty maxWeightProp = componentClass.GetProperty(PAProcessModule.PropNameMaxWeightCapacity);
-                if (maxWeightProp != null && maxWeightProp.Value != null && maxWeightProp.Value is string)
-                    maxWeight = (double)ACConvert.ChangeType(maxWeightProp.Value as string, typeof(double), true, DatabaseApp.ContextIPlus);
-
-                maxWeight = maxWeight - (maxWeight * 0.2);
-
-                if (SingleDosTargetQuantity > maxWeight)
+                using (Database db = new core.datamodel.Database())
                 {
-                    //Error50487:The dosing quantity is {0} kg but the maximum dosing qunatity is {1} kg.
-                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ValidateStart", 2469, "Error50487", SingleDosTargetQuantity, Math.Round(maxWeight,2));
-                    return new MsgWithDetails(new Msg[]{ msg });
+                    ACClass componentClass = currentProcessModule.ComponentClass?.FromIPlusContext<ACClass>(db);
+                    if (componentClass == null)
+                        return null;
+
+                    double maxWeight = 0;
+                    ACClassProperty maxWeightProp = componentClass.GetProperty(PAProcessModule.PropNameMaxWeightCapacity);
+                    if (maxWeightProp != null && maxWeightProp.Value != null && maxWeightProp.Value is string)
+                        maxWeight = (double)ACConvert.ChangeType(maxWeightProp.Value as string, typeof(double), true, db);
+
+                    maxWeight = maxWeight - (maxWeight * 0.2);
+
+                    if (SingleDosTargetQuantity > maxWeight)
+                    {
+                        //Error50487:The dosing quantity is {0} kg but the maximum dosing qunatity is {1} kg.
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ValidateStart", 2469, "Error50487", SingleDosTargetQuantity, Math.Round(maxWeight, 2));
+                        return new MsgWithDetails(new Msg[] { msg });
+                    }
                 }
             }
 
@@ -2989,26 +3002,25 @@ namespace gip.bso.manufacturing
         {
             ACClass processModuleClass = null;
 
-            var contextIplus = DatabaseApp.ContextIPlus;
-            using (ACMonitor.Lock(contextIplus.QueryLock_1X000))
-            {
-                processModuleClass = currentProcessModule?.ComponentClass.FromIPlusContext<ACClass>(contextIplus);
-            }
+            using (Database db = new core.datamodel.Database())
+            { 
+                processModuleClass = currentProcessModule?.ComponentClass.FromIPlusContext<ACClass>(db);
 
-            bool reworkEnabled = false;
+                bool reworkEnabled = false;
 
-            var config = processModuleClass?.ConfigurationEntries.FirstOrDefault(c => c.KeyACUrl == processModuleClass.ACConfigKeyACUrl && c.LocalConfigACUrl == nameof(PAProcessModuleVB.ReworkEnabled));
-            if (config != null)
-            {
-                bool? val = config.Value as bool?;
-                if (val.HasValue)
-                    reworkEnabled = val.Value;
+                var config = processModuleClass?.ConfigurationEntries.FirstOrDefault(c => c.KeyACUrl == processModuleClass.ACConfigKeyACUrl && c.LocalConfigACUrl == nameof(PAProcessModuleVB.ReworkEnabled));
+                if (config != null)
+                {
+                    bool? val = config.Value as bool?;
+                    if (val.HasValue)
+                        reworkEnabled = val.Value;
 
-                IsReworkEnabled = reworkEnabled;
-            }
-            else
-            {
-                //Messages.Error(this, "Can not find the configuration property ReworkEnabled on the process module!");
+                    IsReworkEnabled = reworkEnabled;
+                }
+                else
+                {
+                    //Messages.Error(this, "Can not find the configuration property ReworkEnabled on the process module!");
+                }
             }
         }
 
