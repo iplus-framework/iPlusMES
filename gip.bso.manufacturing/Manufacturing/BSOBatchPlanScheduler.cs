@@ -4708,7 +4708,7 @@ namespace gip.bso.manufacturing
             if ((diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged)
                     || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
                 && reloadBatchPlanList)
-                LoadProdOrderBatchPlanList();
+                LoadProdOrderBatchPlanList(SelectedProdOrderBatchPlan?.ProdOrderBatchPlanID);
         }
 
         #endregion
