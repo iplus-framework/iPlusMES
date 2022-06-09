@@ -779,7 +779,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale)
+        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale, DatabaseApp dbApp, ProdOrderPartslistPosRelation[] queryOpenDosings, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition, MaterialWFConnection matWFConnection, ProdOrderBatch batch, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos endBatchPos)
         {
             return new ScaleBoundaries(scale);
         }
@@ -806,6 +806,18 @@ namespace gip.mes.processapplication
             {
                 return ManageDosingState(PWDosing.ManageDosingStatesMode.QueryHasAnyDosings, dbApp, out sumQuantity);
             }
+        }
+
+        public virtual bool ResetDosingsAfterInterDischarging(IACEntityObjectContext dbApp)
+        {
+            double sumQuantity;
+            return ManageDosingState(PWDosing.ManageDosingStatesMode.ResetDosings, dbApp as DatabaseApp, out sumQuantity);
+        }
+
+        public virtual bool SetDosingsCompletedAfterDischarging(IACEntityObjectContext dbApp)
+        {
+            double sumQuantity;
+            return ManageDosingState(PWDosing.ManageDosingStatesMode.SetDosingsCompleted, dbApp as DatabaseApp, out sumQuantity);
         }
 
         public virtual void OnDosingLoopDecision(IACComponentPWNode dosingloop, bool willRepeatDosing)
@@ -1148,7 +1160,7 @@ namespace gip.mes.processapplication
                     isWeighComponentsNull = WeighingComponents == null;
                 }
 
-                if (isWeighComponentsNull)
+                if (isWeighComponentsNull || AutoInterDis)
                 {
                     if (ParentPWGroup.AccessedProcessModule == null)
                     {
@@ -1163,6 +1175,14 @@ namespace gip.mes.processapplication
                     if (result == StartNextCompResult.CycleWait)
                     {
                         SubscribeToProjectWorkCycle();
+                        return;
+                    }
+                    else if (result == StartNextCompResult.Done)
+                    {
+                        UnSubscribeToProjectWorkCycle();
+                        // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
+                        if (CurrentACState == ACStateEnum.SMRunning)
+                            CurrentACState = ACStateEnum.SMCompleted;
                         return;
                     }
 
@@ -1877,7 +1897,7 @@ namespace gip.mes.processapplication
                         IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                         ScaleBoundaries scaleBoundaries = null;
                         if (scale != null)
-                            scaleBoundaries = OnGetScaleBoundariesForDosing(scale);
+                            scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, queryOpenMaterials, intermediateChildPos, intermediatePosition, matWFConnection, batch, batchPlan, endBatchPos);
                         if (scaleBoundaries != null && scaleBoundaries.MaxWeightCapacity > 0.00000001)
                         {
                             double? remainingWeight = null;
@@ -3217,12 +3237,12 @@ namespace gip.mes.processapplication
 
                                         //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - changePosState value: " + changePosState.ToString());
 
-                                        if (changePosState)
+                                        if (changePosState && !AutoInterDis)
                                         {
                                             //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - posState value: " + posState.ToString());
 
                                             weighingPosRelation.MDProdOrderPartslistPosState = posState;
-                                            if(posState != null && posState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
+                                            if (posState != null && posState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
                                             {
                                                 var unconfirmedBookings = weighingPosRelation.FacilityBooking_ProdOrderPartslistPosRelation
                                                                                              .Where(c => c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New);

@@ -341,7 +341,7 @@ namespace gip.mes.processapplication
                             IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
                             ScaleBoundaries scaleBoundaries = null;
                             if (scale != null)
-                                scaleBoundaries = OnGetScaleBoundariesForDosing(scale);
+                                scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, queryOpenDosings, intermediateChildPos, intermediatePosition, matWFConnection, batch, batchPlan, endBatchPos);
                             if (scaleBoundaries != null)
                             {
                                 double? remainingWeight = null;

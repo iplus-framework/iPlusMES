@@ -4705,8 +4705,8 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if ((diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged)
-                    || diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
+            if ((      diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged))
+                    //|| diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
                 && reloadBatchPlanList)
                 LoadProdOrderBatchPlanList(SelectedProdOrderBatchPlan?.ProdOrderBatchPlanID);
         }

@@ -786,7 +786,7 @@ namespace gip.mes.processapplication
 
                                     if (ParentPWGroup != null)
                                     {
-                                        List<PWDosing> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<PWDosing>(this);
+                                        List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this);
                                         if (previousDosings != null)
                                         {
                                             foreach (var pwDosing in previousDosings)

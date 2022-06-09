@@ -1103,16 +1103,16 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual bool ResetDosingsAfterInterDischarging(DatabaseApp dbApp)
+        public virtual bool ResetDosingsAfterInterDischarging(IACEntityObjectContext dbApp)
         {
             double sumQuantity;
-            return ManageDosingState(ManageDosingStatesMode.ResetDosings, dbApp, out sumQuantity);
+            return ManageDosingState(ManageDosingStatesMode.ResetDosings, dbApp as DatabaseApp, out sumQuantity);
         }
 
-        public virtual bool SetDosingsCompletedAfterDischarging(DatabaseApp dbApp)
+        public virtual bool SetDosingsCompletedAfterDischarging(IACEntityObjectContext dbApp)
         {
             double sumQuantity;
-            return ManageDosingState(ManageDosingStatesMode.SetDosingsCompleted, dbApp, out sumQuantity);
+            return ManageDosingState(ManageDosingStatesMode.SetDosingsCompleted, dbApp as DatabaseApp, out sumQuantity);
         }
 
 
@@ -1158,7 +1158,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale)
+        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale, DatabaseApp dbApp, ProdOrderPartslistPosRelation[] queryOpenDosings, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition, MaterialWFConnection matWFConnection, ProdOrderBatch batch, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos endBatchPos)
         {
             return new ScaleBoundaries(scale);
         }
