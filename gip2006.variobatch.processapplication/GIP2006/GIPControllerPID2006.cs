@@ -679,6 +679,8 @@ namespace gip2006.variobatch.processapplication
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _ = _DBNo.ValueT;
+            _ = _DBOffset.ValueT;
             return true;
         }
 
