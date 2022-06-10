@@ -1160,7 +1160,8 @@ namespace gip.mes.processapplication
                     isWeighComponentsNull = WeighingComponents == null;
                 }
 
-                if (isWeighComponentsNull || AutoInterDis)
+                if (   isWeighComponentsNull 
+                    || (AutoInterDis && manualWeighing == null))
                 {
                     if (ParentPWGroup.AccessedProcessModule == null)
                     {
