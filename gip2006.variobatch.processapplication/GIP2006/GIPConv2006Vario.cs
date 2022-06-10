@@ -832,7 +832,7 @@ namespace gip2006.variobatch.processapplication
                     }
                     if (!_ResponseValue.Bit13_OperationInterlock || !_ResponseValue.Bit12_SwitchInterlock || acStateInPLC != ACStateEnum.SMIdle)
                     {
-                        // TODO Alarm
+                        _RequestValue.Bit03_SignalStartable = true;
                         return false;
                     }
                 }
@@ -1211,6 +1211,7 @@ namespace gip2006.variobatch.processapplication
                                 _RequestValue.Bit12_Stop = true;
                         }
                         _RequestValue.Bit08_Start = true;
+                        _RequestValue.Bit03_SignalStartable = false;
                         changed = true;
                     }
                     break;
@@ -1274,7 +1275,8 @@ namespace gip2006.variobatch.processapplication
                     if (_RequestValue.Bit08_Start)
                         changed = true;
                     _RequestValue.Bit08_Start = false;
-                    
+                    _RequestValue.Bit03_SignalStartable = false;
+
                     if (_RequestValue.Bit12_Stop)
                         changed = true;
                     _RequestValue.Bit12_Stop = false;
@@ -1346,7 +1348,10 @@ namespace gip2006.variobatch.processapplication
                 //    break;
                 case ACStateEnum.SMIdle:
                     if (_RequestValue.Bit08_Start)
+                    {
+                        _RequestValue.Bit03_SignalStartable = false;
                         changed = true;
+                    }
                     _RequestValue.Bit08_Start = false;
 
                     if (_RequestValue.Bit12_Stop)
