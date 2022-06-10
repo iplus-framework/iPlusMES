@@ -45,9 +45,26 @@ namespace gip.bso.manufacturing
 
         void BSOLabOrderMES_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "CurrentLabOrderPos")
+            if (e.PropertyName == nameof(CurrentLabOrderPos))
             {
                 ReportChangedSampleWeighing();
+            }
+        }
+
+        public override LabOrder CurrentLabOrder 
+        { 
+            get => base.CurrentLabOrder;
+            set
+            {
+                base.CurrentLabOrder = value;
+
+                if (value != null)
+                {
+                    if (SelectedLabOrderPos == null && LabOrderPosList != null)
+                    {
+                        SelectedLabOrderPos = LabOrderPosList.FirstOrDefault();
+                    }
+                }
             }
         }
 
