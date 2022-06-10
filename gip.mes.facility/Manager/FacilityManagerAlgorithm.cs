@@ -1539,6 +1539,8 @@ namespace gip.mes.facility
             }
 
             FacilityBooking FB = BP.FacilityBooking != null ? BP.FacilityBooking : NewFacilityBooking(BP);
+            if (BP.FacilityBookings != null && !BP.FacilityBookings.Contains(BP))
+                BP.FacilityBookings.Add(BP);
 
             // Umbuchung auf eine andere Materialnummer
             if (BP.OutwardFacility != null && BP.InwardMaterial != null && BP.BookingType == GlobalApp.FacilityBookingType.Reassign_Facility_BulkMaterial)
