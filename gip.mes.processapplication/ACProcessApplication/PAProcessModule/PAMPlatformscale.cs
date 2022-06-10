@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using gip.core.datamodel;
 using gip.core.autocomponent;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -57,6 +58,29 @@ namespace gip.mes.processapplication
                 return _PAPointMatOut1;
             }
         }
+        #endregion
+
+        #region Methods
+
+        public List<PAEScaleBase> GetWeightDetectionScales()
+        {
+            IPAFuncScaleConfig scaleConfig = FindChildComponents<PAFManualWeighing>(c => c is PAFManualWeighing && !(c is PAFManualAddition)).FirstOrDefault();
+            if (scaleConfig != null)
+            {
+                return scaleConfig.ScaleMappingHelper.AssignedScales.ToList();
+            }
+            else
+            {
+                scaleConfig = FindChildComponents<PAFDosing>(c => c is PAFDosing).FirstOrDefault();
+                if (scaleConfig != null)
+                {
+                    return scaleConfig.ScaleMappingHelper.AssignedScales.ToList();
+                }
+            }
+
+            return new List<PAEScaleBase>();
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers
