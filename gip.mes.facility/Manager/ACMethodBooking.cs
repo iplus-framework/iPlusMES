@@ -1966,7 +1966,7 @@ namespace gip.mes.facility
         /// <summary>
         /// Ignoriert den IsEnbaled-Status eines Lagerplatzes. Die Buchung wir trotzdem durchgeführt auf wenn eine Einlagerungs oder Auslagerungssperre gesetzt ist.
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Ignore in-/outward lock'}de{'Ignoriere Ein-/Ausgangssperre'}")]
+        [ACPropertyInfo(9999, "", "en{'Posting behaviour'}de{'Buchungsverhalten'}")]
         public PostingBehaviourEnum PostingBehaviour
         {
             get
