@@ -544,8 +544,11 @@ namespace gip.mes.facility
                 }
                 #endregion
 
+                PostingBehaviourEnum postingBehaviour = BP.ParamsAdjusted.PostingBehaviour;
                 // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
-                if (BP.ParamsAdjusted.PostingBehaviour == PostingBehaviourEnum.ZeroStockOnRelocation)
+                if (   postingBehaviour == PostingBehaviourEnum.ZeroStockOnRelocation
+                    || postingBehaviour == PostingBehaviourEnum.ZeroStockOnProduction
+                    || postingBehaviour == PostingBehaviourEnum.ZeroStockAlways)
                 {
                     List<FacilityCharge> quantsForZeroBooking = new List<FacilityCharge>();
                     if (BP.FacilityBookings != null)

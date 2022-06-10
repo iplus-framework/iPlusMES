@@ -724,7 +724,6 @@ namespace gip.mes.facility
             }
         }
 
-
         #region Material und Lagerplatz
 
         #region Entitäten die sich auf die ZUGANGsfelder (INward) auswirken
@@ -1963,30 +1962,70 @@ namespace gip.mes.facility
             }
         }
 
+
+        /// <summary>
+        /// Ignoriert den IsEnbaled-Status eines Lagerplatzes. Die Buchung wir trotzdem durchgeführt auf wenn eine Einlagerungs oder Auslagerungssperre gesetzt ist.
+        /// </summary>
+        [ACPropertyInfo(9999, "", "en{'Ignore in-/outward lock'}de{'Ignoriere Ein-/Ausgangssperre'}")]
         public PostingBehaviourEnum PostingBehaviour
         {
             get
             {
-                if (!(BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge
+                ACValue acValue = ParameterValueList.GetACValue("PostingBehaviour");
+                if (acValue == null)
+                    return DefaultPostingBehaviour;
+                return (PostingBehaviourEnum)acValue.Value;
+            }
+            set
+            {
+                ACValue acValue = ParameterValueList.GetACValue("PostingBehaviour");
+                if (acValue == null)
+                {
+                    acValue = new ACValue("PostingBehaviour", typeof(PostingBehaviourEnum), value, Global.ParamOption.Optional);
+                    ParameterValueList.Add(acValue);
+                }
+                acValue.Value = value;
+            }
+        }
+
+
+        public PostingBehaviourEnum DefaultPostingBehaviour
+        {
+            get
+            {
+                bool isRelocation = BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_Facility
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_FacilityCharge_FacilityLocation
                         || BookingType == GlobalApp.FacilityBookingType.Relocation_Facility_BulkMaterial
                         || BookingType == GlobalApp.FacilityBookingType.PickingRelocation
                         || BookingType == GlobalApp.FacilityBookingType.PickingInward
-                        || BookingType == GlobalApp.FacilityBookingType.PickingInwardCancel))
+                        || BookingType == GlobalApp.FacilityBookingType.PickingInwardCancel;
+                bool isProdInward = BookingType == GlobalApp.FacilityBookingType.ProdOrderPosInward
+                        || BookingType == GlobalApp.FacilityBookingType.ProdOrderPosInwardCancel;
+
+                if (!isRelocation && !isProdInward)
                     return PostingBehaviourEnum.DoNothing;
 
+                PostingBehaviourEnum behaviour = PostingBehaviourEnum.DoNothing;
                 if (InwardFacility == null)
-                    return PostingBehaviourEnum.DoNothing;
+                    return behaviour;
                 else
                 {
                     var facility2Check = InwardFacility;
                     while (facility2Check != null)
                     {
                         if (facility2Check.PostingBehaviour > PostingBehaviourEnum.DoNothing)
-                            return facility2Check.PostingBehaviour;
+                        {
+                            behaviour = facility2Check.PostingBehaviour;
+                            break;
+                        }
                         facility2Check = facility2Check.Facility1_ParentFacility;
                     }
+
+                    if (    (behaviour == PostingBehaviourEnum.ZeroStockAlways)
+                         || (isRelocation && (behaviour == PostingBehaviourEnum.BlockOnRelocation || behaviour == PostingBehaviourEnum.ZeroStockOnRelocation))
+                         || (isProdInward && behaviour == PostingBehaviourEnum.ZeroStockOnProduction))
+                        return behaviour;
                 }
                 return PostingBehaviourEnum.DoNothing;
             }

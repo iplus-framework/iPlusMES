@@ -1271,10 +1271,15 @@ namespace gip.mes.processapplication
                     bookingParam.InwardQuantity = currentBatchPos.BookingMaterial.ConvertBaseWeightToBaseUnit(actualWeight);
                     bookingParam.InwardFacility = inwardFacility;
                     bookingParam.InwardFacilityLot = facilityLot;
-                    if (!currentBatchPos.IsFinalMixureBatch)
+                    bool isFinalMixture = currentBatchPos.IsFinalMixureBatch;
+                    if (!isFinalMixture)
                         bookingParam.InwardPartslist = currentBatchPos.ProdOrderPartslist.Partslist;
                     if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                         bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                    if (PostingBehaviour != PostingBehaviourEnum.NotSet)
+                        bookingParam.PostingBehaviour = PostingBehaviour;
+                    else if (isFinalMixture && currentBatchPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
+                        bookingParam.PostingBehaviour = PostingBehaviourEnum.DoNothing;
 
                     msg = dbApp.ACSaveChangesWithRetry();
 

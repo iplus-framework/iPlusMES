@@ -6,12 +6,14 @@ using System.Text;
 namespace gip.mes.datamodel
 {
     //[DataContract]
-    //[ACSerializeableInfo]
 #if NETFRAMEWORK
+    [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Posting behaviour'}de{'Buchungsverhalten'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.datamodel.ACValueListPostingBehaviourEnum")]
 #endif
     public enum PostingBehaviourEnum : short
     {
+        NotSet = -1,
+
         /// <summary>
         /// Do nothing
         /// </summary>
@@ -28,6 +30,16 @@ namespace gip.mes.datamodel
         /// Sets the stock to zero after a relocation posting. 
         /// This is used for scenarios where a other System is master of a storage location
         /// </summary>
-        ZeroStockOnRelocation = 2
+        ZeroStockOnRelocation = 2,
+
+        /// <summary>
+        /// Sets the stock to zero after a inward posting for a order
+        /// </summary>
+        ZeroStockOnProduction = 3,
+
+        /// <summary>
+        /// Sets the stock to zero always
+        /// </summary>
+        ZeroStockAlways = 4,
     }
 }
