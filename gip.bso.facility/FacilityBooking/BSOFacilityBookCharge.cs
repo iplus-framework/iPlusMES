@@ -732,7 +732,7 @@ namespace gip.bso.facility
                 if (CurrentFacilityCharge.EntityState != System.Data.EntityState.Added)
                     return msg;
 
-                //Error50552 The quants with a lot managed material must have a lot!
+                //Error50552: Lot managed quants must have a lot assigned!!
                 return new Msg(this, eMsgLevel.Error, nameof(BSOFacilityBookCharge), nameof(OnPreSave), 693, "Error50552");
             }
 
@@ -1448,6 +1448,35 @@ namespace gip.bso.facility
             return isEnabled;
         }
 
+        [ACMethodCommand(FacilityCharge.ClassName, "en{'All Quants not available'}de{'Alle Quanten nicht verfügbar'}", 711, true, Global.ACKinds.MSMethod)]
+        public void NotAvailableFacilityChargeAll()
+        {
+            //Question50087: Are you sure that you want to change the zero stock status for all the quants listed in the Explorer?
+            Global.MsgResult qResult = Messages.Question(this, "Question50087", Global.MsgResult.No);
+            if (qResult != Global.MsgResult.Yes)
+                return;
+            if (FacilityChargeList == null)
+                return;
+            foreach (FacilityCharge fc in FacilityChargeList.ToArray())
+            {
+                if (fc.NotAvailable)
+                    continue;
+                SelectedFacilityCharge = fc;
+                CurrentFacilityCharge = fc;
+                if (!BookNotAvailableFacilityCharge(false))
+                {
+                    break;
+                }
+            }
+            AccessNav.NavSearch();
+            OnPropertyChanged("FacilityChargeList");
+        }
+
+        public bool IsEnabledNotAvailableFacilityChargeAll()
+        {
+            return CurrentFacilityCharge != null && FacilityChargeList != null && FacilityChargeList.Any();
+        }
+
         /// <summary>
         /// Availables the facility charge.
         /// </summary>
@@ -1455,6 +1484,12 @@ namespace gip.bso.facility
         public void AvailableFacilityCharge()
         {
             if (!PreExecute("AvailableFacilityCharge")) return;
+            BookAvailableFacilityCharge(false);
+            PostExecute("AvailableFacilityCharge");
+        }
+
+        public bool BookAvailableFacilityCharge(bool withRefresh)
+        {
             CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.ResetIfNotAvailable);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
@@ -1466,8 +1501,16 @@ namespace gip.bso.facility
                 Messages.Msg(result.ValidMessage);
             }
             else
+            {
                 ClearBookingData();
-            PostExecute("AvailableFacilityCharge");
+                if (withRefresh)
+                {
+                    AccessNav.NavSearch();
+                    OnPropertyChanged("FacilityChargeList");
+                }
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -1488,6 +1531,37 @@ namespace gip.bso.facility
             }
             return isEnabled;
         }
+
+
+        [ACMethodCommand(FacilityCharge.ClassName, "en{'All Quants available'}de{'Alle Quanten verfügbar'}", 712, true, Global.ACKinds.MSMethod)]
+        public void AvailableFacilityChargeAll()
+        {
+            //Question50087: Are you sure that you want to change the zero stock status for all the quants listed in the Explorer?
+            Global.MsgResult qResult = Messages.Question(this, "Question50087", Global.MsgResult.No);
+            if (qResult != Global.MsgResult.Yes)
+                return;
+            if (FacilityChargeList == null)
+                return;
+            foreach (FacilityCharge fc in FacilityChargeList.ToArray())
+            {
+                if (!fc.NotAvailable)
+                    continue;
+                SelectedFacilityCharge = fc;
+                CurrentFacilityCharge = fc;
+                if (!BookAvailableFacilityCharge(false))
+                {
+                    break;
+                }
+            }
+            AccessNav.NavSearch();
+            OnPropertyChanged("FacilityChargeList");
+        }
+
+        public bool IsEnabledAvailableFacilityChargeAll()
+        {
+            return CurrentFacilityCharge != null && FacilityChargeList != null && FacilityChargeList.Any();
+        }
+
         #endregion
 
         #region Materialneuzuordnung (Reassignment)
@@ -1864,137 +1938,149 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "ClearBookingData":
+                case nameof(ClearBookingData):
                     ClearBookingData();
                     return true;
-                case "IsEnabledClearBookingData":
+                case nameof(IsEnabledClearBookingData):
                     result = IsEnabledClearBookingData();
                     return true;
-                case "InwardFacilityChargeMovement":
+                case nameof(InwardFacilityChargeMovement):
                     InwardFacilityChargeMovement();
                     return true;
-                case "IsEnabledInwardFacilityChargeMovement":
+                case nameof(IsEnabledInwardFacilityChargeMovement):
                     result = IsEnabledInwardFacilityChargeMovement();
                     return true;
-                case "OutwardFacilityChargeMovement":
+                case nameof(OutwardFacilityChargeMovement):
                     OutwardFacilityChargeMovement();
                     return true;
-                case "IsEnabledOutwardFacilityChargeMovement":
+                case nameof(IsEnabledOutwardFacilityChargeMovement):
                     result = IsEnabledOutwardFacilityChargeMovement();
                     return true;
-                case "FacilityChargeRelocation":
+                case nameof(FacilityChargeRelocation):
                     FacilityChargeRelocation();
                     return true;
-                case "IsEnabledFacilityChargeRelocation":
+                case nameof(IsEnabledFacilityChargeRelocation):
                     result = IsEnabledFacilityChargeRelocation();
                     return true;
-                case "LockFacilityCharge":
+                case nameof(LockFacilityCharge):
                     LockFacilityCharge();
                     return true;
-                case "IsEnabledLockFacilityCharge":
+                case nameof(IsEnabledLockFacilityCharge):
                     result = IsEnabledLockFacilityCharge();
                     return true;
-                case "LockFacilityChargeAbsolute":
+                case nameof(LockFacilityChargeAbsolute):
                     LockFacilityChargeAbsolute();
                     return true;
-                case "IsEnabledLockFacilityChargeAbsolute":
+                case nameof(IsEnabledLockFacilityChargeAbsolute):
                     result = IsEnabledLockFacilityChargeAbsolute();
                     return true;
-                case "ReleaseFacilityCharge":
+                case nameof(ReleaseFacilityCharge):
                     ReleaseFacilityCharge();
                     return true;
-                case "IsEnabledReleaseFacilityCharge":
+                case nameof(IsEnabledReleaseFacilityCharge):
                     result = IsEnabledReleaseFacilityCharge();
                     return true;
-                case "ReleaseFacilityChargeAbsolute":
+                case nameof(ReleaseFacilityChargeAbsolute):
                     ReleaseFacilityChargeAbsolute();
                     return true;
-                case "IsEnabledReleaseFacilityChargeAbsolute":
+                case nameof(IsEnabledReleaseFacilityChargeAbsolute):
                     result = IsEnabledReleaseFacilityChargeAbsolute();
                     return true;
-                case "NotAvailableFacilityCharge":
+                case nameof(NotAvailableFacilityCharge):
                     NotAvailableFacilityCharge();
                     return true;
-                case "IsEnabledNotAvailableFacilityCharge":
+                case nameof(IsEnabledNotAvailableFacilityCharge):
                     result = IsEnabledNotAvailableFacilityCharge();
                     return true;
-                case "AvailableFacilityCharge":
+                case nameof(AvailableFacilityCharge):
                     AvailableFacilityCharge();
                     return true;
-                case "IsEnabledAvailableFacilityCharge":
+                case nameof(IsEnabledAvailableFacilityCharge):
                     result = IsEnabledAvailableFacilityCharge();
                     return true;
-                case "FacilityReassign":
+                case nameof(FacilityReassign):
                     FacilityReassign();
                     return true;
-                case "IsEnabledFacilityReassign":
+                case nameof(IsEnabledFacilityReassign):
                     result = IsEnabledFacilityReassign();
                     return true;
-                case "SplitQuant":
+                case nameof(SplitQuant):
                     SplitQuant();
                     return true;
-                case "IsEnabledSplitQuant":
+                case nameof(IsEnabledSplitQuant):
                     result = IsEnabledSplitQuant();
                     return true;
-                case "NewChargeNo":
+                case nameof(NewChargeNo):
                     NewChargeNo();
                     return true;
-                case "IsEnabledNewChargeNo":
+                case nameof(IsEnabledNewChargeNo):
                     result = IsEnabledNewChargeNo();
                     return true;
-                case "NewSplitChargeNo":
+                case nameof(NewSplitChargeNo):
                     NewSplitChargeNo();
                     return true;
-                case "IsEnabledNewSplitChargeNo":
+                case nameof(IsEnabledNewSplitChargeNo):
                     result = IsEnabledNewSplitChargeNo();
                     return true;
-                case "FacilityChargeLotGenerateDlg":
+                case nameof(FacilityChargeLotGenerateDlg):
                     FacilityChargeLotGenerateDlg();
                     return true;
-                case "IsEnabledFacilityChargeLotGenerateDlg":
+                case nameof(IsEnabledFacilityChargeLotGenerateDlg):
                     result = IsEnabledFacilityChargeLotGenerateDlg();
                     return true;
-                case "OnActivate":
+                case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
                     return true;
-                case "SearchFacilityChargeList":
+                case nameof(SearchFacilityChargeList):
                     SearchFacilityChargeList();
                     return true;
-                case "IsEnabledSearchFacilityChargeList":
+                case nameof(IsEnabledSearchFacilityChargeList):
                     result = IsEnabledSearchFacilityChargeList();
+                    return true;
+                case nameof(NotAvailableFacilityChargeAll):
+                    NotAvailableFacilityChargeAll();
+                    return true;
+                case nameof(IsEnabledNotAvailableFacilityChargeAll):
+                    result = IsEnabledNotAvailableFacilityChargeAll();
+                    return true;
+                case nameof(AvailableFacilityChargeAll):
+                    AvailableFacilityChargeAll();
+                    return true;
+                case nameof(IsEnabledAvailableFacilityChargeAll):
+                    result = IsEnabledAvailableFacilityChargeAll();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
