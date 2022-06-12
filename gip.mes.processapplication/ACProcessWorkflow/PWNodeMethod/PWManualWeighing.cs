@@ -3239,22 +3239,25 @@ namespace gip.mes.processapplication
 
                                         //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - changePosState value: " + changePosState.ToString());
 
-                                        if (changePosState && !AutoInterDis)
+                                        if (changePosState)
                                         {
                                             //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - posState value: " + posState.ToString());
 
                                             weighingPosRelation.MDProdOrderPartslistPosState = posState;
-                                            if (posState != null && posState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
+                                            if (!AutoInterDis)
                                             {
-                                                var unconfirmedBookings = weighingPosRelation.FacilityBooking_ProdOrderPartslistPosRelation
-                                                                                             .Where(c => c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New);
-
-                                                //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Bookings count with state new:" + unconfirmedBookings?.Count().ToString());
-
-                                                foreach (var booking in unconfirmedBookings)
+                                                if (posState != null && posState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
                                                 {
-                                                    booking.MaterialProcessState = GlobalApp.MaterialProcessState.Processed;
-                                                    //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Booking change state");
+                                                    var unconfirmedBookings = weighingPosRelation.FacilityBooking_ProdOrderPartslistPosRelation
+                                                                                                 .Where(c => c.MaterialProcessStateIndex == (short)GlobalApp.MaterialProcessState.New);
+
+                                                    //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Bookings count with state new:" + unconfirmedBookings?.Count().ToString());
+
+                                                    foreach (var booking in unconfirmedBookings)
+                                                    {
+                                                        booking.MaterialProcessState = GlobalApp.MaterialProcessState.Processed;
+                                                        //Messages.LogInfo(this.GetACUrl(), "", "ManualWeighingTrace - Booking change state");
+                                                    }
                                                 }
                                             }
                                         }
