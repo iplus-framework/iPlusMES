@@ -516,6 +516,9 @@ namespace gip.mes.processapplication
         public IACContainerTNet<PANotifyState> ValidationError { get; set; }
         public const string PropNameValidationError = "ValidationError";
 
+        [ACPropertyBindingSource(450, "Error", "en{'Fill level warning'}de{'Füllstandswarnung'}", "", false, false)]
+        public IACContainerTNet<PANotifyState> FillLevelAlarm { get; set; }
+
         protected override bool IsDisplayingOrderInfo
         {
             get
@@ -994,9 +997,50 @@ namespace gip.mes.processapplication
                 Hint.ValueT = facilitySilo.Comment;
                 HasHint.ValueT = true;
             }
+
+            double? minStockQ = null;
+            string matUnit = "";
+
+            if (facilitySilo != null)
+            {
+                minStockQ = facilitySilo.MinStockQuantity;
+                matUnit = facilitySilo.Material?.BaseMDUnit.MDUnitName;
+            }
+
             RecalcFillLevelScale();
             ValidateSensorState(VSSInvoker.OnRefreshFacility, facilitySilo);
             _LastStock = _CurrentStock;
+
+            if (minStockQ.HasValue)
+            {
+                if (FillLevel.ValueT <= minStockQ.Value)
+                {
+                    string matNo = MaterialNo.ValueT;
+                    string matName = MaterialName.ValueT;
+
+                    if (string.IsNullOrEmpty(matNo))
+                        return;
+
+                    if (MaxWeightCapacity.ValueT > 0.000001 && minStockQ.Value > MaxWeightCapacity.ValueT)
+                    {
+                        OnNewAlarmOccurred(FillLevelAlarm, "The minimum stock quantity is greather than maximum weight capacity!");
+                    }
+
+                    //Warning50052: The stock level of {0} {1} in the silo {2} has fallen bellow the minimum level of {3} {4}.
+                    string warning = Root.Environment.TranslateMessage(this, "Warning50052", matNo, matName, ACCaption, minStockQ.Value, matUnit);
+
+                    if (IsAlarmActive(FillLevelAlarm) == null)
+                    {
+                        OnNewAlarmOccurred(FillLevelAlarm, warning);
+                        FillLevelAlarm.ValueT = PANotifyState.AlarmOrFault;
+                    }
+                }
+                else if (IsAlarmActive(FillLevelAlarm) != null || FillLevelAlarm.ValueT == PANotifyState.AlarmOrFault)
+                {
+                    OnAlarmDisappeared(FillLevelAlarm);
+                    FillLevelAlarm.ValueT = PANotifyState.Off;
+                }
+            }
         }
 
         protected virtual void RecalcFillLevelScale()
