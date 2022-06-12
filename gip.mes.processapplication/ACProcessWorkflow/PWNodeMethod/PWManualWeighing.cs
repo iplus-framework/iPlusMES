@@ -1271,7 +1271,14 @@ namespace gip.mes.processapplication
 
                         CurrentOpenMaterial = nextComp.PLPosRelation.ProdOrderPartslistPosRelationID;
                         bool hasQuants = TryAutoSelectFacilityCharge(nextComp.PLPosRelation.ProdOrderPartslistPosRelationID);
-                        StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, hasQuants); //Auto Comp && Auto Lot
+                        
+                        StartNextCompResult funcStartResult = StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, hasQuants); //Auto Comp && Auto Lot
+                        if (funcStartResult == StartNextCompResult.CycleWait)
+                        {
+                            CurrentOpenMaterial = null;
+                            SubscribeToProjectWorkCycle();
+                            return;
+                        }
 
                         Guid? currentFacilityCharge = CurrentFacilityCharge;
 
