@@ -3174,7 +3174,8 @@ namespace gip.mes.processapplication
                         if (facilityCharge != null && facilityCharge.MaterialID != weighingPosRelation.SourceProdOrderPartslistPos.MaterialID)
                         {
                             msg = new Msg(this, eMsgLevel.Error, nameof(PWManualWeighing), nameof(DoManualWeighingBooking) + "(32)", 2809, 
-                                           "The material of quant is different than weighing material. The quant ID: " + facilityCharge.FacilityChargeID);
+                                           "The material of quant is different than weighing material. The quant ID: " + facilityCharge.FacilityChargeID + " The material ID: " +
+                                           weighingPosRelation.SourceProdOrderPartslistPos.MaterialID);
 
                             ActivateProcessAlarmWithLog(msg, false);
 
