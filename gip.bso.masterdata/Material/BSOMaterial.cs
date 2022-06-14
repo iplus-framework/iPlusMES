@@ -237,9 +237,16 @@ namespace gip.bso.masterdata
                     }
 
 
-                    if (value != null && BSOMedia_Child != null && BSOMedia_Child.Value != null)
+                    try
                     {
-                        BSOMedia_Child.Value.LoadMedia(value);
+                        if (value != null && BSOMedia_Child != null && BSOMedia_Child.Value != null)
+                        {
+                            BSOMedia_Child.Value.LoadMedia(value);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Messages.Exception(this, e.Message, true);
                     }
 
                     OnPropertyChanged("CurrentMaterial");
