@@ -207,8 +207,10 @@ namespace gip.bso.manufacturing
         public void RecalculateComponentRemainingQuantity()
         {
             if (ProdOrderPartslistPosList != null)
+            {
                 foreach (ProdOrderPartslistPos pos in ProdOrderPartslistPosList)
                     ProdOrderManager.RecalcRemainingOutwardQuantity(pos);
+            }
             OnPropertyChanged(nameof(ProdOrderPartslistPosList));
         }
         #endregion
