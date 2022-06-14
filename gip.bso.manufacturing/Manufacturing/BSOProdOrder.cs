@@ -2058,9 +2058,9 @@ namespace gip.bso.manufacturing
             {
                 childBSO = StartComponent("LabOrderDialogProd", null, new object[] { }) as ACComponent;
                 if (SelectedProdOrderIntermediateBatch != null)
-                    childBSO.ACUrlCommand("!NewLabOrderDialog", null, null, SelectedProdOrderIntermediateBatch, null);
+                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null);
                 else
-                    childBSO.ACUrlCommand("!NewLabOrderDialog", null, null, SelectedIntermediate, null);
+                    childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null);
             }
             if (childBSO == null)
             {
@@ -2097,13 +2097,47 @@ namespace gip.bso.manufacturing
             if (childBSO == null)
                 return;
             if (SelectedProdOrderIntermediateBatch != null)
-                childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
             else
-                childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, SelectedIntermediate, null, null, true, null);
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, true, null);
             childBSO.Stop();
         }
 
         public bool IsEnabledShowLabOrderFromProdOrder()
+        {
+            if (SelectedIntermediate != null)
+            {
+                if (!SelectedIntermediate.LabOrder_ProdOrderPartslistPos.Any() && SelectedProdOrderIntermediateBatch == null)
+                    return false;
+                else if (SelectedProdOrderIntermediateBatch != null)
+                {
+                    if (!SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.Any())
+                        return false;
+                    else
+                        return true;
+                }
+                else
+                    return true;
+            }
+            return false;
+        }
+
+        [ACMethodInfo("Dialog", "en{'Lab Report MES View'}de{'Laborbericht MES'}", (short)MISort.QueryPrintDlg)]
+        public void ShowLabOrderMESFromProdOrder()
+        {
+            ACComponent childBSO = ACUrlCommand("?LabOrderMESViewDialog") as ACComponent;
+            if (childBSO == null)
+                childBSO = StartComponent("LabOrderMESViewDialog", null, new object[] { }) as ACComponent;
+            if (childBSO == null)
+                return;
+            if (SelectedProdOrderIntermediateBatch != null)
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, true, null);
+            else
+                childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, true, null);
+            childBSO.Stop();
+        }
+
+        public bool IsEnabledShowLabOrderMESFromProdOrder()
         {
             if (SelectedIntermediate != null)
             {
