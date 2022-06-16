@@ -1426,8 +1426,12 @@ namespace gip.mes.webservices
                     acParam.OutOrderPos = dbApp.OutOrderPos.Where(c => c.OutOrderPosID == bpParam.OutOrderPosID.Value).FirstOrDefault();
                 if (bpParam.PartslistPosID.HasValue)
                     acParam.PartslistPos = dbApp.ProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosID == bpParam.PartslistPosID.Value).FirstOrDefault();
+
                 if (bpParam.PartslistPosRelationID.HasValue)
-                    acParam.PartslistPosRelation = dbApp.ProdOrderPartslistPosRelation.Where(c => c.ProdOrderPartslistPosRelationID == bpParam.PartslistPosRelationID.Value).FirstOrDefault();
+                    acParam.PartslistPosRelation = dbApp.ProdOrderPartslistPosRelation
+                                                        .Include(x => x.SourceProdOrderPartslistPos)
+                                                        .Where(c => c.ProdOrderPartslistPosRelationID == bpParam.PartslistPosRelationID.Value).FirstOrDefault();
+                
                 if (bpParam.ProdOrderPartslistPosFacilityLotID.HasValue)
                     acParam.ProdOrderPartslistPosFacilityLot = dbApp.ProdOrderPartslistPosFacilityLot.Where(c => c.ProdOrderPartslistPosFacilityLotID == bpParam.ProdOrderPartslistPosFacilityLotID.Value).FirstOrDefault();
                 if (bpParam.PickingPosID.HasValue)
@@ -1457,6 +1461,27 @@ namespace gip.mes.webservices
         protected virtual MsgWithDetails OnBookWithFacilityManager(ACMethodBooking bpParam, facility.ACMethodBooking acParam, DatabaseApp dbApp, FacilityManager facManager, PAJsonServiceHostVB myServiceHost)
         {
             MsgWithDetails msgWithDetails = null;
+
+            if (acParam.PartslistPosRelation != null && acParam.PartslistPosRelation.SourceProdOrderPartslistPos != null)
+            {
+                if (!acParam.PartslistPosRelation.SourceProdOrderPartslistPos.TakeMatFromOtherOrder && acParam.OutwardFacilityCharge != null)
+                {
+                    string programNo = acParam.OutwardFacilityCharge.ProdOrderProgramNo;
+                    var prodOrder = acParam.PartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist?.ProdOrder;
+                    string currentProgramNo = prodOrder?.ProgramNo;
+
+                    if (!string.IsNullOrEmpty(programNo) && !string.IsNullOrEmpty(currentProgramNo) && programNo != currentProgramNo)
+                    {
+                        if (prodOrder.ProdOrderPartslist_ProdOrder.Any(c => c.Partslist.MaterialID == acParam.PartslistPosRelation.SourceProdOrderPartslistPos.MaterialID))
+                        {
+                            var error = new MsgWithDetails();
+                            error.AddDetailMessage(new Msg(facManager, eMsgLevel.Warning, nameof(VBWebService), nameof(OnBookWithFacilityManager) + "(10)", 1475, "Warning50053"));
+                            return error;
+                        }
+                    }
+                }
+            }
+
             var resultBooking = facManager.BookFacilityWithRetry(ref acParam, dbApp, false);
             if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
             {
