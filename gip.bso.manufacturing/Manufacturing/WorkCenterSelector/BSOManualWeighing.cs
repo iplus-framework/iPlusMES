@@ -25,6 +25,7 @@ namespace gip.bso.manufacturing
         public BSOManualWeighing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _InformUserWithMsgNegQuantStock = new ACPropertyConfigValue<bool>(this, nameof(InformUserWithMsgNegQuantStock), false);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -523,6 +524,17 @@ namespace gip.bso.manufacturing
 
         private AbortModeEnum _AbortMode;
 
+        private ACPropertyConfigValue<bool> _InformUserWithMsgNegQuantStock;
+        [ACPropertyConfig("en{'Inform user with message dialog about negative quant stock'}de{'Benutzer mit Meldungsdialog über negativen Quantenbestand informieren'}")]
+        public bool InformUserWithMsgNegQuantStock
+        {
+            get => _InformUserWithMsgNegQuantStock.ValueT;
+            set
+            {
+                _InformUserWithMsgNegQuantStock.ValueT = value;
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -564,6 +576,8 @@ namespace gip.bso.manufacturing
             }
         }
 
+        protected FacilityChargeItem _SelFacilityCharge;
+
         private FacilityChargeItem _SelectedFacilityCharge;
         [ACPropertySelected(628, "FacilityCharge")]
         public virtual FacilityChargeItem SelectedFacilityCharge
@@ -576,6 +590,14 @@ namespace gip.bso.manufacturing
                     ShowSelectFacilityLotInfo = false;
 
                 OnPropertyChanged("SelectedFacilityCharge");
+
+                if (value != null && InformUserWithMsgNegQuantStock
+                        && (_SelFacilityCharge == null
+                            || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID))
+                {
+                    CheckIsQuantStockNegAndInformUser(value);
+                    _SelFacilityCharge = value;
+                }
 
                 IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
@@ -627,6 +649,11 @@ namespace gip.bso.manufacturing
                        && SelectedWeighingMaterial.WeighingMatState != WeighingComponentState.InWeighing)
                 {
                     BtnWeighBlink = true;
+                }
+
+                if (_SelFacilityCharge != null && value == null && SelectedWeighingMaterial == null)
+                {
+                    _SelFacilityCharge = null;
                 }
             }
         }
@@ -2530,6 +2557,18 @@ namespace gip.bso.manufacturing
             }
 
             return result;
+        }
+
+        private void CheckIsQuantStockNegAndInformUser(FacilityChargeItem facilityCharge)
+        {
+            if (facilityCharge == null)
+                return;
+
+            if (facilityCharge.StockQuantityUOM < 0)
+            {
+                //Info50084 : The quant quantity is negative, please check if you use right quant/lot. If current lot is consumed, please peform the Lot change task...
+                Messages.Info(this, "Info50084");
+            }
         }
 
         #endregion

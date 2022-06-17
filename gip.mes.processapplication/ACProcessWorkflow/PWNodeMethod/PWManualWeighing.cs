@@ -1431,7 +1431,7 @@ namespace gip.mes.processapplication
             if(prodOrderPartslistPosRelation == null)
                 return null;
 
-            WeighingComponent comp = GetWeighingComponent(prodOrderPartslistPosRelation);  // WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == prodOrderPartslistPosRelation);
+            WeighingComponent comp = GetWeighingComponent(prodOrderPartslistPosRelation);
             if (comp == null || comp.WeighState == WeighingComponentState.WeighingCompleted)
                 return null;
 
@@ -1466,23 +1466,6 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            //else if (facility.HasValue)
-            //{
-            //    Msg msg = SetFacility(facility, prodOrderPartslistPosRelation);
-            //    if(msg != null)
-            //    {
-            //        SetCanStartFromBSO(true);
-            //        return msg;
-            //    }
-
-            //    if (!FreeSelectionMode)
-            //    {
-            //        if (ApplicationManager != null && ApplicationManager.ApplicationQueue != null && !ApplicationManager.ApplicationQueue.IsBusy)
-            //            ApplicationManager.ApplicationQueue.Add(() => SelectFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State));
-            //        else
-            //            SelectFacilityChargeOrFacility(CurrentOpenMaterial, WeighingComponentInfoType.State);
-            //    }
-            //}
             else
                 SetCanStartFromBSO(true);
 
@@ -1586,9 +1569,17 @@ namespace gip.mes.processapplication
                         return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(20)", 921, "Error50374", currentOpenMaterial.Value);
                     }
 
-                    var fc = GetFacilityChargesForMaterial(dbApp, rel);
-                    if (fc.Any(c => c.FacilityChargeID == newFacilityCharge.Value))
+                    var facilityCharges = GetFacilityChargesForMaterial(dbApp, rel);
+                    var fc = facilityCharges?.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
+
+                    if (fc != null)
                     {
+                        if (fc.MaterialID != rel.SourceProdOrderPartslistPos?.MaterialID)
+                        {
+                            Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " + 
+                                                               rel.SourceProdOrderPartslistPos?.MaterialID);
+                        }
+
                         Msg msg = SetFacilityCharge(newFacilityCharge.Value, currentOpenMaterial, forceSetFC_F);
                         if (msg != null)
                             return msg;
@@ -2463,6 +2454,12 @@ namespace gip.mes.processapplication
 
                         foreach (var fc in availableFC)
                         {
+                            if (mat != null && fc.MaterialID != mat.MaterialID)
+                            {
+                                Messages.LogError(this.GetACUrl(), "Wrong quant(20)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
+                                                  mat?.MaterialID);
+                            }
+
                             msg = SetFacilityCharge(fc.FacilityChargeID, materialID);
                             if (msg == null)
                                 return true;

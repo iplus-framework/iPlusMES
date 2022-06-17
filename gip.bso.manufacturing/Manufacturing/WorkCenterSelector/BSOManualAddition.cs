@@ -105,7 +105,6 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        private FacilityChargeItem _SelFacilityCharge;
 
         public override FacilityChargeItem SelectedFacilityCharge 
         { 
