@@ -1447,11 +1447,12 @@ namespace gip.mes.processapplication
                 if (!FreeSelectionMode)
                 {
                     Guid? currentOpenMaterial = CurrentOpenMaterial;
+                    Guid? currentFacilityCharge = CurrentFacilityCharge;
 
                     if (ApplicationManager != null && ApplicationManager.ApplicationQueue != null && !ApplicationManager.ApplicationQueue.IsBusy)
-                        ApplicationManager.ApplicationQueue.Add(() => SelectFacilityChargeOrFacility(currentOpenMaterial, WeighingComponentInfoType.State));
+                        ApplicationManager.ApplicationQueue.Add(() => SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State));
                     else
-                        SelectFacilityChargeOrFacility(currentOpenMaterial, WeighingComponentInfoType.State);
+                        SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
                 }
                 else
                 {
@@ -1583,7 +1584,9 @@ namespace gip.mes.processapplication
                         Msg msg = SetFacilityCharge(newFacilityCharge.Value, currentOpenMaterial, forceSetFC_F);
                         if (msg != null)
                             return msg;
-                        SelectFacilityChargeOrFacility(currentOpenMaterial, WeighingComponentInfoType.State);
+
+                        currentFacilityCharge = CurrentFacilityCharge;
+                        SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
                     }
                     else
                     {
@@ -2539,7 +2542,7 @@ namespace gip.mes.processapplication
             }    
         }
 
-        private void SelectFacilityChargeOrFacility(Guid? componentID, WeighingComponentInfoType infoType)
+        private void SelectFacilityChargeOrFacility(Guid? currentOpenMaterial, Guid? currentFacilityCharge, WeighingComponentInfoType infoType)
         {
             try
             {
@@ -2553,8 +2556,6 @@ namespace gip.mes.processapplication
 
                 if (msg == null)
                 {
-                    Guid? currentOpenMaterial = CurrentOpenMaterial;
-
                     WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); // WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial.Value);
                     if (comp == null)
                     {
@@ -2565,7 +2566,7 @@ namespace gip.mes.processapplication
 
                 if (msg == null)
                 {
-                    Guid? currentFacilityCharge = CurrentFacilityCharge;
+                    //Guid? currentFacilityCharge = CurrentFacilityCharge;
                     msg = InitializePAFACMethod(paf.CurrentACMethod.ValueT, currentFacilityCharge);
                 }
 
@@ -2800,7 +2801,13 @@ namespace gip.mes.processapplication
 
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
                 if (currentFacilityCharge.HasValue)
+                {
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
+                }
+                else
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
+                }
 
                 bool isLast;
                 using (ACMonitor.Lock(_65050_WeighingCompLock))
@@ -2915,8 +2922,6 @@ namespace gip.mes.processapplication
                                     double? toleranceMinus = (double)parentACMethod["ToleranceMinus"];
                                     double? targetQuantity = (double)parentACMethod["TargetQuantity"];
 
-
-
                                     bool isWeighingInTol = true;
 
                                     if (targetQuantity.HasValue && actWeight.HasValue && toleranceMinus.HasValue)
@@ -3001,7 +3006,6 @@ namespace gip.mes.processapplication
                     {
                         SetCanStartFromBSO(true);
                         CurrentOpenMaterial = null;
-                        //CurrentFacility = null;
                         CurrentFacilityCharge = null;
                         SubscribeToProjectWorkCycle();
                     }

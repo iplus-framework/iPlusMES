@@ -1182,24 +1182,34 @@ namespace gip.mes.processapplication
         {
             ACMethod method = new ACMethod(acIdentifier);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+
             method.ParameterValueList.Add(new ACValue(vd.Material.ClassName, typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add(vd.Material.ClassName, "en{'Material'}de{'Material'}");
+
             method.ParameterValueList.Add(new ACValue("PLPosRelation", typeof(Guid), null, Global.ParamOption.Optional));
             paramTranslation.Add("PLPosRelation", "en{'Order position'}de{'Auftragsposition'}");
+
             method.ParameterValueList.Add(new ACValue("FacilityCharge", typeof(Guid), null, Global.ParamOption.Optional));
             paramTranslation.Add("FacilityCharge", "en{'Batch Location'}de{'Chargenplatz'}");
+
             method.ParameterValueList.Add(new ACValue("Facility", typeof(Guid), null, Global.ParamOption.Optional));
             paramTranslation.Add("Facility", vd.ConstApp.Facility);
+
             method.ParameterValueList.Add(new ACValue("Route", typeof(Route), null, Global.ParamOption.Required));
             paramTranslation.Add("Route", "en{'Route'}de{'Route'}");
+
             method.ParameterValueList.Add(new ACValue("TargetQuantity", typeof(Double), (Double)0.0, Global.ParamOption.Required));
             paramTranslation.Add("TargetQuantity", "en{'Target Quantity'}de{'Sollmenge'}");
+
             method.ParameterValueList.Add(new ACValue("TolerancePlus", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("TolerancePlus", "en{'Tolerance + [+=kg/-=%]'}de{'Toleranz + [+=kg/-=%]'}");
+
             method.ParameterValueList.Add(new ACValue("ToleranceMinus", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("ToleranceMinus", "en{'Tolerance - [+=kg/-=%]'}de{'Toleranz - [+=kg/-=%]'}");
+
             method.ParameterValueList.Add(new ACValue("TargetScaleACIdentifier", typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add("TargetScaleACIdentifier", "en{'Weighing only on Scale (ACIdentifier)'}de{'Verwiegung nur auf Waage (ACIdentifier)'}");
+
             method.ParameterValueList.Add(new ACValue("IsLastWeighingMaterial", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("IsLastWeighingMaterial", "en{'Is last weighing material'}de{'Ist das letzte Wiegegut'}");
 
