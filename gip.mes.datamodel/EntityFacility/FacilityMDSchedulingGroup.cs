@@ -3,7 +3,7 @@ using System;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Facility, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityMDSchedulingGroup, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
     [ACPropertyEntity(2, MDSchedulingGroup.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + MDSchedulingGroup.ClassName, "", true)]
     [ACPropertyEntity(3, MDPickingType.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + MDPickingType.ClassName, "", true)]
