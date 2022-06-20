@@ -111,6 +111,7 @@
         public const string StockQuantityAmb = "en{'Stock Quantity Ambient'}de{'Lagermenge ambient'}";
         public const string StockWeight = "en{'Stock Weight'}de{'Lagergewicht'}";
         public const string MinStockQuantity = "en{'Min.Stock Quantity'}de{'Min.Lagermenge'}";
+        public const string MaxStockQuantity = "en{'Max.Stock Quantity'}de{'Max.Lagermenge'}";
         public const string OptStockQuantity = "en{'Opt.Stock Quantity'}de{'Opt.Lagermenge'}";
 
         public const string TotalQuantity = "en{'Total Quantity'}de{'Gesamtmenge'}";
