@@ -56,6 +56,24 @@ namespace gip.bso.masterdata.Scheduling
         }
         #endregion
 
+        #region ChildBSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
+            }
+        }
+
+        #endregion
+
+
         #region BSO->ACProperty
 
         #region Config
@@ -73,7 +91,6 @@ namespace gip.bso.masterdata.Scheduling
             }
         }
         #endregion
-
 
         #region 1.1 MDSchedulingGroup
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -112,8 +129,13 @@ namespace gip.bso.masterdata.Scheduling
             }
             set
             {
-                if (AccessPrimary == null) return; AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedMDSchedulingGroup");
+                if (AccessPrimary == null) return; 
+                if(AccessPrimary.Selected != value)
+                {
+                    AccessPrimary.Selected = value;
+                    OnPropertyChanged(nameof(SelectedMDSchedulingGroup));
+                    ConnectedFacilityList = LoadConnectedFacilityList();
+                }
             }
         }
 
@@ -307,6 +329,62 @@ namespace gip.bso.masterdata.Scheduling
 
         #endregion
 
+        #region 1.3 ConnectedFacility (FacilityMDSchedulingGroup)
+
+        private FacilityMDSchedulingGroup _SelectedConnectedFacility;
+        /// <summary>
+        /// Selected property for FacilityMDSchedulingGroup
+        /// </summary>
+        /// <value>The selected ConnectedFacility</value>
+        [ACPropertySelected(9999, "ConnectedFacility", "en{'TODO: ConnectedFacility'}de{'TODO: ConnectedFacility'}")]
+        public FacilityMDSchedulingGroup SelectedConnectedFacility
+        {
+            get
+            {
+                return _SelectedConnectedFacility;
+            }
+            set
+            {
+                if (_SelectedConnectedFacility != value)
+                {
+                    _SelectedConnectedFacility = value;
+                    OnPropertyChanged(nameof(SelectedConnectedFacility));
+                }
+            }
+        }
+
+
+        private List<FacilityMDSchedulingGroup> _ConnectedFacilityList;
+        /// <summary>
+        /// List property for FacilityMDSchedulingGroup
+        /// </summary>
+        /// <value>The ConnectedFacility list</value>
+        [ACPropertyList(9999, "ConnectedFacility")]
+        public List<FacilityMDSchedulingGroup> ConnectedFacilityList
+        {
+            get
+            {
+                if (_ConnectedFacilityList == null)
+                    _ConnectedFacilityList = LoadConnectedFacilityList();
+                return _ConnectedFacilityList;
+            }
+            set
+            {
+                _ConnectedFacilityList = value;
+                OnPropertyChanged(nameof(ConnectedFacilityList));
+            }
+        }
+
+        private List<FacilityMDSchedulingGroup> LoadConnectedFacilityList()
+        {
+            if(SelectedMDSchedulingGroup == null)
+                return new List<FacilityMDSchedulingGroup>();
+            return SelectedMDSchedulingGroup.FacilityMDSchedulingGroup_MDSchedulingGroup.ToList();
+        }
+
+
+        #endregion
+
         #endregion
 
         #region BSO->ACMethod
@@ -487,6 +565,79 @@ namespace gip.bso.masterdata.Scheduling
         {
             return SelectedMDSchedulingGroupWF != null;
         }
+        #endregion
+
+        #region 1.3 ConnectedFacility (FacilityMDSchedulingGroup)
+
+        /// <summary>
+        /// Source Property: AddFacility
+        /// </summary>
+        [ACMethodInfo("AddFacility", "en{'Add'}de{'Neu'}", 999)]
+        public void AddFacility()
+        {
+            if (!IsEnabledAddFacility())
+                return;
+
+            FacilityMDSchedulingGroup facilityMDSchedulingGroup = FacilityMDSchedulingGroup.NewACObject(DatabaseApp, null);
+            facilityMDSchedulingGroup.MDSchedulingGroup = SelectedMDSchedulingGroup;
+            SelectedMDSchedulingGroup.FacilityMDSchedulingGroup_MDSchedulingGroup.Add(facilityMDSchedulingGroup);
+            ConnectedFacilityList.Add(facilityMDSchedulingGroup);
+            OnPropertyChanged(nameof(ConnectedFacilityList));
+
+            SelectedConnectedFacility = facilityMDSchedulingGroup;
+        }
+
+        public bool IsEnabledAddFacility()
+        {
+            return SelectedMDSchedulingGroup != null;
+        }
+
+
+        /// <summary>
+        /// Source Property: DeleteFacility
+        /// </summary>
+        [ACMethodInfo("DeleteFacility", "en{'Delete'}de{'Löschen'}", 999)]
+        public void DeleteFacility()
+        {
+            if (!IsEnabledDeleteFacility())
+                return;
+
+            SelectedMDSchedulingGroup.FacilityMDSchedulingGroup_MDSchedulingGroup.Remove(SelectedConnectedFacility);
+            ConnectedFacilityList.Remove(SelectedConnectedFacility);
+
+            SelectedConnectedFacility.DeleteACObject(DatabaseApp ,false);
+
+            OnPropertyChanged(nameof(ConnectedFacilityList));
+        }
+
+        public bool IsEnabledDeleteFacility()
+        {
+            return SelectedConnectedFacility != null;
+        }
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowFacility()
+        {
+            if (!IsEnabledShowFacility())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedConnectedFacility?.Facility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                SelectedConnectedFacility.Facility = facility;
+                OnPropertyChanged(nameof(SelectedConnectedFacility));
+            }
+        }
+
+        public bool IsEnabledShowFacility()
+        {
+            return SelectedConnectedFacility != null;
+        }
+
         #endregion
 
         #endregion
