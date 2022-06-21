@@ -122,6 +122,7 @@
     <Compile Include="Material\BSOLabOrderTemplate.cs" />
     <Compile Include="Material\BSOMaterialExplorer.cs" />
     <Compile Include="Material\BSOMaterialPetroleum.cs" />
+    <Compile Include="Material\BSOMaterialTools.cs" />
     <Compile Include="Material\LOPosValueFieldEnum.cs" />
     <Compile Include="Material\MDBSOLabOrderPosState.cs" />
     <Compile Include="Partslist\BSOPartsList.cs" />
