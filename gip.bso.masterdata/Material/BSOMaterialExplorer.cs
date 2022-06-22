@@ -233,7 +233,6 @@ namespace gip.bso.masterdata
                 if (AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
-                    //ChangedSelectedMaterial(value);
                     OnPropertyChanged("CurrentMaterial");
                 }
             }
