@@ -2011,6 +2011,7 @@ namespace gip.mes.processapplication
         public static ProdOrderPartslistPosRelation[] Qry_WeighMaterials(DatabaseApp dbApp, Guid intermediateChildPosPOPartslistPosID)
         {
             return dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                        .Include(c => c.SourceProdOrderPartslistPos.BasedOnPartslistPos)
                                                         .Include(c => c.SourceProdOrderPartslistPos.Material)
                                                         .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
                                                         .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPosPOPartslistPosID
@@ -2799,15 +2800,32 @@ namespace gip.mes.processapplication
                 acMethod["PLPosRelation"] = weighingComponent.PLPosRelation.ProdOrderPartslistPosRelationID;
                 acMethod["Route"] = new Route();
 
+                if (!IsManualWeighing)
+                {
+                    try
+                    {
+                        bool? skipTol = weighingComponent.PLPosRelation.SourceProdOrderPartslistPos.BasedOnPartslistPos.PostingQuantitySuggestion > 0;
+                        acMethod["SkipToleranceCheck"] = skipTol != null ? skipTol : false;
+                    }
+                    catch (Exception e)
+                    {
+                        Messages.LogException(this.GetACUrl(), nameof(StartManualWeighingNextComp), e);
+                    }
+                }
+                else
+                {
+                    acMethod["SkipToleranceCheck"] = false;
+                }
+
                 Guid? currentFacilityCharge = CurrentFacilityCharge;
                 if (currentFacilityCharge.HasValue)
                 {
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
                 }
-                else
-                {
-                    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
-                }
+                //else
+                //{
+                //    Messages.LogError(this.GetACUrl(), nameof(StartManualWeighingNextComp) + "(20)", "Current facility charge is null on StartManualWeighingNextComp");
+                //}
 
                 bool isLast;
                 using (ACMonitor.Lock(_65050_WeighingCompLock))

@@ -11,8 +11,8 @@ namespace gip.mes.datamodel
     /// PartslistPos (RezeptKomp)
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials Position'}de{'Stücklistenposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
-    [ACPropertyEntity(2, "SequenceProduction", "en{'Production Sequence'}de{'Produktionsreihenfolge'}", "", "", true)]
+    [ACPropertyEntity(1, nameof(Sequence), "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
+    [ACPropertyEntity(2, nameof(SequenceProduction), "en{'Production Sequence'}de{'Produktionsreihenfolge'}", "", "", true)]
     [ACPropertyEntity(3, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
     [ACPropertyEntity(13, "BaseMDUnit", "en{'Base Unit of Measure UOM'}de{'Basismengeneinheit'}", Const.ContextDatabase + "\\Material\\MDUnitList", "", true)]
     [ACPropertyEntity(5, "TargetQuantityUOM", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}", "", "", true)]
@@ -22,7 +22,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(11, "LineNumber", "en{'Item Number'}de{'Positionsnummer'}", "", "", true)]
     [ACPropertyEntity(12, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(13, "ExplosionOff", "en{'Explosion Off'}de{'Stoprückauflösung'}", "", "", true)]
-    [ACPropertyEntity(14, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
+    [ACPropertyEntity(14, nameof(Anterograde), "en{'Anterograde inward posting'}de{'Modus für den Vorschlag der Buchungsmenge'}", "", "", true)]
+    [ACPropertyEntity(15, nameof(PostingQuantitySuggestion), "en{'Suggest quant quantity on posting'}de{'Vorschlagsmenge bei der Buchung'}", "", "", true)]
     [ACPropertyEntity(9999, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
     [ACPropertyEntity(9999, "ParentPartslistPos", "en{'Parent line'}de{'Elternposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
     [ACPropertyEntity(9999, "AlternativePartslistPos", "en{'Alternative Item'}de{'Alternativposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]

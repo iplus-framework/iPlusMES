@@ -1000,6 +1000,16 @@ namespace gip.mes.processapplication
                 }
             }
 
+            if (scale == null)
+            {
+                ACValue tolCheck = CurrentACMethod.ValueT.ParameterValueList.GetACValue("SkipToleranceCheck");
+                bool? tolCheckValue = tolCheck?.ParamAsBoolean;
+                if (tolCheckValue.HasValue && tolCheckValue.Value)
+                {
+                    return true;
+                }
+            }
+
             double actWeight = Math.Round(checkQuantity, 5);
 
             if (actWeight >= Math.Round(targetQuantity - tolMinus, 5))
@@ -1206,6 +1216,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("ToleranceMinus", typeof(Double), (Double)0.0, Global.ParamOption.Optional));
             paramTranslation.Add("ToleranceMinus", "en{'Tolerance - [+=kg/-=%]'}de{'Toleranz - [+=kg/-=%]'}");
+
+            method.ParameterValueList.Add(new ACValue("SkipToleranceCheck", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("SkipToleranceCheck", "en{'Skip tolerance check'}de{'Toleranzprüfung überspringen'}");
 
             method.ParameterValueList.Add(new ACValue("TargetScaleACIdentifier", typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add("TargetScaleACIdentifier", "en{'Weighing only on Scale (ACIdentifier)'}de{'Verwiegung nur auf Waage (ACIdentifier)'}");

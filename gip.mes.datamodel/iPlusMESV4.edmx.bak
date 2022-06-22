@@ -3751,6 +3751,7 @@
           <Property Name="ExplosionOff" Type="bit" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
           <Property Name="Anterograde" Type="bit" />
+          <Property Name="PostingQuantitySuggestion" Type="smallint" />
         </EntityType>
         <EntityType Name="PartslistPosRelation">
           <Key>
@@ -17318,7 +17319,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="Partslist" EntityType="iPlusMESV4_Model.Partslist" />
           <EntitySet Name="PartslistACClassMethod" EntityType="iPlusMESV4_Model.PartslistACClassMethod" />
           <EntitySet Name="PartslistConfig" EntityType="iPlusMESV4_Model.PartslistConfig" />
-          <EntitySet Name="PartslistPos" EntityType="iPlusMESV4_Model.PartslistPos" />
           <EntitySet Name="PartslistPosRelation" EntityType="iPlusMESV4_Model.PartslistPosRelation" />
           <EntitySet Name="PartslistPosSplit" EntityType="iPlusMESV4_Model.PartslistPosSplit" />
           <EntitySet Name="PartslistStock" EntityType="iPlusMESV4_Model.PartslistStock" />
@@ -19170,10 +19170,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Material" EntitySet="Material" />
             <End Role="PartslistConfig" EntitySet="PartslistConfig" />
           </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_MaterialID" Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID">
-            <End Role="Material" EntitySet="Material" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_PickingConfig_MaterialID" Association="iPlusMESV4_Model.FK_PickingConfig_MaterialID">
             <End Role="Material" EntitySet="Material" />
             <End Role="PickingConfig" EntitySet="PickingConfig" />
@@ -19518,10 +19514,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="MDUnit" EntitySet="MDUnit" />
             <End Role="Partslist" EntitySet="Partslist" />
           </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_MDUnitID" Association="iPlusMESV4_Model.FK_PartslistPos_MDUnitID">
-            <End Role="MDUnit" EntitySet="MDUnit" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_ProdOrderPartslistPos_MDUnitID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDUnitID">
             <End Role="MDUnit" EntitySet="MDUnit" />
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
@@ -19634,14 +19626,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Partslist" EntitySet="Partslist" />
             <End Role="PartslistConfig" EntitySet="PartslistConfig" />
           </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_Partslist" Association="iPlusMESV4_Model.FK_PartslistPos_Partslist">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_PartsListID" Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-          </AssociationSet>
           <AssociationSet Name="FK_PartslistStock_PartslistID" Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID">
             <End Role="Partslist" EntitySet="Partslist" />
             <End Role="PartslistStock" EntitySet="PartslistStock" />
@@ -19657,30 +19641,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_PartslistConfig_ParentPartslistConfigID" Association="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID">
             <End Role="PartslistConfig" EntitySet="PartslistConfig" />
             <End Role="PartslistConfig1" EntitySet="PartslistConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_AlternativePartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID">
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-            <End Role="PartslistPos1" EntitySet="PartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPos_ParentPartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID">
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-            <End Role="PartslistPos1" EntitySet="PartslistPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPosRelation_PartslistPos" Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos">
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-            <End Role="PartslistPosRelation" EntitySet="PartslistPosRelation" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPosRelation_PartslistPos1" Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1">
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-            <End Role="PartslistPosRelation" EntitySet="PartslistPosRelation" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PartslistPosSplit_PartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID">
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-            <End Role="PartslistPosSplit" EntitySet="PartslistPosSplit" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderPartslistPos_PartslistPos" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos">
-            <End Role="PartslistPos" EntitySet="PartslistPos" />
-            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
           </AssociationSet>
           <AssociationSet Name="FK_Picking_TourplanID" Association="iPlusMESV4_Model.FK_Picking_TourplanID">
             <End Role="Tourplan" EntitySet="Tourplan" />
@@ -20211,7 +20171,48 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="MDSchedulingGroup" EntitySet="MDSchedulingGroup" />
             <End Role="FacilityMDSchedulingGroup" EntitySet="FacilityMDSchedulingGroup" />
           </AssociationSet>
-          </EntityContainer>
+          <EntitySet Name="PartslistPos" EntityType="iPlusMESV4_Model.PartslistPos" />
+          <AssociationSet Name="FK_PartslistPos_MaterialID" Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_MDUnitID" Association="iPlusMESV4_Model.FK_PartslistPos_MDUnitID">
+            <End Role="MDUnit" EntitySet="MDUnit" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_Partslist" Association="iPlusMESV4_Model.FK_PartslistPos_Partslist">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_PartsListID" Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_AlternativePartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID">
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+            <End Role="PartslistPos1" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPos_ParentPartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID">
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+            <End Role="PartslistPos1" EntitySet="PartslistPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPosRelation_PartslistPos" Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos">
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+            <End Role="PartslistPosRelation" EntitySet="PartslistPosRelation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPosRelation_PartslistPos1" Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1">
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+            <End Role="PartslistPosRelation" EntitySet="PartslistPosRelation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PartslistPosSplit_PartslistPosID" Association="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID">
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+            <End Role="PartslistPosSplit" EntitySet="PartslistPosSplit" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderPartslistPos_PartslistPos" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos">
+            <End Role="PartslistPos" EntitySet="PartslistPos" />
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+          </AssociationSet>
+        </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
             <PropertyRef Name="ACAssemblyID" />
@@ -22829,7 +22830,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="OutOrderPosUtilization_Material" Relationship="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" FromRole="Material" ToRole="OutOrderPosUtilization" />
           <NavigationProperty Name="Partslist_Material" Relationship="iPlusMESV4_Model.FK_Partslist_MaterialID" FromRole="Material" ToRole="Partslist" />
           <NavigationProperty Name="PartslistConfig_Material" Relationship="iPlusMESV4_Model.FK_PartslistConfig_MaterialID" FromRole="Material" ToRole="PartslistConfig" />
-          <NavigationProperty Name="PartslistPos_Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="Material" ToRole="PartslistPos" />
           <NavigationProperty Name="PickingConfig_Material" Relationship="iPlusMESV4_Model.FK_PickingConfig_MaterialID" FromRole="Material" ToRole="PickingConfig" />
           <NavigationProperty Name="PickingPos_PickingMaterial" Relationship="iPlusMESV4_Model.FK_PickingPos_MaterialID" FromRole="Material" ToRole="PickingPos" />
           <NavigationProperty Name="PriceListMaterial_Material" Relationship="iPlusMESV4_Model.FK_PriceListMaterial_Material" FromRole="Material" ToRole="PriceListMaterial" />
@@ -22845,7 +22845,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Facility_Material" Relationship="iPlusMESV4_Model.FK_Facility_MaterialID" FromRole="Material" ToRole="Facility" />
           <NavigationProperty Name="InFacility" Relationship="iPlusMESV4_Model.FK_Material_InFacilityID" FromRole="Material" ToRole="Facility" />
           <NavigationProperty Name="OutFacility" Relationship="iPlusMESV4_Model.FK_Material_OutFacilityID" FromRole="Material" ToRole="Facility" />
-          <NavigationProperty Name="FacilityMaterial" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Material" FromRole="Material" ToRole="FacilityMaterial" />
+          <NavigationProperty Name="FacilityMaterial_Material" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Material" FromRole="Material" ToRole="FacilityMaterial" />
+          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="Material" ToRole="PartslistPos" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -23978,7 +23979,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Picking_MDPickingType" Relationship="iPlusMESV4_Model.FK_Picking_MDPickingType" FromRole="MDPickingType" ToRole="Picking" />
-          <NavigationProperty Name="FacilityMDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDPickingType" FromRole="MDPickingType" ToRole="FacilityMDSchedulingGroup" />
+          <NavigationProperty Name="FacilityMDSchedulingGroup_MDPickingType" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDPickingType" FromRole="MDPickingType" ToRole="FacilityMDSchedulingGroup" />
         </EntityType>
         <EntityType Name="MDProcessErrorAction">
           <Key>
@@ -24107,7 +24108,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="MDSchedulingGroupWF_MDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_MDSchedulingGroupWF_MDSchedulingGroup" FromRole="MDSchedulingGroup" ToRole="MDSchedulingGroupWF" />
-          <NavigationProperty Name="FacilityMDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDSchedulingGroup" FromRole="MDSchedulingGroup" ToRole="FacilityMDSchedulingGroup" />
+          <NavigationProperty Name="FacilityMDSchedulingGroup_MDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDSchedulingGroup" FromRole="MDSchedulingGroup" ToRole="FacilityMDSchedulingGroup" />
         </EntityType>
         <EntityType Name="MDSchedulingGroupWF">
           <Key>
@@ -24304,9 +24305,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="OutOfferPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" FromRole="MDUnit" ToRole="OutOfferPos" />
           <NavigationProperty Name="OutOrderPos_MDUnit" Relationship="iPlusMESV4_Model.FK_OutOrderPos_MDUnitID" FromRole="MDUnit" ToRole="OutOrderPos" />
           <NavigationProperty Name="Partslist_MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="MDUnit" ToRole="Partslist" />
-          <NavigationProperty Name="PartslistPos_MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="MDUnit" ToRole="PartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_MDUnit" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDUnitID" FromRole="MDUnit" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="Facility_MDUnit" Relationship="iPlusMESV4_Model.FK_Facility_MDUnitID" FromRole="MDUnit" ToRole="Facility" />
+          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="MDUnit" ToRole="PartslistPos" />
         </EntityType>
         <EntityType Name="MDUnitConversion">
           <Key>
@@ -24813,13 +24814,13 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_Partslist_MDUnitID" FromRole="Partslist" ToRole="MDUnit" />
           <NavigationProperty Name="PartslistACClassMethod_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" FromRole="Partslist" ToRole="PartslistACClassMethod" />
           <NavigationProperty Name="PartslistConfig_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" FromRole="Partslist" ToRole="PartslistConfig" />
-          <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistStock_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistStock_PartslistID" FromRole="Partslist" ToRole="PartslistStock" />
           <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="Partslist_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist" ToRole="Partslist1" />
           <NavigationProperty Name="Partslist1_PreviousPartslist" Relationship="iPlusMESV4_Model.PreviousPartslistID_PartslistID" FromRole="Partslist1" ToRole="Partslist" />
           <NavigationProperty Name="Facility_Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
+          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPos1" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -24865,46 +24866,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PartslistConfig_ParentPartslistConfig" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID" FromRole="PartslistConfig" ToRole="PartslistConfig1" />
           <NavigationProperty Name="PartslistConfig1_ParentPartslistConfig" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID" FromRole="PartslistConfig1" ToRole="PartslistConfig" />
         </EntityType>
-        <EntityType Name="PartslistPos">
-          <Key>
-            <PropertyRef Name="PartslistPosID" />
-          </Key>
-          <Property Name="PartslistPosID" Type="Guid" Nullable="false" />
-          <Property Name="PartslistID" Type="Guid" Nullable="false" />
-          <Property Name="Sequence" Type="Int32" Nullable="false" />
-          <Property Name="SequenceProduction" Type="Int32" Nullable="false" />
-          <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
-          <Property Name="MaterialID" Type="Guid" Nullable="false" />
-          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="MDUnitID" Type="Guid" />
-          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
-          <Property Name="IsBaseQuantityExcluded" Type="Boolean" Nullable="false" />
-          <Property Name="ParentPartslistPosID" Type="Guid" />
-          <Property Name="AlternativePartslistPosID" Type="Guid" />
-          <Property Name="ParentPartslistID" Type="Guid" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="LineNumber" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="RetrogradeFIFO" Type="Boolean" />
-          <Property Name="ExplosionOff" Type="Boolean" />
-          <Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="PartslistPos" ToRole="Material" />
-          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="PartslistPos" ToRole="MDUnit" />
-          <NavigationProperty Name="ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
-          <NavigationProperty Name="PartslistPos_AlternativePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
-          <NavigationProperty Name="PartslistPos1_AlternativePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPos_ParentPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
-          <NavigationProperty Name="PartslistPos1_ParentPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
-          <NavigationProperty Name="PartslistPosRelation_TargetPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
-          <NavigationProperty Name="PartslistPosRelation_SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
-          <NavigationProperty Name="PartslistPosSplit_PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
-          <NavigationProperty Name="ProdOrderPartslistPos_BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
-          <Property Name="Anterograde" Type="Boolean" />
-        </EntityType>
         <EntityType Name="PartslistPosRelation">
           <Key>
             <PropertyRef Name="PartslistPosRelationID" />
@@ -24918,9 +24879,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="MaterialWFRelationID" Type="Guid" />
           <Property Name="RetrogradeFIFO" Type="Boolean" />
           <NavigationProperty Name="MaterialWFRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" FromRole="PartslistPosRelation" ToRole="MaterialWFRelation" />
-          <NavigationProperty Name="TargetPartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
-          <NavigationProperty Name="SourcePartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
           <Property Name="Anterograde" Type="Boolean" />
+          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPos1" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPosRelation" ToRole="PartslistPos" />
         </EntityType>
         <EntityType Name="PartslistPosSplit">
           <Key>
@@ -25363,7 +25324,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MDToleranceState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDToleranceStateID" FromRole="ProdOrderPartslistPos" ToRole="MDToleranceState" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDUnitID" FromRole="ProdOrderPartslistPos" ToRole="MDUnit" />
           <NavigationProperty Name="OrderLog_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_OrderLog_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="OrderLog" />
-          <NavigationProperty Name="BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PartslistPos" />
           <NavigationProperty Name="PickingPosProdOrderPartslistPos_ProdorderPartslistPos" Relationship="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PickingPosProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderBatch" />
           <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderBatchPlan" />
@@ -25380,6 +25340,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="TandTv2StepItem_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv3MixPointProdOrderPartslistPos" />
           <Property Name="Anterograde" Type="Boolean" />
+          <NavigationProperty Name="PartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PartslistPos" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosFacilityLot">
           <Key>
@@ -31782,18 +31743,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PartslistPos_MaterialID">
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Material">
-              <PropertyRef Name="MaterialID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PickingConfig_MaterialID">
           <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.PickingConfig" Role="PickingConfig" Multiplicity="*" />
@@ -32846,18 +32795,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PartslistPos_MDUnitID">
-          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDUnit">
-              <PropertyRef Name="MDUnitID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="MDUnitID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ProdOrderPartslistPos_MDUnitID">
           <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
@@ -33206,30 +33143,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PartslistPos_Partslist">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="ParentPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_PartsListID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PartslistPos">
-              <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PartslistStock_PartslistID">
           <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -33277,80 +33190,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="PartslistConfig1">
               <PropertyRef Name="ParentPartslistConfigID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_AlternativePartslistPosID">
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PartslistPos">
-              <PropertyRef Name="PartslistPosID" />
-            </Principal>
-            <Dependent Role="PartslistPos1">
-              <PropertyRef Name="AlternativePartslistPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPos_ParentPartslistPosID">
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PartslistPos">
-              <PropertyRef Name="PartslistPosID" />
-            </Principal>
-            <Dependent Role="PartslistPos1">
-              <PropertyRef Name="ParentPartslistPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPosRelation_PartslistPos">
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistPosRelation" Role="PartslistPosRelation" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PartslistPos">
-              <PropertyRef Name="PartslistPosID" />
-            </Principal>
-            <Dependent Role="PartslistPosRelation">
-              <PropertyRef Name="TargetPartslistPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPosRelation_PartslistPos1">
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PartslistPosRelation" Role="PartslistPosRelation" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PartslistPos">
-              <PropertyRef Name="PartslistPosID" />
-            </Principal>
-            <Dependent Role="PartslistPosRelation">
-              <PropertyRef Name="SourcePartslistPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PartslistPosSplit_PartslistPosID">
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PartslistPosSplit" Role="PartslistPosSplit" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PartslistPos">
-              <PropertyRef Name="PartslistPosID" />
-            </Principal>
-            <Dependent Role="PartslistPosSplit">
-              <PropertyRef Name="PartslistPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderPartslistPos_PartslistPos">
-          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PartslistPos">
-              <PropertyRef Name="PartslistPosID" />
-            </Principal>
-            <Dependent Role="ProdOrderPartslistPos">
-              <PropertyRef Name="BasedOnPartslistPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -34793,8 +34632,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="VisitorVoucher_TrailerFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" FromRole="Facility" ToRole="VisitorVoucher" />
           <NavigationProperty Name="VisitorVoucher_VehicleFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" FromRole="Facility" ToRole="VisitorVoucher" />
           <NavigationProperty Name="FacilityInventory_Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="Facility" ToRole="FacilityInventory" />
-          <NavigationProperty Name="FacilityMaterial" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility" FromRole="Facility" ToRole="FacilityMaterial" />
-          <NavigationProperty Name="FacilityMDSchedulingGroup" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility" FromRole="Facility" ToRole="FacilityMDSchedulingGroup" />
+          <NavigationProperty Name="FacilityMaterial_Facility" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility" FromRole="Facility" ToRole="FacilityMaterial" />
+          <NavigationProperty Name="FacilityMDSchedulingGroup_Facility" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility" FromRole="Facility" ToRole="FacilityMDSchedulingGroup" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -35393,7 +35232,170 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        </Schema>
+        <EntityType Name="PartslistPos">
+          <Key>
+            <PropertyRef Name="PartslistPosID" />
+          </Key>
+          <Property Name="PartslistPosID" Type="Guid" Nullable="false" />
+          <Property Name="PartslistID" Type="Guid" Nullable="false" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="SequenceProduction" Type="Int32" Nullable="false" />
+          <Property Name="MaterialPosTypeIndex" Type="Int16" Nullable="false" />
+          <Property Name="MaterialID" Type="Guid" Nullable="false" />
+          <Property Name="TargetQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="MDUnitID" Type="Guid" />
+          <Property Name="TargetQuantity" Type="Double" Nullable="false" />
+          <Property Name="IsBaseQuantityExcluded" Type="Boolean" Nullable="false" />
+          <Property Name="ParentPartslistPosID" Type="Guid" />
+          <Property Name="AlternativePartslistPosID" Type="Guid" />
+          <Property Name="ParentPartslistID" Type="Guid" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LineNumber" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="RetrogradeFIFO" Type="Boolean" />
+          <Property Name="ExplosionOff" Type="Boolean" />
+          <Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="Anterograde" Type="Boolean" />
+          <Property Name="PostingQuantitySuggestion" Type="Int16" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="PartslistPos" ToRole="Material" />
+          <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="PartslistPos" ToRole="MDUnit" />
+          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
+          <NavigationProperty Name="Partslist1" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="PartslistPos" ToRole="Partslist" />
+          <NavigationProperty Name="PartslistPos1" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
+          <NavigationProperty Name="PartslistPos2" Relationship="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPos11" Relationship="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" FromRole="PartslistPos" ToRole="PartslistPos1" />
+          <NavigationProperty Name="PartslistPos3" Relationship="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" FromRole="PartslistPos1" ToRole="PartslistPos" />
+          <NavigationProperty Name="PartslistPosRelation" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
+          <NavigationProperty Name="PartslistPosRelation1" Relationship="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" FromRole="PartslistPos" ToRole="PartslistPosRelation" />
+          <NavigationProperty Name="PartslistPosSplit" Relationship="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" FromRole="PartslistPos" ToRole="PartslistPosSplit" />
+          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="PartslistPos" ToRole="ProdOrderPartslistPos" />
+        </EntityType>
+        <Association Name="FK_PartslistPos_MaterialID">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_MDUnitID">
+          <End Type="iPlusMESV4_Model.MDUnit" Role="MDUnit" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDUnit">
+              <PropertyRef Name="MDUnitID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="MDUnitID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_Partslist">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="ParentPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_PartsListID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PartslistPos">
+              <PropertyRef Name="PartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_AlternativePartslistPosID">
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PartslistPos">
+              <PropertyRef Name="PartslistPosID" />
+            </Principal>
+            <Dependent Role="PartslistPos1">
+              <PropertyRef Name="AlternativePartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPos_ParentPartslistPosID">
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PartslistPos">
+              <PropertyRef Name="PartslistPosID" />
+            </Principal>
+            <Dependent Role="PartslistPos1">
+              <PropertyRef Name="ParentPartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPosRelation_PartslistPos">
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistPosRelation" Role="PartslistPosRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PartslistPos">
+              <PropertyRef Name="PartslistPosID" />
+            </Principal>
+            <Dependent Role="PartslistPosRelation">
+              <PropertyRef Name="TargetPartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPosRelation_PartslistPos1">
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PartslistPosRelation" Role="PartslistPosRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PartslistPos">
+              <PropertyRef Name="PartslistPosID" />
+            </Principal>
+            <Dependent Role="PartslistPosRelation">
+              <PropertyRef Name="SourcePartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PartslistPosSplit_PartslistPosID">
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PartslistPosSplit" Role="PartslistPosSplit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PartslistPos">
+              <PropertyRef Name="PartslistPosID" />
+            </Principal>
+            <Dependent Role="PartslistPosSplit">
+              <PropertyRef Name="PartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderPartslistPos_PartslistPos">
+          <End Type="iPlusMESV4_Model.PartslistPos" Role="PartslistPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PartslistPos">
+              <PropertyRef Name="PartslistPosID" />
+            </Principal>
+            <Dependent Role="ProdOrderPartslistPos">
+              <PropertyRef Name="BasedOnPartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -39197,35 +39199,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="PartslistPos">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPos">
-              <MappingFragment StoreEntitySet="PartslistPos">
-                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
-                <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
-                <ScalarProperty Name="ExplosionOff" ColumnName="ExplosionOff" />
-                <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
-                <ScalarProperty Name="LineNumber" ColumnName="LineNumber" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="ParentPartslistID" ColumnName="ParentPartslistID" />
-                <ScalarProperty Name="AlternativePartslistPosID" ColumnName="AlternativePartslistPosID" />
-                <ScalarProperty Name="ParentPartslistPosID" ColumnName="ParentPartslistPosID" />
-                <ScalarProperty Name="IsBaseQuantityExcluded" ColumnName="IsBaseQuantityExcluded" />
-                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
-                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
-                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="MaterialPosTypeIndex" ColumnName="MaterialPosTypeIndex" />
-                <ScalarProperty Name="SequenceProduction" ColumnName="SequenceProduction" />
-                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
-                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
-                <ScalarProperty Name="PartslistPosID" ColumnName="PartslistPosID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="PartslistPosRelation">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPosRelation">
               <MappingFragment StoreEntitySet="PartslistPosRelation">
@@ -40704,6 +40677,36 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="PartslistPos">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPos">
+              <MappingFragment StoreEntitySet="PartslistPos">
+                <ScalarProperty Name="PostingQuantitySuggestion" ColumnName="PostingQuantitySuggestion" />
+                <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
+                <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
+                <ScalarProperty Name="ExplosionOff" ColumnName="ExplosionOff" />
+                <ScalarProperty Name="RetrogradeFIFO" ColumnName="RetrogradeFIFO" />
+                <ScalarProperty Name="LineNumber" ColumnName="LineNumber" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="ParentPartslistID" ColumnName="ParentPartslistID" />
+                <ScalarProperty Name="AlternativePartslistPosID" ColumnName="AlternativePartslistPosID" />
+                <ScalarProperty Name="ParentPartslistPosID" ColumnName="ParentPartslistPosID" />
+                <ScalarProperty Name="IsBaseQuantityExcluded" ColumnName="IsBaseQuantityExcluded" />
+                <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
+                <ScalarProperty Name="MDUnitID" ColumnName="MDUnitID" />
+                <ScalarProperty Name="TargetQuantityUOM" ColumnName="TargetQuantityUOM" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="MaterialPosTypeIndex" ColumnName="MaterialPosTypeIndex" />
+                <ScalarProperty Name="SequenceProduction" ColumnName="SequenceProduction" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="PartslistID" ColumnName="PartslistID" />
+                <ScalarProperty Name="PartslistPosID" ColumnName="PartslistPosID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -40896,7 +40899,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <EntityTypeShape EntityType="iPlusMESV4_Model.Partslist" Width="1.5" PointX="62.75" PointY="316.25" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistACClassMethod" Width="1.5" PointX="68" PointY="320.25" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistConfig" Width="1.5" PointX="69" PointY="309.5" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPos" Width="1.5" PointX="66" PointY="301.75" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPosRelation" Width="1.5" PointX="54" PointY="292" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPosSplit" Width="1.5" PointX="68.25" PointY="304" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistStock" Width="1.5" PointX="71" PointY="316.875" />
@@ -41413,7 +41415,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPosUtilization_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_MaterialID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingConfig_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PriceListMaterial_Material" />
@@ -41500,7 +41501,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOfferPos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrderPos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Partslist_MDUnitID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDVisitorCard_MDVisitorCardStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_MDVisitorCardID" />
@@ -41529,18 +41529,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistACClassMethod_Partslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_Partslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistStock_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.PreviousPartslistID_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_ParentPartslistConfigID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_TourplanID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_VisitorVoucherID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingConfig_PickingID" />
@@ -41686,7 +41678,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMaterial_Material" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDPickingType" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_MDSchedulingGroup" />
-        </Diagram>
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPos" Width="1.5" PointX="66" PointY="300.625" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_Partslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_PartsListID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_AlternativePartslistPosID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_ParentPartslistPosID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_PartslistPos1" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosSplit_PartslistPosID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" />
+      </Diagram>
     </Diagrams>
   </Designer>
 </edmx:Edmx>

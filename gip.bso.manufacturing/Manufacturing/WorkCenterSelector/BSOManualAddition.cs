@@ -60,6 +60,13 @@ namespace gip.bso.manufacturing
 
         public override ScaleBackgroundState? OnDetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
+            short? quantQuantity = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos.BasedOnPartslistPos.PostingQuantitySuggestion;
+
+            if (quantQuantity.HasValue && quantQuantity.Value > 0 && actual > 0)
+            {
+                return ScaleBackgroundState.InTolerance;
+            }
+
             return null;
         }
 
@@ -123,17 +130,28 @@ namespace gip.bso.manufacturing
                         _SelFacilityCharge = value;
 
                         double diff = SelectedWeighingMaterial.TargetQuantity;
-                        ACMethod pafMethod = GetPAFCurrentACMethod();
-                        if (pafMethod != null)
-                        {
-                            double targetQuantity = pafMethod.ParameterValueList.GetDouble("TargetQuantity");
-                            diff = targetQuantity - ScaleActualWeight;
-                        }
 
-                        if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > diff)
+                        short? quantQuantity = SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.BasedOnPartslistPos.PostingQuantitySuggestion;
+
+                        if (quantQuantity.HasValue && quantQuantity.Value > 0)
+                        {
+                            diff = value.StockQuantityUOM;
                             SelectedWeighingMaterial.AddValue = diff;
+                        }
                         else
-                            SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
+                        {
+                            ACMethod pafMethod = GetPAFCurrentACMethod();
+                            if (pafMethod != null)
+                            {
+                                double targetQuantity = pafMethod.ParameterValueList.GetDouble("TargetQuantity");
+                                diff = targetQuantity - ScaleActualWeight;
+                            }
+
+                            if (value.StockQuantityUOM <= 0.0001 || value.StockQuantityUOM > diff)
+                                SelectedWeighingMaterial.AddValue = diff;
+                            else
+                                SelectedWeighingMaterial.AddValue = value.StockQuantityUOM;
+                        }
 
                         if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
                         {

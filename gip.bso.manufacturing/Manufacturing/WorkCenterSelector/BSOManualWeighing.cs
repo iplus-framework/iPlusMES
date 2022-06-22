@@ -1769,19 +1769,22 @@ namespace gip.bso.manufacturing
                         {
                             if (short.TryParse(valueItem.Value, out short weighingState))
                             {
-                                vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
-                                                                                 .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
-                                if (posRelation != null)
+                                using (ACMonitor.Lock(db.QueryLock_1X000))
                                 {
-                                    try
+                                    vd.ProdOrderPartslistPosRelation posRelation = db.ProdOrderPartslistPosRelation.Include(s => s.SourceProdOrderPartslistPos.Material.MDFacilityManagementType)
+                                                                                 .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRel);
+                                    if (posRelation != null)
                                     {
-                                        posRelation.AutoRefresh();
+                                        try
+                                        {
+                                            posRelation.AutoRefresh();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
+                                        }
+                                        weighingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                                     }
-                                    catch (Exception e)
-                                    {
-                                        Messages.LogException(this.GetACUrl(), nameof(GetWeighingMaterials), e);
-                                    }
-                                    weighingMaterials.Add(new WeighingMaterial(posRelation, (WeighingComponentState)weighingState, iconDesign, this));
                                 }
                             }
                         }
@@ -2708,15 +2711,6 @@ namespace gip.bso.manufacturing
                     Messages.Error(this, "Error50434", false, SelectedSingleDosTargetStorage.ACClassID);
                     return;
                 }
-
-                //vd.Facility outwardFacility = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == SelectedSingleDosingItem.FacilityNo);
-
-                //if (outwardFacility == null)
-                //{
-                //    //Error50435: Can not find any outward facility with FacilityNo: {0}
-                //    Messages.Error(this, "Error50435",false, SelectedSingleDosingItem.FacilityNo);
-                //    return;
-                //}
 
                 vd.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedSingleDosingItem.MaterialNo);
                 if (material == null)

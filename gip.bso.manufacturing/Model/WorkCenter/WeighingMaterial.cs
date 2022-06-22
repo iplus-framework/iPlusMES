@@ -401,8 +401,10 @@ namespace gip.bso.manufacturing
                 try
                 {
                     using (ACMonitor.Lock(dbApp.QueryLock_1X000))
+                    {
                         PosRelation.AutoRefresh();
-                    ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
+                        ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
+                    }
                 }
                 catch
                 {
@@ -418,8 +420,8 @@ namespace gip.bso.manufacturing
                     {
                         PosRelation.AutoRefresh();
                         PosRelation.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
+                        TargetQuantity = Math.Abs(PosRelation.RemainingDosingWeight);
                     }
-                    TargetQuantity = Math.Abs(PosRelation.RemainingDosingWeight);
                     ActualQuantity = 0;
                 }
                 catch
