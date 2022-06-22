@@ -144,6 +144,20 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Child BSO
+
+        ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
+        public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
+        {
+            get
+            {
+                if (_BSOFacilityExplorer_Child == null)
+                    _BSOFacilityExplorer_Child = new ACChildItem<BSOFacilityExplorer>(this, "BSOFacilityExplorer_Child");
+                return _BSOFacilityExplorer_Child;
+            }
+        }
+
         ACChildItem<BSOMedia> _BSOMedia_Child;
         [ACPropertyInfo(9999)]
         [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
@@ -156,6 +170,7 @@ namespace gip.bso.masterdata
                 return _BSOMedia_Child;
             }
         }
+
         #endregion
 
         #region BSO->ACProperty
@@ -695,6 +710,66 @@ namespace gip.bso.masterdata
                 return CurrentMaterial.MDUnitList;
             }
         }
+        #endregion
+
+        #region FacilityMaterial
+
+
+        #region FacilityMaterial
+        private FacilityMaterial _SelectedFacilityMaterial;
+        /// <summary>
+        /// Selected property for FacilityMaterial
+        /// </summary>
+        /// <value>The selected FacilityMaterial</value>
+        [ACPropertySelected(9999, "FacilityMaterial", "en{'TODO: FacilityMaterial'}de{'TODO: FacilityMaterial'}")]
+        public FacilityMaterial SelectedFacilityMaterial
+        {
+            get
+            {
+                return _SelectedFacilityMaterial;
+            }
+            set
+            {
+                if (_SelectedFacilityMaterial != value)
+                {
+                    _SelectedFacilityMaterial = value;
+                    OnPropertyChanged(nameof(SelectedFacilityMaterial));
+                }
+            }
+        }
+
+
+        private List<FacilityMaterial> _FacilityMaterialList;
+        /// <summary>
+        /// List property for FacilityMaterial
+        /// </summary>
+        /// <value>The FacilityMaterial list</value>
+        [ACPropertyList(9999, "FacilityMaterial")]
+        public List<FacilityMaterial> FacilityMaterialList
+        {
+            get
+            {
+                if (_FacilityMaterialList == null)
+                    _FacilityMaterialList = LoadFacilityMaterialList();
+                return _FacilityMaterialList;
+            }
+            set
+            {
+                _FacilityMaterialList = value;
+                OnPropertyChanged(nameof(FacilityMaterialList));
+            }
+        }
+
+        private List<FacilityMaterial> LoadFacilityMaterialList()
+        {
+            if (SelectedMaterial == null)
+                return new List<FacilityMaterial>();
+            return SelectedMaterial.FacilityMaterial_Material.OrderBy(c => c.Facility.FacilityNo).ToList();
+        }
+        #endregion
+
+
+
         #endregion
 
         #endregion
@@ -1358,6 +1433,79 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region FacilityMaterial
+
+        /// <summary>
+        /// Source Property: AddFacility
+        /// </summary>
+        [ACMethodInfo("AddFacility", "en{'Add'}de{'Neu'}", 999)]
+        public void AddFacility()
+        {
+            if (!IsEnabledAddFacility())
+                return;
+
+            FacilityMaterial facilityMaterial = FacilityMaterial.NewACObject(DatabaseApp, null);
+            facilityMaterial.Material = SelectedMaterial;
+            SelectedMaterial.FacilityMaterial_Material.Add(facilityMaterial);
+            FacilityMaterialList.Add(facilityMaterial);
+            OnPropertyChanged(nameof(FacilityMaterialList));
+
+            SelectedFacilityMaterial = facilityMaterial;
+        }
+
+        public bool IsEnabledAddFacility()
+        {
+            return SelectedMaterial != null;
+        }
+
+
+        /// <summary>
+        /// Source Property: DeleteFacility
+        /// </summary>
+        [ACMethodInfo("DeleteFacility", "en{'Delete'}de{'Löschen'}", 999)]
+        public void DeleteFacility()
+        {
+            if (!IsEnabledDeleteFacility())
+                return;
+
+            SelectedMaterial.FacilityMaterial_Material.Remove(SelectedFacilityMaterial);
+            FacilityMaterialList.Remove(SelectedFacilityMaterial);
+
+            SelectedFacilityMaterial.DeleteACObject(DatabaseApp, false);
+
+            OnPropertyChanged(nameof(FacilityMaterialList));
+        }
+
+        public bool IsEnabledDeleteFacility()
+        {
+            return SelectedFacilityMaterial != null;
+        }
+
+        /// <summary>
+        /// Source Property: ShowDlgInwardFacility
+        /// </summary>
+        [ACMethodInfo("ShowFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowFacility()
+        {
+            if (!IsEnabledShowFacility())
+                return;
+
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFacilityMaterial?.Facility);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                SelectedFacilityMaterial.Facility = facility;
+                OnPropertyChanged(nameof(SelectedFacilityMaterial));
+            }
+        }
+
+        public bool IsEnabledShowFacility()
+        {
+            return SelectedFacilityMaterial != null;
+        }
+
+        #endregion
+
         #endregion
 
         #region Translation
@@ -1722,6 +1870,8 @@ namespace gip.bso.masterdata
                 FilterAssociatedPosMaterial.SearchWord = material.MaterialNo;
             else
                 FilterAssociatedPosMaterial.SearchWord = null;
+
+            FacilityMaterialList = LoadFacilityMaterialList();
         }
 
         private List<ACFilterItem> GetQuantitySearchFilter()
