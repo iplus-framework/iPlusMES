@@ -1,3 +1,6 @@
+ALTER TABLE [dbo].[MDFacilityInventoryPosState] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[MDFacilityInventoryPosState] ALTER COLUMN [UpdateName] varchar(20) not null;
+GO
 declare @existPosted int;
 set @existPosted = (select COUNT(*) from [MDFacilityInventoryPosState] where MDKey = 'Posted');
 if @existPosted = 0
