@@ -1,3 +1,5 @@
+ALTER TABLE [dbo].[MDFacilityInventoryState] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[MDFacilityInventoryState] ALTER COLUMN [UpdateName] varchar(20) not null;
 ALTER TABLE [dbo].[MDFacilityInventoryPosState] ALTER COLUMN [InsertName] varchar(20) not null;
 ALTER TABLE [dbo].[MDFacilityInventoryPosState] ALTER COLUMN [UpdateName] varchar(20) not null;
 GO

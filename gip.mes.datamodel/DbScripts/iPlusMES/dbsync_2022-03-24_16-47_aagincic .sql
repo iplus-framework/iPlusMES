@@ -1,3 +1,14 @@
+ALTER TABLE [dbo].[PartslistConfig] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[PartslistConfig] ALTER COLUMN [UpdateName] varchar(20) not null;
+ALTER TABLE [dbo].[PickingConfig] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[PickingConfig] ALTER COLUMN [UpdateName] varchar(20) not null;
+ALTER TABLE [dbo].[ProdOrderPartslistConfig] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[ProdOrderPartslistConfig] ALTER COLUMN [UpdateName] varchar(20) not null;
+ALTER TABLE [dbo].[ACClassMethodConfig] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[ACClassMethodConfig] ALTER COLUMN [UpdateName] varchar(20) not null;
+ALTER TABLE [dbo].[MaterialWFACClassMethodConfig] ALTER COLUMN [InsertName] varchar(20) not null;
+ALTER TABLE [dbo].[MaterialWFACClassMethodConfig] ALTER COLUMN [UpdateName] varchar(20) not null;
+GO
 declare @oldString varchar(250);
 declare @newString varchar(250);
 declare @updateUser varchar(20);
@@ -49,6 +60,8 @@ WHERE XMLConfig like '%' + @oldString + '%'
 
 set @oldString = N'>gip.mes.datamodel.GlobalApp+BatchPlanStartModeEnum<';
 set @newString = N'>gip.mes.datamodel.BatchPlanStartModeEnum<';
+
+
 
 --PartslistConfig
 UPDATE PartslistConfig set 
