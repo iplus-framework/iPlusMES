@@ -3261,6 +3261,52 @@ namespace gip.bso.manufacturing
             ShowDialog(this, DesignNameProgressBar);
         }
 
+        /// <summary>
+        /// Source Property: GenerateBatchPlans
+        /// </summary>
+        [ACMethodInfo("GenerateBatchPlans", "en{'Generate batch plans'}de{'Batchplan generieren'}", 999, true)]
+        public void GenerateBatchPlans()
+        {
+            if (!IsEnabledGenerateBatchPlans())
+                return;
+            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
+            {
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public bool IsEnabledGenerateBatchPlans()
+        {
+            return
+                ProdOrderPartslistList != null
+                && ProdOrderPartslistList.Any(c => c.IsSelected)
+                && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
+        }
+
+        /// <summary>
+        /// Source Property: GenerateBatchPlans
+        /// </summary>
+        [ACMethodInfo("MergeOrders", "en{'Merge prodorders'}de{'Auftrag zusammenführen'}", 999, true)]
+        public void MergeOrders()
+        {
+            if (!IsEnabledMergeOrders())
+                return;
+            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
+            {
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoMergeOrders);
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public bool IsEnabledMergeOrders()
+        {
+            return
+                ProdOrderPartslistList != null
+                && ProdOrderPartslistList.Any(c => c.IsSelected)
+                && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
+        }
+
         #endregion
 
         #region Methods -> (Tab)BatchPlanScheduler -> BatchState
@@ -3964,52 +4010,6 @@ namespace gip.bso.manufacturing
             }
 
             OnPropertyChanged(nameof(CurrentLayout));
-        }
-
-        /// <summary>
-        /// Source Property: GenerateBatchPlans
-        /// </summary>
-        [ACMethodInfo("GenerateBatchPlans", "en{'Generate batch plans'}de{'Batchplan generieren'}", 999, true)]
-        public void GenerateBatchPlans()
-        {
-            if (!IsEnabledGenerateBatchPlans())
-                return;
-            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
-            {
-                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
-                ShowDialog(this, DesignNameProgressBar);
-            }
-        }
-
-        public bool IsEnabledGenerateBatchPlans()
-        {
-            return
-                ProdOrderPartslistList != null
-                && ProdOrderPartslistList.Any(c => c.IsSelected)
-                && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
-        }
-
-        /// <summary>
-        /// Source Property: GenerateBatchPlans
-        /// </summary>
-        [ACMethodInfo("MergeOrders", "en{'Merge prodorders'}de{'Auftrag zusammenführen'}", 999, true)]
-        public void MergeOrders()
-        {
-            if (!IsEnabledMergeOrders())
-                return;
-            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
-            {
-                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoMergeOrders);
-                ShowDialog(this, DesignNameProgressBar);
-            }
-        }
-
-        public bool IsEnabledMergeOrders()
-        {
-            return
-                ProdOrderPartslistList != null
-                && ProdOrderPartslistList.Any(c => c.IsSelected)
-                && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
         }
 
         #endregion
