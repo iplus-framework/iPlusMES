@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking type'}de{'Kommissionierung Typ'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "MDBSOPickingType")]
+    [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.PickingType, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "MDBSOPickingType")]
     [ACPropertyEntity(9999, Const.MDNameTrans, Const.EntityNameTrans, "", "", true, MinLength = 1)]
     [ACPropertyEntity(5, Const.MDKey, Const.EntityKey, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, Const.SortIndex, Const.EntitySortSequence, "", "", true)]

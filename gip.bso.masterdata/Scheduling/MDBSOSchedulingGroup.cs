@@ -129,12 +129,13 @@ namespace gip.bso.masterdata.Scheduling
             }
             set
             {
-                if (AccessPrimary == null) return; 
-                if(AccessPrimary.Selected != value)
+                if (AccessPrimary == null) return;
+                if (AccessPrimary.Selected != value)
                 {
                     AccessPrimary.Selected = value;
                     OnPropertyChanged(nameof(SelectedMDSchedulingGroup));
                     ConnectedFacilityList = LoadConnectedFacilityList();
+                    SelectedConnectedFacility = ConnectedFacilityList.FirstOrDefault();
                 }
             }
         }
@@ -377,9 +378,13 @@ namespace gip.bso.masterdata.Scheduling
 
         private List<FacilityMDSchedulingGroup> LoadConnectedFacilityList()
         {
-            if(SelectedMDSchedulingGroup == null)
+            if (SelectedMDSchedulingGroup == null)
                 return new List<FacilityMDSchedulingGroup>();
-            return SelectedMDSchedulingGroup.FacilityMDSchedulingGroup_MDSchedulingGroup.ToList();
+            return
+                SelectedMDSchedulingGroup
+                .FacilityMDSchedulingGroup_MDSchedulingGroup
+                .OrderBy(c => c.Facility.FacilityNo)
+                .ToList();
         }
 
 
@@ -605,7 +610,7 @@ namespace gip.bso.masterdata.Scheduling
             SelectedMDSchedulingGroup.FacilityMDSchedulingGroup_MDSchedulingGroup.Remove(SelectedConnectedFacility);
             ConnectedFacilityList.Remove(SelectedConnectedFacility);
 
-            SelectedConnectedFacility.DeleteACObject(DatabaseApp ,false);
+            SelectedConnectedFacility.DeleteACObject(DatabaseApp, false);
 
             OnPropertyChanged(nameof(ConnectedFacilityList));
         }

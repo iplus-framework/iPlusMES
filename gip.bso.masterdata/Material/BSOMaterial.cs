@@ -764,7 +764,11 @@ namespace gip.bso.masterdata
         {
             if (SelectedMaterial == null)
                 return new List<FacilityMaterial>();
-            return SelectedMaterial.FacilityMaterial_Material.OrderBy(c => c.Facility.FacilityNo).ToList();
+            return 
+                SelectedMaterial
+                .FacilityMaterial_Material
+                .OrderBy(c => c.Facility.FacilityNo)
+                .ToList();
         }
         #endregion
 
@@ -1872,6 +1876,7 @@ namespace gip.bso.masterdata
                 FilterAssociatedPosMaterial.SearchWord = null;
 
             FacilityMaterialList = LoadFacilityMaterialList();
+            SelectedFacilityMaterial = FacilityMaterialList.FirstOrDefault();
         }
 
         private List<ACFilterItem> GetQuantitySearchFilter()
