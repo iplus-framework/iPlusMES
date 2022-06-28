@@ -2749,9 +2749,6 @@ namespace gip.mes.processapplication
             }
             if (currentFacilityCharge.HasValue)
                 acMethod.ParameterValueList["FacilityCharge"] = currentFacilityCharge.Value;
-            //else if (CurrentFacility.HasValue)
-            //    acMethod.ParameterValueList["Facility"] = CurrentFacility.Value;
-
 
             return null;
         }

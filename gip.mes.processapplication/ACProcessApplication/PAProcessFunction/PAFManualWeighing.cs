@@ -675,22 +675,34 @@ namespace gip.mes.processapplication
                 Guid? plPosRelation = CurrentACMethod.ValueT.ParameterValueList["PLPosRelation"] as Guid?;
                 if (plPosRelation.HasValue)
                 {
-                    using (DatabaseApp dbApp = new DatabaseApp())
+                    if (fc_f.Value == Guid.Empty)
                     {
-                        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
-                                                                                          .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
-                        if (rel != null)
+                        Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", "Quant is empty");
+                        if (ManualWeighingPW != null)
                         {
-                            Material mat = rel.SourceProdOrderPartslistPos.Material;
-                            if (mat != null)
+                            var temp = ManualWeighingPW.CurrentFacilityCharge;
+                            Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", String.Format("PW CurrentFacilityCharge is {0}", temp));
+                        }
+                    }
+                    else
+                    {
+                        using (DatabaseApp dbApp = new DatabaseApp())
+                        {
+                            ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                                                              .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
+                            if (rel != null)
                             {
-                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
-                                if (fc != null)
+                                Material mat = rel.SourceProdOrderPartslistPos.Material;
+                                if (mat != null)
                                 {
-                                    if (fc.MaterialID != mat.MaterialID)
+                                    FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
+                                    if (fc != null)
                                     {
-                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
-                                                                                               fc.FacilityChargeID, mat.MaterialID));
+                                        if (fc.MaterialID != mat.MaterialID)
+                                        {
+                                            Messages.LogError(this.GetACUrl(), "Wrong quant(A15)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
+                                                                                                   fc.FacilityChargeID, mat.MaterialID));
+                                        }
                                     }
                                 }
                             }
