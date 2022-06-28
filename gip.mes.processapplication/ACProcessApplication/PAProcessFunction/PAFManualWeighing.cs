@@ -612,6 +612,41 @@ namespace gip.mes.processapplication
             return base.Start(acMethod);
         }
 
+        protected override void OnChangingCurrentACMethod(ACMethod currentACMethod, ACMethod newACMethod)
+        {
+            base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
+
+            Guid? fc_f = newACMethod.ParameterValueList["FacilityCharge"] as Guid?;
+            if (fc_f.HasValue)
+            {
+                Guid? plPosRelation = newACMethod.ParameterValueList["PLPosRelation"] as Guid?;
+                if (plPosRelation.HasValue)
+                {
+                    using (DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                                                          .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
+                        if (rel != null)
+                        {
+                            Material mat = rel.SourceProdOrderPartslistPos.Material;
+                            if (mat != null)
+                            {
+                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
+                                if (fc != null)
+                                {
+                                    if (fc.MaterialID != mat.MaterialID)
+                                    {
+                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A20)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
+                                                                                               fc.FacilityChargeID, mat.MaterialID));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Methods => ACState
@@ -636,7 +671,34 @@ namespace gip.mes.processapplication
 
             Guid? fc_f = CurrentACMethod.ValueT.ParameterValueList["FacilityCharge"] as Guid?;
             if (fc_f.HasValue)
+            {
+                Guid? plPosRelation = CurrentACMethod.ValueT.ParameterValueList["PLPosRelation"] as Guid?;
+                if (plPosRelation.HasValue)
+                {
+                    using (DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                                                          .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
+                        if (rel != null)
+                        {
+                            Material mat = rel.SourceProdOrderPartslistPos.Material;
+                            if (mat != null)
+                            {
+                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
+                                if (fc != null)
+                                {
+                                    if (fc.MaterialID != mat.MaterialID)
+                                    {
+                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
+                                                                                               fc.FacilityChargeID, mat.MaterialID));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 return true;
+            }
 
             fc_f = CurrentACMethod.ValueT.ParameterValueList["Facility"] as Guid?;
 

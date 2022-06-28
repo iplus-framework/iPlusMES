@@ -1210,6 +1210,25 @@ namespace gip.mes.processapplication
                         ACValue facilityCharge = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetACValue("FacilityCharge");
                         if (facilityCharge != null && facilityCharge.Value != null)
                         {
+                            using (DatabaseApp dbApp = new DatabaseApp())
+                            {
+                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityCharge.ParamAsGuid);
+                                if (fc == null)
+                                {
+                                    Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A10)", 
+                                                      string.Format("The facility charge with ID: {0} not exist in the database.", facilityCharge.ParamAsGuid));
+                                }
+                                else
+                                {
+                                    if (fc.MaterialID != comp.Material)
+                                    {
+                                        Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A20)",
+                                                      string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid,comp.Material));
+                                    }
+                                }
+
+                            }
+
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
                             comp.SwitchState(WeighingComponentState.InWeighing);
                             SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, facilityCharge.ParamAsGuid);
@@ -1503,7 +1522,7 @@ namespace gip.mes.processapplication
                     if (correctedFc.HasValue)
                         currentFacilityCharge = correctedFc;
 
-                    var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentFacilityCharge, isForInterdischarge);
+                    var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentOpenMaterial, currentFacilityCharge, isForInterdischarge);
                     if (msgBooking != null)
                     {
                         Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
@@ -1638,7 +1657,7 @@ namespace gip.mes.processapplication
 
             if (actualWeight > 0.000001)
             {
-                var msgBooking = DoManualWeighingBooking(actualWeight, false, isConsumed, facilityCharge);
+                var msgBooking = DoManualWeighingBooking(actualWeight, false, isConsumed, currentOpenMaterial, facilityCharge);
                 if (msgBooking != null)
                 {
                     Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
@@ -2958,7 +2977,8 @@ namespace gip.mes.processapplication
                                     if (actWeight > 0.000001)
                                     {
                                         bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
-                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentFacilityCharge, false, scaleOtherComp, targetQuantity);
+                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false, 
+                                                                      scaleOtherComp, targetQuantity);
                                         _ScaleComp = false;
                                     }
                                     else if (isWeighingInTol)
@@ -3110,7 +3130,7 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentFacilityCharge, 
+        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentOpenMaterial, Guid? currentFacilityCharge, 
                                            bool isForInterdischarge = false, bool scaleOtherCompAfterAbort = false, double? tQuantityFromPAF = null)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
@@ -3135,8 +3155,6 @@ namespace gip.mes.processapplication
                         ActivateProcessAlarmWithLog(msg, false);
                         return msg;
                     }
-
-                    Guid? currentOpenMaterial = CurrentOpenMaterial;
 
                     if (currentOpenMaterial == null)
                     {
