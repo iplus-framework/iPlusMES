@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -8,7 +9,7 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'PreparedMaterial'}de{'PreparedMaterial.'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class PreparedMaterial
     {
-        public Guid MaterialID { get; set; }
+        public Material Material { get; set; }
 
         [ACPropertyInfo(100, "Sn", "en{'No'}de{'Nr'}")]
         public int Sn { get; set; }
@@ -28,15 +29,18 @@ namespace gip.bso.manufacturing
         [ACPropertyInfo(105, "AvailableQuantity", "en{'Stock Quantity'}de{'Lagermenge'}")]
         public double AvailableQuantityUOM { get; set; }
 
-        [ACPropertyInfo(106, "PickingPosQuantity", "en{'Planned'}de{'Geplant'}")]
+        [ACPropertyInfo(106, "AvailableQuantityDestinationUOM", "en{'Destination Quantity'}de{'Bestimmungsmenge'}")]
+        public double AvailableQuantityDestinationUOM { get; set; }
+
+        [ACPropertyInfo(107, "PickingPosQuantity", "en{'Planned'}de{'Geplant'}")]
         public double? PickingPosQuantityUOM { get; set; }
 
-        [ACPropertyInfo(107, "MissingQuantity", "en{'Missing Planned'}de{'Fehlende Planmenge'}")]
+        [ACPropertyInfo(109, "MissingQuantity", "en{'Missing Planned'}de{'Fehlende Planmenge'}")]
         public double? MissingQuantityUOM { get; set; }
 
         public Guid[] RelatedIDs { get; set; }
 
-        public PickingRelationTypeEnum PickingRelationType{ get; set; }
+        public PickingRelationTypeEnum PickingRelationType { get; set; }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -45,5 +49,7 @@ namespace gip.bso.manufacturing
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public Guid[] MDSchedulingGroupIDs { get; set; }
     }
 }

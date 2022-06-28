@@ -23,6 +23,7 @@ namespace gip.bso.manufacturing
         #region const
 
         public const string ProdMatStorage = @"ProdMatStorage";
+        public double Const_RangeStockQuantityTolerance = 0.1;
         #endregion
 
         #region DI Properties
@@ -36,7 +37,7 @@ namespace gip.bso.manufacturing
         public BSOMaterialPreparation(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            
+
         }
 
 
@@ -78,7 +79,7 @@ namespace gip.bso.manufacturing
 
             return b;
         }
-        
+
         #endregion
 
         #region Overrides
@@ -174,10 +175,8 @@ namespace gip.bso.manufacturing
                 if (_SelectedPreparedMaterial != value)
                 {
                     _SelectedPreparedMaterial = value;
-                    PickingQuantityUOM = SelectedPreparedMaterial.MissingQuantityUOM ?? 0;
                     LoadPreparedMaterial(value);
-                    LoadPickingPositions();
-                    OnPropertyChanged("SelectedPreparedMaterial");
+                    OnPropertyChanged(nameof(SelectedPreparedMaterial));
                 }
             }
         }
@@ -225,7 +224,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedSourceStorageBin != value)
                 {
                     _SelectedSourceStorageBin = value;
-                    OnPropertyChanged("SelectedSourceStorageBin");
+                    OnPropertyChanged(nameof(SelectedSourceStorageBin));
                 }
             }
         }
@@ -257,13 +256,13 @@ namespace gip.bso.manufacturing
         // TargetStorageBin (FacilityChargeSumFacilityHelper)
 
         #region TargetStorageBin
-        private FacilityChargeSumFacilityHelper _SelectedTargetStorageBin;
+        private PlanningTargetStockPreview _SelectedTargetStorageBin;
         /// <summary>
         /// Selected property for FacilityChargeSumFacilityHelper
         /// </summary>
         /// <value>The selected TargetStorageBin</value>
         [ACPropertySelected(504, "TargetStorageBin", "en{'TODO: TargetStorageBin'}de{'TODO: TargetStorageBin'}")]
-        public FacilityChargeSumFacilityHelper SelectedTargetStorageBin
+        public PlanningTargetStockPreview SelectedTargetStorageBin
         {
             get
             {
@@ -274,31 +273,36 @@ namespace gip.bso.manufacturing
                 if (_SelectedTargetStorageBin != value)
                 {
                     _SelectedTargetStorageBin = value;
-                    OnPropertyChanged("SelectedTargetStorageBin");
+                    OnPropertyChanged(nameof(SelectedTargetStorageBin));
+
+                    MDPickingType mDPickingType = null;
+                    if (value != null)
+                        mDPickingType = value.MDPickingType;
+                    LoadPickings(mDPickingType);
+                    if (mDPickingType != null)
+                    {
+                        PickingQuantityUOM = value.NewPlannedStockQuantity;
+                    }
                 }
             }
         }
 
-        private List<FacilityChargeSumFacilityHelper> _TargetStorageBinList;
+        private List<PlanningTargetStockPreview> _TargetStorageBinList;
         /// <summary>
         /// List property for FacilityChargeSumFacilityHelper
         /// </summary>
         /// <value>The TargetStorageBin list</value>
         [ACPropertyList(505, "TargetStorageBin")]
-        public List<FacilityChargeSumFacilityHelper> TargetStorageBinList
+        public List<PlanningTargetStockPreview> TargetStorageBinList
         {
             get
             {
                 if (_TargetStorageBinList == null)
-                    _TargetStorageBinList = LoadTargetStorageBinList();
+                    _TargetStorageBinList = new List<PlanningTargetStockPreview>();
                 return _TargetStorageBinList;
             }
         }
 
-        private List<FacilityChargeSumFacilityHelper> LoadTargetStorageBinList()
-        {
-            return new List<FacilityChargeSumFacilityHelper>();
-        }
         #endregion
 
         // Picking
@@ -322,7 +326,7 @@ namespace gip.bso.manufacturing
                 {
                     _SelectedPicking = value;
                     LoadPickingPositions();
-                    OnPropertyChanged("SelectedPicking");
+                    OnPropertyChanged(nameof(SelectedPicking));
                 }
             }
         }
@@ -339,15 +343,11 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_PickingList == null)
-                    _PickingList = LoadPickingList();
+                    _PickingList = new List<Picking>();
                 return _PickingList;
             }
         }
 
-        private List<vd.Picking> LoadPickingList()
-        {
-            return new List<vd.Picking>();
-        }
         #endregion
 
         // PickingPos
@@ -369,7 +369,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedPickingPos != value)
                 {
                     _SelectedPickingPos = value;
-                    OnPropertyChanged("SelectedPickingPos");
+                    OnPropertyChanged(nameof(SelectedPickingPos));
                 }
             }
         }
@@ -406,12 +406,11 @@ namespace gip.bso.manufacturing
                 return _PickingQuantityUOM;
             }
             set
-
             {
                 if (_PickingQuantityUOM != value)
                 {
                     _PickingQuantityUOM = value;
-                    OnPropertyChanged("PickingQuantityUOM");
+                    OnPropertyChanged(nameof(PickingQuantityUOM));
                 }
             }
         }
@@ -434,7 +433,7 @@ namespace gip.bso.manufacturing
                 {
                     _ShowAllPickingLines = value;
                     LoadPickingPositions();
-                    OnPropertyChanged("ShowAllPickingLines");
+                    OnPropertyChanged(nameof(ShowAllPickingLines));
                 }
             }
         }
@@ -453,16 +452,16 @@ namespace gip.bso.manufacturing
             if (!IsEnabledNewPicking()) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Picking), Picking.NoColumnName, Picking.FormatNewNo, this);
             var picking = Picking.NewACObject(DatabaseApp, null, secondaryKey);
-            picking.MDPickingType = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt);
+            picking.MDPickingType = SelectedTargetStorageBin.MDPickingType;
             DatabaseApp.Picking.AddObject(picking);
             ACSaveChanges();
             PickingList.Add(picking);
-            OnPropertyChanged("PickingList");
+            OnPropertyChanged(nameof(PickingList));
             SelectedPicking = picking;
         }
         public bool IsEnabledNewPicking()
         {
-            return true;
+            return SelectedTargetStorageBin != null && SelectedTargetStorageBin.MDPickingType != null;
         }
 
         /// <summary>
@@ -475,10 +474,10 @@ namespace gip.bso.manufacturing
             Picking picking = SelectedPicking;
             PickingList.Remove(SelectedPicking);
             Msg msg = PickingManager.UnassignAllPickingPos(picking, DatabaseApp, true);
-            if(msg == null || msg.IsSucceded())
+            if (msg == null || msg.IsSucceded())
             {
                 SelectedPicking = PickingList.FirstOrDefault();
-                OnPropertyChanged("PickingList");
+                OnPropertyChanged(nameof(PickingList));
             }
             else
             {
@@ -521,14 +520,13 @@ namespace gip.bso.manufacturing
             // Update SelectedTargetStorageBin
             _SelectedSourceStorageBin.NewPlannedStock += pickingPos.PickingQuantityUOM ?? 0;
             _SourceStorageBinList = _SourceStorageBinList.ToList();
-            _SelectedTargetStorageBin.NewPlannedStock += pickingPos.PickingQuantityUOM ?? 0;
             _TargetStorageBinList = _TargetStorageBinList.ToList();
 
-            OnPropertyChanged("PreparedMaterialList");
-            OnPropertyChanged("SourceStorageBinList");
-            OnPropertyChanged("TargetStorageBinList");
+            OnPropertyChanged(nameof(PreparedMaterialList));
+            OnPropertyChanged(nameof(SourceStorageBinList));
+            OnPropertyChanged(nameof(TargetStorageBinList));
 
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
         }
 
         public bool IsEnabledNewPickingPos()
@@ -553,20 +551,39 @@ namespace gip.bso.manufacturing
             SelectedPreparedMaterial.PickingPosQuantityUOM -= pickingPos.PickingQuantityUOM ?? 0;
             SelectedPreparedMaterial.MissingQuantityUOM = SelectedPreparedMaterial.TargetQuantityUOM - SelectedPreparedMaterial.PickingPosQuantityUOM;
             _PreparedMaterialList = PreparedMaterialList.ToList();
-            OnPropertyChanged("PreparedMaterialList");
+            OnPropertyChanged(nameof(PreparedMaterialList));
             var pickingPosPositions = pickingPos.PickingPosProdOrderPartslistPos_PickingPos.ToList();
             foreach (var pickingPosPos in pickingPosPositions)
                 pickingPosPos.DeleteACObject(DatabaseApp, false);
             pickingPos.DeleteACObject(DatabaseApp, false);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             SelectedPickingPos = PickingPosList.FirstOrDefault();
             ACSaveChanges();
-            LoadPreparedMaterial(SelectedPreparedMaterial);
         }
 
         public bool IsEnabledDeletePickingPos()
         {
             return SelectedPickingPos != null && SelectedPreparedMaterial != null; ;
+        }
+
+        [ACMethodInteraction("", "en{'Show picking'}de{'Kommission öffnen'}", 901, true, nameof(SelectedPicking))]
+        public void ShowPicking()
+        {
+            if (!IsEnabledShowPicking())
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Picking), SelectedPicking.PickingID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowPicking()
+        {
+            return SelectedPicking != null;
         }
 
         #endregion
@@ -614,11 +631,8 @@ namespace gip.bso.manufacturing
             CleanUp();
 
             _PreparedMaterialList = preparedMaterials;
-            OnPropertyChanged("PreparedMaterialList");
+            OnPropertyChanged(nameof(PreparedMaterialList));
             SelectedPreparedMaterial = _PreparedMaterialList.FirstOrDefault();
-
-            LoadPickings();
-            LoadPickingPositions();
         }
 
         public List<PreparedMaterial> GetPreparedMaterials(List<SearchBatchMaterialModel> researchedFacilities)
@@ -636,7 +650,7 @@ namespace gip.bso.manufacturing
                 Guid[] posIDs = item.Select(c => c.SourcePosID).Distinct().ToArray();
                 nr++;
                 PreparedMaterial preparedMaterial = new PreparedMaterial() { Sn = nr, PickingRelationType = PickingRelationTypeEnum.ProductionLine };
-                preparedMaterial.MaterialID = material.MaterialID;
+                preparedMaterial.Material = material;
                 preparedMaterial.MaterialNo = material.MaterialNo;
                 preparedMaterial.MaterialName = material.MaterialName1;
 
@@ -661,14 +675,21 @@ namespace gip.bso.manufacturing
                     .Picking
                     .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished)
                     .SelectMany(c => c.PickingPos_Picking)
-                    .Where(c => c.PickingMaterialID == materialID && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x=>posIDs.Contains(x.ProdorderPartslistPosID)))
+                    .Where(c => c.PickingMaterialID == materialID && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x => posIDs.Contains(x.ProdorderPartslistPosID)))
                     .Select(c => c.PickingQuantityUOM ?? 0)
                     .DefaultIfEmpty()
                     .Sum(c => c);
 
                 preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM;
 
-                preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM ;
+                preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
+
+                preparedMaterial.MDSchedulingGroupIDs =
+                    item
+                    .Where(c => c.MDSchedulingGroupID != null)
+                    .Select(c => c.MDSchedulingGroupID ?? Guid.Empty)
+                    .Distinct()
+                    .ToArray();
 
                 preparedMaterials.Add(preparedMaterial);
             }
@@ -677,27 +698,44 @@ namespace gip.bso.manufacturing
 
         private void LoadPreparedMaterial(PreparedMaterial preparedMaterial)
         {
-            _SourceStorageBinList = LoadSourceStorageBins(preparedMaterial);
             _TargetStorageBinList = LoadTargetStorageBins(preparedMaterial);
-            OnPropertyChanged("SourceStorageBinList");
-            OnPropertyChanged("TargetStorageBinList");
+            if (_TargetStorageBinList != null && _TargetStorageBinList.Any())
+            {
+                SelectedTargetStorageBin = _TargetStorageBinList.Where(c => c.MDPickingType != null).FirstOrDefault();
+                if (SelectedTargetStorageBin == null)
+                {
+                    SelectedTargetStorageBin = _TargetStorageBinList.FirstOrDefault();
+                }
+            }
+
+            _SourceStorageBinList = LoadSourceStorageBins(preparedMaterial);
+            if (_SourceStorageBinList != null && _SourceStorageBinList.Any())
+            {
+                SelectedSourceStorageBin = _SourceStorageBinList.OrderByDescending(c => c.SumTotal).FirstOrDefault();
+            }
+
+            OnPropertyChanged(nameof(SourceStorageBinList));
+            OnPropertyChanged(nameof(TargetStorageBinList));
         }
 
         private List<FacilityChargeSumFacilityHelper> LoadSourceStorageBins(PreparedMaterial preparedMaterial)
         {
             FacilityCharge[] facilityCharges =
                 FacilityManager
-                .s_cQry_MatOverviewFacilityCharge(this.DatabaseApp, preparedMaterial.MaterialID, false)
+                .s_cQry_MatOverviewFacilityCharge(this.DatabaseApp, preparedMaterial.Material.MaterialID, false)
                 .Where(c => c.Facility != null && c.Facility.FacilityNo != ProdMatStorage)
                 .ToArray();
             List<FacilityChargeSumFacilityHelper> list = ACFacilityManager.GetFacilityChargeSumFacilityHelperList(facilityCharges, new FacilityQueryFilter()).ToList();
-            
-            foreach(FacilityChargeSumFacilityHelper item in list)
+
+            string[] targetsNotShownAsSource = TargetStorageBinList.Where(c => c.MDPickingType != null).Select(c => c.FacilityNo).ToArray();
+            list = list.Where(c => !targetsNotShownAsSource.Contains(c.FacilityNo)).ToList();
+
+            foreach (FacilityChargeSumFacilityHelper item in list)
             {
                 item.NewPlannedStock = DatabaseApp
                         .PickingPos
                         .Where(c =>
-                                c.PickingMaterialID == preparedMaterial.MaterialID
+                                c.PickingMaterialID == preparedMaterial.Material.MaterialID
                                 && (c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished)
                                 && c.FromFacility.FacilityNo == item.FacilityNo
                                )
@@ -708,57 +746,130 @@ namespace gip.bso.manufacturing
             return list;
         }
 
-        private List<FacilityChargeSumFacilityHelper> LoadTargetStorageBins(PreparedMaterial preparedMaterial)
+        private List<PlanningTargetStockPreview> LoadTargetStorageBins(PreparedMaterial preparedMaterial)
         {
-            var query =
+            List<PlanningTargetStockPreview> list = new List<PlanningTargetStockPreview>();
+
+            List<FacilityMDSchedulingGroup> schGroupFacility =
                 DatabaseApp
-                .Facility
-                .Where(c => c.ParentFacilityID != null && c.VBiFacilityACClassID != null)
-                .GroupJoin(DatabaseApp.FacilityCharge.Where(ch => ch.MaterialID == preparedMaterial.MaterialID), fc => fc.FacilityID, ch => ch.FacilityID, (fc, ch) => new { fc, ch })
-                .GroupJoin(
+                .MDSchedulingGroup
+                .Where(c => preparedMaterial.MDSchedulingGroupIDs.Contains(c.MDSchedulingGroupID))
+                .SelectMany(c => c.FacilityMDSchedulingGroup_MDSchedulingGroup)
+                .ToList();
+
+            foreach (FacilityMDSchedulingGroup schGroup in schGroupFacility)
+            {
+                PlanningTargetStockPreview item = list.FirstOrDefault(c => c.FacilityNo == schGroup.Facility.FacilityNo);
+                if (item == null)
+                {
+                    item = new PlanningTargetStockPreview();
+                    item.Facility = schGroup.Facility;
+                    item.FacilityNo = schGroup.Facility.FacilityNo;
+                    item.FacilityName = schGroup.Facility.FacilityName;
+                    item.MDPickingType = schGroup.MDPickingType;
+                    if (preparedMaterial.Material.FacilityMaterial_Material.Any())
+                    {
+                        item.OptStockQuantity =
+                            preparedMaterial
+                            .Material
+                            .FacilityMaterial_Material
+                            .Where(c => c.FacilityID == schGroup.Facility.FacilityID)
+                            .Select(c => c.OptStockQuantity)
+                            .FirstOrDefault();
+                    }
+                    list.Add(item);
+                }
+            }
+
+            var testConistentQuery =
+                schGroupFacility
+                .Where(c => c.MDPickingTypeID != null)
+                .Select(c => new { c.Facility.FacilityNo, c.Facility.FacilityName, SchedulingGroup_MDKey = c.MDSchedulingGroup.MDKey, c.MDPickingType.MDKey })
+                .GroupBy(c => new { c.FacilityNo, c.FacilityName, c.SchedulingGroup_MDKey });
+
+            if (testConistentQuery.Any(c => c.Count() > 1))
+            {
+                string pickingTypes = string.Join(",", testConistentQuery.Select(c => c));
+                Messages.Warning(this, "Warning50054", false, pickingTypes);
+            }
+            else
+            {
+                foreach (PlanningTargetStockPreview item in list)
+                {
+                    item.ActualStockQuantity =
+                        DatabaseApp
+                        .FacilityCharge
+                        .Where(c => c.MaterialID == preparedMaterial.Material.MaterialID && !c.NotAvailable && c.Facility.FacilityNo == item.FacilityNo)
+                        .Select(c => c.StockQuantity)
+                        .DefaultIfEmpty()
+                        .Sum();
+
+                    item.OrderedQuantity =
                         DatabaseApp
                         .PickingPos
                         .Where(c =>
-                                c.PickingMaterialID == preparedMaterial.MaterialID
+                                c.PickingMaterialID == preparedMaterial.Material.MaterialID
                                 && (c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished)
-                               ),
-                        tmp => tmp.fc.FacilityID,
-                        pp => pp.ToFacilityID,
-                        (tmp, pp) => new { fc = tmp.fc, ch = tmp.ch, pp })
-                .Select(c =>
-                            new FacilityChargeSumFacilityHelper()
-                            {
-                                Facility = c.fc,
-                                FacilityChargeSumFacilityHelperID = Guid.NewGuid(),
-                                SumTotal = c.ch.Select(fch => fch.StockQuantityUOM).DefaultIfEmpty().Sum(),
-                                SumBlocked = c.ch.Where(o => o.MDReleaseStateID != null && o.MDReleaseState.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.Locked).Select(fch => fch.StockQuantityUOM).DefaultIfEmpty().Sum(),
-                                SumBlockedAbsolute = c.ch.Where(o => o.MDReleaseStateID != null && o.MDReleaseState.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.AbsLocked).Select(fch => fch.StockQuantityUOM).DefaultIfEmpty().Sum(),
-                                SumFree = c.ch.Where(o => o.MDReleaseStateID != null && o.MDReleaseState.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.Free).Select(fch => fch.StockQuantityUOM).DefaultIfEmpty().Sum(),
-                                NewPlannedStock = c.pp.Select(o => o.PickingQuantityUOM ?? 0).DefaultIfEmpty().Sum()
-                            }
-                );
+                               )
+                        .AsEnumerable()
+                        .Select(c => c.TargetQuantityUOM - c.ActualQuantityUOM)
+                        .DefaultIfEmpty()
+                        .Sum();
+                }
+            }
 
-            return query.ToList();
+            foreach (var item in list)
+            {
+                if (item.MDPickingType != null)
+                {
+                    item.NewPlannedStockQuantity = 0;
+                    if (preparedMaterial.TargetQuantityUOM > item.ActualStockQuantity)
+                        item.NewPlannedStockQuantity = preparedMaterial.TargetQuantityUOM - item.ActualStockQuantity;
+                    if (item.OptStockQuantity != null && (item.OptStockQuantity ?? 0) > item.ActualStockQuantity)
+                        item.NewPlannedStockQuantity += (item.OptStockQuantity ?? 0) - item.ActualStockQuantity;
+                    if (item.OptStockQuantity != null)
+                    {
+                        if (item.NewPlannedStockQuantity > Const_RangeStockQuantityTolerance)
+                        {
+                            item.IsInRange = -1;
+                        }
+                        else if (item.NewPlannedStockQuantity == 0)
+                        {
+                            item.IsInRange = 1;
+                        }
+                    }
+                }
+            }
+
+            return list;
         }
 
-        private void LoadPickings()
+        private void LoadPickings(MDPickingType mdPickingType)
         {
-            _PickingList = DatabaseApp
-                .Picking
-                .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished)
-                .OrderByDescending(c => c.InsertDate)
-                .ToList();
-            _SelectedPicking = _PickingList.FirstOrDefault();
-            OnPropertyChanged("SelectedPicking");
-            OnPropertyChanged("PickingList");
+            SelectedPicking = null;
+            _PickingList = null;
+            if (mdPickingType != null)
+            {
+                _PickingList = DatabaseApp
+                               .Picking
+                               .Where(c => c.PickingStateIndex < (short)PickingStateEnum.Finished && c.MDPickingTypeID == mdPickingType.MDPickingTypeID)
+                               .OrderByDescending(c => c.InsertDate)
+                               .ToList();
+                _SelectedPicking = _PickingList.FirstOrDefault();
+            }
+            OnPropertyChanged(nameof(SelectedPicking));
+            OnPropertyChanged(nameof(PickingList));
+            LoadPickingPositions();
         }
 
         private void LoadPickingPositions()
         {
+            SelectedPickingPos = null;
+            _PickingPosList = null;
             Guid? pickingID = null;
             Guid materialID = Guid.Empty;
             if (SelectedPreparedMaterial != null)
-                materialID = SelectedPreparedMaterial.MaterialID;
+                materialID = SelectedPreparedMaterial.Material.MaterialID;
             if (SelectedPicking != null)
                 pickingID = SelectedPicking.PickingID;
             _PickingPosList = DatabaseApp
@@ -766,12 +877,12 @@ namespace gip.bso.manufacturing
                .Where(c =>
                     c.Picking.PickingStateIndex < (short)PickingStateEnum.Finished
                     && c.PickingMaterialID == materialID
-                    && (ShowAllPickingLines || (pickingID == null || (c.PickingID == (pickingID ?? Guid.Empty))))
+                    && (ShowAllPickingLines || (c.PickingID == (pickingID ?? Guid.Empty)))
                 )
                .OrderByDescending(c => c.InsertDate)
                .ToList();
             SelectedPickingPos = _PickingPosList.FirstOrDefault();
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
         }
 
         #endregion
@@ -786,7 +897,7 @@ namespace gip.bso.manufacturing
         {
             _PreparedMaterialList = LoadMockup_PreparedMaterialList();
             _SourceStorageBinList = LoadMockup__SourceStorageBinList();
-            _TargetStorageBinList = LoadMockup_TargetStorageBinList();
+            //_TargetStorageBinList = LoadMockup_TargetStorageBinList();
             _PickingList = LoadMockup_PickingList();
             _PickingPosList = LoadMockup_PickingPosList();
         }

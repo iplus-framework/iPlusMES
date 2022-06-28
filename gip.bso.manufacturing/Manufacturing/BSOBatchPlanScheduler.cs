@@ -4705,8 +4705,8 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if ((      diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged))
-                    //|| diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
+            if ((diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.RefreshCounterChanged))
+                //|| diffResult.HasFlag(PAScheduleForPWNodeList.DiffResult.ValueChangesInList))
                 && reloadBatchPlanList)
                 LoadProdOrderBatchPlanList(SelectedProdOrderBatchPlan?.ProdOrderBatchPlanID);
         }
@@ -5186,19 +5186,23 @@ namespace gip.bso.manufacturing
 
         private double GetRelationForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
         {
-            SearchBatchMaterialModel searchFacilityModel = new SearchBatchMaterialModel();
-            searchFacilityModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
-            searchFacilityModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
-            searchFacilityModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
-            searchFacilityModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
-            searchResult.Add(searchFacilityModel);
+            SearchBatchMaterialModel searchBatchMaterialModel = new SearchBatchMaterialModel();
+            searchBatchMaterialModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
+            searchBatchMaterialModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
+            searchBatchMaterialModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
+            searchBatchMaterialModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
+            searchResult.Add(searchBatchMaterialModel);
 
+            if (batchPlan.VBiACClassWF != null && batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
+            {
+                searchBatchMaterialModel.MDSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroupID).FirstOrDefault();
+            }
             //if (posTargetQuantityUOM  > Double.Epsilon)
             //{
             //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
             //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
             //}
-            return searchFacilityModel.TargetQuantityUOM;
+            return searchBatchMaterialModel.TargetQuantityUOM;
         }
 
         #endregion

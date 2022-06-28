@@ -60,8 +60,8 @@ namespace gip.mes.facility.TandTv3
                 .FacilityBookingCharge_OutwardFacilityLot
                 .Where(c =>
                             // c.OutwardMaterialID == Item.InwardMaterialID
-                             c.OutwardFacilityID == Item.InwardFacilityID
-                            && (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
+                             // c.OutwardFacilityID == Item.InwardFacilityID
+                             (isOrderTrackingActive || c.ProdOrderPartslistPosRelationID == null))
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .ToList();
 
