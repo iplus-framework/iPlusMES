@@ -616,7 +616,7 @@ namespace gip.mes.processapplication
         {
             base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
 
-            Guid? fc_f = newACMethod.ParameterValueList["FacilityCharge"] as Guid?;
+            Guid? fc_f = newACMethod?.ParameterValueList["FacilityCharge"] as Guid?;
             if (fc_f.HasValue)
             {
                 Guid? plPosRelation = newACMethod.ParameterValueList["PLPosRelation"] as Guid?;
@@ -638,6 +638,9 @@ namespace gip.mes.processapplication
                                     {
                                         Messages.LogError(this.GetACUrl(), "Wrong quant(A20)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
                                                                                                fc.FacilityChargeID, mat.MaterialID));
+
+                                        string stackTrace = System.Environment.StackTrace;
+                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A21)", stackTrace);
                                     }
                                 }
                             }
