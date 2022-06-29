@@ -801,23 +801,25 @@ namespace gip.bso.facility
         [ACMethodInteraction(FacilityCharge.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentFacilityCharge", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if (!PreExecute("Delete")) return;
-            if (CurrentFacilityCharge == null)
-                return;
-            if (AccessPrimary == null)
-                return;
+            return;
 
-            FacilityManager manager = ACFacilityManager as FacilityManager;
-            Global.ACMethodResultState result = manager.DeleteFacilityCharge(CurrentBookParamNotAvailable, CurrentFacilityCharge, false, this.DatabaseApp);
-            if (result <= Global.ACMethodResultState.Succeeded)
-            {
-                //(manager as ACMethod).ValidMessage;
-                // BSOMsg.AddDetailMessage((manager as ACMethod).ValidMessage);
-            }
+            //if (!PreExecute("Delete")) return;
+            //if (CurrentFacilityCharge == null)
+            //    return;
+            //if (AccessPrimary == null)
+            //    return;
 
-            ClearBookingData();
-            AccessPrimary.NavigateFirst();
-            PostExecute("Delete");
+            //FacilityManager manager = ACFacilityManager as FacilityManager;
+            //Global.ACMethodResultState result = manager.DeleteFacilityCharge(CurrentBookParamNotAvailable, CurrentFacilityCharge, false, this.DatabaseApp);
+            //if (result <= Global.ACMethodResultState.Succeeded)
+            //{
+            //    //(manager as ACMethod).ValidMessage;
+            //    // BSOMsg.AddDetailMessage((manager as ACMethod).ValidMessage);
+            //}
+
+            //ClearBookingData();
+            //AccessPrimary.NavigateFirst();
+            //PostExecute("Delete");
         }
 
         /// <summary>

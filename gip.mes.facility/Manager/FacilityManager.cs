@@ -369,28 +369,28 @@ namespace gip.mes.facility
         }
 
 
-        /// <summary>
-        /// Löscht eine Charge. Überprüft jedoch ob zuvor die Charge auf Nullbestand gebucht worden ist
-        /// Ansonsten gibt es eine Fehlermeldung
-        /// </summary>
-        public Global.ACMethodResultState DeleteFacilityCharge(ACMethodBooking BP, FacilityCharge facilityCharge, bool setStockZeroAndNotAvailable, DatabaseApp dbApp)
-        {
-            BP.Database = dbApp;
-            Global.ACMethodResultState bResult = Global.ACMethodResultState.Succeeded;
-            if (facilityCharge == null)
-            {
-                BP.AddBookingMessage(ACMethodBooking.eResultCodes.RequiredParamsNotSet, Root.Environment.TranslateMessage(this, "Error00058"));
-                return Global.ACMethodResultState.Notpossible;
-            }
+        ///// <summary>
+        ///// Löscht eine Charge. Überprüft jedoch ob zuvor die Charge auf Nullbestand gebucht worden ist
+        ///// Ansonsten gibt es eine Fehlermeldung
+        ///// </summary>
+        //public Global.ACMethodResultState DeleteFacilityCharge(ACMethodBooking BP, FacilityCharge facilityCharge, bool setStockZeroAndNotAvailable, DatabaseApp dbApp)
+        //{
+        //    BP.Database = dbApp;
+        //    Global.ACMethodResultState bResult = Global.ACMethodResultState.Succeeded;
+        //    if (facilityCharge == null)
+        //    {
+        //        BP.AddBookingMessage(ACMethodBooking.eResultCodes.RequiredParamsNotSet, Root.Environment.TranslateMessage(this, "Error00058"));
+        //        return Global.ACMethodResultState.Notpossible;
+        //    }
            
-            MsgWithDetails msgWithDetails = facilityCharge.DeleteACObject(dbApp, false);
-            if (!msgWithDetails.IsSucceded())
-            {
-                BP.AddBookingMessage(ACMethodBooking.eResultCodes.RequiredParamsNotSet, msgWithDetails.InnerMessage);
-            }
+        //    MsgWithDetails msgWithDetails = facilityCharge.DeleteACObject(dbApp, false);
+        //    if (!msgWithDetails.IsSucceded())
+        //    {
+        //        BP.AddBookingMessage(ACMethodBooking.eResultCodes.RequiredParamsNotSet, msgWithDetails.InnerMessage);
+        //    }
            
-            return bResult;
-        }
+        //    return bResult;
+        //}
 
         #endregion
 
