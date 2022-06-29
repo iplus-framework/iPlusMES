@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
         public double DosedQuantity { get; set; }
 
         [ACPropertyInfo(9999, "DosedInActualQuantityPercentage", "en{'%'}de{'%'}", "", false)]
-        public double DosedInActualQuantityPercentage { get; set; }
+        public double? DosedInActualQuantityPercentage { get; set; }
 
         [ACPropertyInfo(9999, "DosedQuantity", ConstApp.StockQuantity, "", false)]
         public double StockQuantity { get; set; }
