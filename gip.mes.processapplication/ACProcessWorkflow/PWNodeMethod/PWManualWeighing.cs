@@ -1563,7 +1563,7 @@ namespace gip.mes.processapplication
                 manualWeighing.ActiveScaleObject?.Tare();
         }
 
-        protected internal Msg SelectFC_FFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
+        protected internal Msg SelectFCFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F, bool isFCOnPAFEmpty = false)
         {
             Guid? currentOpenMaterial = CurrentOpenMaterial;
 
@@ -1618,6 +1618,11 @@ namespace gip.mes.processapplication
             }
             else if (currentFacilityCharge.HasValue)
             {
+                if (isFCOnPAFEmpty)
+                {
+                    Messages.LogError(this.GetACUrl(), "Wrong quant(AA15)", "Quant on PAF is empty but CurrentFacilityCharge is setted!");
+                }
+
                 return LotChange(newFacilityCharge, actualQuantity, isConsumed, forceSetFC_F);
             }
             return null;
@@ -1745,7 +1750,7 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    SelectFC_FFromPAF(fc.FacilityChargeID, 0, false, false);
+                    SelectFCFromPAF(fc.FacilityChargeID, 0, false, false);
 
                     //WeighingComponent comp = GetWeighingComponent(plPosRelation); //WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
                     //if (comp == null)
