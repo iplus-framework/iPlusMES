@@ -242,7 +242,7 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            processModule.ACUrlCommand("OrderReservationInfo", picking.PickingNo);
+            processModule.ACUrlCommand(nameof(PAProcessModuleVB.OrderReservationInfo), picking.PickingNo);
 
             return StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID);
         }

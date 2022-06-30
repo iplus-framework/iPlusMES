@@ -155,6 +155,7 @@ namespace gip.mes.processapplication
             {
                 OrderInfo.ValueT = "";
                 Allocated.ValueT = false;
+                OrderReservationInfo.ValueT = null;
             }
         }
 
