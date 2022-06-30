@@ -7,15 +7,20 @@ namespace gip.mes.cmdlet.Settings
 {
     public static class FactorySettings
     {
+        public static VBPowerShellSettings VBPowerShellSettings { get; set; }
         public static VBPowerShellSettings Factory(string rootFolder)
         {
             Translator.VBLanguageCode = "en";
-            string path = Path.Combine(rootFolder, VBPowerShellSettings.SettingsFile);
-            string content = File.ReadAllText(path);
-            VBPowerShellSettings settings = Newtonsoft.Json.JsonConvert.DeserializeObject<VBPowerShellSettings>(content);
-            settings.FullConnectionStringConfigurationPaht = LoadConnections(settings, rootFolder);
-            WarmapConfig(settings);
-            return settings;
+            if(VBPowerShellSettings == null)
+            {
+
+                string path = Path.Combine(rootFolder, VBPowerShellSettings.SettingsFile);
+                string content = File.ReadAllText(path);
+                VBPowerShellSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<VBPowerShellSettings>(content);
+                VBPowerShellSettings.FullConnectionStringConfigurationPaht = LoadConnections(VBPowerShellSettings, rootFolder);
+                WarmapConfig(VBPowerShellSettings);
+            }
+            return VBPowerShellSettings;
         }
 
         private static string LoadConnections(VBPowerShellSettings settings, string rootFolder)
