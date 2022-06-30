@@ -703,6 +703,8 @@ namespace gip.mes.processapplication
                     {
                         try
                         {
+                            if (facilitySilo.EntityState == System.Data.EntityState.Modified)
+                                RootDbOpQueue.AppContextQueue.Context.ACSaveChanges();
                             facilitySilo.AutoRefresh();
                         }
                         catch (Exception qEx)

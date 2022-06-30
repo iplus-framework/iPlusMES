@@ -387,7 +387,7 @@ namespace gip.bso.masterdata
                     return null;
                 List<MDUnit> convertableUnits = new List<MDUnit>();
                 // Erstelle Liste mit allen Dimensionslosen Einheiten, die nicht bereits als Alternativ-Einheit angelegt worden sind
-                var query = DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentMaterial.BaseMDUnit.MDUnitID && c.SIDimensionIndex == (short)GlobalApp.SIDimensions.None);
+                var query = DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentMaterial.BaseMDUnit.MDUnitID);
                 if (!DatabaseApp.IsChanged)
                     (query as ObjectQuery).MergeOption = MergeOption.OverwriteChanges;
                 if (query.Any())
@@ -921,6 +921,12 @@ namespace gip.bso.masterdata
                         .Include(c => c.Label.LabelTranslation_Label)
                         .Where(c => c.MaterialID == SelectedMaterial.MaterialID));
             PostExecute("Load");
+            if (requery)
+            {
+                CurrentMaterial.MaterialUnit_Material.AutoRefresh();
+                //CurrentMaterial.MaterialUnit_Material.AutoLoad();
+                OnPropertyChanged("MaterialUnitList");
+            }
 
             if (SelectedMaterial != null)
                 ChangedSelectedMaterial(SelectedMaterial);
@@ -1071,12 +1077,14 @@ namespace gip.bso.masterdata
                 return;
             if (!PreExecute("DeleteMaterialUnit")) return;
             // Einfügen einer Eigenschaft 
+            CurrentMaterial.MaterialUnit_Material.Remove(CurrentMaterialUnit);
             Msg msg = CurrentMaterialUnit.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.Msg(msg);
                 return;
             }
+            OnPropertyChanged("MaterialUnitList");
 
             PostExecute("DeleteMaterialUnit");
         }
