@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
+using System.Collections.ObjectModel;
 
 namespace gip.bso.masterdata
 {
@@ -24,6 +25,26 @@ namespace gip.bso.masterdata
                 {
                     _selectedMaterialWF = value;
                     OnPropertyChanged();
+                    if (value != null)
+                    {
+                        IntermediateProductsList.Clear();
+                        foreach (Material mat in value.MaterialWFRelation_MaterialWF.Select(c => c.TargetMaterial)
+                                                               .Concat(SelectedMaterialWF.MaterialWFRelation_MaterialWF.Select(x => x.SourceMaterial)).Distinct())
+                        {
+                            IntermediateProductsList.Add(mat);
+                        }
+
+                        OnPropertyChanged(nameof(SelectedIntermediateProduct));
+                    }
+                    else
+                    {
+                        IntermediateProductsList.Clear();
+                        foreach (Material mat in DatabaseApp.Material.Where(c => c.IsIntermediate))
+                        {
+                            IntermediateProductsList.Add(mat);
+                        }
+
+                    }
                 }
             }
         }
@@ -50,19 +71,19 @@ namespace gip.bso.masterdata
             }
         }
 
+        private ObservableCollection<Material> _IntermediateProductsList;
+
         [ACPropertyList(9999, "IntermediateProduct")]
-        public IEnumerable<Material> IntermediateProductList
+        public ObservableCollection<Material> IntermediateProductsList
         {
             get
             {
-                if (SelectedMaterialWF != null)
-                {
-                    return SelectedMaterialWF.MaterialWFRelation_MaterialWF.Select(c => c.TargetMaterial).Concat(SelectedMaterialWF.MaterialWFRelation_MaterialWF.Select(x => x.SourceMaterial)).Distinct();
-                }
-                else
-                {
-                    return DatabaseApp.Material.Where(c => c.IsIntermediate);
-                }
+                return _IntermediateProductsList;
+            }
+            set
+            {
+                _IntermediateProductsList = value;
+                OnPropertyChanged();
             }
         }
 
@@ -83,16 +104,17 @@ namespace gip.bso.masterdata
         {
             get
             {
-                return IntermediateProductList;
+                return IntermediateProductsList;
             }
         }
 
-        public void ShowMaterialTools()
+        [ACMethodInfo("", "en{'Show material options'}de{'Materialoptionen anzeigen'}", 9999, true)]
+        public void ShowMaterialOptions()
         {
 
         }
 
-        public bool IsEnabledShowMaterialTools()
+        public bool IsEnabledShowMaterialOptions()
         {
             return true;
         }

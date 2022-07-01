@@ -1202,14 +1202,7 @@ namespace gip.mes.processapplication
             else if (!CheckInToleranceOnlyManuallyAddedQuantity)
                 quantity += ActiveScaleObject.ActualWeight.ValueT;
 
-            bool isQuantEmpty = true;
-            Guid? fc_f = CurrentACMethod.ValueT?.ParameterValueList["FacilityCharge"] as Guid?;
-            if (fc_f.HasValue)
-            {
-                isQuantEmpty = false;
-            }
-
-            return ManualWeighingPW.SelectFCFromPAF(newFacilityCharge, quantity, isConsumed, forceSetFC_F, isQuantEmpty);
+            return ManualWeighingPW.SelectFCFromPAF(newFacilityCharge, quantity, isConsumed, forceSetFC_F);
         }
 
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
