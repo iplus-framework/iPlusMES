@@ -2142,6 +2142,25 @@ namespace gip.bso.facility
             return OnIsEnabledSave();
         }
 
+        /// <summary>
+        /// Undoes the save.
+        /// </summary>
+        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        public void UndoSave()
+        {
+            OnUndoSave();
+            Load();
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled undo save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
+        }
+
         #endregion
 
         #region Methods -> Add FacilityCharge
