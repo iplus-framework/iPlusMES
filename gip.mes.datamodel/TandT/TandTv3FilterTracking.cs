@@ -199,6 +199,20 @@ namespace gip.mes.datamodel
 
         public int? OrderDepth { get; set; }
 
+        private List<string> _MaterialNOsForStopTracking;
+        /// <summary>
+        /// Materials where stop Inward booking search
+        /// </summary>
+        public List<string> MaterialNOsForStopTracking
+        {
+            get
+            {
+                if(_MaterialNOsForStopTracking == null)
+                    _MaterialNOsForStopTracking = new List<string>();
+                return _MaterialNOsForStopTracking;
+            }
+        }
+
         #endregion
 
         #region Filter methods
@@ -208,10 +222,10 @@ namespace gip.mes.datamodel
 
         public bool AggregateOrderData { get; set; }
 
-        short[] _FilteredBookingTypes = new short[] 
-        { 
-            (short)GlobalApp.FacilityBookingType.InOrderPosInwardMovement, 
-            (short)GlobalApp.FacilityBookingType.ProdOrderPosOutward, 
+        short[] _FilteredBookingTypes = new short[]
+        {
+            (short)GlobalApp.FacilityBookingType.InOrderPosInwardMovement,
+            (short)GlobalApp.FacilityBookingType.ProdOrderPosOutward,
             (short)GlobalApp.FacilityBookingType.ProdOrderPosInward,
             (short)GlobalApp.FacilityBookingType.PickingRelocation
         };
