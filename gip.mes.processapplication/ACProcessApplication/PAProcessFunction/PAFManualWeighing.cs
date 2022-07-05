@@ -636,8 +636,8 @@ namespace gip.mes.processapplication
                                 {
                                     if (fc.MaterialID != mat.MaterialID)
                                     {
-                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A20)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
-                                                                                               fc.FacilityChargeID, mat.MaterialID));
+                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A20)", String.Format("Quant is wrong, ID:{0}, material ID: {1}, function state:{2}",
+                                                                                               fc.FacilityChargeID, mat.MaterialID, CurrentACState));
 
                                         string stackTrace = System.Environment.StackTrace;
                                         Messages.LogError(this.GetACUrl(), "Wrong quant(A21)", stackTrace);
@@ -1202,7 +1202,7 @@ namespace gip.mes.processapplication
             else if (!CheckInToleranceOnlyManuallyAddedQuantity)
                 quantity += ActiveScaleObject.ActualWeight.ValueT;
 
-            return ManualWeighingPW.SelectFC_FFromPAF(newFacilityCharge, quantity, isConsumed, forceSetFC_F);
+            return ManualWeighingPW.SelectFCFromPAF(newFacilityCharge, quantity, isConsumed, forceSetFC_F);
         }
 
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]

@@ -1563,7 +1563,7 @@ namespace gip.mes.processapplication
                 manualWeighing.ActiveScaleObject?.Tare();
         }
 
-        protected internal Msg SelectFC_FFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
+        protected internal Msg SelectFCFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
         {
             Guid? currentOpenMaterial = CurrentOpenMaterial;
 
@@ -1576,27 +1576,33 @@ namespace gip.mes.processapplication
 
             Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-            if (!currentFacilityCharge.HasValue)
+            using (Database db = new core.datamodel.Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
             {
-                using (Database db = new core.datamodel.Database())
-                using (DatabaseApp dbApp = new DatabaseApp(db))
+                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                                       .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial.Value);
+                if (rel == null)
                 {
-                    ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
-                                                                                           .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial.Value);
-                    if (rel == null)
-                    {
-                        //Error50374: ProdOrderPartslistPosRelation {0} doesn't exist in the database.
-                        return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(20)", 921, "Error50374", currentOpenMaterial.Value);
-                    }
+                    //Error50374: ProdOrderPartslistPosRelation {0} doesn't exist in the database.
+                    return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(20)", 921, "Error50374", currentOpenMaterial.Value);
+                }
 
-                    var facilityCharges = GetFacilityChargesForMaterial(dbApp, rel);
-                    var fc = facilityCharges?.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
+                var facilityCharges = GetFacilityChargesForMaterial(dbApp, rel);
+                var fc = facilityCharges?.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
 
-                    if (fc != null)
-                    {
+                if (fc == null)
+                {
+                    return new Msg(this, eMsgLevel.Error, PWClassName, nameof(SelectFCFromPAF), 935, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
+                                                                                                               rel.SourceProdOrderPartslistPos.Material.MaterialName1);
+                }
+
+                if (!currentFacilityCharge.HasValue)
+                {
+                    //if (fc != null)
+                    //{
                         if (fc.MaterialID != rel.SourceProdOrderPartslistPos?.MaterialID)
                         {
-                            Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " + 
+                            Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
                                                                rel.SourceProdOrderPartslistPos?.MaterialID);
                         }
 
@@ -1606,19 +1612,20 @@ namespace gip.mes.processapplication
 
                         currentFacilityCharge = CurrentFacilityCharge;
                         SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
-                    }
-                    else
-                    {
-                        //Error50266: The weighing cannot be started because the selected quant cannot be used at this work center {0} {1}.
-                        // Die Verwiegung kann nicht gestartet werden weil das ausgewählte Quant nicht an diesem Arbeitsplatz {0} {1} nicht verwendet werden kann.
-                        return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF", 935, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
-                                                                                                                          rel.SourceProdOrderPartslistPos.Material.MaterialName1);
-                    }
+                    //}
+                    //else
+                    //{
+                    //    //Error50266: The weighing cannot be started because the selected quant cannot be used at this work center {0} {1}.
+                    //    // Die Verwiegung kann nicht gestartet werden weil das ausgewählte Quant nicht an diesem Arbeitsplatz {0} {1} nicht verwendet werden kann.
+                    //    return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF", 935, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
+                    //                                                                                                      rel.SourceProdOrderPartslistPos.Material.MaterialName1);
+                    //}
+
                 }
-            }
-            else if (currentFacilityCharge.HasValue)
-            {
-                return LotChange(newFacilityCharge, actualQuantity, isConsumed, forceSetFC_F);
+                else if (currentFacilityCharge.HasValue)
+                {
+                    return LotChange(newFacilityCharge, actualQuantity, isConsumed, forceSetFC_F);
+                }
             }
             return null;
         }
@@ -1745,7 +1752,7 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    SelectFC_FFromPAF(fc.FacilityChargeID, 0, false, false);
+                    SelectFCFromPAF(fc.FacilityChargeID, 0, false, false);
 
                     //WeighingComponent comp = GetWeighingComponent(plPosRelation); //WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
                     //if (comp == null)
@@ -3806,7 +3813,7 @@ namespace gip.mes.processapplication
             try
             {
                 Guid? fcFromMethod = null;
-                ACValue fcFromMethodVal = pafACMethod.ParameterValueList.GetACValue(nameof(FacilityCharge));
+                ACValue fcFromMethodVal = pafACMethod.ParameterValueList?.GetACValue(nameof(FacilityCharge));
                 if (fcFromMethodVal != null && fcFromMethodVal.Value is Guid)
                     fcFromMethod = fcFromMethodVal.ParamAsGuid;
 

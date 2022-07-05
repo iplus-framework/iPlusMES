@@ -116,52 +116,61 @@ namespace gip.mes.facility
                         foreach (FacilityInventoryPos facilityInventoryPos in positionsWithNewQuantity)
                         {
                             nr++;
-                            ACMethodBooking aCMethodBooking = null;
-                            if (facilityInventoryPos.NotAvailable)
+                            if (!facilityInventoryPos.FacilityBooking_FacilityInventoryPos.Any())
                             {
-                                aCMethodBooking = ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-                                aCMethodBooking.BookingType = GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge;
-                                aCMethodBooking.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(databaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
-                                aCMethodBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(databaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
-                                facilityInventoryPos.FacilityCharge.NotAvailable = true;
-                                ACSaveChanges();
-                            }
-                            else
-                            {
-                                aCMethodBooking = ACUrlACTypeSignature("!" + GlobalApp.FBT_StockCorrection, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-                                aCMethodBooking.BookingType = GlobalApp.FacilityBookingType.StockCorrection;
+                                ACMethodBooking aCMethodBooking = null;
+                                if (facilityInventoryPos.NotAvailable)
+                                {
+                                    aCMethodBooking = ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                                    aCMethodBooking.BookingType = GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge;
+                                    aCMethodBooking.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(databaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
+                                    aCMethodBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(databaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+                                    facilityInventoryPos.FacilityCharge.NotAvailable = true;
+                                    ACSaveChanges();
+                                }
+                                else
+                                {
+                                    aCMethodBooking = ACUrlACTypeSignature("!" + GlobalApp.FBT_StockCorrection, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+                                    aCMethodBooking.BookingType = GlobalApp.FacilityBookingType.StockCorrection;
+                                    aCMethodBooking.InwardFacilityCharge = facilityInventoryPos.FacilityCharge;
+                                    aCMethodBooking.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(databaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
+                                    aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
+                                    aCMethodBooking.InwardQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
+                                    if (facilityInventoryPos.FacilityCharge.MDUnit != null
+                                        && facilityInventoryPos.FacilityCharge.Material.BaseMDUnit != facilityInventoryPos.FacilityCharge.MDUnit)
+                                    {
+                                        aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.FacilityCharge.Material.ConvertQuantity(aCMethodBooking.InwardTargetQuantity.Value, facilityInventoryPos.FacilityCharge.Material.BaseMDUnit, facilityInventoryPos.FacilityCharge.MDUnit);
+                                        aCMethodBooking.InwardQuantity = aCMethodBooking.InwardTargetQuantity;
+                                    }
+                                }
+
                                 aCMethodBooking.InwardFacilityCharge = facilityInventoryPos.FacilityCharge;
-                                aCMethodBooking.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(databaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
-                                aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
-                                aCMethodBooking.InwardQuantity = facilityInventoryPos.NewStockQuantity - facilityInventoryPos.StockQuantity;
-                                if (facilityInventoryPos.FacilityCharge.MDUnit != null
-                                    && facilityInventoryPos.FacilityCharge.Material.BaseMDUnit != facilityInventoryPos.FacilityCharge.MDUnit)
+                                aCMethodBooking.FacilityInventoryPos = facilityInventoryPos;
+                                ACMethodEventArgs result = BookFacility(aCMethodBooking, databaseApp) as ACMethodEventArgs;
+                                if (!aCMethodBooking.ValidMessage.IsSucceded() || aCMethodBooking.ValidMessage.HasWarnings())
                                 {
-                                    aCMethodBooking.InwardTargetQuantity = facilityInventoryPos.FacilityCharge.Material.ConvertQuantity(aCMethodBooking.InwardTargetQuantity.Value, facilityInventoryPos.FacilityCharge.Material.BaseMDUnit, facilityInventoryPos.FacilityCharge.MDUnit);
-                                    aCMethodBooking.InwardQuantity = aCMethodBooking.InwardTargetQuantity;
+
+                                    string msg = "[InventoryClosing] Error Closing FacilityInventoryNo: {0}, Position (FacilityChargeID:{1}) {2} {3}, LotNo:{4}";
+                                    string lotNo = "-";
+                                    if (facilityInventoryPos.FacilityCharge.FacilityLot != null)
+                                    {
+                                        lotNo = facilityInventoryPos.FacilityCharge.FacilityLot.LotNo;
+                                    }
+                                    msg = string.Format(msg, facilityInventoryNo, facilityInventoryPos.FacilityInventoryPosID, facilityInventoryPos.FacilityCharge.Material.MaterialNo,
+                                        facilityInventoryPos.FacilityCharge.Material.MaterialName1, lotNo);
+                                    Root.Messages.LogError("FacilityManager", "InventoryClosing", msg);
+                                    msgWithDetails.AddDetailMessage(new Msg() { Message = msg, MessageLevel = eMsgLevel.Error });
+                                    msgWithDetails.AddDetailMessage(aCMethodBooking.ValidMessage);
                                 }
-                            }
-
-                            aCMethodBooking.InwardFacilityCharge = facilityInventoryPos.FacilityCharge;
-                            aCMethodBooking.FacilityInventoryPos = facilityInventoryPos;
-                            ACMethodEventArgs result = BookFacility(aCMethodBooking, databaseApp) as ACMethodEventArgs;
-                            if (!aCMethodBooking.ValidMessage.IsSucceded() || aCMethodBooking.ValidMessage.HasWarnings())
-                            {
-
-                                string msg = "[InventoryClosing] Error Closing FacilityInventoryNo: {0}, Position (FacilityChargeID:{1}) {2} {3}, LotNo:{4}";
-                                string lotNo = "-";
-                                if (facilityInventoryPos.FacilityCharge.FacilityLot != null)
+                                else
                                 {
-                                    lotNo = facilityInventoryPos.FacilityCharge.FacilityLot.LotNo;
+                                    facilityInventoryPos.MDFacilityInventoryPosState = postedInventoryPosState;
                                 }
-                                msg = string.Format(msg, facilityInventoryNo, facilityInventoryPos.FacilityInventoryPosID, facilityInventoryPos.FacilityCharge.Material.MaterialNo,
-                                    facilityInventoryPos.FacilityCharge.Material.MaterialName1, lotNo);
-                                Root.Messages.LogError("FacilityManager", "InventoryClosing", msg);
-                                msgWithDetails.AddDetailMessage(new Msg() { Message = msg, MessageLevel = eMsgLevel.Error });
-                                msgWithDetails.AddDetailMessage(aCMethodBooking.ValidMessage);
                             }
                             else
+                            {
                                 facilityInventoryPos.MDFacilityInventoryPosState = postedInventoryPosState;
+                            }
 
                             // Doing inventory booking
                             if (progressCallback != null)
@@ -173,7 +182,7 @@ namespace gip.mes.facility
                             MDFacilityInventoryState finishedState = databaseApp.MDFacilityInventoryState.Where(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Finished).FirstOrDefault();
                             facilityInventory.MDFacilityInventoryState = finishedState;
                             MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
-                            if (!saveMsg.IsSucceded())
+                            if (saveMsg == null || !saveMsg.IsSucceded())
                                 msgWithDetails.AddDetailMessage(saveMsg);
                         }
                     }

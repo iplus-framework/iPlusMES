@@ -73,6 +73,8 @@ namespace gip.bso.masterdata
             if (CurrentMaterial != null)
                 FilterAssociatedPosMaterial.SearchWord = CurrentMaterial.MaterialNo;
 
+            IntermediateProductsList = new System.Collections.ObjectModel.ObservableCollection<Material>(DatabaseApp.Material.Where(c => c.IsIntermediate));
+
             return true;
         }
 

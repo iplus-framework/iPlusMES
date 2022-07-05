@@ -1990,7 +1990,7 @@ namespace gip.bso.facility
             if (!IsEnabledClosingInventory())
                 return;
             bool existAnyUnclosedPosition =
-                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex != (short)FacilityInventoryPosStateEnum.Finished);
+                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished);
             if (existAnyUnclosedPosition)
             {
                 SelectedFilterInventoryPosState = FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.InProgress);
@@ -2026,7 +2026,10 @@ namespace gip.bso.facility
                 MDFacilityInventoryPosState finishedState = DatabaseApp.MDFacilityInventoryPosState.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished);
                 foreach (FacilityInventoryPos item in FacilityInventoryPosList)
                 {
-                    item.MDFacilityInventoryPosState = finishedState;
+                    if(item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished)
+                    {
+                        item.MDFacilityInventoryPosState = finishedState;
+                    }
                 }
                 ACSaveChanges();
                 OnPropertyChanged(nameof(FacilityInventoryPosList));
@@ -2140,6 +2143,25 @@ namespace gip.bso.facility
         public bool IsEnabledSave()
         {
             return OnIsEnabledSave();
+        }
+
+        /// <summary>
+        /// Undoes the save.
+        /// </summary>
+        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        public void UndoSave()
+        {
+            OnUndoSave();
+            Load();
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled undo save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
         }
 
         #endregion
