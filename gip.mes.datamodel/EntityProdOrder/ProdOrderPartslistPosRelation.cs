@@ -267,7 +267,15 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                try
+                {
+                    return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                }
+                catch (Exception e)
+                {
+                    Database.Root.Messages.LogException("ProdOrderPartslistPosRelation", "RemainingDosingWeight", e);
+                    return 0;
+                }
             }
         }
 
@@ -275,7 +283,15 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(TargetQuantityUOM);
+                try
+                {
+                    return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(TargetQuantityUOM);
+                }
+                catch (Exception e)
+                {
+                    Database.Root.Messages.LogException("ProdOrderPartslistPosRelation", "TargetWeight", e);
+                    return 0;
+                }
             }
         }
 
@@ -283,7 +299,15 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(ActualQuantityUOM);
+                try
+                {
+                    return SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(ActualQuantityUOM);
+                }
+                catch (Exception e)
+                {
+                    Database.Root.Messages.LogException("ProdOrderPartslistPosRelation", "ActualWeight", e);
+                    return 0;
+                }
             }
         }
 
