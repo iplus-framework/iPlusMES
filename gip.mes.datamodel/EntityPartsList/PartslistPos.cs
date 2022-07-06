@@ -334,6 +334,13 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(9999, "", "en{'Selected'}de{'Ausgewählt'}")]
+        public bool IsChecked
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #region Partial Methods

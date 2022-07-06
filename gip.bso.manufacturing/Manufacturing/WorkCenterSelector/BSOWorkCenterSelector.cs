@@ -1410,7 +1410,7 @@ namespace gip.bso.manufacturing
             ShowDialog(this, "ExtraDisTargetDialog");
         }
 
-        [ACMethodInfo("", "", 9999, true)]
+        [ACMethodInfo("", "en{'Switch to emptying'}de{'Leerfahren'}", 9999, true)]
         public virtual void SwitchPWGroupToEmptyingMode()
         {
             if (SelectedExtraDisTarget == null)
@@ -1434,6 +1434,32 @@ namespace gip.bso.manufacturing
         {
             return SelectedExtraDisTarget != null;
         }
+
+        [ACMethodInfo("", "en{'Abort all and switch to emptying'}de{'Abbrechen alle und leerfahren'}", 9999, true)]
+        public virtual void AbortAllAndSwitchPWGroupToEmptyingMode()
+        {
+            if (SelectedExtraDisTarget == null)
+                return;
+
+            IACComponentPWNode currentPWGroup = null;
+            using (ACMonitor.Lock(_70050_MembersLock))
+            {
+                currentPWGroup = _CurrentPWGroup?.ValueT;
+            }
+
+            if (currentPWGroup == null)
+                return;
+
+            _CurrentPWGroup.ValueT.ExecuteMethod(nameof(PWGroupVB.AbortAllAndSetExtraDisTarget), SelectedExtraDisTarget.ACUrlComponent);
+
+            CloseTopDialog();
+        }
+
+        public virtual bool IsEnabledAbortAllAndSwitchPWGroupToEmptyingMode()
+        {
+            return SelectedExtraDisTarget != null;
+        }
+
         #endregion
 
         #region Methods => LastSelectedWorkCenterItem

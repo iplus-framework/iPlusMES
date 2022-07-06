@@ -33,7 +33,7 @@ namespace gip.bso.masterdata
     /// 1. Artikelstamm
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
-    [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + "AssociatedPartslistPos", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(PartslistPos), PartslistPos.ClassName, "Sequence", "Sequence")]
+    [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + "AssociatedPartslistPos", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(PartslistPos), nameof(PartslistPos), "Sequence", "Sequence")]
     public partial class BSOMaterial : BSOMaterialExplorer
     {
         #region c´tors
@@ -62,6 +62,7 @@ namespace gip.bso.masterdata
                 return false;
 
             AccessTargetMaterial.NavSearch();
+            AccessReplacementMaterial.NavSearch();
 
             _VarioConfigManager = ConfigManagerIPlus.ACRefToServiceInstance(this);
             Search();
@@ -1706,13 +1707,25 @@ namespace gip.bso.masterdata
         {
             if (result != null)
             {
-                result =
-                    result.Where(c =>
-                                    string.IsNullOrEmpty(FilterAssociatedPosIntermMatNo)
-                                    ||
-                                    c.PartslistPosRelation_SourcePartslistPos
-                                    .Any(x => x.TargetPartslistPos.Material.MaterialNo == FilterAssociatedPosIntermMatNo)
-                                );
+                string matNo = SelectedIntermediateProduct?.MaterialNo;
+                if (SelectedMaterialWF != null)
+                {
+                    result =
+                        result.Where(c => (string.IsNullOrEmpty(matNo) || c.PartslistPosRelation_SourcePartslistPos
+                                                                                                    .Any(x => x.TargetPartslistPos.Material.MaterialNo == matNo
+                                                                                                           && x.TargetQuantityUOM > 0.00001))
+                                        && (c.Partslist.MaterialWFID == SelectedMaterialWF.MaterialWFID));
+                }
+                else
+                {
+                    result =
+                        result.Where(c => string.IsNullOrEmpty(matNo) || c.PartslistPosRelation_SourcePartslistPos
+                                                                                                    .Any(x => x.TargetPartslistPos.Material.MaterialNo == matNo
+                                                                                                           && x.TargetQuantityUOM > 0.00001));
+                }
+
+                foreach (var item in result)
+                    item.IsChecked = true;
             }
             return result;
         }
@@ -1739,7 +1752,7 @@ namespace gip.bso.masterdata
                 if (AccessAssociatedPartslistPos == null)
                     return;
                 AccessAssociatedPartslistPos.Selected = value;
-                OnPropertyChanged("SelectedAssociatedPartslistPos");
+                OnPropertyChanged();
             }
         }
 
@@ -1799,7 +1812,7 @@ namespace gip.bso.masterdata
         /// Doc  FilterAssociatedPosTargetQTo
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterAssociatedPosTargetQTo", "en{'To'}de{'Bis'}")]
+        [ACPropertyInfo(999, "FilterAssociatedPosTargetQTo", "en{'Quantity to'}de{'Menge bis'}")]
         public double? FilterAssociatedPosTargetQTo
         {
             get
@@ -1949,100 +1962,7 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region AssociatedPartslistPos -> Material replacement
-
-        #region AssociatedPartslistPos -> Material replacement-> Material (TargetMaterial)
-
-        ACAccessNav<Material> _AccessTargetMaterial;
-        [ACPropertyAccess(200, "TargetMaterial")]
-        public ACAccessNav<Material> AccessTargetMaterial
-        {
-            get
-            {
-                if (_AccessTargetMaterial == null)
-                {
-                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + "Material", Material.ClassName);
-                    _AccessTargetMaterial = navACQueryDefinition.NewAccessNav<Material>("TargetMaterial", this);
-                    _AccessTargetMaterial.AutoSaveOnNavigation = false;
-                }
-                return _AccessTargetMaterial;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the selected FilterInventoryPosMaterial.
-        /// </summary>
-        /// <value>The selected FilterInventoryPosMaterial.</value>
-        [ACPropertySelected(201, "TargetMaterial", ConstApp.Material)]
-        public Material SelectedTargetMaterial
-        {
-            get
-            {
-                if (AccessTargetMaterial == null)
-                    return null;
-                return AccessTargetMaterial.Selected;
-            }
-            set
-            {
-                if (AccessTargetMaterial == null)
-                    return;
-                AccessTargetMaterial.Selected = value;
-                OnPropertyChanged("SelectedFilterInventoryPosMaterial");
-            }
-        }
-
-        /// <summary>
-        /// Gets the FilterInventoryPosMaterial list.
-        /// </summary>
-        /// <value>The facility list.</value>
-        [ACPropertyList(202, "TargetMaterial")]
-        public IEnumerable<Material> TargetMaterialList
-        {
-            get
-            {
-                if (AccessTargetMaterial == null)
-                    return null;
-                return AccessTargetMaterial.NavList;
-            }
-        }
-
-        #endregion
-
-
-        /// <summary>
-        /// Source Property: ReplaceMaterial
-        /// </summary>
-        [ACMethodInfo("ReplaceMaterial", "en{'Replace material'}de{'Material ersetzen'}", 999)]
-        public void ReplaceMaterial()
-        {
-            if (!IsEnabledReplaceMaterial())
-                return;
-            if (Root.Messages.Question(this, "Question50080", Global.MsgResult.No, false, SelectedTargetMaterial.MaterialNo, SelectedTargetMaterial.MaterialName1) == Global.MsgResult.Yes)
-            {
-                PartslistPos[] positions = DatabaseApp.PartslistPos.Where(c => c.MaterialID == CurrentMaterial.MaterialID).ToArray();
-                if (positions.Any())
-                {
-                    foreach (PartslistPos pos in positions)
-                        pos.Material = SelectedTargetMaterial;
-
-                    ACSaveChanges();
-                    SearchAssociatedPos();
-                }
-            }
-        }
-
-        public bool IsEnabledReplaceMaterial()
-        {
-            return
-                CurrentMaterial != null
-                && SelectedTargetMaterial != null
-                && CurrentMaterial.MaterialID != SelectedTargetMaterial.MaterialID
-                && AssociatedPartslistPosList != null
-                && AssociatedPartslistPosList.Any();
-        }
-
-
-        #endregion
+        
 
         #endregion
 

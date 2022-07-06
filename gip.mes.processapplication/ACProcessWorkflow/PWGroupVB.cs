@@ -900,6 +900,27 @@ namespace gip.mes.processapplication
             root?.SwitchToEmptyingMode();
         }
 
+        [ACMethodInfo("", "", 9999, true)]
+        public void AbortAllAndSetExtraDisTarget(string acUrlExtraDisDest)
+        {
+            var activeNodes = RootPW?.FindChildComponents<PWNodeProcessMethod>(c => c is PWNodeProcessMethod)
+                                    .Where(x => x.CurrentACState == ACStateEnum.SMRunning || x.CurrentACState == ACStateEnum.SMPaused).ToArray();
+
+            if (activeNodes != null && activeNodes.Any())
+            {
+                var functions = activeNodes.Select(c => c.GetCurrentExecutingFunction<PAProcessFunction>()).Where(c => !(c is PAFDischarging)).ToArray();
+                if (functions != null && functions.Any())
+                {
+                    foreach (var func in functions)
+                    {
+                        func.Abort();
+                    }
+                }
+            }
+
+            SetExtraDisTarget(acUrlExtraDisDest);
+        }
+
         #endregion
 
 
