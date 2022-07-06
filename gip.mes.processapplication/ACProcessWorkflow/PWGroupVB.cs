@@ -903,20 +903,27 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 9999, true)]
         public void AbortAllAndSetExtraDisTarget(string acUrlExtraDisDest)
         {
-            var activeNodes = RootPW?.FindChildComponents<PWNodeProcessMethod>(c => c is PWNodeProcessMethod)
+            var activeNodes = RootPW?.FindChildComponents<PWBaseExecutable>(c => c is PWBaseExecutable)
                                     .Where(x => x.CurrentACState == ACStateEnum.SMRunning || x.CurrentACState == ACStateEnum.SMPaused).ToArray();
 
             if (activeNodes != null && activeNodes.Any())
             {
-                var functions = activeNodes.Select(c => c.GetCurrentExecutingFunction<PAProcessFunction>()).Where(c => !(c is PAFDischarging)).ToArray();
-                if (functions != null && functions.Any())
+                foreach (var node in activeNodes)
                 {
-                    foreach (var func in functions)
+                    PWNodeProcessMethod nodeProcessMethod = node as PWNodeProcessMethod;
+                    if (nodeProcessMethod != null)
                     {
-                        func.Abort();
+                        PAProcessFunction activeFunction = nodeProcessMethod.GetCurrentExecutingFunction<PAProcessFunction>();
+                        if (activeFunction != null && !(activeFunction is PAFDischarging))
+                            activeFunction.Abort();
+                    }
+                    else
+                    {
+                        node.ResetAndComplete();
                     }
                 }
             }
+
 
             SetExtraDisTarget(acUrlExtraDisDest);
         }
