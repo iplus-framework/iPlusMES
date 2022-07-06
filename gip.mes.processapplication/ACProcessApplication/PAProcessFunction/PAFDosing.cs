@@ -959,7 +959,7 @@ namespace gip.mes.processapplication
             if (IsDosingActiveFromSilo(silo))
             {
                 this.ACStateConverter.OnProjSpecFunctionEvent(this, "OnSiloStateChanged", silo, outwardEnabled);
-                if (!outwardEnabled)
+                if (!outwardEnabled && DosingAbortReason.ValueT == PADosingAbortReason.NotSet)
                 {
                     PADosingAbortReason action = AutoAbortActionEnumOnBlockedSilo;
                     if (action == PADosingAbortReason.CompCancelled)

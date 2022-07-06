@@ -1435,7 +1435,7 @@ namespace gip.bso.manufacturing
             return SelectedExtraDisTarget != null;
         }
 
-        [ACMethodInfo("", "en{'Abort all and switch to emptying'}de{'Abbrechen alle und leerfahren'}", 9999, true)]
+        [ACMethodInfo("", "en{'Abort all and switch to emptying'}de{'Alles abbrechen und leerfahren'}", 9999, true)]
         public virtual void AbortAllAndSwitchPWGroupToEmptyingMode()
         {
             if (SelectedExtraDisTarget == null)

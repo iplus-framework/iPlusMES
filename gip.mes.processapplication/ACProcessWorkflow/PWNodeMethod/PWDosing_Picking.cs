@@ -882,76 +882,106 @@ namespace gip.mes.processapplication
                                     || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenNextComp
                                     || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait)
                             {
-                                bool hasQuants = outwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any();
-
-                                bool zeroBookSucceeded = false;
-                                if (hasQuants)
+                                bool anyOtherFunctionActiveFromThisSilo = false;
+                                // Before Silo is posted to Zero, ensure that other functions that are dosing from this same silo make their posting also
+                                // Otherwise the stock not be correct
+                                // Therefore only the last dosing that finishes can book this Silo to empty stock
+                                if (outwardFacility.VBiFacilityACClass != null && !String.IsNullOrEmpty(outwardFacility.VBiFacilityACClass.ACURLComponentCached))
                                 {
-                                    zeroBookSucceeded = true;
-                                    ACMethodBooking zeroBooking = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
-                                    zeroBooking = zeroBooking.Clone() as ACMethodBooking;
-                                    zeroBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
-                                    zeroBooking.InwardFacility = outwardFacility;
-                                    if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
-                                        zeroBooking.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
-                                    //zeroBooking.OutwardFacility = outwardFacility;
-                                    zeroBooking.IgnoreIsEnabled = true;
-                                    ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref zeroBooking, dbApp);
-                                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                    PAMSilo currentSourceSilo = ACUrlCommand(outwardFacility.VBiFacilityACClass.ACURLComponentCached) as PAMSilo;
+                                    if (currentSourceSilo != null)
                                     {
-                                        collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                                        zeroBookSucceeded = false;
-                                        OnNewAlarmOccurred(ProcessAlarm, new Msg(zeroBooking.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1140), true);
-                                    }
-                                    else
-                                    {
-                                        if (!zeroBooking.ValidMessage.IsSucceded() || zeroBooking.ValidMessage.HasWarnings())
+                                        IEnumerable<PAFDosing> dosingList = currentSourceSilo.GetActiveDosingsFromThisSilo();
+                                        if (dosingList != null && dosingList.Any())
                                         {
-                                            if (!zeroBooking.ValidMessage.IsSucceded())
-                                                collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
-                                            Messages.LogError(this.GetACUrl(), "DoDosingBookingPicking(9)", zeroBooking.ValidMessage.InnerMessage);
-                                            OnNewAlarmOccurred(ProcessAlarm, new Msg(zeroBooking.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1130), true);
-                                        }
-                                        else
-                                            zeroBookSucceeded = true;
-                                    }
-                                }
-                                if (!hasQuants || zeroBookSucceeded)
-                                {
-                                    PAMSilo sourceSilo = null;
-                                    bool disChargingActive = false;
-                                    if (outwardFacility.FacilityACClass != null)
-                                    {
-                                        string url = outwardFacility.FacilityACClass.GetACUrlComponent();
-                                        if (!String.IsNullOrEmpty(url))
-                                        {
-                                            sourceSilo = ACUrlCommand(url) as PAMSilo;
-                                            if (sourceSilo != null)
+                                            foreach (PAFDosing activeDosingFunct in dosingList)
                                             {
-                                                IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
-                                                disChargingActive = activeDischargings != null && activeDischargings.Any();
+                                                if (activeDosingFunct != dosing
+                                                    && activeDosingFunct.CurrentACState != ACStateEnum.SMIdle
+                                                    && activeDosingFunct.IsTransportActive
+                                                    && activeDosingFunct.DosingAbortReason.ValueT == PADosingAbortReason.NotSet)
+                                                {
+                                                    anyOtherFunctionActiveFromThisSilo = true;
+                                                    activeDosingFunct.SetAbortReasonEmptyForced();
+                                                }
                                             }
                                         }
                                     }
-                                    if (   !disChargingActive
-                                        && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
-                                    {
-                                        outwardFacility.Material = null; // Automatisches Löschen der Belegung?
-                                        outwardFacility.Partslist = null;
-                                    }
                                 }
 
-                                changePosState = true;
-                                posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
-
-                                msg = dbApp.ACSaveChangesWithRetry();
-                                if (msg != null)
+                                if (!anyOtherFunctionActiveFromThisSilo)
                                 {
-                                    collectedMessages.AddDetailMessage(msg);
-                                    Messages.LogError(this.GetACUrl(), "DoDosingBookingPicking(10a)", msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1150), true);
+                                    bool hasQuants = outwardFacility.FacilityCharge_Facility.Where(c => c.NotAvailable == false).Any();
+
+                                    bool zeroBookSucceeded = false;
+                                    if (hasQuants)
+                                    {
+                                        zeroBookSucceeded = true;
+                                        ACMethodBooking zeroBooking = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
+                                        zeroBooking = zeroBooking.Clone() as ACMethodBooking;
+                                        zeroBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+                                        zeroBooking.InwardFacility = outwardFacility;
+                                        if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                                            zeroBooking.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                                        //zeroBooking.OutwardFacility = outwardFacility;
+                                        zeroBooking.IgnoreIsEnabled = true;
+                                        ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref zeroBooking, dbApp);
+                                        if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                        {
+                                            collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                                            zeroBookSucceeded = false;
+                                            OnNewAlarmOccurred(ProcessAlarm, new Msg(zeroBooking.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1140), true);
+                                        }
+                                        else
+                                        {
+                                            if (!zeroBooking.ValidMessage.IsSucceded() || zeroBooking.ValidMessage.HasWarnings())
+                                            {
+                                                if (!zeroBooking.ValidMessage.IsSucceded())
+                                                    collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                                                Messages.LogError(this.GetACUrl(), "DoDosingBookingPicking(9)", zeroBooking.ValidMessage.InnerMessage);
+                                                OnNewAlarmOccurred(ProcessAlarm, new Msg(zeroBooking.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1130), true);
+                                            }
+                                            else
+                                                zeroBookSucceeded = true;
+                                        }
+                                    }
+                                    if (!hasQuants || zeroBookSucceeded)
+                                    {
+                                        PAMSilo sourceSilo = null;
+                                        bool disChargingActive = false;
+                                        if (outwardFacility.FacilityACClass != null)
+                                        {
+                                            string url = outwardFacility.FacilityACClass.GetACUrlComponent();
+                                            if (!String.IsNullOrEmpty(url))
+                                            {
+                                                sourceSilo = ACUrlCommand(url) as PAMSilo;
+                                                if (sourceSilo != null)
+                                                {
+                                                    IEnumerable<PAFDischarging> activeDischargings = sourceSilo.GetActiveDischargingsToThisSilo();
+                                                    disChargingActive = activeDischargings != null && activeDischargings.Any();
+                                                }
+                                            }
+                                        }
+                                        if (!disChargingActive
+                                            && (sourceSilo == null || !sourceSilo.LeaveMaterialOccupation))
+                                        {
+                                            outwardFacility.Material = null; // Automatisches Löschen der Belegung?
+                                            outwardFacility.Partslist = null;
+                                        }
+                                    }
+
+                                    changePosState = true;
+                                    posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+
+                                    msg = dbApp.ACSaveChangesWithRetry();
+                                    if (msg != null)
+                                    {
+                                        collectedMessages.AddDetailMessage(msg);
+                                        Messages.LogError(this.GetACUrl(), "DoDosingBookingPicking(10a)", msg.InnerMessage);
+                                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoDosingBookingPicking", 1150), true);
+                                    }
+                                    OnBookingEmptySource(collectedMessages, sender, e, wrapObject, dbApp, pickingPos, dosingFuncResultState);
                                 }
-                                OnBookingEmptySource(collectedMessages, sender, e, wrapObject, dbApp, pickingPos, dosingFuncResultState);
                             }
                         }
 
