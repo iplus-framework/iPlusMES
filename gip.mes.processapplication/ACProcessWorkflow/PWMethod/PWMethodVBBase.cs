@@ -318,6 +318,17 @@ namespace gip.mes.processapplication
             return false;
         }
 
+        public override bool IsInSkippingMode
+        {
+            get
+            {
+                return ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
+                    || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
+                    || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
+            }
+        }
+
+
 
         private static ACClassInfoWithItems.VisibilityFilters _ExtraDisCompSelectorFilter;
         public static ACClassInfoWithItems.VisibilityFilters ExtraDisCompSelectorFilter

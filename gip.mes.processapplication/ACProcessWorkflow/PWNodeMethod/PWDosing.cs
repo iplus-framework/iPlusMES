@@ -807,28 +807,8 @@ namespace gip.mes.processapplication
         public override void SMStarting()
         {
             var pwGroup = ParentPWGroup;
-            if (pwGroup == null) // Is null when Service-Application is shutting down
-            {
-                if (this.InitState == ACInitState.Initialized)
-                    Messages.LogError(this.GetACUrl(), "SMStarting()", "ParentPWGroup is null");
+            if (!CheckParentGroupAndHandleSkipMode())
                 return;
-            }
-
-            if (   ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
-            {
-                UnSubscribeToProjectWorkCycle();
-                // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
-                if (CurrentACState == ACStateEnum.SMStarting)
-                    CurrentACState = ACStateEnum.SMCompleted;
-                return;
-            }
 
             if (Root == null || !Root.Initialized)
             {
@@ -960,28 +940,6 @@ namespace gip.mes.processapplication
             else
             {
                 var pwGroup = ParentPWGroup;
-                if (pwGroup == null) // Is null when Service-Application is shutting down
-                {
-                    if (this.InitState == ACInitState.Initialized)
-                        Messages.LogError(this.GetACUrl(), "SMRunning()", "ParentPWGroup is null");
-                    return;
-                }
-
-                if (((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                    || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                    || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)
-                    || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
-                    || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-                    || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                    || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                    || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
-                {
-                    // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
-                    if (CurrentACState == ACStateEnum.SMRunning)
-                        CurrentACState = ACStateEnum.SMCompleted;
-                    return;
-                }
-
                 if (NoSourceFoundForDosing.ValueT == 1)
                 {
                     if (!NoSourceWait.HasValue)
@@ -1005,10 +963,13 @@ namespace gip.mes.processapplication
                     NoSourceWait = null;
                     CachedEmptySiloHandlingOption = null;
                     StartNextCompResult result = StartNextCompResult.Done;
-                    if (IsProduction)
-                        result = StartNextProdComponent(module);
-                    else if (IsTransport)
-                        result = StartNextPickingPos(module);
+                    if (!pwGroup.IsInSkippingMode)
+                    {
+                        if (IsProduction)
+                            result = StartNextProdComponent(module);
+                        else if (IsTransport)
+                            result = StartNextPickingPos(module);
+                    }
                     if (result == StartNextCompResult.CycleWait)
                     {
                         SubscribeToProjectWorkCycle();

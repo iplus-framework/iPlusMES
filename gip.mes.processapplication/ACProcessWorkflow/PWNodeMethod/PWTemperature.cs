@@ -28,22 +28,8 @@ namespace gip.mes.processapplication
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
         public override void SMStarting()
         {
-            var pwGroup = ParentPWGroup;
-            if (pwGroup == null) // Is null when Service-Application is shutting down
-            {
-                if (this.InitState == ACInitState.Initialized)
-                    Messages.LogError(this.GetACUrl(), "SMStarting()", "ParentPWGroup is null");
+            if (!CheckParentGroupAndHandleSkipMode())
                 return;
-            }
-
-            if (pwGroup.IsPWGroupOrRootPWInSkipMode)
-            {
-                UnSubscribeToProjectWorkCycle();
-                // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
-                if (CurrentACState == ACStateEnum.SMStarting)
-                    CurrentACState = ACStateEnum.SMCompleted;
-                return;
-            }
 
             base.SMStarting();
         }

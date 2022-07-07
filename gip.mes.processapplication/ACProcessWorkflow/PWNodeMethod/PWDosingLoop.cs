@@ -58,6 +58,8 @@ namespace gip.mes.processapplication
         int _LastSubStateResetCounter = 0;
         DateTime? _PreviousLoopTime;
         int _EndlessLoopPreventionCounter = 0;
+
+        public override bool MustBeInsidePWGroup => true;
         #endregion
 
 

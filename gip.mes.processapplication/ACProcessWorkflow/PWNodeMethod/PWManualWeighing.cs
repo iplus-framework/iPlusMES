@@ -1037,28 +1037,8 @@ namespace gip.mes.processapplication
         public override void SMStarting()
         {
             var pwGroup = ParentPWGroup;
-            if (pwGroup == null) // Is null when Service-Application is shutting down
-            {
-                if (this.InitState == ACInitState.Initialized)
-                    Messages.LogError(this.GetACUrl(), "SMStarting()", "ParentPWGroup is null");
+            if (!CheckParentGroupAndHandleSkipMode())
                 return;
-            }
-
-            if (((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
-                || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
-            {
-                UnSubscribeToProjectWorkCycle();
-                // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
-                if (CurrentACState == ACStateEnum.SMStarting)
-                    CurrentACState = ACStateEnum.SMCompleted;
-                return;
-            }
 
             if (!Root.Initialized)
             {
@@ -1098,7 +1078,7 @@ namespace gip.mes.processapplication
                 }
 
                 PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
-                if(manualWeighing != null)
+                if (manualWeighing != null)
                 {
                     if (CurrentACState == ACStateEnum.SMStarting)
                         CurrentACState = ACStateEnum.SMRunning;
@@ -1171,7 +1151,10 @@ namespace gip.mes.processapplication
 
                     StartNextCompResult result = StartNextCompResult.Done;
                     if (IsProduction)
-                        result = StartManualWeighingProd(ParentPWGroup.AccessedProcessModule);
+                    {
+                        if (!ParentPWGroup.IsInSkippingMode)
+                            result = StartManualWeighingProd(ParentPWGroup.AccessedProcessModule);
+                    }
 
                     if (result == StartNextCompResult.CycleWait)
                     {

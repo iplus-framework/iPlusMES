@@ -163,23 +163,8 @@ namespace gip.mes.processapplication
         public override void SMStarting()
         {
             var pwGroup = ParentPWGroup;
-            if (pwGroup == null) // Is null when Service-Application is shutting down
-            {
-                if (this.InitState == ACInitState.Initialized)
-                {
-                    Messages.LogError(this.GetACUrl(), "SMStarting()", "ParentPWGroup is null");
-                    return;
-                }
-            }
-
-            bool isCompleted = IsCompleted(pwGroup);
-            if (isCompleted)
-            {
-                UnSubscribeToProjectWorkCycle();
-                if (CurrentACState == ACStateEnum.SMStarting)
-                    CurrentACState = ACStateEnum.SMCompleted;
+            if (!CheckParentGroupAndHandleSkipMode())
                 return;
-            }
 
             if (!Root.Initialized)
             {
@@ -442,17 +427,6 @@ namespace gip.mes.processapplication
             return StartNextCompResult.NextCompStarted;
         }
 
-        public bool IsCompleted(PWGroup pwGroup)
-        {
-            return ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-               || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-               || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)
-               || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
-               || ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-               || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-               || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-               || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
-        }
 
         #endregion
 

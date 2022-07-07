@@ -273,6 +273,8 @@ namespace gip.mes.processapplication
 
         public override void SMStarting()
         {
+            if (!CheckParentGroupAndHandleSkipMode())
+                return;
             base.SMStarting();
         }
     }

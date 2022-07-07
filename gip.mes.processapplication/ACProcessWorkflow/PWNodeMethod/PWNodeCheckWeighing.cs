@@ -151,6 +151,14 @@ namespace gip.mes.processapplication
                 return false;
             }
         }
+
+        public override bool MustBeInsidePWGroup
+        {
+            get
+            {
+                return true;
+            }
+        }
         #endregion
 
 

@@ -136,6 +136,13 @@ namespace gip.mes.processapplication
             }
         }
 
+        public override bool MustBeInsidePWGroup
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         #endregion
 
@@ -155,12 +162,15 @@ namespace gip.mes.processapplication
             RecalcTimeInfo();
             CreateNewProgramLog(NewACMethodWithConfiguration());
 
-            if (ParentPWGroup != null)
+            if (CheckParentGroupAndHandleSkipMode())
             {
-                ParentPWGroup.ProcessModuleChanged += ParentPWGroup_ProcessModuleChanged;
-                if (ParentPWGroup.AccessedProcessModule != null)
+                if (ParentPWGroup != null)
                 {
-                    HandleProcessModuleMapping(ParentPWGroup.AccessedProcessModule, false);
+                    ParentPWGroup.ProcessModuleChanged += ParentPWGroup_ProcessModuleChanged;
+                    if (ParentPWGroup.AccessedProcessModule != null)
+                    {
+                        HandleProcessModuleMapping(ParentPWGroup.AccessedProcessModule, false);
+                    }
                 }
             }
 

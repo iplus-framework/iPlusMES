@@ -88,6 +88,15 @@ namespace gip.mes.processapplication
                 return ParentPWMethod<PWMethodProduction>() != null;
             }
         }
+
+        public override bool MustBeInsidePWGroup
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         #endregion
 
         #endregion
@@ -98,7 +107,15 @@ namespace gip.mes.processapplication
 
         public override void SMStarting()
         {
-            PAProcessModule module = ParentPWGroup.AccessedProcessModule;
+            var pwGroup = ParentPWGroup;
+            if (!CheckParentGroupAndHandleSkipMode(false))
+            {
+                //base.SMStarting();
+                RaiseOutEventAndComplete();
+                return;
+            }
+
+            PAProcessModule module = pwGroup.AccessedProcessModule;
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             Guid? intermediateChildPosID = GetIntermediateChildPosID(ContentACClassWF, pwMethodProduction);
             PWBinSelection pwBinSelection = this.FindPredecessors<PWBinSelection>(true, c => c is PWBinSelection, c => c is PWBinSelection, 0).FirstOrDefault();

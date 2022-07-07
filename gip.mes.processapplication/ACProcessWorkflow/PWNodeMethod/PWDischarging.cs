@@ -478,6 +478,14 @@ namespace gip.mes.processapplication
         [ACPropertyBindingSource(9999, "", "", "", false, true)]
         public IACContainerTNet<Guid> CurrentDisEntityID { get; set; }
 
+        public override bool IsSkippable
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -518,12 +526,9 @@ namespace gip.mes.processapplication
         public override void SMStarting()
         {
             var pwGroup = ParentPWGroup;
-            if (pwGroup == null) // Is null when Service-Application is shutting down
-            {
-                if (this.InitState == ACInitState.Initialized)
-                    Messages.LogError(this.GetACUrl(), "SMStarting()", "ParentPWGroup is null");
+            if (!CheckParentGroupAndHandleSkipMode())
                 return;
-            }
+
             if (   ((ACSubStateEnum)pwGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
                 || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled))
             {

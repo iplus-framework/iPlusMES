@@ -15,6 +15,13 @@ namespace gip.mes.processapplication
         public const string PWClassName = "PWNodeStartNextBatch";
 
         #region Properties
+        public override bool MustBeInsidePWGroup
+        {
+            get
+            {
+                return false;
+            }
+        }
         #endregion
 
         #region Constructors

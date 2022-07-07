@@ -14,9 +14,16 @@ namespace gip.mes.processapplication
     {
         public const string PWClassName = "PWNodeDeliverMaterial";
 
+        #region Properties
         public Route CurrentDischargingRoute { get { return null; } set { } }
 
-        #region Properties
+        public override bool MustBeInsidePWGroup
+        {
+            get
+            {
+                return false;
+            }
+        }
         #endregion
 
         #region Constructors

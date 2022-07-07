@@ -759,7 +759,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public override bool IsPWGroupOrRootPWInSkipMode
+        public override bool IsInSkippingMode
         {
             get
             {
@@ -772,9 +772,7 @@ namespace gip.mes.processapplication
                 || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)
                 || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
                 || ((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode)
-                || ((ACSubStateEnum)rootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMBatchCancelled)
-                || ((ACSubStateEnum)rootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode)
-                || ((ACSubStateEnum)rootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
+                || RootPW.IsInSkippingMode;
             }
         }
 
@@ -903,8 +901,10 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 9999, true)]
         public void AbortAllAndSetExtraDisTarget(string acUrlExtraDisDest)
         {
-            var activeNodes = RootPW?.FindChildComponents<PWBaseExecutable>(c => c is PWBaseExecutable)
-                                    .Where(x => x.CurrentACState == ACStateEnum.SMRunning || x.CurrentACState == ACStateEnum.SMPaused).ToArray();
+            SetExtraDisTarget(acUrlExtraDisDest);
+
+            var activeNodes = RootPW?.FindChildComponents<PWBaseExecutable>(c => c is PWBaseExecutable && !(c is PWGroup))
+                                     .Where(x => x.CurrentACState > ACStateEnum.SMIdle && x.IsSkippable).ToArray();
 
             if (activeNodes != null && activeNodes.Any())
             {
@@ -923,9 +923,6 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-
-
-            SetExtraDisTarget(acUrlExtraDisDest);
         }
 
         #endregion
