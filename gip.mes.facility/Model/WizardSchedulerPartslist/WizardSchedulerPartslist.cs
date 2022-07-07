@@ -86,7 +86,9 @@ namespace gip.mes.facility
             }
 
             if (SelectedMDSchedulingGroup == null)
+            {
                 SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
+            }
         }
         #endregion
 
@@ -637,6 +639,7 @@ namespace gip.mes.facility
         [ACPropertyInfo(999, "OffsetToEndTime", "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}")]
         public TimeSpan? OffsetToEndTime { get; set; }
 
+
         #endregion
 
         #endregion
@@ -778,7 +781,7 @@ namespace gip.mes.facility
                     RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * targetQuantity,
                     ItemsList = new BindingList<BatchPlanSuggestionItem>()
                 };
-                BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(this, 1, targetQuantity, 1, targetQuantity, null, true ));
+                BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(this, 1, targetQuantity, 1, targetQuantity, null, true));
             }
             else if (BatchSuggestionMode != null)
             {

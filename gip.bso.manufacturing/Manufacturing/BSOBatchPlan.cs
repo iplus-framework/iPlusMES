@@ -714,17 +714,19 @@ namespace gip.bso.manufacturing
 
         override protected void RefreshModules()
         {
+
         }
-
-
 
         override protected void RefreshTargets()
         {
+            BindingList<POPartslistPosReservation> result = new BindingList<POPartslistPosReservation>();
             ProdOrderPartslist currentProdOrderPartslist = CurrentProdOrderPartslist != null ? CurrentProdOrderPartslist : ExternProdOrderPartslist;
-
-            BindingList<POPartslistPosReservation> result = ProdOrderManager.GetTargets(DatabaseApp, VarioConfigManager, RoutingService, VBCurrentACClassWF, currentProdOrderPartslist,
-                SelectedIntermediate, SelectedBatchPlanForIntermediate, CurrentConfigACUrl,
-                ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
+            if (currentProdOrderPartslist != null && ProdOrderManager != null)
+            {
+                result = ProdOrderManager.GetTargets(DatabaseApp, VarioConfigManager, RoutingService, VBCurrentACClassWF, currentProdOrderPartslist,
+               SelectedIntermediate, SelectedBatchPlanForIntermediate, CurrentConfigACUrl,
+               ShowCellsInRoute, ShowSelectedCells, ShowEnabledCells, ShowSameMaterialCells, PreselectFirstFacilityReservation);
+            }
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
         }
@@ -1013,10 +1015,10 @@ namespace gip.bso.manufacturing
         public gip.core.datamodel.ACClassWF GetACClassWFDischarging()
         {
             ProdOrderPartslist currentProdOrderPartslist = CurrentProdOrderPartslist != null ? CurrentProdOrderPartslist : ExternProdOrderPartslist;
-            if (VBCurrentACClassWF == null 
-                || SelectedIntermediate == null 
-                || currentProdOrderPartslist == null 
-                || SelectedBatchPlanForIntermediate == null 
+            if (VBCurrentACClassWF == null
+                || SelectedIntermediate == null
+                || currentProdOrderPartslist == null
+                || SelectedBatchPlanForIntermediate == null
                 || currentProdOrderPartslist.Partslist.MaterialWF == null)
             {
                 return null;
