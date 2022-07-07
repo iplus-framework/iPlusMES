@@ -383,9 +383,9 @@ namespace gip.bso.manufacturing
             if (prodOrderPartslistsChanged.Any())
             {
                 bool isUpdate = UpdateChangedPartslist(prodOrderPartslistsChanged);
-                if(isUpdate)
+                if (isUpdate)
                 {
-                    foreach(ProdOrderPartslist pl in prodOrderPartslistsChanged)
+                    foreach (ProdOrderPartslist pl in prodOrderPartslistsChanged)
                         pl.LastFormulaChange = DateTime.Now;
                     ACSaveChanges();
                 }
@@ -397,7 +397,9 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledGeneratePlanOk()
         {
-            return SelectedPlanningMR != null
+            return
+                !BackgroundWorker.IsBusy
+                && SelectedPlanningMR != null
                 && SelectedPlanningMR.PlanningMRProposal_PlanningMR.Any();
         }
 
@@ -412,12 +414,27 @@ namespace gip.bso.manufacturing
 
         private void GenerateProdOrders()
         {
+            new List<ProdOrder>();
+            List<Guid> filterProdOrderBatchPlanIds = new List<Guid>();
+            if (ChildBSOBatchPlanScheduler.ProdOrderBatchPlanList.Any(c => c.IsSelected))
+            {
+                // Filter is based on ProdOrderPartslist - ProdOrderBatchPlan is selected
+                // is ok select only one batch plan per ProdOrderPartslist
+                filterProdOrderBatchPlanIds =
+                    ChildBSOBatchPlanScheduler
+                    .ProdOrderBatchPlanList
+                    .Where(c => c.IsSelected)
+                    .Select(c => c.ProdOrderBatchPlanID)
+                    .Distinct()
+                    .ToList();
+            }
+
             List<ProdOrder> prodOrders = SelectedPlanningMR.PlanningMRProposal_PlanningMR.Where(c => c.ProdOrder != null).Select(c => c.ProdOrder).Distinct().ToList();
             if (prodOrders != null && prodOrders.Any())
-                GenerateProdOrders(prodOrders);
+                GenerateProdOrders(prodOrders, filterProdOrderBatchPlanIds.ToArray());
         }
 
-        private void GenerateProdOrders(List<ProdOrder> prodOrders)
+        private void GenerateProdOrders(List<ProdOrder> prodOrders, Guid[] filterProdOrderBatchPlanIds)
         {
             List<ProdOrder> generated = new List<ProdOrder>();
             try
@@ -446,8 +463,20 @@ namespace gip.bso.manufacturing
                             mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
                     }
 
-                    ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null, BatchPlanTermin, maxSchedulerOrders);
-                    generated.Add(targetProdOrder);
+                    bool generateProdorder = !filterProdOrderBatchPlanIds.Any();
+                    if (!generateProdorder)
+                    {
+                        generateProdorder =
+                            sourceProdOrder
+                            .ProdOrderPartslist_ProdOrder
+                            .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                            .Any(c => filterProdOrderBatchPlanIds.Contains(c.ProdOrderBatchPlanID));
+                    }
+                    if (generateProdorder)
+                    {
+                        ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(DatabaseApp, sourceProdOrder, null, BatchPlanTermin, filterProdOrderBatchPlanIds, maxSchedulerOrders);
+                        generated.Add(targetProdOrder);
+                    }
                 }
 
                 MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();

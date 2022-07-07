@@ -304,8 +304,11 @@ namespace gip.bso.manufacturing
 
         private void Value_OnSearchStockMaterial(object sender, EventArgs e)
         {
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchStockMaterial);
-            ShowDialog(this, DesignNameProgressBar);
+            if(!BackgroundWorker.IsBusy)
+            {
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchStockMaterial);
+                ShowDialog(this, DesignNameProgressBar);
+            }
         }
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
@@ -3210,7 +3213,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledBackwardSchedulingOk()
         {
-            return ScheduledEndDate != null && IsEnabledScheduling();
+            return !BackgroundWorker.IsBusy && ScheduledEndDate != null && IsEnabledScheduling();
         }
 
         [ACMethodCommand("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508, true)]
@@ -3237,7 +3240,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledForwardSchedulingOk()
         {
-            return ScheduledStartDate != null && IsEnabledScheduling();
+            return !BackgroundWorker.IsBusy && ScheduledStartDate != null && IsEnabledScheduling();
         }
 
         [ACMethodInfo("SchedulingCancel", "en{'Cancel'}de{'Abbrechen'}", 510)]
@@ -3279,7 +3282,8 @@ namespace gip.bso.manufacturing
         public bool IsEnabledGenerateBatchPlans()
         {
             return
-                ProdOrderPartslistList != null
+                !BackgroundWorker.IsBusy
+                && ProdOrderPartslistList != null
                 && ProdOrderPartslistList.Any(c => c.IsSelected)
                 && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
         }
@@ -3302,7 +3306,8 @@ namespace gip.bso.manufacturing
         public bool IsEnabledMergeOrders()
         {
             return
-                ProdOrderPartslistList != null
+                !BackgroundWorker.IsBusy
+                && ProdOrderPartslistList != null
                 && ProdOrderPartslistList.Any(c => c.IsSelected)
                 && ProdOrderPartslistList.Where(c => c.IsSelected && IsEnabledForBatchPlan(c)).Any();
         }
