@@ -621,7 +621,12 @@ namespace gip.bso.manufacturing
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
                                     .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                                     .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-                                    .Where(x => x.SourceProdOrderPartslistPos.Anterograde == null || !(x.SourceProdOrderPartslistPos.Anterograde ?? true))
+                                    .Where(x =>
+
+                                            x.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                            && (x.SourceProdOrderPartslistPos.Anterograde == null || !(x.SourceProdOrderPartslistPos.Anterograde ?? true))
+
+                                    )
                                     .Select(x => x.TargetQuantityUOM)
                                     .DefaultIfEmpty()
                                     .Sum(),
@@ -629,7 +634,12 @@ namespace gip.bso.manufacturing
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
                                     .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                                     .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-                                    .Where(x => x.SourceProdOrderPartslistPos.Anterograde == null || !(x.SourceProdOrderPartslistPos.Anterograde ?? true))
+                                    .Where(x =>
+
+                                            x.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                                            && (x.SourceProdOrderPartslistPos.Anterograde == null || !(x.SourceProdOrderPartslistPos.Anterograde ?? true))
+
+                                    )
                                     .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
                                     .Select(x => x.OutwardQuantity)
                                     .DefaultIfEmpty()
@@ -637,13 +647,15 @@ namespace gip.bso.manufacturing
                     DifferenceOutwardQuantityUOM = 0,
                     SumInwardTargetQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
-                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern && !x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                                    .SelectMany(x => x.ProdOrderPartslistPos_ParentProdOrderPartslistPos)
                                     .Select(x => x.TargetQuantityUOM)
                                     .DefaultIfEmpty()
                                     .Sum(),
                     SumInwardActualQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPos_ProdOrderPartslist)
-                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern && !x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                                    .SelectMany(x => x.ProdOrderPartslistPos_ParentProdOrderPartslistPos)
                                     .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos)
                                     .Select(x => x.InwardQuantity)
                                     .DefaultIfEmpty()
