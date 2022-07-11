@@ -58,7 +58,7 @@ namespace gip.mes.facility
         [ACPropertyInfo(302, Const_Output, "en{'Diff. Output = O2 - O1 (O3)'}de{'Diff. Ergebnis = Erg2 - Erg1 (Erg3)'}")]
         public double InwardDiffQuantityUOM { get; set; }
 
-        [ACPropertyInfo(303, Const_Output, "en{'Diff. Output = O2 - O1 (O3)'}de{'Diff. Erg.-Eins. = Erg2 - Ein2'}")]
+        [ACPropertyInfo(303, Const_Output, "en{'Diff. Out-In = O2 - I2'}de{'Diff. Erg.-Eins. = Erg2 - Ein2'}")]
         public double ActualRestQuantityUOM { get; set; }
 
         #endregion
