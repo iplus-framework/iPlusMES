@@ -840,12 +840,14 @@ namespace gip.bso.manufacturing
             (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName) =>
                 ctx
                 .ProdOrderPartslist
+                .Include("ProdOrder")
                 .Include("Partslist")
                 .Include("Partslist.Material")
                 .Include("ProdOrderPartslistPos_ProdOrderPartslist")
                 .Include("ProdOrderPartslistPos_ProdOrderPartslist.FacilityBooking_ProdOrderPartslistPos")
                 .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos")
                 .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+                .Include("ProdOrderPartslistPos_ProdOrderPartslist.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.SourceProdOrderPartslistPos")
 
                 .Where(c =>
                     (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
@@ -933,28 +935,49 @@ namespace gip.bso.manufacturing
                 .ThenBy(c => c.MaterialNo)
         );
 
+        /*
+         * 
+         * 
+         * .ProdOrderPartslistPos
+                .Include("ProdOrderPartslist")
+                .Include("ProdOrderPartslist.Partslist")
+                .Include("ProdOrderPartslist.ProdOrder")
+                .Include("ProdOrderPartslist.Partslist.Material")
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+
+        */
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, IQueryable<InputOverview>> s_cQry_Input_Program =
        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, IQueryable<InputOverview>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo) =>
                ctx
                .ProdOrderPartslistPos
+
                 .Include("ProdOrderPartslist")
                 .Include("ProdOrderPartslist.Partslist")
-                .Include("ProdOrderPartslist.Partslist.Material")
+                .Include("ProdOrderPartslist.ProdOrder")
+                .Include("ProdOrderPartslist.Material")
+
+                .Include("FacilityBooking_ProdOrderPartslistPos")
+
+                .Include("Material")
+
                 .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
                 .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.OutwardFacility")
 
                 .Where(c =>
 
                         // filtering partslist
                         (filterProdStartDate == null || c.ProdOrderPartslist.StartDate >= filterProdStartDate)
                         && (filterProdEndDate == null || c.ProdOrderPartslist.StartDate < filterProdEndDate)
-                        && (filterStartBookingDate == null || c.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
-                        && (filterEndBookingDate == null || c.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
+                        && (filterStartBookingDate == null || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                        && (filterEndBookingDate == null || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.InsertDate < filterEndBookingDate).Any())
                         && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(filterProgramNo))
                         && (string.IsNullOrEmpty(filterMaterialNo) || c.Material.MaterialNo.Contains(filterMaterialNo) || c.Material.MaterialName1.Contains(filterMaterialNo))
                         && (string.IsNullOrEmpty(filterDepartmentName) || c.ProdOrderPartslist.DepartmentUserName.Contains(filterDepartmentName))
+
                         // filtering pos
                         && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
                         && (
@@ -1007,8 +1030,6 @@ namespace gip.bso.manufacturing
                })
                .OrderBy(c => c.MaterialNo)
        );
-
-
 
         #endregion
 
