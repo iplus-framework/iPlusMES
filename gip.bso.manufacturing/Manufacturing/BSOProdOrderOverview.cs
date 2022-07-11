@@ -614,8 +614,10 @@ namespace gip.bso.manufacturing
             return FilterStartDate != null && FilterEndDate != null;
         }
 
-        private BSOProdOrderOverview_SearchResult GetSearch(bool searchPlAndMt, bool searchInputs)
+        private BSOProdOrderOverview_SearchResult GetSearch(string operationName, bool searchPlAndMt, bool searchInputs)
         {
+            DateTime startTime = DateTime.Now;
+
             DateTime? startProdTime = FilterStartDate;
             DateTime? endProdTime = FilterEndDate;
 
@@ -652,13 +654,17 @@ namespace gip.bso.manufacturing
                 }
 
                 List<InputOverview> inputOverview = null;
-                if(searchInputs)
+                if (searchInputs)
                 {
-                    LoadInputList(databaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, facilityNo);
+                    inputOverview = LoadInputList(databaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, facilityNo);
                 }
 
                 return new BSOProdOrderOverview_SearchResult()
                 {
+                    OperationName = operationName,
+                    OperationStartTime = startTime,
+                    OperationEndTime = DateTime.Now,
+
                     OverviewProdOrderPartslist = overviewPl,
                     OverviewMaterial = overviewMt,
                     InputOverview = inputOverview
@@ -708,13 +714,6 @@ namespace gip.bso.manufacturing
                 if (SelectedFilterFacility != facility)
                 {
                     SelectedFilterFacility = facility;
-
-                    _InputList = null;
-
-                    OnPropertyChanged(nameof(InputList));
-
-                    BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchInput);
-                    ShowDialog(this, DesignNameProgressBar);
                 }
             }
         }
@@ -722,6 +721,27 @@ namespace gip.bso.manufacturing
         public bool IsEnabledShowDlgFilterToFacility()
         {
             return true;
+        }
+
+        /// <summary>
+        /// Source Property: SearchInputs
+        /// </summary>
+        [ACMethodInfo("SearchInputs", "en{'Search'}de{'Suchen'}", 999)]
+        public void SearchInputs()
+        {
+            if (!IsEnabledSearchInputs())
+                return;
+
+            _InputList = null;
+            OnPropertyChanged(nameof(InputList));
+
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchInput);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledSearchInputs()
+        {
+            return IsEnabledSearch();
         }
 
         #endregion
@@ -749,11 +769,11 @@ namespace gip.bso.manufacturing
             switch (command)
             {
                 case BGWorkerMehtod_Search:
-                    e.Result = GetSearch(true, false);
+                    e.Result = GetSearch(command, true, false);
                     break;
 
                 case BGWorkerMehtod_SearchInput:
-                    e.Result = GetSearch(false, true);
+                    e.Result = GetSearch(command, false, true);
                     break;
             }
         }
@@ -776,10 +796,11 @@ namespace gip.bso.manufacturing
             }
             else
             {
+                BSOProdOrderOverview_SearchResult result = null;
                 switch (command)
                 {
                     case BGWorkerMehtod_Search:
-                        BSOProdOrderOverview_SearchResult result = e.Result as BSOProdOrderOverview_SearchResult;
+                        result = e.Result as BSOProdOrderOverview_SearchResult;
                         if (result != null)
                         {
                             _OverviewProdOrderPartslistList = result.OverviewProdOrderPartslist;
@@ -792,13 +813,18 @@ namespace gip.bso.manufacturing
                         }
                         break;
                     case BGWorkerMehtod_SearchInput:
-                        BSOProdOrderOverview_SearchResult result1 = e.Result as BSOProdOrderOverview_SearchResult;
-                        if (result1 != null)
+                        result = e.Result as BSOProdOrderOverview_SearchResult;
+                        if (result != null)
                         {
-                            _InputList = result1.InputOverview;
+                            _InputList = result.InputOverview;
                             OnPropertyChanged(nameof(InputList));
                         }
                         break;
+                }
+                if (result != null)
+                {
+                    TimeSpan timespan = result.OperationEndTime - result.OperationStartTime;
+                    SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} completed! Execution time:{1}", result.OperationName, timespan.ToString("mm\\:ss")) });
                 }
             }
         }
@@ -912,23 +938,38 @@ namespace gip.bso.manufacturing
        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, IQueryable<InputOverview>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo) =>
                ctx
-               .ProdOrderPartslist
+               .ProdOrderPartslistPos
+                .Include("ProdOrderPartslist")
+                .Include("ProdOrderPartslist.Partslist")
+                .Include("ProdOrderPartslist.Partslist.Material")
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
 
-
-               .Where(c =>
-                   (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
-                   && (filterProdEndDate == null || c.StartDate < filterProdEndDate)
-                   && (filterStartBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
-                   && (filterEndBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
-                   && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrder.ProgramNo.Contains(filterProgramNo))
-                   && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
-                   && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName))
-               )
-
-                .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
                 .Where(c =>
-                        c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
-                        && (string.IsNullOrEmpty(filterFacilityNo) || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.OutwardFacility != null && x.OutwardFacility.FacilityNo == filterFacilityNo).Any())
+
+                        // filtering partslist
+                        (filterProdStartDate == null || c.ProdOrderPartslist.StartDate >= filterProdStartDate)
+                        && (filterProdEndDate == null || c.ProdOrderPartslist.StartDate < filterProdEndDate)
+                        && (filterStartBookingDate == null || c.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                        && (filterEndBookingDate == null || c.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
+                        && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(filterProgramNo))
+                        && (string.IsNullOrEmpty(filterMaterialNo) || c.Material.MaterialNo.Contains(filterMaterialNo) || c.Material.MaterialName1.Contains(filterMaterialNo))
+                        && (string.IsNullOrEmpty(filterDepartmentName) || c.ProdOrderPartslist.DepartmentUserName.Contains(filterDepartmentName))
+                        // filtering pos
+                        && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                        && (
+                                string.IsNullOrEmpty(filterFacilityNo)
+                                || c
+                                    .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                    .Where(x =>
+                                                    x.OutwardFacility != null
+                                                    && (
+                                                            x.OutwardFacility.FacilityNo == filterFacilityNo
+                                                            || (x.OutwardFacility.Facility1_ParentFacility != null && x.OutwardFacility.Facility1_ParentFacility.FacilityNo == filterFacilityNo)
+                                                        )
+                                            ).Any()
+                                )
                 )
 
                 .GroupBy(c => new { c.Material.MaterialNo, c.Material.MaterialName1 })
@@ -997,5 +1038,10 @@ namespace gip.bso.manufacturing
         public List<ProdOrderPartslistiOverview> OverviewProdOrderPartslist { get; set; }
         public List<ProdOrderPartslistiOverview> OverviewMaterial { get; set; }
         public List<InputOverview> InputOverview { get; set; }
+
+        public DateTime OperationStartTime { get; set; }
+        public DateTime OperationEndTime { get; set; }
+
+        public string OperationName { get; set; }
     }
 }
