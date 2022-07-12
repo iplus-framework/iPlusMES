@@ -482,36 +482,32 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistOverview> LoadOverviewMaterialList()
+        private List<ProdOrderPartslistOverview> LoadOverviewMaterialList(List<ProdOrderPartslistOverview> prodOrderOverview)
         {
-            List<ProdOrderPartslistOverview> list = new List<ProdOrderPartslistOverview>();
-            if (_OverviewProdOrderPartslistList != null && _OverviewProdOrderPartslistList.Any())
-            {
-                list =
-                    _OverviewProdOrderPartslistList
-                    .GroupBy(c => new { c.MaterialNo, c.MaterialName })
-                    .Select(c => new ProdOrderPartslistOverview()
-                    {
-                        MaterialNo = c.Key.MaterialNo,
-                        MaterialName = c.Key.MaterialName,
-                        MDUnitName = c.Select(x => x.MDUnitName).DefaultIfEmpty().FirstOrDefault(),
-
-                        OutwardTargetQuantityUOM = c.Sum(x => x.OutwardTargetQuantityUOM),
-                        OutwardActualQuantityUOM = c.Sum(x => x.OutwardActualQuantityUOM),
-
-                        InwardTargetQuantityUOM = c.Sum(x => x.InwardTargetQuantityUOM),
-                        InwardActualQuantityUOM = c.Sum(x => x.InwardActualQuantityUOM),
-
-                        UsageTargetQuantityUOM = c.Sum(x => x.UsageTargetQuantityUOM),
-                        UsageActualQuantityUOM = c.Sum(x => x.UsageActualQuantityUOM)
-                    })
-                    .OrderBy(c => c.MaterialNo)
-                    .ToList();
-
-                foreach (ProdOrderPartslistOverview item in list)
+            List<ProdOrderPartslistOverview> list =
+                prodOrderOverview
+                .GroupBy(c => new { c.MaterialNo, c.MaterialName })
+                .Select(c => new ProdOrderPartslistOverview()
                 {
-                    item.CalculateDiff();
-                }
+                    MaterialNo = c.Key.MaterialNo,
+                    MaterialName = c.Key.MaterialName,
+                    MDUnitName = c.Select(x => x.MDUnitName).DefaultIfEmpty().FirstOrDefault(),
+
+                    OutwardTargetQuantityUOM = c.Sum(x => x.OutwardTargetQuantityUOM),
+                    OutwardActualQuantityUOM = c.Sum(x => x.OutwardActualQuantityUOM),
+
+                    InwardTargetQuantityUOM = c.Sum(x => x.InwardTargetQuantityUOM),
+                    InwardActualQuantityUOM = c.Sum(x => x.InwardActualQuantityUOM),
+
+                    UsageTargetQuantityUOM = c.Sum(x => x.UsageTargetQuantityUOM),
+                    UsageActualQuantityUOM = c.Sum(x => x.UsageActualQuantityUOM)
+                })
+                .OrderBy(c => c.MaterialNo)
+                .ToList();
+
+            foreach (ProdOrderPartslistOverview item in list)
+            {
+                item.CalculateDiff();
             }
 
             return list;
@@ -650,7 +646,8 @@ namespace gip.bso.manufacturing
                 if (searchPlAndMt)
                 {
                     overviewPl = LoadOverviewProdOrderPartslistList(databaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName);
-                    overviewMt = LoadOverviewMaterialList();
+                    if (overviewPl != null)
+                        overviewMt = LoadOverviewMaterialList(overviewPl);
                 }
 
                 List<InputOverview> inputOverview = null;
