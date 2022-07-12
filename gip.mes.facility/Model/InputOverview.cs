@@ -37,7 +37,7 @@ namespace gip.mes.facility
         [ACPropertyInfo(403, "Quantities", "en{'Diff = A - T'}de{'Diff = I - S'}")]
         public double DiffQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, "Quantities", "en{'Zero posting'}de{'Null Buchung")]
+        [ACPropertyInfo(403, "Quantities", "en{'Zero posting'}de{'Null Buchung'}")]
         public double ZeroPostingQuantityUOM { get; set; }
 
         [ACPropertyInfo(403, "Quantities", "en{'Diff = T - P'}de{'Diff = S - P'}")]
