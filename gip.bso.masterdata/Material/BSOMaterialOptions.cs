@@ -494,7 +494,7 @@ namespace gip.bso.masterdata
                     msg = DatabaseApp.ACSaveChanges();
                     SearchAssociatedPos();
 
-                    if (msg != null && PerformOpertionsOnProductionOrders)
+                    if (msg == null && PerformOpertionsOnProductionOrders)
                     {
                         var POPos = positions.SelectMany(c => c.ProdOrderPartslistPos_BasedOnPartslistPos)
                                              .Where(c => c.ProdOrderPartslist.MDProdOrderState.ProdOrderState == MDProdOrderState.ProdOrderStates.NewCreated
