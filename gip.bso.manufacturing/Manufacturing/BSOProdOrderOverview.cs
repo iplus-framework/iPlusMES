@@ -394,13 +394,13 @@ namespace gip.bso.manufacturing
 
         #region Properties -> OverviewProdOrderPartslist
 
-        private ProdOrderPartslistiOverview _SelectedOverviewProdOrderPartslist;
+        private ProdOrderPartslistOverview _SelectedOverviewProdOrderPartslist;
         /// <summary>
         /// Selected property for OverviewProdOrderPartslist
         /// </summary>
         /// <value>The selected OverviewProdOrderPartslist</value>
         [ACPropertySelected(9999, "OverviewProdOrderPartslist", "en{'TODO: OverviewProdOrderPartslist'}de{'TODO: OverviewProdOrderPartslist'}")]
-        public ProdOrderPartslistiOverview SelectedOverviewProdOrderPartslist
+        public ProdOrderPartslistOverview SelectedOverviewProdOrderPartslist
         {
             get
             {
@@ -416,13 +416,13 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistiOverview> _OverviewProdOrderPartslistList;
+        private List<ProdOrderPartslistOverview> _OverviewProdOrderPartslistList;
         /// <summary>
         /// List property for OverviewProdOrderPartslist
         /// </summary>
         /// <value>The OverviewProdOrderPartslist list</value>
         [ACPropertyList(9999, "OverviewProdOrderPartslist")]
-        public List<ProdOrderPartslistiOverview> OverviewProdOrderPartslistList
+        public List<ProdOrderPartslistOverview> OverviewProdOrderPartslistList
         {
             get
             {
@@ -430,12 +430,12 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistiOverview> LoadOverviewProdOrderPartslistList(DatabaseApp databaseApp, DateTime? filterProdStartDate, DateTime? filterProdEndDate,
+        private List<ProdOrderPartslistOverview> LoadOverviewProdOrderPartslistList(DatabaseApp databaseApp, DateTime? filterProdStartDate, DateTime? filterProdEndDate,
             DateTime? filterStartBookingDate, DateTime? filterEndBookingDate, string filterProgramNo, string filterMaterialNo, string filterDepartmentName)
         {
 
-            List<ProdOrderPartslistiOverview> list = s_cQry_ProdOrderPartslistiOverview_Program(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName).ToList();
-            foreach (ProdOrderPartslistiOverview item in list)
+            List<ProdOrderPartslistOverview> list = s_cQry_ProdOrderPartslistiOverview_Program(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName).ToList();
+            foreach (ProdOrderPartslistOverview item in list)
             {
                 item.CalculateDiff();
             }
@@ -446,13 +446,13 @@ namespace gip.bso.manufacturing
 
         #region Properties -> OverviewMaterial
 
-        private ProdOrderPartslistiOverview _SelectedOverviewMaterial;
+        private ProdOrderPartslistOverview _SelectedOverviewMaterial;
         /// <summary>
         /// Selected property for OverviewMaterial
         /// </summary>
         /// <value>The selected OverviewMaterial</value>
         [ACPropertySelected(9999, "OverviewMaterial", "en{'TODO: OverviewMaterial'}de{'TODO: OverviewMaterial'}")]
-        public ProdOrderPartslistiOverview SelectedOverviewMaterial
+        public ProdOrderPartslistOverview SelectedOverviewMaterial
         {
             get
             {
@@ -468,13 +468,13 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistiOverview> _OverviewMaterialList;
+        private List<ProdOrderPartslistOverview> _OverviewMaterialList;
         /// <summary>
         /// List property for OverviewMaterial
         /// </summary>
         /// <value>The OverviewMaterial list</value>
         [ACPropertyList(9999, "OverviewMaterial")]
-        public List<ProdOrderPartslistiOverview> OverviewMaterialList
+        public List<ProdOrderPartslistOverview> OverviewMaterialList
         {
             get
             {
@@ -482,15 +482,15 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<ProdOrderPartslistiOverview> LoadOverviewMaterialList()
+        private List<ProdOrderPartslistOverview> LoadOverviewMaterialList()
         {
-            List<ProdOrderPartslistiOverview> list = new List<ProdOrderPartslistiOverview>();
+            List<ProdOrderPartslistOverview> list = new List<ProdOrderPartslistOverview>();
             if (_OverviewProdOrderPartslistList != null && _OverviewProdOrderPartslistList.Any())
             {
                 list =
                     _OverviewProdOrderPartslistList
                     .GroupBy(c => new { c.MaterialNo, c.MaterialName })
-                    .Select(c => new ProdOrderPartslistiOverview()
+                    .Select(c => new ProdOrderPartslistOverview()
                     {
                         MaterialNo = c.Key.MaterialNo,
                         MaterialName = c.Key.MaterialName,
@@ -508,7 +508,7 @@ namespace gip.bso.manufacturing
                     .OrderBy(c => c.MaterialNo)
                     .ToList();
 
-                foreach (ProdOrderPartslistiOverview item in list)
+                foreach (ProdOrderPartslistOverview item in list)
                 {
                     item.CalculateDiff();
                 }
@@ -644,8 +644,8 @@ namespace gip.bso.manufacturing
             {
                 databaseApp.CommandTimeout = 60 * 3;
 
-                List<ProdOrderPartslistiOverview> overviewPl = null;
-                List<ProdOrderPartslistiOverview> overviewMt = null;
+                List<ProdOrderPartslistOverview> overviewPl = null;
+                List<ProdOrderPartslistOverview> overviewMt = null;
 
                 if (searchPlAndMt)
                 {
@@ -835,8 +835,8 @@ namespace gip.bso.manufacturing
         #region Precompiled Queries (ProdOrderPartslistiOverview)
 
 
-        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistiOverview>> s_cQry_ProdOrderPartslistiOverview_Program =
-        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistiOverview>>(
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>> s_cQry_ProdOrderPartslistiOverview_Program =
+        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>>(
             (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName) =>
                 ctx
                 .ProdOrderPartslist
@@ -859,7 +859,7 @@ namespace gip.bso.manufacturing
                     && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName))
                 )
 
-                .Select(c => new ProdOrderPartslistiOverview()
+                .Select(c => new ProdOrderPartslistOverview()
                 {
                     // General
                     ProdOrderPartslistID = c.ProdOrderPartslistID,
@@ -1056,8 +1056,8 @@ namespace gip.bso.manufacturing
 
     public class BSOProdOrderOverview_SearchResult
     {
-        public List<ProdOrderPartslistiOverview> OverviewProdOrderPartslist { get; set; }
-        public List<ProdOrderPartslistiOverview> OverviewMaterial { get; set; }
+        public List<ProdOrderPartslistOverview> OverviewProdOrderPartslist { get; set; }
+        public List<ProdOrderPartslistOverview> OverviewMaterial { get; set; }
         public List<InputOverview> InputOverview { get; set; }
 
         public DateTime OperationStartTime { get; set; }
