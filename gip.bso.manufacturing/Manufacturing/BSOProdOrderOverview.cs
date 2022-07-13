@@ -595,11 +595,9 @@ namespace gip.bso.manufacturing
 
             _OverviewProdOrderPartslistList = null;
             _OverviewMaterialList = null;
-            _InputList = null;
 
             OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
             OnPropertyChanged(nameof(OverviewMaterialList));
-            OnPropertyChanged(nameof(InputList));
 
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_Search);
             ShowDialog(this, DesignNameProgressBar);
