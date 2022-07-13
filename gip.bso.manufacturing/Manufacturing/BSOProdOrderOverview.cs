@@ -800,11 +800,9 @@ namespace gip.bso.manufacturing
                         {
                             _OverviewProdOrderPartslistList = result.OverviewProdOrderPartslist;
                             _OverviewMaterialList = result.OverviewMaterial;
-                            _InputList = result.InputOverview;
 
                             OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
                             OnPropertyChanged(nameof(OverviewMaterialList));
-                            OnPropertyChanged(nameof(InputList));
                         }
                         break;
                     case BGWorkerMehtod_SearchInput:
