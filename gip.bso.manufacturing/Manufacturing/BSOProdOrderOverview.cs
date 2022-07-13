@@ -961,6 +961,7 @@ namespace gip.bso.manufacturing
                 .Include("Material")
 
                 .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.TargetProdOrderPartslistPos")
                 .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
                 .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.OutwardFacility")
 
@@ -1009,6 +1010,7 @@ namespace gip.bso.manufacturing
 
                    TargetQuantityUOM =
                                    c.SelectMany(x => x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                                   .Where(x => x.TargetProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
                                    .Select(x => x.TargetQuantityUOM)
                                    .DefaultIfEmpty()
                                    .Sum(),
@@ -1017,11 +1019,22 @@ namespace gip.bso.manufacturing
                    ActualQuantityUOM =
                                     c.SelectMany(x => x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
                                     .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
-                                   .Select(x => x.OutwardQuantity)
-                                   .DefaultIfEmpty()
-                                   .Sum(),
+                                    .Select(x => x.OutwardQuantity)
+                                    .DefaultIfEmpty()
+                                    .Sum(),
 
-                   ZeroPostingQuantityUOM = 0
+                   ZeroPostingQuantityUOM = c.SelectMany(x => x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                    .Where(x => x.OutwardFacilityCharge != null)
+                                    .Select(x => x.OutwardFacilityCharge)
+                                    .SelectMany(x => x.FacilityBooking_InwardFacilityCharge)
+                                    .Where(x => x.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
+                                    .SelectMany(x => x.FacilityBookingCharge_FacilityBooking)
+                                    .Select(x => new { x.FacilityBookingChargeID, x.InwardQuantityUOM, x.OutwardQuantityUOM })
+                                    .Distinct()
+                                    .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
+                                    .DefaultIfEmpty()
+                                    .Sum(),
 
 
                })
