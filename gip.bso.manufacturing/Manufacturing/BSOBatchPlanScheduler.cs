@@ -2419,6 +2419,35 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private core.datamodel.VBGroup _SelectedVBGroup;
+        [ACPropertySelected(604, "VBGroup", "en{'Group'}de{'Gruppe'}")]
+        public core.datamodel.VBGroup SelectedVBGroup
+        {
+            get => _SelectedVBGroup;
+            set
+            {
+                _SelectedVBGroup = value;
+                OnPropertyChanged(nameof(SelectedVBUser));
+            }
+        }
+
+        private core.datamodel.VBGroup[] _VBGroupList;
+        [ACPropertyList(605, "VBGroup")]
+        public IEnumerable<core.datamodel.VBGroup> VBGroupList
+        {
+            get
+            {
+                if (_VBGroupList == null)
+                {
+                    using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                    {
+                        _VBGroupList = DatabaseApp.ContextIPlus.VBGroup.OrderBy(c => c.VBGroupName).ToArray();
+                    }
+                }
+                return _VBGroupList;
+            }
+        }
+
         private UserRuleItem _SelectedAssignedUserRule;
         [ACPropertySelected(606, "UserRelatedRules", "en{'Assigned user rule'}de{'Assigned user rule'}")]
         public UserRuleItem SelectedAssignedUserRule
@@ -4892,16 +4921,26 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
         public void AddRule()
         {
-            UserRuleItem existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID
-                                                                           && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+            UserRuleItem existingRule = null;
+
+            if (SelectedVBUser != null)
+            {
+                existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID
+                                                                  && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+            }
+            else if (SelectedVBGroup != null)
+            {
+                existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBGroup.VBGroupID
+                                                                  && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+            }
 
             if (existingRule != null)
                 return;
 
             UserRuleItem rule = new UserRuleItem()
             {
-                VBUserID = SelectedVBUser.VBUserID,
-                VBUserName = SelectedVBUser.VBUserName,
+                VBUserID = SelectedVBUser != null ? SelectedVBUser.VBUserID : SelectedVBGroup.VBGroupID,
+                VBUserName = SelectedVBUser != null ? SelectedVBUser.VBUserName : SelectedVBGroup.VBGroupName,
                 RuleParamID = SelectedAvailableSchedulingGroup.MDSchedulingGroupID,
                 RuleParamCaption = SelectedAvailableSchedulingGroup.ACCaption
             };
@@ -4912,7 +4951,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledAddRule()
         {
-            return SelectedVBUser != null && SelectedAvailableSchedulingGroup != null;
+            return (SelectedVBUser != null || SelectedVBGroup != null) && SelectedAvailableSchedulingGroup != null;
         }
 
         [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
@@ -4964,7 +5003,17 @@ namespace gip.bso.manufacturing
         {
             if (_TempRules == null)
                 _TempRules = GetStoredRules();
-            return _TempRules.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
+
+            using (Database db = new core.datamodel.Database())
+            {
+                core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserName == Root.Environment.User.VBUserName);
+                if (vbUser == null)
+                    return _TempRules;
+
+                var userGroups = vbUser.VBUserGroup_VBUser.ToArray();
+
+                return _TempRules.Where(c => c.VBUserID == vbUser.VBUserID || userGroups.Any(x => x.VBUserGroupID == c.VBUserID)).ToList();
+            }
         }
 
         private List<UserRuleItem> GetStoredRules()
@@ -4986,11 +5035,24 @@ namespace gip.bso.manufacturing
                     {
                         foreach (UserRuleItem item in result)
                         {
+                            core.datamodel.VBGroup vbGroup = null;
                             core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserID == item.VBUserID);
                             if (vbUser == null)
-                                continue;
+                            {
+                                vbGroup = db.VBGroup.FirstOrDefault(c => c.VBGroupID == item.VBUserID);
+                            }
 
-                            item.VBUserName = vbUser.VBUserName;
+                            if (vbUser != null)
+                            {
+                                item.VBUserName = vbUser.VBUserName;
+                            }
+                            else if (vbGroup != null)
+                            {
+                                item.VBUserName = vbGroup.VBGroupName;
+                            }
+
+                            if (string.IsNullOrEmpty(item.VBUserName))
+                                continue;
 
                             MDSchedulingGroup group = DatabaseApp.MDSchedulingGroup.FirstOrDefault(c => c.MDSchedulingGroupID == item.RuleParamID);
                             if (group == null)
