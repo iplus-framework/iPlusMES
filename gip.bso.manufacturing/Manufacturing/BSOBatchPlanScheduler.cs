@@ -580,6 +580,9 @@ namespace gip.bso.manufacturing
                 case nameof(Save):
                     Save();
                     return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
@@ -2527,6 +2530,15 @@ namespace gip.bso.manufacturing
             if (!PreExecute("UndoSave")) return;
             OnUndoSave();
             PostExecute("UndoSave");
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled undo save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
         }
 
         [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
