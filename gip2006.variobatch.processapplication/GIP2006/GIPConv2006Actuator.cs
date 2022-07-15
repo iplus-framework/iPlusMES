@@ -153,12 +153,14 @@ namespace gip2006.variobatch.processapplication
         public GIPConv2006Actuator(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _ConvBehaviour = new ACPropertyConfigValue<ushort>(this, "ConvBehaviour", 0);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _ = ConvBehaviour;
             return true;
         }
 
@@ -265,6 +267,23 @@ namespace gip2006.variobatch.processapplication
         #endregion
 
         #region Properties
+
+        #region Configuration
+        private ACPropertyConfigValue<ushort> _ConvBehaviour;
+        [ACPropertyConfig("en{'Converter Behaviour'}de{'Konvertierer Verhalten'}")]
+        public ushort ConvBehaviour
+        {
+            get
+            {
+                return _ConvBehaviour.ValueT;
+            }
+            set
+            {
+                _ConvBehaviour.ValueT = value;
+            }
+        }
+
+        #endregion
 
         #region Read-Values from PLC
         [ACPropertyBindingTarget(240, "Read from PLC", "en{'Response'}de{'Rückmeldung'}", "", false, false)]

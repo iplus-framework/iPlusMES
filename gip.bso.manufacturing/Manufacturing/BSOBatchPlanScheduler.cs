@@ -2622,7 +2622,7 @@ namespace gip.bso.manufacturing
                 string enteredValue = Messages.InputBox(header, diffBatchCount.ToString());
                 if (!string.IsNullOrEmpty(enteredValue))
                 {
-                    int moveBatchCount = BatchCountValidate(enteredValue, SelectedProdOrderBatchPlan.BatchTargetCount);
+                    int moveBatchCount = BatchCountValidate(enteredValue, diffBatchCount);
                     isMovingValueValid = moveBatchCount > 0;
                     if (isMovingValueValid)
                     {
@@ -2649,8 +2649,10 @@ namespace gip.bso.manufacturing
                         }
                         if (changedBatchPlans != null && changedBatchPlans.Any())
                         {
+                            PAScheduleForPWNode targetLinie = SelectedTargetScheduleForPWNode;
                             ProdOrderBatchPlan changedPlan = changedBatchPlans.FirstOrDefault();
-                            ChangeBatchPlanForSchedule(changedPlan, SelectedTargetScheduleForPWNode);
+                            SelectedScheduleForPWNode = targetLinie;
+                            ChangeBatchPlanForSchedule(changedPlan, targetLinie);
                             if (this.WizardSchedulerPartslistList != null)
                             {
                                 WizardSchedulerPartslist wizardLine = this.WizardSchedulerPartslistList.Where(c => c.Partslist == changedPlan.ProdOrderPartslist.Partslist).FirstOrDefault();
@@ -2737,7 +2739,6 @@ namespace gip.bso.manufacturing
                     if (!IsBSOTemplateScheduleParent)
                     {
                         RefreshServerState(SelectedScheduleForPWNode.MDSchedulingGroupID);
-                        RefreshServerState(SelectedTargetScheduleForPWNode.MDSchedulingGroupID);
                     }
                     SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault();
                     OnPropertyChanged(nameof(ProdOrderBatchPlanList));
@@ -2748,14 +2749,13 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledMoveToOtherLine()
         {
-            return SelectedProdOrderBatchPlan != null
-                && SelectedProdOrderBatchPlan.ProdOrderPartslist != null
-                && SelectedProdOrderBatchPlan.PlanState < GlobalApp.BatchPlanState.Completed
-                && (
-                       (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount
-                        && SelectedProdOrderBatchPlan.BatchActualCount < SelectedProdOrderBatchPlan.BatchTargetCount)
-                    || (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize
-                        && SelectedProdOrderBatchPlan.RemainingQuantity > 0.00001)
+            return 
+                    SelectedProdOrderBatchPlan != null
+                    && SelectedProdOrderBatchPlan.ProdOrderPartslist != null
+                    && SelectedProdOrderBatchPlan.PlanState < GlobalApp.BatchPlanState.Completed
+                    && (
+                           (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount && SelectedProdOrderBatchPlan.BatchActualCount < SelectedProdOrderBatchPlan.BatchTargetCount)
+                            || (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize && SelectedProdOrderBatchPlan.RemainingQuantity > 0.00001)
                     )
                 && SelectedTargetScheduleForPWNode != null
                 && SelectedTargetScheduleForPWNode.MDSchedulingGroup != null;

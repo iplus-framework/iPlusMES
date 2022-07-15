@@ -82,34 +82,55 @@ namespace gip2006.variobatch.processapplication
                 if (Pos1 != null && ReqPos1 != null)
                 {
                     bool changed = false;
-                    if (!Response.ValueT.Bit00_Pos1Closed && Response.ValueT.Bit02_Pos2Open)
+                    if (this.ConvBehaviour == 0)
                     {
-                        changed = !Pos1.ValueT;
-                        Pos1.ValueT = true;
-                        // Restore Req at startup:
-                        //if (!ReqPos1.ValueT && (OperatingMode != null) && (OperatingMode.ValueT == Global.OperatingMode.Manual))
-                        //{
-                        //    _LockResend_ReqRunState = true;
-                        //    //ReqPos1.ValueT = true;
-                        //    _LockResend_ReqRunState = false;
-                        //}
-                    }
-                    else if (Response.ValueT.Bit00_Pos1Closed && !Response.ValueT.Bit02_Pos2Open)
-                    {
-                        changed = Pos1.ValueT;
-                        Pos1.ValueT = false;
-                        // Restore Req at startup:
-                        //if (ReqPos1.ValueT && (OperatingMode != null) && (OperatingMode.ValueT == Global.OperatingMode.Manual))
-                        //{
-                        //    _LockResend_ReqRunState = true;
-                        //    //ReqPos1.ValueT = false;
-                        //    _LockResend_ReqRunState = false;
-                        //}
+                        if (!Response.ValueT.Bit00_Pos1Closed && Response.ValueT.Bit02_Pos2Open)
+                        {
+                            changed = !Pos1.ValueT;
+                            Pos1.ValueT = true;
+                            // Restore Req at startup:
+                            //if (!ReqPos1.ValueT && (OperatingMode != null) && (OperatingMode.ValueT == Global.OperatingMode.Manual))
+                            //{
+                            //    _LockResend_ReqRunState = true;
+                            //    //ReqPos1.ValueT = true;
+                            //    _LockResend_ReqRunState = false;
+                            //}
+                        }
+                        else if (Response.ValueT.Bit00_Pos1Closed && !Response.ValueT.Bit02_Pos2Open)
+                        {
+                            changed = Pos1.ValueT;
+                            Pos1.ValueT = false;
+                            // Restore Req at startup:
+                            //if (ReqPos1.ValueT && (OperatingMode != null) && (OperatingMode.ValueT == Global.OperatingMode.Manual))
+                            //{
+                            //    _LockResend_ReqRunState = true;
+                            //    //ReqPos1.ValueT = false;
+                            //    _LockResend_ReqRunState = false;
+                            //}
+                        }
+                        else
+                        {
+                            changed = Pos1.ValueT;
+                            Pos1.ValueT = false;
+                        }
                     }
                     else
                     {
-                        changed = Pos1.ValueT;
-                        Pos1.ValueT = false;
+                        if (!Response.ValueT.Bit00_Pos1Closed && Response.ValueT.Bit02_Pos2Open)
+                        {
+                            changed = Pos1.ValueT;
+                            Pos1.ValueT = false;
+                        }
+                        else if (Response.ValueT.Bit00_Pos1Closed && !Response.ValueT.Bit02_Pos2Open)
+                        {
+                            changed = !Pos1.ValueT;
+                            Pos1.ValueT = true;
+                        }
+                        else
+                        {
+                            changed = !Pos1.ValueT;
+                            Pos1.ValueT = true;
+                        }
                     }
 
                     if (changed)
@@ -150,7 +171,9 @@ namespace gip2006.variobatch.processapplication
                 //return;
             //if (!reqChanged)
                 //return;
-            if (ReqPos1.ValueT && (Response.ValueT.Bit02_Pos2Open || Request.ValueT.Bit00_Pos1Close))
+            if (ReqPos1.ValueT && 
+                   (ConvBehaviour == 0 && (Response.ValueT.Bit02_Pos2Open || Request.ValueT.Bit00_Pos1Close))
+                || (ConvBehaviour == 1 && (!Response.ValueT.Bit02_Pos2Open || !Request.ValueT.Bit00_Pos1Close)))
             {
                 ReqPos1.ValueT = false;
             }

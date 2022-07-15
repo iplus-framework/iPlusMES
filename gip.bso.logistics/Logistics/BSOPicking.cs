@@ -799,6 +799,28 @@ namespace gip.bso.logistics
 
         #endregion
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterMaterialNo;
+        [ACPropertyInfo(999, "FilterMaterialNo", ConstApp.Material)]
+        public string FilterMaterialNo
+        {
+            get
+            {
+                return _FilterMaterialNo;
+            }
+            set
+            {
+                if (_FilterMaterialNo != value)
+                {
+                    _FilterMaterialNo = value;
+                    OnPropertyChanged(nameof(FilterMaterialNo));
+                }
+            }
+        }
+
+
         #endregion
 
         #endregion
@@ -881,6 +903,27 @@ namespace gip.bso.logistics
 
             if (SelectedFilterToFacility != null)
                 result = result.Where(c => c.PickingPos_Picking.Any(x => x.ToFacility != null && x.ToFacility.FacilityID == SelectedFilterToFacility.FacilityID));
+
+            if (!string.IsNullOrEmpty(FilterMaterialNo))
+                result = 
+                    result
+                    .Where(c => 
+                                c.PickingPos_Picking
+                                .Any(x => 
+                                            (
+                                                x.InOrderPos != null
+                                                && (x.InOrderPos.Material.MaterialNo.Contains(FilterMaterialNo) || x.InOrderPos.Material.MaterialName1.Contains(FilterMaterialNo))
+                                            )
+                                            || (
+                                                x.OutOrderPos != null
+                                                && (x.OutOrderPos.Material.MaterialNo.Contains(FilterMaterialNo) || x.OutOrderPos.Material.MaterialName1.Contains(FilterMaterialNo))
+                                            ) || (
+                                                x.PickingMaterial != null
+                                                && (x.PickingMaterial.MaterialNo.Contains(FilterMaterialNo) || x.PickingMaterial.MaterialName1.Contains(FilterMaterialNo))
+                                            )
+
+                                )
+                           );
 
             return result;
         }
