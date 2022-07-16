@@ -20,6 +20,7 @@ namespace gip2006.variobatch.processapplication
     [ACPropertyEntity(104, "Bit04", "en{'Flow(Bit04)'}de{'Flow(Bit04)'}")]
     [ACPropertyEntity(105, "Bit05", "en{'Dosingtime(Bit06)'}de{'Dosingtime(Bit05)'}")]
     [ACPropertyEntity(106, "Bit06", "en{'Manual(Bit06)'}de{'Manual(Bit06)'}")]
+    [ACPropertyEntity(107, "Bit07", "en{'Standstill(Bit07)'}de{'Standstill(Bit07)'}")]
     [ACPropertyEntity(108, "Bit08", "en{'LackOfMaterial(Bit08)'}de{'LackOfMaterial(Bit08)'}")]
     [ACPropertyEntity(109, "Bit09", "en{'Presignal(Bit09)'}de{'Presignal(Bit09)'}")]
     [ACPropertyEntity(110, "Bit10", "en{'Discharging(Bit10)'}de{'Discharging(Bit10)'}")]
@@ -83,6 +84,12 @@ namespace gip2006.variobatch.processapplication
         {
             get { return Bit06; }
             set { Bit06 = value; }
+        }
+
+        public bool Bit07_Standstill
+        {
+            get { return Bit07; }
+            set { Bit07 = value; }
         }
 
         public bool Bit08_LackOfMaterial
