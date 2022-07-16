@@ -580,6 +580,9 @@ namespace gip.bso.manufacturing
                 case nameof(Save):
                     Save();
                     return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
@@ -2416,6 +2419,35 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private core.datamodel.VBGroup _SelectedVBGroup;
+        [ACPropertySelected(604, "VBGroup", "en{'Group'}de{'Gruppe'}")]
+        public core.datamodel.VBGroup SelectedVBGroup
+        {
+            get => _SelectedVBGroup;
+            set
+            {
+                _SelectedVBGroup = value;
+                OnPropertyChanged(nameof(SelectedVBUser));
+            }
+        }
+
+        private core.datamodel.VBGroup[] _VBGroupList;
+        [ACPropertyList(605, "VBGroup")]
+        public IEnumerable<core.datamodel.VBGroup> VBGroupList
+        {
+            get
+            {
+                if (_VBGroupList == null)
+                {
+                    using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+                    {
+                        _VBGroupList = DatabaseApp.ContextIPlus.VBGroup.OrderBy(c => c.VBGroupName).ToArray();
+                    }
+                }
+                return _VBGroupList;
+            }
+        }
+
         private UserRuleItem _SelectedAssignedUserRule;
         [ACPropertySelected(606, "UserRelatedRules", "en{'Assigned user rule'}de{'Assigned user rule'}")]
         public UserRuleItem SelectedAssignedUserRule
@@ -2529,6 +2561,15 @@ namespace gip.bso.manufacturing
             PostExecute("UndoSave");
         }
 
+        /// <summary>
+        /// Determines whether [is enabled undo save].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledUndoSave()
+        {
+            return OnIsEnabledUndoSave();
+        }
+
         [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
@@ -2593,7 +2634,7 @@ namespace gip.bso.manufacturing
                 string enteredValue = Messages.InputBox(header, diffBatchCount.ToString());
                 if (!string.IsNullOrEmpty(enteredValue))
                 {
-                    int moveBatchCount = BatchCountValidate(enteredValue, SelectedProdOrderBatchPlan.BatchTargetCount);
+                    int moveBatchCount = BatchCountValidate(enteredValue, diffBatchCount);
                     isMovingValueValid = moveBatchCount > 0;
                     if (isMovingValueValid)
                     {
@@ -2620,8 +2661,10 @@ namespace gip.bso.manufacturing
                         }
                         if (changedBatchPlans != null && changedBatchPlans.Any())
                         {
+                            PAScheduleForPWNode targetLinie = SelectedTargetScheduleForPWNode;
                             ProdOrderBatchPlan changedPlan = changedBatchPlans.FirstOrDefault();
-                            ChangeBatchPlanForSchedule(changedPlan, SelectedTargetScheduleForPWNode);
+                            SelectedScheduleForPWNode = targetLinie;
+                            ChangeBatchPlanForSchedule(changedPlan, targetLinie);
                             if (this.WizardSchedulerPartslistList != null)
                             {
                                 WizardSchedulerPartslist wizardLine = this.WizardSchedulerPartslistList.Where(c => c.Partslist == changedPlan.ProdOrderPartslist.Partslist).FirstOrDefault();
@@ -2708,7 +2751,6 @@ namespace gip.bso.manufacturing
                     if (!IsBSOTemplateScheduleParent)
                     {
                         RefreshServerState(SelectedScheduleForPWNode.MDSchedulingGroupID);
-                        RefreshServerState(SelectedTargetScheduleForPWNode.MDSchedulingGroupID);
                     }
                     SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault();
                     OnPropertyChanged(nameof(ProdOrderBatchPlanList));
@@ -2719,14 +2761,13 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledMoveToOtherLine()
         {
-            return SelectedProdOrderBatchPlan != null
-                && SelectedProdOrderBatchPlan.ProdOrderPartslist != null
-                && SelectedProdOrderBatchPlan.PlanState < GlobalApp.BatchPlanState.Completed
-                && (
-                       (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount
-                        && SelectedProdOrderBatchPlan.BatchActualCount < SelectedProdOrderBatchPlan.BatchTargetCount)
-                    || (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize
-                        && SelectedProdOrderBatchPlan.RemainingQuantity > 0.00001)
+            return 
+                    SelectedProdOrderBatchPlan != null
+                    && SelectedProdOrderBatchPlan.ProdOrderPartslist != null
+                    && SelectedProdOrderBatchPlan.PlanState < GlobalApp.BatchPlanState.Completed
+                    && (
+                           (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseBatchCount && SelectedProdOrderBatchPlan.BatchActualCount < SelectedProdOrderBatchPlan.BatchTargetCount)
+                            || (SelectedProdOrderBatchPlan.PlanMode == BatchPlanMode.UseTotalSize && SelectedProdOrderBatchPlan.RemainingQuantity > 0.00001)
                     )
                 && SelectedTargetScheduleForPWNode != null
                 && SelectedTargetScheduleForPWNode.MDSchedulingGroup != null;
@@ -4880,16 +4921,26 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602)]
         public void AddRule()
         {
-            UserRuleItem existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID
-                                                                           && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+            UserRuleItem existingRule = null;
+
+            if (SelectedVBUser != null)
+            {
+                existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBUser.VBUserID
+                                                                  && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+            }
+            else if (SelectedVBGroup != null)
+            {
+                existingRule = AssignedUserRules.FirstOrDefault(c => c.VBUserID == SelectedVBGroup.VBGroupID
+                                                                  && c.RuleParamID == SelectedAvailableSchedulingGroup.MDSchedulingGroupID);
+            }
 
             if (existingRule != null)
                 return;
 
             UserRuleItem rule = new UserRuleItem()
             {
-                VBUserID = SelectedVBUser.VBUserID,
-                VBUserName = SelectedVBUser.VBUserName,
+                VBUserID = SelectedVBUser != null ? SelectedVBUser.VBUserID : SelectedVBGroup.VBGroupID,
+                VBUserName = SelectedVBUser != null ? SelectedVBUser.VBUserName : SelectedVBGroup.VBGroupName,
                 RuleParamID = SelectedAvailableSchedulingGroup.MDSchedulingGroupID,
                 RuleParamCaption = SelectedAvailableSchedulingGroup.ACCaption
             };
@@ -4900,7 +4951,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledAddRule()
         {
-            return SelectedVBUser != null && SelectedAvailableSchedulingGroup != null;
+            return (SelectedVBUser != null || SelectedVBGroup != null) && SelectedAvailableSchedulingGroup != null;
         }
 
         [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603)]
@@ -4952,7 +5003,17 @@ namespace gip.bso.manufacturing
         {
             if (_TempRules == null)
                 _TempRules = GetStoredRules();
-            return _TempRules.Where(c => c.VBUserName == Root.Environment.User.VBUserName).ToList();
+
+            using (Database db = new core.datamodel.Database())
+            {
+                core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserName == Root.Environment.User.VBUserName);
+                if (vbUser == null)
+                    return _TempRules;
+
+                var userGroups = vbUser.VBUserGroup_VBUser.ToArray();
+
+                return _TempRules.Where(c => c.VBUserID == vbUser.VBUserID || userGroups.Any(x => x.VBUserGroupID == c.VBUserID)).ToList();
+            }
         }
 
         private List<UserRuleItem> GetStoredRules()
@@ -4974,11 +5035,24 @@ namespace gip.bso.manufacturing
                     {
                         foreach (UserRuleItem item in result)
                         {
+                            core.datamodel.VBGroup vbGroup = null;
                             core.datamodel.VBUser vbUser = db.VBUser.FirstOrDefault(c => c.VBUserID == item.VBUserID);
                             if (vbUser == null)
-                                continue;
+                            {
+                                vbGroup = db.VBGroup.FirstOrDefault(c => c.VBGroupID == item.VBUserID);
+                            }
 
-                            item.VBUserName = vbUser.VBUserName;
+                            if (vbUser != null)
+                            {
+                                item.VBUserName = vbUser.VBUserName;
+                            }
+                            else if (vbGroup != null)
+                            {
+                                item.VBUserName = vbGroup.VBGroupName;
+                            }
+
+                            if (string.IsNullOrEmpty(item.VBUserName))
+                                continue;
 
                             MDSchedulingGroup group = DatabaseApp.MDSchedulingGroup.FirstOrDefault(c => c.MDSchedulingGroupID == item.RuleParamID);
                             if (group == null)
