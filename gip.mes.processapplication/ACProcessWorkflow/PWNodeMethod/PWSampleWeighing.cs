@@ -373,7 +373,7 @@ namespace gip.mes.processapplication
 
                                         LabOrderPos labOrderPos;
                                         msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, C_LabOrderTemplateName, actualWeight, alibiNo, out labOrderPos);
-                                        if (msg == null && labOrderPos != null)
+                                        if (msg == null && labOrderPos == null)
                                         {
                                             //Error50323: The LabOrder position Sample weight not exist.
                                             msg = new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(45)", 422, "Error50323");
