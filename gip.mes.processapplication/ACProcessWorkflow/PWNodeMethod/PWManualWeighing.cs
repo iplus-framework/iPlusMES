@@ -15,7 +15,7 @@ namespace gip.mes.processapplication
 {
     /// <summary>
     /// Class that is responsible for processing input-materials that are associated with an intermediate product. 
-    /// The intermediate prduct, in turn, is linked through the material workflow to one or more workflow nodes that are from this PWManualWeighing class. 
+    /// The intermediate product, in turn, is linked through the material workflow to one or more workflow nodes that are from this PWManualWeighing class. 
     /// PWManualWeighing is used to support manual production. 
     /// It calls the PAFManualWeighing process function asynchronously.
     /// The operator is guided by the business object BSOManualWeighing, which is a plugin for the business object BSOWorkCenter.
@@ -1607,6 +1607,12 @@ namespace gip.mes.processapplication
                 }
                 else if (currentFacilityCharge.HasValue)
                 {
+                    FacilityCharge currentFC = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
+                    if (currentFC != null)
+                    {
+
+                    }
+
                     return LotChange(newFacilityCharge, actualQuantity, isConsumed, forceSetFC_F);
                 }
             }

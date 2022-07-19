@@ -1525,11 +1525,16 @@ namespace gip.bso.manufacturing
                     pwGroup = Root.ACUrlCommand(pwGroupACUrl) as IACComponentPWNode;
                     if (pwGroup == null)
                     {
-                        using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
+                        pwGroup = Root.ACUrlCommand(pwGroupACUrl) as IACComponentPWNode;
+
+                        if (pwGroup == null)
                         {
-                            _CurrentOrderInfoValue = null;
-                            Messages.LogError(this.GetACUrl(), "LoadWFNode(20)", "Returned");
-                            return;
+                            using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
+                            {
+                                _CurrentOrderInfoValue = null;
+                                Messages.LogError(this.GetACUrl(), "LoadWFNode(20)", "Returned");
+                                return;
+                            }
                         }
                     }
 

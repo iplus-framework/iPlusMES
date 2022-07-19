@@ -213,6 +213,24 @@ namespace gip.bso.facility
             }
         }
 
+        [ACPropertyInfo(715, "Filter", "en{'Stock quantity less than'}de{'Lagermenge weniger als'}")]
+        public double StockQuantityLessThan
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<double>(nameof(FacilityCharge.StockQuantityUOM));
+            }
+            set
+            {
+                double tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<double>(nameof(FacilityCharge.StockQuantityUOM));
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<double>(nameof(FacilityCharge.StockQuantityUOM), value);
+                    OnPropertyChanged("FilterLot");
+                }
+            }
+        }
+
         #endregion
 
         #region BSO->ACProperty->BookingParam
@@ -410,7 +428,8 @@ namespace gip.bso.facility
                     new ACFilterItem(Global.FilterTypes.filter, _CFacilityNameProperty, Global.LogicalOperators.contains, Global.Operators.or, "", true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
 
-                    new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.StockQuantityUOM), Global.LogicalOperators.lessThan, Global.Operators.and, "", true, true)
                 };
             }
         }
