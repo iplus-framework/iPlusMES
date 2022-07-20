@@ -2238,7 +2238,7 @@ namespace gip.mes.facility
                     double factor = FBC.InwardQuantityUOM / BP.PartslistPos.TargetQuantityUOM;
                     foreach (var relationForRPost in queryRelationsForRetrogPosting)
                     {
-                        if (!relationForRPost.Backflushing)
+                        if (!relationForRPost.Backflushing || relationForRPost.Foreflushing)
                             continue;
                         double postingQuantity = relationForRPost.TargetQuantityUOM * factor;
                         IList<Facility> possibleSourceFacilities;

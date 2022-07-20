@@ -413,6 +413,24 @@ namespace gip.bso.masterdata
             }
         }
 
+        [ACMethodInfo("", "en{'Select all'}de{'Alle auswählen'}", 9999)]
+        public void SelectAll()
+        {
+            foreach(var item in AssociatedPartslistPosList)
+            {
+                item.IsChecked = true;
+            }
+        }
+
+        [ACMethodInfo("", "en{'Unselect all'}de{'Alle abwählen'}", 9999)]
+        public void UnSelectAll()
+        {
+            foreach (var item in AssociatedPartslistPosList)
+            {
+                item.IsChecked = false;
+            }
+        }
+
         #region AssociatedPartslistPos -> Material replacement
 
         #region AssociatedPartslistPos -> Material replacement-> Material (TargetMaterial)
