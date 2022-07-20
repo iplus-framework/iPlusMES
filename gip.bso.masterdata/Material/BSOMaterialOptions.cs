@@ -174,6 +174,27 @@ namespace gip.bso.masterdata
             }
         }
 
+        private bool _SelectUnSelectAll = false;
+        [ACPropertyInfo(9999)]
+        public bool SelectUnSelectAll
+        {
+            get => _SelectUnSelectAll;
+            set
+            {
+                _SelectUnSelectAll = value;
+
+                if (value)
+                {
+                    SelectAll();
+                }
+                else
+                {
+                    UnSelectAll();
+                }
+                OnPropertyChanged();
+            }
+        }
+
         [ACMethodInfo("", "en{'Show material options'}de{'Materialoptionen anzeigen'}", 9999, true)]
         public void ShowMaterialOptions()
         {
@@ -413,18 +434,22 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACMethodInfo("", "en{'Select all'}de{'Alle auswählen'}", 9999)]
-        public void SelectAll()
+        private void SelectAll()
         {
+            if (AssociatedPartslistPosList == null)
+                return;
+
             foreach(var item in AssociatedPartslistPosList)
             {
                 item.IsChecked = true;
             }
         }
 
-        [ACMethodInfo("", "en{'Unselect all'}de{'Alle abwählen'}", 9999)]
-        public void UnSelectAll()
+        private void UnSelectAll()
         {
+            if (AssociatedPartslistPosList == null)
+                return;
+
             foreach (var item in AssociatedPartslistPosList)
             {
                 item.IsChecked = false;

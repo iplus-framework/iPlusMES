@@ -334,11 +334,16 @@ namespace gip.mes.datamodel
             }
         }
 
+        private bool _IsChecked;
         [ACPropertyInfo(9999, "", "en{'Selected'}de{'Ausgewählt'}")]
         public bool IsChecked
         {
-            get;
-            set;
+            get => _IsChecked;
+            set
+            {
+                _IsChecked = value;
+                OnPropertyChanged(nameof(IsChecked));
+            }
         }
 
         #endregion

@@ -1723,9 +1723,6 @@ namespace gip.bso.masterdata
                                                                                                     .Any(x => x.TargetPartslistPos.Material.MaterialNo == matNo
                                                                                                            && x.TargetQuantityUOM > 0.00001));
                 }
-
-                foreach (var item in result)
-                    item.IsChecked = true;
             }
             return result;
         }
