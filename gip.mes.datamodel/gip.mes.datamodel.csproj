@@ -116,6 +116,8 @@
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistPos_Statistic.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslist_Statistic.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
     <Compile Include="Enums\FacilitySelectLoctation.cs" />
     <Compile Include="Enums\MovementReasonsEnum.cs" />
@@ -515,6 +517,9 @@
     <Content Include="DbScripts\iPlusMES\dbsync_2022-03-24_16-47_aagincic .sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="DbScripts\iPlusMES\dbsync_2022-07-21_09-10_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2022-06-21_22-10_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -192,15 +192,11 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_PreparedMaterialList == null)
-                    _PreparedMaterialList = LoadPreparedMaterialList();
+                    _PreparedMaterialList = new List<PreparedMaterial>();
                 return _PreparedMaterialList;
             }
         }
 
-        private List<PreparedMaterial> LoadPreparedMaterialList()
-        {
-            return new List<PreparedMaterial>();
-        }
 
         #endregion
 
@@ -229,7 +225,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         private List<FacilityChargeSumFacilityHelper> _SourceStorageBinList;
         /// <summary>
         /// List property for FacilityChargeSumFacilityHelper
@@ -241,14 +236,9 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_SourceStorageBinList == null)
-                    _SourceStorageBinList = LoadSourceStorageBinList();
+                    _SourceStorageBinList = new List<FacilityChargeSumFacilityHelper>();
                 return _SourceStorageBinList;
             }
-        }
-
-        private List<FacilityChargeSumFacilityHelper> LoadSourceStorageBinList()
-        {
-            return new List<FacilityChargeSumFacilityHelper>();
         }
 
         #endregion
@@ -386,15 +376,11 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_PickingPosList == null)
-                    _PickingPosList = LoadPickingPosList();
+                    _PickingPosList = new List<PickingPos>();
                 return _PickingPosList;
             }
         }
 
-        private List<vd.PickingPos> LoadPickingPosList()
-        {
-            return new List<vd.PickingPos>();
-        }
         #endregion
 
         private double _PickingQuantityUOM;
@@ -621,6 +607,78 @@ namespace gip.bso.manufacturing
         {
             return OnSearchStockMaterial != null;
         }
+
+        #endregion
+
+        #region BackgroundWorker -> DoMehtods
+
+
+        #region BackgroundWorker -> DoMehtods -> SearchStockMaterial
+
+        public List<PreparedMaterial> DoSearchStockMaterial(List<ProdOrderBatchPlan> selectedBatchPlans)
+        {
+            List<SearchBatchMaterialModel> searchModel = new List<SearchBatchMaterialModel>();
+
+            List<PreparedMaterial> preparedMaterials = new List<PreparedMaterial>();
+            if (selectedBatchPlans.Any())
+            {
+                searchModel = GetSearchBatchMaterialModels(selectedBatchPlans);
+                preparedMaterials = GetPreparedMaterials(searchModel);
+            }
+
+            return preparedMaterials;
+        }
+
+
+        private List<SearchBatchMaterialModel> GetSearchBatchMaterialModels(List<ProdOrderBatchPlan> batchPlans)
+        {
+            List<SearchBatchMaterialModel> searchResult = new List<SearchBatchMaterialModel>();
+            foreach (var batchPlan in batchPlans)
+            {
+                GetPositionsForBatchMaterialModel(searchResult, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
+            }
+            return searchResult;
+        }
+
+        private void GetPositionsForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
+        {
+            foreach (ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
+            {
+                if (prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot)
+                {
+                    SearchBatchMaterialModel searchBatchMaterialModel = GetRelationForBatchMaterialModel(batchPlan, prodOrderPartslistPosRelation, posTargetQuantityUOM);
+                    searchResult.Add(searchBatchMaterialModel);
+                }
+                else
+                {
+                    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
+                    double subPosTargetQuantity = posTargetQuantityUOM * factor;
+                    GetPositionsForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
+                }
+            }
+        }
+
+        private SearchBatchMaterialModel GetRelationForBatchMaterialModel(ProdOrderBatchPlan batchPlan, ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
+        {
+            SearchBatchMaterialModel searchBatchMaterialModel = new SearchBatchMaterialModel();
+            searchBatchMaterialModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
+            searchBatchMaterialModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
+            searchBatchMaterialModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
+            searchBatchMaterialModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
+
+            if (batchPlan.VBiACClassWF != null && batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
+            {
+                searchBatchMaterialModel.MDSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroupID).FirstOrDefault();
+            }
+            //if (posTargetQuantityUOM  > Double.Epsilon)
+            //{
+            //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
+            //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
+            //}
+            return searchBatchMaterialModel;
+        }
+
+        #endregion
 
         #endregion
 
@@ -891,190 +949,5 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Mockup
-
-        private void LoadMockupData()
-        {
-            _PreparedMaterialList = LoadMockup_PreparedMaterialList();
-            _SourceStorageBinList = LoadMockup__SourceStorageBinList();
-            //_TargetStorageBinList = LoadMockup_TargetStorageBinList();
-            _PickingList = LoadMockup_PickingList();
-            _PickingPosList = LoadMockup_PickingPosList();
-        }
-
-        private List<PreparedMaterial> LoadMockup_PreparedMaterialList()
-        {
-            List<PreparedMaterial> list = new List<PreparedMaterial>();
-            list.Add(
-            new PreparedMaterial()
-            {
-                MaterialNo = "101",
-                MaterialName = "Palmöl",
-                TargetQuantityUOM = 12,
-                AvailableQuantityUOM = 37456,
-                PickingPosQuantityUOM = null,
-                MissingQuantityUOM = null
-            }
-        );
-            list.Add(
-                new PreparedMaterial()
-                {
-                    MaterialNo = "2",
-                    MaterialName = "Weizenmehl Typ 1050",
-                    TargetQuantityUOM = 13.3,
-                    AvailableQuantityUOM = 19940,
-                    PickingPosQuantityUOM = null,
-                    MissingQuantityUOM = null
-                }
-            );
-
-            list.Add(
-                new PreparedMaterial()
-                {
-                    MaterialNo = "1",
-                    MaterialName = "Weizenmehl Typ 550",
-                    TargetQuantityUOM = 266.65,
-                    AvailableQuantityUOM = 19940,
-                    PickingPosQuantityUOM = null,
-                    MissingQuantityUOM = null
-                }
-            );
-            list.Add(
-                new PreparedMaterial()
-                {
-                    MaterialNo = "4",
-                    MaterialName = "Zucker",
-                    TargetQuantityUOM = 1200,
-                    AvailableQuantityUOM = 0,
-                    PickingPosQuantityUOM = 1200,
-                    MissingQuantityUOM = 0
-                }
-            );
-            list.Add(
-                new PreparedMaterial()
-                {
-                    MaterialNo = "3",
-                    MaterialName = "Salz",
-                    TargetQuantityUOM = 200,
-                    AvailableQuantityUOM = 0,
-                    PickingPosQuantityUOM = 150,
-                    MissingQuantityUOM = 50
-                }
-            );
-            list.Add(
-                new PreparedMaterial()
-                {
-                    MaterialNo = "102",
-                    MaterialName = "Wasser",
-                    TargetQuantityUOM = 20,
-                    AvailableQuantityUOM = 9910.2,
-                    PickingPosQuantityUOM = null,
-                    MissingQuantityUOM = null
-                }
-            );
-            return list;
-        }
-
-        private List<FacilityChargeSumFacilityHelper> LoadMockup__SourceStorageBinList()
-        {
-            List<FacilityChargeSumFacilityHelper> list = new List<FacilityChargeSumFacilityHelper>();
-            list.Add(
-            new FacilityChargeSumFacilityHelper()
-            {
-                FacilityNo = "G01R01E02",
-                SumTotal = 0,
-                SumFree = 1000,
-                SumBlocked = 0,
-                NewPlannedStock = 0
-            });
-            list.Add(
-            new FacilityChargeSumFacilityHelper()
-            {
-                FacilityNo = "ProdMatStorage",
-                SumTotal = 3.1,
-                SumFree = 3.01,
-                SumBlocked = 0,
-                NewPlannedStock = 0
-            });
-            list.Add(
-            new FacilityChargeSumFacilityHelper()
-            {
-                FacilityNo = "G01R01E03",
-                SumTotal = 800,
-                SumFree = 800,
-                SumBlocked = 0,
-                NewPlannedStock = 600
-            });
-            return list;
-        }
-
-        private List<FacilityChargeSumFacilityHelper> LoadMockup_TargetStorageBinList()
-        {
-            List<FacilityChargeSumFacilityHelper> list = new List<FacilityChargeSumFacilityHelper>();
-            list.Add(
-            new FacilityChargeSumFacilityHelper()
-            {
-                FacilityNo = "G01R01E02",
-                SumTotal = 1000,
-                SumFree = 1000,
-                SumBlocked = 0,
-                NewPlannedStock = 0
-            });
-            list.Add(
-            new FacilityChargeSumFacilityHelper()
-            {
-                FacilityNo = "ProdMatStorage",
-                SumTotal = 1003.01,
-                SumFree = 3,
-                SumBlocked = 0,
-                NewPlannedStock = 1203.011
-            });
-            return list;
-        }
-
-        private List<Picking> LoadMockup_PickingList()
-        {
-            List<Picking> list = new List<Picking>();
-            list.Add(new Picking()
-            {
-                PickingNo = "1006",
-                DeliveryDateFrom = DateTime.Now,
-                PickingState = PickingStateEnum.New
-            });
-            return list;
-        }
-
-        private List<PickingPos> LoadMockup_PickingPosList()
-        {
-            List<PickingPos> list = new List<PickingPos>();
-            PickingPos pickingPos = new PickingPos()
-            {
-                PickingQuantityUOM = 0,
-                Comment = "-",
-                UpdateDate = DateTime.Now
-            };
-
-            List<ProdOrderPartslistPos> tmpPositions = DatabaseApp.ProdOrderPartslistPos.Where(c => c.Material.MaterialNo == "102").Take(2).ToList();
-            foreach (ProdOrderPartslistPos tmpPos in tmpPositions)
-            {
-                PickingPosProdOrderPartslistPos item = new PickingPosProdOrderPartslistPos();
-                item.PickingPos = pickingPos;
-                item.ProdorderPartslistPos = tmpPos;
-                pickingPos.PickingPosProdOrderPartslistPos_PickingPos.Add(item);
-            }
-
-
-            list.Add(new PickingPos()
-            {
-
-                PickingQuantityUOM = 0,
-                Comment = "-",
-                UpdateDate = DateTime.Now
-            });
-            return list;
-        }
-
-
-        #endregion
     }
 }

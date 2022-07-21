@@ -5156,7 +5156,7 @@ namespace gip.bso.manufacturing
                 if (command == BGWorkerMehtod_DoSearchStockMaterial)
                 {
                     List<PreparedMaterial> preparedMaterials = e.Result as List<PreparedMaterial>;
-                    DoSearchStockMaterialFinish(preparedMaterials);
+                    BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
                 }
                 else
                 {
@@ -5221,67 +5221,7 @@ namespace gip.bso.manufacturing
                 selectedBatchPlans = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
             }
 
-            List<PreparedMaterial> preparedMaterials = new List<PreparedMaterial>();
-            if (selectedBatchPlans.Any())
-            {
-                searchModel = GetSearchBatchMaterialModels(selectedBatchPlans);
-                preparedMaterials = BSOMaterialPreparationChild.Value.GetPreparedMaterials(searchModel);
-            }
-
-            return preparedMaterials;
-        }
-
-        private void DoSearchStockMaterialFinish(List<PreparedMaterial> preparedMaterials)
-        {
-            BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
-        }
-
-        private List<SearchBatchMaterialModel> GetSearchBatchMaterialModels(List<ProdOrderBatchPlan> batchPlans)
-        {
-            List<SearchBatchMaterialModel> searchResult = new List<SearchBatchMaterialModel>();
-            foreach (var batchPlan in batchPlans)
-            {
-                GetPositionsForBatchMaterialModel(searchResult, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
-            }
-            return searchResult;
-        }
-
-        private void GetPositionsForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
-        {
-            foreach (ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-            {
-                if (prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot)
-                {
-                    GetRelationForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation, posTargetQuantityUOM);
-                }
-                else
-                {
-                    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
-                    double subPosTargetQuantity = posTargetQuantityUOM * factor;
-                    GetPositionsForBatchMaterialModel(searchResult, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
-                }
-            }
-        }
-
-        private double GetRelationForBatchMaterialModel(List<SearchBatchMaterialModel> searchResult, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
-        {
-            SearchBatchMaterialModel searchBatchMaterialModel = new SearchBatchMaterialModel();
-            searchBatchMaterialModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialID;
-            searchBatchMaterialModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
-            searchBatchMaterialModel.SourcePosID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistPosID;
-            searchBatchMaterialModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
-            searchResult.Add(searchBatchMaterialModel);
-
-            if (batchPlan.VBiACClassWF != null && batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
-            {
-                searchBatchMaterialModel.MDSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroupID).FirstOrDefault();
-            }
-            //if (posTargetQuantityUOM  > Double.Epsilon)
-            //{
-            //    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
-            //    searchFacilityModel.TargetQuantityUOM += batchPlan.BatchSize * batchPlan.BatchTargetCount * factor;
-            //}
-            return searchBatchMaterialModel.TargetQuantityUOM;
+            return BSOMaterialPreparationChild.Value.DoSearchStockMaterial(selectedBatchPlans);
         }
 
         #endregion

@@ -29,6 +29,17 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(23, "TakeMatFromOtherOrder", "en{'Take material from other order'}de{'Entnahme von anderem Auftrag erlaubt'}", "", "", true)]
     [ACPropertyEntity(24, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
+    
+    [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
+
+    [ACPropertyEntity(26, nameof(InputQForActualOutput), "en{'Input Quantity for actual output'}de{'Input Quantity for actual output'}", "", "", true)]
+    [ACPropertyEntity(27, nameof(InputQForGoodActualOutput), "en{'Input Quantity for good output'}de{'Input Quantity for good output'}", "", "", true)]
+    [ACPropertyEntity(28, nameof(InputQForScrapActualOutput), "en{'Input Quantity for scraped output'}de{'Input Quantity for scraped output'}", "", "", true)]
+
+    [ACPropertyEntity(29, nameof(InputQForFinalActualOutput), "en{'Input Quantity for final actual output'}de{'Input Quantity for final actual output'}", "", "", true)]
+    [ACPropertyEntity(30, nameof(InputQForFinalGoodActualOutput), "en{'Input Quantity for final good output'}de{'Input Quantity for final good output'}", "", "", true)]
+    [ACPropertyEntity(31, nameof(InputQForFinalScrapActualOutput), "en{'Input Quantity for final scraped output'}de{'Input Quantity for final scraped output'}", "", "", true)]
+
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

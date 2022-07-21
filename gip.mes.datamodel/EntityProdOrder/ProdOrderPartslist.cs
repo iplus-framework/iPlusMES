@@ -22,6 +22,17 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(13, "ActualQuantity", ConstApp.ActualQuantity, "", "", true)]
     [ACPropertyEntity(14, "ExternProdOrderNo", "en{'Ext prod. ord. No'}de{'Ext FANr'}", "", "", true)]
     [ACPropertyEntity(15, "LastFormulaChange", "en{'Last formula change'}de{'Letzte Formeländerung'}", "", "", true)]
+   
+    [ACPropertyEntity(16, nameof(ActualQuantityScrapUOM), "en{'Actual scrap quantity UOM'}de{'Schrott Istmenge'}", "", "", true)]
+    
+    [ACPropertyEntity(17, nameof(InputQForActualOutputPer), "en{'Input Quantity for actual output (%)'}de{'Input Quantity for actual output (%)'}", "", "", true)]
+    [ACPropertyEntity(18, nameof(InputQForGoodActualOutputPer), "en{'Input Quantity for good output (%)'}de{'Input Quantity for good output (%)'}", "", "", true)]
+    [ACPropertyEntity(19, nameof(InputQForScrapActualOutputPer), "en{'Input Quantity for scraped output (%)'}de{'Input Quantity for scraped output (%)'}", "", "", true)]
+    
+    [ACPropertyEntity(20, nameof(InputQForFinalActualOutputPer), "en{'Input Quantity for final actual output (%)'}de{'Input Quantity for final actual output (%)'}", "", "", true)]
+    [ACPropertyEntity(21, nameof(InputQForFinalGoodActualOutputPer), "en{'Input Quantity for final good output (%)'}de{'Input Quantity for final good output (%)'}", "", "", true)]
+    [ACPropertyEntity(22, nameof(InputQForFinalScrapActualOutputPer), "en{'Input Quantity for final scraped output (%)'}de{'Input Quantity for final scraped output (%)'}", "", "", true)]
+    
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
