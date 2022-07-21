@@ -923,7 +923,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _FilterBatchSelectAll;
-        [ACPropertyInfo(999, "FilterBatchSelectAll", "en{'Select all'}de{'Alles auswählen'}")]
+        [ACPropertyInfo(999, "FilterBatchSelectAll", ConstApp.SelectAll)]
         public bool FilterBatchSelectAll
         {
             get

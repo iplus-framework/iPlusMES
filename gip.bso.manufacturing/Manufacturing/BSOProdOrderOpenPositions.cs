@@ -22,7 +22,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + BSOProdOrder.ClassName;
+                return Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + nameof(BSOProdOrder);
             }
         }
 

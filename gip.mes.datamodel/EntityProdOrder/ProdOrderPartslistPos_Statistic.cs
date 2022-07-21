@@ -5,6 +5,8 @@ namespace gip.mes.datamodel
     public partial class ProdOrderPartslistPos
     {
 
+        #region  DifferenceQuantityPer
+
         /// <summary>
         /// Source Property: 
         /// </summary>
@@ -19,12 +21,14 @@ namespace gip.mes.datamodel
             }
         }
 
+        #endregion
+
         #region InputQForActualOutput
 
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForActualOutput", "en{'Input Quantity for actual output (%)'}de{'Input Quantity for actual output (%)'}")]
+        [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputPer)]
         public double InputQForActualOutputPer
         {
             get
@@ -38,7 +42,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForActualOutput", "en{'Diff. Quantity for actual output'}de{'Diff. Quantity for actual output'}")]
+        [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputDiff)]
         public double InputQForActualOutputDiff
         {
             get
@@ -54,7 +58,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForGoodActualOutput", "en{'Input Quantity for good output (%)'}de{'Input Quantity for good output (%)'}")]
+        [ACPropertyInfo(999, "InputQForGoodActualOutput", ConstIInputQForActual.InputQForGoodActualOutputPer)]
         public double InputQForGoodActualOutputPer
         {
             get
@@ -65,7 +69,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999, "InputQForGoodActualOutput", "en{'Diff. Quantity for good output'}de{'Diff. Quantity for good output'}")]
+        [ACPropertyInfo(999, "InputQForGoodActualOutput", ConstIInputQForActual.InputQForGoodActualOutputDiff)]
         public double InputQForGoodActualOutputDiff
         {
             get
@@ -78,7 +82,7 @@ namespace gip.mes.datamodel
 
         #region InputQForScrapActualOutput
 
-        [ACPropertyInfo(999, "InputQForScrapActualOutput", "en{'Input Quantity for scraped output (%)'}de{'Input Quantity for scraped output (%)'}")]
+        [ACPropertyInfo(999, "InputQForScrapActualOutput", ConstIInputQForActual.InputQForScrapActualOutputPer)]
         public double InputQForScrapActualOutputPer
         {
             get
@@ -89,7 +93,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        [ACPropertyInfo(999, "InputQForScrapActualOutput", "en{'Diff. Quantity for scraped output'}de{'Diff. Quantity for scraped output'}")]
+        [ACPropertyInfo(999, "InputQForScrapActualOutput", ConstIInputQForActual.InputQForScrapActualOutputDiff)]
         public double InputQForScrapActualOutputDiff
         {
             get
@@ -105,7 +109,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForFinalActualOutput", "en{'Input Quantity for final actual output (%)'}de{'Input Quantity for final actual output (%)'}")]
+        [ACPropertyInfo(999, "InputQForFinalActualOutput", ConstIInputQForActual.InputQForFinalActualOutputPer)]
         public double InputQForFinalActualOutputPer
         {
             get
@@ -119,7 +123,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForFinalActualOutput", "en{'Diff. Quantity for final actual output'}de{'Diff. Quantity for final actual output'}")]
+        [ACPropertyInfo(999, "InputQForFinalActualOutput", ConstIInputQForActual.InputQForFinalActualOutputDiff)]
         public double InputQForFinalActualOutputDiff
         {
             get
@@ -135,7 +139,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", "en{'Input Quantity for final good output (%)'}de{'Input Quantity for final good output (%)'}")]
+        [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", ConstIInputQForActual.InputQForFinalGoodActualOutputPer)]
         public double InputQForFinalGoodActualOutputPer
         {
             get
@@ -149,7 +153,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", "en{'Diff. Quantity for final good output'}de{'Diff. Quantity for final good output'}")]
+        [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", ConstIInputQForActual.InputQForFinalGoodActualOutputDiff)]
         public double InputQForFinalGoodActualOutputDiff
         {
             get
@@ -165,7 +169,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", "en{'nput Quantity for final scraped output (%)'}de{'nput Quantity for final scraped output (%)'}")]
+        [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", ConstIInputQForActual.InputQForFinalScrapActualOutputPer)]
         public double InputQForFinalScrapActualOutputPer
         {
             get
@@ -179,7 +183,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", "en{'Diff Quantity for final scraped output'}de{'Diff Quantity for final scraped output'}")]
+        [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", ConstIInputQForActual.InputQForFinalScrapActualOutputDiff)]
         public double InputQForFinalScrapActualOutputDiff
         {
             get

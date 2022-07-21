@@ -25,13 +25,13 @@ namespace gip.mes.datamodel
    
     [ACPropertyEntity(16, nameof(ActualQuantityScrapUOM), "en{'Actual scrap quantity UOM'}de{'Schrott Istmenge'}", "", "", true)]
     
-    [ACPropertyEntity(17, nameof(InputQForActualOutputPer), "en{'Input Quantity for actual output (%)'}de{'Input Quantity for actual output (%)'}", "", "", true)]
-    [ACPropertyEntity(18, nameof(InputQForGoodActualOutputPer), "en{'Input Quantity for good output (%)'}de{'Input Quantity for good output (%)'}", "", "", true)]
-    [ACPropertyEntity(19, nameof(InputQForScrapActualOutputPer), "en{'Input Quantity for scraped output (%)'}de{'Input Quantity for scraped output (%)'}", "", "", true)]
+    [ACPropertyEntity(17, nameof(InputQForActualOutputPer), ConstIInputQForActual.InputQForActualOutputPer, "", "", true)]
+    [ACPropertyEntity(18, nameof(InputQForGoodActualOutputPer), ConstIInputQForActual.InputQForGoodActualOutputPer, "", "", true)]
+    [ACPropertyEntity(19, nameof(InputQForScrapActualOutputPer), ConstIInputQForActual.InputQForScrapActualOutputPer, "", "", true)]
     
-    [ACPropertyEntity(20, nameof(InputQForFinalActualOutputPer), "en{'Input Quantity for final actual output (%)'}de{'Input Quantity for final actual output (%)'}", "", "", true)]
-    [ACPropertyEntity(21, nameof(InputQForFinalGoodActualOutputPer), "en{'Input Quantity for final good output (%)'}de{'Input Quantity for final good output (%)'}", "", "", true)]
-    [ACPropertyEntity(22, nameof(InputQForFinalScrapActualOutputPer), "en{'Input Quantity for final scraped output (%)'}de{'Input Quantity for final scraped output (%)'}", "", "", true)]
+    [ACPropertyEntity(20, nameof(InputQForFinalActualOutputPer), ConstIInputQForActual.InputQForFinalActualOutputPer, "", "", true)]
+    [ACPropertyEntity(21, nameof(InputQForFinalGoodActualOutputPer), ConstIInputQForActual.InputQForFinalGoodActualOutputPer, "", "", true)]
+    [ACPropertyEntity(22, nameof(InputQForFinalScrapActualOutputPer), ConstIInputQForActual.InputQForFinalScrapActualOutputPer, "", "", true)]
     
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

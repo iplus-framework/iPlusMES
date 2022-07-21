@@ -32,13 +32,13 @@ namespace gip.mes.datamodel
     
     [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
 
-    [ACPropertyEntity(26, nameof(InputQForActualOutput), "en{'Input Quantity for actual output'}de{'Input Quantity for actual output'}", "", "", true)]
-    [ACPropertyEntity(27, nameof(InputQForGoodActualOutput), "en{'Input Quantity for good output'}de{'Input Quantity for good output'}", "", "", true)]
-    [ACPropertyEntity(28, nameof(InputQForScrapActualOutput), "en{'Input Quantity for scraped output'}de{'Input Quantity for scraped output'}", "", "", true)]
+    [ACPropertyEntity(26, nameof(InputQForActualOutput), ConstIInputQForActual.InputQForActualOutput, "", "", true)]
+    [ACPropertyEntity(27, nameof(InputQForGoodActualOutput), ConstIInputQForActual.InputQForGoodActualOutput, "", "", true)]
+    [ACPropertyEntity(28, nameof(InputQForScrapActualOutput), ConstIInputQForActual.InputQForScrapActualOutput, "", "", true)]
 
-    [ACPropertyEntity(29, nameof(InputQForFinalActualOutput), "en{'Input Quantity for final actual output'}de{'Input Quantity for final actual output'}", "", "", true)]
-    [ACPropertyEntity(30, nameof(InputQForFinalGoodActualOutput), "en{'Input Quantity for final good output'}de{'Input Quantity for final good output'}", "", "", true)]
-    [ACPropertyEntity(31, nameof(InputQForFinalScrapActualOutput), "en{'Input Quantity for final scraped output'}de{'Input Quantity for final scraped output'}", "", "", true)]
+    [ACPropertyEntity(29, nameof(InputQForFinalActualOutput), ConstIInputQForActual.InputQForFinalActualOutput, "", "", true)]
+    [ACPropertyEntity(30, nameof(InputQForFinalGoodActualOutput), ConstIInputQForActual.InputQForFinalGoodActualOutput, "", "", true)]
+    [ACPropertyEntity(31, nameof(InputQForFinalScrapActualOutput), ConstIInputQForActual.InputQForFinalScrapActualOutput, "", "", true)]
 
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]

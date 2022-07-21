@@ -116,6 +116,8 @@
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
     <Compile Include="EntityPriceList\PriceList.cs" />
     <Compile Include="EntityPriceList\PriceListMaterial.cs" />
+    <Compile Include="EntityProdOrder\ConstIInputQForActual.cs" />
+    <Compile Include="EntityProdOrder\InputQForActual.cs" />
     <Compile Include="EntityProdOrder\ProdOrderPartslistPos_Statistic.cs" />
     <Compile Include="EntityProdOrder\ProdOrderPartslist_Statistic.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />

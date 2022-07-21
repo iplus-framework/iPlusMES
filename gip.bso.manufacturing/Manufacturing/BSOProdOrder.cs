@@ -10,6 +10,7 @@ using gip.mes.manager;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
@@ -22,7 +23,10 @@ namespace gip.bso.manufacturing
     [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPos.ClassName, "en{'Prod. Order Pos.'}de{'Produktionsauftrag Position'}", typeof(ProdOrderPartslistPos), ProdOrderPartslistPos.ClassName, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", Material.ClassName + "\\MaterialNo")]
     public partial class BSOProdOrder : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider, IOnTrackingCall
     {
-        public const string ClassName = "BSOProdOrder";
+        #region constants
+        public const string BGWorkerMehtod_RecalcAllQuantites = @"RecalcAllQuantites";
+        public const string BGWorkerMehtod_RecalcAllQuantitesForSelected = @"RecalcAllQuantitesForSelected";
+        #endregion
 
         #region c´tors
         /// <summary>
@@ -489,6 +493,33 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _FilterProdOrderSelectAll;
+        [ACPropertyInfo(999, "", ConstApp.SelectAll)]
+        public bool FilterProdOrderSelectAll
+        {
+            get
+            {
+                return _FilterProdOrderSelectAll;
+            }
+            set
+            {
+                if (_FilterProdOrderSelectAll != value)
+                {
+                    _FilterProdOrderSelectAll = value;
+                    if (ProdOrderList != null && ProdOrderList.Any())
+                    {
+                        ProdOrderList.ToList().ForEach(c => c.IsSelected = value);
+                        OnPropertyChanged(nameof(ProdOrderList));
+                    }
+                    OnPropertyChanged(nameof(FilterProdOrderSelectAll));
+                }
+            }
+        }
+
+
         #endregion
 
         #endregion
@@ -692,39 +723,65 @@ namespace gip.bso.manufacturing
 
         #region Message
 
-        //private MsgWithDetails _BSOMsg = new MsgWithDetails();
-        //[ACPropertyInfo(9999, "Message")]
-        //public MsgWithDetails BSOMsg
-        //{
-        //    get
-        //    {
-        //        return _BSOMsg;
-        //    }
-        //    set
-        //    {
-        //        _BSOMsg = value;
-        //        OnPropertyChanged("BSOMsg");
-        //    }
-        //}
+        public void SendMessage(object result)
+        {
+            Msg msg = result as Msg;
+            if (msg != null)
+            {
+                SendMessage(msg);
+            }
+        }
 
-        //private void UpdateBSOMsg()
-        //{
-        //    // TODO: Bei BSOFacilityBookCharge die Methode UpdateBSOMsg implementieren
-        //    if (CurrentOutwardACMethodBooking == null)
-        //        return;
-        //    if (!CurrentOutwardACMethodBooking.ValidMessage.IsSucceded() || CurrentOutwardACMethodBooking.ValidMessage.HasWarnings())
-        //    {
-        //        if (!BSOMsg.IsEqual(CurrentOutwardACMethodBooking.ValidMessage))
-        //        {
-        //            BSOMsg.UpdateFrom(CurrentOutwardACMethodBooking.ValidMessage);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (BSOMsg.MsgDetailsCount > 0)
-        //            BSOMsg.ClearMsgDetails();
-        //    }
-        //}
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged(nameof(CurrentMsg));
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged(nameof(MsgList));
+        }
+
         #endregion
 
         #region ProdOrder
@@ -1030,10 +1087,29 @@ namespace gip.bso.manufacturing
         [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals'}de{'Summen neu berechnen'}", 600, true)]
         public void RecalcAllQuantites()
         {
-            if (CurrentProdOrder == null)
+            if (!IsEnabledRecalcAllQuantites())
                 return;
-            CurrentProdOrder.RecalcActualQuantitySP(DatabaseApp);
-            OnPropertyChanged("CurrentProdOrder");
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_RecalcAllQuantites);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledRecalcAllQuantites()
+        {
+            return CurrentProdOrder != null;
+        }
+
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals for all'}de{'Für alle Summen neu berechnen'}", 600, true)]
+        public void RecalcAllQuantitesForSelected()
+        {
+            if (!IsEnabledRecalcAllQuantitesForSelected())
+                return;
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_RecalcAllQuantitesForSelected);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledRecalcAllQuantitesForSelected()
+        {
+            return ProdOrderList != null && ProdOrderList.Any(c => c.IsSelected);
         }
 
         [ACMethodCommand(ProdOrder.ClassName, "en{'Finish Order'}de{'Auftrag beenden'}", 601, true)]
@@ -1744,7 +1820,7 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("ConnectSourceProdOrderPartslist", "en{'Connect production order lines'}de{'Produktionsauftragszeilen verbinden'}", 606, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
         public void ConnectSourceProdOrderPartslist()
         {
-            if(!IsEnabledConnectSourceProdOrderPartslist())
+            if (!IsEnabledConnectSourceProdOrderPartslist())
                 return;
             ProdOrderManager.ConnectSourceProdOrderPartslist(SelectedProdOrder);
         }
@@ -4881,6 +4957,142 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #endregion
+
+        #region BackgroundWorker
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            string updateName = Root.Environment.User.Initials;
+
+            switch (command)
+            {
+                case BGWorkerMehtod_RecalcAllQuantites:
+                    e.Result = DoRecalcAllQuantites(DatabaseApp, CurrentProdOrder, true);
+                    break;
+                case BGWorkerMehtod_RecalcAllQuantitesForSelected:
+                    ProdOrder[] prodOrders = ProdOrderList.Where(c => c.IsSelected).ToArray();
+                    e.Result = DoRecalcAllQuantitesForSelected(DatabaseApp, prodOrders);
+                    break;
+
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+            MsgWithDetails resultMsg = null;
+            ClearMessages();
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                switch (command)
+                {
+                    case BGWorkerMehtod_RecalcAllQuantites:
+                        resultMsg = (MsgWithDetails)e.Result;
+                        if (resultMsg == null || resultMsg.IsSucceded())
+                        {
+                            Load(true);
+                            OnPropertyChanged("CurrentProdOrder");
+                        }
+                        else
+                        {
+                            SendMessage(resultMsg);
+                        }
+                        break;
+                    case BGWorkerMehtod_RecalcAllQuantitesForSelected:
+                        resultMsg = (MsgWithDetails)e.Result;
+                        if (resultMsg == null || resultMsg.IsSucceded())
+                        {
+                            Load(true);
+                            OnPropertyChanged("CurrentProdOrder");
+                        }
+                        else
+                        {
+                            SendMessage(resultMsg);
+                        }
+                        break;
+
+                }
+            }
+        }
+
+        #endregion
+
+        #region BackgroundWorker -> DoMehtods
+
+
+        private MsgWithDetails DoRecalcAllQuantites(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
+        {
+            MsgWithDetails msg = new MsgWithDetails();
+            try
+            {
+                databaseApp.udpRecalcActualQuantity(prodOrder.ProgramNo, null);
+            }
+            catch (Exception ec)
+            {
+                Msg udpErrMsg = new Msg(eMsgLevel.Exception, $"{prodOrder.ProgramNo} error running udpRecalcActualQuantity! Message: " + ec.Message);
+                msg.AddDetailMessage(udpErrMsg);
+            }
+            MsgWithDetails calcMsg = ProdOrderManager.CalculateStatistics(prodOrder);
+            MsgWithDetails saveMsg = null;
+            if (saveChanges && (calcMsg == null || calcMsg.IsSucceded()))
+            {
+                saveMsg = databaseApp.ACSaveChanges();
+            }
+            if (calcMsg != null)
+            {
+                msg.AddDetailMessage(calcMsg);
+            }
+            if (saveMsg != null)
+            {
+                msg.AddDetailMessage(saveMsg);
+            }
+            return msg;
+        }
+
+        private MsgWithDetails DoRecalcAllQuantitesForSelected(DatabaseApp databaseApp, ProdOrder[] prodOrders)
+        {
+            MsgWithDetails msg = new MsgWithDetails();
+            foreach (ProdOrder prodOrder in prodOrders)
+            {
+                MsgWithDetails detMsg = DoRecalcAllQuantites(databaseApp, prodOrder, false);
+                if (detMsg != null)
+                {
+                    msg.AddDetailMessage(detMsg);
+                }
+            }
+            MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+            if (saveMsg != null)
+            {
+                msg.AddDetailMessage(saveMsg);
+            }
+            return msg;
+        }
 
         #endregion
     }
