@@ -2874,7 +2874,7 @@ namespace gip.mes.facility
             List<ProdOrderPartslist> pls = prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
 
             // Final list as nobody source
-            ProdOrderPartslist finalPartslist = 
+            ProdOrderPartslist finalPartslist =
                 prodOrder
                 .ProdOrderPartslist_ProdOrder
                 .Where(c => !c.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
@@ -2953,20 +2953,24 @@ namespace gip.mes.facility
 
         private static void CalculateStatisticProdPlPerGemetricalAvg(ProdOrderPartslist prodOrderPartslist, List<ProdOrderPartslistPos> components)
         {
-            prodOrderPartslist.InputQForActualOutputPer = components.Select(c => (c.InputQForActualOutputPer * c.TargetQuantityUOM) / prodOrderPartslist.ActualQuantity).Average();
-            prodOrderPartslist.InputQForGoodActualOutputPer = components.Select(c => (c.InputQForGoodActualOutputPer * c.TargetQuantityUOM) / prodOrderPartslist.ActualQuantity).Average();
-            prodOrderPartslist.InputQForScrapActualOutputPer = components.Select(c => (c.InputQForScrapActualOutputPer * c.TargetQuantityUOM) / prodOrderPartslist.ActualQuantity).Average();
+            double sumComponentQuantities = components.Select(c => c.TargetQuantityUOM).Sum();
+            if (sumComponentQuantities == 0)
+                return;
+
+            prodOrderPartslist.InputQForActualOutputPer = components.Select(c => c.InputQForActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForGoodActualOutputPer = components.Select(c => c.InputQForGoodActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForScrapActualOutputPer = components.Select(c => c.InputQForScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
 
 
-            prodOrderPartslist.InputQForFinalActualOutputPer = components.Select(c => (c.InputQForFinalActualOutputPer * c.TargetQuantityUOM) / prodOrderPartslist.ActualQuantity).Average();
-            prodOrderPartslist.InputQForFinalGoodActualOutputPer = components.Select(c => (c.InputQForFinalGoodActualOutputPer * c.TargetQuantityUOM) / prodOrderPartslist.ActualQuantity).Average();
-            prodOrderPartslist.InputQForFinalScrapActualOutputPer = components.Select(c => (c.InputQForFinalScrapActualOutputPer * c.TargetQuantityUOM) / prodOrderPartslist.ActualQuantity).Average();
+            prodOrderPartslist.InputQForFinalActualOutputPer = components.Select(c => c.InputQForFinalActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForFinalGoodActualOutputPer = components.Select(c => c.InputQForFinalGoodActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForFinalScrapActualOutputPer = components.Select(c => c.InputQForFinalScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
         }
 
         public MsgWithDetails CalculateStatistics(ProdOrderPartslistPos prodOrderPartslistPos, ProdOrderPartslist finalPartslist)
         {
             MsgWithDetails msg = null;
-            
+
             ProdOrderPartslist partslist = prodOrderPartslistPos.ProdOrderPartslist;
 
             prodOrderPartslistPos.InputQForActualOutput =

@@ -110,7 +110,7 @@ begin
 	where Tmp.JobID = @jobID and (Tmp.ItemType = 'pos-batch' or Tmp.ItemType = 'pos')
 	-- update CalledUpQuantity Pos
 	update Pos
-	set Pos.CalledUpQuantity = dbo.udfConvertToUnit(Pos.CalledUpQuantityUOM, Mt.BaseMDUnitID, isnull(Pos.MDUnitID, mt.BaseMDUnitID),mt.BaseMDUnitID)
+	set Pos.CalledUpQuantity = isnull(dbo.udfConvertToUnit(Pos.CalledUpQuantityUOM, Mt.BaseMDUnitID, isnull(Pos.MDUnitID, mt.BaseMDUnitID),mt.BaseMDUnitID),0)
 	FROM ProdOrderPartslistPos Pos
 	join dbo.JobTableRecalcActualQuantity Tmp on Tmp.ItemID = Pos.ProdOrderPartslistPosID
 	join Material Mt on Pos.MaterialID = Mt.MaterialID
