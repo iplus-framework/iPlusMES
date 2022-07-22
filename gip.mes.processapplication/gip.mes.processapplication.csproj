@@ -117,6 +117,7 @@
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
     <Compile Include="Manager\ACPrintManagerMES.cs" />
     <Compile Include="Model\DosingRestInfo.cs" />
+    <Compile Include="Model\LotUsedUpEnum.cs" />
     <Compile Include="Model\LotSelectionRuleEnum.cs" />
     <Compile Include="Model\SamplePiCommand.cs" />
     <Compile Include="Model\EndPListMode.cs" />
@@ -250,6 +251,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-06-12 08-10_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-07-22 09-44_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

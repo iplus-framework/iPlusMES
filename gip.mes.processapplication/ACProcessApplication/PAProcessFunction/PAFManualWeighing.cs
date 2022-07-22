@@ -1175,7 +1175,7 @@ namespace gip.mes.processapplication
 
         #region Lot-Handling
         [ACMethodInfo("", "", 999)]
-        public virtual Msg LotChange(Guid? newFacilityCharge, bool isConsumed, bool forceSetFC_F)
+        public virtual Msg LotChange(Guid? newFacilityCharge, LotUsedUpEnum? isConsumed, bool forceSetFC_F)
         {
             if (ManualWeighingPW == null)
             {
@@ -1217,6 +1217,8 @@ namespace gip.mes.processapplication
             }
             else
             {
+                LotUsedUpEnum? isLotConsumed = null;
+
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
                     // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
@@ -1228,20 +1230,59 @@ namespace gip.mes.processapplication
                     bool forceSetFacilityCharge = false;
                     if (questionResult.HasValue)
                     {
-                        if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
+                        if (sequence.Message.TranslID == "Question50089")
                         {
-                            forceSetFacilityCharge = true;
+                            if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
+                            {
+                                isLotConsumed = LotUsedUpEnum.Yes;
+                            }
+                            else if ((Global.MsgResult)questionResult.Value == Global.MsgResult.No)
+                            {
+                                isLotConsumed = LotUsedUpEnum.No;
+                            }
+                            else
+                            {
+                                // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
+                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                                resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                return resultSequence;
+                            }
+                        }
+                        else if (sequence.Message.TranslID == "Question50090")
+                        {
+                            if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
+                            {
+                                isLotConsumed = LotUsedUpEnum.YesVerified;
+                            }
+                            else if ((Global.MsgResult)questionResult.Value == Global.MsgResult.No)
+                            {
+                                isLotConsumed = LotUsedUpEnum.No;
+                            }
+                            else
+                            {
+                                // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
+                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                                resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                return resultSequence;
+                            }
                         }
                         else
                         {
-                            // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
-                            resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
-                            resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
-                            return resultSequence;
+                            if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
+                            {
+                                forceSetFacilityCharge = true;
+                            }
+                            else
+                            {
+                                // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
+                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                                resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                return resultSequence;
+                            }
                         }
                     }
 
-                    Msg msg = LotChange(facilityChargeID, previousLotConsumed, forceSetFacilityCharge);
+                    Msg msg = LotChange(facilityChargeID, isLotConsumed, forceSetFacilityCharge);
                     if (msg != null)
                     {
                         resultSequence.Message = msg;
@@ -1333,7 +1374,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(LotChange):
-                    result = LotChange(acParameter[0] as Guid?, (bool)acParameter[1], (bool)acParameter[2]);
+                    result = LotChange(acParameter[0] as Guid?, (LotUsedUpEnum?)acParameter[1], (bool)acParameter[2]);
                     return true;
                 case nameof(TareActiveScale):
                     TareActiveScale();

@@ -1546,7 +1546,7 @@ namespace gip.mes.processapplication
                 manualWeighing.ActiveScaleObject?.Tare();
         }
 
-        protected internal Msg SelectFCFromPAF(Guid? newFacilityCharge, double actualQuantity, bool isConsumed, bool forceSetFC_F)
+        protected internal Msg SelectFCFromPAF(Guid? newFacilityCharge, double actualQuantity, LotUsedUpEnum? isConsumed, bool forceSetFC_F)
         {
             Guid? currentOpenMaterial = CurrentOpenMaterial;
 
@@ -1607,13 +1607,39 @@ namespace gip.mes.processapplication
                 }
                 else if (currentFacilityCharge.HasValue)
                 {
-                    FacilityCharge currentFC = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
-                    if (currentFC != null)
-                    {
+                    bool isLotConsumed = false;
 
+                    if (isConsumed == null)
+                    {
+                        FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
+                        if (currentFC != null)
+                        {
+                            //Question50089: Was the material with the lot number {0} used up?
+                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo, 
+                                           currentFC.FacilityLot.LotNo);
+                        }
+                    }
+                    else if (isConsumed == LotUsedUpEnum.Yes)
+                    {
+                        FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot)
+                                                                       .Include(c => c.Material).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
+                        if (currentFC != null)
+                        {
+                            if (currentFC.StockQuantityUOM > currentFC.Material.ZeroBookingTolerance)
+                            {
+                                //Question50090: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
+                                return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo,
+                                               currentFC.FacilityLot.LotNo);
+                            }
+                            isLotConsumed = true;
+                        }
+                    }
+                    else
+                    {
+                        isLotConsumed = isConsumed == LotUsedUpEnum.Yes || isConsumed == LotUsedUpEnum.YesVerified ? true : false;
                     }
 
-                    return LotChange(newFacilityCharge, actualQuantity, isConsumed, forceSetFC_F);
+                    return LotChange(newFacilityCharge, actualQuantity, isLotConsumed, forceSetFC_F);
                 }
             }
             return null;
@@ -1741,7 +1767,7 @@ namespace gip.mes.processapplication
                         return msg;
                     }
 
-                    SelectFCFromPAF(fc.FacilityChargeID, 0, false, false);
+                    SelectFCFromPAF(fc.FacilityChargeID, 0, LotUsedUpEnum.None, false);
 
                     //WeighingComponent comp = GetWeighingComponent(plPosRelation); //WeighingComponents?.FirstOrDefault(c => c.PLPosRelation == plPosRelation);
                     //if (comp == null)
