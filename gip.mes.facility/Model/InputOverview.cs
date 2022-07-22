@@ -1,5 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace gip.mes.facility
 {
@@ -43,7 +45,12 @@ namespace gip.mes.facility
         [ACPropertyInfo(403, "Quantities", "en{'Diff = T - P'}de{'Diff = S - P'}")]
         public double DiffTargetPlanedQuantityUOM { get; set; }
 
+        [ACPropertyInfo(500, "", "en{'InputQForActual'}de{'InputQForActual'}")]
+        public InputQForActual InputQForActual { get; set; }
+
         #endregion
+
+        public IEnumerable<ProdOrderPartslistPos> GroupedPos { get; set; }
 
         #region Methods
 
@@ -52,6 +59,39 @@ namespace gip.mes.facility
         {
             DiffQuantityUOM = ActualQuantityUOM - TargetQuantityUOM;
             DiffTargetPlanedQuantityUOM = TargetQuantityUOM - PlannedQuantityUOM;
+        }
+
+        public void CalculateStatistics()
+        {
+            if(GroupedPos == null)
+                return;
+            InputQForActual = new InputQForActual()
+            {
+                InputQForActualOutput = GroupedPos.Select(c => (c.InputQForActualOutput ?? 0)).DefaultIfEmpty().Sum(),
+                InputQForActualOutputDiff = GroupedPos.Select(c => c.InputQForActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForActualOutputPer = GroupedPos.Select(c => c.InputQForActualOutputPer).DefaultIfEmpty().Average(),
+
+                InputQForGoodActualOutput = GroupedPos.Select(c => (c.InputQForGoodActualOutput ?? 0)).DefaultIfEmpty().Sum(),
+                InputQForGoodActualOutputDiff = GroupedPos.Select(c => c.InputQForGoodActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForGoodActualOutputPer = GroupedPos.Select(c => c.InputQForGoodActualOutputPer).DefaultIfEmpty().Average(),
+
+                InputQForScrapActualOutput = GroupedPos.Select(c => (c.InputQForScrapActualOutput ?? 0)).DefaultIfEmpty().Sum(),
+                InputQForScrapActualOutputDiff = GroupedPos.Select(c => c.InputQForScrapActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForScrapActualOutputPer = GroupedPos.Select(c => c.InputQForScrapActualOutputPer).DefaultIfEmpty().Average(),
+
+
+                InputQForFinalActualOutput = GroupedPos.Select(c => (c.InputQForFinalActualOutput ?? 0)).DefaultIfEmpty().Sum(),
+                InputQForFinalActualOutputDiff = GroupedPos.Select(c => c.InputQForFinalActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForFinalActualOutputPer = GroupedPos.Select(c => c.InputQForFinalActualOutputPer).DefaultIfEmpty().Average(),
+
+                InputQForFinalGoodActualOutput = GroupedPos.Select(c => (c.InputQForFinalGoodActualOutput ?? 0)).DefaultIfEmpty().Sum(),
+                InputQForFinalGoodActualOutputDiff = GroupedPos.Select(c => c.InputQForFinalGoodActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForFinalGoodActualOutputPer = GroupedPos.Select(c => c.InputQForFinalGoodActualOutputPer).DefaultIfEmpty().Average(),
+
+                InputQForFinalScrapActualOutput = GroupedPos.Select(c => (c.InputQForFinalScrapActualOutput ?? 0)).DefaultIfEmpty().Sum(),
+                InputQForFinalScrapActualOutputDiff = GroupedPos.Select(c => c.InputQForFinalScrapActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForFinalScrapActualOutputPer = GroupedPos.Select(c => c.InputQForFinalScrapActualOutputPer).DefaultIfEmpty().Average(),
+            };
         }
         #endregion
     }

@@ -29,7 +29,7 @@ namespace gip.bso.manufacturing
         public BSOProdOrderOverview(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _CalculateStatistics = new ACPropertyConfigValue<bool>(this, "CalculateStatistics", true);
         }
 
 
@@ -54,6 +54,24 @@ namespace gip.bso.manufacturing
 
 
             return b;
+        }
+
+        #endregion
+
+        #region Statistics
+
+        private ACPropertyConfigValue<bool> _CalculateStatistics;
+        [ACPropertyConfig("CalculateStatistics")]
+        public bool CalculateStatistics
+        {
+            get
+            {
+                return _CalculateStatistics.ValueT;
+            }
+            set
+            {
+                _CalculateStatistics.ValueT = value;
+            }
         }
 
         #endregion
@@ -438,6 +456,8 @@ namespace gip.bso.manufacturing
             foreach (ProdOrderPartslistOverview item in list)
             {
                 item.CalculateDiff();
+                if (CalculateStatistics)
+                    item.CalculateStatistics();
             }
             return list;
         }
@@ -500,7 +520,9 @@ namespace gip.bso.manufacturing
                     InwardActualQuantityUOM = c.Sum(x => x.InwardActualQuantityUOM),
 
                     UsageTargetQuantityUOM = c.Sum(x => x.UsageTargetQuantityUOM),
-                    UsageActualQuantityUOM = c.Sum(x => x.UsageActualQuantityUOM)
+                    UsageActualQuantityUOM = c.Sum(x => x.UsageActualQuantityUOM),
+
+                    GroupedPartslists = c.Select(x => x.ProdOrderPartslist).ToArray()
                 })
                 .OrderBy(c => c.MaterialNo)
                 .ToList();
@@ -508,6 +530,8 @@ namespace gip.bso.manufacturing
             foreach (ProdOrderPartslistOverview item in list)
             {
                 item.CalculateDiff();
+                if (CalculateStatistics)
+                    item.CalculateGroupedStatistics();
             }
 
             return list;
@@ -564,10 +588,12 @@ namespace gip.bso.manufacturing
             DateTime? filterStartBookingDate, DateTime? filterEndBookingDate, string filterProgramNo, string filterMaterialNo,
             string filterDepartmentName, string filterFacilityNo)
         {
-            List<InputOverview> items = s_cQry_Input_Program(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo).ToList();
+            List<InputOverview> items = s_cQry_Input_Program(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo, CalculateStatistics).ToList();
             foreach (InputOverview item in items)
             {
                 item.CalculateDiff();
+                if (CalculateStatistics)
+                    item.CalculateStatistics();
             }
             return items;
         }
@@ -678,7 +704,7 @@ namespace gip.bso.manufacturing
                 info.Entities.Add(
                 new PAOrderInfoEntry()
                 {
-                    EntityID = SelectedOverviewProdOrderPartslist.ProdOrderPartslistID,
+                    EntityID = SelectedOverviewProdOrderPartslist.ProdOrderPartslist.ProdOrderPartslistID,
                     EntityName = ProdOrderPartslist.ClassName
                 });
                 service.ShowDialogOrder(this, info);
@@ -687,7 +713,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledNavigateToProdOrder()
         {
-            return SelectedOverviewProdOrderPartslist != null;
+            return SelectedOverviewProdOrderPartslist != null && SelectedOverviewProdOrderPartslist.ProdOrderPartslist != null;
         }
 
         /// <summary>
@@ -851,11 +877,10 @@ namespace gip.bso.manufacturing
                     && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
                     && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName))
                 )
-
                 .Select(c => new ProdOrderPartslistOverview()
                 {
                     // General
-                    ProdOrderPartslistID = c.ProdOrderPartslistID,
+                    ProdOrderPartslist = c,
                     ProgramNo = c.ProdOrder.ProgramNo,
                     MaterialNo = c.Partslist.Material.MaterialNo,
                     MaterialName = c.Partslist.Material.MaterialName1,
@@ -941,9 +966,9 @@ namespace gip.bso.manufacturing
 
         */
 
-        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, IQueryable<InputOverview>> s_cQry_Input_Program =
-       CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, IQueryable<InputOverview>>(
-           (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo) =>
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>> s_cQry_Input_Program =
+       CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>>(
+           (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo, calulateStatistics) =>
                ctx
                .ProdOrderPartslistPos
 
@@ -1031,6 +1056,7 @@ namespace gip.bso.manufacturing
                                     .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
                                     .DefaultIfEmpty()
                                     .Sum(),
+                   GroupedPos = c.Where(x => calulateStatistics)
 
 
                })

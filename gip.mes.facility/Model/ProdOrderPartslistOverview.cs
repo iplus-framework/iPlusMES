@@ -1,6 +1,7 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
+using System.Linq;
 
 namespace gip.mes.facility
 {
@@ -81,7 +82,12 @@ namespace gip.mes.facility
         #endregion
 
         #region Others
-        public Guid ProdOrderPartslistID { get; set; }
+        public ProdOrderPartslist ProdOrderPartslist { get; set; }
+        public ProdOrderPartslist[] GroupedPartslists { get; set; }
+
+        [ACPropertyInfo(500, Const_Usage, "en{'InputQForActual'}de{'InputQForActual'}")]
+        public InputQForActual InputQForActual { get; set; }
+
         #endregion
 
         #region Methods
@@ -92,6 +98,73 @@ namespace gip.mes.facility
             ActualRestQuantityUOM = InwardActualQuantityUOM - OutwardActualQuantityUOM;
             UsageDiffQuantityUOM = UsageActualQuantityUOM - UsageTargetQuantityUOM;
             UsageInwardDiffQuantityUOM = UsageActualQuantityUOM - InwardActualQuantityUOM;
+        }
+
+        public void CalculateStatistics()
+        {
+            InputQForActual = new InputQForActual()
+            {
+                InputQForActualOutput = ProdOrderPartslist.InputQForActualOutput,
+                InputQForActualOutputDiff = ProdOrderPartslist.InputQForActualOutputDiff,
+                InputQForActualOutputPer = ProdOrderPartslist.InputQForActualOutputPer ?? 0,
+
+                InputQForGoodActualOutput = ProdOrderPartslist.InputQForGoodActualOutput,
+                InputQForGoodActualOutputDiff = ProdOrderPartslist.InputQForGoodActualOutputDiff,
+                InputQForGoodActualOutputPer = ProdOrderPartslist.InputQForGoodActualOutputPer ?? 0,
+
+                InputQForScrapActualOutput = ProdOrderPartslist.InputQForScrapActualOutput,
+                InputQForScrapActualOutputDiff = ProdOrderPartslist.InputQForScrapActualOutputDiff,
+                InputQForScrapActualOutputPer = ProdOrderPartslist.InputQForScrapActualOutputPer ?? 0,
+
+
+                InputQForFinalActualOutput = ProdOrderPartslist.InputQForFinalActualOutput,
+                InputQForFinalActualOutputDiff = ProdOrderPartslist.InputQForFinalActualOutputDiff,
+                InputQForFinalActualOutputPer = ProdOrderPartslist.InputQForFinalActualOutputPer ?? 0,
+
+                InputQForFinalGoodActualOutput = ProdOrderPartslist.InputQForFinalGoodActualOutput,
+                InputQForFinalGoodActualOutputDiff = ProdOrderPartslist.InputQForFinalGoodActualOutputDiff,
+                InputQForFinalGoodActualOutputPer = ProdOrderPartslist.InputQForFinalGoodActualOutputPer ?? 0,
+
+                InputQForFinalScrapActualOutput = ProdOrderPartslist.InputQForFinalScrapActualOutput,
+                InputQForFinalScrapActualOutputDiff = ProdOrderPartslist.InputQForFinalScrapActualOutputDiff,
+                InputQForFinalScrapActualOutputPer = ProdOrderPartslist.InputQForFinalScrapActualOutputPer ?? 0
+            };
+        }
+
+        public void CalculateGroupedStatistics()
+        {
+            if (GroupedPartslists == null || !GroupedPartslists.Any())
+                return;
+            double sumActualQuantity = GroupedPartslists.Select(x => x.ActualQuantity).Sum();
+            if (sumActualQuantity == 0)
+                return;
+            InputQForActual = new InputQForActual()
+            {
+                InputQForActualOutput = GroupedPartslists.Select(x => x.InputQForActualOutput).DefaultIfEmpty().Sum(),
+                InputQForActualOutputDiff = GroupedPartslists.Select(x => x.InputQForActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForActualOutputPer = GroupedPartslists.Select(x => ((x.InputQForActualOutputPer ?? 0) * x.ActualQuantity) / sumActualQuantity).DefaultIfEmpty().Average(),
+
+                InputQForGoodActualOutput = GroupedPartslists.Select(x => x.InputQForGoodActualOutput).DefaultIfEmpty().Sum(),
+                InputQForGoodActualOutputDiff = GroupedPartslists.Select(x => x.InputQForGoodActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForGoodActualOutputPer = GroupedPartslists.Select(x => ((x.InputQForGoodActualOutputPer ?? 0) * x.ActualQuantity) / sumActualQuantity).DefaultIfEmpty().Average(),
+
+                InputQForScrapActualOutput = GroupedPartslists.Select(x => x.InputQForScrapActualOutput).DefaultIfEmpty().Sum(),
+                InputQForScrapActualOutputDiff = GroupedPartslists.Select(x => x.InputQForScrapActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForScrapActualOutputPer = GroupedPartslists.Select(x => ((x.InputQForScrapActualOutputPer ?? 0) * x.ActualQuantity) / sumActualQuantity).DefaultIfEmpty().Average(),
+
+
+                InputQForFinalActualOutput = GroupedPartslists.Select(x => x.InputQForFinalActualOutput).DefaultIfEmpty().Sum(),
+                InputQForFinalActualOutputDiff = GroupedPartslists.Select(x => x.InputQForFinalActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForFinalActualOutputPer = GroupedPartslists.Select(x => ((x.InputQForFinalActualOutputPer ?? 0) * x.ActualQuantity) / sumActualQuantity).DefaultIfEmpty().Average(),
+
+                InputQForFinalGoodActualOutput = GroupedPartslists.Select(x => x.InputQForFinalGoodActualOutput).DefaultIfEmpty().Sum(),
+                InputQForFinalGoodActualOutputDiff = GroupedPartslists.Select(x => x.InputQForFinalGoodActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForFinalGoodActualOutputPer = GroupedPartslists.Select(x => ((x.InputQForFinalGoodActualOutputPer ?? 0) * x.ActualQuantity) / sumActualQuantity).DefaultIfEmpty().Average(),
+
+                InputQForFinalScrapActualOutput = GroupedPartslists.Select(x => x.InputQForFinalScrapActualOutput).DefaultIfEmpty().Sum(),
+                InputQForFinalScrapActualOutputDiff = GroupedPartslists.Select(x => x.InputQForFinalScrapActualOutputDiff).DefaultIfEmpty().Sum(),
+                InputQForFinalScrapActualOutputPer = GroupedPartslists.Select(x => ((x.InputQForFinalScrapActualOutputPer ?? 0) * x.ActualQuantity) / sumActualQuantity).DefaultIfEmpty().Average(),
+            };
         }
         #endregion
     }
