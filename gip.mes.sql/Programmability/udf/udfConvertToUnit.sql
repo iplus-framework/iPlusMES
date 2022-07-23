@@ -1,4 +1,8 @@
-﻿
+﻿IF EXISTS (SELECT * FROM sysobjects WHERE type = 'FN' AND name = 'udfConvertToUnit')
+	BEGIN
+		DROP  function  dbo.[udfConvertToUnit]
+	END
+GO
 CREATE FUNCTION [dbo].[udfConvertToUnit]
 (
 	@quantity float,
@@ -79,5 +83,5 @@ BEGIN
 			set @convertedQuantity = (select top 1 CalcQuantity from @calculationTable order by ID desc);
 		END
 	END
-	RETURN @convertedQuantity
+	RETURN isnull(@convertedQuantity, 0);
 END

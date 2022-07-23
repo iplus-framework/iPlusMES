@@ -79,6 +79,8 @@
     <None Include="build\udfConvertToUnit\udfConvertToUnit-build.sql" />
     <None Include="build\udfConvertToUnit\udfConvertToUnit-build2.sql" />
     <None Include="build\udfConvertToUnit\test.sql" />
+    <None Include="build\udpRecalcActualQuantity\recalcActualQuantity - call all.sql" />
+    <None Include="build\udpRecalcActualQuantity\CalledUPQuantityUOM - null problem.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Programmability\udf\udf_IsTimeSpanActual.sql" />
