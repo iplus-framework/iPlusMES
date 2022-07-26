@@ -306,43 +306,39 @@ namespace gip.mes.facility
                     return new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
                 BP.Database = dbApp;
 
-                // Überprüfe Syntax der übergebenen Parameter
-                if (!BP.IsValid())
-                {
-                    dbApp.ACUndoChanges();
+                ACMethodBooking bp = null;
+                ACMethodEventArgs validResult = OnValidateBooking(dbApp, BP, out bp);
+                if (validResult != null)
+                    return validResult;
+                if (bp == null)
                     return new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
-                }
-                if (!BP.CheckAndAdjustPropertiesForBooking(dbApp))
-                {
-                    dbApp.ACUndoChanges();
-                    return new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
-                }
+                bp.Database = dbApp;
 
                 // Kundenspezifiche Funktion vor eigentlicher Buchung ausführen (Quellcode wird in der Datenbank hinterlegt)
-                if (!PreFacilityBooking(BP))
+                if (!PreFacilityBooking(bp))
                 {
                     dbApp.ACUndoChanges();
-                    return new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
+                    return new ACMethodEventArgs(bp, Global.ACMethodResultState.Notpossible);
                 }
 
                 // Standard-Buchungsfunktion ausführen
-                Global.ACMethodResultState result = DoFacilityBooking(BP);
+                Global.ACMethodResultState result = DoFacilityBooking(bp);
                 if (result == Global.ACMethodResultState.Notpossible || result == Global.ACMethodResultState.Failed)
                 {
                     dbApp.ACUndoChanges();
-                    return new ACMethodEventArgs(BP, result);
+                    return new ACMethodEventArgs(bp, result);
                 }
 
                 // Kundenspezifiche Funktion nach eigentlicher Buchung ausführen (Quellcode wird in der Datenbank hinterlegt)
-                if (!PostFacilityBooking(BP))
+                if (!PostFacilityBooking(bp))
                 {
                     dbApp.ACUndoChanges();
-                    return new ACMethodEventArgs(BP, Global.ACMethodResultState.Failed);
+                    return new ACMethodEventArgs(bp, Global.ACMethodResultState.Failed);
                 }
                 if (result != Global.ACMethodResultState.Succeeded)
                 {
                     dbApp.ACUndoChanges();
-                    return new ACMethodEventArgs(BP, result);
+                    return new ACMethodEventArgs(bp, result);
                 }
 
                 // Commit auf Datenbank
@@ -351,12 +347,12 @@ namespace gip.mes.facility
                 {
                     BP.AddBookingMessage(ACMethodBooking.eResultCodes.TransactionError, saveMsg.InnerMessage);
                     result = Global.ACMethodResultState.Failed;
-                    return new ACMethodEventArgs(BP, result);
+                    return new ACMethodEventArgs(bp, result);
                 }
 
-                PostFacilityBookingSaved(BP);
+                PostFacilityBookingSaved(bp);
 
-                return new ACMethodEventArgs(BP, result);
+                return new ACMethodEventArgs(bp, result);
             }
             catch (Exception e)
             {
@@ -382,19 +378,36 @@ namespace gip.mes.facility
         //        BP.AddBookingMessage(ACMethodBooking.eResultCodes.RequiredParamsNotSet, Root.Environment.TranslateMessage(this, "Error00058"));
         //        return Global.ACMethodResultState.Notpossible;
         //    }
-           
+
         //    MsgWithDetails msgWithDetails = facilityCharge.DeleteACObject(dbApp, false);
         //    if (!msgWithDetails.IsSucceded())
         //    {
         //        BP.AddBookingMessage(ACMethodBooking.eResultCodes.RequiredParamsNotSet, msgWithDetails.InnerMessage);
         //    }
-           
+
         //    return bResult;
         //}
 
         #endregion
 
         #region Private
+        protected virtual ACMethodEventArgs OnValidateBooking(DatabaseApp dbApp, ACMethodBooking acMethodBooking, out ACMethodBooking replacedBooking)
+        {
+            replacedBooking = acMethodBooking;
+            // Überprüfe Syntax der übergebenen Parameter
+            if (!replacedBooking.IsValid())
+            {
+                dbApp.ACUndoChanges();
+                return new ACMethodEventArgs(replacedBooking, Global.ACMethodResultState.Notpossible);
+            }
+            if (!replacedBooking.CheckAndAdjustPropertiesForBooking(dbApp))
+            {
+                dbApp.ACUndoChanges();
+                return new ACMethodEventArgs(replacedBooking, Global.ACMethodResultState.Notpossible);
+            }
+            return null;
+        }
+
         /// <summary>
         /// TOOD: 
         /// </summary>
