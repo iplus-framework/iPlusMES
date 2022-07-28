@@ -1478,16 +1478,27 @@ namespace gip.bso.facility
                 return;
             if (FacilityChargeList == null)
                 return;
+
+            MDMovementReason movementReason = CurrentBookParamNotAvailable?.MDMovementReason;
+
             foreach (FacilityCharge fc in FacilityChargeList.ToArray())
             {
                 if (fc.NotAvailable)
                     continue;
                 SelectedFacilityCharge = fc;
                 CurrentFacilityCharge = fc;
+
+                if (movementReason != CurrentBookParamNotAvailable.MDMovementReason)
+                {
+                    CurrentBookParamNotAvailable.MDMovementReason = movementReason;
+                }
+
                 if (!BookNotAvailableFacilityCharge(false))
                 {
                     break;
                 }
+
+                Save();
             }
             AccessNav.NavSearch();
             OnPropertyChanged("FacilityChargeList");
