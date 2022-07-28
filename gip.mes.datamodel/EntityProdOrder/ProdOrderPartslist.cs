@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, "ExternProdOrderNo", "en{'Ext prod. ord. No'}de{'Ext FANr'}", "", "", true)]
     [ACPropertyEntity(15, "LastFormulaChange", "en{'Last formula change'}de{'Letzte Formeländerung'}", "", "", true)]
    
-    [ACPropertyEntity(16, nameof(ActualQuantityScrapUOM), "en{'Actual scrap quantity UOM'}de{'Schrott Istmenge'}", "", "", true)]
+    [ACPropertyEntity(16, nameof(ActualQuantityScrapUOM), "en{'Scrapped Quantity'}de{'Ausschussmenge'}", "", "", true)]
     
     [ACPropertyEntity(17, nameof(InputQForActualOutputPer), ConstIInputQForActual.InputQForActualOutputPer, "", "", true)]
     [ACPropertyEntity(18, nameof(InputQForGoodActualOutputPer), ConstIInputQForActual.InputQForGoodActualOutputPer, "", "", true)]
@@ -169,7 +169,7 @@ namespace gip.mes.datamodel
         }
         #endregion
 
-        #region AddtionalProperties
+        #region AdditionalProperties
 
         partial void OnTargetQuantityChanged()
         {
@@ -188,6 +188,15 @@ namespace gip.mes.datamodel
             get
             {
                 return ActualQuantity - TargetQuantity;
+            }
+        }
+
+        [ACPropertyInfo(25, "", "en{'Good Quantity'}de{'Gutmenge'}")]
+        public double ActualQuantityGoodUOM
+        {
+            get
+            {
+                return ActualQuantity - ActualQuantityScrapUOM;
             }
         }
 
@@ -218,6 +227,14 @@ namespace gip.mes.datamodel
         internal void OnPostionTargetQuantityChanged()
         {
             OnPropertyChanged("TargetQuantityLossFactor");
+        }
+
+        public bool IsFinalProdOrderPartslist
+        {
+            get
+            {
+                return !this.ProdOrderPartslistPos_SourceProdOrderPartslist.Any();
+            }
         }
         #endregion
 

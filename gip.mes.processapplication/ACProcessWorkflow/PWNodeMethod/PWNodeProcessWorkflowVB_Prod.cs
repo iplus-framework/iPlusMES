@@ -843,8 +843,15 @@ namespace gip.mes.processapplication
                         {
                             prodOrderPartslistPos.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
                             // prodOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
-                            prodOrderPartslistPos.ProdOrderPartslist.RecalcActualQuantitySP(dbApp);
-                            //if (EndPList == 
+                            if (   prodOrderPartslistPos.ProdOrderPartslist.IsFinalProdOrderPartslist
+                                && ProdOrderManager != null)
+                            {
+                                ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, prodOrderPartslistPos.ProdOrderPartslist.ProdOrder, false);
+                            }
+                            else
+                            {
+                                prodOrderPartslistPos.ProdOrderPartslist.RecalcActualQuantitySP(dbApp);
+                            }
                         }
                         else
                             prodOrderPartslistPos.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted).FirstOrDefault();
@@ -853,7 +860,15 @@ namespace gip.mes.processapplication
                     {
                         prodOrderPartslistPos.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
                         //prodOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
-                        prodOrderPartslistPos.ProdOrderPartslist.RecalcActualQuantitySP(dbApp);
+                        if (prodOrderPartslistPos.ProdOrderPartslist.IsFinalProdOrderPartslist
+                            && ProdOrderManager != null)
+                        {
+                            ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, prodOrderPartslistPos.ProdOrderPartslist.ProdOrder, false);
+                        }
+                        else
+                        {
+                            prodOrderPartslistPos.ProdOrderPartslist.RecalcActualQuantitySP(dbApp);
+                        }
                     }
 
                     dbApp.ACSaveChanges();

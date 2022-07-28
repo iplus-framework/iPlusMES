@@ -23,11 +23,6 @@ namespace gip.bso.manufacturing
     [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPos.ClassName, "en{'Prod. Order Pos.'}de{'Produktionsauftrag Position'}", typeof(ProdOrderPartslistPos), ProdOrderPartslistPos.ClassName, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", Material.ClassName + "\\MaterialNo")]
     public partial class BSOProdOrder : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider, IOnTrackingCall
     {
-        #region constants
-        public const string BGWorkerMehtod_RecalcAllQuantites = @"RecalcAllQuantites";
-        public const string BGWorkerMehtod_RecalcAllQuantitesForSelected = @"RecalcAllQuantitesForSelected";
-        #endregion
-
         #region c´tors
         /// <summary>
         /// Initializes a new instance of the <see cref="BSOProdOrder"/> class.
@@ -1089,7 +1084,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledRecalcAllQuantites())
                 return;
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_RecalcAllQuantites);
+            BackgroundWorker.RunWorkerAsync(nameof(RecalcAllQuantities));
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -1103,7 +1098,7 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledRecalcAllQuantitesForSelected())
                 return;
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_RecalcAllQuantitesForSelected);
+            BackgroundWorker.RunWorkerAsync(nameof(DoRecalcAllQuantitiesForSelected));
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -4981,12 +4976,12 @@ namespace gip.bso.manufacturing
 
             switch (command)
             {
-                case BGWorkerMehtod_RecalcAllQuantites:
-                    e.Result = DoRecalcAllQuantites(DatabaseApp, CurrentProdOrder, true);
+                case nameof(RecalcAllQuantities):
+                    e.Result = RecalcAllQuantities(DatabaseApp, CurrentProdOrder, true);
                     break;
-                case BGWorkerMehtod_RecalcAllQuantitesForSelected:
+                case nameof(DoRecalcAllQuantitiesForSelected):
                     ProdOrder[] prodOrders = ProdOrderList.Where(c => c.IsSelected).ToArray();
-                    e.Result = DoRecalcAllQuantitesForSelected(DatabaseApp, prodOrders);
+                    e.Result = DoRecalcAllQuantitiesForSelected(DatabaseApp, prodOrders);
                     break;
 
             }
@@ -5012,7 +5007,7 @@ namespace gip.bso.manufacturing
             {
                 switch (command)
                 {
-                    case BGWorkerMehtod_RecalcAllQuantites:
+                    case nameof(RecalcAllQuantities):
                         resultMsg = (MsgWithDetails)e.Result;
                         if (resultMsg == null || resultMsg.IsSucceded())
                         {
@@ -5024,7 +5019,7 @@ namespace gip.bso.manufacturing
                             SendMessage(resultMsg);
                         }
                         break;
-                    case BGWorkerMehtod_RecalcAllQuantitesForSelected:
+                    case nameof(DoRecalcAllQuantitiesForSelected):
                         resultMsg = (MsgWithDetails)e.Result;
                         if (resultMsg == null || resultMsg.IsSucceded())
                         {
@@ -5046,41 +5041,17 @@ namespace gip.bso.manufacturing
         #region BackgroundWorker -> DoMehtods
 
 
-        private MsgWithDetails DoRecalcAllQuantites(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
+        private MsgWithDetails RecalcAllQuantities(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
         {
-            MsgWithDetails msg = new MsgWithDetails();
-            try
-            {
-                databaseApp.udpRecalcActualQuantity(prodOrder.ProgramNo, null);
-            }
-            catch (Exception ec)
-            {
-                Msg udpErrMsg = new Msg(eMsgLevel.Exception, $"{prodOrder.ProgramNo} error running udpRecalcActualQuantity! Message: " + ec.Message);
-                msg.AddDetailMessage(udpErrMsg);
-            }
-            MsgWithDetails calcMsg = ProdOrderManager.CalculateStatistics(prodOrder);
-            MsgWithDetails saveMsg = null;
-            if (saveChanges && (calcMsg == null || calcMsg.IsSucceded()))
-            {
-                saveMsg = databaseApp.ACSaveChanges();
-            }
-            if (calcMsg != null)
-            {
-                msg.AddDetailMessage(calcMsg);
-            }
-            if (saveMsg != null)
-            {
-                msg.AddDetailMessage(saveMsg);
-            }
-            return msg;
+            return ProdOrderManager.RecalcAllQuantitesAndStatistics(databaseApp, prodOrder, saveChanges);
         }
 
-        private MsgWithDetails DoRecalcAllQuantitesForSelected(DatabaseApp databaseApp, ProdOrder[] prodOrders)
+        private MsgWithDetails DoRecalcAllQuantitiesForSelected(DatabaseApp databaseApp, ProdOrder[] prodOrders)
         {
             MsgWithDetails msg = new MsgWithDetails();
             foreach (ProdOrder prodOrder in prodOrders)
             {
-                MsgWithDetails detMsg = DoRecalcAllQuantites(databaseApp, prodOrder, false);
+                MsgWithDetails detMsg = RecalcAllQuantities(databaseApp, prodOrder, false);
                 if (detMsg != null)
                 {
                     msg.AddDetailMessage(detMsg);

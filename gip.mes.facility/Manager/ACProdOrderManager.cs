@@ -2867,11 +2867,41 @@ namespace gip.mes.facility
 
         #region Statistics
 
-        public MsgWithDetails CalculateStatistics(ProdOrder prodOrder)
+
+        public MsgWithDetails RecalcAllQuantitesAndStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
+        {
+            MsgWithDetails msg = new MsgWithDetails();
+            try
+            {
+                prodOrder.RecalcActualQuantitySP(databaseApp, false);
+            }
+            catch (Exception ec)
+            {
+                Msg udpErrMsg = new Msg(eMsgLevel.Exception, $"{prodOrder.ProgramNo} error running udpRecalcActualQuantity! Message: " + ec.Message);
+                msg.AddDetailMessage(udpErrMsg);
+            }
+            MsgWithDetails calcMsg = CalculateStatistics(databaseApp, prodOrder);
+            MsgWithDetails saveMsg = null;
+            if (saveChanges && (calcMsg == null || calcMsg.IsSucceded()))
+            {
+                saveMsg = databaseApp.ACSaveChanges();
+            }
+            if (calcMsg != null)
+            {
+                msg.AddDetailMessage(calcMsg);
+            }
+            if (saveMsg != null)
+            {
+                msg.AddDetailMessage(saveMsg);
+            }
+            return msg;
+        }
+
+        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrder prodOrder)
         {
             MsgWithDetails msg = new MsgWithDetails();
 
-            List<ProdOrderPartslist> pls = prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
+            List<ProdOrderPartslist> pls = prodOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).ToList();
 
             // Final list as nobody source
             ProdOrderPartslist finalPartslist =
@@ -2880,9 +2910,20 @@ namespace gip.mes.facility
                 .Where(c => !c.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
                 .FirstOrDefault();
 
+            if (finalPartslist != null)
+            {
+                MsgWithDetails plMsg = CalculateStatistics(databaseApp, finalPartslist, finalPartslist);
+                if (plMsg != null)
+                {
+                    msg.AddDetailMessage(plMsg);
+                }
+            }
+
             foreach (ProdOrderPartslist pl in pls)
             {
-                MsgWithDetails plMsg = CalculateStatistics(pl, finalPartslist);
+                if (pl == finalPartslist)
+                    continue;
+                MsgWithDetails plMsg = CalculateStatistics(databaseApp, pl, finalPartslist);
                 if (plMsg != null)
                 {
                     msg.AddDetailMessage(plMsg);
@@ -2891,26 +2932,31 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public MsgWithDetails CalculateStatistics(ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist finalPartslist)
+        public MsgWithDetails CalculateStatistics(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist finalPartslist)
         {
             MsgWithDetails msg = new MsgWithDetails();
 
-            List<ProdOrderPartslistPos> components =
-               prodOrderPartslist
-               .ProdOrderPartslistPos_ProdOrderPartslist
-               .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
-               .ToList();
+            IEnumerable<ProdOrderPartslistPos> components = 
+                                databaseApp.ProdOrderPartslistPos
+                                            .Include(c => c.Material)
+                                            .Where(c => c.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                                            .ToArray();
+            //List<ProdOrderPartslistPos> components =
+            //   prodOrderPartslist
+            //   .ProdOrderPartslistPos_ProdOrderPartslist
+            //   .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+            //   .ToList();
 
-            List<ProdOrderPartslistPos> batches =
+            IEnumerable<ProdOrderPartslistPos> batches =
                 prodOrderPartslist
                 .ProdOrderPartslistPos_ProdOrderPartslist
                 .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
-                .ToList();
+                .ToArray();
 
-            List<FacilityBooking> facilityBookings =
+            IEnumerable<FacilityBooking> facilityBookings =
                 batches
                 .SelectMany(c => c.FacilityBooking_ProdOrderPartslistPos)
-                .ToList();
+                .ToArray();
 
             prodOrderPartslist.ActualQuantity =
                facilityBookings
@@ -2934,37 +2980,37 @@ namespace gip.mes.facility
                 }
             }
 
-            CalculateStatisticProdPlPerGemetricalAvg(prodOrderPartslist, components);
+            CalculateStatisticProdPlPerAvg(prodOrderPartslist, components);
 
             return msg;
         }
 
-        private static void CalculateStatisticProdPlPerAvg(ProdOrderPartslist prodOrderPartslist, List<ProdOrderPartslistPos> batches)
+        private static void CalculateStatisticProdPlPerAvg(ProdOrderPartslist prodOrderPartslist, IEnumerable<ProdOrderPartslistPos> batches)
         {
-            prodOrderPartslist.InputQForActualOutputPer = batches.Select(c => c.InputQForActualOutputPer).Average();
-            prodOrderPartslist.InputQForGoodActualOutputPer = batches.Select(c => c.InputQForGoodActualOutputPer).Average();
-            prodOrderPartslist.InputQForScrapActualOutputPer = batches.Select(c => c.InputQForScrapActualOutputPer).Average();
+            prodOrderPartslist.InputQForActualOutputPer = batches.Where(c => c.InputQForActualOutputPer.HasValue).Select(c => c.InputQForActualOutputPer).Average();
+            prodOrderPartslist.InputQForGoodActualOutputPer = batches.Where(c => c.InputQForGoodActualOutputPer.HasValue).Select(c => c.InputQForGoodActualOutputPer).Average();
+            prodOrderPartslist.InputQForScrapActualOutputPer = batches.Where(c => c.InputQForScrapActualOutputPer.HasValue).Select(c => c.InputQForScrapActualOutputPer).Average();
 
 
-            prodOrderPartslist.InputQForFinalActualOutputPer = batches.Select(c => c.InputQForFinalActualOutputPer).Average();
-            prodOrderPartslist.InputQForFinalGoodActualOutputPer = batches.Select(c => c.InputQForFinalGoodActualOutputPer).Average();
-            prodOrderPartslist.InputQForFinalScrapActualOutputPer = batches.Select(c => c.InputQForFinalScrapActualOutputPer).Average();
+            prodOrderPartslist.InputQForFinalActualOutputPer = batches.Where(c => c.InputQForFinalActualOutputPer.HasValue).Select(c => c.InputQForFinalActualOutputPer).Average();
+            prodOrderPartslist.InputQForFinalGoodActualOutputPer = batches.Where(c => c.InputQForFinalGoodActualOutputPer.HasValue).Select(c => c.InputQForFinalGoodActualOutputPer).Average();
+            prodOrderPartslist.InputQForFinalScrapActualOutputPer = batches.Where(c => c.InputQForFinalScrapActualOutputPer.HasValue).Select(c => c.InputQForFinalScrapActualOutputPer).Average();
         }
 
-        private static void CalculateStatisticProdPlPerGemetricalAvg(ProdOrderPartslist prodOrderPartslist, List<ProdOrderPartslistPos> components)
+        private static void CalculateStatisticProdPlPerGemetricalAvg(ProdOrderPartslist prodOrderPartslist, IEnumerable<ProdOrderPartslistPos> components)
         {
             double sumComponentQuantities = components.Select(c => c.TargetQuantityUOM).Sum();
             if (sumComponentQuantities == 0)
                 return;
 
-            prodOrderPartslist.InputQForActualOutputPer = components.Select(c => c.InputQForActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
-            prodOrderPartslist.InputQForGoodActualOutputPer = components.Select(c => c.InputQForGoodActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
-            prodOrderPartslist.InputQForScrapActualOutputPer = components.Select(c => c.InputQForScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForActualOutputPer = components.Where(c => c.InputQForActualOutputPer.HasValue).Select(c => c.InputQForActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForGoodActualOutputPer = components.Where(c => c.InputQForGoodActualOutputPer.HasValue).Select(c => c.InputQForGoodActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForScrapActualOutputPer = components.Where(c => c.InputQForScrapActualOutputPer.HasValue).Select(c => c.InputQForScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
 
 
-            prodOrderPartslist.InputQForFinalActualOutputPer = components.Select(c => c.InputQForFinalActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
-            prodOrderPartslist.InputQForFinalGoodActualOutputPer = components.Select(c => c.InputQForFinalGoodActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
-            prodOrderPartslist.InputQForFinalScrapActualOutputPer = components.Select(c => c.InputQForFinalScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForFinalActualOutputPer = components.Where(c => c.InputQForFinalActualOutputPer.HasValue).Select(c => c.InputQForFinalActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForFinalGoodActualOutputPer = components.Where(c => c.InputQForFinalGoodActualOutputPer.HasValue).Select(c => c.InputQForFinalGoodActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
+            prodOrderPartslist.InputQForFinalScrapActualOutputPer = components.Where(c => c.InputQForFinalScrapActualOutputPer.HasValue).Select(c => c.InputQForFinalScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
         }
 
         public MsgWithDetails CalculateStatistics(ProdOrderPartslistPos prodOrderPartslistPos, ProdOrderPartslist finalPartslist)

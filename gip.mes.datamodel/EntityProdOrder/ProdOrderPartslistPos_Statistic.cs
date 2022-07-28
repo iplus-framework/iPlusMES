@@ -1,9 +1,17 @@
 ﻿using gip.core.datamodel;
+using System;
 
 namespace gip.mes.datamodel
 {
     public partial class ProdOrderPartslistPos
     {
+        public bool IsExcludedFromStat
+        {
+            get
+            {
+                return Material == null || Material.SpecHeatCapacity > 4000;
+            }
+        }
 
         #region  DifferenceQuantityPer
 
@@ -28,14 +36,14 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputPer)]
-        public double InputQForActualOutputPer
+        [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputPer )]
+        public double? InputQForActualOutputPer
         {
             get
             {
-                if (InputQForActualOutput == null || (InputQForActualOutput ?? 0) == 0)
-                    return 0;
-                return ActualQuantityUOM / (InputQForActualOutput ?? 1);
+                if (InputQForActualOutput == null || Math.Abs(InputQForActualOutput.Value) <= double.Epsilon || IsExcludedFromStat)
+                    return null;
+                return ActualQuantityUOM / InputQForActualOutput;
             }
         }
 
@@ -43,11 +51,11 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForActualOutput", ConstIInputQForActual.InputQForActualOutputDiff)]
-        public double InputQForActualOutputDiff
+        public double? InputQForActualOutputDiff
         {
             get
             {
-                return ActualQuantityUOM - (InputQForActualOutput ?? 0);
+                return InputQForActualOutput != null ? ActualQuantityUOM - InputQForActualOutput : null;
             }
         }
 
@@ -59,22 +67,22 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForGoodActualOutput", ConstIInputQForActual.InputQForGoodActualOutputPer)]
-        public double InputQForGoodActualOutputPer
+        public double? InputQForGoodActualOutputPer
         {
             get
             {
-                if (InputQForGoodActualOutput == null || (InputQForGoodActualOutput ?? 0) == 0)
-                    return 0;
-                return ActualQuantityUOM / (InputQForGoodActualOutput ?? 1);
+                if (InputQForGoodActualOutput == null || Math.Abs(InputQForGoodActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                return ActualQuantityUOM / InputQForGoodActualOutput;
             }
         }
 
         [ACPropertyInfo(999, "InputQForGoodActualOutput", ConstIInputQForActual.InputQForGoodActualOutputDiff)]
-        public double InputQForGoodActualOutputDiff
+        public double? InputQForGoodActualOutputDiff
         {
             get
             {
-                return ActualQuantityUOM - (InputQForGoodActualOutput ?? 0);
+                return InputQForGoodActualOutput != null ? ActualQuantityUOM - InputQForGoodActualOutput : null;
             }
         }
 
@@ -83,22 +91,22 @@ namespace gip.mes.datamodel
         #region InputQForScrapActualOutput
 
         [ACPropertyInfo(999, "InputQForScrapActualOutput", ConstIInputQForActual.InputQForScrapActualOutputPer)]
-        public double InputQForScrapActualOutputPer
+        public double? InputQForScrapActualOutputPer
         {
             get
             {
-                if (InputQForScrapActualOutput == null || (InputQForScrapActualOutput ?? 0) == 0)
-                    return 0;
-                return ActualQuantityUOM / (InputQForScrapActualOutput ?? 1);
+                if (InputQForScrapActualOutput == null || Math.Abs(InputQForScrapActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                return ActualQuantityUOM / InputQForScrapActualOutput;
             }
         }
 
         [ACPropertyInfo(999, "InputQForScrapActualOutput", ConstIInputQForActual.InputQForScrapActualOutputDiff)]
-        public double InputQForScrapActualOutputDiff
+        public double? InputQForScrapActualOutputDiff
         {
             get
             {
-                return ActualQuantityUOM - (InputQForScrapActualOutput ?? 0);
+                return InputQForScrapActualOutput != null ? ActualQuantityUOM - InputQForScrapActualOutput : null;
             }
         }
 
@@ -110,13 +118,13 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalActualOutput", ConstIInputQForActual.InputQForFinalActualOutputPer)]
-        public double InputQForFinalActualOutputPer
+        public double? InputQForFinalActualOutputPer
         {
             get
             {
-                if (InputQForFinalActualOutput == null || (InputQForFinalActualOutput ?? 0) == 0)
-                    return 0;
-                return ActualQuantityUOM / (InputQForFinalActualOutput ?? 1);
+                if (InputQForFinalActualOutput == null || Math.Abs(InputQForFinalActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                return ActualQuantityUOM / InputQForFinalActualOutput;
             }
         }
 
@@ -124,11 +132,11 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalActualOutput", ConstIInputQForActual.InputQForFinalActualOutputDiff)]
-        public double InputQForFinalActualOutputDiff
+        public double? InputQForFinalActualOutputDiff
         {
             get
             {
-                return ActualQuantityUOM - (InputQForFinalActualOutput ?? 0);
+                return InputQForFinalActualOutput != null ? ActualQuantityUOM - InputQForFinalActualOutput : null;
             }
         }
 
@@ -140,13 +148,13 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", ConstIInputQForActual.InputQForFinalGoodActualOutputPer)]
-        public double InputQForFinalGoodActualOutputPer
+        public double? InputQForFinalGoodActualOutputPer
         {
             get
             {
-                if (InputQForFinalGoodActualOutput == null || (InputQForFinalGoodActualOutput ?? 0) == 0)
-                    return 0;
-                return ActualQuantityUOM / (InputQForFinalGoodActualOutput ?? 1);
+                if (InputQForFinalGoodActualOutput == null || Math.Abs(InputQForFinalGoodActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                return ActualQuantityUOM / InputQForFinalGoodActualOutput;
             }
         }
 
@@ -154,11 +162,11 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalGoodActualOutput", ConstIInputQForActual.InputQForFinalGoodActualOutputDiff)]
-        public double InputQForFinalGoodActualOutputDiff
+        public double? InputQForFinalGoodActualOutputDiff
         {
             get
             {
-                return ActualQuantityUOM - (InputQForFinalGoodActualOutput ?? 0);
+                return InputQForFinalGoodActualOutput != null ? ActualQuantityUOM - InputQForFinalGoodActualOutput : null;
             }
         }
 
@@ -170,13 +178,13 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", ConstIInputQForActual.InputQForFinalScrapActualOutputPer)]
-        public double InputQForFinalScrapActualOutputPer
+        public double? InputQForFinalScrapActualOutputPer
         {
             get
             {
-                if (InputQForFinalScrapActualOutput == null || (InputQForFinalScrapActualOutput ?? 0) == 0)
-                    return 0;
-                return ActualQuantityUOM / (InputQForFinalScrapActualOutput ?? 1);
+                if (InputQForFinalScrapActualOutput == null || Math.Abs(InputQForFinalScrapActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                return ActualQuantityUOM / InputQForFinalScrapActualOutput;
             }
         }
 
@@ -184,11 +192,11 @@ namespace gip.mes.datamodel
         /// Source Property: 
         /// </summary>
         [ACPropertyInfo(999, "InputQForFinalScrapActualOutput", ConstIInputQForActual.InputQForFinalScrapActualOutputDiff)]
-        public double InputQForFinalScrapActualOutputDiff
+        public double? InputQForFinalScrapActualOutputDiff
         {
             get
             {
-                return ActualQuantityUOM - (InputQForFinalScrapActualOutput ?? 0);
+                return InputQForFinalScrapActualOutput != null ? ActualQuantityUOM - InputQForFinalScrapActualOutput : null;
             }
         }
 

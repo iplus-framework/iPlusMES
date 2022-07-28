@@ -541,8 +541,9 @@ namespace gip.mes.datamodel
                     _OnTargetQuantityUOMChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantityUOM");
-            OnPropertyChanged("RemainingCallQuantityUOM");
+            OnPropertyChanged(nameof(DifferenceQuantityUOM));
+            OnPropertyChanged(nameof(RemainingCallQuantityUOM));
+            OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
         bool _OnActualQuantityChanging = false;
@@ -568,7 +569,8 @@ namespace gip.mes.datamodel
                     _OnActualQuantityChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantity");
+            OnPropertyChanged(nameof(DifferenceQuantity));
+            OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
         bool _OnActualQuantityUOMChanging = false;
@@ -594,7 +596,8 @@ namespace gip.mes.datamodel
                     _OnActualQuantityUOMChanging = false;
                 }
             }
-            OnPropertyChanged("DifferenceQuantityUOM");
+            OnPropertyChanged(nameof(DifferenceQuantityUOM));
+            OnPropertyChanged(nameof(DifferenceQuantityPer));
         }
 
         private bool _OnMDUnitChanging = false;
