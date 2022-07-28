@@ -2,6 +2,7 @@
 using gip.mes.datamodel;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace gip.mes.facility
 {
@@ -26,24 +27,27 @@ namespace gip.mes.facility
 
         #region Quantities
 
-        [ACPropertyInfo(403, "Quantities", "en{'Planned (P)'}de{'Planned (P)'}")]
+        [ACPropertyInfo(400, "Quantities", "en{'Planned (P)'}de{'Planned (P)'}")]
         public double PlannedQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, "Quantities", "en{'Target (T)'}de{'Soll (S)'}")]
+        [ACPropertyInfo(401, "Quantities", "en{'Target (T)'}de{'Soll (S)'}")]
         public double TargetQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, "Quantities", "en{'Actual (A)'}de{'Ist (I)'}")]
+        [ACPropertyInfo(402, "Quantities", "en{'Actual (A)'}de{'Ist (I)'}")]
         public double ActualQuantityUOM { get; set; }
-
 
         [ACPropertyInfo(403, "Quantities", "en{'Diff = A - T'}de{'Diff = I - S'}")]
         public double DiffQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, "Quantities", "en{'Zero posting'}de{'Null Buchung'}")]
+        [ACPropertyInfo(404, "Quantities", "en{'Zero posting'}de{'Null Buchung'}")]
         public double ZeroPostingQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, "Quantities", "en{'Diff = T - P'}de{'Diff = S - P'}")]
+        [ACPropertyInfo(405, "Quantities", "en{'Diff = T - P'}de{'Diff = S - P'}")]
         public double DiffTargetPlanedQuantityUOM { get; set; }
+
+        [ACPropertyInfo(408, "Quantities", "en{'Yield [%]'}de{'Ausbeute [%]'}")]
+        public double DiffQuantityPer { get; set; }
+
 
         [ACPropertyInfo(500, "", "en{'InputQForActual'}de{'InputQForActual'}")]
         public InputQForActual InputQForActual { get; set; }
@@ -59,6 +63,7 @@ namespace gip.mes.facility
         {
             DiffQuantityUOM = ActualQuantityUOM - TargetQuantityUOM;
             DiffTargetPlanedQuantityUOM = TargetQuantityUOM - PlannedQuantityUOM;
+            DiffQuantityPer = Math.Abs(TargetQuantityUOM) > double.Epsilon ? ActualQuantityUOM / TargetQuantityUOM : 0;
         }
 
         public void CalculateStatistics()
