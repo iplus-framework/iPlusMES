@@ -2842,7 +2842,7 @@ namespace gip.mes.processapplication
                 {
                     try
                     {
-                        bool? skipTol = weighingComponent.PLPosRelation.SourceProdOrderPartslistPos.BasedOnPartslistPos.PostingQuantitySuggestion > 0;
+                        bool? skipTol = weighingComponent.PLPosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.PostingQuantitySuggestion > 0;
                         acMethod["SkipToleranceCheck"] = skipTol != null ? skipTol : false;
                     }
                     catch (Exception e)

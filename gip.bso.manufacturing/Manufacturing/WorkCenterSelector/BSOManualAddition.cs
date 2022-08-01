@@ -60,7 +60,7 @@ namespace gip.bso.manufacturing
 
         public override ScaleBackgroundState? OnDetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
-            short? quantQuantity = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos.BasedOnPartslistPos.PostingQuantitySuggestion;
+            short? quantQuantity = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.PostingQuantitySuggestion;
 
             if (quantQuantity.HasValue && quantQuantity.Value > 0 && actual > 0)
             {
@@ -131,7 +131,7 @@ namespace gip.bso.manufacturing
 
                         double diff = SelectedWeighingMaterial.TargetQuantity;
 
-                        short? quantQuantity = SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.BasedOnPartslistPos.PostingQuantitySuggestion;
+                        short? quantQuantity = SelectedWeighingMaterial.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.PostingQuantitySuggestion;
 
                         if (quantQuantity.HasValue && quantQuantity.Value > 0)
                         {
