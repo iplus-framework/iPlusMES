@@ -1185,7 +1185,7 @@ namespace gip.mes.processapplication
                     // Überprüfe Rechnerischen Restbestand des Silos
                     //double rest = silo.FillLevel.ValueT - actualQuantity;
                     //if (rest < zeroTolerance)
-                    if (restInfo.InZeroTolerance)
+                    if (restInfo.InZeroTolerance && restInfo.IsZeroTolSet)
                     {
                         // Falls Methode true zurückgibt
                         EmptySiloHandlingOptions handlingOptions = HandleAbortReasonOnEmptySilo(silo);

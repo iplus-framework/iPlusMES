@@ -74,7 +74,7 @@ namespace gip.mes.facility
         [ACPropertyInfo(305, Const_Output, "en{'Good Quantity [%]'}de{'Gutmenge [%]'}")]
         public double InwardActualQuantityGoodPer { get; set; }
 
-        [ACPropertyInfo(306, Const_Output, "en{'Scrapped Quantity'}de{'Ausschussmenge'")]
+        [ACPropertyInfo(306, Const_Output, "en{'Scrapped Quantity'}de{'Ausschussmenge'}")]
         public double InwardActualQuantityScrapUOM { get; set; }
 
         [ACPropertyInfo(307, Const_Output, "en{'Scrapped Quantity [%]'}de{'Ausschussmenge [%]'}")]
