@@ -606,8 +606,8 @@ namespace gip2006.variobatch.processapplication
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.MAN_VALUE), 0, sendPackage1, 70, 4);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ITL_VALUE), 0, sendPackage1, 74, 4);
 
-            ErrorCode errCode = s7Session.PLCConn.WriteBytes(DataType.DataBlock, dbNo, offset, ref sendPackage1);
-            return errCode == ErrorCode.NoError;
+            PLC.Result errCode = s7Session.PLCConn.WriteBytes(DataTypeEnum.DataBlock, dbNo, offset, ref sendPackage1);
+            return errCode == null || errCode.IsSucceeded;
         }
 
         public override object ReadObject(object complexObj, int dbNo, int offset, object miscParams)
@@ -622,8 +622,8 @@ namespace gip2006.variobatch.processapplication
                 return null;
 
             byte[] readPackage1 = new byte[StructLen];
-            ErrorCode errCode = s7Session.PLCConn.ReadBytes(DataType.DataBlock, dbNo, offset, StructLen, out readPackage1);
-            if (errCode != ErrorCode.NoError)
+            PLC.Result errCode = s7Session.PLCConn.ReadBytes(DataTypeEnum.DataBlock, dbNo, offset, StructLen, out readPackage1);
+            if (errCode != null && !errCode.IsSucceeded)
                 return null;
 
             response.DEADB_W = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 0);

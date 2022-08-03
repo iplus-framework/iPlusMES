@@ -121,8 +121,8 @@ namespace gip2006.variobatch.processapplication
 
                 byte[] readPackage1 = new byte[iOffset];
 
-                ErrorCode errCode = s7Session.PLCConn.ReadBytes(DataType.DataBlock, dbNo, offset, iOffset, out readPackage1);
-                if (errCode != ErrorCode.NoError)
+                PLC.Result errCode = s7Session.PLCConn.ReadBytes(DataTypeEnum.DataBlock, dbNo, offset, iOffset, out readPackage1);
+                if (errCode != null && !errCode.IsSucceeded)
                     return null;
 
                 iOffset = 0;
@@ -156,8 +156,8 @@ namespace gip2006.variobatch.processapplication
 
                 byte[] readPackage1 = new byte[iOffset];
 
-                ErrorCode errCode = s7Session.PLCConn.ReadBytes(DataType.DataBlock, dbNo, offset, iOffset, out readPackage1);
-                if (errCode != ErrorCode.NoError)
+                PLC.Result errCode = s7Session.PLCConn.ReadBytes(DataTypeEnum.DataBlock, dbNo, offset, iOffset, out readPackage1);
+                if (errCode != null && !errCode.IsSucceeded)
                     return null;
 
                 iOffset = 0;

@@ -59,9 +59,9 @@ namespace gip2006.variobatch.processapplication
             foreach (byte[] package in sendPackages)
             {
                 byte[] pack = package;
-                ErrorCode errCode = s7Session.PLCConn.WriteBytes(DataType.DataBlock, dbNo, offset, ref pack);
+                PLC.Result errCode = s7Session.PLCConn.WriteBytes(DataTypeEnum.DataBlock, dbNo, offset, ref pack);
                 offset += pack.Length;
-                if (errCode != ErrorCode.NoError)
+                if (errCode != null && !errCode.IsSucceeded)
                     return false;
             }
 
