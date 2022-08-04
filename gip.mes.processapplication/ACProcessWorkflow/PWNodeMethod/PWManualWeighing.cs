@@ -578,7 +578,7 @@ namespace gip.mes.processapplication
                 }
                 return null;
             }
-    
+
         }
 
         #endregion
@@ -680,7 +680,7 @@ namespace gip.mes.processapplication
             get
             {
                 return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility.Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
-                                                                                                && (x.MDReleaseState == null 
+                                                                                                && (x.MDReleaseState == null
                                                                                                  || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)))
                                                                                               .ToArray().OrderBy(o => o.ExpirationDate);
             }
@@ -779,7 +779,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale, DatabaseApp dbApp, ProdOrderPartslistPosRelation[] queryOpenDosings, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition, MaterialWFConnection matWFConnection, ProdOrderBatch batch, ProdOrderBatchPlan batchPlan, ProdOrderPartslistPos endBatchPos)
+        public virtual ScaleBoundaries OnGetScaleBoundariesForDosing(IPAMContScale scale, DatabaseApp dbApp, ProdOrderPartslistPosRelation[] queryOpenDosings)
         {
             return new ScaleBoundaries(scale);
         }
@@ -1135,12 +1135,12 @@ namespace gip.mes.processapplication
                 PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
 
                 bool isWeighComponentsNull;
-                using (ACMonitor.Lock (_65050_WeighingCompLock))
+                using (ACMonitor.Lock(_65050_WeighingCompLock))
                 {
                     isWeighComponentsNull = WeighingComponents == null;
                 }
 
-                if (   isWeighComponentsNull 
+                if (isWeighComponentsNull
                     || (AutoInterDis && manualWeighing == null))
                 {
                     if (ParentPWGroup.AccessedProcessModule == null)
@@ -1198,7 +1198,7 @@ namespace gip.mes.processapplication
                                 FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityCharge.ParamAsGuid);
                                 if (fc == null)
                                 {
-                                    Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A10)", 
+                                    Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A10)",
                                                       string.Format("The facility charge with ID: {0} not exist in the database.", facilityCharge.ParamAsGuid));
                                 }
                                 else
@@ -1206,7 +1206,7 @@ namespace gip.mes.processapplication
                                     if (fc.MaterialID != comp.Material)
                                     {
                                         Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A20)",
-                                                      string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid,comp.Material));
+                                                      string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid, comp.Material));
                                     }
                                 }
 
@@ -1273,7 +1273,7 @@ namespace gip.mes.processapplication
 
                         CurrentOpenMaterial = nextComp.PLPosRelation.ProdOrderPartslistPosRelationID;
                         bool hasQuants = TryAutoSelectFacilityCharge(nextComp.PLPosRelation.ProdOrderPartslistPosRelationID);
-                        
+
                         StartNextCompResult funcStartResult = StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, hasQuants); //Auto Comp && Auto Lot
                         if (funcStartResult == StartNextCompResult.CycleWait)
                         {
@@ -1329,7 +1329,7 @@ namespace gip.mes.processapplication
                 else
                 {
                     bool isAnyReadyToWeigh = false;
-                    using(ACMonitor.Lock(_65050_WeighingCompLock))
+                    using (ACMonitor.Lock(_65050_WeighingCompLock))
                     {
                         isAnyReadyToWeigh = WeighingComponents.Any(c => c.WeighState == WeighingComponentState.ReadyToWeighing);
                     }
@@ -1374,7 +1374,7 @@ namespace gip.mes.processapplication
             using (ACMonitor.Lock(_65025_MemberCompLock))
             {
                 InterdischargingScaleActualValue.ValueT = null;
-            }    
+            }
 
             base.SMCompleted();
         }
@@ -1420,7 +1420,7 @@ namespace gip.mes.processapplication
 
         #region Methods => Commands
 
-        [ACMethodInfo("","",999)]
+        [ACMethodInfo("", "", 999)]
         public Msg StartWeighing(Guid? prodOrderPartslistPosRelation, Guid? facilityCharge, Guid? facility, bool forceSetFC_F)
         {
             using (ACMonitor.Lock(_65001_CanStartFromBSOLock))
@@ -1430,7 +1430,7 @@ namespace gip.mes.processapplication
                 _CanStartFromBSO = false;
             }
 
-            if(prodOrderPartslistPosRelation == null)
+            if (prodOrderPartslistPosRelation == null)
                 return null;
 
             WeighingComponent comp = GetWeighingComponent(prodOrderPartslistPosRelation);
@@ -1518,7 +1518,7 @@ namespace gip.mes.processapplication
                     manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = rest;
                     manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
 
-                   
+
 
                     WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial); //TODO:lock currentOpenMaterial
                     if (comp == null)
@@ -1583,18 +1583,18 @@ namespace gip.mes.processapplication
                 {
                     //if (fc != null)
                     //{
-                        if (fc.MaterialID != rel.SourceProdOrderPartslistPos?.MaterialID)
-                        {
-                            Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
-                                                               rel.SourceProdOrderPartslistPos?.MaterialID);
-                        }
+                    if (fc.MaterialID != rel.SourceProdOrderPartslistPos?.MaterialID)
+                    {
+                        Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
+                                                           rel.SourceProdOrderPartslistPos?.MaterialID);
+                    }
 
-                        Msg msg = SetFacilityCharge(newFacilityCharge.Value, currentOpenMaterial, forceSetFC_F);
-                        if (msg != null)
-                            return msg;
+                    Msg msg = SetFacilityCharge(newFacilityCharge.Value, currentOpenMaterial, forceSetFC_F);
+                    if (msg != null)
+                        return msg;
 
-                        currentFacilityCharge = CurrentFacilityCharge;
-                        SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
+                    currentFacilityCharge = CurrentFacilityCharge;
+                    SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
                     //}
                     //else
                     //{
@@ -1615,7 +1615,7 @@ namespace gip.mes.processapplication
                         if (currentFC != null)
                         {
                             //Question50089: Was the material with the lot number {0} used up?
-                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo, 
+                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo,
                                            currentFC.FacilityLot.LotNo);
                         }
                     }
@@ -1737,7 +1737,7 @@ namespace gip.mes.processapplication
         {
             Msg msg = null;
             try
-            { 
+            {
                 using (Database db = new core.datamodel.Database())
                 using (DatabaseApp dbApp = new DatabaseApp(db))
                 {
@@ -1834,7 +1834,7 @@ namespace gip.mes.processapplication
             // If dosing is not for production, then do nothing
             if (pwMethodProduction == null)
                 return StartNextCompResult.Done;
-            
+
             if (ProdOrderManager == null)
             {
                 // Error50275: ProdOrderManager is null.
@@ -1940,86 +1940,7 @@ namespace gip.mes.processapplication
 
                     AvailableRoutes = GetAvailableStorages(module);
 
-                    if (AutoInterDis)
-                    {
-                        bool interDischargingNeeded = false;
-                        ProdOrderPartslistPosRelation relation = WeighingComponents.Where(c => c.WeighState != WeighingComponentState.Aborted && c.WeighState != WeighingComponentState.WeighingCompleted)
-                                                                                    .Select(c => c.PLPosRelation)
-                                                                                    .FirstOrDefault();
-                        if (relation != null)
-                        {
-                            double dosingWeight = relation.RemainingDosingWeight;
-                            IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
-                            ScaleBoundaries scaleBoundaries = null;
-                            if (scale != null)
-                                scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, queryOpenMaterials, intermediateChildPos, intermediatePosition, matWFConnection, batch, batchPlan, endBatchPos);
-                            if (scaleBoundaries != null && scaleBoundaries.MaxWeightCapacity > 0.00000001)
-                            {
-                                double? remainingWeight = null;
-                                if (scaleBoundaries.RemainingWeightCapacity.HasValue)
-                                    remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
-                                else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
-                                    remainingWeight = scaleBoundaries.MaxWeightCapacity;
-                                if (remainingWeight.HasValue)
-                                {
-                                    // FALL A:
-                                    if (Math.Abs(relation.RemainingDosingWeight) > remainingWeight.Value)
-                                    {
-                                        // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
-                                        // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                        if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && relation.TargetWeight > scaleBoundaries.MaxWeightCapacity)
-                                        {
-                                            // Fall A.1:
-                                            interDischargingNeeded = true;
-                                            dosingWeight = remainingWeight.Value;
-                                        }
-                                        else
-                                        {
-                                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
-                                            return StartNextCompResult.Done;
-                                        }
-                                    }
 
-                                    if (scaleBoundaries.RemainingVolumeCapacity.HasValue
-                                        && relation.SourceProdOrderPartslistPos.Material != null
-                                        && relation.SourceProdOrderPartslistPos.Material.IsDensityValid)
-                                    {
-                                        double remainingDosingVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(Math.Abs(relation.RemainingDosingQuantityUOM));
-                                        if (remainingDosingVolume > scaleBoundaries.RemainingVolumeCapacity.Value)
-                                        {
-                                            double targetVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(relation.TargetQuantityUOM);
-                                            // FALL B:
-                                            // Falls die Komponentenvolumen größer als die maximale Volumenkapazität ist, dann muss die Komponente gesplittet werden, 
-                                            // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                            if (scaleBoundaries.MaxVolumeCapacity > 0.00000001 && targetVolume > scaleBoundaries.MaxVolumeCapacity)
-                                            {
-                                                double dosingWeightAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
-                                                // Falls Dichte > 1000 g/dm³, dann kann das errechnete zu dosierende Teilgewicht größer als das Restgewicht in der Waage sein,
-                                                // dann muss das Restgewicht genommen werden (interDischargingNeeded ist true wenn weiter oben die Restgewichtermittlung durchgeführt wurde 
-                                                // und die komponentenmenge gesplittet werden musste. SIEHE FALL A.1)
-                                                if (!interDischargingNeeded || dosingWeightAccordingVolume < dosingWeight)
-                                                {
-                                                    // FALL B.1:
-                                                    dosingWeight = dosingWeightAccordingVolume;
-                                                }
-                                                // Prüfe erneut ob Restgewicht der Waage überschritten wird, falls ja reduziere die Restmenge
-                                                // Dieser Fall kommt dann vor, wenn die Dichte > 1000 g/dm³ ist, jedoch die zu dosierende Komponentenmenge kleiner war als das Restgewicht der Waage.
-                                                // Dann wurde interDischargingNeeded nicht gesetzt (FALL A ist nicht eingetreten).
-                                                if (!remainingWeight.HasValue && dosingWeight > remainingWeight.Value)
-                                                    dosingWeight = remainingWeight.Value;
-                                                interDischargingNeeded = true;
-                                            }
-                                            else
-                                            {
-                                                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
-                                                return StartNextCompResult.Done;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
 
@@ -2101,7 +2022,7 @@ namespace gip.mes.processapplication
                             comp.TargetWeight = Math.Abs(rel.RemainingDosingWeight);
                             SetInfo(comp, WeighingComponentInfoType.State, null);
                         }
-                        
+
                         if (comp.WeighState != WeighingComponentState.WeighingCompleted && comp.WeighState != WeighingComponentState.Aborted)
                         {
                             result = false;
@@ -2250,25 +2171,25 @@ namespace gip.mes.processapplication
                     if (!isLIFO)
                     {
                         FacilityCharge oldestFacilityCharge = relevantFacilityCharges.OrderBy(c => c.FillingDate).FirstOrDefault();
-                        if (   oldestFacilityCharge != null
+                        if (oldestFacilityCharge != null
                             && oldestFacilityCharge != newFacilityCharge)
                         {
                             //Question50051: The scanned or selected batch (Quant) is not the oldest in the warehouse. Do you still want to use this batch?
                             // Die gescannte bzw. ausgewählte Charge (Quant) ist nicht die älteste im Lager. Möchten Sie diese Charge dennoch verwenden?
                             return new Msg(this, eMsgLevel.Question, PWClassName, "ValidateFacilityChargeFIFOorLIFO(50)", 50, "Question50051")
-                                            { MessageButton = eMsgButton.YesNo };
+                            { MessageButton = eMsgButton.YesNo };
                         }
                     }
                     else
                     {
                         FacilityCharge youngestFacilityCharge = relevantFacilityCharges.OrderByDescending(c => c.FillingDate).FirstOrDefault();
-                        if (   youngestFacilityCharge != null
+                        if (youngestFacilityCharge != null
                             && youngestFacilityCharge != newFacilityCharge)
                         {
                             //Question50052: The scanned or selected batch (Quant) is not the youngest in the warehouse. Do you still want to use this batch?
                             // Die gescannte bzw. ausgewählte Charge (Quant) ist nicht die jüngste im Lager. Möchten Sie diese Charge dennoch verwenden?
                             return new Msg(this, eMsgLevel.Question, PWClassName, "ValidateFacilityChargeFIFOorLIFO(60)", 60, "Question50052")
-                                    { MessageButton = eMsgButton.YesNo };
+                            { MessageButton = eMsgButton.YesNo };
                         }
                     }
                 }
@@ -2432,7 +2353,7 @@ namespace gip.mes.processapplication
                 RoutingResult routeResult = ACRoutingService.FindSuccessors(RoutingService, db, false, toComponent,
                                         PAMSilo.SelRuleID_Storage, RouteDirections.Backwards, new object[] { },
                                         (c, p, r) => typeof(PAMParkingspace).IsAssignableFrom(c.ObjectFullType),
-                                        (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), 
+                                        (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType),
                                         0, true, true);
 
                 if (routeResult != null)
@@ -2553,35 +2474,35 @@ namespace gip.mes.processapplication
                 ApplicationManager?.ApplicationQueue.Add(() =>
                 {
                     using (Database db = new core.datamodel.Database())
-                   using (DatabaseApp dbApp = new DatabaseApp(db))
-                   {
-                       ProdOrderPartslistPosRelation posRel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == materialID);
-                       if (posRel == null)
-                           return;
+                    using (DatabaseApp dbApp = new DatabaseApp(db))
+                    {
+                        ProdOrderPartslistPosRelation posRel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == materialID);
+                        if (posRel == null)
+                            return;
 
-                       MaterialConfig lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == posRel.SourceProdOrderPartslistPos.MaterialID
-                                                                                                                       && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
+                        MaterialConfig lastUsedFC = dbApp.MaterialConfig.FirstOrDefault(c => c.VBiACClassID == moduleID && c.MaterialID == posRel.SourceProdOrderPartslistPos.MaterialID
+                                                                                                                        && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
 
-                       if (lastUsedFC == null)
-                       {
-                           lastUsedFC = MaterialConfig.NewACObject(dbApp, null);
-                           lastUsedFC.MaterialID = posRel.SourceProdOrderPartslistPos.MaterialID;
-                           lastUsedFC.VBiACClassID = moduleID;
-                           lastUsedFC.KeyACUrl = MaterialConfigLastUsedLotKeyACUrl;
+                        if (lastUsedFC == null)
+                        {
+                            lastUsedFC = MaterialConfig.NewACObject(dbApp, null);
+                            lastUsedFC.MaterialID = posRel.SourceProdOrderPartslistPos.MaterialID;
+                            lastUsedFC.VBiACClassID = moduleID;
+                            lastUsedFC.KeyACUrl = MaterialConfigLastUsedLotKeyACUrl;
                             dbApp.MaterialConfig.AddObject(lastUsedFC);
                             lastUsedFC.SetValueTypeACClass(db.GetACType(typeof(Guid)));
-                       }
+                        }
 
-                       Guid? lastFCID = lastUsedFC.Value as Guid?;
-                       if (!lastFCID.HasValue || lastFCID.Value != facilityCharge.Value)
-                       {
-                           lastUsedFC.Value = facilityCharge;
-                       }
+                        Guid? lastFCID = lastUsedFC.Value as Guid?;
+                        if (!lastFCID.HasValue || lastFCID.Value != facilityCharge.Value)
+                        {
+                            lastUsedFC.Value = facilityCharge;
+                        }
 
-                       Msg msg = dbApp.ACSaveChanges();
-                   }
+                        Msg msg = dbApp.ACSaveChanges();
+                    }
                 });
-            }    
+            }
         }
 
         private void SelectFacilityChargeOrFacility(Guid? currentOpenMaterial, Guid? currentFacilityCharge, WeighingComponentInfoType infoType)
@@ -2721,7 +2642,7 @@ namespace gip.mes.processapplication
                     InitializePAFACMethod(acMethod, currentFacilityCharge);
 
                 bool isLast;
-                using(ACMonitor.Lock(_65050_WeighingCompLock))
+                using (ACMonitor.Lock(_65050_WeighingCompLock))
                 {
                     isLast = WeighingComponents.Count(c => c.WeighState == WeighingComponentState.ReadyToWeighing) == 1;
                 }
@@ -2742,7 +2663,7 @@ namespace gip.mes.processapplication
                     if (fc == null)
                     {
                         //Error50376: The quant {0} doesn't exist in the database!
-                        return new Msg(this, eMsgLevel.Error, PWClassName,"InitializePAFACMethod(10)", 1607, "Error50376", currentFacilityCharge);
+                        return new Msg(this, eMsgLevel.Error, PWClassName, "InitializePAFACMethod(10)", 1607, "Error50376", currentFacilityCharge);
                     }
 
                     //if (fc.Facility == null)
@@ -2797,7 +2718,7 @@ namespace gip.mes.processapplication
             if (module == null)
                 return StartNextCompResult.CycleWait;
 
-            if (   (!hasQuantsChecked.HasValue || !hasQuantsChecked.Value)
+            if ((!hasQuantsChecked.HasValue || !hasQuantsChecked.Value)
                 && !String.IsNullOrEmpty(AutoInsertQuantToStore))
             {
                 DoAutoInsertQuantToStore(weighingComponent);
@@ -2831,9 +2752,109 @@ namespace gip.mes.processapplication
 
             //TODO: get target scale from partslistconfig if is rule configured for this material
 
+            double? dosingWeight = weighingComponent?.TargetWeight;
+
+            if (AutoInterDis && weighingComponent != null)
+            {
+                bool interDischargingNeeded = false;
+                ProdOrderPartslistPosRelation relation = weighingComponent.PLPosRelation;
+                if (relation != null)
+                {
+                    using (Database dbIPlus = new core.datamodel.Database())
+                    using (DatabaseApp dbApp = new DatabaseApp(dbIPlus))
+                    {
+                        relation = relation.FromAppContext<ProdOrderPartslistPosRelation>(dbApp);
+
+                        dosingWeight = Math.Abs(relation.RemainingDosingWeight);
+                        IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
+                        ScaleBoundaries scaleBoundaries = null;
+
+
+                        if (scale != null)
+                        {
+                            ProdOrderPartslistPosRelation[] relations = null;
+                            using (ACMonitor.Lock(_65050_WeighingCompLock))
+                            {
+                                relations = WeighingComponents.Select(c => c.PLPosRelation).ToArray();
+                            }
+
+                            scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, relations);
+                        }
+                        if (scaleBoundaries != null && scaleBoundaries.MaxWeightCapacity > 0.00000001)
+                        {
+                            double? remainingWeight = null;
+                            if (scaleBoundaries.RemainingWeightCapacity.HasValue)
+                                remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
+                            else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
+                                remainingWeight = scaleBoundaries.MaxWeightCapacity;
+                            if (remainingWeight.HasValue)
+                            {
+                                // FALL A:
+                                if (Math.Abs(relation.RemainingDosingWeight) > remainingWeight.Value)
+                                {
+                                    // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
+                                    // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
+                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && dosingWeight > scaleBoundaries.MaxWeightCapacity)
+                                    {
+                                        // Fall A.1:
+                                        interDischargingNeeded = true;
+                                        dosingWeight = remainingWeight.Value;
+                                    }
+                                    else
+                                    {
+                                        ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                        return StartNextCompResult.Done;
+                                    }
+                                }
+
+                                if (scaleBoundaries.RemainingVolumeCapacity.HasValue
+                                    && relation.SourceProdOrderPartslistPos.Material != null
+                                    && relation.SourceProdOrderPartslistPos.Material.IsDensityValid)
+                                {
+                                    double remainingDosingVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(Math.Abs(relation.RemainingDosingQuantityUOM));
+                                    if (remainingDosingVolume > scaleBoundaries.RemainingVolumeCapacity.Value)
+                                    {
+                                        double targetVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(relation.TargetQuantityUOM);
+                                        // FALL B:
+                                        // Falls die Komponentenvolumen größer als die maximale Volumenkapazität ist, dann muss die Komponente gesplittet werden, 
+                                        // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
+                                        if (scaleBoundaries.MaxVolumeCapacity > 0.00000001 && targetVolume > scaleBoundaries.MaxVolumeCapacity)
+                                        {
+                                            double dosingWeightAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
+                                            // Falls Dichte > 1000 g/dm³, dann kann das errechnete zu dosierende Teilgewicht größer als das Restgewicht in der Waage sein,
+                                            // dann muss das Restgewicht genommen werden (interDischargingNeeded ist true wenn weiter oben die Restgewichtermittlung durchgeführt wurde 
+                                            // und die komponentenmenge gesplittet werden musste. SIEHE FALL A.1)
+                                            if (!interDischargingNeeded || dosingWeightAccordingVolume < dosingWeight)
+                                            {
+                                                // FALL B.1:
+                                                dosingWeight = dosingWeightAccordingVolume;
+                                            }
+                                            // Prüfe erneut ob Restgewicht der Waage überschritten wird, falls ja reduziere die Restmenge
+                                            // Dieser Fall kommt dann vor, wenn die Dichte > 1000 g/dm³ ist, jedoch die zu dosierende Komponentenmenge kleiner war als das Restgewicht der Waage.
+                                            // Dann wurde interDischargingNeeded nicht gesetzt (FALL A ist nicht eingetreten).
+                                            if (!remainingWeight.HasValue && dosingWeight > remainingWeight.Value)
+                                                dosingWeight = remainingWeight.Value;
+                                            interDischargingNeeded = true;
+                                        }
+                                        else
+                                        {
+                                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                            return StartNextCompResult.Done;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (weighingComponent != null)
             {
-                acMethod["TargetQuantity"] = weighingComponent.TargetWeight;
+                if (dosingWeight == null)
+                    dosingWeight = weighingComponent.TargetWeight;
+
+                acMethod["TargetQuantity"] = dosingWeight.Value;
                 acMethod[Material.ClassName] = weighingComponent.MaterialName;
                 acMethod["PLPosRelation"] = weighingComponent.PLPosRelation.ProdOrderPartslistPosRelationID;
                 acMethod["Route"] = new Route();
@@ -2879,7 +2900,7 @@ namespace gip.mes.processapplication
                 acMethod["Route"] = new Route();
             }
 
-                if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true))
+            if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true))
                 return StartNextCompResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -2963,7 +2984,7 @@ namespace gip.mes.processapplication
                                 Guid? currentOpenMaterial = CurrentOpenMaterial;
                                 Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-                                if (function.CurrentACState == ACStateEnum.SMCompleted || function.CurrentACState == ACStateEnum.SMAborted || 
+                                if (function.CurrentACState == ACStateEnum.SMCompleted || function.CurrentACState == ACStateEnum.SMAborted ||
                                    (function.CurrentACState == ACStateEnum.SMIdle && function.LastACState == ACStateEnum.SMResetting))
                                 {
                                     bool isComponentConsumed = false;
@@ -2987,6 +3008,22 @@ namespace gip.mes.processapplication
                                         {
                                             isWeighingInTol = false;
                                         }
+
+                                        if (AutoInterDis && currentOpenMaterial != null)
+                                        {
+                                            using (DatabaseApp dbApp = new DatabaseApp())
+                                            {
+                                                var relation = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
+                                                if (relation != null)
+                                                {
+                                                    var tempTargetQ = Math.Abs(relation.RemainingDosingQuantityUOM);
+                                                    if (actWeightRounded < Math.Round(tempTargetQ - toleranceMinus.Value, 5))
+                                                    {
+                                                        isWeighingInTol = false;
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
 
                                     var correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, parentACMethod);
@@ -2996,7 +3033,7 @@ namespace gip.mes.processapplication
                                     if (actWeight > 0.000001)
                                     {
                                         bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
-                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false, 
+                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false,
                                                                       scaleOtherComp, targetQuantity);
                                         _ScaleComp = false;
                                     }
@@ -3027,7 +3064,7 @@ namespace gip.mes.processapplication
                                     changeState = true;
                                 }
 
-                                if (msg != null || function.CurrentACState == ACStateEnum.SMAborted || 
+                                if (msg != null || function.CurrentACState == ACStateEnum.SMAborted ||
                                     (function.LastACState == ACStateEnum.SMResetting && function.CurrentACState == ACStateEnum.SMIdle && _IsAborted))
                                 {
                                     using (ACMonitor.Lock(_65003_IsAbortedLock))
@@ -3055,7 +3092,7 @@ namespace gip.mes.processapplication
                             }
                         }
                     }
-                    catch(Exception exc)
+                    catch (Exception exc)
                     {
                         Messages.LogException(this.GetACUrl(), "TaskCallback(10)", exc);
                     }
@@ -3149,7 +3186,7 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentOpenMaterial, Guid? currentFacilityCharge, 
+        public Msg DoManualWeighingBooking(double? actualWeight, bool thisWeighingIsInTol, bool isConsumedLot, Guid? currentOpenMaterial, Guid? currentFacilityCharge,
                                            bool isForInterdischarge = false, bool scaleOtherCompAfterAbort = false, double? tQuantityFromPAF = null)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
@@ -3218,18 +3255,18 @@ namespace gip.mes.processapplication
                         //else
                         //{
                         //    facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == CurrentFacility);
-                            if (facility == null)
-                            {
-                                //Error50378: Can't get the Facility from database with FacilityID: {0}
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(31)", 1686, "Error50378", "from quant!");
-                                ActivateProcessAlarmWithLog(msg, false);
-                                return msg;
-                            }
+                        if (facility == null)
+                        {
+                            //Error50378: Can't get the Facility from database with FacilityID: {0}
+                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "DoManualWeighingBooking(31)", 1686, "Error50378", "from quant!");
+                            ActivateProcessAlarmWithLog(msg, false);
+                            return msg;
+                        }
                         //}
 
                         if (facilityCharge != null && facilityCharge.MaterialID != weighingPosRelation.SourceProdOrderPartslistPos.MaterialID)
                         {
-                            msg = new Msg(this, eMsgLevel.Error, nameof(PWManualWeighing), nameof(DoManualWeighingBooking) + "(32)", 2809, 
+                            msg = new Msg(this, eMsgLevel.Error, nameof(PWManualWeighing), nameof(DoManualWeighingBooking) + "(32)", 2809,
                                            "The material of quant is different than weighing material. The quant ID: " + facilityCharge.FacilityChargeID + " The material ID: " +
                                            weighingPosRelation.SourceProdOrderPartslistPos.MaterialID);
 
@@ -3244,9 +3281,13 @@ namespace gip.mes.processapplication
                         if (comp != null)
                             targetQuantity = weighingPosRelation.SourceProdOrderPartslistPos.Material.ConvertBaseWeightToBaseUnit(comp.TargetWeight);
 
-                        if (!isForInterdischarge && (!tQuantityFromPAF.HasValue || tQuantityFromPAF == targetQuantity))
+                        if (!isForInterdischarge && (!tQuantityFromPAF.HasValue || _IsLotChanged))
                         {
                             double calcActualQuantity = targetQuantity + weighingPosRelation.RemainingDosingQuantityUOM;
+                            if (tQuantityFromPAF.HasValue && calcActualQuantity > 0.00001)
+                            {
+                                calcActualQuantity = tQuantityFromPAF.Value + weighingPosRelation.RemainingDosingQuantityUOM;
+                            }
                             if (actualQuantity > calcActualQuantity)
                                 actualQuantity = actualQuantity - calcActualQuantity;
                         }
@@ -3479,7 +3520,7 @@ namespace gip.mes.processapplication
         //    return null;
         //}
 
-        public void SetInfo(WeighingComponent weighingComp, WeighingComponentInfoType infoType, Guid? facilityCharge, bool dbAutoRefresh = false, 
+        public void SetInfo(WeighingComponent weighingComp, WeighingComponentInfoType infoType, Guid? facilityCharge, bool dbAutoRefresh = false,
                             bool lotChange = false)
         {
             using (ACMonitor.Lock(_65000_CurrentWeighingComponentInfoLock))
@@ -3493,7 +3534,7 @@ namespace gip.mes.processapplication
                     case WeighingComponentInfoType.State:
                         {
                             compInfo.PLPosRelation = weighingComp.PLPosRelation.ProdOrderPartslistPosRelationID;
-                            compInfo.WeighingComponentState = (short) weighingComp.WeighState;
+                            compInfo.WeighingComponentState = (short)weighingComp.WeighState;
                             break;
                         }
                     case WeighingComponentInfoType.StateSelectFC_F:
@@ -3545,7 +3586,7 @@ namespace gip.mes.processapplication
 
         public WeighingComponent GetWeighingComponent(Guid? currentOpenMaterial)
         {
-            using(ACMonitor.Lock(_65050_WeighingCompLock))
+            using (ACMonitor.Lock(_65050_WeighingCompLock))
             {
                 if (WeighingComponents == null)
                     return null;
@@ -3554,7 +3595,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACMethodInfo("","",9999)]
+        [ACMethodInfo("", "", 9999)]
         public bool IsBinChangeLoopNodeAvailable()
         {
             if (PWPointOut == null || PWPointOut.ConnectionList == null || !PWPointOut.ConnectionList.Any())
@@ -3587,7 +3628,7 @@ namespace gip.mes.processapplication
                 {
                     returnValue = scale.ActualValue.ValueT.ToString();
                     double actualWeight = scale.ActualWeight.ValueT;
-                    using(ACMonitor.Lock(_65025_MemberCompLock))
+                    using (ACMonitor.Lock(_65025_MemberCompLock))
                     {
                         InterdischargingScaleActualValue.ValueT = returnValue;
                         InterdischargingScaleActualWeight.ValueT = actualWeight;
@@ -3780,7 +3821,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        [ACMethodInfo("","",9999)]
+        [ACMethodInfo("", "", 9999)]
         public string GetPWParametersInfo()
         {
             var configStores = MandatoryConfigStores?.ToArray();
@@ -3857,7 +3898,7 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Messages.LogException(this.GetACUrl(), nameof(IsCurrentFacilityChargeCorrect) + "(40)", e);
             }
@@ -3874,7 +3915,7 @@ namespace gip.mes.processapplication
         [ACSerializeableInfo]
         [ACClassInfo(Const.PackName_VarioSystem, "en{'Lot usage Enum'}de{'Lot usage Enum'}", Global.ACKinds.TACEnum, Global.ACStorableTypes.NotStorable, true, false)]
         [DataContract]
-        public enum LotUsageEnum : short   
+        public enum LotUsageEnum : short
         {
             [EnumMember(Value = "LU0")]
             FIFO = 0,
@@ -3950,7 +3991,7 @@ namespace gip.mes.processapplication
         {
             return HandleExecuteACMethod_PWNodeProcessMethod(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
-        
+
         #endregion
     }
 
@@ -4130,7 +4171,7 @@ namespace gip.mes.processapplication
     {
         State = 0,
         ReturnComp = 10, //Manual component select - automatic facility charge or facility select
-        SelectFC_F = 15, 
+        SelectFC_F = 15,
         StateSelectFC_F = 20, //Manual component select - automatic facility charge or facility select
         StateSelectCompAndFC_F = 30, //Automatic component select - automatic facility charge or facility select
         SelectCompReturnFC_F = 40, //Automatic component select - manual facility charge or facility select
