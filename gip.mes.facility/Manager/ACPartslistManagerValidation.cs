@@ -616,7 +616,7 @@ namespace gip.mes.facility
             gip.core.datamodel.ACClassWF acClassWF = mapPosWF.MatWFConn.ACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(dbiPlus);
             ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
             ruleValueList = serviceInstance.GetRuleValueList(configStores, "", acClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString());
-            if (ruleValueList != null)
+            if (ruleValueList != null && ruleValueList.Items != null)
             {
                 var selectedClasses = ruleValueList.GetSelectedClasses(ACClassWFRuleTypes.Allowed_instances, dbiPlus);
                 if (selectedClasses != null && selectedClasses.Any())

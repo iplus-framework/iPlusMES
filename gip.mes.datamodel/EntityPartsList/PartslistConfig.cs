@@ -196,18 +196,21 @@ namespace gip.mes.datamodel
                     if(propExt.Value is RuleValueList)
                     {
                         RuleValueList values = propExt.Value as RuleValueList;
-                        foreach(var value in values.Items)
+                        if (values != null && values.Items != null)
                         {
-                            foreach(string url in value.ACClassACUrl)
+                            foreach (var value in values.Items)
                             {
-                                string newUrl = url;
-                                if (url.Contains(Const.ContextDatabase) && url.Contains(gip.core.datamodel.ACProject.ClassName) && url.Contains(gip.core.datamodel.ACClass.ClassName))
-                                    newUrl = url.Split('\\').Last().Split('(').Last().Split(')').First();
-                                else if (url.Contains(TypeAnalyser._TypeName_Boolean))
-                                    newUrl = url.Split('\\').Last();
-                                returnValue += newUrl;
-                                if (value.ACClassACUrl.Count() > value.ACClassACUrl.IndexOf(url) + 1)
-                                    returnValue += Environment.NewLine;
+                                foreach (string url in value.ACClassACUrl)
+                                {
+                                    string newUrl = url;
+                                    if (url.Contains(Const.ContextDatabase) && url.Contains(gip.core.datamodel.ACProject.ClassName) && url.Contains(gip.core.datamodel.ACClass.ClassName))
+                                        newUrl = url.Split('\\').Last().Split('(').Last().Split(')').First();
+                                    else if (url.Contains(TypeAnalyser._TypeName_Boolean))
+                                        newUrl = url.Split('\\').Last();
+                                    returnValue += newUrl;
+                                    if (value.ACClassACUrl.Count() > value.ACClassACUrl.IndexOf(url) + 1)
+                                        returnValue += Environment.NewLine;
+                                }
                             }
                         }
                     }
