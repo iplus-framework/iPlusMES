@@ -710,10 +710,11 @@ namespace gip.mes.facility
                 .ToList();
 
             BatchLinearResize(positions, changeFactor);
-            BatchLinearResize(relations, changeFactor);
+            // @aagincic: resize of relations executed in : BSOProdOrder.OutwardRootPosItem_PropertyChanged
+            //BatchLinearResize(relations, changeFactor);
 
             BatchLinearResize(positionsAdded, changeFactor);
-            BatchLinearResize(relationsAdded, changeFactor);
+            //BatchLinearResize(relationsAdded, changeFactor);
 
             prodOrderPartslist.TargetQuantity = targetQuantityUOM;
 
