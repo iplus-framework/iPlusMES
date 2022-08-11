@@ -1661,7 +1661,24 @@ namespace gip.bso.manufacturing
         {
             if (RecalculateQuantities)
             {
+                if (_ProdOrderPartslistPosList != null && _ProdOrderPartslistPosList.Any())
+                {
+                    foreach (var outwardRootPosItem in _ProdOrderPartslistPosList)
+                    {
+                        outwardRootPosItem.PropertyChanged -= OutwardRootPosItem_PropertyChanged;
+                    }
+                }
+
                 Msg msg = ProdOrderManager.ProdOrderPartslistChangeTargetQuantity(DatabaseApp, SelectedProdOrderPartslist, PartslistChangeTargetQuantityInput.Value);
+
+                if (_ProdOrderPartslistPosList != null && _ProdOrderPartslistPosList.Any())
+                {
+                    foreach (var outwardRootPosItem in _ProdOrderPartslistPosList)
+                    {
+                        outwardRootPosItem.PropertyChanged += OutwardRootPosItem_PropertyChanged;
+                    }
+                }
+
                 if (msg != null)
                 {
                     Messages.Msg(msg);

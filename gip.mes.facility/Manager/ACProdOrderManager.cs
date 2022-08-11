@@ -709,12 +709,12 @@ namespace gip.mes.facility
                 .Where(x => positionAddedIds.Contains(x.TargetProdOrderPartslistPosID))
                 .ToList();
 
+
             BatchLinearResize(positions, changeFactor);
-            // @aagincic: resize of relations executed in : BSOProdOrder.OutwardRootPosItem_PropertyChanged
-            //BatchLinearResize(relations, changeFactor);
+            BatchLinearResize(relations, changeFactor);
 
             BatchLinearResize(positionsAdded, changeFactor);
-            //BatchLinearResize(relationsAdded, changeFactor);
+            BatchLinearResize(relationsAdded, changeFactor);
 
             prodOrderPartslist.TargetQuantity = targetQuantityUOM;
 
