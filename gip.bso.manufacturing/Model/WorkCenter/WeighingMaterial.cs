@@ -25,7 +25,7 @@ namespace gip.bso.manufacturing
         public WeighingMaterial(vd.ProdOrderPartslistPosRelation posRelation, WeighingComponentState state, ACClassDesign materialIconDesign, IACObject parent)
         {
             PosRelation = posRelation;
-            MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.ToArray();
+            MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
             WeighingMatState = state;
             MaterialIconDesign = materialIconDesign;
             _ParentACObject = parent;
@@ -335,7 +335,7 @@ namespace gip.bso.manufacturing
             {
                 //return _MaterialUnitList;
                 if (PosRelation != null && PosRelation.SourceProdOrderPartslistPos != null)
-                    return PosRelation.SourceProdOrderPartslistPos.Material.MaterialUnit_Material.ToArray();
+                    return PosRelation.SourceProdOrderPartslistPos.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
                 return null;
             }
             set

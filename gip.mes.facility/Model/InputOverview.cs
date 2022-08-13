@@ -27,26 +27,26 @@ namespace gip.mes.facility
 
         #region Quantities
 
-        [ACPropertyInfo(400, "Quantities", "en{'Planned (P)'}de{'Planned (P)'}")]
-        public double PlannedQuantityUOM { get; set; }
-
-        [ACPropertyInfo(401, "Quantities", "en{'Target (T)'}de{'Soll (S)'}")]
+        [ACPropertyInfo(400, "Quantities", "en{'Target Q.'}de{'Sollmenge'}")]
         public double TargetQuantityUOM { get; set; }
 
-        [ACPropertyInfo(402, "Quantities", "en{'Actual (A)'}de{'Ist (I)'}")]
+        [ACPropertyInfo(401, "Quantities", "en{'Actual Q.'}de{'Istmenge'}")]
         public double ActualQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, "Quantities", "en{'Diff = A - T'}de{'Diff = I - S'}")]
+        [ACPropertyInfo(402, "Quantities", "en{'Diff. to target Q.'}de{'Diff. zur Sollm.'}")]
         public double DiffQuantityUOM { get; set; }
 
-        [ACPropertyInfo(404, "Quantities", "en{'Zero posting'}de{'Null Buchung'}")]
-        public double ZeroPostingQuantityUOM { get; set; }
+        [ACPropertyInfo(403, "Quantities", "en{'Diff. to target Q. %'}de{'Diff. zur Sollm. %'}")]
+        public double DiffQuantityPer { get; set; }
 
-        [ACPropertyInfo(405, "Quantities", "en{'Diff = T - P'}de{'Diff = S - P'}")]
+        [ACPropertyInfo(404, "Quantities", "en{'Planned Q.'}de{'Geplante M.'}")]
+        public double PlannedQuantityUOM { get; set; }
+
+        [ACPropertyInfo(405, "Quantities", "en{'Diff. to planned Q.'}de{'Diff. zur Planm. %'}")]
         public double DiffTargetPlanedQuantityUOM { get; set; }
 
-        [ACPropertyInfo(408, "Quantities", "en{'Yield [%]'}de{'Ausbeute [%]'}")]
-        public double DiffQuantityPer { get; set; }
+        [ACPropertyInfo(406, "Quantities", "en{'Zero posting'}de{'Null Buchung'}")]
+        public double ZeroPostingQuantityUOM { get; set; }
 
 
         [ACPropertyInfo(500, "", "en{'InputQForActual'}de{'InputQForActual'}")]

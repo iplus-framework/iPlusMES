@@ -322,7 +322,7 @@ namespace gip.mes.facility
             {
                 if (Partslist == null || Partslist.Material == null)
                     return null;
-                return Partslist.Material.MaterialUnit_Material.OrderBy(c => c.Multiplier).Select(c => c.ToMDUnit).ToArray();
+                return Partslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).Select(c => c.ToMDUnit).ToArray();
             }
         }
 

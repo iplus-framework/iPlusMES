@@ -268,7 +268,7 @@ namespace gip.mes.datamodel
                     _MaterialUnitList.Insert(0, this.BaseMDUnit);
 
                     // Materialbezogene Einheiten
-                    foreach (var materialUnit in this.MaterialUnit_Material)
+                    foreach (var materialUnit in this.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0))
                     {
                         if (!_MaterialUnitList.Contains(materialUnit.ToMDUnit))
                         {

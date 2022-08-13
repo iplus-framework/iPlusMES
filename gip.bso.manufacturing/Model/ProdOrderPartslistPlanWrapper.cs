@@ -62,7 +62,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return Material != null ? Material.MaterialUnit_Material.FirstOrDefault() : null;
+                return Material != null ? Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).FirstOrDefault() : null;
             }
         }
 

@@ -50,50 +50,56 @@ namespace gip.mes.facility
 
         #region Output
 
-        [ACPropertyInfo(300, Const_Output, "en{'Planned Output'}de{'Geplantes Ergebnis'}")]
+        [ACPropertyInfo(301, Const_Output, "en{'Planned Output'}de{'Geplantes Ergebnis'}")]
         public double InwardPlannedQuantityUOM { get; set; }
 
-        [ACPropertyInfo(300, Const_Output, "en{'Target Output (O1)'}de{'Soll Ergebnis (Erg1)'}")]
+        [ACPropertyInfo(302, Const_Output, "en{'Target Output'}de{'Soll Ergebnis'}")]
         public double InwardTargetQuantityUOM { get; set; }
 
-        [ACPropertyInfo(301, Const_Output, "en{'Actual Output (O2)'}de{'Ist Ergebnis (Erg2)'}")]
+        [ACPropertyInfo(303, Const_Output, "en{'Actual Output'}de{'Ist Ergebnis'}")]
         public double InwardActualQuantityUOM { get; set; }
 
-        [ACPropertyInfo(302, Const_Output, "en{'Diff. Output = O2 - O1 (O3)'}de{'Diff. Ergebnis = Erg2 - Erg1 (Erg3)'}")]
+        [ACPropertyInfo(304, Const_Output, "en{'Difference to Planned Q.'}de{'Differenz zur Planm.'}")]
+        public double InwardDiffPlannedQuantity { get; set; }
+
+        [ACPropertyInfo(305, Const_Output, "en{'Deviation to Planned Q. [%]'}de{'Abweichung zur Planm. [%]'}")]
+        public double InwardDiffPlannedQuantityPer { get; set; }
+
+        [ACPropertyInfo(306, Const_Output, "en{'Difference to Target-Q.'}de{'Differenz zur Sollm.'}")]
         public double InwardDiffQuantityUOM { get; set; }
 
-        [ACPropertyInfo(302, Const_Output, "en{'Difference [%] to Target-Quantity'}de{'Differenz [%] zu Sollmenge'}")]
-        public double InwardDifferenceQuantityPer { get; set; }
+        [ACPropertyInfo(307, Const_Output, "en{'Difference to Target-Quantity [%]'}de{'Differenz zur Sollm. [%]'}")]
+        public double InwardDiffQuantityPer { get; set; }
 
         //[ACPropertyInfo(303, Const_Output, "en{'Diff. Out-In = O2 - I2'}de{'Diff. Erg.-Eins. = Erg2 - Ein2'}")]
         //public double InwardActualRestQuantityUOM { get; set; }
 
-        [ACPropertyInfo(304, Const_Output, "en{'Good Quantity'}de{'Gutmenge'}")]
+        [ACPropertyInfo(308, Const_Output, "en{'Good Quantity'}de{'Gutmenge'}")]
         public double InwardActualQuantityGoodUOM { get; set; }
 
-        [ACPropertyInfo(305, Const_Output, "en{'Good Quantity [%]'}de{'Gutmenge [%]'}")]
+        [ACPropertyInfo(309, Const_Output, "en{'Good Quantity [%]'}de{'Gutmenge [%]'}")]
         public double InwardActualQuantityGoodPer { get; set; }
 
-        [ACPropertyInfo(306, Const_Output, "en{'Scrapped Quantity'}de{'Ausschussmenge'}")]
+        [ACPropertyInfo(310, Const_Output, "en{'Scrapped Quantity'}de{'Ausschussmenge'}")]
         public double InwardActualQuantityScrapUOM { get; set; }
 
-        [ACPropertyInfo(307, Const_Output, "en{'Scrapped Quantity [%]'}de{'Ausschussmenge [%]'}")]
+        [ACPropertyInfo(311, Const_Output, "en{'Scrapped Quantity [%]'}de{'Ausschussmenge [%]'}")]
         public double InwardActualQuantityScrapPer { get; set; }
 
         #endregion
 
         #region Usage
 
-        [ACPropertyInfo(400, Const_Usage, "en{'Target Usage (U1)'}de{'Soll Verw. (V1)'}")]
+        [ACPropertyInfo(400, Const_Usage, "en{'Target Usage (F1)'}de{'Soll Verw. (F1)'}")]
         public double UsageTargetQuantityUOM { get; set; }
 
-        [ACPropertyInfo(401, Const_Usage, "en{'Actual Usage (U2)'}de{'Ist Verw. (V2)'}")]
+        [ACPropertyInfo(401, Const_Usage, "en{'Actual Usage (F2)'}de{'Ist Verw. (F2)'}")]
         public double UsageActualQuantityUOM { get; set; }
 
-        [ACPropertyInfo(402, Const_Usage, "en{'Diff. Usage = U2 - U1'}de{'Diff. Verw.  = V2 - V1'}")]
+        [ACPropertyInfo(402, Const_Usage, "en{'Diff. Usage (F2-F1)'}de{'Diff. Verw. (F2-F1)'}")]
         public double UsageDiffQuantityUOM { get; set; }
 
-        [ACPropertyInfo(403, Const_Usage, "en{'Diff. Usg-Out = U2 - O2'}de{'Diff. Verw.-Erg.= U2 - O2'}")]
+        [ACPropertyInfo(403, Const_Usage, "en{'Diff. Usage-Out (F2-B1)'}de{'Diff. Verw.-Erg. (F2-F1)'}")]
         public double UsageInwardDiffQuantityUOM { get; set; }
 
         #endregion
@@ -133,10 +139,14 @@ namespace gip.mes.facility
                 InwardActualQuantityGoodUOM = ProdOrderPartslist.ActualQuantityGoodUOM;
                 InwardActualQuantityGoodPer = ProdOrderPartslist.ActualQuantityGoodPer;
                 InwardActualQuantityScrapPer = ProdOrderPartslist.ActualQuantityScrapPer;
-                InwardDifferenceQuantityPer = ProdOrderPartslist.DifferenceQuantityPer;
+                InwardDiffPlannedQuantityPer = ProdOrderPartslist.DifferenceQuantityPer;
+                InwardDiffPlannedQuantity = ProdOrderPartslist.DifferenceQuantity;
             }
+            else
+                InwardDiffPlannedQuantity = InwardActualQuantityUOM - InwardPlannedQuantityUOM;
 
             InwardDiffQuantityUOM = InwardActualQuantityUOM - InwardTargetQuantityUOM;
+            InwardDiffQuantityPer = Math.Abs(InwardActualQuantityUOM) > Double.Epsilon && Math.Abs(InwardTargetQuantityUOM) > Double.Epsilon ? InwardActualQuantityUOM / InwardTargetQuantityUOM : 0;
             UsageDiffQuantityUOM = UsageActualQuantityUOM - UsageTargetQuantityUOM;
             UsageInwardDiffQuantityUOM = UsageActualQuantityUOM - InwardActualQuantityUOM;
         }
@@ -184,7 +194,8 @@ namespace gip.mes.facility
 
             foreach (ProdOrderPartslistOverview c in GroupedOverview)
             {
-                InwardDifferenceQuantityPer += c.InwardDifferenceQuantityPer * c.InwardActualQuantityUOM / InwardActualQuantityUOM;
+                InwardDiffQuantityPer += c.InwardDiffQuantityPer * c.InwardActualQuantityUOM / InwardActualQuantityUOM;
+                InwardDiffPlannedQuantityPer += c.InwardDiffPlannedQuantityPer * c.InwardActualQuantityUOM / InwardActualQuantityUOM;
                 InwardActualQuantityGoodPer += c.InwardActualQuantityGoodPer * c.InwardActualQuantityUOM / InwardActualQuantityUOM;
                 InwardActualQuantityScrapPer += c.InwardActualQuantityScrapPer * c.InwardActualQuantityUOM / InwardActualQuantityUOM;
 

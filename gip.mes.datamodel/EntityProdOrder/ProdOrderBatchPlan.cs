@@ -717,7 +717,7 @@ namespace gip.mes.datamodel
                     || ProdOrderPartslist.Partslist == null
                     || ProdOrderPartslist.Partslist.Material == null)
                     return null;
-                return ProdOrderPartslist.Partslist.Material.MaterialUnit_Material.FirstOrDefault();
+                return ProdOrderPartslist.Partslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).FirstOrDefault();
             }
         }
 

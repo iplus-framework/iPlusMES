@@ -416,7 +416,7 @@ namespace gip.bso.masterdata
                     && CurrentPartslist.Material != null
                     && CurrentPartslist.ProductionUnits.HasValue
                     && CurrentPartslist.Material.MaterialUnit_Material.Any())
-                    CurrentProdMDUnit = CurrentPartslist.Material.MaterialUnit_Material.FirstOrDefault().ToMDUnit;
+                    CurrentProdMDUnit = CurrentPartslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).FirstOrDefault().ToMDUnit;
                 else
                     CurrentProdMDUnit = null;
             }
