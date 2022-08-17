@@ -731,6 +731,7 @@ namespace gip.mes.facility
                 isChangedPartslist = AreEntityPropertiesChanged(databaseApp, new List<EntityObject>() { partslist }, S_Partslist_Change_Fields);
             bool isChangedQuantities = false;
             bool isAddedElements = false;
+            bool isDeletedElements = false;
 
             if (!isChangedPartslist)
             {
@@ -761,7 +762,43 @@ namespace gip.mes.facility
                 }
             }
 
-            return isChangedPartslist || isAddedElements || isChangedQuantities;
+            if (!isChangedPartslist)
+            {
+                IEnumerable<ObjectStateEntry> deletedItems = partslist.GetObjectContext().ObjectStateManager.GetObjectStateEntries(EntityState.Deleted);
+                if(deletedItems.Any())
+                {
+                    IEnumerable<ObjectStateEntry> deletedPositions = deletedItems.Where(c => c.EntityKey.EntitySetName == nameof(PartslistPos));
+                    foreach (ObjectStateEntry deletedPos in deletedPositions)
+                    {
+                        if (deletedPos.Entity is PartslistPos)
+                        {
+                            isChangedPartslist = (deletedPos.Entity as PartslistPos).PartslistID == partslist.PartslistID;
+                            if (isChangedPartslist)
+                                break;
+                        }
+                    }
+
+                    if (!isChangedPartslist)
+                    {
+                        IEnumerable<ObjectStateEntry> deletedRelations = deletedItems.Where(c => c.EntityKey.EntitySetName == nameof(PartslistPosRelation));
+                        foreach (ObjectStateEntry deletedRel in deletedRelations)
+                        {
+                            if (deletedRel.Entity is PartslistPosRelation)
+                            {
+                                PartslistPosRelation deletedRelation = deletedRel.Entity as PartslistPosRelation;
+                                isChangedPartslist =
+                                    partslist.PartslistPos_Partslist.Any(c => c.PartslistPosID == deletedRelation.SourcePartslistPosID)
+                                    || partslist.PartslistPos_Partslist.Any(c => c.PartslistPosID == deletedRelation.TargetPartslistPosID);
+                                if (isChangedPartslist)
+                                    break;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            return isChangedPartslist || isAddedElements || isChangedQuantities || isDeletedElements;
         }
 
         private bool AreEntityPropertiesChanged(DatabaseApp databaseApp, List<EntityObject> changedObjects, string[] fieldsForValidation)

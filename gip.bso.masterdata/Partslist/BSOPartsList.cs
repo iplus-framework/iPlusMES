@@ -506,7 +506,7 @@ namespace gip.bso.masterdata
                     .ToList();
 
                 foreach (ProdOrderPartslist prodOrderPartslist in relatedTemplateProdPl)
-                    ProdOrderManager.PartslistRebuild(DatabaseApp, partslist, prodOrderPartslist);
+                    ProdOrderManager.RefreshScheduledTemplateOrders(DatabaseApp, partslist, prodOrderPartslist);
             }
         }
 

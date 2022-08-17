@@ -540,7 +540,7 @@ namespace gip.bso.manufacturing
                 isUpdate = true;
                 foreach (ProdOrderPartslist prodOrderPartslistChanged in prodOrderPartslistsChanged)
                 {
-                    ProdOrderManager.PartslistRebuild(DatabaseApp, prodOrderPartslistChanged.Partslist, prodOrderPartslistChanged);
+                    ProdOrderManager.RefreshScheduledTemplateOrders(DatabaseApp, prodOrderPartslistChanged.Partslist, prodOrderPartslistChanged);
                 }
             }
             return isUpdate;
