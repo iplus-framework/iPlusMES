@@ -29,7 +29,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(23, "TakeMatFromOtherOrder", "en{'Take material from other order'}de{'Entnahme von anderem Auftrag erlaubt'}", "", "", true)]
     [ACPropertyEntity(24, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
-    
+
     [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
 
     [ACPropertyEntity(26, nameof(InputQForActualOutput), ConstIInputQForActual.InputQForActualOutput, "", "", true)]
@@ -226,8 +226,8 @@ namespace gip.mes.datamodel
             {
                 return this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
                     && !ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any();
-                    //&& Material != null
-                    //&& !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
+                //&& Material != null
+                //&& !this.Material.MaterialWFRelation_SourceMaterial.Where(c => c.SourceMaterialID != c.TargetMaterialID).Any();
             }
         }
 
@@ -239,9 +239,9 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return 
-                    this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern 
-                    && ParentProdOrderPartslistPosID != null 
+                return
+                    this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern
+                    && ParentProdOrderPartslistPosID != null
                     && ProdOrderPartslistPos1_ParentProdOrderPartslistPos.IsFinalMixure;
             }
         }
@@ -632,6 +632,18 @@ namespace gip.mes.datamodel
                 _OnMDUnitChanging = false;
                 _OnTargetQuantityUOMChanging = false;
                 _OnActualQuantityUOMChanging = false;
+            }
+        }
+
+        partial void OnTargetQuantityUOMChanging(double value)
+        {
+            if (InappropriateComponentQuantityOccurrence.IsForAnalyse(TargetQuantityUOM, value))
+            {
+                bool isInappropriate = InappropriateComponentQuantityOccurrence.IsInappropriate(this);
+                if (isInappropriate)
+                {
+                    InappropriateComponentQuantityOccurrence.WriteStackTrace(this);
+                }
             }
         }
 

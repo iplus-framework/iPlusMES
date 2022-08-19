@@ -164,7 +164,14 @@ namespace gip.mes.facility
         {
             public int BatchSeqNo { get; set; }
             public double Size { get; set; }
+
+
         }
+
+
+        [ACPropertyBindingSource(730, "Error", "en{'ProdOrderManager-Alarm'}de{'ProdOrderManager-Alarm'}", "", false, false)]
+        public IACContainerTNet<PANotifyState> IsProdOrderManagerAlarm { get; set; }
+
         #endregion
 
         #region (ProdOrder)Partslist
@@ -342,6 +349,7 @@ namespace gip.mes.facility
                 Root.Messages.LogError(GetACUrl(), "", "Unable to build relation");
             return prodRelationItem;
         }
+
         public ProdOrderPartslistPosRelation GetProdOrderPartslistPosRelation(DatabaseApp dbApp, List<ProdOrderPartslistPos> prodOrderPartsListPosItems, PartslistPosRelation posRelation, ProdOrderPartslistPos sourcePos, ProdOrderPartslistPos targetPos)
         {
             ProdOrderPartslistPosRelation prodRelationItem = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
@@ -2823,7 +2831,7 @@ namespace gip.mes.facility
         {
             MsgWithDetails msg = new MsgWithDetails();
 
-            IEnumerable<ProdOrderPartslistPos> components = 
+            IEnumerable<ProdOrderPartslistPos> components =
                                 databaseApp.ProdOrderPartslistPos
                                             .Include(c => c.Material)
                                             .Where(c => c.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)

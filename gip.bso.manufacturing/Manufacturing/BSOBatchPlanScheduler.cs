@@ -16,6 +16,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using vd = gip.mes.datamodel;
 using System.Xml;
+using System.Data;
 
 namespace gip.bso.manufacturing
 {
@@ -2034,7 +2035,7 @@ namespace gip.bso.manufacturing
 
             if (DatabaseApp.IsChanged)
             {
-                MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+                MsgWithDetails saveMsg = LocalSaveChanges();
                 foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
                 {
                     if (!IsBSOTemplateScheduleParent && wizardItem.SelectedMDSchedulingGroup != null)
@@ -2584,6 +2585,65 @@ namespace gip.bso.manufacturing
         {
             return SelectedScheduleForPWNode != null;
         }
+
+        public MsgWithDetails LocalSaveChanges()
+        {
+            MsgWithDetails saveMsg = null;
+            Msg msg = CheckForInappropriateComponentQuantityOccurrence();
+            if(msg != null)
+            {
+                Messages.Msg(msg);
+                ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
+            }
+            saveMsg = DatabaseApp.ACSaveChanges();
+            return saveMsg;
+        }
+
+
+        public Msg CheckForInappropriateComponentQuantityOccurrence()
+        {
+            Msg msg = null;
+            IEnumerable<ObjectStateEntry> modifiedEntities = DatabaseApp.ObjectStateManager.GetObjectStateEntries(EntityState.Modified);
+            IEnumerable<ObjectStateEntry> modifiedPosEntities = modifiedEntities.Where(c => c.EntitySet.Name == nameof(ProdOrderPartslistPos));
+            if (modifiedPosEntities.Any())
+            {
+                IEnumerable<ProdOrderPartslistPos> modifiedPositions = modifiedPosEntities.Select(c => c.Entity as ProdOrderPartslistPos).Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot);
+                if (modifiedPositions.Any())
+                {
+                    foreach (ProdOrderPartslistPos modifiedPos in modifiedPositions)
+                    {
+                        ObjectStateEntry objectStateEntry = DatabaseApp.ObjectStateManager.GetObjectStateEntry(modifiedPos.EntityKey);
+                        if (
+                                objectStateEntry != null
+
+                                && objectStateEntry.OriginalValues != null
+                                && objectStateEntry.OriginalValues.FieldCount > 0
+                                && objectStateEntry.OriginalValues[nameof(ProdOrderPartslistPos.TargetQuantityUOM)] != null
+
+                                && objectStateEntry.CurrentValues != null
+                                && objectStateEntry.CurrentValues.FieldCount > 0
+                                && objectStateEntry.CurrentValues[nameof(ProdOrderPartslistPos.TargetQuantityUOM)] != null
+                            )
+                        {
+                            double oldValue = (double)objectStateEntry.OriginalValues[nameof(ProdOrderPartslistPos.TargetQuantityUOM)];
+                            double newValue = (double)objectStateEntry.CurrentValues[nameof(ProdOrderPartslistPos.TargetQuantityUOM)];
+                            if (InappropriateComponentQuantityOccurrence.IsForAnalyse(oldValue, newValue))
+                            {
+                                if (InappropriateComponentQuantityOccurrence.IsInappropriate(modifiedPos))
+                                {
+                                    msg = new Msg(this, eMsgLevel.Warning, GetACUrl(), nameof(OnPreSave), 2558, "Warning50055");
+                                    ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
+                                    InappropriateComponentQuantityOccurrence.WriteStackTrace(modifiedPos);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+
         #endregion
 
         #region Methods -> Explorer
@@ -2724,7 +2784,7 @@ namespace gip.bso.manufacturing
             if (isMovingValueValid)
             {
                 bool isSaveValid = true;
-                MsgWithDetails saveBatchPlanMoveMsg = DatabaseApp.ACSaveChanges();
+                MsgWithDetails saveBatchPlanMoveMsg = LocalSaveChanges();
                 if (saveBatchPlanMoveMsg == null || saveBatchPlanMoveMsg.IsSucceded())
                 {
                     // Correct the SortOrder from ProdOrderBatchPlan
@@ -2732,7 +2792,7 @@ namespace gip.bso.manufacturing
                     if (ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any() && isMove)
                     {
                         MoveBatchSortOrderCorrect(ProdOrderBatchPlanList);
-                        MsgWithDetails saveOrderNoMsg = DatabaseApp.ACSaveChanges();
+                        MsgWithDetails saveOrderNoMsg = LocalSaveChanges();
                         if (saveOrderNoMsg != null && !saveOrderNoMsg.IsSucceded())
                         {
                             SendMessage(saveOrderNoMsg);
@@ -3524,7 +3584,7 @@ namespace gip.bso.manufacturing
 
                     MoveBatchSortOrderCorrect(notSelected);
 
-                    MsgWithDetails saveMsg = saveMsg = DatabaseApp.ACSaveChanges();
+                    MsgWithDetails saveMsg = saveMsg = LocalSaveChanges();
                     if (saveMsg != null)
                         SendMessage(saveMsg);
 
@@ -3813,7 +3873,7 @@ namespace gip.bso.manufacturing
             }
             MaintainProdOrderState(prodOrders, mDProdOrderStateCancelled, mDProdOrderStateCompleted);
 
-            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+            MsgWithDetails saveMsg = LocalSaveChanges();
             if (saveMsg != null)
                 SendMessage(saveMsg);
             LoadProdOrderBatchPlanList();
@@ -3955,7 +4015,7 @@ namespace gip.bso.manufacturing
                 {
                     if (DatabaseApp.IsChanged)
                     {
-                        MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+                        MsgWithDetails saveMsg = LocalSaveChanges();
                         if (saveMsg != null)
                             SendMessage(saveMsg);
                     }
@@ -4248,7 +4308,7 @@ namespace gip.bso.manufacturing
                                 List<vd.ProdOrderBatchPlan> generatedBatchPlans;
                                 success = FactoryBatchPlans(SelectedWizardSchedulerPartslist, ref programNo, out generatedBatchPlans);
                             }
-                            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+                            MsgWithDetails saveMsg = LocalSaveChanges();
                             if (saveMsg != null)
                                 SendMessage(saveMsg);
                             if (success && !string.IsNullOrEmpty(programNo) && (saveMsg == null || saveMsg.IsSucceded()))
@@ -4984,7 +5044,7 @@ namespace gip.bso.manufacturing
                 xml = sw.ToString();
             }
             BSOBatchPlanSchedulerRules = xml;
-            var msg = DatabaseApp.ACSaveChanges();
+            var msg = LocalSaveChanges();
 
             if (msg != null)
                 Messages.Msg(msg);
@@ -5267,7 +5327,7 @@ namespace gip.bso.manufacturing
                     groupWf.VBiACClassWF = item;
                     databaseApp.MDSchedulingGroup.AddObject(group);
                 }
-                databaseApp.ACSaveChanges();
+                LocalSaveChanges();
                 OnPropertyChanged(nameof(ScheduleForPWNodeList));
             }
         }
