@@ -61,7 +61,10 @@ namespace gip.mes.facility
             ProgramNo = prodOrderPartslist.ProdOrder.ProgramNo;
             MDProdOrderState = prodOrderPartslist.MDProdOrderState;
             gip.mes.datamodel.ACClassWF tempACClassWFItem = WFNodeMES;
-            ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, tempACClassWFItem.MaterialWFConnection_ACClassWF.FirstOrDefault());
+
+            var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(WFNodeMES, prodOrderPartslist.Partslist.MaterialWFID);
+            ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, materialWFConnection);
+            
             // Read selected MDSchedulingGroup
             if (finalMix != null)
             {
