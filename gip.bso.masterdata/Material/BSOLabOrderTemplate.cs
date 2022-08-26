@@ -2,6 +2,8 @@
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
+using static gip.core.datamodel.Global;
+using System.Collections.Generic;
 
 namespace gip.bso.masterdata
 {
@@ -20,11 +22,6 @@ namespace gip.bso.masterdata
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             var b = base.ACDeInit(deleteACClassTask);
-            if (_AccessPrimary != null)
-            {
-                _AccessPrimary.ACDeInit(false);
-                _AccessPrimary = null;
-            }
             return b;
         }
 
@@ -33,60 +30,19 @@ namespace gip.bso.masterdata
 
         #region Properties
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
-        /// <summary>
-        /// The _ access primary
-        /// </summary>
-        ACAccessNav<LabOrder> _AccessPrimary;
-        /// <summary>
-        /// Gets the access primary.
-        /// </summary>
-        /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "LabOrder")]
-        public override ACAccessNav<LabOrder> AccessPrimary
+
+
+        #region Properties -> AccessPrimary
+
+        public override GlobalApp.LabOrderType FilterLabOrderType
         {
             get
             {
-                if (_AccessPrimary == null && ACType != null)
-                {
-                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + LabOrder.ClassName, ACType.ACIdentifier);
-                    short loType = (short)GlobalApp.LabOrderType.Template;
-                    bool rebuildACQueryDef = false;
-                    if (!navACQueryDefinition.ACFilterColumns.Any())
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "LabOrderTypeIndex")
-                            {
-                                if (filterItem.SearchWord == loType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
-                                    countFoundCorrect++;
-                            }
-                            else if (filterItem.PropertyName == "LabOrderNo")
-                            {
-                                countFoundCorrect++;
-                            }
-                        }
-                        if (countFoundCorrect < 2)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "LabOrderTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, loType.ToString(), true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "LabOrderNo", Global.LogicalOperators.equal, Global.Operators.and, null, true));
-                        navACQueryDefinition.SaveConfig(true);
-                    }
-
-                    _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>("LabOrder", this);
-                    _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
-                }
-                return _AccessPrimary;
+                return GlobalApp.LabOrderType.Template;
             }
         }
+
+        #endregion
 
         public override LabOrder SelectedLabOrder
         {

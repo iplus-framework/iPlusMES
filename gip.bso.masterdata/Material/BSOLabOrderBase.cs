@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using gip.mes.facility;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.masterdata
 {
@@ -28,7 +29,7 @@ namespace gip.bso.masterdata
                 return _LabOrderManager.ValueT;
             }
         }
-        
+
         #region c'tors
         /// <summary>
         /// Initializes a new instance of the <see cref="BSOLabOrderBase"/> class.
@@ -38,8 +39,8 @@ namespace gip.bso.masterdata
         /// <param name="parentACObject">The parent AC object.</param>
         /// <param name="parameter">The parameter.</param>
         /// <param name="acIdentifier">The ac identifier.</param>
-        public BSOLabOrderBase(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
-            :base(acType, content, parentACObject, parameter, acIdentifier)
+        public BSOLabOrderBase(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+            : base(acType, content, parentACObject, parameter, acIdentifier)
         {
 
         }
@@ -90,6 +91,9 @@ namespace gip.bso.masterdata
         #region BSO -> ACProperty
 
         #region LabOrder
+
+
+        #region BSO -> ACProperty -> AccessPrimary
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         /// <summary>
         /// The _ access primary
@@ -109,18 +113,18 @@ namespace gip.bso.masterdata
             {
                 if (_AccessPrimary == null && ACType != null)
                 {
-                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(this, PrimaryNavigationquery(), ACType.ACIdentifier);
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "LabOrderNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                            navACQueryDefinition.TakeCount = NavigationQueryTakeCount;
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
+                        _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>(LabOrder.ClassName, this);
+                        _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
                     }
-                    _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>("LabOrder", this);
-                    _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
                 }
+
                 return _AccessPrimary;
             }
         }
@@ -130,7 +134,7 @@ namespace gip.bso.masterdata
             if (IsEnabledApplyValueFilter())
             {
                 if (ValueFilterFieldType == LOPosValueFieldEnum.MinMin)
-                    result = result.Where(c => c.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID 
+                    result = result.Where(c => c.LabOrderPos_LabOrder.Where(l => l.MDLabTagID == this.SelectedLabTag.MDLabTagID
                                                                     && l.ValueMinMin >= FilterValueFrom.Value
                                                                     && l.ValueMinMin <= FilterValueTo.Value).Any());
                 else if (ValueFilterFieldType == LOPosValueFieldEnum.Min)
@@ -149,6 +153,54 @@ namespace gip.bso.masterdata
             return result;
         }
 
+
+        public virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem partslistNo = new ACSortItem(nameof(LabOrder.LabOrderNo), SortDirections.descending, true);
+                acSortItems.Add(partslistNo);
+
+                return acSortItems;
+            }
+        }
+
+        public virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem phLabOrderTypeIndex = new ACFilterItem(Global.FilterTypes.filter, nameof(LabOrder.LabOrderTypeIndex), Global.LogicalOperators.equal, Global.Operators.and, ((short)FilterLabOrderType).ToString(), true);
+                aCFilterItems.Add(phLabOrderTypeIndex);
+
+                ACFilterItem phLabOrderNo = new ACFilterItem(FilterTypes.filter, nameof(LabOrder.LabOrderNo), LogicalOperators.contains, Operators.and, null, true, true);
+                aCFilterItems.Add(phLabOrderNo);
+
+                return aCFilterItems;
+            }
+        }
+
+        public virtual GlobalApp.LabOrderType FilterLabOrderType
+        {
+            get
+            {
+                return GlobalApp.LabOrderType.Order;
+            }
+        }
+
+        public virtual int NavigationQueryTakeCount
+        {
+            get
+            {
+                return ACQueryDefinition.C_DefaultTakeCount;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Gets or sets the selected lab order.
         /// </summary>
@@ -159,7 +211,7 @@ namespace gip.bso.masterdata
             get
             {
                 if (AccessPrimary == null)
-                    return null; 
+                    return null;
                 if (AccessPrimary == null) return null; return AccessPrimary.Selected;
             }
             set
@@ -178,11 +230,11 @@ namespace gip.bso.masterdata
             get
             {
                 if (AccessPrimary == null)
-                    return null; 
+                    return null;
                 if (AccessPrimary == null) return null; return AccessPrimary.Current;
             }
             set
-            {               
+            {
                 SetCurrentSelected(value);
             }
         }
@@ -198,7 +250,7 @@ namespace gip.bso.masterdata
                 OnPropertyChanged("CurrentLabOrder");
                 OnPropertyChanged("LabOrderPosList");
             }
-            if(value != SelectedLabOrder)
+            if (value != SelectedLabOrder)
             {
                 if (AccessPrimary == null) return; AccessPrimary.Selected = value;
                 OnPropertyChanged("SelectedLabOrder");
@@ -268,14 +320,14 @@ namespace gip.bso.masterdata
                     SetCurrentSelectedLabOrderPos(value);
                     CurrentLabOrderPos.PropertyChanged -= CurrentLabOrderPos_PropertyChanged;
                 }
-                if(_CurrentLabOrderPos != null)
+                if (_CurrentLabOrderPos != null)
                     CurrentLabOrderPos.PropertyChanged += CurrentLabOrderPos_PropertyChanged;
             }
         }
 
         protected virtual void CurrentLabOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == "MDLabTagID")
+            if (e.PropertyName == "MDLabTagID")
                 OnPropertyChanged("LabOrderPosList");
         }
 
@@ -341,7 +393,7 @@ namespace gip.bso.masterdata
             {
                 return _FilterValueFrom;
             }
-            set 
+            set
             {
                 _FilterValueFrom = value;
                 OnPropertyChanged("FilterValueFrom");
@@ -394,7 +446,7 @@ namespace gip.bso.masterdata
             {
                 if (SelectedValueFilterField == null)
                     return LOPosValueFieldEnum.MinMin;
-                return (LOPosValueFieldEnum) SelectedValueFilterField.Value;
+                return (LOPosValueFieldEnum)SelectedValueFilterField.Value;
             }
         }
 
@@ -518,7 +570,7 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("LabOrder", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedLabOrder", Global.ACKinds.MSMethodPrePost)]
         public virtual void New()
         {
-            if (!PreExecute("New")) 
+            if (!PreExecute("New"))
                 return;
             if (AccessPrimary == null)
                 return;
@@ -547,7 +599,7 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("LabOrder", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentLabOrder", Global.ACKinds.MSMethodPrePost)]
         public virtual void Delete()
         {
-            if (!PreExecute("Delete")) 
+            if (!PreExecute("Delete"))
                 return;
             if (AccessPrimary == null)
                 return;
@@ -563,7 +615,7 @@ namespace gip.bso.masterdata
             Load();
             PostExecute("Delete");
         }
-        
+
         /// <summary>
         /// Determines whether [is enabled delete].
         /// </summary>
@@ -672,8 +724,8 @@ namespace gip.bso.masterdata
 
         public virtual bool IsEnabledApplyValueFilter()
         {
-            return FilterValueFrom.HasValue 
-                && FilterValueTo.HasValue 
+            return FilterValueFrom.HasValue
+                && FilterValueTo.HasValue
                 && SelectedValueFilterField != null
                 && SelectedLabTag != null;
         }

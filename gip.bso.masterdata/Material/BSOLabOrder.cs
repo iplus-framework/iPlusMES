@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Reflection;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.masterdata
 {
@@ -15,6 +16,12 @@ namespace gip.bso.masterdata
     [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + LabOrder.ClassName, "en{'Lab Order'}de{'Laborauftrag'}", typeof(LabOrder), LabOrder.ClassName, "LabOrderTypeIndex", "LabOrderNo")]
     public class BSOLabOrder : BSOLabOrderBase
     {
+
+        #region const
+
+        public const string Const_FilterMaterialGroup = @"Material\MDMaterialGroup\MDKey";
+        #endregion
+
         #region c'tors
         public BSOLabOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
@@ -39,11 +46,6 @@ namespace gip.bso.masterdata
             this._LabOrderMaterialState = null;
             this._LabOrderTemplate = null;
             var b = base.ACDeInit(deleteACClassTask);
-            if (_AccessPrimary != null)
-            {
-                _AccessPrimary.ACDeInit(false);
-                _AccessPrimary = null;
-            }
             return b;
         }
         #endregion
@@ -92,6 +94,14 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedFilterMaterialGroup = value;
+                ACFilterItem filterItemMaterialGroup = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(x => x.PropertyName == Const_FilterMaterialGroup).FirstOrDefault();
+                if (filterItemMaterialGroup != null)
+                {
+                    if (value == null)
+                        filterItemMaterialGroup.SearchWord = null;
+                    else
+                        filterItemMaterialGroup.SearchWord = value.MDKey;
+                }
                 OnPropertyChanged("SelectedFilterMaterialGroup");
             }
         }
@@ -171,92 +181,10 @@ namespace gip.bso.masterdata
         #endregion
 
         #region BSO -> ACProperties
+
+
+        #region BSO -> ACProperties -> AccessPrimary
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
-        /// <summary>
-        /// The _ access primary
-        /// </summary>
-        ACAccessNav<LabOrder> _AccessPrimary;
-        /// <summary>
-        /// Gets the access primary.
-        /// </summary>
-        /// <value>The access primary.</value>
-        /// <summary xml:lang="de">
-        /// Ruft den primären Zugriff ab.
-        /// </summary>
-        /// <value xml:lang="de">Der Zugang primär.</value>
-        [ACPropertyAccessPrimary(9999, "LabOrder")]
-        public override ACAccessNav<LabOrder> AccessPrimary
-        {
-            get
-            {
-                if (_AccessPrimary == null && ACType != null)
-                {
-                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + LabOrder.ClassName, ACType.ACIdentifier);
-                    if (navACQueryDefinition != null)
-                    {
-
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "LabOrderNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
-                        if (navACQueryDefinition.TakeCount == 0)
-                            navACQueryDefinition.TakeCount = 50;
-                    }
-
-                    short loType = (short)GlobalApp.LabOrderType.Order;
-                    bool rebuildACQueryDef = false;
-                    if (!navACQueryDefinition.ACFilterColumns.Any())
-                    {
-                        rebuildACQueryDef = true;
-                    }
-                    else
-                    {
-                        int countFoundCorrect = 0;
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
-                        {
-                            if (filterItem.PropertyName == "LabOrderTypeIndex")
-                            {
-                                if (filterItem.SearchWord == loType.ToString() && filterItem.LogicalOperator == Global.LogicalOperators.equal)
-                                    countFoundCorrect++;
-                            }
-                            else if (filterItem.PropertyName == "LabOrderNo")
-                            {
-                                countFoundCorrect++;
-                            }
-                        }
-                        if (countFoundCorrect < 2)
-                            rebuildACQueryDef = true;
-                    }
-                    if (rebuildACQueryDef)
-                    {
-                        navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "LabOrderTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, loType.ToString(), true));
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "LabOrderNo", Global.LogicalOperators.equal, Global.Operators.and, null, true));
-                        navACQueryDefinition.SaveConfig(true);
-                    }
-
-
-
-                    _AccessPrimary = navACQueryDefinition.NewAccessNav<LabOrder>("LabOrder", this);
-                    _AccessPrimary.NavSearchExecuting += LabOrder_AccessPrimary_NavSearchExecuting;
-                }
-
-                ACFilterItem filterItemMaterialGroup = _AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(x => x.PropertyName == @"Material\MDMaterialGroup\MDKey").FirstOrDefault();
-                if (SelectedFilterMaterialGroup != null)
-                {
-                    if (filterItemMaterialGroup == null)
-                    {
-                        filterItemMaterialGroup = new ACFilterItem(Global.FilterTypes.filter, @"Material\MDMaterialGroup\MDKey", Global.LogicalOperators.equal, Global.Operators.and, "", false);
-                        _AccessPrimary.NavACQueryDefinition.ACFilterColumns.Add(filterItemMaterialGroup);
-                    }
-                    filterItemMaterialGroup.SearchWord = SelectedFilterMaterialGroup.MDKey;
-                }
-                else if (filterItemMaterialGroup != null)
-                {
-                    _AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItemMaterialGroup);
-                }
-                return _AccessPrimary;
-            }
-        }
 
         public override IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
         {
@@ -267,6 +195,35 @@ namespace gip.bso.masterdata
             }
             return result;
         }
+
+        public override List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem phLabOrderTypeIndex = new ACFilterItem(Global.FilterTypes.filter, nameof(LabOrder.LabOrderTypeIndex), Global.LogicalOperators.equal, Global.Operators.and, ((short)FilterLabOrderType).ToString(), true);
+                aCFilterItems.Add(phLabOrderTypeIndex);
+
+                ACFilterItem phLabOrderNo = new ACFilterItem(FilterTypes.filter, nameof(LabOrder.LabOrderNo), LogicalOperators.contains, Operators.and, null, true, true);
+                aCFilterItems.Add(phLabOrderNo);
+
+                ACFilterItem phMaterialGroup = new ACFilterItem(Global.FilterTypes.filter, Const_FilterMaterialGroup, Global.LogicalOperators.equal, Global.Operators.and, null, true);
+                aCFilterItems.Add(phMaterialGroup);
+
+                return aCFilterItems;
+            }
+        }
+
+        public override int NavigationQueryTakeCount
+        {
+            get
+            {
+                return 50;
+            }
+        }
+
+        #endregion
 
         LabOrder _LastLabOrder = null;
 
