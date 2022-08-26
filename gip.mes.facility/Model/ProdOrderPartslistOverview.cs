@@ -136,17 +136,19 @@ namespace gip.mes.facility
         {
             if (ProdOrderPartslist != null)
             {
+                // Calculate for ProdOrderPartslist values
                 InwardActualQuantityGoodUOM = ProdOrderPartslist.ActualQuantityGoodUOM;
                 InwardActualQuantityGoodPer = ProdOrderPartslist.ActualQuantityGoodPer;
                 InwardActualQuantityScrapPer = ProdOrderPartslist.ActualQuantityScrapPer;
                 InwardDiffPlannedQuantityPer = ProdOrderPartslist.DifferenceQuantityPer;
                 InwardDiffPlannedQuantity = ProdOrderPartslist.DifferenceQuantity;
+                InwardDiffQuantityPer = Math.Abs(InwardActualQuantityUOM) > Double.Epsilon && Math.Abs(InwardTargetQuantityUOM) > Double.Epsilon ? InwardActualQuantityUOM / InwardTargetQuantityUOM : 0;
             }
             else
+                // Calculate for group by material values
                 InwardDiffPlannedQuantity = InwardActualQuantityUOM - InwardPlannedQuantityUOM;
 
             InwardDiffQuantityUOM = InwardActualQuantityUOM - InwardTargetQuantityUOM;
-            InwardDiffQuantityPer = Math.Abs(InwardActualQuantityUOM) > Double.Epsilon && Math.Abs(InwardTargetQuantityUOM) > Double.Epsilon ? InwardActualQuantityUOM / InwardTargetQuantityUOM : 0;
             UsageDiffQuantityUOM = UsageActualQuantityUOM - UsageTargetQuantityUOM;
             UsageInwardDiffQuantityUOM = UsageActualQuantityUOM - InwardActualQuantityUOM;
         }
