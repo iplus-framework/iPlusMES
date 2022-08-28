@@ -1,7 +1,9 @@
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
+using System.Collections;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace gip.mes.facility
 {
@@ -111,6 +113,8 @@ namespace gip.mes.facility
 
         [ACPropertyInfo(500, Const_Usage, "en{'InputQForActual'}de{'InputQForActual'}")]
         public InputQForActual InputQForActual { get; set; }
+
+        public string[] MaterialNos { get; set; }
 
         #endregion
 

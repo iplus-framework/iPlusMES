@@ -462,6 +462,7 @@ namespace gip.bso.manufacturing
         /// </summary>
         /// <value>The OverviewProdOrderPartslist list</value>
         [ACPropertyList(9999, "OverviewProdOrderPartslist")]
+
         public List<ProdOrderPartslistOverview> OverviewProdOrderPartslistList
         {
             get
@@ -1066,7 +1067,7 @@ namespace gip.bso.manufacturing
                     .ProdOrderPartslist
                     .Where(c => plIds.Contains(c.ProdOrderPartslistID))
                     .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-                    .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                    .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.Material.MaterialNo == materialNo)
                     .ToList();
             }
 
@@ -1193,7 +1194,6 @@ namespace gip.bso.manufacturing
                             .Select(x => x.ActualQuantityUOM)
                             .DefaultIfEmpty()
                             .Sum()
-
 
                 })
                 .OrderBy(c => c.ProgramNo)
