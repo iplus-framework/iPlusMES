@@ -240,22 +240,28 @@ namespace gip.bso.masterdata
         }
 
 
-        public virtual void SetCurrentSelected(LabOrder value)
+        public virtual bool SetCurrentSelected(LabOrder value)
         {
+            bool isChanged =false;
             if (AccessPrimary == null)
-                return;
+                return false;
             if (value != CurrentLabOrder)
             {
-                if (AccessPrimary == null) return; AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentLabOrder");
-                OnPropertyChanged("LabOrderPosList");
+                AccessPrimary.Current = value;
+                OnPropertyChanged(nameof(CurrentLabOrder));
+                isChanged = true;
             }
             if (value != SelectedLabOrder)
             {
-                if (AccessPrimary == null) return; AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedLabOrder");
-                OnPropertyChanged("LabOrderPosList");
+                AccessPrimary.Selected = value;
+                OnPropertyChanged(nameof(SelectedLabOrder));
+                isChanged = true;
             }
+
+            if(isChanged)
+                LoadLabOrderPosList(value);
+
+            return isChanged;
         }
 
         /// <summary>
@@ -328,23 +334,38 @@ namespace gip.bso.masterdata
         protected virtual void CurrentLabOrderPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "MDLabTagID")
-                OnPropertyChanged("LabOrderPosList");
+                OnPropertyChanged(nameof(LabOrderPosList));
         }
 
+        private List<LabOrderPos> _LabOrderPosList;
         /// <summary>
         /// Gets the lab order pos list.
         /// </summary>
         /// <value>The lab order pos list.</value>
         [ACPropertyList(605, "LabOrderPos")]
-        public IEnumerable<LabOrderPos> LabOrderPosList
+        public List<LabOrderPos> LabOrderPosList
         {
             get
             {
-                if (CurrentLabOrder == null)
-                    return null;
-                CurrentLabOrder.LabOrderPos_LabOrder.AutoRefresh(this.DatabaseApp);
-                return CurrentLabOrder.LabOrderPos_LabOrder.OrderBy(c => c.Sequence);
+                if(_LabOrderPosList == null)
+                    _LabOrderPosList = new List<LabOrderPos>();
+                return _LabOrderPosList;
             }
+        }
+
+        private void LoadLabOrderPosList(LabOrder labOrder)
+        {
+            _LabOrderPosList = null;
+            if (labOrder != null)
+            {
+                labOrder.LabOrderPos_LabOrder.AutoRefresh(this.DatabaseApp);
+                _LabOrderPosList = labOrder.LabOrderPos_LabOrder.OrderBy(c => c.Sequence).ToList();
+            }
+            if(_LabOrderPosList == null)
+                SelectedLabOrderPos = null;
+            else
+                SelectedLabOrderPos = _LabOrderPosList.FirstOrDefault();
+            OnPropertyChanged(nameof(LabOrderPosList));
         }
 
         /// <summary>
@@ -374,12 +395,12 @@ namespace gip.bso.masterdata
             {
                 isCurrentPosInChange = true;
                 _CurrentLabOrderPos = value;
-                OnPropertyChanged("CurrentLabOrderPos");
+                OnPropertyChanged(nameof(CurrentLabOrderPos));
             }
             if (SelectedLabOrderPos != value)
             {
                 _SelectedLabOrderPos = value;
-                OnPropertyChanged("SelectedLabOrderPos");
+                OnPropertyChanged(nameof(SelectedLabOrderPos));
             }
         }
         #endregion
@@ -396,7 +417,7 @@ namespace gip.bso.masterdata
             set
             {
                 _FilterValueFrom = value;
-                OnPropertyChanged("FilterValueFrom");
+                OnPropertyChanged(nameof(FilterValueFrom));
             }
         }
 
@@ -411,7 +432,7 @@ namespace gip.bso.masterdata
             set
             {
                 _FilterValueTo = value;
-                OnPropertyChanged("FilterValueTo");
+                OnPropertyChanged(nameof(FilterValueTo));
             }
         }
 
@@ -436,7 +457,7 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedValueFilterField = value;
-                OnPropertyChanged("ValueFilterField");
+                OnPropertyChanged(nameof(SelectedValueFilterField));
             }
         }
 
@@ -461,7 +482,7 @@ namespace gip.bso.masterdata
             set
             {
                 _SelectedLabTag = value;
-                OnPropertyChanged("SelectedLabTag");
+                OnPropertyChanged(nameof(SelectedLabTag));
             }
         }
 
@@ -580,7 +601,7 @@ namespace gip.bso.masterdata
             ACState = Const.SMNew;
             AccessPrimary.NavList.Add(newLabOrder);
             CurrentLabOrder = newLabOrder;
-            OnPropertyChanged("LabOrderList");
+            OnPropertyChanged(nameof(LabOrderList));
             PostExecute("New");
         }
 
@@ -632,7 +653,7 @@ namespace gip.bso.masterdata
         public virtual void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("LabOrderList");
+            OnPropertyChanged(nameof(LabOrderList));
         }
         #endregion
 
@@ -671,7 +692,7 @@ namespace gip.bso.masterdata
             CurrentLabOrderPos = LabOrderPos.NewACObject(DatabaseApp, CurrentLabOrder);
             CurrentLabOrderPos.LabOrder = CurrentLabOrder;
             CurrentLabOrder.LabOrderPos_LabOrder.Add(CurrentLabOrderPos);
-            OnPropertyChanged("LabOrderPosList");
+            OnPropertyChanged(nameof(LabOrderPosList));
             PostExecute("NewLabOrderPos");
         }
 
@@ -700,7 +721,7 @@ namespace gip.bso.masterdata
                 Messages.Msg(msg);
                 return;
             }
-            OnPropertyChanged("LabOrderPosList");
+            OnPropertyChanged(nameof(LabOrderPosList));
             PostExecute("DeleteLabOrderPos");
         }
 

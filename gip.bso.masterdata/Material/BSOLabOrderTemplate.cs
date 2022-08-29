@@ -72,24 +72,6 @@ namespace gip.bso.masterdata
             }
         }
 
-        public override void SetCurrentSelected(LabOrder value)
-        {
-            if (AccessPrimary == null)
-                return;
-            if (value != CurrentLabOrder)
-            {
-                if (AccessPrimary == null) return; AccessPrimary.Current = value;
-                OnPropertyChanged("CurrentLabOrder");
-                OnPropertyChanged("LabOrderPosList");
-            }
-            if (value != SelectedLabOrder)
-            {
-                if (AccessPrimary == null) return; AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedLabOrder");
-                OnPropertyChanged("LabOrderPosList");
-            }
-        }
-
         #region Find and Replace
         public override IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
         {
