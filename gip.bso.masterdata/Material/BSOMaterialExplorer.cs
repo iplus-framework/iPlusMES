@@ -164,9 +164,7 @@ namespace gip.bso.masterdata
 
             if (FilterIsConnectedWithEnabledPartslist != null)
             {
-                query =
-                    query
-                    .Where(c => c.Partslist_Material.Any(x => x.IsEnabled == (FilterIsConnectedWithEnabledPartslist ?? false))) as ObjectQuery<Material>;
+                query = query.Where(c => c.Partslist_Material.Any(x => x.DeleteDate == null && x.IsEnabled == (FilterIsConnectedWithEnabledPartslist ?? false))) as ObjectQuery<Material>;
             }
 
             return query;

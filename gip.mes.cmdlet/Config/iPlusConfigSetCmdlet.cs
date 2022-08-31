@@ -15,6 +15,8 @@ namespace gip.mes.cmdlet.Config
         protected override void ProcessRecord()
         {
             VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(".\\");
+
+            WriteObject(iPlusCmdLetSettings);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace gip.bso.manufacturing
 
         public const string BGWorkerMehtod_Search = "Search";
         public const string BGWorkerMehtod_SearchInput = "SearchInput";
+        public const string BGWorkerMehtod_LoadOrderPositionsForInputList = "LoadOrderPositionsForInputList";
 
         #endregion
 
@@ -77,7 +78,7 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
-        #region Statistics
+        #region Configuration
 
         private ACPropertyConfigValue<bool> _CalculateStatistics;
         [ACPropertyConfig("CalculateStatistics")]
@@ -367,6 +368,8 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #endregion
+
         #region Properties -> Messages
 
         public void SendMessage(object result)
@@ -459,6 +462,7 @@ namespace gip.bso.manufacturing
         /// </summary>
         /// <value>The OverviewProdOrderPartslist list</value>
         [ACPropertyList(9999, "OverviewProdOrderPartslist")]
+
         public List<ProdOrderPartslistOverview> OverviewProdOrderPartslistList
         {
             get
@@ -613,12 +617,54 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties -> Input -> OrderPositionsForInput
+
+        private ProdOrderPartslistPos _SelectedOrderPositionsForInput;
+        /// <summary>
+        /// Selected property for ProdOrderPartslistPos
+        /// </summary>
+        /// <value>The selected OrderPositionsForInput</value>
+        [ACPropertySelected(9999, "OrderPositionsForInput", "en{'TODO: OrderPositionsForInput'}de{'TODO: OrderPositionsForInput'}")]
+        public ProdOrderPartslistPos SelectedOrderPositionsForInput
+        {
+            get
+            {
+                return _SelectedOrderPositionsForInput;
+            }
+            set
+            {
+                if (_SelectedOrderPositionsForInput != value)
+                {
+                    _SelectedOrderPositionsForInput = value;
+                    OnPropertyChanged(nameof(SelectedOrderPositionsForInput));
+                }
+            }
+        }
+
+
+        private List<ProdOrderPartslistPos> _OrderPositionsForInputList;
+        /// <summary>
+        /// List property for ProdOrderPartslistPos
+        /// </summary>
+        /// <value>The OrderPositionsForInput list</value>
+        [ACPropertyList(9999, "OrderPositionsForInput")]
+        public List<ProdOrderPartslistPos> OrderPositionsForInputList
+        {
+            get
+            {
+                if (_OrderPositionsForInputList == null)
+                    _OrderPositionsForInputList = new List<ProdOrderPartslistPos>();
+                return _OrderPositionsForInputList;
+            }
+        }
 
         #endregion
 
         #endregion
 
         #region Methods
+
+        #region Methods -> OverviewProdOrderPartslist
 
         /// <summary>
         /// Source Property: Search
@@ -644,7 +690,265 @@ namespace gip.bso.manufacturing
             return FilterStartDate != null && FilterEndDate != null;
         }
 
-        private BSOProdOrderOverview_SearchResult GetSearch(string operationName, bool searchPlAndMt, bool searchInputs)
+
+        [ACMethodInteraction("NavigateToProdOrder", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedOverviewProdOrderPartslist))]
+        public void NavigateToProdOrder()
+        {
+            if (!IsEnabledNavigateToProdOrder())
+                return;
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedOverviewProdOrderPartslist.ProdOrderPartslist.ProdOrderPartslistID,
+                    EntityName = ProdOrderPartslist.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToProdOrder()
+        {
+            return SelectedOverviewProdOrderPartslist != null && SelectedOverviewProdOrderPartslist.ProdOrderPartslist != null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo("ShowDlgFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgFilterFacility()
+        {
+            if (!IsEnabledShowDlgFilterToFacility())
+                return;
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterFacility != null ? SelectedFilterFacility : null);
+            if (dlgResult.SelectedCommand == eMsgButton.OK)
+            {
+                Facility facility = dlgResult.ReturnValue as Facility;
+                if (facility != null)
+                    if (!AccessFilterFacility.NavList.Contains(facility))
+                        AccessFilterFacility.NavList.Add(facility);
+
+                if (SelectedFilterFacility != facility)
+                {
+                    SelectedFilterFacility = facility;
+                }
+            }
+        }
+
+        public bool IsEnabledShowDlgFilterToFacility()
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region Methods -> Input
+
+        /// <summary>
+        /// Source Property: SearchInputs
+        /// </summary>
+        [ACMethodInfo("SearchInputs", "en{'Search'}de{'Suchen'}", 999)]
+        public void SearchInputs()
+        {
+            if (!IsEnabledSearchInputs())
+                return;
+
+            _InputList = null;
+            OnPropertyChanged(nameof(InputList));
+
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchInput);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledSearchInputs()
+        {
+            return IsEnabledSearch();
+        }
+
+        #endregion
+
+        #region Methods -> RecalculateAllStats
+
+        [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Recalculate Statistics'}", 999, true)]
+        public void RecalculateAllStats()
+        {
+            if (!IsEnabledShowDlgFilterToFacility())
+                return;
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoRecalculateAllStatsAsync));
+            ShowDialog(this, DesignNameProgressBar);
+
+        }
+
+        public bool IsEnabledRecalculateAll()
+        {
+            return this.ProdOrderManager != null;
+        }
+
+        #endregion
+
+        #region Methods -> OrderPositionsForInput
+
+        [ACMethodInteraction("ShowOrderPositionsForInput", "en{'Show Order Inputs'}de{'Auftrag Einsats anzeigen'}", 507, false, nameof(SelectedInput))]
+        public void ShowOrderPositionsForInput()
+        {
+            if (!IsEnabledShowOrderPositionsForInput())
+                return;
+
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_LoadOrderPositionsForInputList);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledShowOrderPositionsForInput()
+        {
+            return SelectedInput != null && !string.IsNullOrEmpty(SelectedInput.MaterialNo);
+        }
+
+        [ACMethodInteraction("NavigateToProdOrder1", "en{'Show Order'}de{'Auftrag anzeigen'}", 505, false, nameof(SelectedOrderPositionsForInput))]
+        public void NavigateToProdOrder1()
+        {
+            if (!IsEnabledNavigateToProdOrder1())
+                return;
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedOrderPositionsForInput.ProdOrderPartslist.ProdOrderPartslistID,
+                    EntityName = ProdOrderPartslist.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToProdOrder1()
+        {
+            return SelectedOrderPositionsForInput != null && SelectedOrderPositionsForInput.ProdOrderPartslist != null;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Background worker
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            //worker.ProgressInfo.AddSubTask(command, 0, 9);
+            //string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            //worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+            worker.ProgressInfo.TotalProgress.ProgressText = "Calculating...";
+
+            string updateName = Root.Environment.User.Initials;
+            switch (command)
+            {
+                case BGWorkerMehtod_Search:
+                    e.Result = DoSearch(command, true, false);
+                    break;
+
+                case BGWorkerMehtod_SearchInput:
+                    e.Result = DoSearch(command, false, true);
+                    break;
+                case nameof(DoRecalculateAllStatsAsync):
+                    e.Result = DoRecalculateAllStatsAsync();
+                    break;
+                case BGWorkerMehtod_LoadOrderPositionsForInputList:
+                    bool loadRelatedLists = OverviewProdOrderPartslistList == null || !OverviewProdOrderPartslistList.Any();
+                    e.Result = DoLoadOrderPositionsForInputList(DatabaseApp, SelectedInput.MaterialNo, OverviewProdOrderPartslistList, loadRelatedLists);
+                    break;
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ClearMessages();
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                BSOProdOrderOverview_SearchResult result = null;
+                switch (command)
+                {
+                    case BGWorkerMehtod_Search:
+                        result = e.Result as BSOProdOrderOverview_SearchResult;
+                        if (result != null)
+                        {
+                            _OverviewProdOrderPartslistList = result.OverviewProdOrderPartslist;
+                            _OverviewMaterialList = result.OverviewMaterial;
+
+                            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
+                            OnPropertyChanged(nameof(OverviewMaterialList));
+                        }
+                        break;
+                    case BGWorkerMehtod_SearchInput:
+                        result = e.Result as BSOProdOrderOverview_SearchResult;
+                        if (result != null)
+                        {
+                            _InputList = result.InputOverview;
+                            OnPropertyChanged(nameof(InputList));
+                        }
+                        break;
+
+                    case nameof(DoRecalculateAllStatsAsync):
+                        break;
+
+                    case BGWorkerMehtod_LoadOrderPositionsForInputList:
+                        result = e.Result as BSOProdOrderOverview_SearchResult;
+                        if (result != null)
+                        {
+
+                            if (result.OverviewProdOrderPartslist != null)
+                            {
+                                _OverviewProdOrderPartslistList = result.OverviewProdOrderPartslist;
+                                _OverviewMaterialList = result.OverviewMaterial;
+
+                                OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
+                                OnPropertyChanged(nameof(OverviewMaterialList));
+                            }
+
+                            _OrderPositionsForInputList = result.OrderPositionsForInputList;
+                            ShowDialog(this, "OrderPositionsForInputDlg");
+                        }
+                        break;
+                }
+                if (result != null)
+                {
+                    TimeSpan timespan = result.OperationEndTime - result.OperationStartTime;
+                    SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} completed! Execution time:{1}", result.OperationName, timespan.ToString("mm\\:ss")) });
+                }
+            }
+        }
+
+        #endregion
+
+        #region Background worker DoMethods
+
+        private BSOProdOrderOverview_SearchResult DoSearch(string operationName, bool searchPlAndMt, bool searchInputs)
         {
             DateTime startTime = DateTime.Now;
 
@@ -701,98 +1005,9 @@ namespace gip.bso.manufacturing
                     InputOverview = inputOverview
                 };
             }
-
         }
 
-        [ACMethodInteraction("NavigateToProdOrder", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedOverviewProdOrderPartslist))]
-        public void NavigateToProdOrder()
-        {
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
-            {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(
-                new PAOrderInfoEntry()
-                {
-                    EntityID = SelectedOverviewProdOrderPartslist.ProdOrderPartslist.ProdOrderPartslistID,
-                    EntityName = ProdOrderPartslist.ClassName
-                });
-                service.ShowDialogOrder(this, info);
-            }
-        }
-
-        public bool IsEnabledNavigateToProdOrder()
-        {
-            return SelectedOverviewProdOrderPartslist != null && SelectedOverviewProdOrderPartslist.ProdOrderPartslist != null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [ACMethodInfo("ShowDlgFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
-        public void ShowDlgFilterFacility()
-        {
-            if (!IsEnabledShowDlgFilterToFacility())
-                return;
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterFacility != null ? SelectedFilterFacility : null);
-            if (dlgResult.SelectedCommand == eMsgButton.OK)
-            {
-                Facility facility = dlgResult.ReturnValue as Facility;
-                if (facility != null)
-                    if (!AccessFilterFacility.NavList.Contains(facility))
-                        AccessFilterFacility.NavList.Add(facility);
-
-                if (SelectedFilterFacility != facility)
-                {
-                    SelectedFilterFacility = facility;
-                }
-            }
-        }
-
-        public bool IsEnabledShowDlgFilterToFacility()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Source Property: SearchInputs
-        /// </summary>
-        [ACMethodInfo("SearchInputs", "en{'Search'}de{'Suchen'}", 999)]
-        public void SearchInputs()
-        {
-            if (!IsEnabledSearchInputs())
-                return;
-
-            _InputList = null;
-            OnPropertyChanged(nameof(InputList));
-
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchInput);
-            ShowDialog(this, DesignNameProgressBar);
-        }
-
-        public bool IsEnabledSearchInputs()
-        {
-            return IsEnabledSearch();
-        }
-
-
-        [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Recalculate Statistics'}", 999, true)]
-        public void RecalculateAllStats()
-        {
-            if (!IsEnabledShowDlgFilterToFacility())
-                return;
-
-            BackgroundWorker.RunWorkerAsync(nameof(RecalculateAllStatsAsync));
-            ShowDialog(this, DesignNameProgressBar);
-
-        }
-
-        public bool IsEnabledRecalculateAll()
-        {
-            return this.ProdOrderManager != null;
-        }
-
-        private bool RecalculateAllStatsAsync()
+        private bool DoRecalculateAllStatsAsync()
         {
             IEnumerable<Guid> prodOrders = null;
             using (DatabaseApp databaseApp = new DatabaseApp())
@@ -824,101 +1039,64 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        #endregion
-
-
-
-            #region Background worker
-
-            /// <summary>
-            /// </summary>
-            /// <param name="sender">The sender.</param>
-            /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
-        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        private BSOProdOrderOverview_SearchResult DoLoadOrderPositionsForInputList(DatabaseApp databaseApp, string materialNo, List<ProdOrderPartslistOverview> prodOrderPartslistOverviews, bool loadRelatedLists)
         {
-            base.BgWorkerDoWork(sender, e);
-            ACBackgroundWorker worker = sender as ACBackgroundWorker;
-            string command = e.Argument.ToString();
-
-            worker.ProgressInfo.OnlyTotalProgress = true;
-            //worker.ProgressInfo.AddSubTask(command, 0, 9);
-            //string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
-            //worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
-            worker.ProgressInfo.TotalProgress.ProgressText = "Calculating...";
-
-            string updateName = Root.Environment.User.Initials;
-            switch (command)
+            BSOProdOrderOverview_SearchResult result = new BSOProdOrderOverview_SearchResult()
             {
-                case BGWorkerMehtod_Search:
-                    e.Result = GetSearch(command, true, false);
-                    break;
+                OperationName = nameof(DoLoadOrderPositionsForInputList),
+                OperationStartTime = DateTime.Now
+            };
 
-                case BGWorkerMehtod_SearchInput:
-                    e.Result = GetSearch(command, false, true);
-                    break;
-                case nameof(RecalculateAllStatsAsync):
-                    e.Result = RecalculateAllStatsAsync();
-                    break;
-            }
-        }
-
-        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            base.BgWorkerCompleted(sender, e);
-            CloseWindow(this, DesignNameProgressBar);
-            ClearMessages();
-            ACBackgroundWorker worker = sender as ACBackgroundWorker;
-            string command = worker.EventArgs.Argument.ToString();
-
-            if (e.Cancelled)
+            if (loadRelatedLists)
             {
-                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
-            }
-            if (e.Error != null)
-            {
-                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
-            }
-            else
-            {
-                BSOProdOrderOverview_SearchResult result = null;
-                switch (command)
-                {
-                    case BGWorkerMehtod_Search:
-                        result = e.Result as BSOProdOrderOverview_SearchResult;
-                        if (result != null)
-                        {
-                            _OverviewProdOrderPartslistList = result.OverviewProdOrderPartslist;
-                            _OverviewMaterialList = result.OverviewMaterial;
+                BSOProdOrderOverview_SearchResult preparedData = DoSearch("", true, false);
+                result.OverviewProdOrderPartslist = preparedData.OverviewProdOrderPartslist;
+                result.OverviewMaterial = preparedData.OverviewMaterial;
 
-                            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
-                            OnPropertyChanged(nameof(OverviewMaterialList));
-                        }
-                        break;
-                    case BGWorkerMehtod_SearchInput:
-                        result = e.Result as BSOProdOrderOverview_SearchResult;
-                        if (result != null)
-                        {
-                            _InputList = result.InputOverview;
-                            OnPropertyChanged(nameof(InputList));
-                        }
-                        break;
-
-                    case nameof(RecalculateAllStatsAsync):
-                        break;
-                }
-                if (result != null)
-                {
-                    TimeSpan timespan = result.OperationEndTime - result.OperationStartTime;
-                    SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} completed! Execution time:{1}", result.OperationName, timespan.ToString("mm\\:ss")) });
-                }
+                prodOrderPartslistOverviews = result.OverviewProdOrderPartslist;
             }
+
+            List<ProdOrderPartslistPos> list = new List<ProdOrderPartslistPos>();
+
+            Material material = databaseApp.Material.FirstOrDefault(c => c.MaterialNo == materialNo);
+            if (material != null && prodOrderPartslistOverviews != null)
+            {
+                Guid[] plIds = prodOrderPartslistOverviews.Select(c => c.ProdOrderPartslist.ProdOrderPartslistID).ToArray();
+                list =
+                    databaseApp
+                    .ProdOrderPartslist
+                    .Where(c => plIds.Contains(c.ProdOrderPartslistID))
+                    .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+                    .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.Material.MaterialNo == materialNo)
+                    .ToList();
+            }
+
+            if (list.Any())
+            {
+                list = list.OrderByDescending(c => c.InputQForFinalScrapActualOutputPer).ToList();
+            }
+
+            result.OrderPositionsForInputList = list;
+            result.OperationEndTime = DateTime.Now;
+            return result;
         }
 
         #endregion
-
 
         #region Precompiled Queries (ProdOrderPartslistiOverview)
 
+
+        public static readonly Func<ProdOrderPartslist, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool> s_cQry_ProdOrderPartslistOverview_Query = (c, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName) =>
+        {
+            return
+             (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
+                    && (filterProdEndDate == null || c.StartDate < filterProdEndDate)
+                    && (filterStartBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                    && (filterEndBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
+                    && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrder.ProgramNo.Contains(filterProgramNo))
+                    && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
+                    && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName));
+        };
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>> s_cQry_ProdOrderPartslistOverview =
         CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, IQueryable<ProdOrderPartslistOverview>>(
@@ -936,13 +1114,14 @@ namespace gip.bso.manufacturing
 
                 .Where(c =>
                     (filterProdStartDate == null || c.StartDate >= filterProdStartDate)
-                    && (filterProdEndDate == null || c.StartDate < filterProdEndDate)
-                    && (filterStartBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
-                    && (filterEndBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
-                    && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrder.ProgramNo.Contains(filterProgramNo))
-                    && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
-                    && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName))
+                        && (filterProdEndDate == null || c.StartDate < filterProdEndDate)
+                        && (filterStartBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                        && (filterEndBookingDate == null || c.ProdOrderPartslistPos_ProdOrderPartslist.SelectMany(x => x.FacilityBooking_ProdOrderPartslistPos).Where(x => x.InsertDate < filterEndBookingDate).Any())
+                        && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrder.ProgramNo.Contains(filterProgramNo))
+                        && (string.IsNullOrEmpty(filterMaterialNo) || c.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
+                        && (string.IsNullOrEmpty(filterDepartmentName) || c.DepartmentUserName.Contains(filterDepartmentName))
                 )
+
                 .Select(c => new ProdOrderPartslistOverview()
                 {
                     // General
@@ -1016,24 +1195,11 @@ namespace gip.bso.manufacturing
                             .DefaultIfEmpty()
                             .Sum()
 
-
                 })
                 .OrderBy(c => c.ProgramNo)
                 .ThenBy(c => c.MaterialNo)
         );
 
-        /*
-         * 
-         * 
-         * .ProdOrderPartslistPos
-                .Include("ProdOrderPartslist")
-                .Include("ProdOrderPartslist.Partslist")
-                .Include("ProdOrderPartslist.ProdOrder")
-                .Include("ProdOrderPartslist.Partslist.Material")
-                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
-                .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
-
-        */
 
         protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>> s_cQry_Inputs =
        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, string, bool, IQueryable<InputOverview>>(
@@ -1159,10 +1325,9 @@ namespace gip.bso.manufacturing
         public List<ProdOrderPartslistOverview> OverviewProdOrderPartslist { get; set; }
         public List<ProdOrderPartslistOverview> OverviewMaterial { get; set; }
         public List<InputOverview> InputOverview { get; set; }
-
+        public List<ProdOrderPartslistPos> OrderPositionsForInputList { get; set; }
         public DateTime OperationStartTime { get; set; }
         public DateTime OperationEndTime { get; set; }
-
         public string OperationName { get; set; }
     }
 }

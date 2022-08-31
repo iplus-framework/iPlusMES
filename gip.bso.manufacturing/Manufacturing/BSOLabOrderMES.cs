@@ -57,14 +57,6 @@ namespace gip.bso.manufacturing
             set
             {
                 base.CurrentLabOrder = value;
-
-                if (value != null)
-                {
-                    if (SelectedLabOrderPos == null && LabOrderPosList != null)
-                    {
-                        SelectedLabOrderPos = LabOrderPosList.FirstOrDefault();
-                    }
-                }
             }
         }
 
@@ -114,7 +106,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedSamplePiStats = value;
-                OnPropertyChanged("SelectedSamplePiStats");
+                OnPropertyChanged(nameof(SelectedSamplePiStats));
             }
         }
 
@@ -133,7 +125,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _CurrentSamplePiStats = value;
-                OnPropertyChanged("CurrentSamplePiStats");
+                OnPropertyChanged(nameof(CurrentSamplePiStats));
             }
         }
 
@@ -161,11 +153,11 @@ namespace gip.bso.manufacturing
         protected void ReportChangedSampleWeighing()
         {
             RebuildSamplePiStatsStats();
-            OnPropertyChanged("PiStats");
-            OnPropertyChanged("SamplePiStatsList");
-            OnPropertyChanged("SamplePiMaxList");
-            OnPropertyChanged("SamplePiMinList");
-            OnPropertyChanged("SamplePiSetPointList");
+            OnPropertyChanged(nameof(PiStats));
+            OnPropertyChanged(nameof(SamplePiStatsList));
+            OnPropertyChanged(nameof(SamplePiMaxList));
+            OnPropertyChanged(nameof(SamplePiMinList));
+            OnPropertyChanged(nameof(SamplePiSetPointList));
         }
 
         protected void RebuildSamplePiStatsStats()
