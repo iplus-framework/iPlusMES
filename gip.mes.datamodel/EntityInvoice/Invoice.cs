@@ -196,7 +196,7 @@ namespace gip.mes.datamodel
             {
                 if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
                 {
-                    return InvoicePos_Invoice.Where(c => c.PriceNet < 0).Sum(o => o.PriceNet);
+                    return InvoicePos_Invoice.Where(c => c.PriceNet < 0 && c.Sequence >= 1000).Sum(o => o.PriceNet);
                 }
                 return 0;
             }
@@ -209,7 +209,7 @@ namespace gip.mes.datamodel
             {
                 if (InvoicePos_Invoice != null && InvoicePos_Invoice.Any())
                 {
-                    return InvoicePos_Invoice.Where(c => c.TotalPrice >= 0).Sum(o => o.TotalPrice);
+                    return InvoicePos_Invoice.Where(c => c.Sequence < 1000).Sum(o => o.TotalPrice);
                 }
                 return 0;
             }

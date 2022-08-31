@@ -1199,7 +1199,7 @@ namespace gip.mes.facility
                 var percent = (decimal)((Math.Abs(outOrder.PosPriceNetDiscount) / outOrder.PosPriceNetSum) * 100);
 
                 mDCountrySalesTaxes = positions
-                                        .Where(c => c.PriceNet > 0)
+                                        .Where(c => c.Sequence < 1000)
                                         .Select(x => new Tuple<decimal, decimal>(x.SalesTax, (x.PriceNet - (x.PriceNet * (percent / 100))) * (decimal)x.TargetQuantity * (x.SalesTax / 100)))
                                         .GroupBy(t => t.Item1)
                                         .Select(o => new MDCountrySalesTax()
@@ -1212,7 +1212,7 @@ namespace gip.mes.facility
             else
             {
                 mDCountrySalesTaxes = positions
-                                        .Where(c => c.SalesTax > 0 && c.SalesTaxAmount > 0)
+                                        .Where(c => c.SalesTax > 0)
                                         .GroupBy(g => g.SalesTax)
                                         .Select(o => new MDCountrySalesTax()
                                         {

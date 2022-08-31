@@ -571,7 +571,7 @@ namespace gip.bso.sales
             {
                 if (InvoicePosList == null)
                     return null;
-                return InvoicePosList.Where(c => c.PriceNet >= 0).OrderBy(c => c.Sequence).ToList();
+                return InvoicePosList.Where(c => c.Sequence < 1000).OrderBy(c => c.Sequence).ToList();
             }
         }
 
@@ -613,7 +613,7 @@ namespace gip.bso.sales
             {
                 if (InvoicePosList == null)
                     return null;
-                return InvoicePosList.Where(c => c.PriceNet < 0).OrderBy(c => c.Sequence).ToList();
+                return InvoicePosList.Where(c => c.PriceNet < 0 && c.Sequence >= 1000).OrderBy(c => c.Sequence).ToList();
             }
         }
 
@@ -1661,7 +1661,7 @@ namespace gip.bso.sales
             List<InvoicePos> posData = new List<InvoicePos>();
 
             //foreach (var invoicePos in CurrentInvoice.InvoicePos_Invoice.Where(c => c.GroupInvoicePosID == null && c.PriceNet >= 0).OrderBy(p => p.Position))
-            foreach (var invoicePos in CurrentInvoice.InvoicePos_Invoice.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
+            foreach (var invoicePos in CurrentInvoice.InvoicePos_Invoice.Where(c => c.Sequence < 1000).OrderBy(p => p.Position))
             {
                 posData.Add(invoicePos);
                 //BuildInvoicePosDataRecursive(posData, invoicePos.Items);
@@ -1677,7 +1677,7 @@ namespace gip.bso.sales
             }
 
             InvoiceDataList = posData;
-            InvoiceDiscountList = CurrentInvoice.InvoicePos_Invoice.Where(c => c.PriceNet < 0).OrderBy(s => s.Sequence).ToList();
+            InvoiceDiscountList = CurrentInvoice.InvoicePos_Invoice.Where(c => c.PriceNet < 0 && c.Sequence >= 1000).OrderBy(s => s.Sequence).ToList();
             if (InvoiceDiscountList != null && InvoiceDiscountList.Any())
             {
                 //OutOfferPosDiscountList.Add(new OutOfferPos() { Comment = "Rabatt in Summe:", PriceNet = (decimal)CurrentInvoice.PosPriceNetDiscount });
@@ -1689,7 +1689,7 @@ namespace gip.bso.sales
 
         private void BuildInvoicePosDataRecursive(List<InvoicePos> posDataList, IEnumerable<InvoicePos> invoicePosList)
         {
-            foreach (var invoicePos in invoicePosList.Where(c => c.PriceNet >= 0).OrderBy(p => p.Position))
+            foreach (var invoicePos in invoicePosList.Where(c => c.Sequence < 1000).OrderBy(p => p.Position))
             {
                 posDataList.Add(invoicePos);
                 //BuildInvoicePosDataRecursive(posDataList, invoicePos.Items);
