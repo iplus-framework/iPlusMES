@@ -1184,6 +1184,27 @@ namespace gip.bso.facility
 
         protected override bool BookRelocation()
         {
+            if (CurrentBookParamRelocation.FacilityBooking != null)
+            {
+                if (CurrentBookParamRelocation.FacilityBooking.OutwardMaterial != CurrentBookParamRelocation.OutwardMaterial)
+                    CurrentBookParamRelocation.FacilityBooking.OutwardMaterial = CurrentBookParamRelocation.OutwardMaterial;
+
+                if (CurrentBookParamRelocation.FacilityBooking.OutwardFacility != CurrentBookParamRelocation.OutwardFacility)
+                    CurrentBookParamRelocation.FacilityBooking.OutwardFacility = CurrentBookParamRelocation.OutwardFacility;
+
+                if (CurrentBookParamRelocation.FacilityBooking.OutwardFacilityLot != CurrentBookParamRelocation.OutwardFacilityLot)
+                    CurrentBookParamRelocation.FacilityBooking.OutwardFacilityLot = CurrentBookParamRelocation.OutwardFacilityLot;
+
+                if (CurrentBookParamRelocation.FacilityBooking.InwardMaterial != CurrentBookParamRelocation.InwardMaterial)
+                    CurrentBookParamRelocation.FacilityBooking.InwardMaterial = CurrentBookParamRelocation.InwardMaterial;
+
+                if (CurrentBookParamRelocation.FacilityBooking.InwardFacility != CurrentBookParamRelocation.InwardFacility)
+                    CurrentBookParamRelocation.FacilityBooking.InwardFacility = CurrentBookParamRelocation.InwardFacility;
+
+                if (CurrentBookParamRelocation.FacilityBooking.InwardFacilityLot != CurrentBookParamRelocation.InwardFacilityLot)
+                    CurrentBookParamRelocation.FacilityBooking.InwardFacilityLot = CurrentBookParamRelocation.InwardFacilityLot;
+            }
+
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamRelocation, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamRelocation.ValidMessage.IsSucceded() || CurrentBookParamRelocation.ValidMessage.HasWarnings())
             {

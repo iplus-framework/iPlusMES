@@ -608,6 +608,9 @@ namespace gip.mes.facility
         {
             Global.ACMethodResultState bookingResult = Global.ACMethodResultState.Succeeded;
             FacilityBooking FB = BP.FacilityBooking != null ? BP.FacilityBooking : NewFacilityBooking(BP);
+
+            if (BP.FacilityBookings != null && !BP.FacilityBookings.Contains(BP))
+                BP.FacilityBookings.Add(BP);
             ///     Pseudo-Code:        
             // Falls Umlagerungsbuchung von FacilityCharge nach FacilityCharge
             // FacitlityBookingType.Relocation_FacilityCharge:
