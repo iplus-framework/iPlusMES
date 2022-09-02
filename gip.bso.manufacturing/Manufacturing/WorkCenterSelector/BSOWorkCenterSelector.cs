@@ -760,6 +760,47 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties => ReceivedAlarms
+
+        public IACContainerTNet<bool> HasReceivedAlarms;
+
+        private bool _HasAnyReceivedAlarm;
+        [ACPropertyInfo(9999)]
+        public bool HasAnyReceivedAlarm
+        {
+            get => _HasAnyReceivedAlarm;
+            set
+            {
+                _HasAnyReceivedAlarm = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Msg _SelectedReceivedAlarm;
+        [ACPropertySelected(9999, "ReceivedAlarm", "en{'Alarms'}de{'Alarms'}")]
+        public Msg SelectedReceivedAlarm
+        {
+            get => _SelectedReceivedAlarm;
+            set
+            {
+                _SelectedReceivedAlarm = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private MsgList _ReceivedAlarmsList;
+        [ACPropertyList(9999, "ReceivedAlarm")]
+        public MsgList ReceivedAlarmsList
+        {
+            get => _ReceivedAlarmsList;
+            set
+            {
+                _ReceivedAlarmsList = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -953,18 +994,40 @@ namespace gip.bso.manufacturing
             if (ProcessModuleOrderInfo != null)
                 ProcessModuleOrderInfo.PropertyChanged -= ProcessModuleOrderInfo_PropertyChanged;
 
+            if (HasReceivedAlarms != null)
+                HasReceivedAlarms.PropertyChanged -= HasReceivedAlarms_PropertyChanged;
+
             ProcessModuleOrderInfo = null;
 
             ProcessModuleOrderInfo = processModule.GetPropertyNet(nameof(PAProcessModule.OrderInfo)) as IACContainerTNet<string>;
             if (ProcessModuleOrderInfo == null)
             {
-                //error
+                Messages.LogMessage(eMsgLevel.Error, this.GetACUrl(), nameof(BSOWorkCenterSelector), "ProcessModuleOrderInfo property is null!");
                 return;
+            }
+
+            HasReceivedAlarms = processModule.GetPropertyNet(nameof(PAProcessModule.HasAttachedAlarm)) as IACContainerTNet<bool>;
+            if (HasReceivedAlarms != null)
+            {
+                HasReceivedAlarms.PropertyChanged += HasReceivedAlarms_PropertyChanged;
+                HasAnyReceivedAlarm = HasReceivedAlarms.ValueT;
             }
 
             ProcessModuleOrderInfo.PropertyChanged += ProcessModuleOrderInfo_PropertyChanged;
             string orderInfo = ProcessModuleOrderInfo.ValueT;
             HandleOrderInfoPropChanged(orderInfo, processModule);
+        }
+
+        private void HasReceivedAlarms_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                IACContainerTNet<bool> senderProp = sender as IACContainerTNet<bool>;
+                if (senderProp != null)
+                {
+                    HasAnyReceivedAlarm = senderProp.ValueT;
+                }
+            }
         }
 
         private void ProcessModuleOrderInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -1458,6 +1521,55 @@ namespace gip.bso.manufacturing
         public virtual bool IsEnabledAbortAllAndSwitchPWGroupToEmptyingMode()
         {
             return SelectedExtraDisTarget != null;
+        }
+
+        [ACMethodInfo("","",9999)]
+        public void ShowReceivedAlarmsDialog()
+        {
+            var processModule = CurrentProcessModule;
+
+            if (processModule == null)
+                return;
+
+            MsgList receivedAlarms = processModule.ExecuteMethod(nameof(PAProcessModule.GetAttachedAlarms)) as MsgList;
+
+            ReceivedAlarmsList = receivedAlarms;
+
+            ShowDialog(this, "ReceivedAlarmsDialog");
+        }
+
+        [ACMethodInfo("", "en{'Acknowledge alarm'}de{'Alarm quittieren'}", 9999)]
+        public void AckReceivedAlarm()
+        {
+            var processModule = CurrentProcessModule;
+
+            if (processModule == null)
+                return;
+
+            processModule.ExecuteMethod(nameof(PAProcessModule.AckAttachedAlarm), SelectedReceivedAlarm.MsgId);
+
+            ReceivedAlarmsList.Remove(SelectedReceivedAlarm);
+            var alarmList = new MsgList();
+            alarmList.AddRange(ReceivedAlarmsList);
+            ReceivedAlarmsList = alarmList;
+        }
+
+        public bool IsEnabledAckReceivedAlarm()
+        {
+            return SelectedReceivedAlarm != null;
+        }
+
+        [ACMethodInfo("", "en{'Acknowledge all alarms'}de{'Alle Alarme quittieren'}", 9999)]
+        public void AckAllReceivedAlarms()
+        {
+            var processModule = CurrentProcessModule;
+
+            if (processModule == null)
+                return;
+
+            processModule.ExecuteMethod(nameof(PAProcessModule.AckAllAttachedAlarms));
+
+            ReceivedAlarmsList = null;
         }
 
         #endregion
