@@ -2277,6 +2277,22 @@ namespace gip.mes.facility
                                                                             relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID,
                                                                             false));
 
+                            ProdOrder prodOrder = relationForRPost?.SourceProdOrderPartslistPos?.ProdOrderPartslist?.ProdOrder;
+                            ProdOrderPartslist plMat = prodOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID);
+                            
+                            if (plMat != null && !relationForRPost.SourceProdOrderPartslistPos.TakeMatFromOtherOrder)
+                            {
+                                facilityOutwardChargeSubList = new FacilityChargeList(facilityOutwardChargeSubList.Where(c => c.ProdOrderProgramNo == prodOrder.ProgramNo));
+
+                                if (!facilityOutwardChargeSubList.Any())
+                                {
+                                    // Warning50056: Backflushing for Material {0} / {1} is not possible, because there not exist any facility charge that is produced from a same order.
+                                    BP.AddBookingMessage(ACMethodBooking.eResultCodes.NoFacilityChargeFoundForRetrotragePosting, Root.Environment.TranslateMessage(this, "Warning50056", relationForRPost.SourceProdOrderPartslistPos.MaterialNo, relationForRPost.SourceProdOrderPartslistPos.MaterialName));
+                                    continue;
+                                }
+                            }
+
+
                             StackItemList stackItemListInOut;
                             MsgBooking msgBookingInOut;
                             bookingSubResult = BP.StackCalculatorOutward(this).CalculateInOut(false,

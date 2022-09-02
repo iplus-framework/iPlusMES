@@ -4770,6 +4770,7 @@ namespace gip.mes.facility
 
             // Warning  (10000 - 19999)
             NoFacilityFoundForRetrotragePosting = 10000,
+            NoFacilityChargeFoundForRetrotragePosting = 10001,
 
             // Failure  (20000 - 29999)
 
