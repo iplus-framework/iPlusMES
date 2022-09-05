@@ -882,9 +882,7 @@ namespace gip.mes.facility
 
                 if (prodOrderPartslist != null && defaultWizardSchedulerPartslist.ProdOrderPartslistPos != null)
                 {
-                    prodOrderPartslist.DepartmentUserName = defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.DepartmentUserName;
-                    prodOrderPartslist.StartDate = defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.StartDate;
-                    prodOrderPartslist.EndDate = defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.EndDate;
+                    CopyStartDepartmentFromMain(prodOrderPartslist, defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
                 }
 
                 success = msg == null || msg.IsSucceded();
@@ -1008,6 +1006,13 @@ namespace gip.mes.facility
             batchPlan.TotalSize = suggestionItem.TotalBatchSizeUOM;
             batchPlan.BatchSize = suggestionItem.BatchSizeUOM;
             batchPlan.BatchTargetCount = suggestionItem.BatchTargetCount;
+        }
+
+        public void CopyStartDepartmentFromMain(ProdOrderPartslist prodOrderPartslist, ProdOrderPartslist mainProdOrderPartslist)
+        {
+            prodOrderPartslist.DepartmentUserName = mainProdOrderPartslist.DepartmentUserName;
+            prodOrderPartslist.StartDate = mainProdOrderPartslist.StartDate;
+            prodOrderPartslist.EndDate = mainProdOrderPartslist.EndDate;
         }
 
 
@@ -1136,6 +1141,14 @@ namespace gip.mes.facility
             }
 
             WizardSchedulerPartslist defaultWizardPl = wPls.Where(c => c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
+
+            foreach (WizardSchedulerPartslist wPl in wPls)
+            {
+                if(wPl != defaultWizardPl && wPl.ProdOrderPartslistPos != null && defaultWizardPl.ProdOrderPartslistPos != null)
+                {
+                    CopyStartDepartmentFromMain(wPl.ProdOrderPartslistPos.ProdOrderPartslist, defaultWizardPl.ProdOrderPartslistPos.ProdOrderPartslist);
+                }
+            }
 
             string programNo = prodOrder.ProgramNo;
             // 4.0 define targets
