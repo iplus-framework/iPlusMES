@@ -305,7 +305,7 @@ namespace gip.bso.manufacturing
 
         private void Value_OnSearchStockMaterial(object sender, EventArgs e)
         {
-            if(!BackgroundWorker.IsBusy)
+            if (!BackgroundWorker.IsBusy)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchStockMaterial);
                 ShowDialog(this, DesignNameProgressBar);
@@ -2590,7 +2590,7 @@ namespace gip.bso.manufacturing
         {
             MsgWithDetails saveMsg = null;
             Msg msg = CheckForInappropriateComponentQuantityOccurrence();
-            if(msg != null)
+            if (msg != null)
             {
                 Messages.Msg(msg);
                 ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
@@ -2821,7 +2821,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledMoveToOtherLine()
         {
-            return 
+            return
                     SelectedProdOrderBatchPlan != null
                     && SelectedProdOrderBatchPlan.ProdOrderPartslist != null
                     && SelectedProdOrderBatchPlan.PlanState < GlobalApp.BatchPlanState.Completed
@@ -3242,7 +3242,7 @@ namespace gip.bso.manufacturing
         public void ShowParslist()
         {
             double treeQuantityRatio = SelectedProdOrderBatchPlan.ProdOrderPartslist.TargetQuantity / SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.TargetQuantityUOM;
-            rootPartslistExpand = new PartslistExpand(SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist, treeQuantityRatio);
+            rootPartslistExpand = new PartslistExpand(SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist, 1, treeQuantityRatio);
             rootPartslistExpand.IsChecked = true;
             rootPartslistExpand.LoadTree();
 
@@ -3826,6 +3826,23 @@ namespace gip.bso.manufacturing
             List<MaintainOrderInfo> prodOrders = new List<MaintainOrderInfo>();
             //= plForRemove.Select(c => new MaintainOrderInfo() { PO = c.ProdOrder }).Distinct().ToList();
 
+            List<ProdOrderPartslist> allForRemove = new List<ProdOrderPartslist>();
+
+            //foreach (ProdOrderPartslist partslist in plForRemove)
+            //{
+            //    if(partslist.ProdOrder.ProdOrderPartslist_ProdOrder.Count() > 1)
+            //    {
+            //        ProdOrderPartslist finalList =
+            //            partslist.ProdOrder
+            //            .ProdOrderPartslist_ProdOrder
+            //            .Where(c => !c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID != null)).FirstOrDefault();
+                    
+            //        ProdOrderPartslistExpand expandItem  =new ProdOrderPartslistExpand(finalList);
+            //        expandItem.LoadTree();
+            //    }
+            //}
+
+
             foreach (ProdOrderPartslist partslist in plForRemove)
             {
                 MaintainOrderInfo mOrderInfo = prodOrders.Where(c => c.PO == partslist.ProdOrder).FirstOrDefault();
@@ -4240,7 +4257,7 @@ namespace gip.bso.manufacturing
                         OnSelectedWizardSchedulerPartslistChanged();
 
                         double treeQuantityRatio = DefaultWizardSchedulerPartslist.TargetQuantityUOM / selectedPartslist.TargetQuantityUOM;
-                        rootPartslistExpand = new PartslistExpand(selectedPartslist, treeQuantityRatio);
+                        rootPartslistExpand = new PartslistExpand(selectedPartslist, 1, treeQuantityRatio);
                         rootPartslistExpand.IsChecked = true;
                         rootPartslistExpand.LoadTree();
                         rootPartslistExpand.IsEnabled = false;
@@ -4394,11 +4411,13 @@ namespace gip.bso.manufacturing
 
             foreach (ExpandResult expand in treeResult)
             {
+                PartslistExpand partslistExpand = expand.Item as PartslistExpand;
+
                 WizardSchedulerPartslist wizardSchedulerPartslist =
                     AllWizardSchedulerPartslistList
                     .Where(c =>
                                 c.ProdOrderPartslistPos != null
-                                && c.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo == expand.Item.PartslistNo)
+                                && c.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.PartslistNo == partslistExpand.PartslistNo)
                     .FirstOrDefault();
 
                 sn++;
@@ -4407,17 +4426,17 @@ namespace gip.bso.manufacturing
                 {
                     ProdOrderPartslist prodOrderPartslist = null;
                     if (prodOrder != null)
-                        prodOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.PartslistNo == expand.Item.PartslistNo);
+                        prodOrderPartslist = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.PartslistNo == partslistExpand.PartslistNo);
 
-                    List<MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, expand.Item.PartslistForPosition, PartslistMDSchedulerGroupConnections);
+                    List<MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, partslistExpand.Partslist, PartslistMDSchedulerGroupConnections);
                     if (prodOrderPartslist != null)
                         wizardSchedulerPartslist = new WizardSchedulerPartslist(
                         DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
-                        expand.Item.PartslistForPosition, expand.Item.TargetQuantityUOM, sn, schedulingGroups, prodOrderPartslist);
+                        partslistExpand.Partslist, partslistExpand.TargetQuantityUOM, sn, schedulingGroups, prodOrderPartslist);
                     else
                         wizardSchedulerPartslist = new WizardSchedulerPartslist(
                             DatabaseApp, ProdOrderManager, LocalBSOBatchPlan.VarioConfigManager,
-                            expand.Item.PartslistForPosition, expand.Item.TargetQuantityUOM, sn, schedulingGroups);
+                            partslistExpand.Partslist, partslistExpand.TargetQuantityUOM, sn, schedulingGroups);
 
                     AddWizardSchedulerPartslistList(wizardSchedulerPartslist, sn);
                 }

@@ -1807,7 +1807,7 @@ namespace gip.bso.manufacturing
         public void BOMExplosion()
         {
             double treeQuantityRatio = SelectedProdOrderPartslist.TargetQuantity / SelectedProdOrderPartslist.Partslist.TargetQuantityUOM;
-            rootProdOrderPartListExpand = new PartslistExpand(SelectedProdOrderPartslist.Partslist, treeQuantityRatio);
+            rootProdOrderPartListExpand = new PartslistExpand(SelectedProdOrderPartslist.Partslist, 1, treeQuantityRatio);
             rootProdOrderPartListExpand.IsChecked = true;
             rootProdOrderPartListExpand.LoadTree();
             rootProdOrderPartListExpand.IsEnabled = false;
@@ -1864,7 +1864,8 @@ namespace gip.bso.manufacturing
                 foreach (ExpandResult item in treeResult)
                 {
                     ProdOrderPartslist prodOrderPartslist = null;
-                    Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, SelectedProdOrder, item.Item.PartslistForPosition, selectedSequence, item.Item.TargetQuantityUOM, out prodOrderPartslist);
+                    PartslistExpand partslistExpand = item.Item as PartslistExpand;
+                    Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, SelectedProdOrder, partslistExpand.Partslist, selectedSequence, partslistExpand.TargetQuantityUOM, out prodOrderPartslist);
                     selectedSequence--;
                 }
                 ProdOrderManager.ConnectSourceProdOrderPartslist(SelectedProdOrder);

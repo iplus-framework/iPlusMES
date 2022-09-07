@@ -1068,7 +1068,7 @@ namespace gip.mes.facility
             {
                 // 1.0 make BOM - create partslists
                 double treeQuantityRatio = plForBatchGenerate.TargetQuantity / plForBatchGenerate.Partslist.TargetQuantityUOM;
-                PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist, treeQuantityRatio);
+                PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist,1, treeQuantityRatio);
                 rootPartslistExpand.IsChecked = true;
                 rootPartslistExpand.LoadTree();
 
@@ -1086,9 +1086,10 @@ namespace gip.mes.facility
                 foreach (ExpandResult expand in treeResult)
                 {
                     sn++;
-                    ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == expand.Item.PartslistForPosition.PartslistID);
+                    PartslistExpand partslistExpand = expand.Item as  PartslistExpand;
+                    ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == partslistExpand.Partslist.PartslistID);
                     if (pl == null)
-                        PartslistAdd(databaseApp, prodOrder, expand.Item.PartslistForPosition, sn, expand.Item.TargetQuantityUOM, out pl);
+                        PartslistAdd(databaseApp, prodOrder, partslistExpand.Partslist, sn, partslistExpand.TargetQuantityUOM, out pl);
                     pl.Sequence = sn;
                 }
             }

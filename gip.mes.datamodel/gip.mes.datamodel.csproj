@@ -111,6 +111,7 @@
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityMD\MDPickingType.cs" />
+    <None Include="EntityPartsList\PartslistExpand.tmp" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="EntityProdOrder\ConstIInputQForActual.cs" />
     <Compile Include="EntityProdOrder\InappropriateComponentQuantityOccurrence.cs" />
     <Compile Include="EntityProdOrder\InputQForActual.cs" />
+    <Compile Include="EntityProdOrder\ProdOrderPartslistExpand.cs" />
     <Compile Include="EntityProdOrder\ProdOrderPartslistPos_Statistic.cs" />
     <Compile Include="EntityProdOrder\ProdOrderPartslist_Statistic.cs" />
     <Compile Include="EntityUser\UserSettings.cs" />
@@ -275,7 +277,6 @@
     <Compile Include="EntityOutOrder\OutOrderPos.cs" />
     <Compile Include="EntityOutOrder\OutOrderPosSplit.cs" />
     <Compile Include="EntityOutOrder\OutOrderPosUtilization.cs" />
-    <Compile Include="EntityPartsList\ExpandResult.cs" />
     <Compile Include="EntityPartsList\PartslistACClassMethod.cs" />
     <Compile Include="EntityPartsList\Partslist.cs" />
     <Compile Include="EntityPartsList\PartslistConfig.cs" />
