@@ -5,13 +5,18 @@ namespace gip.mes.datamodel
 {
     public class InappropriateComponentQuantityOccurrence
     {
+        #region const
+        public static double OldNewValueRatioFactor = 5;
+        #endregion
+
+        #region Methods
 
         public static bool IsForAnalyse(double oldValue, double newValue)
         {
             bool isForAnalyse = false;
             if (oldValue > double.Epsilon && newValue > double.Epsilon && Math.Abs(oldValue - newValue) > double.Epsilon)
             {
-                if ((oldValue / newValue) > 5 || (newValue / oldValue) > 5)
+                if ((oldValue / newValue) > OldNewValueRatioFactor || (newValue / oldValue) > OldNewValueRatioFactor)
                 {
                     isForAnalyse = true;
                 }
@@ -24,7 +29,7 @@ namespace gip.mes.datamodel
             bool isInappropriate = false;
             if (pos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
             {
-                if (pos.ProdOrderPartslist.TargetQuantity > 0 && pos.BasedOnPartslistPos != null)
+                if (pos.ProdOrderPartslist.TargetQuantity > 0 && pos.BasedOnPartslistPos != null && Math.Abs(pos.TargetQuantityUOM - pos.BasedOnPartslistPos.TargetQuantityUOM) > 0.1)
                 {
                     double componentRatio = pos.TargetQuantityUOM / pos.ProdOrderPartslist.TargetQuantity;
                     double partslistComponentRatio = pos.BasedOnPartslistPos.TargetQuantityUOM / pos.BasedOnPartslistPos.Partslist.TargetQuantityUOM;
@@ -73,7 +78,10 @@ namespace gip.mes.datamodel
                     root.Messages.LogWarning(pos.GetACUrl(), pos.ACIdentifier, stackTrace);
                 }
             }
-        }
-    }
 
+        }
+
+        #endregion
+
+    }
 }
