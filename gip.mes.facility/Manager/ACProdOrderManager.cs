@@ -1151,6 +1151,9 @@ namespace gip.mes.facility
                 }
             }
 
+            ConnectSourceProdOrderPartslist(prodOrder);
+            CorrectSortOrder(prodOrder);
+
             string programNo = prodOrder.ProgramNo;
             // 4.0 define targets
             List<ProdOrderBatchPlan> prodOrderBatchPlans = new List<ProdOrderBatchPlan>();
