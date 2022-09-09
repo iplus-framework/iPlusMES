@@ -111,6 +111,15 @@ namespace gip.mes.processapplication
             CurrentEndBatchPosKey = null;
             _LastOpenMaterial = null;
 
+            if (!_FreeMDReleaseStateID.HasValue || !_AbsFreeMDReleaseStateID.HasValue)
+            {
+                using(DatabaseApp dbApp = new DatabaseApp())
+                {
+                    _FreeMDReleaseStateID = dbApp.MDReleaseState.FirstOrDefault(c => c.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.Free)?.MDReleaseStateID;
+                    _AbsFreeMDReleaseStateID = dbApp.MDReleaseState.FirstOrDefault(c => c.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.AbsFree)?.MDReleaseStateID;
+                }
+            }
+
             return true;
         }
 
@@ -163,6 +172,10 @@ namespace gip.mes.processapplication
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
+
+        private Guid? _FreeMDReleaseStateID;
+        private Guid? _AbsFreeMDReleaseStateID;
+
 
         //TODO: _IsAborted and _ScaleComp change with PAF paramter AbortType
         protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false, _ScaleComp = false;
@@ -675,14 +688,21 @@ namespace gip.mes.processapplication
             set;
         }
 
+        public List<Guid> RoutableFacilities
+        {
+            get;
+            set;
+        }
+
         public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> FacilityChargeListQuery
         {
             get
             {
-                return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility.Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
-                                                                                                && (x.MDReleaseState == null
-                                                                                                 || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree)))
-                                                                                              .ToArray().OrderBy(o => o.ExpirationDate);
+                return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
+                                                    .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
+                                                                                && (x.MDReleaseStateID == null || x.MDReleaseStateID == _AbsFreeMDReleaseStateID
+                                                                                                               || x.MDReleaseStateID == _FreeMDReleaseStateID))
+                                                    .ToArray().OrderBy(o => o.ExpirationDate);
             }
         }
 
@@ -1939,8 +1959,6 @@ namespace gip.mes.processapplication
                     }
 
                     AvailableRoutes = GetAvailableStorages(module);
-
-
                 }
             }
 
@@ -2218,7 +2236,7 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public ACValueList GetAvailableFacilityCharges(Guid PLPosRelation)
         {
             using (Database db = new Database())
@@ -2236,6 +2254,27 @@ namespace gip.mes.processapplication
                 }
                 return null;
             }
+        }
+
+        [ACMethodInfo("", "", 9999)]
+        public ACValueList GetRoutableFacilities(Guid PLPosRelation)
+        {
+            using (Database db = new Database())
+            using (DatabaseApp dbApp = new DatabaseApp(db))
+            {
+                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation
+                                                    .Include(c => c.SourceProdOrderPartslistPos)
+                                                    .Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                    .Include(c => c.SourceProdOrderPartslistPos.Material.BaseMDUnit)
+                                                    .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == PLPosRelation);
+                if (rel != null)
+                {
+                    IEnumerable<Facility> facilities = GetAvailableFacilitiesForMaterial(dbApp, rel);
+                    return new ACValueList(facilities.Select(c => new ACValue("ID", c.FacilityID)).ToArray());
+                }
+                return null;
+            }
+
         }
 
         private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)

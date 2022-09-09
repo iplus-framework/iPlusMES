@@ -809,5 +809,22 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
         }
 
         #endregion
+
+
+        #region FacilityCharges
+
+        public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> FacilityChargeListQuery
+        {
+            get
+            {
+                return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
+                                                    .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
+                                                                                && (x.MDReleaseStateID == null || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                    .ToArray().OrderBy(o => o.ExpirationDate);
+            }
+        }
+
+        #endregion
+
     }
 }

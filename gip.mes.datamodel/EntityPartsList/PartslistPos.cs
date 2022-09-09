@@ -346,6 +346,22 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(9999, "", "en{'Suggest quant quantity on posting'}de{'Vorschlagsmenge bei der Buchung'}")]
+        public bool SuggestQuantQOnPosting
+        {
+            get
+            {
+                return PostingQuantitySuggestion > 0;
+            }
+            set
+            {
+                if (value)
+                    PostingQuantitySuggestion = 1;
+                else
+                    PostingQuantitySuggestion = 0;
+            }
+        }
+
         #endregion
 
         #region Partial Methods

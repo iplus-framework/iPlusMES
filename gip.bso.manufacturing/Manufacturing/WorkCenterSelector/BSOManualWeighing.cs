@@ -678,16 +678,41 @@ namespace gip.bso.manufacturing
 
                     if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
                     {
-                        ACValueList facilityCharges = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetAvailableFacilityCharges), 
-                                                                                     SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
-                        if (facilityCharges == null)
+                        ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
+                                                                                SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
+
+                        var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
+                        if (facilityIDs == null)
                             return null;
+
                         using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
                         {
-                            _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge
-                                                                                                            .Include(d => d.FacilityLot).Include(d => d.MDUnit).Include(d => d.Material).Include(d => d.Facility)
-                                                                                                             .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
-                                                                 .ToArray();
+                            var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
+
+                            if (_ACFacilityManager == null)
+                            {
+                                _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+                                if (_ACFacilityManager == null)
+                                {
+                                    //Error50432: The facility manager is null.
+                                    Messages.Error(this, "Error50432");
+                                }
+                            }
+
+                            if (SelectedWeighingMaterial.PosRelation != null)
+                                _FacilityChargeList = ACFacilityManager?.FacilityChargeListQuery(facilitesDB, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
+
+
+
+                        //ACValueList facilityCharges = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetAvailableFacilityCharges), 
+                        //                                                             SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
+                        //if (facilityCharges == null)
+                        //    return null;
+
+                        //    _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge
+                        //                                                                                    .Include(d => d.FacilityLot).Include(d => d.MDUnit).Include(d => d.Material).Include(d => d.Facility)
+                        //                                                                                     .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
+                        //                                         .ToArray();
 
                             FacilityChargeListCount = _FacilityChargeList.Count();
                         }
