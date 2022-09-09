@@ -813,7 +813,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
 
         #region FacilityCharges
 
-        public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> FacilityChargeListQuery
+        public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> ManualWeigingFacilityChargeListQuery
         {
             get
             {

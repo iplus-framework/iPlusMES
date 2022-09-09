@@ -700,7 +700,7 @@ namespace gip.bso.manufacturing
                             }
 
                             if (SelectedWeighingMaterial.PosRelation != null)
-                                _FacilityChargeList = ACFacilityManager?.FacilityChargeListQuery(facilitesDB, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
+                                _FacilityChargeList = ACFacilityManager?.ManualWeigingFacilityChargeListQuery(facilitesDB, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
 
 
 

@@ -111,15 +111,6 @@ namespace gip.mes.processapplication
             CurrentEndBatchPosKey = null;
             _LastOpenMaterial = null;
 
-            if (!_FreeMDReleaseStateID.HasValue || !_AbsFreeMDReleaseStateID.HasValue)
-            {
-                using(DatabaseApp dbApp = new DatabaseApp())
-                {
-                    _FreeMDReleaseStateID = dbApp.MDReleaseState.FirstOrDefault(c => c.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.Free)?.MDReleaseStateID;
-                    _AbsFreeMDReleaseStateID = dbApp.MDReleaseState.FirstOrDefault(c => c.MDReleaseStateIndex == (short)MDReleaseState.ReleaseStates.AbsFree)?.MDReleaseStateID;
-                }
-            }
-
             return true;
         }
 
@@ -172,10 +163,6 @@ namespace gip.mes.processapplication
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
-
-        private Guid? _FreeMDReleaseStateID;
-        private Guid? _AbsFreeMDReleaseStateID;
-
 
         //TODO: _IsAborted and _ScaleComp change with PAF paramter AbortType
         protected bool _CanStartFromBSO = true, _IsAborted = false, _IsBinChangeActivated = false, _IsLotChanged = false, _ScaleComp = false;
@@ -688,23 +675,17 @@ namespace gip.mes.processapplication
             set;
         }
 
-        public List<Guid> RoutableFacilities
-        {
-            get;
-            set;
-        }
-
-        public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> FacilityChargeListQuery
-        {
-            get
-            {
-                return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
-                                                    .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
-                                                                                && (x.MDReleaseStateID == null || x.MDReleaseStateID == _AbsFreeMDReleaseStateID
-                                                                                                               || x.MDReleaseStateID == _FreeMDReleaseStateID))
-                                                    .ToArray().OrderBy(o => o.ExpirationDate);
-            }
-        }
+        ////public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> FacilityChargeListQuery
+        ////{
+        ////    get
+        ////    {
+        ////        return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
+        ////                                            .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
+        ////                                                                        && (x.MDReleaseStateID == null || x.MDReleaseStateID == _AbsFreeMDReleaseStateID
+        ////                                                                                                       || x.MDReleaseStateID == _FreeMDReleaseStateID))
+        ////                                            .ToArray().OrderBy(o => o.ExpirationDate);
+        ////    }
+        ////}
 
         public virtual Func<IEnumerable<Facility>, Guid[], IEnumerable<Facility>> FacilityListQuery
         {
@@ -2281,7 +2262,10 @@ namespace gip.mes.processapplication
         {
             IEnumerable<Facility> facilities = GetAvailableFacilitiesForMaterial(dbApp, posRel);
 
-            return FacilityChargeListQuery(facilities, posRel.SourceProdOrderPartslistPos.MaterialID);
+            if (ACFacilityManager == null)
+                return null;
+
+            return ACFacilityManager.ManualWeigingFacilityChargeListQuery(facilities, posRel.SourceProdOrderPartslistPos.MaterialID);
         }
 
         public IEnumerable<Facility> GetAvailableFacilitiesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
