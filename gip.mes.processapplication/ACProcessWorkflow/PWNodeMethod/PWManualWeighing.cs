@@ -687,14 +687,14 @@ namespace gip.mes.processapplication
         ////    }
         ////}
 
-        public virtual Func<IEnumerable<Facility>, Guid[], IEnumerable<Facility>> FacilityListQuery
-        {
-            get
-            {
-                return (fc, a) => fc.Where(c => !c.NotAvailable && a != null && c.VBiFacilityACClassID.HasValue &&
-                                                 a.Any(x => x == c.VBiFacilityACClassID)).ToArray();
-            }
-        }
+        //public virtual Func<IEnumerable<Facility>, Guid[], IEnumerable<Facility>> FacilityListQuery
+        //{
+        //    get
+        //    {
+        //        return (fc, a) => fc.Where(c => !c.NotAvailable && a != null && c.VBiFacilityACClassID.HasValue &&
+        //                                         a.Any(x => x == c.VBiFacilityACClassID)).ToArray();
+        //    }
+        //}
 
         #endregion
 
@@ -3987,6 +3987,9 @@ namespace gip.mes.processapplication
                     return true;
                 case nameof(GetAvailableFacilityCharges):
                     result = GetAvailableFacilityCharges((Guid)acParameter[0]);
+                    return true;
+                case nameof(GetRoutableFacilities):
+                    result = GetRoutableFacilities((Guid)acParameter[0]);
                     return true;
                 //case "GetAvailableFacilities":
                 //    result = GetAvailableFacilities((Guid)acParameter[0]);
