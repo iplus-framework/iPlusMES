@@ -11,12 +11,22 @@ using gip.mes.facility;
 using gip.mes.processapplication;
 using System.Data.Objects;
 using gip.bso.masterdata;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System.IO;
 
 namespace gip.bso.manufacturing
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Laboratory Order MES'}de{'Laborauftrag MES'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + LabOrder.ClassName)]
     public class BSOLabOrderMES : BSOLabOrder
     {
+
+        #region const
+
+        public const string BGWorkerMehtod_DoExportExcel = @"DoExportExcel";
+
+        #endregion
+
+
         #region c´tors
 
         public BSOLabOrderMES(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -51,8 +61,8 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public override LabOrder CurrentLabOrder 
-        { 
+        public override LabOrder CurrentLabOrder
+        {
             get => base.CurrentLabOrder;
             set
             {
@@ -61,6 +71,57 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+
+        #region Properties
+
+        string _ExportFilePath;
+
+        [ACPropertyInfo(500, "ExportFilePath", "en{'Export File Path'}de{'Export File Path'}")]
+        public string ExportFilePath
+        {
+            get
+            {
+                return _ExportFilePath;
+            }
+            set
+            {
+                if (_ExportFilePath != value)
+                {
+                    _ExportFilePath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _FilterLabOrderSelectAll;
+        [ACPropertyInfo(999, "", ConstApp.SelectAll)]
+        public bool FilterLabOrderSelectAll
+        {
+            get
+            {
+                return _FilterLabOrderSelectAll;
+            }
+            set
+            {
+                if (_FilterLabOrderSelectAll != value)
+                {
+                    _FilterLabOrderSelectAll = value;
+                    if (LabOrderList != null && LabOrderList.Any())
+                    {
+                        LabOrderList.ToList().ForEach(c => c.IsSelected = value);
+                        OnPropertyChanged(nameof(LabOrderList));
+                    }
+                    OnPropertyChanged(nameof(FilterLabOrderSelectAll));
+                }
+            }
+        }
+
+        #endregion
+
 
         #region Methods
 
@@ -85,6 +146,135 @@ namespace gip.bso.manufacturing
                     break;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        [ACMethodInfo("ExportToExcel", "en{'Export to Excel'}de{'Zum Excel exportieren'}", 701)]
+        public void ExportToExcel()
+        {
+
+            if (!IsEnabledExportToExcel())
+            {
+                return;
+            }
+
+            using (var dialog = new CommonOpenFileDialog())
+            {
+                if (Directory.Exists(ExportFilePath))
+                    dialog.InitialDirectory = Path.GetDirectoryName(ExportFilePath);
+                dialog.DefaultExtension = ".xlsx";
+                dialog.Filters.Add(new CommonFileDialogFilter("Excel Files", "*.xlsx, *.csv, *.xls"));
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    if (Directory.Exists(Path.GetDirectoryName(dialog.FileName)))
+                    {
+                        ExportFilePath = dialog.FileName;
+                        BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoExportExcel);
+                        ShowDialog(this, DesignNameProgressBar);
+                    }
+                }
+            }
+
+        }
+
+
+        public bool IsEnabledExportToExcel()
+        {
+            return !BackgroundWorker.IsBusy && LabOrderList != null && LabOrderList.Any(c => c.IsSelected);
+        }
+
+
+        private void DoExportToExcel(string exportFilePath, LabOrder[] selectedLabOrders)
+        {
+            LabOrderToExcel.DoLabOrderToExcel(exportFilePath, selectedLabOrders);
+        }
+
+        #endregion 
+
+
+        #region Properties -> Messages
+
+        Msg _CurrentMsg;
+
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged(nameof(CurrentMsg));
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged(nameof(MsgList));
+        }
+        #endregion
+
+        #region BackgroundWorker
+
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            string updateName = Root.Environment.User.Initials;
+
+
+            switch (command)
+            {
+                case BGWorkerMehtod_DoExportExcel:
+                    LabOrder[] selectedLabOrders = LabOrderList.Where(c => c.IsSelected).ToArray();
+                    DoExportToExcel(ExportFilePath, selectedLabOrders);
+                    break;
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+            ClearMessages();
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
         }
 
         #endregion
