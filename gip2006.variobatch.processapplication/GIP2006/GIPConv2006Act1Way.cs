@@ -133,17 +133,6 @@ namespace gip2006.variobatch.processapplication
                         }
                     }
 
-                    if (changed)
-                    {
-                        gip.core.processapplication.PAEControlModuleBase controlModule = ParentACComponent as gip.core.processapplication.PAEControlModuleBase;
-                        if (controlModule != null)
-                        {
-                            if (Pos1.ValueT)
-                                controlModule.TurnOnInstant.ValueT = DateTime.Now;
-                            else
-                                controlModule.TurnOffInstant.ValueT = DateTime.Now;
-                        }
-                    }
                     SynchronizeRequest();
                     _LockResend_ReqRunState = false;
                 }
