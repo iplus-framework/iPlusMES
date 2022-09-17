@@ -483,7 +483,7 @@ namespace gip.mes.maintenance
                 return affectedInstances;
             foreach (var componentToCheck in affectedComponents)
             {
-                if (componentToCheck.ComponentClass.IsDerivedClassFrom(maintTypeInfo.ACType))
+                if (componentToCheck.ComponentClass.IsDerivedClassFrom(maintTypeInfo.ACType) || componentToCheck.ComponentClass == maintTypeInfo.ACType)
                 {
                     affectedInstances.Add(componentToCheck);
                 }
