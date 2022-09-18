@@ -642,7 +642,7 @@ namespace gip.mes.maintenance
                 return;
 
             if (e.ForACComponent == null
-                //|| eventArgs.NetValueEventArgs.Sender != EventRaiser.Source 
+                //|| e.NetValueEventArgs.Sender != EventRaiser.Source 
                 || e.NetValueEventArgs.EventType != EventTypes.ValueChangedInSource
                 || !(e.ForACComponent is PAClassAlarmingBase))
                 return;
