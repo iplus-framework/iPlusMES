@@ -44,69 +44,61 @@ namespace gip.mes.processapplication
         {
             worksheet.Cell("A1").Value = "Laboratory Order No";
             worksheet.Cell("B1").Value = labOrder.LabOrderNo;
-            worksheet.Cell("A2").Value = "Production Order";
-            worksheet.Cell("B2").Value = labOrder.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
-            worksheet.Cell("A3").Value = "Update Dates";
-            worksheet.Cell("B3").Value = labOrder.SampleTakingDate;
-            worksheet.Cell("D1").Value = "Material Name";
-            worksheet.Cell("E1").Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+            worksheet.Cell("A2").Value = "Material Name";
+            worksheet.Cell("B2").Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+            worksheet.Cell("A3").Value = "Production Order";
+            worksheet.Cell("B3").Value = labOrder.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
+            worksheet.Cell("A4").Value = "Update Dates";
+            worksheet.Cell("B4").Value = labOrder.SampleTakingDate;
+            worksheet.Cell("A5").Value = "Proizvodna linija";
 
 
-            worksheet.Cell("A5").Value = "Sequence";
-            worksheet.Cell("B5").Value = "Key";
-            worksheet.Cell("C5").Value = "Reference Value";
-            worksheet.Cell("D5").Value = "Average Value";
-            worksheet.Cell("E5").Value = "Lab Order Pos. Status";
-            worksheet.Cell("F5").Value = "Comment";
-            worksheet.Cell("G5").Value = "Lowest value for alarm";
-            worksheet.Cell("H5").Value = "Lowest value";
-            worksheet.Cell("I5").Value = "Maximum value";
-            worksheet.Cell("J5").Value = "Maximum value for alarm";
+            ProdOrderBatchPlan batchPlan = labOrder.ProdOrderPartslistPos?.ProdOrderBatch?.ProdOrderBatchPlan;
+            if (batchPlan != null)
+            {
+                MDSchedulingGroup group = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
+                if (group != null)
+                    worksheet.Cell("B5").Value = group.MDSchedulingGroupName;
+            }
+            
+            worksheet.Cell("A7").Value = "Reference Value";
+            worksheet.Cell("A8").Value = "Lowest value";
+            worksheet.Cell("A9").Value = "Maximum value";
+            worksheet.Cell("A10").Value = "Average Value";
 
-            int rowPos = 6;
+            worksheet.Cell("A12").Value = "Broj vaganja";
+            worksheet.Cell("A13").Value = "Broj vaganja u toleranciji";
+            worksheet.Cell("A14").Value = "Broj vaganja izvan tolerancije";
+
+            int tolCounter = 0;
+            int counter = 0;
 
             foreach (LabOrderPos labOrderPosItem in labOrder.LabOrderPos_LabOrder.ToArray())
             {
                 double refValue = (double)labOrderPosItem.ReferenceValue;
-                int rowPiStats = 11;
+                int rowPiStats = 17;
 
-                worksheet.Cell(rowPos, 1).Value = labOrderPosItem.Sequence;
-                if (labOrderPosItem.MDLabTag != null) 
-                {
-                    worksheet.Cell(rowPos, 2).Value = labOrderPosItem.MDLabTag.MDKey;
-                }
-
-                worksheet.Cell(rowPos, 3).Value = labOrderPosItem.ReferenceValue;
-                worksheet.Cell(rowPos, 4).Value = labOrderPosItem.ActualValue;
-
-                if (labOrderPosItem.MDLabOrderPosState != null) 
-                { 
-                    worksheet.Cell(rowPos, 5).Value = labOrderPosItem.MDLabOrderPosState.MDKey; 
-                }
-
-                worksheet.Cell(rowPos, 6).Value = labOrderPosItem.Comment;
-                worksheet.Cell(rowPos, 7).Value = labOrderPosItem.ValueMinMin;
-                worksheet.Cell(rowPos, 8).Value = labOrderPosItem.ValueMin;
-                worksheet.Cell(rowPos, 9).Value = labOrderPosItem.ValueMax;
-                worksheet.Cell(rowPos, 10).Value = labOrderPosItem.ValueMaxMax;
-                rowPos++;
+                worksheet.Cell("B7").Value = labOrderPosItem.ReferenceValue;
+                worksheet.Cell("B8").Value = labOrderPosItem.ValueMin;
+                worksheet.Cell("B9").Value = labOrderPosItem.ValueMax;
+                worksheet.Cell("B10").Value = labOrderPosItem.ActualValue;
 
 
+                worksheet.Cell("A16").Value = "Date";
+                worksheet.Cell("B16").Value = "Weight";
+                worksheet.Cell("C16").Value = "Tolerancy Status";
+                worksheet.Cell("D16").Value = "Deviation from Reference Weight";
 
-                worksheet.Cell("A10").Value = "Date";
-                worksheet.Cell("B10").Value = "Weight";
-                worksheet.Cell("C10").Value = "Tolerancy Status";
-                worksheet.Cell("D10").Value = "Deviation from Reference Weight";
-
-                if (labOrderPosItem.XMLConfig != null) 
+                if (labOrderPosItem.XMLConfig != null)
                 {
                     SamplePiStats piStats = null;
                     try
                     {
                         piStats = labOrderPosItem[PWSamplePiLightBox.C_LabOrderExtFieldStats] as SamplePiStats;
-                    } catch { }
+                    }
+                    catch { }
 
-                    if (piStats != null) 
+                    if (piStats != null)
                     {
                         foreach (SamplePiValue item in piStats.Values)
                         {
@@ -119,24 +111,35 @@ namespace gip.mes.processapplication
                             else
                                 worksheet.Cell(rowPiStats, 4).Value = refValue - item.Value;
 
+                            if (item.TolState == 1 || item.TolState == -1)
+                                tolCounter++;
 
+                            counter++;
                             rowPiStats++;
                         }
 
                     }
                 }
 
+                worksheet.Cell("B12").Value = counter;
+                worksheet.Cell("B13").Value = counter - tolCounter;
+                worksheet.Cell("B14").Value = tolCounter;
+
                 #region Excel Styling
 
-                var bottomTableHeader = worksheet.Range(10, 1, 10, 4);
+                var bottomTableHeader = worksheet.Range(16, 1, 16, 4);
                 bottomTableHeader.Style.Font.Bold = true;
                 bottomTableHeader.Style.Fill.BackgroundColor = XLColor.CornflowerBlue;
 
-                var rngTable = worksheet.Range(10, 1, rowPiStats, 4);
+                var rngTable = worksheet.Range(16, 1, rowPiStats, 4);
                 rngTable.Sort("4 Desc");
+
+                worksheet.Cell("B4").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
 
                 #endregion
             }
+
+            
 
         }
 
