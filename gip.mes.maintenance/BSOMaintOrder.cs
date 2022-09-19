@@ -502,8 +502,10 @@ namespace gip.mes.maintenance
 
         public bool IsEnabledStartMaintenanceTask()
         {
-            if (SelectedMaintTask != null && Root.Environment.User.VBUserGroup_VBUser.Any(c => c.VBGroupID == SelectedMaintTask.MaintACClassVBGroup.VBGroupID
-                 && SelectedMaintTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.UnfinishedTask))
+            if (SelectedMaintTask != null 
+             && (Root.Environment.User.VBUserGroup_VBUser.Any(c => c.VBGroupID == SelectedMaintTask.MaintACClassVBGroup.VBGroupID
+                || Root.Environment.User.IsSuperuser)
+             && SelectedMaintTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.UnfinishedTask))
                 return true;
             return false;
         }
@@ -529,7 +531,8 @@ namespace gip.mes.maintenance
         public bool IsEnabledEndMaintenanceTask()
         {
             if (SelectedMaintTask != null && SelectedMaintTask.StartTaskDate != null && SelectedMaintTask.EndTaskDate != null
-                && Root.Environment.User.VBUserGroup_VBUser.Any(c => c.VBGroupID == SelectedMaintTask.MaintACClassVBGroup.VBGroupID
+                && (Root.Environment.User.VBUserGroup_VBUser.Any(c => c.VBGroupID == SelectedMaintTask.MaintACClassVBGroup.VBGroupID
+                    || Root.Environment.User.IsSuperuser)
                 && SelectedMaintTask.MDMaintTaskState.MDMaintTaskStateIndex == (short)MaintTaskState.TaskInProcess))
                 return true;
             return false;

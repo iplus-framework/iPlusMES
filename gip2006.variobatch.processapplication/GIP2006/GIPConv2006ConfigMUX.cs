@@ -74,6 +74,7 @@ namespace gip2006.variobatch.processapplication
         public GIPConv2006ConfigMUX(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _ReadStatistics = new ACPropertyConfigValue<bool>(this, "ReadStatistics", false);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -100,6 +101,7 @@ namespace gip2006.variobatch.processapplication
             if (OnTimePLC != null)
                 (OnTimePLC as IACPropertyNetServer).ValueUpdatedOnReceival += PLCProperty_ValueUpdatedOnReceival;
 
+            _ = ReadStatistics;
             return true;
         }
 
@@ -139,6 +141,21 @@ namespace gip2006.variobatch.processapplication
 
             return base.ACDeInit(deleteACClassTask);
         }
+
+        private ACPropertyConfigValue<bool> _ReadStatistics;
+        [ACPropertyConfig("ReadStatistics")]
+        public bool ReadStatistics
+        {
+            get
+            {
+                return _ReadStatistics.ValueT;
+            }
+            set
+            {
+                _ReadStatistics.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region Properties
@@ -294,7 +311,7 @@ namespace gip2006.variobatch.processapplication
 
         private void UpdateOperatingTime()
         {
-            if (OperatingTime != null)
+            if (OperatingTime != null && ReadStatistics)
             {
                 OperatingTime.ValueT = new TimeSpan(OperatingTimePLC.ValueT, 0, 0);
             }
@@ -306,7 +323,7 @@ namespace gip2006.variobatch.processapplication
 
         private void UpdateSwitchingFrequency()
         {
-            if (SwitchingFrequency != null)
+            if (SwitchingFrequency != null && ReadStatistics)
             {
                 SwitchingFrequency.ValueT = SwitchingFrequencyPLC.ValueT;
             }
@@ -317,7 +334,7 @@ namespace gip2006.variobatch.processapplication
 
         private void UpdateTotalAlarms()
         {
-            if (TotalAlarms != null)
+            if (TotalAlarms != null && ReadStatistics)
             {
                 TotalAlarms.ValueT = TotalAlarmsPLC.ValueT;
             }
@@ -328,7 +345,7 @@ namespace gip2006.variobatch.processapplication
 
         private void UpdateOnTime()
         {
-            if (OnTime != null)
+            if (OnTime != null && ReadStatistics)
             {
                 OnTime.ValueT = new TimeSpan(0, 0, OnTimePLC.ValueT);
             }

@@ -310,17 +310,6 @@ namespace gip2006.variobatch.processapplication
                         var newState = ResponseValue.Bit01_SignalDisplay ? PANotifyState.InfoOrActive : PANotifyState.Off;
                         bool changed = SensorState.ValueT != newState;
                         SensorState.ValueT = newState;
-                        if (changed)
-                        {
-                            PAEControlModuleBase controlModule = ParentACComponent as PAEControlModuleBase;
-                            if (controlModule != null)
-                            {
-                                if (SensorState.ValueT != PANotifyState.Off)
-                                    controlModule.TurnOnInstant.ValueT = DateTime.Now;
-                                else
-                                    controlModule.TurnOffInstant.ValueT = DateTime.Now;
-                            }
-                        }
                     }
                 }
                 catch (Exception ec)

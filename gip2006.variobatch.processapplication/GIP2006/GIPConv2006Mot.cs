@@ -826,17 +826,6 @@ namespace gip2006.variobatch.processapplication
                 {
                     bool changed = RunState.ValueT != Response.ValueT.Bit02_Run;
                     RunState.ValueT = Response.ValueT.Bit02_Run;
-                    if (changed)
-                    {
-                        PAEControlModuleBase controlModule = ParentACComponent as PAEControlModuleBase;
-                        if (controlModule != null)
-                        {
-                            if (RunState.ValueT)
-                                controlModule.TurnOnInstant.ValueT = DateTime.Now;
-                            else
-                                controlModule.TurnOffInstant.ValueT = DateTime.Now;
-                        }
-                    }
                 }
                 if (SpeedFast != null) SpeedFast.ValueT = !Response.ValueT.Bit03_Fast;
                 if (DirectionLeft != null) DirectionLeft.ValueT = Response.ValueT.Bit04_Direction1;
