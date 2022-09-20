@@ -133,16 +133,31 @@ namespace gip.mes.processapplication
 
         public virtual bool SendNewBatchEvent2Invoker()
         {
-            var rootPW = RootPW;
-            if (rootPW != null && rootPW.ParentTaskExecComp != null)
+            try
             {
-                IACComponentTaskExec taskExec = rootPW.ParentTaskExecComp;
-                ACMethodEventArgs eventArgs = rootPW.CreateNewMethodEventArgs(rootPW.CurrentTask.ACMethod, Global.ACMethodResultState.InProcess);
-                if (eventArgs != null)
+                var rootPW = RootPW;
+                if (rootPW != null && rootPW.ParentTaskExecComp != null)
                 {
-                    ACValue acValue = new ACValue(typeof(PWNodeStartNextBatch).Name, typeof(string), this.GetACUrl());
-                    eventArgs.Add(acValue);
-                    return taskExec.CallbackTask(rootPW.CurrentTask, eventArgs, PointProcessingState.Accepted);
+                    IACComponentTaskExec taskExec = rootPW.ParentTaskExecComp;
+                    ACMethodEventArgs eventArgs = rootPW.CreateNewMethodEventArgs(rootPW.CurrentTask.ACMethod, Global.ACMethodResultState.InProcess);
+                    if (eventArgs != null)
+                    {
+                        ACValue acValue = new ACValue(typeof(PWNodeStartNextBatch).Name, typeof(string), this.GetACUrl());
+                        eventArgs.Add(acValue);
+                        return taskExec.CallbackTask(rootPW.CurrentTask, eventArgs, PointProcessingState.Accepted);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    var messages = Messages;
+                    if (messages != null)
+                        messages.LogException(this.GetACUrl(), "SendNewBatchEvent2Invoker(10)", ex);
+                }
+                catch (Exception)
+                {
                 }
             }
             return false;
