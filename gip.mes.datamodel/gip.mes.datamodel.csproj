@@ -111,7 +111,6 @@
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityMD\MDPickingType.cs" />
-    <None Include="EntityPartsList\PartslistExpand.tmp" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
