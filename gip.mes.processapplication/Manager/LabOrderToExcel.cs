@@ -1,11 +1,13 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using DocumentFormat.OpenXml.Spreadsheet;
+using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,7 +17,7 @@ namespace gip.mes.processapplication
     {
 
         #region Create Excel Table
-        public static void DoLabOrderToExcel(string fileName, LabOrder[] labOrders)
+        public static void DoLabOrderToExcel(Database database, string fileName, LabOrder[] labOrders)
         {
             XLWorkbook workBook = new XLWorkbook();
             List<String> sheetNames = new List<String>();
@@ -29,7 +31,7 @@ namespace gip.mes.processapplication
                 indexOfMaterial = sheetNames.Where(s => s != null && s.Equals(sheetName)).Count();
 
                 IXLWorksheet workSheet = workBook.Worksheets.Add(sheetName + " - " + indexOfMaterial);
-                DoLabOrderToExcel(workSheet, labOrder);
+                DoLabOrderToExcel(database, workSheet, labOrder);
                 workSheet.Columns().AdjustToContents();
             }
 
@@ -40,7 +42,7 @@ namespace gip.mes.processapplication
 
         #region Excel Cell Printing
 
-        public static void DoLabOrderToExcel(IXLWorksheet worksheet, LabOrder labOrder)
+        public static void DoLabOrderToExcel(Database database, IXLWorksheet worksheet, LabOrder labOrder)
         {
             worksheet.Cell("A1").Value = "Laboratory Order No";
             worksheet.Cell("B1").Value = labOrder.LabOrderNo;
@@ -52,15 +54,23 @@ namespace gip.mes.processapplication
             worksheet.Cell("B4").Value = labOrder.SampleTakingDate;
             worksheet.Cell("A5").Value = "Proizvodna linija";
 
+            gip.core.datamodel.ACClass machine = null;
 
-            ProdOrderBatchPlan batchPlan = labOrder.ProdOrderPartslistPos?.ProdOrderBatch?.ProdOrderBatchPlan;
-            if (batchPlan != null)
+            if (labOrder.RefACClassID == null)
             {
-                MDSchedulingGroup group = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
-                if (group != null)
-                    worksheet.Cell("B5").Value = group.MDSchedulingGroupName;
+                machine = GetMachine(database, labOrder);
+                if(machine != null)
+                {
+                    labOrder.RefACClassID = machine.ACClassID;
+                }
             }
-            
+            else if(labOrder.RefACClassID != null)
+            {
+                machine = database.ACClass.FirstOrDefault(c => c.ACClassID == labOrder.RefACClassID);
+            }
+
+            worksheet.Cell("B5").Value = machine?.ACCaption;
+
             worksheet.Cell("A7").Value = "Reference Value";
             worksheet.Cell("A8").Value = "Lowest value";
             worksheet.Cell("A9").Value = "Maximum value";
@@ -139,8 +149,55 @@ namespace gip.mes.processapplication
                 #endregion
             }
 
-            
 
+
+        }
+
+        #endregion
+
+        #region provide machines
+
+        private static gip.core.datamodel.ACClass GetMachine(Database database, LabOrder labOrder)
+        {
+
+            List<OrderLog> orderLogs = labOrder.ProdOrderPartslistPos.OrderLog_ProdOrderPartslistPos.ToList();
+
+            if (!orderLogs.Any())
+            {
+                orderLogs =
+                    labOrder
+                    .ProdOrderPartslistPos
+                    .ProdOrderPartslist
+                    .ProdOrderPartslistPos_ProdOrderPartslist
+                    .SelectMany(c => c.OrderLog_ProdOrderPartslistPos)
+                    .ToList();
+
+            }
+            Guid[] programLogIDs = orderLogs.Select(x => x.VBiACProgramLogID).ToArray();
+            gip.core.datamodel.ACProgramLog[] programLogs = database.ACProgramLog.Where(c => programLogIDs.Contains(c.ACProgramLogID)).ToArray();
+            return GetMachine(database, programLogs);
+        }
+
+        private static gip.core.datamodel.ACClass GetMachine(Database database, gip.core.datamodel.ACProgramLog[] programLogs)
+        {
+            gip.core.datamodel.ACClass machine = null;
+
+            foreach (gip.core.datamodel.ACProgramLog programLog in programLogs)
+            {
+                machine = GetMachine(database, programLog);
+                if (machine != null)
+                    break;
+            }
+
+            return machine;
+        }
+
+        private static gip.core.datamodel.ACClass GetMachine(Database database, gip.core.datamodel.ACProgramLog programLog)
+        {
+            if (programLog.RefACClassID != null)
+                return database.ACClass.FirstOrDefault(c => c.ACClassID == programLog.RefACClassID);
+            else
+                return GetMachine(database, programLog.ACProgramLog_ParentACProgramLog.ToArray());
         }
 
         #endregion

@@ -13,6 +13,7 @@ using System.Data.Objects;
 using gip.bso.masterdata;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.IO;
+using System.Data;
 
 namespace gip.bso.manufacturing
 {
@@ -176,16 +177,17 @@ namespace gip.bso.manufacturing
 
         }
 
-
         public bool IsEnabledExportToExcel()
         {
             return !BackgroundWorker.IsBusy && LabOrderList != null && LabOrderList.Any(c => c.IsSelected);
         }
 
-
         private void DoExportToExcel(string exportFilePath, LabOrder[] selectedLabOrders)
         {
-            LabOrderToExcel.DoLabOrderToExcel(exportFilePath, selectedLabOrders);
+            using(Database database = new core.datamodel.Database())
+            {
+                LabOrderToExcel.DoLabOrderToExcel(database, exportFilePath, selectedLabOrders);
+            }
         }
 
         #endregion 

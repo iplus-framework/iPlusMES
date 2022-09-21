@@ -1871,6 +1871,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+	      <Property Name="RefACClassID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="LabOrderPos">
           <Key>
@@ -22587,6 +22588,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+		  <Property Name="RefACClassID" Type="Guid" />
           <NavigationProperty Name="FacilityLot" Relationship="iPlusMESV4_Model.FK_LabOrder_FacilityLotID" FromRole="LabOrder" ToRole="FacilityLot" />
           <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_LabOrder_InOrderPosID" FromRole="LabOrder" ToRole="InOrderPos" />
           <NavigationProperty Name="LabOrder_BasedOnTemplate" Relationship="iPlusMESV4_Model.FK_LabOrder_LabOrder" FromRole="LabOrder" ToRole="LabOrder1" />
@@ -37271,6 +37273,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="BasedOnTemplateID" ColumnName="BasedOnTemplateID" />
                 <ScalarProperty Name="LabOrderNo" ColumnName="LabOrderNo" />
                 <ScalarProperty Name="LabOrderID" ColumnName="LabOrderID" />
+				<ScalarProperty Name="RefACClassID" ColumnName="RefACClassID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -1,4 +1,5 @@
 -- ProdOrderPartslistPos
+-- ProdOrderPartslistPos
 alter table ProdOrderPartslistPos add InputQForActualOutput float null;
 alter table ProdOrderPartslistPos add InputQForGoodActualOutput float null;
 alter table ProdOrderPartslistPos add InputQForScrapActualOutput float null;

@@ -400,6 +400,13 @@ namespace gip.mes.processapplication
                                     labOrderPos.ValueMax = setPoint + tolPlus;
                                     labOrderPos.ValueMin = setPoint - tolMinus;
                                     labOrderPos[C_LabOrderExtFieldStats] = stats;
+
+                                    gip.core.datamodel.ACClass machine =  ParentPWGroup?.AccessedProcessModule?.ComponentClass;
+                                    if(machine != null)
+                                    {
+                                        labOrderPos.LabOrder.RefACClassID = machine.ACClassID;
+                                    }
+
                                     msg = dbApp.ACSaveChanges();
                                 }
                             }
