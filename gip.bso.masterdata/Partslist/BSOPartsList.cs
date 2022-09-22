@@ -232,10 +232,18 @@ namespace gip.bso.masterdata
             foreach (Partslist changedPartslist in changedPartslists)
                 if (!ChangedPartslists.Contains(changedPartslist))
                     ChangedPartslists.Add(changedPartslist);
+
+            ProcessChangedPartslists();
+
             UpdatePlanningMROrders();
             ClearChangeTracking();
 
             return result;
+        }
+
+        public virtual void ProcessChangedPartslists()
+        {
+
         }
 
         protected override void OnPostSave()
