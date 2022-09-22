@@ -832,14 +832,23 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
 
         #region FacilityCharges
 
-        public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> ManualWeigingFacilityChargeListQuery
+        public virtual Func<DatabaseApp, IEnumerable<Guid>, Guid?, IEnumerable<FacilityCharge>> ManualWeighingFacilityChargeListQuery
         {
             get
             {
-                return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
-                                                    .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
-                                                                                && (x.MDReleaseStateID == null || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
-                                                    .ToArray().OrderBy(o => o.ExpirationDate);
+                return (dbApp, facility, matID) => dbApp.FacilityCharge
+                                                        .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
+                                                                                    && facility.Contains(x.FacilityID)
+                                                                                    && (x.MDReleaseStateID == null || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                                                        .ToArray()
+                                                        .OrderBy(o => o.ExpirationDate);
+
+
+
+                //return (dbApp, facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
+                //                                    .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
+                //                                                                && (x.MDReleaseStateID == null || x.MDReleaseState.MDReleaseStateIndex <= (short)MDReleaseState.ReleaseStates.AbsFree))
+                //                                    .ToArray().OrderBy(o => o.ExpirationDate);
             }
         }
 

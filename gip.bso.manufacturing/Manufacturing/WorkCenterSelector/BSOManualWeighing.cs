@@ -687,7 +687,7 @@ namespace gip.bso.manufacturing
 
                         using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
                         {
-                            var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
+                            //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
 
                             if (_ACFacilityManager == null)
                             {
@@ -700,7 +700,7 @@ namespace gip.bso.manufacturing
                             }
 
                             if (SelectedWeighingMaterial.PosRelation != null)
-                                _FacilityChargeList = ACFacilityManager?.ManualWeigingFacilityChargeListQuery(facilitesDB, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
+                                _FacilityChargeList = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
 
 
 

@@ -2260,12 +2260,12 @@ namespace gip.mes.processapplication
 
         private IEnumerable<FacilityCharge> GetFacilityChargesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
         {
-            IEnumerable<Facility> facilities = GetAvailableFacilitiesForMaterial(dbApp, posRel);
+            Guid[] facilities = GetAvailableFacilitiesForMaterial(dbApp, posRel).Select(c => c.FacilityID).ToArray();
 
             if (ACFacilityManager == null)
                 return null;
 
-            return ACFacilityManager.ManualWeigingFacilityChargeListQuery(facilities, posRel.SourceProdOrderPartslistPos.MaterialID);
+            return ACFacilityManager.ManualWeighingFacilityChargeListQuery(dbApp, facilities, posRel.SourceProdOrderPartslistPos.MaterialID);
         }
 
         public IEnumerable<Facility> GetAvailableFacilitiesForMaterial(DatabaseApp dbApp, ProdOrderPartslistPosRelation posRel)
