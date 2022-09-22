@@ -1363,7 +1363,20 @@ namespace gip.mes.facility
                 // Ermittle FacilityCharge's auf Ziel-lagerplatz 
                 if (BP.ParamsAdjusted.IsLotManaged)
                 {
-                    if ((BP.ParamsAdjusted.InwardFacilityLot != null) && (BP.ParamsAdjusted.InwardMaterial != null))
+                    if ((BP.ParamsAdjusted.InwardFacilityLot != null) && (BP.ParamsAdjusted.InwardMaterial != null) && (BP.ParamsAdjusted.InwardSplitNo != null))
+                    {
+                        Guid? guidNull = null;
+
+                        facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable_SplitNo(BP.DatabaseApp,
+                                                                                                BP.ParamsAdjusted.InwardFacility.FacilityID,
+                                                                                                BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
+                                                                                                BP.ParamsAdjusted.InwardMaterial.MaterialID,
+                                                                                                BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
+                                                                                                BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
+                                                                                                false,
+                                                                                                BP.InwardSplitNo.Value));
+                    }
+                    else if ((BP.ParamsAdjusted.InwardFacilityLot != null) && (BP.ParamsAdjusted.InwardMaterial != null))
                     {
                         Guid? guidNull = null;
                         facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable(BP.DatabaseApp,
@@ -1632,6 +1645,8 @@ namespace gip.mes.facility
                         // Einlagerdatum + Eindeutige Reihenfolgennumer der Einlagerung
                         InwardFacilityCharge.FillingDate = DateTime.Now;
                         InwardFacilityCharge.FacilityChargeSortNo = InwardFacilityCharge.Facility.GetNextFCSortNo(BP.DatabaseApp);
+                        if (BP.InwardSplitNo.HasValue)
+                            InwardFacilityCharge.SplitNo = BP.InwardSplitNo.Value;
 
                         FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
                         bookingResult = InitFacilityBookingCharge_FromBookingParameter_Inward(BP, FBC, InwardFacilityCharge);

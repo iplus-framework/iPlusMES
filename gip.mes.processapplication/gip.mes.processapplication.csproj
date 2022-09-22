@@ -71,8 +71,10 @@
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAETransport.cs" />
     <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFUnregisterEntityOnScan.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFRegisterEntityOnScan.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="Manager\DischargingItemNoValidatorBehaviorEnum.cs" />
     <Compile Include="Manager\ACPrintManagerMES.cs" />
     <Compile Include="Manager\LabOrderToExcel.cs" />
+    <Compile Include="Model\ActionOnScanEnum.cs" />
     <Compile Include="Model\DosingRestInfo.cs" />
     <Compile Include="Model\LotUsedUpEnum.cs" />
     <Compile Include="Model\LotSelectionRuleEnum.cs" />

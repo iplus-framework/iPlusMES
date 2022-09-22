@@ -14,7 +14,8 @@ namespace gip.mes.datamodel
             AddEntry(PostingBehaviourEnum.BlockOnRelocation, "en{'Blocks new quants after relocation'}de{'Sperrt neue Quanten nach der Umlagerung'}");
             AddEntry(PostingBehaviourEnum.ZeroStockOnRelocation, "en{'Set the stock to zero after relocation'}de{'Setzt quanten auf Nullbestand nach einer Umlagerung'}");
             AddEntry(PostingBehaviourEnum.ZeroStockOnProduction, "en{'Set the stock to zero after production'}de{'Setzt quanten auf Nullbestand nach einer Produktion'}");
-            AddEntry(PostingBehaviourEnum.ZeroStockAlways, "en{'Set the stock to zero alway'}de{'Setzt quanten immer auf Nullbestand'}");
+            AddEntry(PostingBehaviourEnum.ZeroStockAlways, "en{'Set the stock to zero always'}de{'Setzt quanten immer auf Nullbestand'}");
+            AddEntry(PostingBehaviourEnum.SplitQuantOnProduction, "en{'Split quant on inward posting'}de{'Setzt quanten immer auf Nullbestand'}");
         }
     }
 }

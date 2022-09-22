@@ -19,6 +19,7 @@ namespace gip.mes.facility
         None = 10,
         [EnumMember]
         ForceQuantQuantity = 20,
+        [EnumMember]
         ProportionallyAnotherComp = 30
     }
 
@@ -31,6 +32,7 @@ namespace gip.mes.facility
             AddEntry(PostingQuantitySuggestionMode.None, "en{'None'}de{'Keine'}");
             AddEntry(PostingQuantitySuggestionMode.OrderQuantity, "en{'According order quantity'}de{'Nach Bestellmenge'}");
             AddEntry(PostingQuantitySuggestionMode.ForceQuantQuantity, "en{'Force quant quantity'}de{'Kraft-Quant-Menge'}");
+            AddEntry(PostingQuantitySuggestionMode.ProportionallyAnotherComp, "en{'Proportionally another component (first component)'}de{'Proportionally another component (first component)'}");
         }
     }
 #endif

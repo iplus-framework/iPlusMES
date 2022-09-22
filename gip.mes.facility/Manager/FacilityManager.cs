@@ -306,6 +306,25 @@ namespace gip.mes.facility
                     return new ACMethodEventArgs(BP, Global.ACMethodResultState.Notpossible);
                 BP.Database = dbApp;
 
+                if (BP.PartslistPos != null && BP.InwardFacility != null
+                                            && BP.InwardFacility.PostingBehaviour == PostingBehaviourEnum.SplitQuantOnProduction
+                                            && BP.InwardMaterial != null  
+                                            && BP.InwardSplitNo != null 
+                                            && BP.InwardFacilityLot != null)
+                {
+                    int splitNo = 1;
+
+                    var query = s_cQry_FCList_Fac_Lot_Mat(dbApp, BP.InwardFacility.FacilityID, BP.InwardFacilityLot.FacilityLotID, BP.InwardMaterial.MaterialID, null)
+                                                         .OrderByDescending(x => x.SplitNo);
+
+                    if (query != null && query.Any())
+                    {
+                        splitNo = query.FirstOrDefault().SplitNo + 1;
+                    }
+
+                    BP.InwardSplitNo = splitNo;
+                }    
+
                 ACMethodBooking bp = null;
                 ACMethodEventArgs validResult = OnValidateBooking(dbApp, BP, out bp);
                 if (validResult != null)

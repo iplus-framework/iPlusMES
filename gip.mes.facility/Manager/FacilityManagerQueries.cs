@@ -596,6 +596,25 @@ namespace gip.mes.facility
                         .ThenByDescending(c => c.FacilityChargeSortNo)
         );
 
+        public static readonly Func<DatabaseApp, Guid, Guid?, Guid, Guid?, Guid?, bool, int, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Lot_ProdMat_Pl_NotAvailable_SplitNo =
+        CompiledQuery.Compile<DatabaseApp, Guid, Guid?, Guid, Guid?, Guid?, bool, int, IQueryable<FacilityCharge>>(
+            (ctx, facilityID, facilityLotID, materialID, prodMaterialID, partslistID, notAvailable, splitNo) => ctx.FacilityCharge
+                        .Include(FacilityLot.ClassName)
+                        .Include(Facility.ClassName)
+                        .Include(Material.ClassName)
+                        .Include(MDReleaseState.ClassName)
+                        .Include(MDUnit.ClassName)
+                        .Where(c => c.FacilityID == facilityID
+                                    && (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
+                                    && (c.MaterialID == materialID
+                                        || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value))
+                                    && (!partslistID.HasValue || c.PartslistID == partslistID)
+                                    && c.NotAvailable == notAvailable
+                                    && c.SplitNo == splitNo)
+                        .OrderByDescending(c => c.FillingDate)
+                        .ThenByDescending(c => c.FacilityChargeSortNo)
+        );
+
 
         public static readonly Func<DatabaseApp, Guid, Guid?, Guid?, bool, IQueryable<FacilityCharge>> s_cQry_FCList_Fac_Lot_Pl_NotAvailable =
         CompiledQuery.Compile<DatabaseApp, Guid, Guid?, Guid?, bool, IQueryable<FacilityCharge>>(
@@ -823,6 +842,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                                                     .ToArray().OrderBy(o => o.ExpirationDate);
             }
         }
+
 
         #endregion
 

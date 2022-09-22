@@ -1871,7 +1871,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
-	      <Property Name="RefACClassID" Type="uniqueidentifier" />
+          <Property Name="RefACClassID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="LabOrderPos">
           <Key>
@@ -3404,6 +3404,22 @@
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="TranslID" Type="varchar" MaxLength="200" />
           <Property Name="ACClassID" Type="uniqueidentifier" />
+        </EntityType>
+        <EntityType Name="OperationLog">
+          <Key>
+            <PropertyRef Name="OperationLogID" />
+          </Key>
+          <Property Name="OperationLogID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RefACClassID" Type="uniqueidentifier" />
+          <Property Name="ACProgramLogID" Type="uniqueidentifier" />
+          <Property Name="FacilityChargeID" Type="uniqueidentifier" />
+          <Property Name="OperationTime" Type="datetime" Nullable="false" />
+          <Property Name="Operation" Type="smallint" Nullable="false" />
+          <Property Name="OperationState" Type="smallint" Nullable="false" />
+          <Property Name="InsertName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="InsertDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="OrderLog">
           <Key>
@@ -10231,6 +10247,30 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_OperationLog_ACProgramLog">
+          <End Role="ACProgramLog" Type="Self.ACProgramLog" Multiplicity="0..1" />
+          <End Role="OperationLog" Type="Self.OperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACProgramLog">
+              <PropertyRef Name="ACProgramLogID" />
+            </Principal>
+            <Dependent Role="OperationLog">
+              <PropertyRef Name="ACProgramLogID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OperationLog_FacilityCharge">
+          <End Role="FacilityCharge" Type="Self.FacilityCharge" Multiplicity="0..1" />
+          <End Role="OperationLog" Type="Self.OperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FacilityCharge">
+              <PropertyRef Name="FacilityChargeID" />
+            </Principal>
+            <Dependent Role="OperationLog">
+              <PropertyRef Name="FacilityChargeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_OrderLog_ACProgramLogID">
           <End Role="ACProgramLog" Type="Self.ACProgramLog" Multiplicity="1" />
           <End Role="OrderLog" Type="Self.OrderLog" Multiplicity="0..1" />
@@ -14024,6 +14064,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="MDVisitorVoucherState" EntityType="Self.MDVisitorVoucherState" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MDZeroStockState" EntityType="Self.MDZeroStockState" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MsgAlarmLog" EntityType="Self.MsgAlarmLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OperationLog" EntityType="Self.OperationLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OrderLog" EntityType="Self.OrderLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OutOffer" EntityType="Self.OutOffer" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OutOfferConfig" EntityType="Self.OutOfferConfig" Schema="dbo" store:Type="Tables" />
@@ -15949,6 +15990,14 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_MsgAlarmLog_ACProgramLogID" Association="Self.FK_MsgAlarmLog_ACProgramLogID">
             <End Role="ACProgramLog" EntitySet="ACProgramLog" />
             <End Role="MsgAlarmLog" EntitySet="MsgAlarmLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OperationLog_ACProgramLog" Association="Self.FK_OperationLog_ACProgramLog">
+            <End Role="ACProgramLog" EntitySet="ACProgramLog" />
+            <End Role="OperationLog" EntitySet="OperationLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OperationLog_FacilityCharge" Association="Self.FK_OperationLog_FacilityCharge">
+            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
+            <End Role="OperationLog" EntitySet="OperationLog" />
           </AssociationSet>
           <AssociationSet Name="FK_OrderLog_ACProgramLogID" Association="Self.FK_OrderLog_ACProgramLogID">
             <End Role="ACProgramLog" EntitySet="ACProgramLog" />
@@ -20227,6 +20276,15 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
             <End Role="TandTv3MixPointProdOrderPartslistPos" EntitySet="TandTv3MixPointProdOrderPartslistPos" />
           </AssociationSet>
+          <EntitySet Name="OperationLog" EntityType="iPlusMESV4_Model.OperationLog" />
+          <AssociationSet Name="FK_OperationLog_ACProgramLog" Association="iPlusMESV4_Model.FK_OperationLog_ACProgramLog">
+            <End Role="ACProgramLog" EntitySet="ACProgramLog" />
+            <End Role="OperationLog" EntitySet="OperationLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OperationLog_FacilityCharge" Association="iPlusMESV4_Model.FK_OperationLog_FacilityCharge">
+            <End Role="FacilityCharge" EntitySet="FacilityCharge" />
+            <End Role="OperationLog" EntitySet="OperationLog" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -20907,6 +20965,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ACProgramLogTask_ACProgramLog" Relationship="iPlusMESV4_Model.FK_ACProgramLogTask_ACProgramLogID" FromRole="ACProgramLog" ToRole="ACProgramLogTask" />
           <NavigationProperty Name="MsgAlarmLog_ACProgramLog" Relationship="iPlusMESV4_Model.FK_MsgAlarmLog_ACProgramLogID" FromRole="ACProgramLog" ToRole="MsgAlarmLog" />
           <NavigationProperty Name="OrderLog_VBiACProgramLog" Relationship="iPlusMESV4_Model.FK_OrderLog_ACProgramLogID" FromRole="ACProgramLog" ToRole="OrderLog" />
+          <NavigationProperty Name="OperationLog_ACProgramLog" Relationship="iPlusMESV4_Model.FK_OperationLog_ACProgramLog" FromRole="ACProgramLog" ToRole="OperationLog" />
         </EntityType>
         <EntityType Name="ACProgramLogTask">
           <Key>
@@ -21835,6 +21894,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="FacilityReservation_FacilityCharge" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityChargeID" FromRole="FacilityCharge" ToRole="FacilityReservation" />
           <NavigationProperty Name="TandTv2StepItem_FacilityCharge" Relationship="iPlusMESV4_Model.FK_TandTv2StepItem_FacilityChargeID" FromRole="FacilityCharge" ToRole="TandTv2StepItem" />
           <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityCharge_FacilityID" FromRole="FacilityCharge" ToRole="Facility" />
+          <NavigationProperty Name="OperationLog_FacilityCharge" Relationship="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" FromRole="FacilityCharge" ToRole="OperationLog" />
         </EntityType>
         <EntityType Name="FacilityHistory">
           <Key>
@@ -22588,7 +22648,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-		  <Property Name="RefACClassID" Type="Guid" />
+          <Property Name="RefACClassID" Type="Guid" />
           <NavigationProperty Name="FacilityLot" Relationship="iPlusMESV4_Model.FK_LabOrder_FacilityLotID" FromRole="LabOrder" ToRole="FacilityLot" />
           <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_LabOrder_InOrderPosID" FromRole="LabOrder" ToRole="InOrderPos" />
           <NavigationProperty Name="LabOrder_BasedOnTemplate" Relationship="iPlusMESV4_Model.FK_LabOrder_LabOrder" FromRole="LabOrder" ToRole="LabOrder1" />
@@ -35424,6 +35484,48 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="OperationLog">
+          <Key>
+            <PropertyRef Name="OperationLogID" />
+          </Key>
+          <Property Name="OperationLogID" Type="Guid" Nullable="false" />
+          <Property Name="RefACClassID" Type="Guid" />
+          <Property Name="ACProgramLogID" Type="Guid" />
+          <Property Name="FacilityChargeID" Type="Guid" />
+          <Property Name="OperationTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Operation" Type="Int16" Nullable="false" />
+          <Property Name="OperationState" Type="Int16" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="ACProgramLog" Relationship="iPlusMESV4_Model.FK_OperationLog_ACProgramLog" FromRole="OperationLog" ToRole="ACProgramLog" />
+          <NavigationProperty Name="FacilityCharge" Relationship="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" FromRole="OperationLog" ToRole="FacilityCharge" />
+        </EntityType>
+        <Association Name="FK_OperationLog_ACProgramLog">
+          <End Type="iPlusMESV4_Model.ACProgramLog" Role="ACProgramLog" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OperationLog" Role="OperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACProgramLog">
+              <PropertyRef Name="ACProgramLogID" />
+            </Principal>
+            <Dependent Role="OperationLog">
+              <PropertyRef Name="ACProgramLogID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OperationLog_FacilityCharge">
+          <End Type="iPlusMESV4_Model.FacilityCharge" Role="FacilityCharge" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.OperationLog" Role="OperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FacilityCharge">
+              <PropertyRef Name="FacilityChargeID" />
+            </Principal>
+            <Dependent Role="OperationLog">
+              <PropertyRef Name="FacilityChargeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -37273,7 +37375,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="BasedOnTemplateID" ColumnName="BasedOnTemplateID" />
                 <ScalarProperty Name="LabOrderNo" ColumnName="LabOrderNo" />
                 <ScalarProperty Name="LabOrderID" ColumnName="LabOrderID" />
-				<ScalarProperty Name="RefACClassID" ColumnName="RefACClassID" />
+                <ScalarProperty Name="RefACClassID" ColumnName="RefACClassID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -40750,6 +40852,23 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="OperationLog">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.OperationLog">
+              <MappingFragment StoreEntitySet="OperationLog">
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="OperationState" ColumnName="OperationState" />
+                <ScalarProperty Name="Operation" ColumnName="Operation" />
+                <ScalarProperty Name="OperationTime" ColumnName="OperationTime" />
+                <ScalarProperty Name="FacilityChargeID" ColumnName="FacilityChargeID" />
+                <ScalarProperty Name="ACProgramLogID" ColumnName="ACProgramLogID" />
+                <ScalarProperty Name="RefACClassID" ColumnName="RefACClassID" />
+                <ScalarProperty Name="OperationLogID" ColumnName="OperationLogID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -41732,6 +41851,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosSplit_ProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv2StepItem_ProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.OperationLog" Width="1.5" PointX="30.5" PointY="311.5" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OperationLog_ACProgramLog" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_OperationLog_FacilityCharge" />
       </Diagram>
     </Diagrams>
   </Designer>
