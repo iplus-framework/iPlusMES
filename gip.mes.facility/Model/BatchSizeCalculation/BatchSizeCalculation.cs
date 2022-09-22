@@ -1,4 +1,5 @@
-﻿using System;
+﻿using gip.mes.datamodel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,7 +23,7 @@ namespace gip.mes.facility
                 (x => new BatchPercentageModel()
                 {
                     Sequence = x.Sequence,
-                    Percentage = x.TargetQuantity / targetQuantity
+                    Percentage = targetQuantity > 0 ? (x.TargetQuantity / targetQuantity) : 0
                 }).ToList();
         }
 

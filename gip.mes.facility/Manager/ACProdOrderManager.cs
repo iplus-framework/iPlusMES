@@ -1480,7 +1480,9 @@ namespace gip.mes.facility
                     if (relations != null && relations.Any())
                         foreach (ProdOrderPartslistPosRelation relation in relations)
                         {
-                            double quantityFactor = childPosition.TargetQuantityUOM / connItem.IntermediateWarp.Intermediate.TargetQuantityUOM;
+                            double quantityFactor = connItem.IntermediateWarp.Intermediate.TargetQuantityUOM > 0 ?
+                                childPosition.TargetQuantityUOM / connItem.IntermediateWarp.Intermediate.TargetQuantityUOM
+                                : 0;
                             BatchCreateRelation(dbApp, batch, childPosition, relation, quantityFactor);
                         }
                 }
