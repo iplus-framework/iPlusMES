@@ -112,6 +112,7 @@
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityMD\MDPickingType.cs" />
     <None Include="EntityPartsList\PartslistExpand.tmp" />
+    <Compile Include="EntityOperation\OperationLog.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
@@ -126,6 +127,8 @@
     <Compile Include="EntityUser\UserSettings.cs" />
     <Compile Include="Enums\FacilitySelectLoctation.cs" />
     <Compile Include="Enums\MovementReasonsEnum.cs" />
+    <Compile Include="Enums\OperationLogEnum.cs" />
+    <Compile Include="Enums\OperationLogStateEnum.cs" />
     <Compile Include="Enums\PickingStateEnum.cs" />
     <Compile Include="Enums\PostingBehaviourEnum.cs" />
     <Compile Include="TandT\IACObjectEntityComparer.cs" />
@@ -521,6 +524,9 @@
     <Content Include="DbScripts\iPlusMES\dbsync_2022-03-24_16-47_aagincic .sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="DbScripts\iPlusMES\dbsync_2022-09-21_16-00_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2022-09-21_11-30_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
