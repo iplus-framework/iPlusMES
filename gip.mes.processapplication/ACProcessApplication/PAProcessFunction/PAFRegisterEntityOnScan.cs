@@ -217,6 +217,31 @@ namespace gip.mes.processapplication
             return null;
         }
 
+        public ACMethod GetConfigForMaterial(DatabaseApp dbApp, Guid materialID)
+        {
+            ACMethod acMethod = ACUrlACTypeSignature("!" + VMethodName_RegisterEntityOnScan);
+
+            Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
+
+            var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID 
+                                                              && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
+
+            foreach (var matConfig in wayIndependent)
+            {
+                ACValue acValue = acMethod.ParameterValueList.Where(c => c.ACIdentifier == matConfig.LocalConfigACUrl).FirstOrDefault();
+                if (acValue != null/* && acValue.HasDefaultValue*/)
+                    acValue.Value = matConfig.Value;
+                if (acMethod != null)
+                {
+                    acValue = acMethod.ParameterValueList.Where(c => c.ACIdentifier == matConfig.LocalConfigACUrl).FirstOrDefault();
+                    if (acValue != null/* && acValue.HasDefaultValue*/)
+                        acValue.Value = matConfig.Value;
+                }
+            }
+
+            return acMethod;
+        }
+
         [ACMethodInfo("Function", "en{'Inherirt params from config'}de{'Übernehme Dosierparameter aus Konfiguration'}", 9999)]
         public virtual void InheritParamsFromConfig(ACMethod newACMethod, ACMethod configACMethod, bool isConfigInitialization)
         {
@@ -285,7 +310,8 @@ namespace gip.mes.processapplication
                     {
                         OperationLog inOperationLog = dbApp.OperationLog.FirstOrDefault(c => c.RefACClassID == ComponentClass.ACClassID
                                                                                           && c.FacilityChargeID != null
-                                                                                          && c.FacilityChargeID == facilityChargeID);
+                                                                                          && c.FacilityChargeID == facilityChargeID
+                                                                                          && c.OperationState == (short)OperationLogStateEnum.Open);
 
                         if (inOperationLog != null)
                         {
@@ -295,7 +321,8 @@ namespace gip.mes.processapplication
                         }
                         else
                         {
-                            inOperationLog = OperationLog.NewACObject(dbApp, this);
+                            inOperationLog = OperationLog.NewACObject(dbApp, null);
+                            inOperationLog.RefACClassID = this.ComponentClass.ACClassID;
                             inOperationLog.FacilityChargeID = facilityChargeID;
                             inOperationLog.Operation = (short)OperationLogEnum.RegisterEntityOnScan;
                             inOperationLog.OperationState = (short)OperationLogStateEnum.Open;

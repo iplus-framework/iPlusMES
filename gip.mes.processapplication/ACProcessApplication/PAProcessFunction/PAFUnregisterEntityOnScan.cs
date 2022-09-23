@@ -26,6 +26,46 @@ namespace gip.mes.processapplication
                                "en{'Unegister entity on scan'}de{'Unegister entity on scan'}", typeof(PWWorkTaskGeneric)));
         }
 
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            return base.ACInit(startChildMode);
+        }
+
+        public override bool ACPostInit()
+        {
+            bool result = base.ACPostInit();
+
+            if (result)
+            {
+                PAFRegisterEntityOnScan registerEntityOnScan = ParentACComponent.FindChildComponents<PAFRegisterEntityOnScan>().FirstOrDefault();
+                if (registerEntityOnScan == null)
+                {
+                    return false;
+                }
+
+                RegisterEntityOnScan = new ACRef<PAFRegisterEntityOnScan>(registerEntityOnScan, this);
+            }
+
+            return result;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            if (RegisterEntityOnScan != null)
+            {
+                RegisterEntityOnScan.Detach();
+                RegisterEntityOnScan = null;
+            }
+
+            return base.ACDeInit(deleteACClassTask);
+        }
+
+        public ACRef<PAFRegisterEntityOnScan> RegisterEntityOnScan
+        {
+            get;
+            set;
+        }
+
         [ACMethodAsync("Process", "en{'Start'}de{'Start'}", (short)MISort.Start, false)]
         public override ACMethodEventArgs Start(ACMethod acMethod)
         {
@@ -283,11 +323,122 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
-                    //save to database
+                    using(DatabaseApp dbApp = new DatabaseApp())
+                    {
+                        Guid regEntOnScanID = RegisterEntityOnScan.ValueT.ComponentClass.ACClassID;
+
+                        OperationLog inOperationLog = dbApp.OperationLog.FirstOrDefault(c => c.RefACClassID == regEntOnScanID
+                                                                    && c.FacilityChargeID != null
+                                                                    && c.FacilityChargeID == facilityChargeID
+                                                                    && c.OperationState == (short)OperationLogStateEnum.Open);
+
+                        if (inOperationLog != null)
+                        {
+                            if (!questionResult.HasValue)
+                            {
+                                TimeSpan durationToCheck = DateTime.Now - inOperationLog.OperationTime;
+
+                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                                if (fc == null)
+                                {
+                                    // Error50... : Facility charge error TODO
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFUnregisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                }
+
+                                ACMethod acMethod = RegisterEntityOnScan.ValueT.GetConfigForMaterial(dbApp, fc.MaterialID);
+
+                                if (acMethod == null)
+                                {
+                                    // Error50... : Facility charge error TODO
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFUnregisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                }
+
+                                ACValue minDurationValue = acMethod.ParameterValueList.GetACValue("MinDuration");
+                                if (minDurationValue == null)
+                                {
+                                    // Error50... : Facility charge error TODO
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFUnregisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                }
+
+                                if (minDurationValue.Value != null)
+                                {
+                                    TimeSpan minDuration = minDurationValue.ParamAsTimeSpan;
+
+                                    if (minDuration.TotalSeconds > 0)
+                                    {
+                                        if (durationToCheck < minDuration)
+                                        {
+                                            // Error50... : Facility charge error TODO
+                                            resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFUnregisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                            return resultSequence;
+                                        }
+                                    }
+                                }
+
+                                ACValue maxDurationValue = acMethod.ParameterValueList.GetACValue("MaxDuration");
+                                if (maxDurationValue == null)
+                                {
+                                    // Error50... : Facility charge error TODO
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFUnregisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                }
+
+                                if (maxDurationValue.Value != null)
+                                {
+                                    TimeSpan maxDuration = maxDurationValue.ParamAsTimeSpan;
+                                    if (maxDuration.TotalSeconds > 0)
+                                    {
+                                        if (durationToCheck > maxDuration)
+                                        {
+                                            // Error50... : Facility charge error TODO
+                                            resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if ((Global.MsgResult)questionResult.Value != Global.MsgResult.Yes)
+                                {
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                }
+                            }
+
+                            inOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
+
+                            OperationLog outOperationLog = OperationLog.NewACObject(dbApp, null);
+                            outOperationLog.RefACClassID = this.ComponentClass.ACClassID;
+                            outOperationLog.FacilityChargeID = facilityChargeID;
+                            outOperationLog.Operation = (short)OperationLogEnum.UnregisterEntityOnScan;
+                            outOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
+                            outOperationLog.OperationTime = DateTime.Now;
+
+                            dbApp.OperationLog.AddObject(outOperationLog);
+
+                            Msg msg = dbApp.ACSaveChanges();
+                            if (msg != null)
+                            {
+                                resultSequence.Message = msg;
+                                resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                            }
+
+                            resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
+
+                        }
+                        else
+                        {
+                            // Error50... : The scanned entity is not registered on this machine/place! TODO
+                            resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                            resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                        }
+                    }
                 }
             }
             return resultSequence;
         }
-
     }
 }
