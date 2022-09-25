@@ -456,11 +456,14 @@ namespace gip.bso.masterdata
             List<Partslist> changedPartslist = new List<Partslist>();
             foreach (Partslist partslist in VisitedPartslists)
             {
-                bool isChanged = PartslistManager.IsFormulaChanged(DatabaseApp, partslist);
-                if (isChanged)
+                if(partslist.EntityState != EntityState.Deleted)
                 {
-                    partslist.LastFormulaChange = DateTime.Now;
-                    changedPartslist.Add(partslist);
+                    bool isChanged = PartslistManager.IsFormulaChanged(DatabaseApp, partslist);
+                    if (isChanged)
+                    {
+                        partslist.LastFormulaChange = DateTime.Now;
+                        changedPartslist.Add(partslist);
+                    }
                 }
             }
             return changedPartslist;
