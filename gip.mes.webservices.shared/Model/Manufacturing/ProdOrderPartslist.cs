@@ -105,15 +105,8 @@ namespace gip.mes.webservices
             set;
         }
 
-        [DataMember(Name = "VSNPQSM")]
-        public string ValidSeqNoForPostingQSMode
-        {
-            get;
-            set;
-        }
-
-        [DataMember(Name = "OQOIP")]
-        public bool OrderQuantityOnInwardPosting
+        [DataMember(Name = "PQSM2")]
+        public PostingQuantitySuggestionMode PostingQSuggestionMode2
         {
             get;
             set;

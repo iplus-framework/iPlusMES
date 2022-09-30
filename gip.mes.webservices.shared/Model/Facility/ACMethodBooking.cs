@@ -219,6 +219,14 @@ namespace gip.mes.webservices
             set { SetProperty<Double?>(ref _InwardTargetQuantity, value); }
         }
 
+        private int? _InwardAutoSplitQuant;
+        [DataMember(Name = "IASQ")]
+        public int? InwardAutoSplitQuant
+        {
+            get => _InwardAutoSplitQuant;
+            set => SetProperty<int?>(ref _InwardAutoSplitQuant, value);
+        }
+
         #endregion
 
 

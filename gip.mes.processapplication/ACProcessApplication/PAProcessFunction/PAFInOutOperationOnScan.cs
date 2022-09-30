@@ -10,19 +10,19 @@ using gip.mes.datamodel;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Register entity on scan'}de{'Entität beim Scannen registrieren'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWInfoACClass = nameof(PWWorkTaskGeneric))]
-    public class PAFRegisterEntityOnScan : PAProcessFunction
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Input/output operation on scan'}de{'Ein/Aus-Betrieb beim Scannen'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWInfoACClass = nameof(PWWorkTaskGeneric))]
+    public class PAFInOutOperationOnScan : PAProcessFunction
     {
-        static string VMethodName_RegisterEntityOnScan = "RegisterEntityOnScan";
+        static string VMethodName_InOutOperationOnScan = "InOutOperationOnScan";
 
-        public PAFRegisterEntityOnScan(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
+        public PAFInOutOperationOnScan(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
-        static PAFRegisterEntityOnScan()
+        static PAFInOutOperationOnScan()
         {
-            ACMethod.RegisterVirtualMethod(typeof(PAFRegisterEntityOnScan), ACStateConst.TMStart, CreateVirtualMethod(VMethodName_RegisterEntityOnScan,
-                                           "en{'Register entity on scan'}de{'Register entity on scan'}", typeof(PWWorkTaskGeneric)));
+            ACMethod.RegisterVirtualMethod(typeof(PAFInOutOperationOnScan), ACStateConst.TMStart, CreateVirtualMethod(VMethodName_InOutOperationOnScan,
+                                           "en{'In/out operation on scan'}de{'Ein/Aus-Betrieb beim Scannen'}", typeof(PWWorkTaskGeneric)));
         }
 
         [ACMethodAsync("Process", "en{'Start'}de{'Start'}", (short)MISort.Start, false)]
@@ -45,7 +45,7 @@ namespace gip.mes.processapplication
                 var routes = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, parentACClass, sourcePoint, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != parentACClass.ACClassID, null, RouteDirections.Backwards, true, false);
                 if (routes != null && routes.Any())
                 {
-                    string virtMethodName = VMethodName_RegisterEntityOnScan;
+                    string virtMethodName = VMethodName_InOutOperationOnScan;
                     IReadOnlyList<ACMethodWrapper> virtualMethods = ACMethod.GetVirtualMethodInfos(this.GetType(), ACStateConst.TMStart);
                     if (virtualMethods != null && virtualMethods.Any())
                         virtMethodName = virtualMethods.FirstOrDefault().Method.ACIdentifier;
@@ -85,7 +85,7 @@ namespace gip.mes.processapplication
             if (route == null || !route.Any())
             {
                 //Error50360: The route is null or empty.
-                return new MsgWithDetails(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "GetACMethodFromConfig(10)", 446, "Error50360");
+                return new MsgWithDetails(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "GetACMethodFromConfig(10)", 446, "Error50360");
             }
             if (IsMethodChangedFromClient)
                 return null;
@@ -95,7 +95,7 @@ namespace gip.mes.processapplication
                 if (route.Count < 2)
                 {
                     //Error50361: The route has not enough route items.
-                    return new MsgWithDetails(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "GetACMethodFromConfig(20)", 456, "Error50361");
+                    return new MsgWithDetails(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "GetACMethodFromConfig(20)", 456, "Error50361");
                 }
                 targetRouteItem = route[route.Count - 2];
             }
@@ -219,11 +219,11 @@ namespace gip.mes.processapplication
 
         public ACMethod GetConfigForMaterial(DatabaseApp dbApp, Guid materialID)
         {
-            ACMethod acMethod = ACUrlACTypeSignature("!" + VMethodName_RegisterEntityOnScan);
+            ACMethod acMethod = ACUrlACTypeSignature("!" + VMethodName_InOutOperationOnScan);
 
             Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
 
-            var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID 
+            var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID
                                                               && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
 
             foreach (var matConfig in wayIndependent)
@@ -242,7 +242,7 @@ namespace gip.mes.processapplication
             return acMethod;
         }
 
-        [ACMethodInfo("Function", "en{'Inherirt params from config'}de{'Übernehme Dosierparameter aus Konfiguration'}", 9999)]
+        [ACMethodInfo("Function", "en{'Inherit params from config'}de{'Übernehme Dosierparameter aus Konfiguration'}", 9999)]
         public virtual void InheritParamsFromConfig(ACMethod newACMethod, ACMethod configACMethod, bool isConfigInitialization)
         {
             if (isConfigInitialization)
@@ -292,32 +292,76 @@ namespace gip.mes.processapplication
             BarcodeSequenceBase resultSequence = new BarcodeSequenceBase();
             if (scanSequence == 1)
             {
-                // Info50050: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
-                resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFRegisterEntityOnScan), "OnScanEvent(10)", 10, "Info50050");
+                // Info50085: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
+                resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(10)", 10, "Info50085");
                 resultSequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
             }
             else
             {
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
-                    // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
-                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
+                    // Error50563: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OnScanEvent(20)", 20, "Error50563");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                 }
                 else
                 {
                     using (DatabaseApp dbApp = new DatabaseApp())
                     {
-                        OperationLog inOperationLog = dbApp.OperationLog.FirstOrDefault(c => c.RefACClassID == ComponentClass.ACClassID
-                                                                                          && c.FacilityChargeID != null
-                                                                                          && c.FacilityChargeID == facilityChargeID
-                                                                                          && c.OperationState == (short)OperationLogStateEnum.Open);
+                        OperationLog inOperationLog = dbApp.OperationLog.Where(c => c.RefACClassID == ComponentClass.ACClassID
+                                                                                 && c.FacilityChargeID != null
+                                                                                 && c.FacilityChargeID == facilityChargeID
+                                                                                 && c.OperationState == (short)OperationLogStateEnum.Open)
+                                                                        .OrderBy(o => o.OperationTime)
+                                                                        .FirstOrDefault();
 
                         if (inOperationLog != null)
                         {
-                            // Error50... : The scanned entity already registered at machine/place.
-                            resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFRegisterEntityOnScan), "OnScanEvent(20)", 20, "Error50354");
-                            resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                            if (questionResult != null && sequence.QuestionSequence == 1 && (Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
+                            {
+                                OutOperationOnScan(resultSequence, dbApp, inOperationLog, facilityChargeID);
+                            }
+                            else if (questionResult != null && sequence.QuestionSequence > 1)
+                            {
+                                if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
+                                {
+                                    OutOperationOnScan(resultSequence, dbApp, inOperationLog, facilityChargeID, true);
+                                }
+                                else
+                                {
+                                    //Error50568: Output operation is cancelled.
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Error50568");
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                    return resultSequence;
+                                }
+                            }
+                            else if (sequence.QuestionSequence < 2)
+                            {
+
+                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+
+                                if (fc == null)
+                                {
+                                    //Error50564: The quant with ID: {0} not exist in the database.
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OnScanEvent(30)", 30, "Error50564", facilityChargeID);
+                                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                    return resultSequence;
+                                }
+
+                                if (fc.SplitNo > 0)
+                                {
+                                    var result = OutOperationOnScan(resultSequence, dbApp, inOperationLog, facilityChargeID);
+                                    if (result != null)
+                                        return result;
+                                }
+                                else
+                                {
+                                    // Question50091 : Output operation on entity?
+                                    resultSequence.QuestionSequence = 1;
+                                    resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Question50091", eMsgButton.YesNo);
+                                    return resultSequence;
+                                }
+                            }
                         }
                         else
                         {
@@ -340,13 +384,106 @@ namespace gip.mes.processapplication
 
                     }
 
-                    // Info500.. : Registration is successfully performed!
-                    resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFRegisterEntityOnScan), "OnScanEvent(40)", 40, "Info50052");
+                    // Info50086: Operation is successfully performed!
+                    resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50086");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
                 }
             }
             return resultSequence;
         }
 
+
+        private BarcodeSequenceBase OutOperationOnScan(BarcodeSequenceBase resultSequence, DatabaseApp dbApp, OperationLog inOperationLog, Guid facilityChargeID, bool skipValidation = false)
+        {
+            if (!skipValidation)
+            {
+                TimeSpan durationToCheck = DateTime.Now - inOperationLog.OperationTime;
+
+                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                if (fc == null)
+                {
+                    //Error50564: The quant with ID: {0} not exist in the database.
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(10)", 10, "Error50564", facilityChargeID);
+                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
+
+                ACMethod acMethod = GetConfigForMaterial(dbApp, fc.MaterialID);
+
+                if (acMethod == null)
+                {
+                    // Error50565 : Can't get configuration for material.
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(20)", 20, "Error50565");
+                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
+
+                ACValue minDurationValue = acMethod.ParameterValueList.GetACValue("MinDuration");
+                if (minDurationValue == null)
+                {
+                    // Error50566 : Minimum duration setting is not exist.
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(30)", 30, "Error50566");
+                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
+
+                if (minDurationValue.Value != null)
+                {
+                    TimeSpan minDuration = minDurationValue.ParamAsTimeSpan;
+
+                    if (minDuration.TotalSeconds > 0)
+                    {
+                        if (durationToCheck < minDuration)
+                        {
+                            // The quant is not long enough in a object. Do you want to continue with a output operation?
+                            // Question50092: Kvant nije dovoljno dugo u objektu? Želite li ipak nastaviti s izlaznom operacijom? 
+                            resultSequence.QuestionSequence = 2;
+                            resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Question50092", eMsgButton.YesNo);
+                            return resultSequence;
+                        }
+                    }
+                }
+
+                ACValue maxDurationValue = acMethod.ParameterValueList.GetACValue("MaxDuration");
+                if (maxDurationValue == null)
+                {
+                    // Error50567 : Maximum duration setting is not exist.
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(50)", 50, "Error50567");
+                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
+
+                if (maxDurationValue.Value != null)
+                {
+                    TimeSpan maxDuration = maxDurationValue.ParamAsTimeSpan;
+                    if (maxDuration.TotalSeconds > 0)
+                    {
+                        if (durationToCheck > maxDuration)
+                        {
+                            // Warning50057 : The quant was too long in the object.
+                            resultSequence.Message = new Msg(this, eMsgLevel.Warning, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(60)", 60, "Warning50057");
+                        }
+                    }
+                }
+            }
+
+            inOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
+
+            OperationLog outOperationLog = OperationLog.NewACObject(dbApp, null);
+            outOperationLog.RefACClassID = this.ComponentClass.ACClassID;
+            outOperationLog.FacilityChargeID = facilityChargeID;
+            outOperationLog.Operation = (short)OperationLogEnum.UnregisterEntityOnScan;
+            outOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
+            outOperationLog.OperationTime = DateTime.Now;
+
+            dbApp.OperationLog.AddObject(outOperationLog);
+
+            Msg msg = dbApp.ACSaveChanges();
+            if (msg != null)
+            {
+                resultSequence.Message = msg;
+                resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+            }
+
+            resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
+
+            return null;
+        }
     }
 }

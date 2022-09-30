@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace gip.mes.webservices
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Scan-Controller for PAFRegisterEntityOnScanSC'}de{'Scan-Controller für PAFRegisterEntityOnScanSC'}", Global.ACKinds.TPABGModule, Global.ACStorableTypes.Required, false, false)]
-    public class PAFRegisterEntityOnScanSC : PAScannedCompContrBase
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Scan-Controller for PAFInOutOperationOnScan'}de{'Scan-Controller für PAFInOutOperationOnScan'}", Global.ACKinds.TPABGModule, Global.ACStorableTypes.Required, false, false)]
+    public class PAFInOutOperationOnScanSC : PAScannedCompContrBase
     {
-        public PAFRegisterEntityOnScanSC(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
+        public PAFInOutOperationOnScanSC(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
@@ -30,7 +30,7 @@ namespace gip.mes.webservices
             Guid facilityID, facilityChargeID;
             ParentDecoder.GetGuidFromFacilityEntities(entityFacility, entityCharge, out facilityID, out facilityChargeID);
 
-            BarcodeSequenceBase result = component.ExecuteMethod(nameof(PAFRegisterEntityOnScan.OnScanEvent),
+            BarcodeSequenceBase result = component.ExecuteMethod(nameof(PAFInOutOperationOnScan.OnScanEvent),
                 new BarcodeSequenceBase() { State = sequence.State, Message = sequence.Message, QuestionSequence = sequence.QuestionSequence },
                 sequence.PreviousLotConsumed,
                 facilityID, facilityChargeID, sequence.Sequence.Count,
@@ -38,7 +38,10 @@ namespace gip.mes.webservices
             if (result != null)
             {
                 if (result.Message != null && result.Message.MessageLevel == eMsgLevel.Question)
+                {
                     sequence.AddQuestion(result.Message);
+                    sequence.QuestionSequence = result.QuestionSequence;
+                }
                 else
                 {
                     sequence.State = result.State;
@@ -55,7 +58,7 @@ namespace gip.mes.webservices
 
         protected override Type OnGetControlledType()
         {
-            return typeof(PAFRegisterEntityOnScan);
+            return typeof(PAFInOutOperationOnScan);
         }
     }
 }
