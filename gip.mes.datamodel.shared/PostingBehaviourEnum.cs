@@ -42,9 +42,9 @@ namespace gip.mes.datamodel
         /// </summary>
         ZeroStockAlways = 4,
 
-        /// <summary>
-        /// Split quant on inward posting for a order
-        /// </summary>
-        SplitQuantOnProduction = 5,
+        ///// <summary>
+        ///// Split quant on inward posting for a order
+        ///// </summary>
+        //SplitQuantOnProduction = 5,
     }
 }

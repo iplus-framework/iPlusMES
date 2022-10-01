@@ -195,9 +195,8 @@ namespace gip.mes.webservices
                                 pwInfo.WFMethod.ParameterValueList.Remove(paramToRemove);
                         }
 
-                        pwInfo.OrderQuantityOnInwardPosting = orderWFInfo.OrderQuantityOnInwardPosting;
                         pwInfo.PostingQSuggestionMode = orderWFInfo.PostingQSuggestionMode;
-                        pwInfo.ValidSeqNoForPostingQSMode = orderWFInfo.ValidSeqNoForPostingQSMode;
+                        pwInfo.PostingQSuggestionMode2 = orderWFInfo.PostingQSuggestionMode2;
 
                         pwInfo.ProdOrderPartslist = vbWebService.ConvertToWSProdOrderPartslists(poPartslist.Where(c => c.ProdOrderPartslistID == orderWFInfo.POPId).AsQueryable()).FirstOrDefault();
                         if (orderWFInfo.IntermPOPPosId != Guid.Empty)

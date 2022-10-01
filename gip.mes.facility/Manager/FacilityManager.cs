@@ -307,19 +307,25 @@ namespace gip.mes.facility
                 BP.Database = dbApp;
 
                 if (BP.PartslistPos != null && BP.InwardFacility != null
-                                            && BP.InwardFacility.PostingBehaviour == PostingBehaviourEnum.SplitQuantOnProduction
+                                            && BP.InwardAutoSplitQuant != null
                                             && BP.InwardMaterial != null  
                                             && BP.InwardSplitNo != null 
                                             && BP.InwardFacilityLot != null)
                 {
                     int splitNo = 1;
+                    int i = 1;
+
+                    if (BP.InwardAutoSplitQuant > 0)
+                    {
+                        i = BP.InwardAutoSplitQuant.Value;
+                    }
 
                     var query = s_cQry_FCList_Fac_Lot_Mat(dbApp, BP.InwardFacility.FacilityID, BP.InwardFacilityLot.FacilityLotID, BP.InwardMaterial.MaterialID, null)
                                                          .OrderByDescending(x => x.SplitNo);
 
                     if (query != null && query.Any())
                     {
-                        splitNo = query.FirstOrDefault().SplitNo + 1;
+                        splitNo = query.FirstOrDefault().SplitNo + i;
                     }
 
                     BP.InwardSplitNo = splitNo;

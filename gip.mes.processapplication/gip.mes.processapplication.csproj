@@ -74,7 +74,7 @@
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFUnregisterEntityOnScan.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
-    <Compile Include="ACProcessApplication\PAProcessFunction\PAFRegisterEntityOnScan.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFInOutOperationOnScan.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
@@ -269,6 +269,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-08-04 11-57_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-09-30 13-39_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

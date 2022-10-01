@@ -105,15 +105,8 @@ namespace gip.mes.processapplication
             set;
         }
 
-        [DataMember(Name = "VSNPQSM")]
-        public string ValidSeqNoForPostingQSMode
-        {
-            get;
-            set;
-        }
-
-        [DataMember(Name = "OQOIP")]
-        public bool OrderQuantityOnInwardPosting
+        [DataMember(Name = "PQSM2")]
+        public PostingQuantitySuggestionMode PostingQSuggestionMode2
         {
             get;
             set;
@@ -425,8 +418,7 @@ namespace gip.mes.processapplication
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
                 WFMethod = pwNode.CurrentACMethod.ValueT,
                 PostingQSuggestionMode = pwNode.PostingQuantitySuggestionMode.HasValue ? pwNode.PostingQuantitySuggestionMode.Value : PostingQuantitySuggestionMode.OrderQuantity,
-                ValidSeqNoForPostingQSMode = String.IsNullOrEmpty(pwNode.ValidSeqNoForPostingQSMode) ? null : pwNode.ValidSeqNoForPostingQSMode,
-                OrderQuantityOnInwardPosting = pwNode.OrderQuantityOnInwardPosting
+                PostingQSuggestionMode2 = pwNode.PostingQuantitySuggestionMode2.HasValue ? pwNode.PostingQuantitySuggestionMode2.Value : PostingQuantitySuggestionMode.None
             }) ; 
         }
 

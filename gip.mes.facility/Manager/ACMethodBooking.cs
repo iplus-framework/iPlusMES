@@ -1962,6 +1962,26 @@ namespace gip.mes.facility
             }
         }
 
+        public int? InwardAutoSplitQuant
+        {
+            get
+            {
+                ACValue acValue = ParameterValueList.GetACValue("InwardAutoSplitQuant");
+                if (acValue == null)
+                    return null;
+                return acValue.Value as Nullable<int>;
+            }
+            set
+            {
+                ACValue acValue = ParameterValueList.GetACValue("InwardAutoSplitQuant");
+                if (acValue == null)
+                {
+                    acValue = new ACValue("InwardAutoSplitQuant", typeof(Nullable<int>), value, Global.ParamOption.Optional);
+                    ParameterValueList.Add(acValue);
+                }
+                acValue.Value = value;
+            }
+        }
 
         /// <summary>
         /// Ignoriert den IsEnbaled-Status eines Lagerplatzes. Die Buchung wir trotzdem durchgeführt auf wenn eine Einlagerungs oder Auslagerungssperre gesetzt ist.

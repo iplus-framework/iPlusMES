@@ -57,6 +57,12 @@ namespace gip.mes.processapplication
         }
         #endregion
 
+        public void EqalizeInwardQuantsAccordingOutwardPostings()
+        {
+
+        }
+
+
 
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
         public override void SMStarting()

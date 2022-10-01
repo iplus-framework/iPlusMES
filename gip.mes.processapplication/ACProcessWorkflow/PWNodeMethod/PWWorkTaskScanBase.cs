@@ -51,35 +51,22 @@ namespace gip.mes.processapplication
             }
         }
 
-        public string ValidSeqNoForPostingQSMode
+        public PostingQuantitySuggestionMode? PostingQuantitySuggestionMode2
         {
             get
             {
                 var method = MyConfiguration;
                 if (method != null)
                 {
-                    var acValue = method.ParameterValueList.GetACValue("ValidSeqNoPostingQSMode");
+                    var acValue = method.ParameterValueList.GetACValue("PostingQuantitySuggestionMode2");
                     if (acValue != null)
-                        return acValue.Value as string;
+                        return acValue.Value as PostingQuantitySuggestionMode?;
                 }
                 return null;
             }
         }
 
-        public bool OrderQuantityOnInwardPosting
-        {
-            get
-            {
-                var method = MyConfiguration;
-                if (method != null)
-                {
-                    var acValue = method.ParameterValueList.GetACValue("OrderQuantityOnInwardPosting");
-                    if (acValue != null)
-                        return acValue.ParamAsBoolean;
-                }
-                return false;
-            }
-        }
+        
 
         #endregion
 
@@ -261,7 +248,6 @@ namespace gip.mes.processapplication
             }
             return null;
         }
-
 
         protected override bool RunWithoutInvokingFunction
         {

@@ -1396,6 +1396,9 @@ namespace gip.mes.webservices
                 acParam.InwardQuantity = bpParam.InwardQuantity;
                 acParam.InwardTargetQuantity = bpParam.InwardTargetQuantity;
 
+                if (bpParam.InwardAutoSplitQuant.HasValue)
+                    acParam.InwardAutoSplitQuant = bpParam.InwardAutoSplitQuant;
+
                 if (bpParam.OutwardMaterialID.HasValue)
                     acParam.OutwardMaterial = dbApp.Material.Where(c => c.MaterialID == bpParam.OutwardMaterialID.Value).FirstOrDefault();
                 if (bpParam.OutwardFacilityID.HasValue)
