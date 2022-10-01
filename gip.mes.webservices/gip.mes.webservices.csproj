@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="Components\Controller\PAFDischargingSC.cs" />
     <Compile Include="Components\Controller\PAFInOutOperationOnScanSC.cs" />
-    <Compile Include="Components\Controller\PAFUnregisterEntityOnScanSC.cs" />
     <Compile Include="Components\Controller\PAFWorkTaskScanBaseSC.cs" />
     <Compile Include="Components\Controller\PAFManualWeighingSC.cs" />
     <Compile Include="Components\Controller\PAFBinSelectionSC.cs" />
