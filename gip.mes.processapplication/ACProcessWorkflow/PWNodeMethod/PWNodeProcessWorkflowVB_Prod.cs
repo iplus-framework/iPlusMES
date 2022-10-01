@@ -697,6 +697,7 @@ namespace gip.mes.processapplication
 
         protected virtual void OnBatchplanCompleted(DatabaseApp dbApp, ProdOrderPartslistPos intermediatePosition, ProdOrderBatchPlan lastBatchPlanEntry)
         {
+            DoFinalPostingsOnCompletedBatchPlan(dbApp, intermediatePosition, lastBatchPlanEntry);
         }
 
         public Guid? CurrentProdOrderBatchPlanID { get; set; }
@@ -913,6 +914,28 @@ namespace gip.mes.processapplication
                 }
             }
             return batchCreateSize;
+        }
+
+        protected virtual void DoFinalPostingsOnCompletedBatchPlan(DatabaseApp dbApp, ProdOrderPartslistPos intermediatePosition, ProdOrderBatchPlan lastBatchPlanEntry)
+        {
+            try
+            {
+                PWMethodVBBase rootPW = RootPW as PWMethodVBBase;
+                if (rootPW != null)
+                {
+                    MsgWithDetails saveMsg = this.ProdOrderManager.BalanceBackAndForeflushedStocks(rootPW.ACFacilityManager, dbApp, intermediatePosition.ProdOrderPartslist, true);
+                    if (saveMsg != null)
+                    {
+                        Messages.LogError(this.GetACUrl(), nameof(DoFinalPostingsOnCompletedBatchPlan) + "(10)", saveMsg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(DoFinalPostingsOnCompletedBatchPlan), 1000), true);
+                        dbApp.ACUndoChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(DoFinalPostingsOnCompletedBatchPlan), ex);
+            }
         }
         #endregion
 

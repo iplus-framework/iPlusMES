@@ -3485,17 +3485,17 @@ namespace gip.mes.processapplication
                     fbtZeroBooking.InwardFacilityCharge = fc;
                     fbtZeroBooking.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
 
-                    ACMethodEventArgs result = ACFacilityManager.BookFacility(fbtZeroBooking, dbApp);
-                    if (!fbtZeroBooking.ValidMessage.IsSucceded() || fbtZeroBooking.ValidMessage.HasWarnings())
+                    ACMethodEventArgs resultBooking = ACFacilityManager.BookFacilityWithRetry(ref fbtZeroBooking, dbApp);
+                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                     {
-                        return fbtZeroBooking.ValidMessage;
+                        if (String.IsNullOrEmpty(resultBooking.ValidMessage.Message))
+                            resultBooking.ValidMessage.Message = resultBooking.ResultState.ToString();
+                        return resultBooking.ValidMessage;
                     }
-                    else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+                    else
                     {
-                        if (String.IsNullOrEmpty(result.ValidMessage.Message))
-                            result.ValidMessage.Message = result.ResultState.ToString();
-
-                        return result.ValidMessage;
+                        if (!fbtZeroBooking.ValidMessage.IsSucceded() || fbtZeroBooking.ValidMessage.HasWarnings())
+                            return fbtZeroBooking.ValidMessage;
                     }
                 }
                 catch (Exception e)

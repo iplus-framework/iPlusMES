@@ -2074,6 +2074,110 @@ namespace gip.mes.facility
             }
             return result;
         }
+
+
+        public MsgWithDetails BalanceBackAndForeflushedStocks(FacilityManager facilityManager, DatabaseApp dbApp, ProdOrderPartslist poPartsList, bool postWithRetry = false)
+        {
+            if (facilityManager == null || dbApp == null || poPartsList == null)
+                return null;
+            MsgWithDetails collectedMessages = new MsgWithDetails();
+            IEnumerable<ProdOrderPartslistPos> backflushedPosFromPrevPartslist 
+                = poPartsList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.SourceProdOrderPartslistID.HasValue
+                                                                                    && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                                                                        .AsEnumerable()
+                                                                        .Where(c => c.Backflushing);
+            if (backflushedPosFromPrevPartslist.Any())
+            {
+                List<FacilityPreBooking> newPreBookings = new List<FacilityPreBooking>();
+                foreach (ProdOrderPartslistPos backflushedPos in backflushedPosFromPrevPartslist)
+                {
+                    if (Math.Abs(backflushedPos.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
+                        continue;
+                    ProdOrderPartslistPos finalPosFromPrevPartslist =
+                        backflushedPos.SourceProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                                 .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern
+                                    && !c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                                 .FirstOrDefault();
+                    if (finalPosFromPrevPartslist != null && finalPosFromPrevPartslist.Foreflushing)
+                    {
+                        if (Math.Abs(finalPosFromPrevPartslist.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
+                            continue;
+                        double diff = backflushedPos.ActualQuantityUOM - finalPosFromPrevPartslist.ActualQuantityUOM;
+                        if (Math.Abs(diff) > FacilityConst.C_ZeroCompare)
+                        {
+                            FacilityBookingCharge lastInwardPosting =
+                            dbApp.FacilityBookingCharge.Include(c => c.ProdOrderPartslistPos)
+                                                        .Include(c => c.ProdOrderPartslistPos.Material)
+                                                        .Include(c => c.InwardMaterial)
+                                                        .Include(c => c.InwardFacility)
+                                                        .Include(c => c.InwardFacilityCharge)
+                                                        .Include(c => c.InwardFacilityLot)
+                                                        .Where(c => c.ProdOrderPartslistPos != null
+                                                                    && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                        || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                                    || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                        && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID)))))
+                                                        .OrderByDescending(c => c.FacilityBookingChargeNo)
+                                                        .FirstOrDefault();
+                            if (lastInwardPosting != null)
+                            {
+                                FacilityPreBooking facilityPreBooking = NewInwardFacilityPreBooking(facilityManager, dbApp, lastInwardPosting.ProdOrderPartslistPos);
+                                if (facilityPreBooking != null)
+                                {
+                                    ACMethodBooking acMethodBooking = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                                    if (acMethodBooking != null)
+                                    {
+                                        acMethodBooking.InwardFacility = lastInwardPosting.InwardFacility;
+                                        acMethodBooking.InwardFacilityCharge = lastInwardPosting.InwardFacilityCharge;
+                                        acMethodBooking.InwardFacilityLot = lastInwardPosting.InwardFacilityLot;
+                                        acMethodBooking.InwardQuantity = diff;
+                                        newPreBookings.Add(facilityPreBooking);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (newPreBookings.Any())
+                {
+                    MsgWithDetails subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
+                    if (subMessage != null)
+                        return subMessage;
+                    foreach (var facilityPreBooking in newPreBookings)
+                    {
+                        ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                        if (bookingParam != null)
+                        {
+                            ACMethodEventArgs resultBooking = postWithRetry ? facilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) : facilityManager.BookFacility(bookingParam, dbApp);
+                            if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                            else
+                            {
+                                if (bookingParam.ValidMessage.IsSucceded())
+                                {
+                                    facilityPreBooking.DeleteACObject(dbApp, true);
+                                    if (bookingParam.PartslistPos != null)
+                                    {
+                                        bookingParam.PartslistPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
+                                        //bookingParam.PartslistPos.RecalcActualQuantity();
+                                        //bookingParam.PartslistPos.TopParentPartslistPos.RecalcActualQuantity();
+                                    }
+                                    subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
+                                    if (subMessage != null)
+                                        collectedMessages.AddDetailMessage(subMessage);
+                                }
+                                else
+                                {
+                                    collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
+        }
         #endregion
 
         #region RecalcTargetQuantity

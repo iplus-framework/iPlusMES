@@ -1131,8 +1131,16 @@ namespace gip.bso.manufacturing
                     return Global.MsgResult.None;
             }
 
+            Msg msgForAll = BalanceBackAndForeflushedStocks();
+            if (msgForAll != null)
+            {
+                Global.MsgResult msgResultOpenPostings = Messages.Msg(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
+                if (msgResultOpenPostings != Global.MsgResult.Yes)
+                    return Global.MsgResult.None;
+            }
+
             // "Wollen Sie den Auftrag beenden?"
-            Msg msgForAll = new Msg
+            msgForAll = new Msg
             {
                 Source = GetACUrl(),
                 MessageLevel = eMsgLevel.Info,
@@ -1227,9 +1235,15 @@ namespace gip.bso.manufacturing
                     Message = Root.Environment.TranslateMessage(this, "Info50034")
                 };
                 Global.MsgResult msgResult = Messages.Msg(noOpenPostings, Global.MsgResult.OK, eMsgButton.OK);
-                if (msgResult == Global.MsgResult.OK)
-                    return;
+
+                Msg msgForAll = BalanceBackAndForeflushedStocks();
+                if (msgForAll != null)
+                {
+                    msgResult = Messages.Msg(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
+                }
+                return;
             }
+
             ShowDialog(this, "OpenPostingsList");
         }
         /// <summary>
@@ -1344,6 +1358,19 @@ namespace gip.bso.manufacturing
             OnPropertyChanged("OpenPostingsList");
         }
 
+        public Msg BalanceBackAndForeflushedStocks()
+        {
+            if (ProdOrderManager == null)
+                return null;
+            var partsList = ProdOrderPartslistList.ToList();
+            foreach (var item in partsList)
+            {
+                Msg msg = ProdOrderManager.BalanceBackAndForeflushedStocks(this.ACFacilityManager, this.DatabaseApp, item);
+                if (msg != null)
+                    return msg;
+            }
+            return null;
+        }
         #endregion
 
         #endregion
