@@ -310,7 +310,8 @@ namespace gip.mes.facility
                                             && BP.InwardAutoSplitQuant != null
                                             && BP.InwardMaterial != null  
                                             && BP.InwardSplitNo != null 
-                                            && BP.InwardFacilityLot != null)
+                                            && BP.InwardFacilityLot != null
+                                            && BP.InwardAutoSplitQuant > 0)
                 {
                     int splitNo = 1;
                     int i = 1;
