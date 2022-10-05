@@ -3904,6 +3904,65 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region BroadCasting
+
+        [ACMethodCommand("BroadCastPicking", "en{'Broadcast picking'}de{'Sende Kommissionierauftrag'}", 800, true)]
+        public void BroadCastPicking()
+        {
+            if(!IsEnabledBroadCastPicking())
+                return;
+            PickingPos[] pickingPositions = CurrentPicking.PickingPos_Picking.ToArray();
+
+            List<Facility> facilities = new List<Facility>();
+            foreach (PickingPos pickingPos in pickingPositions)
+            {
+                if (pickingPos.FromFacility != null && pickingPos.FromFacility.IsMirroredOnMoreDatabases && !facilities.Contains(pickingPos.FromFacility))
+                {
+                    facilities.Add(pickingPos.FromFacility);
+                }
+                if (pickingPos.ToFacility != null && pickingPos.ToFacility.IsMirroredOnMoreDatabases && !facilities.Contains(pickingPos.ToFacility))
+                {
+                    facilities.Add(pickingPos.ToFacility);
+                }
+            }
+
+            foreach(Facility facility in facilities)
+            {
+                facility.CallSendPicking(false, CurrentPicking.PickingID);
+            }
+
+            facilities = new List<Facility>();
+            FacilityBooking[] facilityBookings = CurrentPicking.PickingPos_Picking.SelectMany(c=>c.FacilityBooking_PickingPos).ToArray();
+
+            foreach(FacilityBooking facilityBooking in facilityBookings)
+            {
+                if (facilityBooking.InwardFacility != null && facilityBooking.InwardFacility.IsMirroredOnMoreDatabases && !facilities.Contains(facilityBooking.InwardFacility))
+                {
+                    facilities.Add(facilityBooking.InwardFacility);
+                }
+                if (facilityBooking.OutwardFacility != null && facilityBooking.OutwardFacility.IsMirroredOnMoreDatabases && !facilities.Contains(facilityBooking.OutwardFacility))
+                {
+                    facilities.Add(facilityBooking.OutwardFacility);
+                }
+            }
+
+            foreach (Facility facility in facilities)
+            {
+                foreach (FacilityBooking facilityBooking in facilityBookings)
+                {
+                    facility.CallRefreshFacility(true, facilityBooking.FacilityBookingID);
+                }
+            }
+
+        }
+
+        public bool IsEnabledBroadCastPicking()
+        {
+            return CurrentPicking != null && CurrentPicking.PickingPos_Picking.Any();
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers

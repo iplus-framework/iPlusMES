@@ -157,17 +157,26 @@ namespace gip.mes.webservices
 
         public WSResponse<List<Picking>> GetPickings()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Picking>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             List<Picking> result = null;
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPickings));
             try
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null)).ToList();
+                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount)).ToList();
                 }
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPickings) + "(10)", e);
                 return new WSResponse<List<Picking>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPickings));
             }
             return new WSResponse<List<Picking>>(result);
         }
@@ -212,17 +221,27 @@ namespace gip.mes.webservices
                 }
             }
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Picking>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(SearchPickings));
             List<Picking> result;
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(dbApp, s_cQry_SearchPicking(dbApp, mdPickingType, fromFacilityID, toFacilityID, fromDT, toDT)).ToList();
+                    result = ConvertToWSPicking(dbApp, s_cQry_SearchPicking(dbApp, mdPickingType, fromFacilityID, toFacilityID, fromDT, toDT).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount)).ToList();
                 }
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchPickings) + "(10)", e);
                 return new WSResponse<List<Picking>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(SearchPickings));
             }
 
             return new WSResponse<List<Picking>>(result);
@@ -264,6 +283,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(pickingID, out guid))
                 return new WSResponse<Picking>(null, new Msg(eMsgLevel.Error, "pickingID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<Picking>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPicking));
             Picking result = null;
             try
             {
@@ -274,7 +297,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPicking) + "(10)", e);
                 return new WSResponse<Picking>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPicking));
             }
             return new WSResponse<Picking>(result);
         }
@@ -288,6 +316,10 @@ namespace gip.mes.webservices
         {
             if (item == null || item.PickingID == Guid.Empty)
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "item is null"));
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(UpdatePicking));
             try
             {
                 using (var dbApp = new DatabaseApp())
@@ -299,7 +331,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(UpdatePicking) + "(10)", e);
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(UpdatePicking));
             }
         }
 
@@ -378,9 +415,11 @@ namespace gip.mes.webservices
 
             FacilityManager facilityManager = null;
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-            if (myServiceHost != null)
-                facilityManager = FacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+            if (myServiceHost == null)
+                return new WSResponse<PickingPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            facilityManager = FacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
 
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(ConvertToWSPickingPos));
             PickingPos result = null;
             try
             {
@@ -391,7 +430,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(ConvertToWSPickingPos) + "(10)", e);
                 return new WSResponse<PickingPos>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(ConvertToWSPickingPos));
             }
             return new WSResponse<PickingPos>(result);
         }
@@ -449,6 +493,7 @@ namespace gip.mes.webservices
             if (facManager == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPickingPostingsPos));
             PostingOverview result = new PostingOverview();
             try
             {
@@ -468,7 +513,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPickingPostingsPos) + "(10)", e);
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPickingPostingsPos));
             }
             return new WSResponse<PostingOverview>(result);
         }
@@ -482,7 +532,10 @@ namespace gip.mes.webservices
             }
 
             PickingPosList result;
-
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<PickingPosList>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPickingPosByMaterial));
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -493,7 +546,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPickingPosByMaterial) + "(10)", e);
                 return new WSResponse<PickingPosList>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPickingPosByMaterial));
             }
             return new WSResponse<PickingPosList>(result);
         }
@@ -516,6 +574,10 @@ namespace gip.mes.webservices
             }
 
             MsgWithDetails result = null;
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(ConvertToWSPickingPosOnlyActQuantity));
 
             try
             {
@@ -531,13 +593,12 @@ namespace gip.mes.webservices
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
                     }
 
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                     ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
-                    if (pickingManger == null)
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+                    if (pickingManger == null || inDeliveryNoteManager == null || outDeliveryNoteManager == null || facManager == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "ACPickingManager == null || ACInDeliveryNoteManager == null || ACOutDeliveryNoteManager == null || FacilityManager == null"));
 
 
                     DeliveryNote deliveryNote = null;
@@ -548,7 +609,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(ConvertToWSPickingPosOnlyActQuantity) + "(10)", e);
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(ConvertToWSPickingPosOnlyActQuantity));
             }
 
             return new WSResponse<MsgWithDetails>(result);
@@ -562,6 +628,10 @@ namespace gip.mes.webservices
             }
 
             MsgWithDetails result = null;
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(FinishPickingOrderWithoutCheck));
 
             try
             {
@@ -577,13 +647,12 @@ namespace gip.mes.webservices
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
                     }
 
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                     ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
-                    if (pickingManger == null)
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+                    if (pickingManger == null || inDeliveryNoteManager == null || outDeliveryNoteManager == null || facManager == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "ACPickingManager == null || ACInDeliveryNoteManager == null || ACOutDeliveryNoteManager == null || FacilityManager == null"));
 
                     DeliveryNote deliveryNote = null;
                     InOrder inOrder = null;
@@ -593,7 +662,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(FinishPickingOrderWithoutCheck) + "(10)", e);
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(FinishPickingOrderWithoutCheck));
             }
 
             return new WSResponse<MsgWithDetails>(result);
@@ -606,7 +680,11 @@ namespace gip.mes.webservices
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "The parameter pickingOrders is null."));
             }
 
-            try 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(FinishPickingOrdersByMaterial));
+            try
             {
                 Guid[] pickingIDs = pickingOrders.Sequence.Where(c => c.Picking != null).Select(x => x.Picking.PickingID).ToArray();
 
@@ -616,13 +694,12 @@ namespace gip.mes.webservices
 
                     MsgWithDetails mainResult = new MsgWithDetails();
 
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                     ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
-                    if (pickingManger == null)
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+                    if (pickingManger == null || inDeliveryNoteManager == null || outDeliveryNoteManager == null || facManager == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "ACPickingManager == null || ACInDeliveryNoteManager == null || ACOutDeliveryNoteManager == null || FacilityManager == null"));
 
                     foreach (datamodel.Picking picking in pickings)
                     {
@@ -648,7 +725,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(FinishPickingOrdersByMaterial) + "(10)", e);
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(FinishPickingOrdersByMaterial));
             }
         }
 
@@ -660,6 +742,10 @@ namespace gip.mes.webservices
             }
 
             MsgWithDetails result = new MsgWithDetails();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(BookAndFinishPickingOrder));
 
             try
             {
@@ -675,13 +761,12 @@ namespace gip.mes.webservices
                         return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking with ID: not exists in the database."));
                     }
 
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                     ACInDeliveryNoteManager inDeliveryNoteManager = ACInDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     ACOutDeliveryNoteManager outDeliveryNoteManager = ACOutDeliveryNoteManager.GetServiceInstance(myServiceHost);
                     FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     ACPickingManager pickingManger = ACPickingManager.GetServiceInstance(myServiceHost) as ACPickingManager;
-                    if (pickingManger == null)
-                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Picking manager instance is null!"));
+                    if (pickingManger == null || inDeliveryNoteManager == null || outDeliveryNoteManager == null || facManager == null)
+                        return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "ACPickingManager == null || ACInDeliveryNoteManager == null || ACOutDeliveryNoteManager == null || FacilityManager == null"));
 
                     if (picking.PickingType != GlobalApp.PickingType.Issue)
                     {
@@ -760,7 +845,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(BookAndFinishPickingOrder) + "(10)", e);
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(BookAndFinishPickingOrder));
             }
 
             return new WSResponse<MsgWithDetails>(result);

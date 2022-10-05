@@ -2697,13 +2697,41 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("IntermediateParts", "en{'Recalculate Totals'}de{'Summenberechnung'}", 606, true, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
         public void RecalcIntermediateSum()
         {
-            if (!IsEnabledRecalcIntermediateSum()) return;
+            if (!IsEnabledRecalcIntermediateSum()) 
+                return;
+
+            MsgWithDetails msgWithDetails = null;
             ProdOrderPartslistPos lastIntermediateProduct = IntermediateList.Where(c => c.IsFinalMixure).FirstOrDefault();
+            /*
+                Do you want to perform the sum-calculation over the entire network of the material workflow?
+                If you only want to get the sum of the Input-Materials per intermediate, press the No button.
+            */
             Global.MsgResult mr = Root.Messages.YesNoCancel(this, "Question50059", Global.MsgResult.Yes);
             if (mr != Global.MsgResult.Cancel)
             {
-                ProdOrderManager.RecalcIntermediateItem(lastIntermediateProduct, mr == Global.MsgResult.Yes);
-                ProdOrderManager.RecalcRemainingQuantity(lastIntermediateProduct);
+                msgWithDetails = ProdOrderManager.IsRecalcIntermediateSumPossible(lastIntermediateProduct);
+                bool makeCalc = true;
+                if (msgWithDetails != null)
+                {
+                    foreach (Msg msg in msgWithDetails.MsgDetails)
+                    {
+                        if (Root.Messages.YesNoCancel(this, msg.Message, Global.MsgResult.OK, true) != Global.MsgResult.Yes)
+                        {
+                            makeCalc = false;
+                        }
+                    }
+                }
+
+                if (makeCalc)
+                {
+                    MDUnit startMDUnit = lastIntermediateProduct.MDUnit != null ? lastIntermediateProduct.MDUnit : lastIntermediateProduct.Material.BaseMDUnit;
+                    msgWithDetails = ProdOrderManager.RecalcIntermediateItem(lastIntermediateProduct, mr == Global.MsgResult.Yes, startMDUnit);
+                }
+
+                if (msgWithDetails != null && !msgWithDetails.IsSucceded())
+                {
+                    Root.Messages.Msg(msgWithDetails);
+                }
             }
 
             OnPropertyChanged("IntermediateList");

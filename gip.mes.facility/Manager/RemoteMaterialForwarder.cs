@@ -89,6 +89,9 @@ namespace gip.mes.facility
             }
         }
 
+        [ACPropertyInfo(true, 401, DefaultValue = false)]
+        public bool LoggingOn { get; set; }
+
         #endregion
 
 

@@ -94,6 +94,10 @@ namespace gip.mes.processapplication
                 return nameof(gip.mes.facility.RemoteFacilityManager.RefreshFacility);
             }
         }
+
+        [ACPropertyInfo(true, 401, DefaultValue = false)]
+        public bool LoggingOn { get; set; }
+
         #endregion
 
 

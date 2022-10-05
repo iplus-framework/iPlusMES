@@ -18,6 +18,7 @@ namespace gip.mes.facility
         SafeList<RemoteStorePostingData> RemoteStorePostings { get; set; }
         ApplicationManager ApplicationManager { get; }
         List<core.datamodel.ACClassConfig> RemoteFacilityManager { get; }
+        bool LoggingOn { get; set; }
 
         /// <summary>
         /// Name of method that should be called on the remote facility manager that receives the changed data
@@ -110,6 +111,8 @@ namespace gip.mes.facility
                 RemoteInstance remoteInstance = RemoteInstances.Where(c => c.Recipient.ACUrl == postingData.Recipient).FirstOrDefault();
                 if (remoteInstance != null && remoteInstance.Recipient.ValueT.ConnectionState >= ACObjectConnectionState.Connected)
                 {
+                    if (_ParentComponent.LoggingOn)
+                        _ParentComponent.Messages.LogDebug(_ParentComponent.GetACUrl(), "RemoteFacilityBroadcaster.ResendUnsent(10)", remoteInstance.Recipient.ValueT.GetACUrl());
                     ResendData(remoteInstance.Recipient.ValueT as ACComponentProxy, postingData);
                 }
                 else
@@ -120,6 +123,8 @@ namespace gip.mes.facility
 
         private void ResendData(ACComponentProxy proxy)
         {
+            if (_ParentComponent.LoggingOn)
+                _ParentComponent.Messages.LogDebug(_ParentComponent.GetACUrl(), "RemoteFacilityBroadcaster.ResendData(10)", proxy.GetACUrl());
             string acUrlOfProxy = proxy.GetACUrl();
             RemoteStorePostingData postingData = _ParentComponent.RemoteStorePostings.Where(c => c.Recipient == acUrlOfProxy).FirstOrDefault();
             if (postingData != null)
@@ -150,6 +155,8 @@ namespace gip.mes.facility
             var appManager = _ParentComponent.ApplicationManager;
             if (appManager == null)
                 return;
+            if (_ParentComponent.LoggingOn)
+                _ParentComponent.Messages.LogDebug(_ParentComponent.GetACUrl(), "RemoteFacilityBroadcaster.SendToRemoteStore(10)", String.Format("entityType: {0}, keyID {1}", entityType, keyID.HasValue ? keyID.Value : Guid.Empty));
             foreach (RemoteInstance remoteInstance in RemoteInstances)
             {
                 RemoteStorePostingData postingData = _ParentComponent.RemoteStorePostings.Where(c => c.Recipient == remoteInstance.Recipient.ACUrl).FirstOrDefault();
@@ -168,6 +175,8 @@ namespace gip.mes.facility
                     }
                     if (appManager.ApplicationQueue != null)
                     {
+                        if (_ParentComponent.LoggingOn)
+                            _ParentComponent.Messages.LogDebug(_ParentComponent.GetACUrl(), "RemoteFacilityBroadcaster.SendToRemoteStore(20)", String.Format("entityType: {0}, keyID {1}", entityType, keyID.HasValue ? keyID.Value : Guid.Empty));
                         appManager.ApplicationQueue.Add(() => { remoteInstance.Recipient.ValueT.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + _ParentComponent.MethodNameOfRFM, _ParentComponent.GetACUrl(), postingData); });
                     }
                 }
@@ -186,6 +195,8 @@ namespace gip.mes.facility
                     }
                     if (keyID.HasValue)
                         postingData.FBIds.Add(new RSPDEntry() { EntityType = entityType, KeyId = keyID.Value });
+                    if (_ParentComponent.LoggingOn)
+                        _ParentComponent.Messages.LogDebug(_ParentComponent.GetACUrl(), "RemoteFacilityBroadcaster.SendToRemoteStore(30)", String.Format("entityType: {0}, keyID {1}", entityType, keyID.HasValue ? keyID.Value : Guid.Empty));
                     _ParentComponent.OnPropertyChanged(nameof(IRemoteFacilityForwarder.RemoteStorePostings)); // Persist
                 }
             }

@@ -57,7 +57,6 @@
     <Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
     <Compile Include="Helperclasses\MsgBooking.cs" />
     <Compile Include="Interfaces\IACPickingManager.cs" />
-    <Compile Include="Manager\ACProdOrderManagerTest.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
     <Compile Include="Manager\RemoteMaterialForwarder.cs" />
     <Compile Include="Manager\RemoteFacilityManager.cs" />

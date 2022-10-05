@@ -134,6 +134,9 @@ namespace gip.mes.facility
             }
         }
 
+        [ACPropertyInfo(true, 401, DefaultValue = false)]
+        bool LoggingOn { get; set; }
+
         #endregion
 
         #region Methods
@@ -191,6 +194,19 @@ namespace gip.mes.facility
             {
                 if (remoteStorePosting == null || remoteStorePosting.FBIds == null || !remoteStorePosting.FBIds.Any())
                     return;
+
+                if (LoggingOn)
+                {
+                    try
+                    {
+                        Messages.LogDebug(GetACUrl(), "SynchronizeFacility(10)", ACConvert.ObjectToXML(remoteStorePosting, true, true));
+                    }
+                    catch (Exception ex)
+                    {
+                        Messages.LogException(GetACUrl(), "SynchronizeFacility(20)", ex);
+                    }
+                }
+
                 MsgWithDetails msgWithDetails = null;
                 using (DatabaseApp dbRemote = new DatabaseApp(remoteConnString))
                 using (DatabaseApp dbLocal = new DatabaseApp())
@@ -338,8 +354,10 @@ namespace gip.mes.facility
                     if (MirroringBookingToPreBooking)
                     {
                         foreach (FacilityBookingCharge fbcForMirroring in fbcForMirroringToPreBooking)
+                        {
                             if (fbcForMirroring.InwardFacilityChargeID != null)
                                 AssignMirroredPreBooking(dbLocal, fbcForMirroring);
+                        }
                     }
 
                     msgWithDetails = dbLocal.ACSaveChanges();

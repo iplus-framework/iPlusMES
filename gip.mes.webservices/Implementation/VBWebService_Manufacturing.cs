@@ -83,17 +83,26 @@ namespace gip.mes.webservices
 
         public WSResponse<List<ProdOrderPartslist>> GetProdOrderPartslists()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<ProdOrderPartslist>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslists));
             List<ProdOrderPartslist> result = null;
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSProdOrderPartslists(s_cQry_GetProdOrderPartslist(dbApp, null)).ToList();
+                    result = ConvertToWSProdOrderPartslists(s_cQry_GetProdOrderPartslist(dbApp, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount)).ToList();
                 }
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPartslists) + "(10)", e);
                 return new WSResponse<List<ProdOrderPartslist>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPartslists));
             }
             return new WSResponse<List<ProdOrderPartslist>>(result);
         }
@@ -107,6 +116,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(prodOrderPartslistID, out guid))
                 return new WSResponse<ProdOrderPartslist>(null, new Msg(eMsgLevel.Error, "prodOrderPartslistID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderPartslist>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslist));
             ProdOrderPartslist result = null;
             try
             {
@@ -117,7 +130,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPartslist) + "(10)", e);
                 return new WSResponse<ProdOrderPartslist>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPartslist));
             }
             return new WSResponse<ProdOrderPartslist>(result);
         }
@@ -239,6 +257,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(prodOrderPartslistID, out guid))
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "prodOrderPartslistID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPLIntermediates));
             List<ProdOrderPartslistPos> result = null;
             try
             {
@@ -249,7 +271,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPLIntermediates) + "(10)", e);
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPLIntermediates));
             }
             return new WSResponse<List<ProdOrderPartslistPos>>(result);
         }
@@ -263,6 +290,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(intermediateID, out guid))
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "intermediateID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPLIntermediate));
             ProdOrderPartslistPos result = null;
             try
             {
@@ -273,7 +304,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPLIntermediate) + "(10)", e);
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPLIntermediate));
             }
             return new WSResponse<ProdOrderPartslistPos>(result);
         }
@@ -376,6 +412,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(targetPOPLPosID, out guid))
                 return new WSResponse<List<ProdOrderPartslistPosRelation>>(null, new Msg(eMsgLevel.Error, "targetPOPLPosID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<ProdOrderPartslistPosRelation>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderInputMaterials));
             List<ProdOrderPartslistPosRelation> result = null;
             try
             {
@@ -386,7 +426,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderInputMaterials) + "(10)", e);
                 return new WSResponse<List<ProdOrderPartslistPosRelation>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderInputMaterials));
             }
             return new WSResponse<List<ProdOrderPartslistPosRelation>>(result);
         }
@@ -503,6 +548,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(parentIntermediateID, out guid))
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "parentIntermediateID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderIntermBatches));
             List<ProdOrderPartslistPos> result = null;
             try
             {
@@ -513,7 +562,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderIntermBatches) + "(10)", e);
                 return new WSResponse<List<ProdOrderPartslistPos>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderIntermBatches));
             }
             return new WSResponse<List<ProdOrderPartslistPos>>(result);
         }
@@ -527,6 +581,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(intermediateID, out guid))
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "intermediateID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderIntermBatch));
             ProdOrderPartslistPos result = null;
             try
             {
@@ -537,7 +595,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderIntermBatch) + "(10)", e);
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderIntermBatch));
             }
             return new WSResponse<ProdOrderPartslistPos>(result);
         }
@@ -582,6 +645,7 @@ namespace gip.mes.webservices
             if (facManager == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPosRelFacilityBooking));
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -594,7 +658,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPosRelFacilityBooking) + "(10)", e);
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPosRelFacilityBooking));
             }
 
             return new WSResponse<PostingOverview>();
@@ -636,6 +705,7 @@ namespace gip.mes.webservices
             if (facManager == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPosFacilityBooking));
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -648,7 +718,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPosFacilityBooking) + "(10)", e);
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPosFacilityBooking));
             }
 
             return new WSResponse<PostingOverview>();
@@ -682,6 +757,10 @@ namespace gip.mes.webservices
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "The given parameter machineID is incorrect!"));
 
             ProdOrderPartslistPos result = null;
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderIntermOrIntermBatchByMachine));
 
             try
             {
@@ -731,7 +810,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderIntermOrIntermBatchByMachine) + "(10)", e);
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderIntermOrIntermBatchByMachine));
             }
 
             return new WSResponse<ProdOrderPartslistPos>(result);
@@ -754,6 +838,10 @@ namespace gip.mes.webservices
                 return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "The given parameter intermBatchID is incorrect!"));
 
             List<Facility> result = new List<Facility>();
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPOBatchTargetFacilities));
 
             try
             {
@@ -782,7 +870,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPOBatchTargetFacilities) + "(10)", e);
                 return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPOBatchTargetFacilities));
             }
             return new WSResponse<List<Facility>>(result);
         }
@@ -793,6 +886,10 @@ namespace gip.mes.webservices
 
         public WSResponse<ProdOrderPartslistPos> GetProdOrderPartslistPos(string POPLPosID)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslistPos));
             ProdOrderPartslistPos pos = null;
             try
             {
@@ -817,7 +914,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPartslistPos) + "(10)", e);
                 return new WSResponse<ProdOrderPartslistPos>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPartslistPos));
             }
             return new WSResponse<ProdOrderPartslistPos>(pos);
         }
@@ -891,6 +993,10 @@ namespace gip.mes.webservices
 
         public WSResponse<ProdOrderPartslistPosRelation> GetProdOrderPartslistPosRel(string POPLPosRelID)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderPartslistPosRelation>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderPartslistPosRel));
             ProdOrderPartslistPosRelation posRel = null;
             try
             {
@@ -914,7 +1020,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderPartslistPosRel) + "(10)", e);
                 return new WSResponse<ProdOrderPartslistPosRelation>(null, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderPartslistPosRel));
             }
             return new WSResponse<ProdOrderPartslistPosRelation>(posRel);
         }
