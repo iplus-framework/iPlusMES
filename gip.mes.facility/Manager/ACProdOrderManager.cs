@@ -2193,7 +2193,8 @@ namespace gip.mes.facility
             if (lastQuant == null)
             {
                 collectedMessages = new MsgWithDetails();
-                //TODO add message
+                //Error50569: The last quant is not available or not exists!
+                collectedMessages.AddDetailMessage(new Msg(this, eMsgLevel.Error, nameof(ACProdOrderManager), nameof(CorrectLastInwardQuantAccordingOutwardPostings)+"(10)",2197, "Error50569"));
                 return collectedMessages;
             }
 
@@ -2223,8 +2224,8 @@ namespace gip.mes.facility
 
 
                 MsgWithDetails subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
-                //if (subMessage != null)
-                //    return subMessage;
+                if (subMessage != null)
+                    return subMessage;
 
                 ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                 if (bookingParam != null)

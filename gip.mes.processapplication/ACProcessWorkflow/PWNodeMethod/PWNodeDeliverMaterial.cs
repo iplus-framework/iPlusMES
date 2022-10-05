@@ -142,13 +142,19 @@ namespace gip.mes.processapplication
             if (pwMethodProduction == null)
                 return;
 
+            Msg msg;
+
             if (ACFacilityManager == null || ProdOrderManager == null)
             {
-                //todo alarm
+                //Error50571: The facility manager and/or prod order manager is not available.
+                msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CorrectInwardQuantsAccordingOutwardPostings) + "(10)", 150, "Error50571");
+
+                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                OnNewAlarmOccurred(ProcessAlarm, msg, false);
+
                 return;
             }
-
-            Msg msg;
 
             using (var dbIPlus = new Database())
             {
@@ -164,8 +170,8 @@ namespace gip.mes.processapplication
                         out intermediateChildPos, out intermediatePosition, out endBatchPos, out matWFConnection, out batch, out batchPlan);
                     if (batch == null)
                     {
-                        // Error50276: No batch assigned to last intermediate material of this workflow
-                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(30)", 1010, "Error50276");
+                        // Error50570: No batch assigned to last intermediate material of this workflow.
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CorrectInwardQuantsAccordingOutwardPostings) + "(20)", 168, "Error50570");
 
                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
@@ -174,8 +180,8 @@ namespace gip.mes.processapplication
                     }
                     else if (endBatchPos == null)
                     {
-                        // Error50277: No relation defined between Workflownode and intermediate material in Materialworkflow
-                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartManualWeighingProd(40)", 761, "Error50277");
+                        // Error50572: The last intermediate material not exist!
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CorrectInwardQuantsAccordingOutwardPostings) + "(20)", 168, "Error50572");
 
                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
@@ -248,10 +254,10 @@ namespace gip.mes.processapplication
             if (CreateNewProgramLog(NewACMethodWithConfiguration()) <= CreateNewProgramLogResult.ErrorNoProgramFound)
                 return;
 
-            //if (CorrectLastQuantOnEnd)
-            //{
-            //    CorrectInwardQuantsAccordingOutwardPostings();
-            //}
+            if (CorrectLastQuantOnEnd)
+            {
+                CorrectInwardQuantsAccordingOutwardPostings();
+            }
 
             // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
             if (CurrentACState == ACStateEnum.SMStarting)
