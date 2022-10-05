@@ -26,7 +26,7 @@ namespace gip.mes.webservices
                 //.Include(gip.mes.datamodel.Facility.ClassName)
                 //.Include(gip.mes.datamodel.MDUnit.ClassName)
                 //.Include(gip.mes.datamodel.MDReleaseState.ClassName)
-                .Where(c =>    (!facilityChargeID.HasValue && !c.NotAvailable)
+                .Where(c => (!facilityChargeID.HasValue && !c.NotAvailable)
                             || (facilityChargeID.HasValue && c.FacilityChargeID == facilityChargeID.Value))
                 .Select(c => new gip.mes.webservices.FacilityCharge()
                 {
@@ -87,9 +87,9 @@ namespace gip.mes.webservices
                         .Include(gip.mes.datamodel.Facility.ClassName)
                         .Include(gip.mes.datamodel.MDUnit.ClassName)
                         .Include(gip.mes.datamodel.MDReleaseState.ClassName)
-                        .Where(c => c.FacilityID == facilityID 
-                                 && c.MaterialID == materialID 
-                                 && c.FacilityLotID == facilityLotID 
+                        .Where(c => c.FacilityID == facilityID
+                                 && c.MaterialID == materialID
+                                 && c.FacilityLotID == facilityLotID
                                  && (splitNo == null || c.SplitNo == splitNo))
                         .Select(c => new gip.mes.webservices.FacilityCharge()
                         {
@@ -144,18 +144,24 @@ namespace gip.mes.webservices
 
         public WSResponse<List<FacilityCharge>> GetFacilityCharges()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityCharges));
                 try
                 {
-                    return new WSResponse<List<FacilityCharge>>(s_cQry_GetFacilityCharge(dbApp, null).ToList());
+                    return new WSResponse<List<FacilityCharge>>(s_cQry_GetFacilityCharge(dbApp, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharges(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharges(10)", e);
                     return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityCharges));
                 }
             }
         }
@@ -169,19 +175,25 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityChargeID, out guid))
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "facilityChargeID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityCharge));
                 try
                 {
                     return new WSResponse<FacilityCharge>(s_cQry_GetFacilityCharge(dbApp, guid).FirstOrDefault());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharge(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharge(10)", e);
                     return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityCharge));
                 }
             }
         }
@@ -200,6 +212,7 @@ namespace gip.mes.webservices
 
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityChargeByBarcode));
                 try
                 {
                     Guid guid = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, barcodeID);
@@ -209,9 +222,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityChargeByBarcode(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityChargeByBarcode(10)", e);
                     return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityChargeByBarcode));
                 }
             }
         }
@@ -227,22 +243,39 @@ namespace gip.mes.webservices
                 return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "workplaceID is not valid GUID."));
             }
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
-                var registeredChargesID  = dbApp.MaterialConfig.Where(c => c.VBiACClassID == workplaceGUID).ToArray().Select(x => x.Value as Guid?);
-
-                if (registeredChargesID != null && registeredChargesID.Any())
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetRegisteredFacilityCharges));
+                try
                 {
-                    var charges = dbApp.FacilityCharge.Where(c => registeredChargesID.Contains(c.FacilityChargeID))
-                                                        .ToArray()
-                                                        .Select(c => ConvertFacilityCharge(c))
-                                                        .ToList();
+                    var registeredChargesID = dbApp.MaterialConfig.Where(c => c.VBiACClassID == workplaceGUID).ToArray().Select(x => x.Value as Guid?);
 
-                    return new WSResponse<List<FacilityCharge>>(charges);
+                    if (registeredChargesID != null && registeredChargesID.Any())
+                    {
+                        var charges = dbApp.FacilityCharge.Where(c => registeredChargesID.Contains(c.FacilityChargeID))
+                                                            .ToArray()
+                                                            .Select(c => ConvertFacilityCharge(c))
+                                                            .ToList();
+
+                        return new WSResponse<List<FacilityCharge>>(charges);
+                    }
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetRegisteredFacilityCharges(10)", e);
+                    return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetRegisteredFacilityCharges));
                 }
             }
 
-            return new WSResponse<List<FacilityCharge>>(null,null);
+            return new WSResponse<List<FacilityCharge>>(null, null);
         }
 
         public WSResponse<PostingOverview> GetFacilityChargeBookings(string facilityChargeID, string dateFrom, string dateTo)
@@ -267,31 +300,38 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityChargeBookings));
+            try
             {
-                try
-                {
-                    FacilityQueryFilter filter = new FacilityQueryFilter();
-                    filter.SearchFrom = dtFrom;
-                    filter.SearchTo = dtTo;
-                    filter.FacilityChargeID = guid;
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
-                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
-                    PostingOverview po = new PostingOverview();
-                    po.Postings = fbList.Keys.ToList();
-                    po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
-                    return new WSResponse<PostingOverview>(po);
-                }
-                catch (Exception e)
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityQueryFilter filter = new FacilityQueryFilter();
+                        filter.SearchFrom = dtFrom;
+                        filter.SearchTo = dtTo;
+                        filter.FacilityChargeID = guid;
+
+                        Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
+                        PostingOverview po = new PostingOverview();
+                        po.Postings = fbList.Keys.ToList();
+                        po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
+                        return new WSResponse<PostingOverview>(po);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityChargeBookings(10)", e);
-                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityChargeBookings));
             }
         }
 
@@ -327,9 +367,13 @@ namespace gip.mes.webservices
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "splitNo is invalid"));
             }
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityChargeFromFacilityMaterialLot));
                 try
                 {
                     if (splitNo == CoreWebServiceConst.EmptyParam)
@@ -338,15 +382,17 @@ namespace gip.mes.webservices
                                                                                                           facilityLotGuidID, null)
                                                               .OrderByDescending(c => c.SplitNo).FirstOrDefault());
                     }
-                    return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID, 
+                    return new WSResponse<FacilityCharge>(s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, facilityGuidID, materialGuidID,
                                                                                                           facilityLotGuidID, splitNoParsed).FirstOrDefault());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharge(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityCharge(10)", e);
                     return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityChargeFromFacilityMaterialLot));
                 }
             }
         }
@@ -419,130 +465,138 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            if (facilityCharge == null)
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(CreateFacilityCharge));
+            try
             {
-                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge is null"));
-            }
 
-            if (facilityCharge.Material == null)
-            {
-                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have material."));
-            }
-
-            if (facilityCharge.Facility == null)
-            {
-                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have facility."));
-            }
-
-            using (DatabaseApp dbApp = new DatabaseApp())
-            {
-                try
+                if (facilityCharge == null)
                 {
-                    var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
-                    if (response != null)
-                        return new WSResponse<FacilityCharge>(null, response.Message);
+                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge is null"));
+                }
 
-                    Msg msg = null;
+                if (facilityCharge.Material == null)
+                {
+                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have material."));
+                }
 
-                    datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == facilityCharge.Material.MaterialID);
-                    if (material == null)
+                if (facilityCharge.Facility == null)
+                {
+                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "parameter facilityCharge must have facility."));
+                }
+
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    try
                     {
-                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, String.Format("The material with ID:{0} not exist in database!", 
-                                                                                                   facilityCharge.Material.MaterialID)));
-                    }
+                        var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
+                        if (response != null)
+                            return new WSResponse<FacilityCharge>(null, response.Message);
 
-                    FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-                    if (facManager == null)
-                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+                        Msg msg = null;
 
-                    datamodel.FacilityInventory inventory = null;
-
-                    if (facilityCharge.ParamID != Guid.Empty)
-                    {
-                        inventory = dbApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityCharge.ParamID);
-                    }
-
-                    if (inventory != null && inventory.FacilityID.HasValue)
-                    {
-                        datamodel.Facility facilityToCheck = dbApp.Facility.Include(c => c.Facility1_ParentFacility)
-                                                                           .FirstOrDefault(c => c.FacilityID == facilityCharge.Facility.FacilityID);
-
-                        while (facilityToCheck.FacilityID != inventory.FacilityID)
+                        datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == facilityCharge.Material.MaterialID);
+                        if (material == null)
                         {
-                            facilityToCheck = facilityToCheck.Facility1_ParentFacility;
-                            if (facilityToCheck == null)
+                            return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, String.Format("The material with ID:{0} not exist in database!",
+                                                                                                       facilityCharge.Material.MaterialID)));
+                        }
+
+                        FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                        if (facManager == null)
+                            return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                        datamodel.FacilityInventory inventory = null;
+
+                        if (facilityCharge.ParamID != Guid.Empty)
+                        {
+                            inventory = dbApp.FacilityInventory.FirstOrDefault(c => c.FacilityInventoryID == facilityCharge.ParamID);
+                        }
+
+                        if (inventory != null && inventory.FacilityID.HasValue)
+                        {
+                            datamodel.Facility facilityToCheck = dbApp.Facility.Include(c => c.Facility1_ParentFacility)
+                                                                               .FirstOrDefault(c => c.FacilityID == facilityCharge.Facility.FacilityID);
+
+                            while (facilityToCheck.FacilityID != inventory.FacilityID)
                             {
-                                return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "Quant can not be added to this facility because inventory is for another facility."));
+                                facilityToCheck = facilityToCheck.Facility1_ParentFacility;
+                                if (facilityToCheck == null)
+                                {
+                                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "Quant can not be added to this facility because inventory is for another facility."));
+                                }
                             }
                         }
-                    }
 
-                    datamodel.FacilityLot lot = null;
-                    if (material.IsLotManaged && facilityCharge.FacilityLot != null)
-                    {
-                        string secondaryKey = dbApp.Root().NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), datamodel.FacilityLot.NoColumnName,
-                                                                               datamodel.FacilityLot.FormatNewNo, myServiceHost);
-
-                        lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
-                        lot.ExpirationDate = facilityCharge.FacilityLot.ExpirationDate;
-                        lot.ExternLotNo = facilityCharge.FacilityLot.ExternLotNo;
-                        dbApp.FacilityLot.AddObject(lot);
-
-                        msg = dbApp.ACSaveChangesWithRetry();
-                        if (msg != null)
+                        datamodel.FacilityLot lot = null;
+                        if (material.IsLotManaged && facilityCharge.FacilityLot != null)
                         {
-                            return new WSResponse<FacilityCharge>(null, msg);
+                            string secondaryKey = dbApp.Root().NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), datamodel.FacilityLot.NoColumnName,
+                                                                                   datamodel.FacilityLot.FormatNewNo, myServiceHost);
+
+                            lot = datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                            lot.ExpirationDate = facilityCharge.FacilityLot.ExpirationDate;
+                            lot.ExternLotNo = facilityCharge.FacilityLot.ExternLotNo;
+                            dbApp.FacilityLot.AddObject(lot);
+
+                            msg = dbApp.ACSaveChangesWithRetry();
+                            if (msg != null)
+                            {
+                                return new WSResponse<FacilityCharge>(null, msg);
+                            }
                         }
+
+                        ACMethodBooking acMethodBooking = new ACMethodBooking();
+                        acMethodBooking.VirtualMethodName = datamodel.GlobalApp.FBT_InventoryNewQuant;
+                        acMethodBooking.InwardFacilityID = facilityCharge.Facility.FacilityID;
+                        acMethodBooking.InwardMaterialID = facilityCharge.Material.MaterialID;
+                        acMethodBooking.InwardQuantity = facilityCharge.StockQuantity;
+
+                        if (lot != null)
+                        {
+                            acMethodBooking.InwardFacilityLotID = lot.FacilityLotID;
+                        }
+
+                        var bookResponse = Book(acMethodBooking, dbApp, facManager, myServiceHost);
+                        if (bookResponse != null)
+                        {
+                            return new WSResponse<FacilityCharge>(new Msg(bookResponse.MessageLevel, bookResponse.DetailsAsText));
+                        }
+
+                        FacilityCharge fc = s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, acMethodBooking.InwardFacilityID.Value,
+                                                                        acMethodBooking.InwardMaterialID.Value,
+                                                                        lot?.FacilityLotID, acMethodBooking.InwardSplitNo).FirstOrDefault();
+
+                        Msg invMsg = null;
+                        if (inventory != null && fc != null)
+                        {
+                            datamodel.FacilityInventoryPos iPos = datamodel.FacilityInventoryPos.NewACObject(dbApp, inventory);
+                            iPos.FacilityChargeID = fc.FacilityChargeID;
+                            iPos.StockQuantity = fc.StockQuantity;
+                            iPos.NewStockQuantity = fc.StockQuantity;
+
+                            datamodel.MDFacilityInventoryPosState posState = dbApp.MDFacilityInventoryPosState
+                                                                                    .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
+
+                            if (posState != null)
+                                iPos.MDFacilityInventoryPosState = posState;
+
+                            invMsg = dbApp.ACSaveChanges();
+
+                        }
+
+                        return new WSResponse<FacilityCharge>(fc, invMsg);
+
                     }
-
-                    ACMethodBooking acMethodBooking = new ACMethodBooking();
-                    acMethodBooking.VirtualMethodName = datamodel.GlobalApp.FBT_InventoryNewQuant;
-                    acMethodBooking.InwardFacilityID = facilityCharge.Facility.FacilityID;
-                    acMethodBooking.InwardMaterialID = facilityCharge.Material.MaterialID;
-                    acMethodBooking.InwardQuantity = facilityCharge.StockQuantity;
-
-                    if (lot != null)
+                    catch (Exception e)
                     {
-                        acMethodBooking.InwardFacilityLotID = lot.FacilityLotID;
-                    }
-
-                    var bookResponse = Book(acMethodBooking, dbApp, facManager, myServiceHost);
-                    if (bookResponse != null)
-                    {
-                        return new WSResponse<FacilityCharge>(new Msg(bookResponse.MessageLevel, bookResponse.DetailsAsText));
-                    }
-
-                    FacilityCharge fc = s_cQry_GetFacilityChargeFromFacilityMaterialLot(dbApp, acMethodBooking.InwardFacilityID.Value,
-                                                                    acMethodBooking.InwardMaterialID.Value,
-                                                                    lot?.FacilityLotID, acMethodBooking.InwardSplitNo).FirstOrDefault();
-
-                    Msg invMsg = null;
-                    if (inventory != null && fc != null)
-                    {
-                        datamodel.FacilityInventoryPos iPos = datamodel.FacilityInventoryPos.NewACObject(dbApp, inventory);
-                        iPos.FacilityChargeID = fc.FacilityChargeID;
-                        iPos.StockQuantity = fc.StockQuantity;
-                        iPos.NewStockQuantity = fc.StockQuantity;
-
-                        datamodel.MDFacilityInventoryPosState posState = dbApp.MDFacilityInventoryPosState
-                                                                                .FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)MDFacilityInventoryPosState.FacilityInventoryPosStates.Finished);
-
-                        if (posState != null)
-                            iPos.MDFacilityInventoryPosState = posState;
-
-                        invMsg = dbApp.ACSaveChanges();
-                        
-                    }
-
-                    return new WSResponse<FacilityCharge>(fc, invMsg);
-
-                }
-                catch (Exception e)
-                {
-                    if (myServiceHost != null)
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(CreateFacilityCharge) + "(10)", e);
-                    return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(CreateFacilityCharge));
             }
         }
 
@@ -563,6 +617,11 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
             }
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(ActivateFacilityCharge));
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -602,6 +661,10 @@ namespace gip.mes.webservices
             {
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
             }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(ActivateFacilityCharge));
+            }
         }
 
         public WSResponse<bool> DeactivateFacilityCharge(FacilityChargeParamItem deactivationItem)
@@ -621,6 +684,11 @@ namespace gip.mes.webservices
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "Workplace ID is empty"));
             }
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(DeactivateFacilityCharge));
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -648,6 +716,10 @@ namespace gip.mes.webservices
             catch (Exception e)
             {
                 return new WSResponse<bool>(false, new Msg(eMsgLevel.Exception, e.Message));
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(DeactivateFacilityCharge));
             }
         }
 
@@ -696,18 +768,25 @@ namespace gip.mes.webservices
 
         public WSResponse<List<FacilityLot>> GetFacilityLots()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLots));
                 try
                 {
-                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLots(dbApp).ToList());
+                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLots(dbApp).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "FacilityLot(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "FacilityLot(10)", e);
                     return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLots));
                 }
             }
         }
@@ -762,18 +841,25 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityLotID, out guid))
                 return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Error, "facilityLotID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLot));
                 try
                 {
                     return new WSResponse<FacilityLot>(s_cQry_GetFacilityLot(dbApp, guid, null).FirstOrDefault());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLot(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLot(10)", e);
                     return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLot));
                 }
             }
         }
@@ -784,18 +870,25 @@ namespace gip.mes.webservices
             if (string.IsNullOrEmpty(term) || term == CoreWebServiceConst.EmptyParam)
                 term = null;
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(SearchFacilityLot));
                 try
                 {
-                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLot(dbApp, null, term).ToList());
+                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLot(dbApp, null, term).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacilityLot)+"(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacilityLot) + "(10)", e);
                     return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(SearchFacilityLot));
                 }
             }
         }
@@ -805,18 +898,25 @@ namespace gip.mes.webservices
             if (string.IsNullOrEmpty(materialNo) || materialNo == CoreWebServiceConst.EmptyParam)
                 return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, "materialNo is empty."));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(SearchFacilityLotByMaterial));
                 try
                 {
-                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLotByMaterial(dbApp, materialNo).ToList());
+                    return new WSResponse<List<FacilityLot>>(s_cQry_GetFacilityLotByMaterial(dbApp, materialNo).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacilityLotByMaterial)+"(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacilityLotByMaterial) + "(10)", e);
                     return new WSResponse<List<FacilityLot>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(SearchFacilityLotByMaterial));
                 }
             }
         }
@@ -836,6 +936,7 @@ namespace gip.mes.webservices
 
             using (DatabaseApp dbApp = new DatabaseApp())
             {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLotByBarcode));
                 try
                 {
                     Guid guid = facManager.ResolveFacilityLotIdFromBarcode(dbApp, barcodeID);
@@ -845,9 +946,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotByBarcode(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotByBarcode(10)", e);
                     return new WSResponse<FacilityLot>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLotByBarcode));
                 }
             }
         }
@@ -866,29 +970,37 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLotSum));
+            try
             {
-                try
+
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    FacilityLotSumOverview overview = new FacilityLotSumOverview();
-                    overview.FacilityLotStock = s_cQry_GetFacilityLotStock(dbApp, guid).FirstOrDefault();
-                    gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_LotOverviewFacilityCharge(dbApp, guid, false).ToArray();
-                    overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
-                    overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
-                    overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
-                    overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
-                    return new WSResponse<FacilityLotSumOverview>(overview);
-                }
-                catch (Exception e)
-                {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityLotSumOverview overview = new FacilityLotSumOverview();
+                        overview.FacilityLotStock = s_cQry_GetFacilityLotStock(dbApp, guid).FirstOrDefault();
+                        gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_LotOverviewFacilityCharge(dbApp, guid, false).ToArray();
+                        overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
+                        overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
+                        overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
+                        overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
+                        return new WSResponse<FacilityLotSumOverview>(overview);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotSum(10)", e);
-                    return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<FacilityLotSumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLotSum));
             }
         }
 
@@ -915,31 +1027,39 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLotBookings));
+            try
             {
-                try
-                {
-                    FacilityQueryFilter filter = new FacilityQueryFilter();
-                    filter.SearchFrom = dtFrom;
-                    filter.SearchTo = dtTo;
-                    filter.FacilityLotID = guid;
 
-                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
-                    PostingOverview po = new PostingOverview();
-                    po.Postings = fbList.Keys.ToList();
-                    po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
-                    return new WSResponse<PostingOverview>(po);
-                }
-                catch (Exception e)
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityQueryFilter filter = new FacilityQueryFilter();
+                        filter.SearchFrom = dtFrom;
+                        filter.SearchTo = dtTo;
+                        filter.FacilityLotID = guid;
+
+                        Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
+                        PostingOverview po = new PostingOverview();
+                        po.Postings = fbList.Keys.ToList();
+                        po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
+                        return new WSResponse<PostingOverview>(po);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotBookings(10)", e);
-                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLotBookings));
             }
         }
 
@@ -982,30 +1102,37 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMaterialSum));
+            try
             {
-                try
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    MaterialSumOverview overview = new MaterialSumOverview();
-                    overview.MaterialStock = s_cQry_GetMaterialStock(dbApp, guid).FirstOrDefault();
-                    gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(dbApp, guid, false).OrderBy(c => c.InsertDate).ToArray();
-                    overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });
-                    overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter());
-                    overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });
-                    overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter());
-                    overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
-                    return new WSResponse<MaterialSumOverview>(overview);
-                }
-                catch (Exception e)
-                {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        MaterialSumOverview overview = new MaterialSumOverview();
+                        overview.MaterialStock = s_cQry_GetMaterialStock(dbApp, guid).FirstOrDefault();
+                        gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(dbApp, guid, false).OrderBy(c => c.InsertDate).ToArray();
+                        overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });
+                        overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter());
+                        overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });
+                        overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter());
+                        overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
+                        return new WSResponse<MaterialSumOverview>(overview);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterialSum(10)", e);
-                    return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<MaterialSumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetMaterialSum));
             }
         }
 
@@ -1031,31 +1158,38 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMaterialBookings));
+            try
             {
-                try
-                {
-                    FacilityQueryFilter filter = new FacilityQueryFilter();
-                    filter.SearchFrom = dtFrom;
-                    filter.SearchTo = dtTo;
-                    filter.MaterialID = guid;
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
-                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
-                    PostingOverview po = new PostingOverview();
-                    po.Postings = fbList.Keys.ToList();
-                    po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
-                    return new WSResponse<PostingOverview>(po);
-                }
-                catch (Exception e)
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityQueryFilter filter = new FacilityQueryFilter();
+                        filter.SearchFrom = dtFrom;
+                        filter.SearchTo = dtTo;
+                        filter.MaterialID = guid;
+
+                        Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
+                        PostingOverview po = new PostingOverview();
+                        po.Postings = fbList.Keys.ToList();
+                        po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
+                        return new WSResponse<PostingOverview>(po);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterialBookings(10)", e);
-                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetMaterialBookings));
             }
         }
 
@@ -1097,28 +1231,36 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilitySum));
+            try
             {
-                try
+
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    FacilitySumOverview overview = new FacilitySumOverview();
-                    overview.FacilityStock = s_cQry_GetFacilityStock(dbApp, guid).FirstOrDefault();
-                    gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(dbApp, guid, false).ToArray();
-                    overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityID = guid });
-                    overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityID = guid });
-                    overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
-                    return new WSResponse<FacilitySumOverview>(overview);
-                }
-                catch (Exception e)
-                {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilitySumOverview overview = new FacilitySumOverview();
+                        overview.FacilityStock = s_cQry_GetFacilityStock(dbApp, guid).FirstOrDefault();
+                        gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(dbApp, guid, false).ToArray();
+                        overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityID = guid });
+                        overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityID = guid });
+                        overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
+                        return new WSResponse<FacilitySumOverview>(overview);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilitySum(10)", e);
-                    return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<FacilitySumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilitySum));
             }
         }
 
@@ -1144,31 +1286,39 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityBookings));
+            try
             {
-                try
-                {
-                    FacilityQueryFilter filter = new FacilityQueryFilter();
-                    filter.SearchFrom = dtFrom;
-                    filter.SearchTo = dtTo;
-                    filter.FacilityID = guid;
 
-                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
-                    PostingOverview po = new PostingOverview();
-                    po.Postings = fbList.Keys.ToList();
-                    po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
-                    return new WSResponse<PostingOverview>(po);
-                }
-                catch (Exception e)
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityQueryFilter filter = new FacilityQueryFilter();
+                        filter.SearchFrom = dtFrom;
+                        filter.SearchTo = dtTo;
+                        filter.FacilityID = guid;
+
+                        Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
+                        PostingOverview po = new PostingOverview();
+                        po.Postings = fbList.Keys.ToList();
+                        po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
+                        return new WSResponse<PostingOverview>(po);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityBookings(10)", e);
-                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityBookings));
             }
         }
 
@@ -1189,27 +1339,35 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLocationSum));
+            try
             {
-                try
+
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    FacilityLocationSumOverview overview = new FacilityLocationSumOverview();
-                    gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_LocationOverviewFacilityCharge(dbApp, guid, false).ToArray();
-                    overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLocationID = guid });
-                    overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLocationID = guid });
-                    overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
-                    return new WSResponse<FacilityLocationSumOverview>(overview);
-                }
-                catch (Exception e)
-                {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityLocationSumOverview overview = new FacilityLocationSumOverview();
+                        gip.mes.datamodel.FacilityCharge[] facilityChargeList = FacilityManager.s_cQry_LocationOverviewFacilityCharge(dbApp, guid, false).ToArray();
+                        overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLocationID = guid });
+                        overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLocationID = guid });
+                        overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
+                        return new WSResponse<FacilityLocationSumOverview>(overview);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLotSum(10)", e);
-                    return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<FacilityLocationSumOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLocationSum));
             }
         }
 
@@ -1236,31 +1394,39 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityLocationBookings));
+            try
             {
-                try
-                {
-                    FacilityQueryFilter filter = new FacilityQueryFilter();
-                    filter.SearchFrom = dtFrom;
-                    filter.SearchTo = dtTo;
-                    filter.FacilityLocationID = guid;
 
-                    Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
-                    PostingOverview po = new PostingOverview();
-                    po.Postings = fbList.Keys.ToList();
-                    po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
-                    return new WSResponse<PostingOverview>(po);
-                }
-                catch (Exception e)
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    if (myServiceHost != null)
+                    try
+                    {
+                        FacilityQueryFilter filter = new FacilityQueryFilter();
+                        filter.SearchFrom = dtFrom;
+                        filter.SearchTo = dtTo;
+                        filter.FacilityLocationID = guid;
+
+                        Dictionary<FacilityBookingOverview, List<FacilityBookingChargeOverview>> fbList = facManager.GetFacilityOverviewLists(dbApp, filter);
+                        PostingOverview po = new PostingOverview();
+                        po.Postings = fbList.Keys.ToList();
+                        po.PostingsFBC = fbList.SelectMany(c => c.Value).ToList();
+                        return new WSResponse<PostingOverview>(po);
+                    }
+                    catch (Exception e)
+                    {
                         myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityLocationBookings(10)", e);
-                    return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                        return new WSResponse<PostingOverview>(null, new Msg(eMsgLevel.Exception, e.Message));
+                    }
                 }
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityLocationBookings));
             }
         }
 
@@ -1269,28 +1435,33 @@ namespace gip.mes.webservices
         #region Booking
         public WSResponse<MsgWithDetails> BookFacility(ACMethodBooking bpParam)
         {
-            //if (bpParam == null)
-            //    return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "Booking parameter is null"));
-            //if (String.IsNullOrEmpty(bpParam.VirtualMethodName))
-            //    return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "VirtualMethodName is empty"));
             PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
             if (myServiceHost == null)
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            MsgWithDetails msg;
-
-            using (var dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(BookFacility));
+            try
             {
-                var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
-                if (response != null)
-                    return response;
-                msg = Book(bpParam, dbApp, facManager, myServiceHost);
+
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                MsgWithDetails msg;
+
+                using (var dbApp = new DatabaseApp())
+                {
+                    var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
+                    if (response != null)
+                        return response;
+                    msg = Book(bpParam, dbApp, facManager, myServiceHost);
+                }
+                return new WSResponse<MsgWithDetails>(msg);
             }
-            return new WSResponse<MsgWithDetails>(msg);
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(BookFacility));
+            }
         }
 
         protected virtual MsgWithDetails Book(ACMethodBooking bpParam, DatabaseApp dbApp, FacilityManager facManager, PAJsonServiceHostVB myServiceHost)
@@ -1309,7 +1480,7 @@ namespace gip.mes.webservices
                 return error;
             }
 
-            if (bpParam.InwardQuantity > 10000000 || bpParam.OutwardQuantity > 10000000 || bpParam.InwardQuantity < -10000000 || bpParam.OutwardQuantity < - 10000000)
+            if (bpParam.InwardQuantity > 10000000 || bpParam.OutwardQuantity > 10000000 || bpParam.InwardQuantity < -10000000 || bpParam.OutwardQuantity < -10000000)
             {
                 var error = new MsgWithDetails();
                 error.AddDetailMessage(new Msg(eMsgLevel.Error, "Error: Booking quantity is not valid!!!"));
@@ -1365,12 +1536,12 @@ namespace gip.mes.webservices
                     acParam.MDReleaseState = dbApp.MDReleaseState.Where(c => c.MDReleaseStateIndex == bpParam.ReleaseStateIndex).FirstOrDefault();
                 if (bpParam.ReservationModeIndex.HasValue)
                     acParam.MDReservationMode = dbApp.MDReservationMode.Where(c => c.MDReservationModeIndex == bpParam.ReservationModeIndex).FirstOrDefault();
-                
+
                 if (bpParam.MovementReasonID.HasValue)
                     acParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonID == bpParam.MovementReasonID).FirstOrDefault();
                 else if (bpParam.MovementReasonIndex.HasValue)
                     acParam.MDMovementReason = dbApp.MDMovementReason.Where(c => c.MDMovementReasonIndex == bpParam.MovementReasonIndex).FirstOrDefault();
-                
+
                 acParam.IgnoreIsEnabled = bpParam.IgnoreIsEnabled;
                 acParam.SetCompleted = bpParam.SetCompleted;
 
@@ -1434,7 +1605,7 @@ namespace gip.mes.webservices
                     acParam.PartslistPosRelation = dbApp.ProdOrderPartslistPosRelation
                                                         .Include(x => x.SourceProdOrderPartslistPos)
                                                         .Where(c => c.ProdOrderPartslistPosRelationID == bpParam.PartslistPosRelationID.Value).FirstOrDefault();
-                
+
                 if (bpParam.ProdOrderPartslistPosFacilityLotID.HasValue)
                     acParam.ProdOrderPartslistPosFacilityLot = dbApp.ProdOrderPartslistPosFacilityLot.Where(c => c.ProdOrderPartslistPosFacilityLotID == bpParam.ProdOrderPartslistPosFacilityLotID.Value).FirstOrDefault();
                 if (bpParam.PickingPosID.HasValue)
@@ -1560,32 +1731,41 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-            if (facManager == null)
-                return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
-
-            using (DatabaseApp dbApp = new DatabaseApp())
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(BookFacilities));
+            try
             {
-                var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
-                if (response != null)
-                    return response;
-                foreach (ACMethodBooking bpParam in bpParams)
-                {
-                    MsgWithDetails msg = Book(bpParam, dbApp, facManager, myServiceHost);
-                    if (msg != null)
-                    {
-                        Msg message = new Msg(msg.MessageLevel, msg.Message) { MessageButton = msg.MessageButton };
-                        msgWithDetails.AddDetailMessage(message);
 
-                        foreach (Msg m in msg.MsgDetails)
+                FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+                if (facManager == null)
+                    return new WSResponse<MsgWithDetails>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+                using (DatabaseApp dbApp = new DatabaseApp())
+                {
+                    var response = SetDatabaseUserName<MsgWithDetails>(dbApp, myServiceHost);
+                    if (response != null)
+                        return response;
+                    foreach (ACMethodBooking bpParam in bpParams)
+                    {
+                        MsgWithDetails msg = Book(bpParam, dbApp, facManager, myServiceHost);
+                        if (msg != null)
                         {
-                            message = new Msg(m.MessageLevel, m.Message);
+                            Msg message = new Msg(msg.MessageLevel, msg.Message) { MessageButton = msg.MessageButton };
                             msgWithDetails.AddDetailMessage(message);
+
+                            foreach (Msg m in msg.MsgDetails)
+                            {
+                                message = new Msg(m.MessageLevel, m.Message);
+                                msgWithDetails.AddDetailMessage(message);
+                            }
                         }
                     }
                 }
+                return new WSResponse<MsgWithDetails>(msgWithDetails);
             }
-            return new WSResponse<MsgWithDetails>(msgWithDetails);
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(BookFacilities));
+            }
         }
 
         #endregion
@@ -1595,7 +1775,12 @@ namespace gip.mes.webservices
         #region Inventory -> MD
         public WSResponse<List<MDFacilityInventoryState>> GetMDFacilityInventoryStates()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<MDFacilityInventoryState>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             WSResponse<List<MDFacilityInventoryState>> response = new WSResponse<List<MDFacilityInventoryState>>();
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMDFacilityInventoryStates));
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
@@ -1617,19 +1802,25 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMDFacilityInventoryStates(973)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMDFacilityInventoryStates(973)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: GetMDFacilityInventoryStates");
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetMDFacilityInventoryStates));
+            }
 
             return response;
         }
 
         public WSResponse<List<MDFacilityInventoryPosState>> GetMDFacilityInventoryPosStates()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<MDFacilityInventoryPosState>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             WSResponse<List<MDFacilityInventoryPosState>> response = new WSResponse<List<MDFacilityInventoryPosState>>();
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMDFacilityInventoryPosStates));
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
@@ -1651,12 +1842,13 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMDFacilityInventoryStates(973)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMDFacilityInventoryStates(973)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: GetMDFacilityInventoryPosStates");
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetMDFacilityInventoryPosStates));
+            }
             return response;
         }
         #endregion
@@ -1689,7 +1881,7 @@ namespace gip.mes.webservices
                                     SortIndex = c.MDFacilityInventoryState.SortIndex,
                                     IsDefault = c.MDFacilityInventoryState.IsDefault
                                 },
-                                Facility = c.Facility == null ? null:
+                                Facility = c.Facility == null ? null :
                                                         new gip.mes.webservices.Facility()
                                                         {
                                                             FacilityID = c.Facility.FacilityID,
@@ -1709,7 +1901,12 @@ namespace gip.mes.webservices
 
         public WSResponse<List<FacilityInventory>> GetFacilityInventories(string inventoryState, string dateFrom, string dateTo)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityInventory>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             WSResponse<List<FacilityInventory>> response = new WSResponse<List<FacilityInventory>>();
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityInventories));
             try
             {
                 short? inventoryStateVal = null;
@@ -1726,17 +1923,18 @@ namespace gip.mes.webservices
 
                 using (DatabaseApp databaseApp = new DatabaseApp())
                 {
-                    response.Data = ConvtertFacilityInventory(s_cQry_GetFacilityInventories(databaseApp, inventoryStateVal, dtFrom, dtTo));
+                    response.Data = ConvtertFacilityInventory(s_cQry_GetFacilityInventories(databaseApp, inventoryStateVal, dtFrom, dtTo).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount));
                 }
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventories(1067)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventories(1067)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: GetFacilityInventories");
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityInventories));
+            }
             return response;
         }
 
@@ -1745,29 +1943,38 @@ namespace gip.mes.webservices
         #region Inventory -> New
         public WSResponse<string> GetFacilityInventoryNo()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<string>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityInventoryNo));
             WSResponse<string> response = new WSResponse<string>();
             try
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                 FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                 response.Data = facManager.GetNewInventoryNo();
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryNo(1090)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryNo(1090)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityInventoryNo));
             }
             return response;
         }
 
         public WSResponse<bool> NewFacilityInventory(string facilityInventoryNo, string facilityInventoryName)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(NewFacilityInventory));
             WSResponse<bool> response = new WSResponse<bool>();
             try
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
                 FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                 MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, null);
                 response.Data = msgWithDetails.IsSucceded();
@@ -1775,10 +1982,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "NewFacilityInventory(1109)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "NewFacilityInventory(1109)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(NewFacilityInventory));
             }
             return response;
         }
@@ -1787,7 +1996,12 @@ namespace gip.mes.webservices
         #region Inventory -> Lifecycle
         public WSResponse<bool> StartFacilityInventory(string facilityInventoryNo)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             WSResponse<bool> response = new WSResponse<bool>();
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(StartFacilityInventory));
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
@@ -1816,16 +2030,22 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "StartFacilityInventory(1132)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "StartFacilityInventory(1132)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(StartFacilityInventory));
             }
             return response;
         }
 
         public WSResponse<bool> CloseFacilityInventory(string facilityInventoryNo)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(CloseFacilityInventory));
             WSResponse<bool> response = new WSResponse<bool>();
             try
             {
@@ -1855,10 +2075,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "CloseFacilityInventory(1168)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "CloseFacilityInventory(1168)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(CloseFacilityInventory));
             }
             return response;
         }
@@ -1868,7 +2090,7 @@ namespace gip.mes.webservices
         #region Inventory -> Pos - Get
 
         public static readonly Func<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>> s_cQry_GetFacilityInventoryLines =
-       CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
+        CompiledQuery.Compile<DatabaseApp, string, Guid?, string, string, string, string, short?, bool?, bool?, bool, IQueryable<FacilityInventoryPos>>(
            (dbApp, facilityInventoryNo, inputCodeVal, storageLocationNo, facilityNo, lotNo, materialNo, inventoryPosStateVal, notAvailableVal, zeroStockVal, notProcessedVal) =>
                dbApp.FacilityInventoryPos
                        .Where(c =>
@@ -1906,11 +2128,17 @@ namespace gip.mes.webservices
                            FacilityInventoryNo = c.FacilityInventory.FacilityInventoryNo,
                            MDFacilityInventoryPosStateIndex = c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex
                        })
-       );
+        );
+        
         public WSResponse<List<FacilityInventoryPos>> GetFacilityInventoryLines(string facilityInventoryNo, string inputCode, string storageLocationNo, string facilityNo,
             string lotNo, string materialNo, string inventoryPosState, string notAvailable, string zeroStock, string notProcessed)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityInventoryPos>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             WSResponse<List<FacilityInventoryPos>> response = new WSResponse<List<FacilityInventoryPos>>();
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityInventoryLines));
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
@@ -1997,18 +2225,18 @@ namespace gip.mes.webservices
                         }
                     }
 
-                    List<FacilityInventoryPos> items = 
+                    List<FacilityInventoryPos> items =
                         s_cQry_GetFacilityInventoryLines(
-                                databaseApp, 
-                                facilityInventoryNo, 
-                                inputCodeVal, 
-                                storageLocationNo, 
+                                databaseApp,
+                                facilityInventoryNo,
+                                inputCodeVal,
+                                storageLocationNo,
                                 facilityNo,
-                                lotNo, 
-                                materialNo, 
-                                inventoryPosStateVal, 
-                                notAvailableVal, 
-                                zeroStockVal, 
+                                lotNo,
+                                materialNo,
+                                inventoryPosStateVal,
+                                notAvailableVal,
+                                zeroStockVal,
                                 notProcessedVal
                         )
                         .OrderBy(c => c.LotNo).ToList();
@@ -2017,12 +2245,13 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryLines(1361)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventoryLines(1361)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: GetFacilityInventoryLines");
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityInventoryLines));
+            }
             return response;
         }
 
@@ -2032,7 +2261,12 @@ namespace gip.mes.webservices
 
         public WSResponse<bool> UpdateFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos)
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<bool>(false, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             WSResponse<bool> response = new WSResponse<bool>();
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(UpdateFacilityInventoryPos));
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
@@ -2107,10 +2341,12 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "UpdateFacilityInventoryPos(1430)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "UpdateFacilityInventoryPos(1430)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(UpdateFacilityInventoryPos));
             }
             return response;
         }
@@ -2127,9 +2363,14 @@ namespace gip.mes.webservices
             if (!string.IsNullOrEmpty(emptyErrorMessage))
                 return new WSResponse<SearchFacilityCharge>(null, new Msg(eMsgLevel.Error, emptyErrorMessage));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<SearchFacilityCharge>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
             SearchFacilityCharge result = new SearchFacilityCharge();
             result.States = new List<FacilityChargeStateEnum>();
             response.Data = result;
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityInventorySearchCharge));
             try
             {
                 Guid facilityChargeIDVal = Guid.Empty;
@@ -2182,12 +2423,13 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventorySearchCharge(1508)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityInventorySearchCharge(1508)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: GetFacilityInventorySearchCharge");
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityInventorySearchCharge));
+            }
             return response;
         }
 
@@ -2203,6 +2445,11 @@ namespace gip.mes.webservices
             if (!string.IsNullOrEmpty(emptyErrorMessage))
                 return new WSResponse<FacilityInventoryPos>(null, new Msg(eMsgLevel.Error, emptyErrorMessage));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<FacilityInventoryPos>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(SetFacilityInventoryChargeAvailable));
             try
             {
                 using (DatabaseApp databaseApp = new DatabaseApp())
@@ -2238,12 +2485,13 @@ namespace gip.mes.webservices
             }
             catch (Exception e)
             {
-                PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                if (myServiceHost != null)
-                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "SetFacilityInventoryChargeAvailables(1540)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "SetFacilityInventoryChargeAvailables(1540)", e);
                 response.Message = new Msg() { MessageLevel = eMsgLevel.Error, Message = e.Message };
             }
-            Console.WriteLine("web service: SetFacilityInventoryChargeAvailables");
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(SetFacilityInventoryChargeAvailable));
+            }
             return response;
         }
 
@@ -2295,6 +2543,10 @@ namespace gip.mes.webservices
 
         public virtual WSResponse<List<MDMovementReason>> GetMovementReasons()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<MDMovementReason>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMovementReasons));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -2303,10 +2555,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMovementReasons) + "(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMovementReasons) + "(10)", e);
                     return new WSResponse<List<MDMovementReason>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetMovementReasons));
                 }
             }
         }

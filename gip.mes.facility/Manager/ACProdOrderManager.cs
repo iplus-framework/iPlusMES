@@ -27,7 +27,7 @@ namespace gip.mes.facility
         }
 
         public const string ClassName = "ACProdOrderManager";
-        public const string C_DefaultServiceACIdentifier = "ProdOrderManager";
+        public const string C_DefaultServiceACIdentifier = "ProdOrderManager";        
         #endregion
 
         #region PrecompiledQueries
@@ -77,6 +77,7 @@ namespace gip.mes.facility
         #endregion
 
         #region Properties
+
         ACMethodBooking _BookParamInwardMovementClone;
         public ACMethodBooking BookParamInwardMovementClone(ACComponent facilityManager, DatabaseApp dbApp)
         {
@@ -172,9 +173,9 @@ namespace gip.mes.facility
         [ACPropertyBindingSource(730, "Error", "en{'ProdOrderManager-Alarm'}de{'ProdOrderManager-Alarm'}", "", false, false)]
         public IACContainerTNet<PANotifyState> IsProdOrderManagerAlarm { get; set; }
 
-        #endregion
+#endregion
 
-        #region (ProdOrder)Partslist
+#region (ProdOrder)Partslist
         /// <summary>
         /// Add Partslist to production order
         /// </summary>
@@ -638,9 +639,9 @@ namespace gip.mes.facility
                                                     .SelectMany(c => c.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist).ToList();
             return nextStages;
         }
-        #endregion
+#endregion
 
-        #region Batch-Creation
+#region Batch-Creation
         /// <summary>
         /// Create batch item
         /// </summary>
@@ -1291,7 +1292,7 @@ namespace gip.mes.facility
                         routes.AddRange(rResult.Routes);
                 }
 
-                #region Filter routes if is selected    ShowCellsInRoute
+#region Filter routes if is selected    ShowCellsInRoute
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
                 {
@@ -1323,7 +1324,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                #endregion
+#endregion
 
                 var availableModules = routes.Select(c => c.LastOrDefault())
                     .Distinct(new TargetEqualityComparer())
@@ -1421,13 +1422,13 @@ namespace gip.mes.facility
             return configStores;
         }
 
-        #endregion
+#endregion
 
-        #region ProdOrder -> Batch
+#region ProdOrder -> Batch
 
-        #region Batch cascade creation
+#region Batch cascade creation
 
-        #region Batch cascade creation -> Public methods
+#region Batch cascade creation -> Public methods
 
         /// <summary>
         /// Generate list of connected intermediates 
@@ -1490,9 +1491,9 @@ namespace gip.mes.facility
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Batch cascade creation -> Helper methods
+#region Batch cascade creation -> Helper methods
 
         /// <summary>
         ///  Created tree of included intermediates 
@@ -1548,11 +1549,11 @@ namespace gip.mes.facility
         }
 
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region ProdOrder -> Batch -> Start
+#region ProdOrder -> Batch -> Start
 
 
         public virtual void SetProdOrderItemsToInProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate)
@@ -1670,9 +1671,9 @@ namespace gip.mes.facility
             return saveMsg;
         }
 
-        #endregion
+#endregion
 
-        #region Public -> Batch -> Duration Calculation
+#region Public -> Batch -> Duration Calculation
         public TimeSpan? GetCalculatedBatchPlanDuration(DatabaseApp databaseApp, Guid materialWFACClassMethodID, Guid vBiACClassWFID)
         {
             TimeSpan? duration = null;
@@ -1700,9 +1701,9 @@ namespace gip.mes.facility
             return duration;
         }
 
-        #endregion
+#endregion
 
-        #region Batch -> Select batch
+#region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
         CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
@@ -1770,12 +1771,12 @@ namespace gip.mes.facility
         }
 
 
-        #endregion
-        #endregion
+#endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
 
-        #region ProdOrder
+#region ProdOrder
         public virtual void FinishOrder(DatabaseApp dbApp, ProdOrder currentProdOrder)
         {
             MDProdOrderState state = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
@@ -1849,9 +1850,9 @@ namespace gip.mes.facility
             }
         }
 
-        #endregion
+#endregion
 
-        #region BookingOutward
+#region BookingOutward
         public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation,
                                                                bool onEmptyingFacility = false)
         {
@@ -1965,9 +1966,9 @@ namespace gip.mes.facility
             return result;
         }
 
-        #endregion
+#endregion
 
-        #region BookingInward
+#region BookingInward
         public FacilityPreBooking NewInwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPos partsListPos)
         {
             ACMethodBooking acMethodClone = BookParamInwardMovementClone(facilityManager, dbApp);
@@ -2178,17 +2179,108 @@ namespace gip.mes.facility
             }
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
         }
-        #endregion
+#endregion
 
-        #region RecalcTargetQuantity
+#region RecalcTargetQuantity
 
-        /// <summary>
-        /// RecalcIntermediateItem
-        /// </summary>
-        /// <param name="inwardPos">mixure for recalculation</param>
-        /// <param name="updateMixureRelations">if true expected is for relations of mixure to sum all input mixure quantities</param>
-        /// <returns></returns>
-        public MsgWithDetails RecalcIntermediateItem(ProdOrderPartslistPos inwardPos, bool updateMixureRelations)
+        ///// <summary>
+        ///// RecalcIntermediateItem
+        ///// </summary>
+        ///// <param name="inwardPos">mixure for recalculation</param>
+        ///// <param name="updateMixureRelations">if true expected is for relations of mixure to sum all input mixure quantities</param>
+        ///// <returns></returns>
+        //public MsgWithDetails RecalcIntermediateItem(ProdOrderPartslistPos inwardPos, bool updateMixureRelations)
+        //{
+        //    MsgWithDetails msgWithDetails = null;
+        //    try
+        //    {
+        //        List<ProdOrderPartslistPos> inputMixures =
+        //           inwardPos
+        //           .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+        //           .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+        //           .Select(c => c.SourceProdOrderPartslistPos)
+        //           .ToList();
+        //        foreach (ProdOrderPartslistPos inputMixure in inputMixures)
+        //        {
+        //            RecalcIntermediateItem(inputMixure, updateMixureRelations);
+        //        }
+
+        //        if (inwardPos.Material.ExcludeFromSumCalc)
+        //        {
+        //            inwardPos.TargetQuantityUOM = 0;
+        //        }
+        //        else
+        //        {
+        //            // fix child relations
+        //            double newTargetQuantityUOM = 0;
+        //            if (inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any())
+        //                newTargetQuantityUOM = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
+        //            else
+        //                newTargetQuantityUOM = 0;
+
+        //            bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
+        //            double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
+        //            inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
+
+        //            //mixure distrubutes it's quantity to target mixures
+        //            if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+        //            {
+        //                double ratioInwardPosQuantityGrowth = 0;
+        //                if (inwardPos.TargetQuantityUOM > 0)
+        //                    ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
+        //                if (ratioInwardPosQuantityGrowth == 0 && !noChange && inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+        //                    ratioInwardPosQuantityGrowth = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+
+        //                List<ProdOrderPartslistPosRelation> mixureDestinationRelations =
+        //                    inwardPos
+        //                    .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+        //                    .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
+        //                    .ToList();
+        //                foreach (var rel in mixureDestinationRelations)
+        //                {
+        //                    if (updateMixureRelations /*&& rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern*/)
+        //                    {
+        //                        // Find pos relation
+        //                        PartslistPosRelation plRel = null;
+        //                        if (inwardPos.BasedOnPartslistPos != null)
+        //                            plRel = inwardPos
+        //                                               .BasedOnPartslistPos
+        //                                               .PartslistPosRelation_SourcePartslistPos
+        //                                               .Where(c =>
+        //                                                           c.TargetPartslistPos.MaterialID == rel.TargetProdOrderPartslistPos.MaterialID
+        //                                                     )
+        //                                               .FirstOrDefault();
+
+        //                        // calculate ratio of relation quantity in source quantity of partslist
+        //                        double plRelQueryRatio = 0;
+        //                        if (plRel != null && plRel.SourcePartslistPos.TargetQuantityUOM > 0)
+        //                            plRelQueryRatio = plRel.TargetQuantityUOM / plRel.SourcePartslistPos.TargetQuantityUOM;
+        //                        if (plRel == null || plRelQueryRatio == 0)
+        //                        {
+        //                            // if no pl connection or ratio -> quantity divide equally
+        //                            int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
+        //                            plRelQueryRatio = 1 / count;
+        //                        }
+
+        //                        // Distribute new SourceProdOrderPartslistPos.TargetQuantityUOM with ratio from partslist
+        //                        if (plRelQueryRatio > 0)
+        //                            rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * plRelQueryRatio;
+        //                    }
+        //                    else
+        //                        rel.TargetQuantityUOM = rel.TargetQuantityUOM + ratioInwardPosQuantityGrowth * rel.TargetQuantityUOM;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ec)
+        //    {
+        //        msgWithDetails = new MsgWithDetails() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+        //    }
+
+        //    return msgWithDetails;
+        //}
+
+        public MsgWithDetails RecalcIntermediateItem(ProdOrderPartslistPos inwardPos, bool updateMixureRelations, MDUnit startMDUnit)
         {
             MsgWithDetails msgWithDetails = null;
             try
@@ -2201,8 +2293,10 @@ namespace gip.mes.facility
                    .ToList();
                 foreach (ProdOrderPartslistPos inputMixure in inputMixures)
                 {
-                    RecalcIntermediateItem(inputMixure, updateMixureRelations);
+                    RecalcIntermediateItem(inputMixure, updateMixureRelations, startMDUnit);
                 }
+
+                MDUnit inwardPosMDUnit = inwardPos.MDUnit != null ? inwardPos.MDUnit : inwardPos.Material.BaseMDUnit;
 
                 if (inwardPos.Material.ExcludeFromSumCalc)
                 {
@@ -2213,60 +2307,56 @@ namespace gip.mes.facility
                     // fix child relations
                     double newTargetQuantityUOM = 0;
                     if (inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any())
-                        newTargetQuantityUOM = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Sum(c => c.TargetQuantityUOM);
-                    else
-                        newTargetQuantityUOM = 0;
-
-                    bool noChange = newTargetQuantityUOM == inwardPos.TargetQuantityUOM;
-                    double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
-                    inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
-
-                    //mixure distrubutes it's quantity to target mixures
-                    if (inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
                     {
-                        double ratioInwardPosQuantityGrowth = 0;
-                        if (inwardPos.TargetQuantityUOM > 0)
-                            ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
-                        if (ratioInwardPosQuantityGrowth == 0 && !noChange && inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
-                            ratioInwardPosQuantityGrowth = 1 / inwardPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-
-                        List<ProdOrderPartslistPosRelation> mixureDestinationRelations =
-                            inwardPos
-                            .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
-                            .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern)
-                            .ToList();
-                        foreach (var rel in mixureDestinationRelations)
+                        ProdOrderPartslistPosRelation[] targetRelations = inwardPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray();
+                        foreach (ProdOrderPartslistPosRelation targetRelation in targetRelations)
                         {
-                            if (updateMixureRelations /*&& rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern*/)
+                            ProdOrderPartslistPos sourcePos = targetRelation.SourceProdOrderPartslistPos;
+                            MDUnit sourcePosMDUnit = sourcePos.MDUnit != null ? sourcePos.MDUnit : sourcePos.Material.BaseMDUnit;
+                            if (sourcePosMDUnit.MDUnitID == inwardPosMDUnit.MDUnitID)
                             {
-                                // Find pos relation
-                                PartslistPosRelation plRel = null;
-                                if (inwardPos.BasedOnPartslistPos != null)
-                                    plRel = inwardPos
-                                                       .BasedOnPartslistPos
-                                                       .PartslistPosRelation_SourcePartslistPos
-                                                       .Where(c =>
-                                                                   c.TargetPartslistPos.MaterialID == rel.TargetProdOrderPartslistPos.MaterialID
-                                                             )
-                                                       .FirstOrDefault();
-
-                                // calculate ratio of relation quantity in source quantity of partslist
-                                double plRelQueryRatio = 0;
-                                if (plRel != null && plRel.SourcePartslistPos.TargetQuantityUOM > 0)
-                                    plRelQueryRatio = plRel.TargetQuantityUOM / plRel.SourcePartslistPos.TargetQuantityUOM;
-                                if (plRel == null || plRelQueryRatio == 0)
-                                {
-                                    // if no pl connection or ratio -> quantity divide equally
-                                    int count = rel.SourceProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Count();
-                                    plRelQueryRatio = 1 / count;
-                                }
-
-                                // Distribute new SourceProdOrderPartslistPos.TargetQuantityUOM with ratio from partslist
-                                if (plRelQueryRatio > 0)
-                                    rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * plRelQueryRatio;
+                                newTargetQuantityUOM += targetRelation.TargetQuantityUOM;
                             }
                             else
+                            {
+                                if (sourcePos.Material.IsConvertableToUnit(sourcePosMDUnit, inwardPosMDUnit))
+                                {
+                                    newTargetQuantityUOM += sourcePos.Material.ConvertQuantity(targetRelation.TargetQuantityUOM, sourcePosMDUnit, inwardPosMDUnit);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        newTargetQuantityUOM = 0;
+                    }
+
+                    var queryMixureConsumers =
+                        inwardPos
+                        .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                        .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern);
+
+                    double diffQuantity = newTargetQuantityUOM - inwardPos.TargetQuantityUOM;
+                    inwardPos.TargetQuantityUOM = newTargetQuantityUOM;
+                    int sourceRelationCount = queryMixureConsumers.Count();
+                    double ratioInwardPosQuantityGrowth = 0;
+                    if (!FacilityConst.IsDoubleZeroForPosting(inwardPos.TargetQuantityUOM))
+                        ratioInwardPosQuantityGrowth = diffQuantity / inwardPos.TargetQuantityUOM;
+
+                    //mixure distrubutes it's quantity to target mixures
+                    if (sourceRelationCount > 0)
+                    {
+                        foreach (var rel in queryMixureConsumers)
+                        {
+                            // redistrubute complete quantity (updateMixureRelations or previous quanitity = 0
+                            if (updateMixureRelations || ratioInwardPosQuantityGrowth == 0 /*&& rel.SourceProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern*/)
+                            {
+                                rel.TargetQuantityUOM = rel.SourceProdOrderPartslistPos.TargetQuantityUOM * (1 / sourceRelationCount);
+                            }
+                            else
+                            {
                                 rel.TargetQuantityUOM = rel.TargetQuantityUOM + ratioInwardPosQuantityGrowth * rel.TargetQuantityUOM;
+                            }
                         }
                     }
                 }
@@ -2277,6 +2367,99 @@ namespace gip.mes.facility
             }
 
             return msgWithDetails;
+        }
+
+
+        public MsgWithDetails IsRecalcIntermediateSumPossible(ProdOrderPartslistPos inwardPos)
+        {
+            return IsRecalcIntermediateSumPossible(inwardPos, inwardPos.MDUnit);
+        }
+
+        public MsgWithDetails IsRecalcIntermediateSumPossible(ProdOrderPartslistPos inwardPos, MDUnit startMDUnit)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            Msg msgCheckComponents = IsInputComponentsCompatibile(inwardPos);
+            Msg msgCheckMixures = IsInputMixuresCompatibile(inwardPos, startMDUnit);
+
+            if (msgCheckComponents != null)
+            {
+                msgWithDetails.AddDetailMessage(msgCheckComponents);
+            }
+
+            if (msgCheckMixures != null)
+            {
+                msgWithDetails.AddDetailMessage(msgCheckMixures);
+            }
+            return msgWithDetails;
+        }
+
+
+        /// <summary>
+        /// Pass component unit to own intermediate unit
+        /// </summary>
+        /// <param name="inwardPos"></param>
+        /// <param name="startMDUnit"></param>
+        /// <returns></returns>
+        private Msg IsInputComponentsCompatibile(ProdOrderPartslistPos inwardPos)
+        {
+            Msg msg = null;
+            ProdOrderPartslistPosRelation[] relations =
+                inwardPos
+                .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .ToArray();
+
+            // OutwardRoot[Pos] MDUnit != InwardIntern[Pos] MDUnit
+            //inwardPos.MDUnit.IsConvertableToUnit()
+            MDUnit posUnit = inwardPos.MDUnit != null ? inwardPos.MDUnit : inwardPos.Material.BaseMDUnit;
+            //relations.Any(c => c.SourceProdOrderPartslistPos.Material.IsConvertableToUnit(c.SourceProdOrderPartslistPos.MDUnit != null ? c.SourceProdOrderPartslistPos.MDUnit : c.SourceProdOrderPartslistPos.Material.BaseMDUnit, posUnit));
+            //MDUnit[] inputUnits = relations.Select(c => c.SourceProdOrderPartslistPos.MDUnit != null ? c.SourceProdOrderPartslistPos.MDUnit : c.SourceProdOrderPartslistPos.Material.BaseMDUnit).ToArray();
+            if (relations.Any(c => !c.SourceProdOrderPartslistPos.Material.IsConvertableToUnit(c.SourceProdOrderPartslistPos.MDUnit != null ? c.SourceProdOrderPartslistPos.MDUnit : c.SourceProdOrderPartslistPos.Material.BaseMDUnit, posUnit)))
+            {
+                msg = new Msg(this, eMsgLevel.Warning, nameof(ACProdOrderManager), nameof(IsInputComponentsCompatibile), 145, "Question50091");
+            }
+
+            // Recursive search to other input mixures
+            if (msg == null)
+            {
+                ProdOrderPartslistPosRelation[] mixRelations =
+                   inwardPos
+                   .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                   .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                   .ToArray();
+
+                foreach (ProdOrderPartslistPosRelation inputMix in mixRelations)
+                {
+                    msg = IsInputComponentsCompatibile(inputMix.SourceProdOrderPartslistPos);
+                    if (msg != null)
+                        break;
+                }
+            }
+            return msg;
+        }
+
+        private Msg IsInputMixuresCompatibile(ProdOrderPartslistPos inwardPos, MDUnit lastIntermediateUnit)
+        {
+            Msg msg = null;
+            ProdOrderPartslistPosRelation[] mixRelations =
+                    inwardPos
+                    .ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
+                    .Where(c => c.SourceProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                    .ToArray();
+
+            foreach (ProdOrderPartslistPosRelation inputMix in mixRelations)
+            {
+                MDUnit intermediateUnit = inputMix.SourceProdOrderPartslistPos.MDUnit != null ? inputMix.SourceProdOrderPartslistPos.MDUnit : inputMix.SourceProdOrderPartslistPos.Material.BaseMDUnit;
+                if (!inputMix.SourceProdOrderPartslistPos.Material.IsConvertableToUnit(intermediateUnit, lastIntermediateUnit))
+                {
+                    msg = new Msg(this, eMsgLevel.Warning, nameof(ACProdOrderManager), nameof(IsInputComponentsCompatibile), 145, "Question50092");
+                }
+                if (msg == null)
+                {
+                    msg = IsInputMixuresCompatibile(inputMix.SourceProdOrderPartslistPos, lastIntermediateUnit);
+                }
+            }
+            return msg;
         }
 
 
@@ -2341,9 +2524,9 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        #endregion
+#endregion
 
-        #region CalcProducedBatchWeight
+#region CalcProducedBatchWeight
         public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, out double sumWeight)
         {
             sumWeight = 0;
@@ -2387,9 +2570,9 @@ namespace gip.mes.facility
             }
         }
 
-        #endregion
+#endregion
 
-        #region Methods -> Connect 
+#region Methods -> Connect 
 
 
         /// <summary>
@@ -2534,9 +2717,9 @@ namespace gip.mes.facility
         }
 
 
-        #endregion
+#endregion
 
-        #region ProdOrder -> Clone ProdOrder
+#region ProdOrder -> Clone ProdOrder
 
         public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, DateTime scheduledStartDate, Guid[] filterProdOrderBatchPlanIds, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
         {
@@ -2850,11 +3033,11 @@ namespace gip.mes.facility
             return targetRel;
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Common
+#region Common
         /// <summary>
         /// Batch linear resize by 
         /// </summary>
@@ -2881,9 +3064,9 @@ namespace gip.mes.facility
                 BatchLinearResize(item, factor);
             }
         }
-        #endregion
+#endregion
 
-        #region Statistics
+#region Statistics
 
 
         public MsgWithDetails RecalcAllQuantitesAndStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
@@ -3036,21 +3219,26 @@ namespace gip.mes.facility
             MsgWithDetails msg = null;
 
             ProdOrderPartslist partslist = prodOrderPartslistPos.ProdOrderPartslist;
+            ProdOrderPartslistPos plPos = partslist.FinalIntermediate;
+            double targetQForRatio = plPos != null ? plPos.TargetQuantityUOM : partslist.TargetQuantity;
 
             prodOrderPartslistPos.InputQForActualOutput =
-                (partslist.ActualQuantity / partslist.TargetQuantity) * prodOrderPartslistPos.TargetQuantityUOM;
+                (partslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
 
             prodOrderPartslistPos.InputQForScrapActualOutput =
-              (partslist.ActualQuantityScrapUOM / partslist.TargetQuantity) * prodOrderPartslistPos.TargetQuantity;
+              (partslist.ActualQuantityScrapUOM / targetQForRatio) * prodOrderPartslistPos.TargetQuantity;
 
             prodOrderPartslistPos.InputQForGoodActualOutput = prodOrderPartslistPos.InputQForActualOutput - prodOrderPartslistPos.InputQForScrapActualOutput;
 
 
+            plPos = finalPartslist.FinalIntermediate;
+            targetQForRatio = plPos != null ? plPos.TargetQuantityUOM : finalPartslist.TargetQuantity;
+
             prodOrderPartslistPos.InputQForFinalActualOutput =
-                 (finalPartslist.ActualQuantity / finalPartslist.TargetQuantity) * prodOrderPartslistPos.TargetQuantityUOM;
+                 (finalPartslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
 
             prodOrderPartslistPos.InputQForFinalScrapActualOutput =
-                 (finalPartslist.ActualQuantityScrapUOM / finalPartslist.TargetQuantity) * prodOrderPartslistPos.TargetQuantity;
+                 (finalPartslist.ActualQuantityScrapUOM / targetQForRatio) * prodOrderPartslistPos.TargetQuantity;
 
             prodOrderPartslistPos.InputQForFinalGoodActualOutput = prodOrderPartslistPos.InputQForFinalActualOutput - prodOrderPartslistPos.InputQForFinalScrapActualOutput;
 
@@ -3058,7 +3246,7 @@ namespace gip.mes.facility
             return msg;
         }
 
-        #endregion
+#endregion
 
     }
 

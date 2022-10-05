@@ -236,6 +236,18 @@ namespace gip.mes.datamodel
                 return !this.ProdOrderPartslistPos_SourceProdOrderPartslist.Any();
             }
         }
+
+        public ProdOrderPartslistPos FinalIntermediate
+        {
+            get
+            {
+                return ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                .AsEnumerable()
+                .Where(x => x.IsFinalMixure)
+                .FirstOrDefault();
+            }
+        }
         #endregion
 
         #region Methods

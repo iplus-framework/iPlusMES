@@ -350,9 +350,9 @@ namespace gip.bso.masterdata
             Material matNew = isOnlyChangeIntermediate ? null : DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedReplacementMaterial.MaterialNo);
             Material intMatNew = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == SelectedNewIntermediateProduct.MaterialNo); ;
 
-            var partslistToSwitch = AssociatedPartslistPosList.Where(c => c.IsChecked).Select(c => c.Partslist).Distinct().ToArray();
+            IEnumerable<Partslist> partslistToSwitch = AssociatedPartslistPosList.Where(c => c.IsChecked).Select(c => c.Partslist).Distinct().ToArray();
 
-            var prodOrders = partslistToSwitch.SelectMany(c => c.ProdOrderPartslist_Partslist)
+            IEnumerable<ProdOrderPartslist> prodOrders = partslistToSwitch.SelectMany(c => c.ProdOrderPartslist_Partslist)
                                               .Where(x => x.MDProdOrderState.ProdOrderState == MDProdOrderState.ProdOrderStates.NewCreated
                                                        && x.ProdOrder.MDProdOrderState.ProdOrderState == MDProdOrderState.ProdOrderStates.NewCreated).ToArray();
 
@@ -413,9 +413,10 @@ namespace gip.bso.masterdata
                         prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
                     }
 
+                    ProdOrderPartslistPos finalIntermediate = poPls.FinalIntermediate;
                     if (prodOrderManager != null)
                     {
-                        prodOrderManager.RecalcIntermediateItem(intPos, true);
+                        prodOrderManager.RecalcIntermediateItem(finalIntermediate, true, finalIntermediate.MDUnit != null ? finalIntermediate.MDUnit : finalIntermediate.Material.BaseMDUnit);
                     }
 
                     msg = DatabaseApp.ACSaveChanges();

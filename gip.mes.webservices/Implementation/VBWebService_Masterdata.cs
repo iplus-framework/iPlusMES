@@ -41,18 +41,24 @@ namespace gip.mes.webservices
 
         public WSResponse<List<Material>> GetMaterials()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMaterials));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
                 {
-                    return new WSResponse<List<Material>>(s_cQry_GetMaterial(dbApp, null, null).ToList());
+                    return new WSResponse<List<Material>>(s_cQry_GetMaterial(dbApp, null, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterials()", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMaterials) + "(10)", e);
                     return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetMaterials));
                 }
             }
         }
@@ -67,6 +73,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(materialID, out guid))
                 return new WSResponse<Material>(null, new Msg(eMsgLevel.Error, "materialID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<Material>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMaterial));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -75,10 +85,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterial(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMaterial) + "(10)", e);
                     return new WSResponse<Material>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetMaterial));
                 }
             }
         }
@@ -92,14 +104,15 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(materialID, out guid))
                 return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "materialID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetSuggestedMaterials));
+
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost == null)
-                        return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
-
                     FacilityManager facilityManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
                     if (facilityManager == null)
                         return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
@@ -126,10 +139,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterial(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetSuggestedMaterials) + "(10)", e);
                     return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetSuggestedMaterials));
                 }
             }
         }
@@ -140,18 +155,24 @@ namespace gip.mes.webservices
             if (string.IsNullOrEmpty(term) || term == CoreWebServiceConst.EmptyParam)
                 term = null;
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(SearchMaterial));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
                 {
-                    return new WSResponse<List<Material>>(s_cQry_GetMaterial(dbApp, null, term).ToList());
+                    return new WSResponse<List<Material>>(s_cQry_GetMaterial(dbApp, null, term).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "SearchMaterial(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchMaterial) + "(10)", e);
                     return new WSResponse<List<Material>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(SearchMaterial));
                 }
             }
         }
@@ -169,6 +190,7 @@ namespace gip.mes.webservices
             if (facManager == null)
                 return new WSResponse<Material>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMaterialByBarcode));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -180,9 +202,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetMaterialByBarcode(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMaterialByBarcode) + "(10)", e);
                     return new WSResponse<Material>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetMaterialByBarcode));
                 }
             }
         }
@@ -221,18 +246,24 @@ namespace gip.mes.webservices
 
         public WSResponse<List<Facility>> GetFacilities()
         {
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilities));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
                 {
-                    return new WSResponse<List<Facility>>(s_cQry_GetFacility(dbApp, null, null, null, null).ToList());
+                    return new WSResponse<List<Facility>>(s_cQry_GetFacility(dbApp, null, null, null, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilities()", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetFacilities) + "(10)", e);
                     return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilities));
                 }
             }
         }
@@ -246,6 +277,10 @@ namespace gip.mes.webservices
             if (!Guid.TryParse(facilityID, out guid))
                 return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "facilityID is invalid"));
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacility));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -257,10 +292,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacility(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetFacility) + "(10)", e);
                     return new WSResponse<Facility>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacility));
                 }
             }
         }
@@ -291,18 +328,24 @@ namespace gip.mes.webservices
                 facilityTypeIndex = tmpIndex;
             }
 
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(SearchFacility));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
                 {
-                    return new WSResponse<List<Facility>>(s_cQry_GetFacility(dbApp, null, term, guid, facilityTypeIndex).ToList());
+                    return new WSResponse<List<Facility>>(s_cQry_GetFacility(dbApp, null, term, guid, facilityTypeIndex).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount).ToList());
                 }
                 catch (Exception e)
                 {
-                    PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "SearchFacility(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(SearchFacility) + "(10)", e);
                     return new WSResponse<List<Facility>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(SearchFacility));
                 }
             }
         }
@@ -319,6 +362,7 @@ namespace gip.mes.webservices
             if (facManager == null)
                 return new WSResponse<Facility>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
 
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityByBarcode));
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 try
@@ -333,9 +377,12 @@ namespace gip.mes.webservices
                 }
                 catch (Exception e)
                 {
-                    if (myServiceHost != null)
-                        myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetFacilityByBarcode(10)", e);
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetFacilityByBarcode) + "(10)", e);
                     return new WSResponse<Facility>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetFacilityByBarcode));
                 }
             }
         }
