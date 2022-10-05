@@ -9,6 +9,9 @@ using System.ComponentModel;
 using System.Threading;
 using gip.core.reporthandler;
 using gip.mes.facility;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace gip.bso.test
 {
@@ -112,7 +115,7 @@ namespace gip.bso.test
             }
             set
             {
-                if(_FilterSuggestionMode != value)
+                if (_FilterSuggestionMode != value)
                 {
                     _FilterSuggestionMode = value;
                     OnPropertyChanged("FilterSuggestionMode");
@@ -149,7 +152,7 @@ namespace gip.bso.test
         public virtual void TestMethod()
         {
             Guid ID = Guid.Empty;
-            if(!string.IsNullOrEmpty(TestInput) && Guid.TryParse(TestInput, out ID))
+            if (!string.IsNullOrEmpty(TestInput) && Guid.TryParse(TestInput, out ID))
             {
                 ACComponent printManager = ACPrintManager.GetServiceInstance(this);
                 if (printManager != null && printManager.ConnectionState == ACObjectConnectionState.Connected)
@@ -328,6 +331,151 @@ namespace gip.bso.test
             MsgList.Add(msg);
             OnPropertyChanged("MsgList");
         }
+        #endregion
+
+
+        #region Za igru Mario
+
+        /// <summary>
+        /// Suggestion : use this while mail is stored on right place
+        /// </summary>
+        public void TestSavingUserData_EmailInCompanyAddress()
+        {
+            string email = "";
+            string firstName = "";
+            string lastName = "";
+            string companyName = "";
+            int rating = 0;
+
+            Company company = null;
+            CompanyAddress companyAddress = DatabaseApp.CompanyAddress.FirstOrDefault(c => c.EMail == email);
+            // Company setup
+            if (companyAddress == null)
+            {
+                company = DatabaseApp.Company.Where(c => c.CompanyName == companyName).FirstOrDefault();
+                if (company == null)
+                {
+                    string secondaryKeyCompany = Root.NoManager.GetNewNo(Database, typeof(Company), Company.NoColumnName, Company.FormatNewNo, this);
+                    company = Company.NewACObject(DatabaseApp, null, secondaryKeyCompany);
+                    company.CompanyName = companyName;
+                    // Setup not nullable fields varchar
+                    company.BillingAccountNo = "";
+                    company.ShippingAccountNo = "";
+                    company.NoteInternal = "";
+                    company.NoteExternal = "";
+                    company.VATNumber = "";
+                    companyAddress = company.CompanyAddress_Company.FirstOrDefault();
+                    CompanyAddressPopulateValues(company, companyAddress);
+                }
+
+                // za drugog čovjeka iz iste firme s drugim mailom
+                if (companyAddress == null)
+                {
+                    companyAddress = CompanyAddress.NewACObject(DatabaseApp, company);
+                    CompanyAddressPopulateValues(company, companyAddress);
+                }
+
+
+                // CompanyAddress
+
+                companyAddress.EMail = email;
+
+            }
+
+            CompanyPerson companyPerson = company.CompanyPerson_Company.Where(c => c.Name3 == email).FirstOrDefault();
+
+            if (companyPerson == null)
+            {
+                // CompanyPerson setup
+                string secondaryKeyCompanyPerson = Root.NoManager.GetNewNo(Database, typeof(CompanyPerson), CompanyPerson.NoColumnName, CompanyPerson.FormatNewNo, this);
+                companyPerson = CompanyPerson.NewACObject(DatabaseApp, company, secondaryKeyCompanyPerson);
+                company.CompanyPerson_Company.Add(companyPerson);
+                companyPerson.Name3 = email;
+
+                // Setup not nullable fields varchar
+                companyPerson.Street = "";
+                companyPerson.City = "";
+                companyPerson.Postcode = "";
+            }
+
+
+            // values always updated
+            companyPerson.Name1 = firstName + " " + lastName;
+
+            companyAddress.RouteNo = rating;
+
+            DatabaseApp.Company.AddObject(company);
+            MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+            bool saveSuccess = msgWithDetails.IsSucceded();
+        }
+
+        private static void CompanyAddressPopulateValues(Company company, CompanyAddress companyAddress)
+        {
+            companyAddress.Name1 = company.CompanyName;
+            companyAddress.Name2 = "";
+            //companyAddress.Name3 = "";
+            companyAddress.Street = "";
+            companyAddress.City = "";
+            companyAddress.Postcode = "";
+            companyAddress.PostOfficeBox = "";
+            companyAddress.Phone = "";
+            companyAddress.Fax = "";
+            companyAddress.Mobile = "";
+            companyAddress.EMail = "";
+        }
+
+
+        /// <summary>
+        /// Without CompanyAddress record
+        /// All stored in CompanyPerson
+        /// simple solution
+        /// </summary>
+        public void TestSavingUserData_EmailInCompanyPerson()
+        {
+            string email = "";
+            string firstName = "";
+            string lastName = "";
+            string companyName = "";
+            int rating = 0;
+
+            Company company = null;
+            CompanyPerson companyPerson = company.CompanyPerson_Company.Where(c => c.Name3 == email).FirstOrDefault();
+            // Company setup
+            if (companyPerson == null)
+            {
+                company = DatabaseApp.Company.Where(c => c.CompanyName == companyName).FirstOrDefault();
+                if (company == null)
+                {
+                    string secondaryKeyCompany = Root.NoManager.GetNewNo(Database, typeof(Company), Company.NoColumnName, Company.FormatNewNo, this);
+                    company = Company.NewACObject(DatabaseApp, null, secondaryKeyCompany);
+                    company.CompanyName = companyName;
+                    // Setup not nullable fields varchar
+                    company.BillingAccountNo = "";
+                    company.ShippingAccountNo = "";
+                    company.NoteInternal = "";
+                    company.NoteExternal = "";
+                    company.VATNumber = "";
+                }
+
+                string secondaryKeyCompanyPerson = Root.NoManager.GetNewNo(Database, typeof(CompanyPerson), CompanyPerson.NoColumnName, CompanyPerson.FormatNewNo, this);
+                companyPerson = CompanyPerson.NewACObject(DatabaseApp, company, secondaryKeyCompanyPerson);
+                company.CompanyPerson_Company.Add(companyPerson);
+                companyPerson.Name3 = email;
+
+            }
+
+
+            // values always updated
+            companyPerson.Name1 = firstName + " " + lastName;
+
+            companyPerson.PostOfficeBox = rating.ToString();
+
+            DatabaseApp.Company.AddObject(company);
+            MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
+            bool saveSuccess = msgWithDetails.IsSucceded();
+        }
+
+
         #endregion
 
     }
