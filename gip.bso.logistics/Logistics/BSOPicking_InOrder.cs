@@ -94,7 +94,7 @@ namespace gip.bso.logistics
             set
             {
                 AccessInOrderPos.Current = value;
-                OnPropertyChanged("CurrentInOrderPos");
+                OnPropertyChanged(nameof(CurrentInOrderPos));
             }
         }
 
@@ -150,7 +150,7 @@ namespace gip.bso.logistics
                 if (AccessInOrderPos == null)
                     return;
                 AccessInOrderPos.Selected = value;
-                OnPropertyChanged("SelectedInOrderPos");
+                OnPropertyChanged(nameof(SelectedInOrderPos));
                 CurrentInOrderPos = value;
             }
         }
@@ -172,7 +172,7 @@ namespace gip.bso.logistics
             set
             {
                 _CurrentDNoteInOrderPos = value;
-                OnPropertyChanged("CurrentDNoteInOrderPos");
+                OnPropertyChanged(nameof(CurrentDNoteInOrderPos));
             }
         }
 
@@ -208,7 +208,7 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedDNoteInOrderPos = value;
-                OnPropertyChanged("SelectedDNoteInOrderPos");
+                OnPropertyChanged(nameof(SelectedDNoteInOrderPos));
                 CurrentDNoteInOrderPos = value;
             }
         }
@@ -244,17 +244,15 @@ namespace gip.bso.logistics
                 if (e.InnerException != null && e.InnerException.Message != null)
                     msg += " Inner:" + e.InnerException.Message;
 
-                Messages.LogException("BSOPicking", "AssignInOrderPos", msg);
+                Messages.LogException(nameof(BSOPicking), nameof(AssignInOrderPos), msg);
             }
 
             // TODO: Es muss noch implementiert werden, wenn Teilmenge abgerufen worden dass Auftrags-Position nicht verschwindet
             if (_UnSavedUnAssignedInOrderPos.Contains(CurrentInOrderPos))
                 _UnSavedUnAssignedInOrderPos.Remove(CurrentInOrderPos);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             RefreshInOrderPosList();
             PartialQuantity = null;
-
-            PostExecute("AssignInOrderPos");
         }
 
         /// <summary>
@@ -287,7 +285,7 @@ namespace gip.bso.logistics
                 return;
             if (_ActivateInOpen || forceQueryFromDb)
                 AccessInOrderPos.NavSearch(DatabaseApp);
-            OnPropertyChanged("InOrderPosList");
+            OnPropertyChanged(nameof(InOrderPosList));
         }
         #endregion
 
@@ -322,11 +320,9 @@ namespace gip.bso.logistics
 
             if (_UnSavedUnAssignedInOrderPos.Contains(CurrentDNoteInOrderPos))
                 _UnSavedUnAssignedInOrderPos.Remove(CurrentDNoteInOrderPos);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             RefreshInOrderPosList();
             PartialQuantity = null;
-
-            PostExecute("AssignDNoteInOrderPos");
         }
 
         /// <summary>

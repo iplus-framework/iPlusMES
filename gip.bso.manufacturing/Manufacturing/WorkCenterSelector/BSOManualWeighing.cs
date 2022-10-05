@@ -1573,6 +1573,12 @@ namespace gip.bso.manufacturing
                                                                                                         c.ACIdentifier == PWManualWeighing.PWClassName);
                         ACRef<ACClass> refClass = new ACRef<ACClass>(pwClass, true);
                         pwNodes = pwGroup.GetChildInstanceInfo(1, new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, TypeOfRoots = refClass });
+
+                        if (pwNodes == null)
+                        {
+                            pwNodes = pwGroup.GetChildInstanceInfo(1, new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, TypeOfRoots = refClass });
+                        }
+
                         refClass.Detach();
                     }
 

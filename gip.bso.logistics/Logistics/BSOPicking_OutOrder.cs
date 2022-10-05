@@ -94,7 +94,7 @@ namespace gip.bso.logistics
             set
             {
                 AccessOutOrderPos.Current = value;
-                OnPropertyChanged("CurrentOutOrderPos");
+                OnPropertyChanged(nameof(CurrentOutOrderPos));
             }
         }
 
@@ -150,7 +150,7 @@ namespace gip.bso.logistics
                 if (AccessOutOrderPos == null)
                     return;
                 AccessOutOrderPos.Selected = value;
-                OnPropertyChanged("SelectedOutOrderPos");
+                OnPropertyChanged(nameof(SelectedOutOrderPos));
                 CurrentOutOrderPos = value;
             }
         }
@@ -172,7 +172,7 @@ namespace gip.bso.logistics
             set
             {
                 _CurrentDNoteOutOrderPos = value;
-                OnPropertyChanged("CurrentDNoteOutOrderPos");
+                OnPropertyChanged(nameof(CurrentDNoteOutOrderPos));
             }
         }
 
@@ -208,7 +208,7 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedDNoteOutOrderPos = value;
-                OnPropertyChanged("SelectedDNoteOutOrderPos");
+                OnPropertyChanged(nameof(SelectedDNoteOutOrderPos));
                 CurrentDNoteOutOrderPos = value;
             }
         }
@@ -250,7 +250,7 @@ namespace gip.bso.logistics
             // TODO: Es muss noch implementiert werden, wenn Teilmenge abgerufen worden dass Auftrags-Position nicht verschwindet
             if (_UnSavedUnAssignedOutOrderPos.Contains(CurrentOutOrderPos))
                 _UnSavedUnAssignedOutOrderPos.Remove(CurrentOutOrderPos);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             RefreshOutOrderPosList();
             PartialQuantity = null;
 
@@ -285,7 +285,7 @@ namespace gip.bso.logistics
         {
             if ((_ActivateOutOpen || forceQueryFromDb) && AccessOutOrderPos != null)
                 AccessOutOrderPos.NavSearch(DatabaseApp);
-            OnPropertyChanged("OutOrderPosList");
+            OnPropertyChanged(nameof(OutOrderPosList));
         }
         #endregion
 
@@ -320,7 +320,7 @@ namespace gip.bso.logistics
 
             if (_UnSavedUnAssignedOutOrderPos.Contains(CurrentDNoteOutOrderPos))
                 _UnSavedUnAssignedOutOrderPos.Remove(CurrentDNoteOutOrderPos);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             RefreshOutOrderPosList();
             PartialQuantity = null;
 

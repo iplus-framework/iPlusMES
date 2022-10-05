@@ -99,7 +99,7 @@ namespace gip.bso.logistics
             if (Parameters != null && Parameters.Any())
                 InitParams();
 
-            Search();
+            Search(false);
             return true;
         }
 
@@ -358,7 +358,7 @@ namespace gip.bso.logistics
                     InFilterChange = true;
 
                     AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("PickingNo", value);
-                    OnPropertyChanged("FilterPickingPickingNo");
+                    OnPropertyChanged(nameof(FilterPickingPickingNo));
 
                     InFilterChange = false;
                 }
@@ -383,7 +383,7 @@ namespace gip.bso.logistics
                     if (value.HasValue)
                     {
                         AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual, value.Value);
-                        OnPropertyChanged("FilterDateFrom");
+                        OnPropertyChanged(nameof(FilterDateFrom));
                     }
                 }
                 else
@@ -394,13 +394,13 @@ namespace gip.bso.logistics
                         if (tmpdt != value)
                         {
                             AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual, value.Value);
-                            OnPropertyChanged("FilterDateFrom");
+                            OnPropertyChanged(nameof(FilterDateFrom));
                         }
                     }
                     else
                     {
                         AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateFrom", Global.LogicalOperators.greaterThanOrEqual, "");
-                        OnPropertyChanged("FilterDateFrom");
+                        OnPropertyChanged(nameof(FilterDateFrom));
                     }
                 }
             }
@@ -424,7 +424,7 @@ namespace gip.bso.logistics
                     if (value.HasValue)
                     {
                         AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateTo", Global.LogicalOperators.lessThan, value.Value);
-                        OnPropertyChanged("FilterDateTo");
+                        OnPropertyChanged(nameof(FilterDateTo));
                     }
                 }
                 else
@@ -435,13 +435,13 @@ namespace gip.bso.logistics
                         if (tmpdt != value)
                         {
                             AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateTo", Global.LogicalOperators.lessThan, value.Value);
-                            OnPropertyChanged("FilterDateTo");
+                            OnPropertyChanged(nameof(FilterDateTo));
                         }
                     }
                     else
                     {
                         AccessPrimary.NavACQueryDefinition.SetSearchValue("DeliveryDateTo", Global.LogicalOperators.lessThan, "");
-                        OnPropertyChanged("FilterDateTo");
+                        OnPropertyChanged(nameof(FilterDateTo));
                     }
                 }
             }
@@ -465,7 +465,7 @@ namespace gip.bso.logistics
                 if (_SelectedFilterMDPickingType != value)
                 {
                     _SelectedFilterMDPickingType = value;
-                    OnPropertyChanged("SelectedFilterMDPickingType");
+                    OnPropertyChanged(nameof(SelectedFilterMDPickingType));
 
                     string filterPickingKey = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("MDPickingType\\MDKey");
                     string newPickingKey = null;
@@ -476,7 +476,7 @@ namespace gip.bso.logistics
                         InFilterChange = true;
 
                         AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("MDPickingType\\MDKey", newPickingKey);
-                        OnPropertyChanged("SelectedFilterMDPickingType");
+                        OnPropertyChanged(nameof(SelectedFilterMDPickingType));
 
                         InFilterChange = false;
                     }
@@ -529,7 +529,7 @@ namespace gip.bso.logistics
                 if (_SelectedFilterPickingState != value)
                 {
                     _SelectedFilterPickingState = value;
-                    OnPropertyChanged("SelectedFilterPickingState");
+                    OnPropertyChanged(nameof(SelectedFilterPickingState));
 
                     short? filterPickingStateIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingStateIndex");
                     short? newPickingStateIndex = null;
@@ -540,7 +540,7 @@ namespace gip.bso.logistics
                         InFilterChange = true;
 
                         AccessPrimary.NavACQueryDefinition.SetSearchValue<short?>("PickingStateIndex", newPickingStateIndex);
-                        OnPropertyChanged("SelectedFilterPickingState");
+                        OnPropertyChanged(nameof(SelectedFilterPickingState));
 
                         InFilterChange = false;
                     }
@@ -651,7 +651,7 @@ namespace gip.bso.logistics
                 {
                     _SelectedFilterDeliveryAddress = value;
 
-                    OnPropertyChanged("SelectedFilterDeliveryAddress");
+                    OnPropertyChanged(nameof(SelectedFilterDeliveryAddress));
                 }
             }
         }
@@ -735,7 +735,7 @@ namespace gip.bso.logistics
                 if (_SelectedFilterFromFacility != value)
                 {
                     _SelectedFilterFromFacility = value;
-                    OnPropertyChanged("SelectedFilterFromFacility");
+                    OnPropertyChanged(nameof(SelectedFilterFromFacility));
                 }
             }
         }
@@ -790,7 +790,7 @@ namespace gip.bso.logistics
                 if (_SelectedFilterToFacility != value)
                 {
                     _SelectedFilterToFacility = value;
-                    OnPropertyChanged("SelectedFilterToFacility");
+                    OnPropertyChanged(nameof(SelectedFilterToFacility));
                 }
             }
         }
@@ -870,18 +870,18 @@ namespace gip.bso.logistics
             {
                 switch (aCFilterItem.PropertyName)
                 {
-                    case "PickingNo":
-                        OnPropertyChanged("FilterPickingPickingNo");
+                    case nameof(Picking.PickingNo):
+                        OnPropertyChanged(nameof(FilterPickingPickingNo));
                         break;
-                    case "DeliveryDateFrom":
-                        OnPropertyChanged("FilterDateFrom");
-                        OnPropertyChanged("FilterDateTo");
+                    case nameof(Picking.DeliveryDateFrom):
+                        OnPropertyChanged(nameof(FilterDateFrom));
+                        OnPropertyChanged(nameof(FilterDateTo));
                         break;
-                    case "PickingTypeIndex":
-                        OnPropertyChanged("SelectedFilterMDPickingType");
+                    case nameof(MDPickingType.MDPickingTypeIndex):
+                        OnPropertyChanged(nameof(SelectedFilterMDPickingType));
                         break;
-                    case "PickingStateIndex":
-                        OnPropertyChanged("SelectedFilterPickingState");
+                    case nameof(Picking.PickingStateIndex):
+                        OnPropertyChanged(nameof(SelectedFilterPickingState));
                         break;
                 }
             }
@@ -952,10 +952,10 @@ namespace gip.bso.logistics
                         ProcessWorkflowList.FirstOrDefault(p => p.ACClassMethodID == CurrentPicking.ACClassMethodID);
                 else
                     SelectedProcessWorkflow = null;
-                OnPropertyChanged("CurrentPicking");
+                OnPropertyChanged(nameof(CurrentPicking));
                 if (value != null && _InLoad)
                     value.PickingPos_Picking.AutoRefresh(this.DatabaseApp);
-                OnPropertyChanged("PickingPosList");
+                OnPropertyChanged(nameof(PickingPosList));
                 if (value != null && CurrentPickingPos != null)
                 {
                     if (!value.PickingPos_Picking.Any())
@@ -1009,7 +1009,7 @@ namespace gip.bso.logistics
                 if (AccessPrimary == null)
                     return;
                 AccessPrimary.Selected = value;
-                OnPropertyChanged("SelectedPicking");
+                OnPropertyChanged(nameof(SelectedPicking));
             }
         }
 
@@ -1107,9 +1107,9 @@ namespace gip.bso.logistics
                         _CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad();
                         _CurrentPickingPos.FacilityBooking_PickingPos.AutoRefresh();
                     }
-                    OnPropertyChanged("CurrentPickingPos");
-                    OnPropertyChanged("FacilityPreBookingList");
-                    OnPropertyChanged("FacilityBookingList");
+                    OnPropertyChanged(nameof(CurrentPickingPos));
+                    OnPropertyChanged(nameof(FacilityPreBookingList));
+                    OnPropertyChanged(nameof(FacilityBookingList));
                     if (FacilityPreBookingList != null && FacilityPreBookingList.Any())
                         SelectedFacilityPreBooking = FacilityPreBookingList.First();
                     else
@@ -1118,8 +1118,8 @@ namespace gip.bso.logistics
                     RefreshFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
                     if (AccessBookingFacilityLot != null)
                         RefreshFilterFacilityLotAccess(_AccessBookingFacilityLot);
-                    OnPropertyChanged("BookingFacilityList");
-                    OnPropertyChanged("BookingFacilityListTarget");
+                    OnPropertyChanged(nameof(BookingFacilityList));
+                    OnPropertyChanged(nameof(BookingFacilityListTarget));
 
                     if (CurrentPickingPos != null)
                         CurrentPickingPos.PropertyChanged += CurrentPickingPos_PropertyChanged;
@@ -1179,7 +1179,7 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedPickingPos = value;
-                OnPropertyChanged("SelectedPickingPos");
+                OnPropertyChanged(nameof(SelectedPickingPos));
                 CurrentPickingPos = value;
             }
         }
@@ -1228,9 +1228,9 @@ namespace gip.bso.logistics
                 if (CurrentPickingPos != null && CurrentPickingPos.MDUnit != value)
                 {
                     CurrentPickingPos.MDUnit = value;
-                    OnPropertyChanged("CurrentPickingPos");
+                    OnPropertyChanged(nameof(CurrentPickingPos));
                 }
-                OnPropertyChanged("CurrentMDUnit");
+                OnPropertyChanged(nameof(CurrentMDUnit));
             }
         }
 
@@ -1259,10 +1259,10 @@ namespace gip.bso.logistics
                         _CurrentFacilityPreBooking.ACMethodBooking.PropertyChanged -= ACMethodBooking_PropertyChanged;
 
                     _CurrentFacilityPreBooking = value;
-                    OnPropertyChanged("CurrentFacilityPreBooking");
-                    OnPropertyChanged("CurrentACMethodBooking");
-                    OnPropertyChanged("CurrentACMethodBookingLayout");
-                    //OnPropertyChanged("BookableFacilityLots");
+                    OnPropertyChanged(nameof(CurrentFacilityPreBooking));
+                    OnPropertyChanged(nameof(CurrentACMethodBooking));
+                    OnPropertyChanged(nameof(CurrentACMethodBookingLayout));
+                    //OnPropertyChanged(nameof(BookableFacilityLots));
                     RefreshFilterFacilityAccess(AccessBookingFacility, BookingFilterMaterial);
                     RefreshFilterFacilityAccess(AccessBookingFacilityTarget, BookingFilterMaterialTarget);
                     if (AccessBookingFacilityLot != null)
@@ -1271,8 +1271,8 @@ namespace gip.bso.logistics
                     if (_CurrentFacilityPreBooking != null && _CurrentFacilityPreBooking.ACMethodBooking != null)
                         _CurrentFacilityPreBooking.ACMethodBooking.PropertyChanged += ACMethodBooking_PropertyChanged;
 
-                    OnPropertyChanged("BookingFacilityList");
-                    OnPropertyChanged("BookingFacilityListTarget");
+                    OnPropertyChanged(nameof(BookingFacilityList));
+                    OnPropertyChanged(nameof(BookingFacilityListTarget));
                 }
             }
         }
@@ -1322,12 +1322,12 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedFacilityPreBooking = value;
-                OnPropertyChanged("SelectedFacilityPreBooking");
+                OnPropertyChanged(nameof(SelectedFacilityPreBooking));
                 CurrentFacilityPreBooking = value;
-                OnPropertyChanged("BookingFacilityList");
-                OnPropertyChanged("OutwardFacilityChargeList");
-                OnPropertyChanged("InwardFacilityChargeList");
-                //OnPropertyChanged("BookableFacilityLots");
+                OnPropertyChanged(nameof(BookingFacilityList));
+                OnPropertyChanged(nameof(OutwardFacilityChargeList));
+                OnPropertyChanged(nameof(InwardFacilityChargeList));
+                //OnPropertyChanged(nameof(BookableFacilityLots));
                 if (AccessBookingFacilityLot != null)
                     AccessBookingFacilityLot.NavSearch(DatabaseApp);
             }
@@ -1365,8 +1365,8 @@ namespace gip.bso.logistics
                 }
                 else
                     _CurrentACMethodBookingDummy = null;
-                OnPropertyChanged("CurrentACMethodBooking");
-                OnPropertyChanged("CurrentACMethodBookingLayout");
+                OnPropertyChanged(nameof(CurrentACMethodBooking));
+                OnPropertyChanged(nameof(CurrentACMethodBookingLayout));
             }
         }
 
@@ -1377,28 +1377,28 @@ namespace gip.bso.logistics
                 return;
             try
             {
-                if (e.PropertyName == "OutwardFacility")
+                if (e.PropertyName == nameof(ACMethodBooking.OutwardFacility))
                 {
                     _UpdatingControlModeBooking = true;
-                    OnPropertyChanged("OutwardFacilityChargeList");
-                    OnPropertyChanged("BookableFacilityLots");
+                    OnPropertyChanged(nameof(OutwardFacilityChargeList));
+                    OnPropertyChanged(nameof(BookableFacilityLots));
                     if (CurrentACMethodBooking != null)
                     {
-                        CurrentACMethodBooking.OnEntityPropertyChanged("OutwardFacility");
-                        CurrentACMethodBooking.OnEntityPropertyChanged("OutwardFacilityCharge");
-                        CurrentACMethodBooking.OnEntityPropertyChanged("OutwardFacilityLot");
+                        CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardFacility));
+                        CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardFacilityCharge));
+                        CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardFacilityLot));
                     }
                 }
-                else if (e.PropertyName == "InwardFacility")
+                else if (e.PropertyName == nameof(ACMethodBooking.InwardFacility))
                 {
                     _UpdatingControlModeBooking = true;
-                    OnPropertyChanged("InwardFacilityChargeList");
-                    OnPropertyChanged("BookableFacilityLots");
+                    OnPropertyChanged(nameof(InwardFacilityChargeList));
+                    OnPropertyChanged(nameof(BookableFacilityLots));
                     if (CurrentACMethodBooking != null)
                     {
-                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacility");
-                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacilityCharge");
-                        CurrentACMethodBooking.OnEntityPropertyChanged("InwardFacilityLot");
+                        CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacility));
+                        CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacilityCharge));
+                        CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacilityLot));
                     }
                 }
             }
@@ -1453,12 +1453,12 @@ namespace gip.bso.logistics
             set
             {
                 _BookingFilterMaterial = value;
-                OnPropertyChanged("BookingFilterMaterial");
+                OnPropertyChanged(nameof(BookingFilterMaterial));
                 RefreshFilterFacilityAccess(AccessBookingFacility, value);
-                OnPropertyChanged("BookingFacilityList");
-                OnPropertyChanged("OutwardFacilityChargeList");
-                OnPropertyChanged("InwardFacilityChargeList");
-                //OnPropertyChanged("BookableFacilityLots");
+                OnPropertyChanged(nameof(BookingFacilityList));
+                OnPropertyChanged(nameof(OutwardFacilityChargeList));
+                OnPropertyChanged(nameof(InwardFacilityChargeList));
+                //OnPropertyChanged(nameof(BookableFacilityLots));
             }
         }
 
@@ -1515,9 +1515,9 @@ namespace gip.bso.logistics
             set
             {
                 _BookingFilterMaterialTarget = value;
-                OnPropertyChanged("BookingFilterMaterialTarget");
+                OnPropertyChanged(nameof(BookingFilterMaterialTarget));
                 RefreshFilterFacilityAccess(AccessBookingFacilityTarget, value);
-                OnPropertyChanged("BookingFacilityListTarget");
+                OnPropertyChanged(nameof(BookingFacilityListTarget));
             }
         }
 
@@ -1753,7 +1753,7 @@ namespace gip.bso.logistics
                 if (_SelectedPreBookingAvailableQuants != value)
                 {
                     _SelectedPreBookingAvailableQuants = value;
-                    OnPropertyChanged("SelectedPreBookingAvailableQuants");
+                    OnPropertyChanged(nameof(SelectedPreBookingAvailableQuants));
                 }
             }
         }
@@ -1795,7 +1795,7 @@ namespace gip.bso.logistics
         private void LoadPreBookingAvailableQuants()
         {
             _PreBookingAvailableQuantsList = null;
-            OnPropertyChanged("PreBookingAvailableQuantsList");
+            OnPropertyChanged(nameof(PreBookingAvailableQuantsList));
         }
 
         #endregion
@@ -1814,7 +1814,7 @@ namespace gip.bso.logistics
             set
             {
                 _CurrentFacilityBooking = value;
-                OnPropertyChanged("CurrentFacilityBooking");
+                OnPropertyChanged(nameof(CurrentFacilityBooking));
             }
         }
 
@@ -1869,9 +1869,9 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedFacilityBooking = value;
-                OnPropertyChanged("SelectedFacilityBooking");
+                OnPropertyChanged(nameof(SelectedFacilityBooking));
                 CurrentFacilityBooking = value;
-                OnPropertyChanged("FacilityBookingChargeList");
+                OnPropertyChanged(nameof(FacilityBookingChargeList));
             }
         }
         #endregion
@@ -2030,7 +2030,7 @@ namespace gip.bso.logistics
             set
             {
                 _PartialQuantity = value;
-                OnPropertyChanged("PartialQuantity");
+                OnPropertyChanged(nameof(PartialQuantity));
             }
         }
 
@@ -2044,7 +2044,7 @@ namespace gip.bso.logistics
             set
             {
                 _BookingFacilityLotNo = value;
-                OnPropertyChanged("BookingFacilityLotNo");
+                OnPropertyChanged(nameof(BookingFacilityLotNo));
             }
         }
 
@@ -2063,7 +2063,7 @@ namespace gip.bso.logistics
             set
             {
                 _BSOMsg = value;
-                OnPropertyChanged("BSOMsg");
+                OnPropertyChanged(nameof(BSOMsg));
             }
         }
 
@@ -2177,37 +2177,37 @@ namespace gip.bso.logistics
             if (acAccess == _AccessBookingFacility)
             {
                 _AccessBookingFacility.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("BookingFacilityList");
+                OnPropertyChanged(nameof(BookingFacilityList));
                 return true;
             }
             else if (acAccess == _AccessBookingFacilityTarget)
             {
                 _AccessBookingFacility.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("BookingFacilityListTarget");
+                OnPropertyChanged(nameof(BookingFacilityListTarget));
                 return true;
             }
             else if (acAccess == _AccessPickingPos)
             {
                 _AccessPickingPos.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("PickingPosList");
+                OnPropertyChanged(nameof(PickingPosList));
                 return true;
             }
             else if (acAccess == _AccessInOrderPos)
             {
                 _AccessInOrderPos.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("InOrderPosList");
+                OnPropertyChanged(nameof(InOrderPosList));
                 return true;
             }
             else if (acAccess == _AccessOutOrderPos)
             {
                 _AccessOutOrderPos.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("OutOrderPosList");
+                OnPropertyChanged(nameof(OutOrderPosList));
                 return true;
             }
             else if (acAccess == _AccessProdOrderPartslistPos)
             {
                 _AccessProdOrderPartslistPos.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("ProdOrderPartslistPosList");
+                OnPropertyChanged(nameof(ProdOrderPartslistPosList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -2311,10 +2311,9 @@ namespace gip.bso.logistics
 
             _ForwardPlan = null;
 
-            RefreshInOrderPosList(true);
-            RefreshOutOrderPosList(true);
-            RefreshProdOrderPartslistPosList(true);
-            PostExecute("Save");
+            RefreshInOrderPosList(false);
+            RefreshOutOrderPosList(false);
+            RefreshProdOrderPartslistPosList(false);
         }
 
 
@@ -2346,7 +2345,7 @@ namespace gip.bso.logistics
             RefreshProdOrderPartslistPosList(true);
             if (CurrentPicking != null && CurrentPicking.EntityState != System.Data.EntityState.Detached)
                 CurrentPicking.PickingPos_Picking.Load();
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             base.OnPostUndoSave();
         }
 
@@ -2399,7 +2398,7 @@ namespace gip.bso.logistics
                 CurrentPicking.PickingPos_Picking.AutoRefresh(RefreshMode.StoreWins);
             }
             PostExecute("Load");
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             if (PickingPosList != null && PickingPosList.Any())
             {
                 _CurrentPickingPos = null;
@@ -2495,15 +2494,19 @@ namespace gip.bso.logistics
         /// Searches the delivery note.
         /// </summary>
         [ACMethodCommand("Picking", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search()
+        public void Search(bool refreshList = true)
         {
             if (AccessPrimary == null)
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("PickingList");
-            RefreshInOrderPosList();
-            RefreshOutOrderPosList();
-            RefreshProdOrderPartslistPosList();
+            OnPropertyChanged(nameof(PickingList));
+
+            if (refreshList)
+            {
+                RefreshInOrderPosList();
+                RefreshOutOrderPosList();
+                RefreshProdOrderPartslistPosList();
+            }
         }
 
         [ACMethodCommand("Picking", "en{'Cancel Picking'}de{'Storniere Kommission'}", (short)MISort.Cancel, true, Global.ACKinds.MSMethodPrePost)]
@@ -2564,7 +2567,7 @@ namespace gip.bso.logistics
                 Save();
             }
 
-            OnPropertyChanged("PickingList");
+            OnPropertyChanged(nameof(PickingList));
             CurrentPicking = CurrentPicking;
 
             PostExecute("CancelPicking");
@@ -2592,7 +2595,7 @@ namespace gip.bso.logistics
                 return;
             Picking mirroredPicking = PickingManager.MirrorPicking(DatabaseApp, CurrentPicking);
             AccessPrimary.NavList.Add(mirroredPicking);
-            OnPropertyChanged("PickingList");
+            OnPropertyChanged(nameof(PickingList));
             CurrentPicking = mirroredPicking;
             SelectedPicking = mirroredPicking;
         }
@@ -2734,9 +2737,8 @@ namespace gip.bso.logistics
                 }
             }
 
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             PartialQuantity = null;
-            PostExecute("UnassignPickingPos");
         }
 
         /// <summary>
@@ -2763,7 +2765,7 @@ namespace gip.bso.logistics
             PickingPos pickingPos = PickingPos.NewACObject(DatabaseApp, CurrentPicking);
             if (pickingPos != null)
                 CurrentPicking.PickingPos_Picking.Add(pickingPos);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             pickingPos.FromFacility = SelectedFilterFromFacility;
             pickingPos.ToFacility = SelectedFilterToFacility;
             if (pickingPos.MDDelivPosLoadState == null)
@@ -2798,7 +2800,7 @@ namespace gip.bso.logistics
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
                 CurrentPickingPos.FromFacility = facility;
-                OnPropertyChanged("CurrentPickingPos");
+                OnPropertyChanged(nameof(CurrentPickingPos));
             }
         }
 
@@ -2821,7 +2823,7 @@ namespace gip.bso.logistics
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
                 CurrentPickingPos.ToFacility = facility;
-                OnPropertyChanged("CurrentPickingPos");
+                OnPropertyChanged(nameof(CurrentPickingPos));
             }
         }
 
@@ -2847,10 +2849,9 @@ namespace gip.bso.logistics
             if (CurrentFacilityPreBooking != null)
                 ACFacilityManager.InitBookingParamsFromTemplate(CurrentFacilityPreBooking.ACMethodBooking as ACMethodBooking, CurrentPickingPos, CurrentFacilityPreBooking);
 
-            OnPropertyChanged("CurrentACMethodBooking");
-            OnPropertyChanged("CurrentACMethodBookingLayout");
-            OnPropertyChanged("FacilityPreBookingList");
-            PostExecute("NewFacilityPreBooking");
+            OnPropertyChanged(nameof(CurrentACMethodBooking));
+            OnPropertyChanged(nameof(CurrentACMethodBookingLayout));
+            OnPropertyChanged(nameof(FacilityPreBookingList));
         }
 
         public bool IsEnabledNewFacilityPreBooking()
@@ -2899,11 +2900,10 @@ namespace gip.bso.logistics
             if (result != null && result.Any())
             {
                 CurrentFacilityPreBooking = result.FirstOrDefault();
-                OnPropertyChanged("CurrentACMethodBooking");
-                OnPropertyChanged("CurrentACMethodBookingLayout");
-                OnPropertyChanged("FacilityPreBookingList");
+                OnPropertyChanged(nameof(CurrentACMethodBooking));
+                OnPropertyChanged(nameof(CurrentACMethodBookingLayout));
+                OnPropertyChanged(nameof(FacilityPreBookingList));
             }
-            PostExecute("CancelFacilityPreBooking");
         }
 
         public bool IsEnabledCancelFacilityPreBooking()
@@ -2939,9 +2939,8 @@ namespace gip.bso.logistics
             else
             {
                 CurrentFacilityPreBooking = null;
-                OnPropertyChanged("FacilityPreBookingList");
+                OnPropertyChanged(nameof(FacilityPreBookingList));
             }
-            PostExecute("DeleteFacilityPreBooking");
         }
 
         public bool IsEnabledDeleteFacilityPreBooking()
@@ -3023,7 +3022,7 @@ namespace gip.bso.logistics
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
                 Messages.Msg(result.ValidMessage);
-                OnPropertyChanged("FacilityBookingList");
+                OnPropertyChanged(nameof(FacilityBookingList));
             }
             else
             {
@@ -3041,7 +3040,7 @@ namespace gip.bso.logistics
                 }
 
                 DeleteFacilityPreBooking();
-                OnPropertyChanged("FacilityBookingList");
+                OnPropertyChanged(nameof(FacilityBookingList));
                 ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, isCancellation, true);
                 Save();
 
@@ -3270,7 +3269,7 @@ namespace gip.bso.logistics
                 CurrentACMethodBooking.OutwardMaterial = null;
                 CurrentACMethodBooking.OutwardFacilityLot = null;
             }
-            OnPropertyChanged("CurrentACMethodBooking");
+            OnPropertyChanged(nameof(CurrentACMethodBooking));
             CloseTopDialog();
         }
 
@@ -3481,7 +3480,7 @@ namespace gip.bso.logistics
                     if (!_ActivateInDNote)
                     {
                         _ActivateInDNote = true;
-                        OnPropertyChanged("DNoteInOrderPosList");
+                        OnPropertyChanged(nameof(DNoteInOrderPosList));
                     }
                     break;
                 case "*AssignOutOrderPos":
@@ -3496,7 +3495,7 @@ namespace gip.bso.logistics
                     if (!_ActivateOutDNote)
                     {
                         _ActivateOutDNote = true;
-                        OnPropertyChanged("DNoteOutOrderPosList");
+                        OnPropertyChanged(nameof(DNoteOutOrderPosList));
                     }
                     break;
                 case "*AssignProdOrderPos":
@@ -3732,7 +3731,7 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedAppManager = value;
-                OnPropertyChanged("SelectedAppManager");
+                OnPropertyChanged(nameof(SelectedAppManager));
             }
         }
 
@@ -3747,7 +3746,7 @@ namespace gip.bso.logistics
             set
             {
                 _AppManagersList = value;
-                OnPropertyChanged("AppManagersList");
+                OnPropertyChanged(nameof(AppManagersList));
             }
         }
 
@@ -3901,6 +3900,65 @@ namespace gip.bso.logistics
         public bool IsEnabledFilterClear()
         {
             return true;
+        }
+
+        #endregion
+
+        #region BroadCasting
+
+        [ACMethodCommand("BroadCastPicking", "en{'Broadcast picking'}de{'Sende Kommissionierauftrag'}", 800, true)]
+        public void BroadCastPicking()
+        {
+            if(!IsEnabledBroadCastPicking())
+                return;
+            PickingPos[] pickingPositions = CurrentPicking.PickingPos_Picking.ToArray();
+
+            List<Facility> facilities = new List<Facility>();
+            foreach (PickingPos pickingPos in pickingPositions)
+            {
+                if (pickingPos.FromFacility != null && pickingPos.FromFacility.IsMirroredOnMoreDatabases && !facilities.Contains(pickingPos.FromFacility))
+                {
+                    facilities.Add(pickingPos.FromFacility);
+                }
+                if (pickingPos.ToFacility != null && pickingPos.ToFacility.IsMirroredOnMoreDatabases && !facilities.Contains(pickingPos.ToFacility))
+                {
+                    facilities.Add(pickingPos.ToFacility);
+                }
+            }
+
+            foreach(Facility facility in facilities)
+            {
+                facility.CallSendPicking(false, CurrentPicking.PickingID);
+            }
+
+            facilities = new List<Facility>();
+            FacilityBooking[] facilityBookings = CurrentPicking.PickingPos_Picking.SelectMany(c=>c.FacilityBooking_PickingPos).ToArray();
+
+            foreach(FacilityBooking facilityBooking in facilityBookings)
+            {
+                if (facilityBooking.InwardFacility != null && facilityBooking.InwardFacility.IsMirroredOnMoreDatabases && !facilities.Contains(facilityBooking.InwardFacility))
+                {
+                    facilities.Add(facilityBooking.InwardFacility);
+                }
+                if (facilityBooking.OutwardFacility != null && facilityBooking.OutwardFacility.IsMirroredOnMoreDatabases && !facilities.Contains(facilityBooking.OutwardFacility))
+                {
+                    facilities.Add(facilityBooking.OutwardFacility);
+                }
+            }
+
+            foreach (Facility facility in facilities)
+            {
+                foreach (FacilityBooking facilityBooking in facilityBookings)
+                {
+                    facility.CallRefreshFacility(true, facilityBooking.FacilityBookingID);
+                }
+            }
+
+        }
+
+        public bool IsEnabledBroadCastPicking()
+        {
+            return CurrentPicking != null && CurrentPicking.PickingPos_Picking.Any();
         }
 
         #endregion
@@ -4195,9 +4253,9 @@ namespace gip.bso.logistics
                 if (_ProcessWorkflowShowAllWorkflows = value)
                 {
                     _ProcessWorkflowShowAllWorkflows = value;
-                    OnPropertyChanged("ProcessWorkflowShowAllWorkflows");
+                    OnPropertyChanged(nameof(ProcessWorkflowShowAllWorkflows));
                     _ProcessWorkflowList = null;
-                    OnPropertyChanged("ProcessWorkflowList");
+                    OnPropertyChanged(nameof(ProcessWorkflowList));
                 }
             }
         }
@@ -4242,7 +4300,7 @@ namespace gip.bso.logistics
                         else
                             this.ProcessWorkflowPresenter.Load(_SelectedProcessWorkflow);
                     }
-                    OnPropertyChanged("SelectedProcessWorkflow");
+                    OnPropertyChanged(nameof(SelectedProcessWorkflow));
                 }
             }
         }
@@ -4302,8 +4360,8 @@ namespace gip.bso.logistics
         {
             if (!IsEnabledProcessWorkflowAssign()) return;
             CurrentPicking.ACClassMethod = SelectedProcessWorkflow.FromAppContext<gip.mes.datamodel.ACClassMethod>(DatabaseApp);
-            OnPropertyChanged("IsEnabledProcessWorkflowAssign");
-            OnPropertyChanged("IsEnabledProcessWorkflowCancel");
+            OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
+            OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
         }
 
         public bool IsEnabledProcessWorkflowAssign()
@@ -4318,8 +4376,8 @@ namespace gip.bso.logistics
             CurrentPicking.ACClassMethod = null;
             CurrentPicking.ACClassMethodID = null;
             SelectedProcessWorkflow = null;
-            OnPropertyChanged("IsEnabledProcessWorkflowAssign");
-            OnPropertyChanged("IsEnabledProcessWorkflowCancel");
+            OnPropertyChanged(nameof(IsEnabledProcessWorkflowAssign));
+            OnPropertyChanged(nameof(IsEnabledProcessWorkflowCancel));
         }
 
         public bool IsEnabledProcessWorkflowCancel()
@@ -4377,7 +4435,7 @@ namespace gip.bso.logistics
             set
             {
                 _VisitedMethods = value;
-                OnPropertyChanged("VisitedMethods");
+                OnPropertyChanged(nameof(VisitedMethods));
             }
         }
         public void AddVisitedMethods(core.datamodel.ACClassMethod acClassMethod)

@@ -120,7 +120,7 @@ namespace gip.bso.logistics
                 if (AccessProdOrderPartslistPos == null)
                     return;
                 AccessProdOrderPartslistPos.Current = value;
-                OnPropertyChanged("CurrentProdOrderPartslistPos");
+                OnPropertyChanged(nameof(CurrentProdOrderPartslistPos));
             }
         }
 
@@ -176,7 +176,7 @@ namespace gip.bso.logistics
                 if (AccessProdOrderPartslistPos == null)
                     return;
                 AccessProdOrderPartslistPos.Selected = value;
-                OnPropertyChanged("SelectedProdOrderPartslistPos");
+                OnPropertyChanged(nameof(SelectedProdOrderPartslistPos));
                 CurrentProdOrderPartslistPos = value;
             }
         }
@@ -217,11 +217,9 @@ namespace gip.bso.logistics
 
             if (_UnSavedUnAssignedProdOrderPartslistPos.Contains(CurrentProdOrderPartslistPos))
                 _UnSavedUnAssignedProdOrderPartslistPos.Remove(CurrentProdOrderPartslistPos);
-            OnPropertyChanged("PickingPosList");
+            OnPropertyChanged(nameof(PickingPosList));
             RefreshProdOrderPartslistPosList();
             PartialQuantity = null;
-
-            PostExecute("AssignProdOrderPartslistPos");
         }
 
         /// <summary>
@@ -254,7 +252,7 @@ namespace gip.bso.logistics
                 return;
             if (_ActivateProdOpen || forceQueryFromDb)
                 AccessProdOrderPartslistPos.NavSearch(DatabaseApp);
-            OnPropertyChanged("ProdOrderPartslistPosList");
+            OnPropertyChanged(nameof(ProdOrderPartslistPosList));
         }
         #endregion
 

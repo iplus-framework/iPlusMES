@@ -2179,7 +2179,92 @@ namespace gip.mes.facility
             }
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
         }
-#endregion
+        
+        
+        public MsgWithDetails CorrectLastInwardQuantAccordingOutwardPostings(FacilityManager facilityManager, DatabaseApp dbApp, ProdOrderBatch batch, 
+                                                                             ProdOrderPartslistPos endBatchPos, IEnumerable<int> outwardSequenceNo = null, bool postWithRetry = false)
+        {
+            MsgWithDetails collectedMessages = null;
+
+            FacilityCharge lastQuant = endBatchPos.FacilityBookingCharge_ProdOrderPartslistPos.Select(c => c.InwardFacilityCharge)
+                                                                                                     .Where(x => !x.NotAvailable)
+                                                                                                     .OrderByDescending(x => x.InsertDate)
+                                                                                                     .FirstOrDefault();
+
+            if (lastQuant == null)
+            {
+                collectedMessages = new MsgWithDetails();
+                //TODO add message
+                return collectedMessages;
+            }
+
+            double totalInwardQuantity = endBatchPos.ActualQuantityUOM;
+
+            double totalOutwardQuantity = batch.ProdOrderPartslistPosRelation_ProdOrderBatch.Where(c => !c.SourceProdOrderPartslistPos.Material.IsIntermediate
+                                                                                                      && (outwardSequenceNo == null || outwardSequenceNo.Contains(c.Sequence)))
+                                                                                            .Sum(x => x.ActualQuantityUOM);
+
+            if (totalOutwardQuantity != totalInwardQuantity)
+            {
+                double difference = totalInwardQuantity - totalOutwardQuantity;
+
+
+                FacilityPreBooking facilityPreBooking = NewInwardFacilityPreBooking(facilityManager, dbApp, endBatchPos);
+                if (facilityPreBooking != null)
+                {
+                    ACMethodBooking acMethodBooking = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                    if (acMethodBooking != null)
+                    {
+                        acMethodBooking.InwardFacility = lastQuant.Facility;
+                        acMethodBooking.InwardFacilityCharge = lastQuant;
+                        acMethodBooking.InwardFacilityLot = lastQuant.FacilityLot;
+                        acMethodBooking.InwardQuantity = difference;
+                    }
+                }
+
+
+                MsgWithDetails subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
+                //if (subMessage != null)
+                //    return subMessage;
+
+                ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                if (bookingParam != null)
+                {
+                    ACMethodEventArgs resultBooking = postWithRetry ? facilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) : facilityManager.BookFacility(bookingParam, dbApp);
+                    if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                    {
+                        if (collectedMessages == null)
+                            collectedMessages = new MsgWithDetails();
+
+                        collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                    }
+                    else
+                    {
+                        if (bookingParam.ValidMessage.IsSucceded())
+                        {
+                            facilityPreBooking.DeleteACObject(dbApp, true);
+                            if (bookingParam.PartslistPos != null)
+                            {
+                                bookingParam.PartslistPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
+                                //bookingParam.PartslistPos.RecalcActualQuantity();
+                                //bookingParam.PartslistPos.TopParentPartslistPos.RecalcActualQuantity();
+                            }
+                            subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
+                            if (subMessage != null)
+                                collectedMessages.AddDetailMessage(subMessage);
+                        }
+                        else
+                        {
+                            collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                        }
+                    }
+                }
+            }
+
+            return collectedMessages;
+        }
+        
+        #endregion
 
 #region RecalcTargetQuantity
 
