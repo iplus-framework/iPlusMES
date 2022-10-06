@@ -18,10 +18,11 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9, "CalledUpQuantityUOM", "en{'Called up Quantity (UOM)'}de{'Abgerufene Menge (BME)'}", "", "", true)]
     [ACPropertyEntity(10, "CalledUpQuantity", "en{'Called up Quantity'}de{'Abgerufene Menge'}", "", "", true)]
     [ACPropertyEntity(12, MDToleranceState.ClassName, "en{'Tolernace state'}de{'Toleranzstatus'}", Const.ContextDatabase + "\\" + MDToleranceState.ClassName, "", true)]
-    //[ACPropertyEntity(13, "IsBaseQuantityExcluded", "en{'Excluded from total Quantity'}de{'Nicht in Gesamtmenge enthalten'}", "", "", true)]
+    [ACPropertyEntity(13, "BasedOnPartslistPos", "en{'From BOM line'}de{'Von Stücklistenposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
+    [ACPropertyEntity(13, "IsBaseQuantityExcluded", "en{'Excluded from total Quantity (Rework)'}de{'Nicht in Gesamtmenge enthalten (Rework)'}", "", "", true)]
     [ACPropertyEntity(15, "ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos", "en{'Alternative Line from'}de{'Alternativposition von'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     [ACPropertyEntity(16, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", "en{'Subline from'}de{'Unterposition von'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
-    [ACPropertyEntity(18, "LineNumber", "en{'Item Number'}de{'Positionsnummer'}", "", "", true)]
+    [ACPropertyEntity(18, "LineNumber", "en{'Line Number'}de{'Positionsnummer'}", "", "", true)]
     [ACPropertyEntity(19, MDProdOrderPartslistPosState.ClassName, "en{'Status'}de{'Status'}", Const.ContextDatabase + "\\" + MDProdOrderPartslistPosState.ClassName, "", true)]
     [ACPropertyEntity(20, ProdOrderPartslist.ClassName, "en{'Order BOM'}de{'Auftragsbezogene Stückliste'}", Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName, "", true)]
     [ACPropertyEntity(20, "Source" + ProdOrderPartslist.ClassName, "en{'Produced from BOM'}de{'Hergestellt aus Stückliste'}", Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName, "", true)]
@@ -30,13 +31,9 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(23, "TakeMatFromOtherOrder", "en{'Take material from other order'}de{'Entnahme von anderem Auftrag erlaubt'}", "", "", true)]
     [ACPropertyEntity(24, "RetrogradeFIFO", "en{'Backflushing'}de{'Retrograde Entnahme'}", "", "", true)]
     [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
-
-    [ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
-
     [ACPropertyEntity(26, nameof(InputQForActualOutput), ConstIInputQForActual.InputQForActualOutput, "", "", true)]
     [ACPropertyEntity(27, nameof(InputQForGoodActualOutput), ConstIInputQForActual.InputQForGoodActualOutput, "", "", true)]
     [ACPropertyEntity(28, nameof(InputQForScrapActualOutput), ConstIInputQForActual.InputQForScrapActualOutput, "", "", true)]
-
     [ACPropertyEntity(29, nameof(InputQForFinalActualOutput), ConstIInputQForActual.InputQForFinalActualOutput, "", "", true)]
     [ACPropertyEntity(30, nameof(InputQForFinalGoodActualOutput), ConstIInputQForActual.InputQForFinalGoodActualOutput, "", "", true)]
     [ACPropertyEntity(31, nameof(InputQForFinalScrapActualOutput), ConstIInputQForActual.InputQForFinalScrapActualOutput, "", "", true)]

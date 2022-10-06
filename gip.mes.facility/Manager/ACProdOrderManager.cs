@@ -3257,9 +3257,45 @@ namespace gip.mes.facility
                 .DefaultIfEmpty()
                 .Sum();
 
+            ProdOrderPartslistPos lastIntermediatePos = prodOrderPartslist.FinalIntermediate;
+
+            if (prodOrderPartslist.MDProdOrderState.ProdOrderState > MDProdOrderState.ProdOrderStates.InProduction
+                && lastIntermediatePos != null)
+            {
+                bool recalcIntermediateTargetQ = false;
+                foreach (ProdOrderPartslistPos component in components)
+                {
+                    if (component.IsBaseQuantityExcluded) //&& !component.BasedOnPartslistPosID.HasValue
+                    {
+                        if (Math.Abs(component.TargetQuantityUOM - component.ActualQuantityUOM) > FacilityConst.C_ZeroCompare)
+                        {
+                            component.TargetQuantityUOM = component.ActualQuantityUOM;
+                            recalcIntermediateTargetQ = true;
+                        }
+                        foreach (var relation in component.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                                            .Where(c => c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern))
+                        {
+                            if (Math.Abs(relation.TargetQuantityUOM - relation.ActualQuantityUOM) > FacilityConst.C_ZeroCompare)
+                            {
+                                relation.TargetQuantityUOM = relation.ActualQuantityUOM;
+                                recalcIntermediateTargetQ = true;
+                            }
+                        }
+                    }
+                }
+
+                if (recalcIntermediateTargetQ)
+                {
+                    MDUnit finalMDUnit = lastIntermediatePos.MDUnit != null ? lastIntermediatePos.MDUnit : lastIntermediatePos.Material.BaseMDUnit;
+                    RecalcIntermediateItem(lastIntermediatePos, true, finalMDUnit);
+                }
+            }
+
+            ProdOrderPartslistPos lastIntermediatePosOfFinalPL = finalPartslist.FinalIntermediate;
+
             foreach (ProdOrderPartslistPos component in components)
             {
-                MsgWithDetails msgBatch = CalculateStatistics(component, finalPartslist);
+                MsgWithDetails msgBatch = CalculateStatistics(component, lastIntermediatePos, finalPartslist, lastIntermediatePosOfFinalPL);
                 if (msgBatch != null)
                 {
                     msg.AddDetailMessage(msgBatch);
@@ -3276,7 +3312,6 @@ namespace gip.mes.facility
             prodOrderPartslist.InputQForActualOutputPer = batches.Where(c => c.InputQForActualOutputPer.HasValue).Select(c => c.InputQForActualOutputPer).Average();
             prodOrderPartslist.InputQForGoodActualOutputPer = batches.Where(c => c.InputQForGoodActualOutputPer.HasValue).Select(c => c.InputQForGoodActualOutputPer).Average();
             prodOrderPartslist.InputQForScrapActualOutputPer = batches.Where(c => c.InputQForScrapActualOutputPer.HasValue).Select(c => c.InputQForScrapActualOutputPer).Average();
-
 
             prodOrderPartslist.InputQForFinalActualOutputPer = batches.Where(c => c.InputQForFinalActualOutputPer.HasValue).Select(c => c.InputQForFinalActualOutputPer).Average();
             prodOrderPartslist.InputQForFinalGoodActualOutputPer = batches.Where(c => c.InputQForFinalGoodActualOutputPer.HasValue).Select(c => c.InputQForFinalGoodActualOutputPer).Average();
@@ -3299,13 +3334,12 @@ namespace gip.mes.facility
             prodOrderPartslist.InputQForFinalScrapActualOutputPer = components.Where(c => c.InputQForFinalScrapActualOutputPer.HasValue).Select(c => c.InputQForFinalScrapActualOutputPer * c.TargetQuantityUOM).DefaultIfEmpty().Sum() / sumComponentQuantities;
         }
 
-        public MsgWithDetails CalculateStatistics(ProdOrderPartslistPos prodOrderPartslistPos, ProdOrderPartslist finalPartslist)
+        public MsgWithDetails CalculateStatistics(ProdOrderPartslistPos prodOrderPartslistPos, ProdOrderPartslistPos lastIntermediatePos, ProdOrderPartslist finalPartslist, ProdOrderPartslistPos lastIntermediatePosOfFinalPL)
         {
             MsgWithDetails msg = null;
 
             ProdOrderPartslist partslist = prodOrderPartslistPos.ProdOrderPartslist;
-            ProdOrderPartslistPos plPos = partslist.FinalIntermediate;
-            double targetQForRatio = plPos != null ? plPos.TargetQuantityUOM : partslist.TargetQuantity;
+            double targetQForRatio = lastIntermediatePos != null ? lastIntermediatePos.TargetQuantityUOM : partslist.TargetQuantity;
 
             prodOrderPartslistPos.InputQForActualOutput =
                 (partslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
@@ -3316,8 +3350,7 @@ namespace gip.mes.facility
             prodOrderPartslistPos.InputQForGoodActualOutput = prodOrderPartslistPos.InputQForActualOutput - prodOrderPartslistPos.InputQForScrapActualOutput;
 
 
-            plPos = finalPartslist.FinalIntermediate;
-            targetQForRatio = plPos != null ? plPos.TargetQuantityUOM : finalPartslist.TargetQuantity;
+            targetQForRatio = lastIntermediatePosOfFinalPL != null ? lastIntermediatePosOfFinalPL.TargetQuantityUOM : finalPartslist.TargetQuantity;
 
             prodOrderPartslistPos.InputQForFinalActualOutput =
                  (finalPartslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;

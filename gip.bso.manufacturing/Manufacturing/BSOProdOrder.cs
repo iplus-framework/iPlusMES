@@ -1174,6 +1174,7 @@ namespace gip.bso.manufacturing
             if (this.ProdOrderManager != null)
             {
                 this.ProdOrderManager.FinishOrder(this.DatabaseApp, CurrentProdOrder);
+                ProdOrderManager.RecalcAllQuantitesAndStatistics(this.DatabaseApp, CurrentProdOrder, true);
             }
         }
 

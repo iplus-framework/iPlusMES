@@ -161,6 +161,7 @@ namespace gip.mes.processapplication
             }
             pos.MDUnit = reworkMaterial.BaseMDUnit;
             pos.TargetQuantityUOM = targetQuantity;
+            pos.IsBaseQuantityExcluded = true;
 
             dbApp.ProdOrderPartslistPos.AddObject(pos);
 
