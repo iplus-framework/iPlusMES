@@ -245,8 +245,6 @@ namespace gip.mes.processapplication
             }
         }
 
-        
-
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
         public override void SMStarting()
         {

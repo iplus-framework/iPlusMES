@@ -2207,7 +2207,7 @@ namespace gip.mes.facility
 
             if (totalOutwardQuantity != totalInwardQuantity)
             {
-                double difference = totalInwardQuantity - totalOutwardQuantity;
+                double difference = totalOutwardQuantity - totalInwardQuantity;
 
 
                 FacilityPreBooking facilityPreBooking = NewInwardFacilityPreBooking(facilityManager, dbApp, endBatchPos);
