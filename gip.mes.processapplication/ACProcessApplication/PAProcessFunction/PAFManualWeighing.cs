@@ -612,43 +612,43 @@ namespace gip.mes.processapplication
             return base.Start(acMethod);
         }
 
-        protected override void OnChangingCurrentACMethod(ACMethod currentACMethod, ACMethod newACMethod)
-        {
-            base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
+        //protected override void OnChangingCurrentACMethod(ACMethod currentACMethod, ACMethod newACMethod)
+        //{
+        //    base.OnChangingCurrentACMethod(currentACMethod, newACMethod);
 
-            Guid? fc_f = newACMethod?.ParameterValueList["FacilityCharge"] as Guid?;
-            if (fc_f.HasValue)
-            {
-                Guid? plPosRelation = newACMethod.ParameterValueList["PLPosRelation"] as Guid?;
-                if (plPosRelation.HasValue)
-                {
-                    using (DatabaseApp dbApp = new DatabaseApp())
-                    {
-                        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
-                                                                                          .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
-                        if (rel != null)
-                        {
-                            Material mat = rel.SourceProdOrderPartslistPos.Material;
-                            if (mat != null)
-                            {
-                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
-                                if (fc != null)
-                                {
-                                    if (fc.MaterialID != mat.MaterialID)
-                                    {
-                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A20)", String.Format("Quant is wrong, ID:{0}, material ID: {1}, function state:{2}",
-                                                                                               fc.FacilityChargeID, mat.MaterialID, CurrentACState));
+        //    Guid? fc_f = newACMethod?.ParameterValueList["FacilityCharge"] as Guid?;
+        //    if (fc_f.HasValue)
+        //    {
+        //        Guid? plPosRelation = newACMethod.ParameterValueList["PLPosRelation"] as Guid?;
+        //        if (plPosRelation.HasValue)
+        //        {
+        //            using (DatabaseApp dbApp = new DatabaseApp())
+        //            {
+        //                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
+        //                                                                                  .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
+        //                if (rel != null)
+        //                {
+        //                    Material mat = rel.SourceProdOrderPartslistPos.Material;
+        //                    if (mat != null)
+        //                    {
+        //                        FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
+        //                        if (fc != null)
+        //                        {
+        //                            if (fc.MaterialID != mat.MaterialID)
+        //                            {
+        //                                Messages.LogError(this.GetACUrl(), "Wrong quant(A20)", String.Format("Quant is wrong, ID:{0}, material ID: {1}, function state:{2}",
+        //                                                                                       fc.FacilityChargeID, mat.MaterialID, CurrentACState));
 
-                                        string stackTrace = System.Environment.StackTrace;
-                                        Messages.LogError(this.GetACUrl(), "Wrong quant(A21)", stackTrace);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                                string stackTrace = System.Environment.StackTrace;
+        //                                Messages.LogError(this.GetACUrl(), "Wrong quant(A21)", stackTrace);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion
 
@@ -681,36 +681,36 @@ namespace gip.mes.processapplication
                     if (fc_f.Value == Guid.Empty)
                     {
                         Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", "Quant is empty");
-                        if (ManualWeighingPW != null)
-                        {
-                            var temp = ManualWeighingPW.CurrentFacilityCharge;
-                            Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", String.Format("PW CurrentFacilityCharge is {0}", temp));
-                        }
+                        //if (ManualWeighingPW != null)
+                        //{
+                        //    var temp = ManualWeighingPW.CurrentFacilityCharge;
+                        //    Messages.LogError(this.GetACUrl(), "Wrong quant(A10)", String.Format("PW CurrentFacilityCharge is {0}", temp));
+                        //}
                     }
-                    else
-                    {
-                        using (DatabaseApp dbApp = new DatabaseApp())
-                        {
-                            ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
-                                                                                              .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
-                            if (rel != null)
-                            {
-                                Material mat = rel.SourceProdOrderPartslistPos.Material;
-                                if (mat != null)
-                                {
-                                    FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
-                                    if (fc != null)
-                                    {
-                                        if (fc.MaterialID != mat.MaterialID)
-                                        {
-                                            Messages.LogError(this.GetACUrl(), "Wrong quant(A15)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
-                                                                                                   fc.FacilityChargeID, mat.MaterialID));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    //else
+                    //{
+                    //    using (DatabaseApp dbApp = new DatabaseApp())
+                    //    {
+                    //        ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos.Material)
+                    //                                                                          .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelation.Value);
+                    //        if (rel != null)
+                    //        {
+                    //            Material mat = rel.SourceProdOrderPartslistPos.Material;
+                    //            if (mat != null)
+                    //            {
+                    //                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == fc_f.Value);
+                    //                if (fc != null)
+                    //                {
+                    //                    if (fc.MaterialID != mat.MaterialID)
+                    //                    {
+                    //                        Messages.LogError(this.GetACUrl(), "Wrong quant(A15)", String.Format("Quant is wrong, ID:{0}, material ID: {1}",
+                    //                                                                               fc.FacilityChargeID, mat.MaterialID));
+                    //                    }
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
                 return true;
             }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Objects;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -158,8 +159,6 @@ namespace gip.mes.processapplication
         private readonly ACMonitorObject _65001_CanStartFromBSOLock = new ACMonitorObject(65001);
 
         private readonly ACMonitorObject _65500_LotChangeLock = new ACMonitorObject(65500);
-
-        protected readonly ACMonitorObject _65003_IsAbortedLock = new ACMonitorObject(65003);
 
         private readonly ACMonitorObject _65025_MemberCompLock = new ACMonitorObject(65025);
         private readonly ACMonitorObject _65050_WeighingCompLock = new ACMonitorObject(65050);
@@ -1019,16 +1018,9 @@ namespace gip.mes.processapplication
             CurrentACMethod.ValueT = null;
             ClearMyConfiguration();
 
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _IsBinChangeActivated = false;
-            }
-
-            using (ACMonitor.Lock(_65003_IsAbortedLock))
-            {
-                _IsAborted = false;
-            }
-
+            _IsBinChangeActivated = false;
+            _IsAborted = false;
+            
             _IsLotChanged = false;
 
             base.SMIdle();
@@ -1400,10 +1392,7 @@ namespace gip.mes.processapplication
             ClearMyConfiguration();
             SetCanStartFromBSO(true);
 
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _IsBinChangeActivated = false;
-            }
+            _IsBinChangeActivated = false;
 
             using (ACMonitor.Lock(_65025_MemberCompLock))
             {
@@ -1502,9 +1491,9 @@ namespace gip.mes.processapplication
 
                     Guid? currentOpenMaterial = CurrentOpenMaterial;
 
-                    Guid? correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, currentACMethod);
-                    if (correctedFc.HasValue)
-                        currentFacilityCharge = correctedFc;
+                    //Guid? correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, currentACMethod);
+                    //if (correctedFc.HasValue)
+                    //    currentFacilityCharge = correctedFc;
 
                     var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentOpenMaterial, currentFacilityCharge, isForInterdischarge);
                     if (msgBooking != null)
@@ -1674,9 +1663,9 @@ namespace gip.mes.processapplication
                 msgSet = SetFacilityCharge(newFacilityCharge, currentOpenMaterial, forceSetFC_F, true);
             }
 
-            Guid? correctedFc = IsCurrentFacilityChargeCorrect(facilityCharge, currentOpenMaterial, currentACMethod);
-            if (correctedFc.HasValue)
-                facilityCharge = correctedFc;
+            //Guid? correctedFc = IsCurrentFacilityChargeCorrect(facilityCharge, currentOpenMaterial, currentACMethod);
+            //if (correctedFc.HasValue)
+            //    facilityCharge = correctedFc;
 
             if (actualWeight > 0.000001)
             {
@@ -1709,13 +1698,11 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 999)]
         public virtual void BinChange()
         {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                if (_IsBinChangeActivated)
-                    return;
 
-                _IsBinChangeActivated = true;
-            }
+            if (_IsBinChangeActivated)
+                return;
+
+            _IsBinChangeActivated = true;
 
             PAFManualWeighing pafManualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
             if (pafManualWeighing != null)
@@ -1799,13 +1786,11 @@ namespace gip.mes.processapplication
         {
             _ScaleComp = scaleComp;
             PAFManualWeighing paf = CurrentExecutingFunction<PAFManualWeighing>();
-            using (ACMonitor.Lock(_65003_IsAbortedLock))
-            {
-                if (_IsAborted)
-                    return;
-                _IsAborted = true;
-            }
 
+            if (_IsAborted)
+                return;
+            _IsAborted = true;
+            
             if (paf != null)
                 paf.Abort(isConsumed);
         }
@@ -3049,16 +3034,24 @@ namespace gip.mes.processapplication
                                         }
                                     }
 
-                                    var correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, parentACMethod);
-                                    if (correctedFc.HasValue)
-                                        currentFacilityCharge = correctedFc;
+                                    //var correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, parentACMethod);
+                                    //if (correctedFc.HasValue)
+                                    //    currentFacilityCharge = correctedFc;
 
                                     if (actWeight > 0.000001)
                                     {
+                                        //DateTime start = DateTime.Now;
+
                                         bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
                                         msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false,
                                                                       scaleOtherComp, targetQuantity);
                                         _ScaleComp = false;
+
+                                        //TimeSpan duration = DateTime.Now - start;
+                                        //if (duration.TotalSeconds > 2)
+                                        //{
+                                        //    Messages.LogMessage(eMsgLevel.Error, this.GetACUrl(), nameof(TaskCallback) + "(Perf10)", "The booking consumed: " + duration);
+                                        //}
                                     }
                                     else if (isWeighingInTol)
                                     {
@@ -3090,10 +3083,7 @@ namespace gip.mes.processapplication
                                 if (msg != null || function.CurrentACState == ACStateEnum.SMAborted ||
                                     (function.LastACState == ACStateEnum.SMResetting && function.CurrentACState == ACStateEnum.SMIdle && _IsAborted))
                                 {
-                                    using (ACMonitor.Lock(_65003_IsAbortedLock))
-                                    {
-                                        _IsAborted = false;
-                                    }
+                                    _IsAborted = false;
 
                                     Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
                                     if (msgResult != null)

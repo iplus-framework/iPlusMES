@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
+    <Compile Include="Manufacturing\BSOOperationLog.cs" />
     <Compile Include="Model\TimeFilterTypeEnum.cs" />
     <Compile Include="Model\BatchPlanProdOrderSortFilterEnum.cs" />
     <Compile Include="Manufacturing\BSOLabOrderMES.cs" />
