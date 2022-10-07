@@ -667,7 +667,7 @@ namespace gip.mes.facility
                 }
 
                 databaseApp.OutOrder.AddObject(outOrder);
-                databaseApp.SaveChanges();
+                databaseApp.ACSaveChanges();
 
                 msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50065", outOrder.OutOrderNo) };
             }
@@ -733,7 +733,7 @@ namespace gip.mes.facility
                     InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
                     invoice.InvoicePos_Invoice.Add(invoicePos);
                 }
-                databaseApp.SaveChanges();
+                databaseApp.ACSaveChanges();
                 msg = new Msg() { MessageLevel = eMsgLevel.Info, Message = Root.Environment.TranslateMessage(this, "Info50062", invoice.InvoiceNo) };
             }
             catch (Exception ec)
@@ -798,7 +798,7 @@ namespace gip.mes.facility
                     InvoicePos invoicePos = GetInvoicePos(databaseApp, invoice, nr, outOrderPos);
                     invoice.InvoicePos_Invoice.Add(invoicePos);
                 }
-                databaseApp.SaveChanges();
+                databaseApp.ACSaveChanges();
             }
             catch (Exception ec)
             {

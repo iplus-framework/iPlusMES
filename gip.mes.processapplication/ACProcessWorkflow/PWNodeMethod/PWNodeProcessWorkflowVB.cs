@@ -1327,7 +1327,7 @@ namespace gip.mes.processapplication
                     return;
                 }
 
-                //perfEvent = vbDump != null ? vbDump.PerfLogger.Start(loggerInstance, 100) : null;
+                //perfEvent = vbDump != null ? vbDump.PerfLoggerStart(loggerInstance, 100) : null;
 
                 bool canStartIfPredecessorIsStopping = this.CanStartIfPredecessorIsStopping;
                 bool compareOnlySameACIdentifers = CompareOnlySameACIdentifers;

@@ -219,10 +219,10 @@ namespace gip.mes.processapplication
             //string loggerInstance = rgx.Replace(this.GetACUrl(), "");
             //PerformanceEvent perfEvent = null;
 
-            //perfEvent = vbDump != null ? vbDump.PerfLogger.Start(loggerInstance, 200) : null;
+            //perfEvent = vbDump != null ? vbDump.PerfLoggerStart(loggerInstance, 200) : null;
             bool canBeStarted = CheckIfNextBatchCanBeStarted();
             //if (perfEvent != null)
-            //    vbDump.PerfLogger.Stop(loggerInstance, 200, perfEvent);
+            //    vbDump.PerfLoggerStop(loggerInstance, 200, perfEvent);
 
             if (!canBeStarted)
             {
@@ -348,11 +348,11 @@ namespace gip.mes.processapplication
                 double tolerance = intermediatePosition.TargetQuantityUOM * ProdOrderManager.TolRemainingCallQ * 0.01;
                 bool totalSizeReached;
 
-                //perfEvent = vbDump != null ? vbDump.PerfLogger.Start(loggerInstance, 202) : null;
+                //perfEvent = vbDump != null ? vbDump.PerfLoggerStart(loggerInstance, 202) : null;
                 NextBatchState nbResult = ManageStateAndGetNextBatchFromPlanEntry(intermediatePosition, currentProdOrderPartslist, dbApp, uncompletedBatchPlans, null, false, null, false,
                                                 out batchPlanEntry, out prevBatch, out nextBatchNo, out isLastBatch, out totalSizeReached, tolerance);
                 //if (perfEvent != null)
-                //    vbDump.PerfLogger.Stop(loggerInstance, 202, perfEvent);
+                //    vbDump.PerfLoggerStop(loggerInstance, 202, perfEvent);
 
                 // Falls Status eines BatchPlans auf ERledigt gesetzt wurde, dann erneut aktualisiseren
                 ReCreateBatchPlanningTimes(uncompletedBatchPlans);
@@ -378,10 +378,10 @@ namespace gip.mes.processapplication
                                 && prevBatch.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.InProduction)
                             {
 
-                                //perfEvent = vbDump != null ? vbDump.PerfLogger.Start(loggerInstance, 203) : null;
+                                //perfEvent = vbDump != null ? vbDump.PerfLoggerStart(loggerInstance, 203) : null;
                                 bool isStarted = CheckIfBatchIsStartedInSubWf(prevBatch.ProdOrderBatchID);
                                 //if (perfEvent != null)
-                                //    vbDump.PerfLogger.Stop(loggerInstance, 203, perfEvent);
+                                //    vbDump.PerfLoggerStop(loggerInstance, 203, perfEvent);
 
                                 if (!isStarted)
                                 {

@@ -8,6 +8,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.reporthandler;
+using System.Reflection;
 
 namespace gip.mes.facility
 {
@@ -299,6 +300,13 @@ namespace gip.mes.facility
         [ACMethodInfo("", "", 9999)]
         public ACMethodEventArgs BookFacility(ACMethodBooking BP, DatabaseApp dbApp)
         {
+            IRuntimeDump vbDump = Root?.VBDump;
+            PerformanceEvent performanceEvent = null;
+            if (vbDump != null)
+                performanceEvent = vbDump.PerfLoggerStart("\\LocalServiceObjects\\FacilityManager!BookFacility", 100);
+            else
+                performanceEvent = new PerformanceEvent(true);
+
             // TODO: Replace _ACMethodBooking and othe Memebers with a kind TransactionToken, so that BookFacility could be executed concurrently
             try
             {
@@ -308,8 +316,8 @@ namespace gip.mes.facility
 
                 if (BP.PartslistPos != null && BP.InwardFacility != null
                                             && BP.InwardAutoSplitQuant != null
-                                            && BP.InwardMaterial != null  
-                                            && BP.InwardSplitNo != null 
+                                            && BP.InwardMaterial != null
+                                            && BP.InwardSplitNo != null
                                             && BP.InwardFacilityLot != null
                                             && BP.InwardAutoSplitQuant > 0)
                 {
@@ -330,7 +338,7 @@ namespace gip.mes.facility
                     }
 
                     BP.InwardSplitNo = splitNo;
-                }    
+                }
 
                 ACMethodBooking bp = null;
                 ACMethodEventArgs validResult = OnValidateBooking(dbApp, BP, out bp);
@@ -387,6 +395,25 @@ namespace gip.mes.facility
                 if (e.InnerException != null && !String.IsNullOrEmpty(e.InnerException.Message))
                     BP.AddBookingMessage(ACMethodBooking.eResultCodes.TransactionError, e.InnerException.Message);
                 return new ACMethodEventArgs(BP, Global.ACMethodResultState.Failed);
+            }
+            finally
+            {
+                if (performanceEvent != null)
+                {
+                    bool? stoppedInTime = null;
+                    if (vbDump != null)
+                        stoppedInTime = vbDump.PerfLoggerStop("\\LocalServiceObjects\\FacilityManager!BookFacility", 100, performanceEvent);
+                    else
+                    {
+                        performanceEvent.Stop();
+                        stoppedInTime = performanceEvent.ElapsedMilliseconds > (vbDump != null ? vbDump.PerfTimeoutStackTrace : 2000);
+                    }
+                    if (stoppedInTime.HasValue && !stoppedInTime.Value)
+                    {
+                        string bpSerialized = ACConvert.ObjectToXML(BP, true);
+                        Messages.LogDebug("\\LocalServiceObjects\\FacilityManager", "BookFacility(Duration)", bpSerialized);
+                    }
+                }
             }
         }
 
