@@ -921,7 +921,7 @@ namespace gip.mes.processapplication
             try
             {
                 PWMethodVBBase rootPW = RootPW as PWMethodVBBase;
-                if (rootPW != null)
+                if (rootPW != null && this.ProdOrderManager != null)
                 {
                     MsgWithDetails saveMsg = this.ProdOrderManager.BalanceBackAndForeflushedStocks(rootPW.ACFacilityManager, dbApp, intermediatePosition.ProdOrderPartslist, true);
                     if (saveMsg != null)
@@ -929,6 +929,19 @@ namespace gip.mes.processapplication
                         Messages.LogError(this.GetACUrl(), nameof(DoFinalPostingsOnCompletedBatchPlan) + "(10)", saveMsg.InnerMessage);
                         OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(DoFinalPostingsOnCompletedBatchPlan), 1000), true);
                         dbApp.ACUndoChanges();
+                    }
+                    else
+                    {
+                        if (intermediatePosition.ProdOrderPartslist.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished)
+                        {
+                            saveMsg = ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, intermediatePosition.ProdOrderPartslist.ProdOrder, false);
+                            if (saveMsg != null)
+                            {
+                                Messages.LogError(this.GetACUrl(), nameof(DoFinalPostingsOnCompletedBatchPlan) + "(20)", saveMsg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(DoFinalPostingsOnCompletedBatchPlan), 1010), true);
+                                dbApp.ACUndoChanges();
+                            }
+                        }
                     }
                 }
             }
