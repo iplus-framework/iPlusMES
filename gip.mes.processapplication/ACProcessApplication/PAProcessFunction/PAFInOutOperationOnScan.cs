@@ -15,6 +15,8 @@ namespace gip.mes.processapplication
     {
         static string VMethodName_InOutOperationOnScan = "InOutOperationOnScan";
 
+        #region c'tors
+
         public PAFInOutOperationOnScan(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
@@ -24,6 +26,10 @@ namespace gip.mes.processapplication
             ACMethod.RegisterVirtualMethod(typeof(PAFInOutOperationOnScan), ACStateConst.TMStart, CreateVirtualMethod(VMethodName_InOutOperationOnScan,
                                            "en{'In/out operation on scan'}de{'Ein/Aus-Betrieb beim Scannen'}", typeof(PWWorkTaskGeneric)));
         }
+
+        #endregion
+
+        #region Methods
 
         [ACMethodAsync("Process", "en{'Start'}de{'Start'}", (short)MISort.Start, false)]
         public override ACMethodEventArgs Start(ACMethod acMethod)
@@ -372,6 +378,13 @@ namespace gip.mes.processapplication
                             inOperationLog.OperationState = (short)OperationLogStateEnum.Open;
                             inOperationLog.OperationTime = DateTime.Now;
 
+                            PAProcessModuleVB moduleVB = ParentACComponent as PAProcessModuleVB;
+
+                            if (moduleVB != null && moduleVB.CurrentProgramLog != null)
+                            {
+                                inOperationLog.ACProgramLogID = moduleVB.CurrentProgramLog.ACProgramLogID;
+                            }
+
                             dbApp.OperationLog.AddObject(inOperationLog);
 
                             Msg msg = dbApp.ACSaveChanges();
@@ -381,7 +394,6 @@ namespace gip.mes.processapplication
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                             }
                         }
-
                     }
 
                     // Info50086: Operation is successfully performed!
@@ -391,7 +403,6 @@ namespace gip.mes.processapplication
             }
             return resultSequence;
         }
-
 
         private BarcodeSequenceBase OutOperationOnScan(BarcodeSequenceBase resultSequence, DatabaseApp dbApp, OperationLog inOperationLog, Guid facilityChargeID, bool skipValidation = false)
         {
@@ -471,6 +482,7 @@ namespace gip.mes.processapplication
             outOperationLog.Operation = (short)OperationLogEnum.UnregisterEntityOnScan;
             outOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
             outOperationLog.OperationTime = DateTime.Now;
+            outOperationLog.ACProgramLogID = inOperationLog.ACProgramLogID;
 
             dbApp.OperationLog.AddObject(outOperationLog);
 
@@ -485,5 +497,7 @@ namespace gip.mes.processapplication
 
             return null;
         }
+
+        #endregion
     }
 }

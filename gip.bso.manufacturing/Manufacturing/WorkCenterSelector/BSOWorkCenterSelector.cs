@@ -337,7 +337,7 @@ namespace gip.bso.manufacturing
                 if (_VBUserList == null)
                 {
                     using(ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
-                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.ToArray();
+                        _VBUserList = DatabaseApp.ContextIPlus.VBUser.OrderBy(c => c.VBUserName).ToArray();
                 }
                 return _VBUserList;
             }
