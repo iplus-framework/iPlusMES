@@ -150,6 +150,20 @@ EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "gip.mes.sql", "gip.mes.sql\gip.mes.sql.sqlproj", "{D2F4E983-CF1F-4689-BF8D-4D56A6615491}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		gip.mes.webservices.shared\gip.mes.webservices.shared.projitems*{099caf77-67a9-4ed5-b5d9-8709796f3628}*SharedItemsImports = 4
+		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{0c232936-48b8-4ccd-951e-8ad3d439d264}*SharedItemsImports = 13
+		gip.mes.webservices.shared\gip.mes.webservices.shared.projitems*{1131f03b-f0f7-4ab7-ad22-8207d49c2e24}*SharedItemsImports = 13
+		..\iPlus\gip.core.datamodel.shared\gip.core.datamodel.shared.projitems*{16fb4111-5110-46e5-851d-38a4d7522f85}*SharedItemsImports = 4
+		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{47f013c1-e869-419e-8b17-c56313acc34b}*SharedItemsImports = 13
+		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{52dc947d-677d-42ca-bca6-153a4e027272}*SharedItemsImports = 4
+		gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems*{5a0c15dd-ad10-43e7-9113-c4fb1b92d3b9}*SharedItemsImports = 4
+		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{6d353dd2-970b-45bb-9ab6-d23a28e0233f}*SharedItemsImports = 13
+		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{7931f65b-3c2a-4db9-a5a6-4bc5b4d12c00}*SharedItemsImports = 4
+		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{893d3b1b-dc55-4684-8b5d-941f1049151b}*SharedItemsImports = 4
+		gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems*{ae832fbc-6e4e-4ad5-a2d6-04b45c1b1b5e}*SharedItemsImports = 13
+		..\iPlus\gip.core.datamodel.shared\gip.core.datamodel.shared.projitems*{fe279fba-181f-4d15-bbe8-8820caf186b2}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		DebugDiag|Any CPU = DebugDiag|Any CPU
@@ -556,19 +570,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3D892D3-D698-40B1-927D-CB943150F1E1}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		gip.mes.webservices.shared\gip.mes.webservices.shared.projitems*{099caf77-67a9-4ed5-b5d9-8709796f3628}*SharedItemsImports = 4
-		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{0c232936-48b8-4ccd-951e-8ad3d439d264}*SharedItemsImports = 13
-		gip.mes.webservices.shared\gip.mes.webservices.shared.projitems*{1131f03b-f0f7-4ab7-ad22-8207d49c2e24}*SharedItemsImports = 13
-		..\iPlus\gip.core.datamodel.shared\gip.core.datamodel.shared.projitems*{16fb4111-5110-46e5-851d-38a4d7522f85}*SharedItemsImports = 4
-		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{47f013c1-e869-419e-8b17-c56313acc34b}*SharedItemsImports = 13
-		gip.mes.facility.shared\gip.mes.facility.shared.projitems*{52dc947d-677d-42ca-bca6-153a4e027272}*SharedItemsImports = 4
-		gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems*{5a0c15dd-ad10-43e7-9113-c4fb1b92d3b9}*SharedItemsImports = 4
-		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{6d353dd2-970b-45bb-9ab6-d23a28e0233f}*SharedItemsImports = 13
-		..\iPlus\gip.core.webservices.shared\gip.core.webservices.shared.projitems*{7931f65b-3c2a-4db9-a5a6-4bc5b4d12c00}*SharedItemsImports = 4
-		..\iPlus\gip.core.autocomponent.shared\gip.core.autocomponent.shared.projitems*{893d3b1b-dc55-4684-8b5d-941f1049151b}*SharedItemsImports = 4
-		gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems*{ae832fbc-6e4e-4ad5-a2d6-04b45c1b1b5e}*SharedItemsImports = 13
-		..\iPlus\gip.core.datamodel.shared\gip.core.datamodel.shared.projitems*{fe279fba-181f-4d15-bbe8-8820caf186b2}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

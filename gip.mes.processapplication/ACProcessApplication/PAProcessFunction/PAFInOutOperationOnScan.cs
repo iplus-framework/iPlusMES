@@ -393,12 +393,12 @@ namespace gip.mes.processapplication
                                 resultSequence.Message = msg;
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                             }
+
+                            // Info50086: Input operation is successfully performed!
+                            resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50086");
+                            resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
                         }
                     }
-
-                    // Info50086: Operation is successfully performed!
-                    resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50086");
-                    resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
                 }
             }
             return resultSequence;
@@ -443,8 +443,8 @@ namespace gip.mes.processapplication
                     {
                         if (durationToCheck < minDuration)
                         {
-                            // The quant is not long enough in a object. Do you want to continue with a output operation?
-                            // Question50092: Kvant nije dovoljno dugo u objektu? Želite li ipak nastaviti s izlaznom operacijom? 
+                            // 
+                            // Question50092: The quant is not long enough in a object. Do you want to continue with a output operation?
                             resultSequence.QuestionSequence = 2;
                             resultSequence.Message = new Msg(this, eMsgLevel.Question, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(40)", 40, "Question50092", eMsgButton.YesNo);
                             return resultSequence;
@@ -455,7 +455,7 @@ namespace gip.mes.processapplication
                 ACValue maxDurationValue = acMethod.ParameterValueList.GetACValue("MaxDuration");
                 if (maxDurationValue == null)
                 {
-                    // Error50567 : Maximum duration setting is not exist.
+                    // Error50567: Maximum duration setting is not exist.
                     resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFInOutOperationOnScan), "OutOperationOnScan(50)", 50, "Error50567");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                 }
@@ -474,25 +474,15 @@ namespace gip.mes.processapplication
                 }
             }
 
-            inOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
-
-            OperationLog outOperationLog = OperationLog.NewACObject(dbApp, null);
-            outOperationLog.RefACClassID = this.ComponentClass.ACClassID;
-            outOperationLog.FacilityChargeID = facilityChargeID;
-            outOperationLog.Operation = (short)OperationLogEnum.UnregisterEntityOnScan;
-            outOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
-            outOperationLog.OperationTime = DateTime.Now;
-            outOperationLog.ACProgramLogID = inOperationLog.ACProgramLogID;
-
-            dbApp.OperationLog.AddObject(outOperationLog);
-
-            Msg msg = dbApp.ACSaveChanges();
+            Msg msg = OperationLog.CloseOperationLog(dbApp, inOperationLog);
             if (msg != null)
             {
                 resultSequence.Message = msg;
                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
             }
 
+            // Info50087: Output operation is successfully performed!
+            resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50087");
             resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
 
             return null;

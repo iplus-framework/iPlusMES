@@ -3,12 +3,14 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Operation logs'}de{'Betriebsprotokolle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOOperationLog : ACBSOvb
     {
         #region c'tors
@@ -22,15 +24,13 @@ namespace gip.bso.manufacturing
         {
             bool result = base.ACPostInit();
 
-            ProcessFunctionsList = BSOWorkCenterSelector.s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, nameof(gip.mes.processapplication.PAFInOutOperationOnScan), "")
-                                     .Distinct()
-                                     .ToList();
+            ProcessFunctionsList = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, nameof(gip.mes.processapplication.PAFInOutOperationOnScan))
+                                                        .ToList();
 
             if (ProcessFunctionsList != null && ProcessFunctionsList.Any())
             {
                 SelectedProcessFunction = ProcessFunctionsList.FirstOrDefault();
             }
-
 
             return result;
         }
@@ -40,7 +40,7 @@ namespace gip.bso.manufacturing
         #region Properties
 
         private core.datamodel.ACClass _SelectedProcessFunction;
-        
+        [ACPropertySelected(9999, "ProcessFunction", "en{'Selected process function'}de{'Ausgewählte Prozessfunktion'}")]
         public core.datamodel.ACClass SelectedProcessFunction
         {
             get => _SelectedProcessFunction;
@@ -65,7 +65,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<core.datamodel.ACClass> _ProcessFunctionsList;
-
+        [ACPropertyList(9999, "ProcessFunction")]
         public List<core.datamodel.ACClass> ProcessFunctionsList
         {
             get => _ProcessFunctionsList;
@@ -77,7 +77,7 @@ namespace gip.bso.manufacturing
         }
 
         private OperationLog _SelectedOperationLog;
-
+        [ACPropertySelected(9999, "OperationLog", "en{'Operation log'}de{'Betriebsprotokoll'}")]
         public OperationLog SelectedOperationLog
         {
             get => _SelectedOperationLog;
@@ -89,7 +89,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<OperationLog> _OperationLogList;
-
+        [ACPropertyList(9999, "OperationLog")]
         public List<OperationLog> OperationLogList
         {
             get => _OperationLogList;
@@ -106,22 +106,10 @@ namespace gip.bso.manufacturing
 
         #region Methods
 
-        [ACMethodInfo("", "en{'Close operation log'}de{'Close operation log'}", 9999, true)]
+        [ACMethodInfo("", "en{'Close operation'}de{'Close operation'}", 9999, true)]
         public void CloseSelectedOperationLog()
         {
-            SelectedOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
-
-            OperationLog outOperationLog = OperationLog.NewACObject(DatabaseApp, null);
-            outOperationLog.RefACClassID = this.ComponentClass.ACClassID;
-            outOperationLog.FacilityChargeID = SelectedOperationLog.FacilityChargeID;
-            outOperationLog.Operation = (short)OperationLogEnum.UnregisterEntityOnScan;
-            outOperationLog.OperationState = (short)OperationLogStateEnum.Closed;
-            outOperationLog.OperationTime = DateTime.Now;
-            outOperationLog.ACProgramLogID = SelectedOperationLog.ACProgramLogID;
-
-            DatabaseApp.OperationLog.AddObject(outOperationLog);
-
-            Msg msg = DatabaseApp.ACSaveChanges();
+            MsgWithDetails msg = OperationLog.CloseOperationLog(DatabaseApp, SelectedOperationLog);
             if (msg != null)
             {
                 Messages.Msg(msg);
@@ -141,5 +129,29 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        public static readonly Func<Database, string, IQueryable<gip.core.datamodel.ACClass>> s_cQry_GetRelevantPAProcessFunctions =
+CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
+    (ctx, pafACIdentifier) => ctx.ACClass.Where(c => (c.BasedOnACClassID.HasValue
+                                                    && (c.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 1. Ableitungsstufe
+                                                        || (c.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                && (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 2. Ableitungsstufe
+                                                                    || (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                                && (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier // 3. Ableitungsstufe
+                                                                                    || (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                                        && c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier) // 4. Ableitungsstufe
+                                                                                            || (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                                                && c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier) // 5. Ableitungsstufe
+                                                                                                    || (c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue
+                                                                                                    && c.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pafACIdentifier)
+                                                                                    )
+                                                                        )
+                                                                    )
+                                                            )
+                                                        )
+                                                    
+ 
+
+    ) && c.ACProject != null && c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application && c.ACStartTypeIndex == (short)Global.ACStartTypes.Automatic));
     }
 }
