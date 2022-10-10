@@ -1,17 +1,15 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.reporthandler;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading;
-using gip.core.reporthandler;
-using gip.mes.facility;
-using System.IO;
 using System.Linq;
-using System.Xml.Linq;
+using System.Threading;
 
 namespace gip.bso.test
 {
@@ -57,6 +55,43 @@ namespace gip.bso.test
                 if (_TestInput != value)
                 {
                     _TestInput = value;
+                    OnPropertyChanged(TestInput);
+                }
+            }
+        }
+
+        private string _TestInput1;
+        [ACPropertyInfo(999, "TestInput1", "en{'Test input1'}de{'Test input1'}")]
+        public string TestInput1
+        {
+            get
+            {
+                return _TestInput1;
+            }
+            set
+            {
+                if (_TestInput1 != value)
+                {
+                    _TestInput1 = value;
+                    OnPropertyChanged(TestInput1);
+                }
+            }
+        }
+
+        private string _TestInput2;
+        [ACPropertyInfo(999, "TestInput2", "en{'Test input2'}de{'Test input2'}")]
+        public string TestInput2
+        {
+            get
+            {
+                return _TestInput2;
+            }
+            set
+            {
+                if (_TestInput2 != value)
+                {
+                    _TestInput2 = value;
+                    OnPropertyChanged(TestInput2);
                 }
             }
         }
@@ -127,6 +162,8 @@ namespace gip.bso.test
         #endregion
 
         #region Methods
+
+        #region Methods -> BackgroudndWorker test
         [ACMethodInfo("RunTestWork", "en{'Test work'}de{'Test work'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void RunTestWork()
         {
@@ -148,21 +185,68 @@ namespace gip.bso.test
             ShowDialog(this, DesignNameProgressBar);
         }
 
-        [ACMethodInfo("TestMethod", "en{'Test'}de{'Test'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        #endregion
+
+        #region Methods -> Test Methods
+
+        [ACMethodInfo("TestMethod", "en{'TestMethod'}de{'TestMethod'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void TestMethod()
         {
-            Guid ID = Guid.Empty;
-            if (!string.IsNullOrEmpty(TestInput) && Guid.TryParse(TestInput, out ID))
+            if (!IsEnabledTestMethod())
+                return;
+
+        }
+
+        public bool IsEnabledTestMethod()
+        {
+            return true;
+        }
+
+        [ACMethodInfo("TestMethod1", "en{'TestMethod1'}de{'TestMethod1'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void TestMethod1()
+        {
+            if (!IsEnabledTestMethod1())
+                return;
+
+        }
+
+        public bool IsEnabledTestMethod1()
+        {
+            return true;
+        }
+
+        [ACMethodInfo("TestMethod2", "en{'TestMethod2'}de{'TestMethod2'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void TestMethod2()
+        {
+            if (!IsEnabledTestMethod2())
+                return;
+
+        }
+
+        public bool IsEnabledTestMethod2()
+        {
+            return true;
+        }
+
+
+        #region Methods -> Tests
+
+        public void TestACPrintManagerPrint(Guid ID)
+        {
+            ACComponent printManager = ACPrintManager.GetServiceInstance(this);
+            if (printManager != null && printManager.ConnectionState == ACObjectConnectionState.Connected)
             {
-                ACComponent printManager = ACPrintManager.GetServiceInstance(this);
-                if (printManager != null && printManager.ConnectionState == ACObjectConnectionState.Connected)
-                {
-                    PAOrderInfo pAOrderInfo = new PAOrderInfo();
-                    pAOrderInfo.Add(FacilityCharge.ClassName, ID);
-                    printManager.ACUrlCommand("!Print", pAOrderInfo, 1);
-                }
+                PAOrderInfo pAOrderInfo = new PAOrderInfo();
+                pAOrderInfo.Add(FacilityCharge.ClassName, ID);
+                printManager.ACUrlCommand("!Print", pAOrderInfo, 1);
             }
         }
+
+        #endregion
+
+
+        #endregion
+
         #endregion
 
         #region BackgroundWorker
@@ -333,8 +417,9 @@ namespace gip.bso.test
         }
         #endregion
 
+        #region Mario igra
 
-        #region Za igru Mario
+        #region Mario igra -> Methods
 
         /// <summary>
         /// Suggestion : use this while mail is stored on right place
@@ -475,8 +560,275 @@ namespace gip.bso.test
             bool saveSuccess = msgWithDetails.IsSucceded();
         }
 
+        public void TestUsingUserData()
+        {
+            List<ScoreBoard> list =
+                DatabaseApp
+                .CompanyAddress
+                .Where(c => c.GEO_x != null)
+                .Select(c => new ScoreBoard()
+                {
+                    Name = c.Company.CompanyPerson_Company
+                    .Where(x => x.Name3 == c.EMail)
+                    .Select(x => x.Name1)
+                    .FirstOrDefault(),
+                    Score = c.GEO_x.Value
+                })
+                .OrderByDescending(c => c.Score)
+                .ToList();
+        }
 
         #endregion
 
+        #region Mario igra -> ScoreBoard
+
+        private ScoreBoard _SelectedScoreBoard;
+        /// <summary>
+        /// Selected property for ScoreBoard
+        /// </summary>
+        /// <value>The selected ScoreBoard</value>
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: ScoreBoard'}de{'TODO: ScoreBoard'}")]
+        public ScoreBoard SelectedScoreBoard
+        {
+            get
+            {
+                return _SelectedScoreBoard;
+            }
+            set
+            {
+                if (_SelectedScoreBoard != value)
+                {
+                    _SelectedScoreBoard = value;
+                    OnPropertyChanged(nameof(SelectedScoreBoard));
+                }
+            }
+        }
+
+        private List<ScoreBoard> _ScoreBoardList;
+        /// <summary>
+        /// List property for ScoreBoard
+        /// </summary>
+        /// <value>The ScoreBoard list</value>
+        [ACPropertyList(9999, "PropertyGroupName")]
+        public List<ScoreBoard> ScoreBoardList
+        {
+            get
+            {
+                if (_ScoreBoardList == null)
+                    _ScoreBoardList = LoadScoreBoardList();
+                return _ScoreBoardList;
+            }
+        }
+        private List<ScoreBoard> LoadScoreBoardList()
+        {
+            return
+              DatabaseApp
+              .CompanyAddress
+              .Where(c => c.GEO_x != null)
+              .Select(c => new ScoreBoard()
+              {
+                  Name = c.Company.CompanyPerson_Company
+                  .Where(x => x.Name3 == c.EMail)
+                  .Select(x => x.Name1)
+                  .FirstOrDefault(),
+                  Score = c.GEO_x.Value
+              })
+              .OrderByDescending(c => c.Score)
+              .ToList();
+
+        }
+        #endregion
+
+        #endregion
+
+        #region RemoteFacilityManager
+
+        #region RemoteFacilityManager -> Properties
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _RemotePickingNo;
+        [ACPropertyInfo(999, "RemotePickingNo", "en{'Remote PickingNo'}de{'Remote PickngNo'}")]
+        public string RemotePickingNo
+        {
+            get
+            {
+                return _RemotePickingNo;
+            }
+            set
+            {
+                if (_RemotePickingNo != value)
+                {
+                    _RemotePickingNo = value;
+                    OnPropertyChanged(nameof(RemotePickingNo));
+                }
+            }
+        }
+
+        private RemoteFacilityManagerInfo _SelectedRemoteFacilityManagerInfo;
+        /// <summary>
+        /// Selected property for RemoteFacilityManagerInfo
+        /// </summary>
+        /// <value>The selected RemoteFacilityManagerInfo</value>
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: RemoteFacilityManagerInfo'}de{'TODO: RemoteFacilityManagerInfo'}")]
+        public RemoteFacilityManagerInfo SelectedRemoteFacilityManagerInfo
+        {
+            get
+            {
+                return _SelectedRemoteFacilityManagerInfo;
+            }
+            set
+            {
+                if (_SelectedRemoteFacilityManagerInfo != value)
+                {
+                    _SelectedRemoteFacilityManagerInfo = value;
+                    OnPropertyChanged(nameof(SelectedRemoteFacilityManagerInfo));
+                }
+            }
+        }
+
+
+        private List<RemoteFacilityManagerInfo> _RemoteFacilityManagerInfoList;
+        /// <summary>
+        /// List property for RemoteFacilityManagerInfo
+        /// </summary>
+        /// <value>The RemoteFacilityManagerInfo list</value>
+        [ACPropertyList(9999, "PropertyGroupName")]
+        public List<RemoteFacilityManagerInfo> RemoteFacilityManagerInfoList
+        {
+            get
+            {
+                if (_RemoteFacilityManagerInfoList == null)
+                    _RemoteFacilityManagerInfoList = LoadRemoteFacilityManagerInfoList();
+                return _RemoteFacilityManagerInfoList;
+            }
+        }
+
+        #endregion
+
+        #region RemoteFacilityManager -> Methods
+        /// <summary>
+        /// Source Property: ReciveRemotePicking
+        /// </summary>
+        [ACMethodInfo("RecieveRemotePicking", "en{'TODO:MethodName'}de{'TODO:MethodName'}", 999)]
+        public void RecieveRemotePicking()
+        {
+            if (!IsEnabledRecieveRemotePicking())
+                return;
+            CallRemoteFacilityManagerForPicking(SelectedRemoteFacilityManagerInfo.RemoteFacilityManager, RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
+        }
+
+        public bool IsEnabledRecieveRemotePicking()
+        {
+            return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
+        }
+
+        private List<RemoteFacilityManagerInfo> LoadRemoteFacilityManagerInfoList()
+        {
+            List<RemoteFacilityManagerInfo> rmList = new List<RemoteFacilityManagerInfo>();
+
+            List<RemoteFacilityManager> remoteFacilityManagers = new List<RemoteFacilityManager>();
+            IACComponent[] appManagers = Root.ACComponentChilds.Where(c => c is ApplicationManager || c is ApplicationManagerProxy).ToArray();
+            foreach (IACComponent appManager in appManagers)
+            {
+                RemoteFacilityManager remoteFacilityManager = appManager.FindChildComponents<RemoteFacilityManager>().FirstOrDefault();
+                if (remoteFacilityManager != null)
+                {
+                    remoteFacilityManagers.Add(remoteFacilityManager);
+                }
+            }
+
+            foreach (RemoteFacilityManager remoteFacilityManager in remoteFacilityManagers)
+            {
+                string connectionString = GetRemoteFacilityManagerConnectionString(remoteFacilityManager);
+
+                RemoteFacilityManagerInfo rm = new RemoteFacilityManagerInfo();
+                rm.ACUrl = remoteFacilityManager.ACUrl;
+                rm.RemoteConnString = GetRemoteFacilityManagerConnectionString(remoteFacilityManager);
+                rm.RemoteFacilityManager = remoteFacilityManager;
+                rmList.Add(rm);
+            }
+
+            return rmList;
+        }
+
+        private string GetRemoteFacilityManagerConnectionString(RemoteFacilityManager remoteFacilityManager1)
+        {
+            List<string> hierarchy = ACUrlHelper.ResolveParents(remoteFacilityManager1.ACUrl);
+            string remoteProxyACurl = hierarchy.FirstOrDefault();
+            if (String.IsNullOrEmpty(remoteProxyACurl))
+                return null;
+            ACComponent remoteAppManager = ACUrlCommand(remoteProxyACurl) as ACComponent;
+            if (remoteAppManager == null)
+                return null;
+            return remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
+        }
+
+        private void CallRemoteFacilityManagerForPicking(RemoteFacilityManager remoteFacilityManager, string pickingNo, string remoteConnString)
+        {
+
+            RemoteStorePostingData remoteStorePostingData = null;
+
+            Picking picking = null;
+
+            using (DatabaseApp remoteDbApp = new DatabaseApp(remoteConnString))
+            {
+                picking = remoteDbApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
+                if (picking != null)
+                {
+                    remoteStorePostingData = new RemoteStorePostingData();
+                    Guid[] faciltiyBookingIDs = picking.PickingPos_Picking.SelectMany(c => c.FacilityBooking_PickingPos).Select(c => c.FacilityBookingID).ToArray();
+                    Guid facilityID = Guid.Empty;
+                    foreach (PickingPos pickingPos in picking.PickingPos_Picking.ToArray())
+                    {
+                        if (pickingPos.FromFacility != null)
+                        {
+                            facilityID = pickingPos.FromFacility.FacilityID;
+                            break;
+                        }
+                        if (pickingPos.ToFacility != null)
+                        {
+                            facilityID = pickingPos.ToFacility.FacilityID;
+                            break;
+                        }
+                    }
+
+                    remoteStorePostingData.FBIds.Add(
+                        new RSPDEntry()
+                        {
+                            EntityType = nameof(Picking),
+                            KeyId = picking.PickingID
+                        });
+
+                    foreach (Guid id in faciltiyBookingIDs)
+                    {
+                        remoteStorePostingData.FBIds.Add(
+                        new RSPDEntry()
+                        {
+                            EntityType = nameof(FacilityBooking),
+                            KeyId = id
+                        });
+                    }
+                }
+
+
+                if (remoteStorePostingData != null)
+                {
+                    remoteFacilityManager.SynchronizeFacility(remoteFacilityManager.ACUrl, remoteConnString, remoteStorePostingData, false);
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+    }
+
+    public class ScoreBoard
+    {
+        public string Name { get; set; }
+        public int Score { get; set; }
     }
 }

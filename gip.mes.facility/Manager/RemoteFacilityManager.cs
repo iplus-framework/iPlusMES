@@ -188,7 +188,7 @@ namespace gip.mes.facility
 
         #region Booking and Picking-Sync -> SynchronizeFacility
 
-        protected void SynchronizeFacility(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting)
+        public void SynchronizeFacility(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting, bool syncRemoteStore = true)
         {
             try
             {
@@ -226,29 +226,34 @@ namespace gip.mes.facility
                         }
                     }
 
-                    if (!SynchronizeFacilityACClass(remoteStorePosting, dbLocal, remoteFacility, ref localFacility, addOrUpdateFacilityMD))
-                        return;
-
-                    if (remoteFacility == null)
+                    if (syncRemoteStore)
                     {
-                        remoteFacility = dbRemote.Facility
-                                        .Include(c => c.Facility1_ParentFacility)
-                                        .Where(c => c.FacilityID == localFacility.FacilityID)
-                                        .FirstOrDefault();
 
-                        // If local Facility doesn't have the same Guid as Remote
+                        if (!SynchronizeFacilityACClass(remoteStorePosting, dbLocal, remoteFacility, ref localFacility, addOrUpdateFacilityMD))
+                            return;
+
+
                         if (remoteFacility == null)
                         {
                             remoteFacility = dbRemote.Facility
                                             .Include(c => c.Facility1_ParentFacility)
-                                            .Where(c => c.FacilityNo == localFacility.FacilityNo
-                                                        && c.Facility1_ParentFacility != null
-                                                        && c.Facility1_ParentFacility.FacilityNo == localFacility.Facility1_ParentFacility.FacilityNo)
+                                            .Where(c => c.FacilityID == localFacility.FacilityID)
                                             .FirstOrDefault();
+
+                            // If local Facility doesn't have the same Guid as Remote
+                            if (remoteFacility == null)
+                            {
+                                remoteFacility = dbRemote.Facility
+                                                .Include(c => c.Facility1_ParentFacility)
+                                                .Where(c => c.FacilityNo == localFacility.FacilityNo
+                                                            && c.Facility1_ParentFacility != null
+                                                            && c.Facility1_ParentFacility.FacilityNo == localFacility.Facility1_ParentFacility.FacilityNo)
+                                                .FirstOrDefault();
+                            }
                         }
+                        if (remoteFacility == null)
+                            return;
                     }
-                    if (remoteFacility == null)
-                        return;
 
                     //remoteStorePosting.FacilityUrlOfRecipient
                     List<FacilityCharge> changedRemoteFCs = new List<FacilityCharge>();
@@ -490,8 +495,8 @@ namespace gip.mes.facility
                     if (localLot == null)
                     {
                         localLot = changedRemoteFC.FacilityLot.Clone(true) as FacilityLot;
-                        int countExisting = dbLocal.FacilityLot.Where(c=>c.LotNo == changedRemoteFC.FacilityLot.LotNo).Count();
-                        if(countExisting > 0)
+                        int countExisting = dbLocal.FacilityLot.Where(c => c.LotNo == changedRemoteFC.FacilityLot.LotNo).Count();
+                        if (countExisting > 0)
                         {
                             localLot.LotNo = localLot.LotNo + string.Format(@"-{0}", countExisting);
                         }
