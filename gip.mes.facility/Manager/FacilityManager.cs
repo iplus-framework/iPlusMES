@@ -400,15 +400,14 @@ namespace gip.mes.facility
             {
                 if (performanceEvent != null)
                 {
-                    bool? stoppedInTime = null;
                     if (vbDump != null)
-                        stoppedInTime = vbDump.PerfLoggerStop("\\LocalServiceObjects\\FacilityManager!BookFacility", 100, performanceEvent);
+                        vbDump.PerfLoggerStop("\\LocalServiceObjects\\FacilityManager!BookFacility", 100, performanceEvent);
                     else
                     {
                         performanceEvent.Stop();
-                        stoppedInTime = performanceEvent.ElapsedMilliseconds > (vbDump != null ? vbDump.PerfTimeoutStackTrace : 2000);
+                        performanceEvent.CalculateTimeout(vbDump != null ? vbDump.PerfTimeoutStackTrace : 2000);
                     }
-                    if (stoppedInTime.HasValue && !stoppedInTime.Value)
+                    if (performanceEvent.IsTimedOut)
                     {
                         string bpSerialized = ACConvert.ObjectToXML(BP, true);
                         Messages.LogDebug("\\LocalServiceObjects\\FacilityManager", "BookFacility(Duration)", bpSerialized);
