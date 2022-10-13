@@ -95,9 +95,17 @@ namespace gip.mes.processapplication
         public bool IsTargetFunction(PAFWorkTaskScanBase pafTSC)
         {
             core.datamodel.ACClass pafClass = null;
-            using (ACMonitor.Lock(this.ContextLockForACClassWF))
+            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+            if (refPAACClassMethod == null)
+                return false;
+            if (refPAACClassMethod.AttachedFromACClassReference.IsLoaded)
+                pafClass = refPAACClassMethod.AttachedFromACClassReference.Value;
+            if (pafClass == null)
             {
-                pafClass = ContentACClassWF?.RefPAACClassMethod?.AttachedFromACClass;
+                using (ACMonitor.Lock(this.ContextLockForACClassWF))
+                {
+                    pafClass = refPAACClassMethod.AttachedFromACClass;
+                }
             }
             if (pafClass == null || pafClass.ObjectType == null || pafTSC.ComponentClass.ObjectType == null)
                 return false;
@@ -150,27 +158,36 @@ namespace gip.mes.processapplication
                 if (currentProgramLog != null)
                 {
                     core.datamodel.ACProgram acProgram = null;
-                    ACClassTaskQueue.TaskQueue.ProcessAction(() =>
+                    if (currentProgramLog.ACProgramReference.IsLoaded)
+                        acProgram = currentProgramLog.ACProgramReference.Value;
+                    if (acProgram == null)// && (currentProgramLog.EntityState == System.Data.EntityState.Added || currentProgramLog.EntityState == System.Data.EntityState.Detached))
+                        acProgram = currentProgramLog.NewACProgramForQueue;
+                    if (acProgram == null)
                     {
-                        acProgram = currentProgramLog.ACProgram;
-                    });
+                        ACClassTaskQueue.TaskQueue.ProcessAction(() =>
+                        {
+                            acProgram = currentProgramLog.ACProgram;
+                        });
+                    }
+                    if (acProgram == null && currentProgramLog.ACProgramID != Guid.Empty)
+                        acProgram = ACClassTaskQueue.TaskQueue.ProgramCache.GetProgram(currentProgramLog.ACProgramID);
 
                     core.datamodel.ACProgramLog subProgramLog = null;
                     Guid componentClassID = invoker.ComponentClass.ACClassID;
-                    ACClassTaskQueue.TaskQueue.ProcessAction(() =>
-                    {
-                        subProgramLog = core.datamodel.ACProgramLog.NewACObject(ACClassTaskQueue.TaskQueue.Context, acProgram);
+                    //ACClassTaskQueue.TaskQueue.ProcessAction(() =>
+                    //{
+                        subProgramLog = core.datamodel.ACProgramLog.NewACObject(ACClassTaskQueue.TaskQueue.Context, null);
                         subProgramLog.ACProgramLog1_ParentACProgramLog = currentProgramLog;
                         subProgramLog.ACProgram = acProgram;
                         subProgramLog.ACUrl = invoker.GetACUrl();
                         subProgramLog.ACClassID = componentClassID;
                         if (acMethod != null)
                             subProgramLog.XMLConfig = ACConvert.ObjectToXML(acMethod, true);
-                        else
+                        if (currentProgramLog.XMLConfig == null)
                             subProgramLog.XMLConfig = "";
                         subProgramLog.StartDate = DateTime.Now;
-                    }
-                    );
+                    //}
+                    //);
 
                     //ACClassTaskQueue.TaskQueue.ProgramCache.AddProgramLog(subProgramLog);
 

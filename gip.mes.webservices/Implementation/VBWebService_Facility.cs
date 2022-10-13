@@ -1487,20 +1487,31 @@ namespace gip.mes.webservices
                 return error;
             }
 
+            PerformanceEvent perfEvent110 = null;
+            PerformanceEvent perfEvent120 = null;
+            PerformanceEvent perfEvent130 = null;
+            PerformanceEvent perfEvent140 = null;
+            PerformanceEvent perfEvent150 = null;
             MsgWithDetails msgWithDetails = null;
             try
             {
                 datamodel.PickingPos pickingPos = null;
                 if (bpParam.PickingPosID.HasValue)
+                {
+                    perfEvent110 = myServiceHost.OnMethodCalled(nameof(BookFacility), 110);
                     pickingPos = dbApp.PickingPos
                                         .Include(c => c.InOrderPos)
                                         .Include(c => c.OutOrderPos)
                                         .Include(c => c.Picking)
                                         .FirstOrDefault(c => c.PickingPosID == bpParam.PickingPosID.Value);
+                    myServiceHost.OnMethodReturned(perfEvent110, nameof(BookFacility), 110);
+                    perfEvent110 = null;
+                }
                 facility.ACMethodBooking acParam = null;
                 FacilityPreBooking preBooking = null;
                 if (pickingPos != null)
                 {
+                    perfEvent120 = myServiceHost.OnMethodCalled(nameof(BookFacility), 120);
                     preBooking = pickingPos.FacilityPreBooking_PickingPos.FirstOrDefault();
                     if (preBooking == null && pickingPos.InOrderPos != null)
                         preBooking = pickingPos.InOrderPos.FacilityPreBooking_InOrderPos.FirstOrDefault();
@@ -1508,13 +1519,23 @@ namespace gip.mes.webservices
                         preBooking = pickingPos.OutOrderPos.FacilityPreBooking_OutOrderPos.FirstOrDefault();
                     if (preBooking != null)
                         acParam = preBooking.ACMethodBooking.Clone() as facility.ACMethodBooking;
+                    myServiceHost.OnMethodReturned(perfEvent120, nameof(BookFacility), 120);
+                    perfEvent120 = null;
                 }
 
                 if (acParam == null)
                 {
+                    perfEvent130 = myServiceHost.OnMethodCalled(nameof(BookFacility), 130);
                     acParam = facManager.ACUrlACTypeSignature("!" + bpParam.VirtualMethodName, gip.core.datamodel.Database.GlobalDatabase) as facility.ACMethodBooking;
+                    myServiceHost.OnMethodReturned(perfEvent130, nameof(BookFacility), 130);
+                    perfEvent130 = null;
                     if (pickingPos != null && facManager != null)
+                    {
+                        perfEvent140 = myServiceHost.OnMethodCalled(nameof(BookFacility), 140);
                         facManager.InitBookingParamsFromTemplate(acParam, pickingPos, preBooking);
+                        myServiceHost.OnMethodReturned(perfEvent140, nameof(BookFacility), 140);
+                        perfEvent140 = null;
+                    }
                 }
 
                 if (pickingPos != null)
@@ -1524,6 +1545,7 @@ namespace gip.mes.webservices
                     acParam.OutOrderPos = pickingPos.OutOrderPos;
                 }
 
+                perfEvent150 = myServiceHost.OnMethodCalled(nameof(BookFacility), 150);
                 acParam.ShiftBookingReverse = bpParam.ShiftBookingReverse;
                 acParam.DontAllowNegativeStock = bpParam.DontAllowNegativeStock;
                 acParam.IgnoreManagement = bpParam.IgnoreManagement;
@@ -1618,6 +1640,8 @@ namespace gip.mes.webservices
                 acParam.Comment = bpParam.Comment;
                 acParam.RecipeOrFactoryInfo = bpParam.RecipeOrFactoryInfo;
                 acParam.PropertyACUrl = bpParam.PropertyACUrl;
+                myServiceHost.OnMethodReturned(perfEvent150, nameof(BookFacility), 150);
+                perfEvent150 = null;
 
                 msgWithDetails = OnBookWithFacilityManager(bpParam, acParam, dbApp, facManager, myServiceHost);
             }
@@ -1628,6 +1652,19 @@ namespace gip.mes.webservices
                 msgWithDetails = new MsgWithDetails();
                 msgWithDetails.AddDetailMessage(new Msg(eMsgLevel.Exception, e.Message));
                 return msgWithDetails;
+            }
+            finally
+            {
+                if (perfEvent110 != null)
+                    myServiceHost.OnMethodReturned(perfEvent110, nameof(BookFacility), 110);
+                if (perfEvent120 != null)
+                    myServiceHost.OnMethodReturned(perfEvent110, nameof(BookFacility), 120);
+                if (perfEvent130 != null)
+                    myServiceHost.OnMethodReturned(perfEvent110, nameof(BookFacility), 130);
+                if (perfEvent140 != null)
+                    myServiceHost.OnMethodReturned(perfEvent110, nameof(BookFacility), 140);
+                if (perfEvent150 != null)
+                    myServiceHost.OnMethodReturned(perfEvent110, nameof(BookFacility), 150);
             }
             return msgWithDetails;
         }

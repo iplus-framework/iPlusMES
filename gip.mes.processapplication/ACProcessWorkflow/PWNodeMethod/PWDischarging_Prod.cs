@@ -253,12 +253,9 @@ namespace gip.mes.processapplication
                             return StartDisResult.CycleWait;
                         }
 
-                        core.datamodel.ACClassMethod refPAACClassMethod = null;
-
-                        using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                        {
-                            refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                        }
+                        core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                        if (refPAACClassMethod == null)
+                            return StartDisResult.CancelDischarging;
 
                         ACMethod acMethod = refPAACClassMethod.TypeACSignature();
                         if (acMethod == null)
@@ -430,12 +427,9 @@ namespace gip.mes.processapplication
                             // Falls ein Ziel ermittelt werden konnte
                             if (dischargeToModule != null)
                             {
-                                core.datamodel.ACClassMethod refPAACClassMethod = null;
-
-                                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                                {
-                                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                                }
+                                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                                if (refPAACClassMethod == null)
+                                    return StartDisResult.CancelDischarging;
 
                                 ACMethod acMethod = refPAACClassMethod.TypeACSignature();
                                 if (acMethod == null)
@@ -1003,12 +997,9 @@ namespace gip.mes.processapplication
                     }
                     if (acMethod == null)
                     {
-                        core.datamodel.ACClassMethod refPAACClassMethod = null;
-
-                        using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                        {
-                            refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                        }
+                        core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                        if (refPAACClassMethod == null)
+                            return StartDisResult.CancelDischarging;
                         acMethod = refPAACClassMethod.TypeACSignature();
                         if (acMethod == null)
                         {

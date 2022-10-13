@@ -816,15 +816,7 @@ namespace gip.mes.processapplication
                 return;
             }
 
-            core.datamodel.ACClassMethod refPAACClassMethod = null;
-            if (this.ContentACClassWF != null)
-            {
-
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
-            }
+            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
 
             if (pwGroup != null
                 && this.ContentACClassWF != null

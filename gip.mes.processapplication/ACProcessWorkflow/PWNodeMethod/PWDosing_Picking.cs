@@ -282,14 +282,9 @@ namespace gip.mes.processapplication
                     return StartNextCompResult.CycleWait;
                 }
 
-
-                gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
-
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
-
+                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                if (refPAACClassMethod == null)
+                    return StartNextCompResult.Done;
 
                 ACMethod acMethod = refPAACClassMethod.TypeACSignature();
                 if (acMethod == null)

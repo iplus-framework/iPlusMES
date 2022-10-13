@@ -109,13 +109,7 @@ namespace gip.mes.processapplication
             if (pwGroup != null
                 && this.ContentACClassWF != null)
             {
-                ACClassMethod refPAACClassMethod = null;
-
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
-
+                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
                 if (refPAACClassMethod != null)
                 {
                     PAProcessModule module = null;

@@ -217,20 +217,13 @@ namespace gip.mes.processapplication
                     var processModule = ParentPWGroup?.AccessedProcessModule;
                     if (processModule != null)
                     {
-                        core.datamodel.ACClassMethod refPAACClassMethod = null;
-                        if (this.ContentACClassWF != null)
-                        {
-
-                            using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                            {
-                                refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                            }
-                        }
-
-                        ACMethod acMethod = refPAACClassMethod.TypeACSignature();
+                        core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                        if (refPAACClassMethod == null)
+                            return null;
+                        //ACMethod acMethod = refPAACClassMethod.TypeACSignature();
 
                         PAProcessFunction paProcessFunction = null;
-                        processModule.GetACStateOfFunction(acMethod.ACIdentifier, out paProcessFunction);
+                        processModule.GetACStateOfFunction(refPAACClassMethod.ACIdentifier, out paProcessFunction);
 
                         IPAFuncScaleConfig function = paProcessFunction as IPAFuncScaleConfig;
                         if (function != null)
@@ -299,16 +292,7 @@ namespace gip.mes.processapplication
                 ScaleWeightOnStart = CheckScale.ActualValue.ValueT;
             }
 
-            core.datamodel.ACClassMethod refPAACClassMethod = null;
-            if (this.ContentACClassWF != null)
-            {
-
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
-            }
-
+            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
             ACMethod acMethod = refPAACClassMethod.TypeACSignature();
             if (acMethod == null)
             {
@@ -452,15 +436,7 @@ namespace gip.mes.processapplication
             else
             {
 
-                core.datamodel.ACClassMethod refPAACClassMethod = null;
-                if (this.ContentACClassWF != null)
-                {
-                    using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                    {
-                        refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                    }
-                }
-
+                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
                 ACMethod acMethod = refPAACClassMethod.TypeACSignature();
 
                 PAProcessFunction responsibleFunc = CanStartProcessFunc(module, acMethod);

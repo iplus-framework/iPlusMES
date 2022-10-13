@@ -1039,16 +1039,7 @@ namespace gip.mes.processapplication
                 return;
             }
 
-            core.datamodel.ACClassMethod refPAACClassMethod = null;
-            if (this.ContentACClassWF != null)
-            {
-
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
-            }
-
+            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
             if (pwGroup != null
                 && this.ContentACClassWF != null
                 && refPAACClassMethod != null)
@@ -2283,13 +2274,8 @@ namespace gip.mes.processapplication
             PAFManualWeighing manWeigh = CurrentExecutingFunction<PAFManualWeighing>();
             if (manWeigh == null)
             {
-                gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
-
-                ACMethod acMethod = refPAACClassMethod.TypeACSignature();
+                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                ACMethod acMethod = refPAACClassMethod?.TypeACSignature();
                 if (acMethod != null)
                 {
                     PAProcessModule module = ParentPWGroup.AccessedProcessModule;
@@ -2732,14 +2718,8 @@ namespace gip.mes.processapplication
                 DoAutoInsertQuantToStore(weighingComponent);
             }
 
-            gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
-            using (ACMonitor.Lock(this.ContextLockForACClassWF))
-            {
-                refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-            }
-
-            ACMethod acMethod = refPAACClassMethod.TypeACSignature();
-
+            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+            ACMethod acMethod = refPAACClassMethod?.TypeACSignature();
             if (acMethod == null)
             {
                 //Error50281: acMethod is null.

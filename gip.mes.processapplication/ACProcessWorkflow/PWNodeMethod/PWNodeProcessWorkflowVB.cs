@@ -1295,7 +1295,9 @@ namespace gip.mes.processapplication
             }
 
             if (   !Root.Initialized
-                || (RootPW != null && RootPW.IsStartingProcessFunction))
+                || (    RootPW != null 
+                    && (   RootPW.IsStartingProcessFunction 
+                        || RootPW.CurrentACState <= ACStateEnum.SMStarting)))
             {
                 SubscribeToProjectWorkCycle();
                 return;
@@ -1308,12 +1310,7 @@ namespace gip.mes.processapplication
 
             if (!IgnoreFIFO && !WillReadAndStartNextBatchCompleteNode())
             {
-                gip.core.datamodel.ACClass refPAAClass = null;
-
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAAClass = this.ContentACClassWF.RefPAACClass;
-                }
+                gip.core.datamodel.ACClass refPAAClass = RefACClassOfContentWF;
 
                 if (refPAAClass == null)
                 {
@@ -1339,11 +1336,12 @@ namespace gip.mes.processapplication
                 {
                     query = query.Where(c => c.InitState == ACInitState.Initialized);
                     Func<PWNodeProcessWorkflowVB, bool> safeAccessToAppDefinition = (c) => {
-                        using (ACMonitor.Lock(ContextLockForACClassWF))
-                        {
-                            return     c.ContentACClassWF.RefPAACClass != null
-                                    && c.ContentACClassWF.RefPAACClass.ACProjectID == refPAAClass.ACProjectID;
-                        }
+                        return RefACClassOfContentWF?.ACProjectID == refPAAClass.ACProjectID;
+                        //using (ACMonitor.Lock(ContextLockForACClassWF))
+                        //{
+                        //    return     c.ContentACClassWF.RefPAACClass != null
+                        //            && c.ContentACClassWF.RefPAACClass.ACProjectID == refPAAClass.ACProjectID;
+                        //}
                     };
 
                     // Search for other Planning-Nodes which can be considered for priorization
@@ -1378,6 +1376,12 @@ namespace gip.mes.processapplication
 
                     // Determine the Application-Project, where Subworkflow must be started depending on the Routing-Rules (Which Production-Line) 
                     var thisAppProject4Starting = this.FirstInvokableTaskExecutor;
+                    // If this Reference is null, then ConfigStores are not loaded completely => wait!
+                    if (thisAppProject4Starting == null)
+                    {
+                        SubscribeToProjectWorkCycle();
+                        return;
+                    }
 
                     // Make a priorized List that's sorted by PriorityTime
                     // Consider only the not started nodes (IterationCount.ValueT <= 0) and which are active (This means: Ignore Planing nodes that are completed (IterationCount.ValueT >= 1)

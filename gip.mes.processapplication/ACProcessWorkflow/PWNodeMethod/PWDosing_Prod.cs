@@ -141,16 +141,12 @@ namespace gip.mes.processapplication
                                     continue;
 
                                 PAProcessFunction responsibleFunc = null;
-                                gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
-                                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                                {
-                                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                                }
+                                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                                if (refPAACClassMethod == null)
+                                    return true;
                                 ACMethod acMethod = refPAACClassMethod.TypeACSignature();
                                 if (acMethod == null)
-                                {
                                     return true;
-                                }
 
                                 IList<Facility> possibleSilos;
 
@@ -422,12 +418,8 @@ namespace gip.mes.processapplication
                             }
 
                             PAProcessFunction responsibleFunc = null;
-                            gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
-                            using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                            {
-                                refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                            }
-                            ACMethod acMethod = refPAACClassMethod.TypeACSignature();
+                            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                            ACMethod acMethod = refPAACClassMethod?.TypeACSignature();
                             if (acMethod == null)
                             {
                                 //Error50154: acMethod is null.
@@ -530,7 +522,8 @@ namespace gip.mes.processapplication
                                                                                                 && (c as PWDosing).ContentACClassWF != null
                                                                                                 && otherDosingNodes.Contains((c as PWDosing).ContentACClassWF.ACClassWFID)
                                                                                                 && (   (c as PWDosing).IterationCount.ValueT <= 0 
-                                                                                                    || ((c as PWDosing).ParentPWGroup != null && (c as PWDosing).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
+                                                                                                    || (   (c as PWDosing).ParentPWGroup != null 
+                                                                                                        && (c as PWDosing).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
                                                                                                 /*&& (c.CurrentACState == PABaseState.SMIdle || c.CurrentACState == PABaseState.SMBreakPoint)*/);
                                     // Remove potential WFNodes which are out of the SequenceRange
                                     if (otherDosingWFs.Any())

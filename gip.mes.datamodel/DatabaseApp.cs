@@ -18,7 +18,7 @@ namespace gip.mes.datamodel
     {
         public static TEntityApp FromAppContext<TEntityApp>(this EntityObject entityIPlus, DatabaseApp dbApp) where TEntityApp : EntityObject
         {
-            if (entityIPlus == null || dbApp == null)
+            if (entityIPlus == null || entityIPlus.EntityKey == null || dbApp == null)
                 return default(TEntityApp);
             EntityKey key = new EntityKey(dbApp.DefaultContainerName + "." + entityIPlus.EntityKey.EntitySetName, entityIPlus.EntityKey.EntityKeyValues);
             //key.EntityContainerName = entityApp.DefaultContainerName;

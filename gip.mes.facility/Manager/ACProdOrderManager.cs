@@ -3173,14 +3173,18 @@ namespace gip.mes.facility
             {
                 saveMsg = databaseApp.ACSaveChanges();
             }
-            if (calcMsg != null)
+            if (calcMsg != null && calcMsg.MsgDetailsCount > 0)
             {
                 msg.AddDetailMessage(calcMsg);
             }
-            if (saveMsg != null)
+            if (saveMsg != null && saveMsg.MsgDetailsCount > 0)
             {
                 msg.AddDetailMessage(saveMsg);
             }
+            if (msg == null)
+                return null;
+            if (msg.MsgDetailsCount <= 0)
+                return null;
             return msg;
         }
 
@@ -3200,7 +3204,7 @@ namespace gip.mes.facility
             if (finalPartslist != null)
             {
                 MsgWithDetails plMsg = CalculateStatistics(databaseApp, finalPartslist, finalPartslist);
-                if (plMsg != null)
+                if (plMsg != null && plMsg.MsgDetailsCount > 0)
                 {
                     msg.AddDetailMessage(plMsg);
                 }
@@ -3211,11 +3215,15 @@ namespace gip.mes.facility
                 if (pl == finalPartslist)
                     continue;
                 MsgWithDetails plMsg = CalculateStatistics(databaseApp, pl, finalPartslist);
-                if (plMsg != null)
+                if (plMsg != null && plMsg.MsgDetailsCount > 0)
                 {
                     msg.AddDetailMessage(plMsg);
                 }
             }
+            if (msg == null)
+                return null;
+            if (msg.MsgDetailsCount <= 0)
+                return null;
             return msg;
         }
 
@@ -3305,6 +3313,10 @@ namespace gip.mes.facility
 
             CalculateStatisticProdPlPerAvg(prodOrderPartslist, components);
 
+            if (msg == null)
+                return null;
+            if (msg.MsgDetailsCount <= 0)
+                return null;
             return msg;
         }
 

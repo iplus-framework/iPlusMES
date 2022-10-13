@@ -366,12 +366,9 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
 
-            gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
-
-            using (ACMonitor.Lock(this.ContextLockForACClassWF))
-            {
-                refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-            }
+            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+            if (refPAACClassMethod == null)
+                return StartDisResult.CancelDischarging;
 
             ACMethod acMethod = refPAACClassMethod.TypeACSignature();
             if (acMethod == null)
@@ -666,12 +663,10 @@ namespace gip.mes.processapplication
             }
             if (acMethod == null)
             {
-                gip.core.datamodel.ACClassMethod refPAACClassMethod = null;
+                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                if (refPAACClassMethod == null)
+                    return StartDisResult.CancelDischarging;
 
-                using (ACMonitor.Lock(this.ContextLockForACClassWF))
-                {
-                    refPAACClassMethod = this.ContentACClassWF.RefPAACClassMethod;
-                }
                 acMethod = refPAACClassMethod.TypeACSignature();
                 if (acMethod == null)
                 {
