@@ -169,6 +169,22 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Methods
+
+        public Msg RunManualWeighing()
+        {
+            if (!CanStart())
+            {
+                return new Msg(eMsgLevel.Error, "Can't start Manual weighing function!");
+            }
+
+            if (!CheckInToleranceOnlyManuallyAddedQuantity)
+                DetermineTargetScaleObject();
+
+            CurrentACState = ACStateEnum.SMRunning;
+
+            return null;
+        }
+
         private bool OccupyAndSetActiveScaleObject(PAEScaleGravimetric scale)
         {
             if (scale == null)
@@ -659,7 +675,10 @@ namespace gip.mes.processapplication
             SubscribeToProjectWorkCycle();
 
             if (!CanStart())
+            {
+                UnSubscribeToProjectWorkCycle();
                 return;
+            }
 
             if (!CheckInToleranceOnlyManuallyAddedQuantity)
                 DetermineTargetScaleObject();

@@ -659,7 +659,7 @@ namespace gip.mes.processapplication
                     intermediateChildPos = IntermediateChildPos;
                 }
 
-                if (intermediateChildPos != null)
+                if (intermediateChildPos != null && weighingComponentsInfo != null)
                 {
                     weighingComponentsInfo.Add(intermediateChildPos.ProdOrderPartslistPosID.ToString(), null);
                 }
@@ -673,27 +673,6 @@ namespace gip.mes.processapplication
             get;
             set;
         }
-
-        ////public virtual Func<IEnumerable<Facility>, Guid?, IEnumerable<FacilityCharge>> FacilityChargeListQuery
-        ////{
-        ////    get
-        ////    {
-        ////        return (facility, matID) => facility.SelectMany(c => c.FacilityCharge_Facility)
-        ////                                            .Where(x => !x.NotAvailable && (matID == null || x.MaterialID == matID)
-        ////                                                                        && (x.MDReleaseStateID == null || x.MDReleaseStateID == _AbsFreeMDReleaseStateID
-        ////                                                                                                       || x.MDReleaseStateID == _FreeMDReleaseStateID))
-        ////                                            .ToArray().OrderBy(o => o.ExpirationDate);
-        ////    }
-        ////}
-
-        //public virtual Func<IEnumerable<Facility>, Guid[], IEnumerable<Facility>> FacilityListQuery
-        //{
-        //    get
-        //    {
-        //        return (fc, a) => fc.Where(c => !c.NotAvailable && a != null && c.VBiFacilityACClassID.HasValue &&
-        //                                         a.Any(x => x == c.VBiFacilityACClassID)).ToArray();
-        //    }
-        //}
 
         #endregion
 
@@ -1193,7 +1172,6 @@ namespace gip.mes.processapplication
                                                       string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid, comp.Material));
                                     }
                                 }
-
                             }
 
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
@@ -1420,6 +1398,11 @@ namespace gip.mes.processapplication
 
             if (facilityCharge.HasValue)
             {
+                if (FreeSelectionMode)
+                {
+                    CurrentOpenMaterial = prodOrderPartslistPosRelation;
+                }
+
                 Msg msg = SetFacilityCharge(facilityCharge, prodOrderPartslistPosRelation, forceSetFC_F);
                 if (msg != null)
                 {
@@ -1439,14 +1422,23 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
-                    ACMethod acMethod = CurrentExecutingFunction<PAFManualWeighing>()?.CurrentACMethod.ValueT;
-                    if (acMethod != null)
+                    PAFManualWeighing manWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+
+                    if (manWeighing != null)
                     {
-                        UpdatePAFACMethod(comp, acMethod);
+                        ACMethod acMethod = manWeighing.CurrentACMethod.ValueT;
+                        if (acMethod != null)
+                        {
+                            UpdatePAFACMethod(comp, acMethod);
+                        }
+                        else
+                        {
+                            Messages.LogMessage(eMsgLevel.Error, this.GetACUrl(), nameof(StartWeighing), "The ACMethod from function is null!");
+                        }
                     }
                     else
                     {
-                        //TODO: error
+                        SubscribeToProjectWorkCycle();
                     }
                 }
             }
@@ -2172,22 +2164,6 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        //public Msg SetFacility(Guid? facilityID, Guid? plPosRelationID)
-        //{
-        //    if(!facilityID.HasValue)
-        //    {
-        //        CurrentFacility = facilityID;
-        //        return null;
-        //    }
-
-        //    Msg msg = OnSetFacility(facilityID, plPosRelationID);
-        //    if (msg != null)
-        //        return msg;
-
-        //    CurrentFacility = facilityID;
-        //    return null;
-        //}
-
         public virtual Msg OnSetFacility(Guid? facilityID, Guid? plPosRelationID)
         {
             return null;
@@ -2525,6 +2501,11 @@ namespace gip.mes.processapplication
                 {
                     //Guid? currentFacilityCharge = CurrentFacilityCharge;
                     msg = InitializePAFACMethod(paf.CurrentACMethod.ValueT, currentFacilityCharge);
+
+                    if (msg == null)
+                    {
+                        paf.RunManualWeighing();
+                    }
                 }
 
                 if (msg != null)
@@ -2659,16 +2640,8 @@ namespace gip.mes.processapplication
                         //Error50376: The quant {0} doesn't exist in the database!
                         return new Msg(this, eMsgLevel.Error, PWClassName, "InitializePAFACMethod(10)", 1607, "Error50376", currentFacilityCharge);
                     }
-
-                    //if (fc.Facility == null)
-                    //{
-                    //    //Error50361: On the FacilityCharge {0}, Facility is null!
-                    //    return new Msg(this, eMsgLevel.Error, PWClassName, "InitializePAFACMethod(20)", 1613, "Error50361", fc.ACCaption);
-                    //}
                     facility = fc.Facility;
                 }
-                //else if (CurrentFacility.HasValue)
-                //    facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == CurrentFacility);
 
                 if (facility == null || facility.VBiFacilityACClass == null)
                 {
