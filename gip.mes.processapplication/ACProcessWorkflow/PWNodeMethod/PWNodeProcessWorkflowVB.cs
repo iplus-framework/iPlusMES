@@ -1057,7 +1057,11 @@ namespace gip.mes.processapplication
         {
             bool wasInPlanningWait = IsInPlanningWaitNotElapsed;
             HandleStartNextBatch();
-            if (this.Root != null && !this.Root.Initialized && IsSubscribedToWorkCycle)
+            if (this.Root != null 
+                && (   !this.Root.Initialized
+                    || RootPW.IsStartingProcessFunction
+                    || RootPW.CurrentACState <= ACStateEnum.SMStarting)
+                && IsSubscribedToWorkCycle)
                 return;
             if (   !wasInPlanningWait 
                 && (BatchPlanningTimes == null || !BatchPlanningTimes.Any()) 

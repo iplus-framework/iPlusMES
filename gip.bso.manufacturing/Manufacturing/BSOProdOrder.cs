@@ -4998,6 +4998,15 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledChangeViaPartslistOk):
                     result = IsEnabledChangeViaPartslistOk();
                     return true;
+                case nameof(IsEnabledRecalcAllQuantites):
+                    result = IsEnabledRecalcAllQuantites();
+                    return true;
+                case nameof(IsEnabledConnectSourceProdOrderPartslist):
+                    result = IsEnabledConnectSourceProdOrderPartslist();
+                    return true;
+                case nameof(ConnectSourceProdOrderPartslist):
+                    ConnectSourceProdOrderPartslist();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
