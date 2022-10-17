@@ -1050,7 +1050,9 @@ namespace gip.mes.processapplication
 
                 StartNextCompResult result = StartNextCompResult.Done;
                 if (IsProduction)
+                {
                     result = StartManualWeighingProd(module);
+                }
 
                 if (result == StartNextCompResult.CycleWait)
                 {
@@ -1065,6 +1067,7 @@ namespace gip.mes.processapplication
                         CurrentACState = ACStateEnum.SMRunning;
                         RaiseRunningEvent();
                     }
+
                     return;
                 }
                 else
@@ -1156,23 +1159,23 @@ namespace gip.mes.processapplication
                         ACValue facilityCharge = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetACValue("FacilityCharge");
                         if (facilityCharge != null && facilityCharge.Value != null)
                         {
-                            using (DatabaseApp dbApp = new DatabaseApp())
-                            {
-                                FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityCharge.ParamAsGuid);
-                                if (fc == null)
-                                {
-                                    Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A10)",
-                                                      string.Format("The facility charge with ID: {0} not exist in the database.", facilityCharge.ParamAsGuid));
-                                }
-                                else
-                                {
-                                    if (fc.MaterialID != comp.Material)
-                                    {
-                                        Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A20)",
-                                                      string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid, comp.Material));
-                                    }
-                                }
-                            }
+                            //using (DatabaseApp dbApp = new DatabaseApp())
+                            //{
+                            //    FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityCharge.ParamAsGuid);
+                            //    if (fc == null)
+                            //    {
+                            //        Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A10)",
+                            //                          string.Format("The facility charge with ID: {0} not exist in the database.", facilityCharge.ParamAsGuid));
+                            //    }
+                            //    else
+                            //    {
+                            //        if (fc.MaterialID != comp.Material)
+                            //        {
+                            //            Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A20)",
+                            //                          string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid, comp.Material));
+                            //        }
+                            //    }
+                            //}
 
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
                             comp.SwitchState(WeighingComponentState.InWeighing);
@@ -1933,7 +1936,7 @@ namespace gip.mes.processapplication
 
         protected virtual ProdOrderPartslistPosRelation[] OnGetAllMaterials(Database dbIPlus, DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos)
         {
-            ProdOrderPartslistPosRelation[] queryOpenDosings = Qry_WeighMaterials(dbApp, intermediateChildPos.ProdOrderPartslistPosID);
+            ProdOrderPartslistPosRelation[] queryOpenDosings = s_cQry_WeighMaterials(dbApp, intermediateChildPos.ProdOrderPartslistPosID).ToArray(); //Qry_WeighMaterials(dbApp, intermediateChildPos.ProdOrderPartslistPosID);
             return queryOpenDosings;
         }
 
@@ -1955,6 +1958,34 @@ namespace gip.mes.processapplication
                                                         .OrderBy(c => c.Sequence)
                                                         .ToArray();
         }
+
+        public static readonly Func<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>> s_cQry_WeighMaterials =
+                CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<ProdOrderPartslistPosRelation>>(
+                    (ctx, intermediateChildPOPLPosID) => ctx.ProdOrderPartslistPosRelation
+                                                            .Include("SourceProdOrderPartslistPos")
+                                                            .Include("SourceProdOrderPartslistPos.BasedOnPartslistPos")
+                                                            .Include("SourceProdOrderPartslistPos.Material")
+                                                            .Include("SourceProdOrderPartslistPos.Material.BaseMDUnit")
+                                                            .Include("MDProdOrderPartslistPosState")
+                                                            .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPOPLPosID
+                                                                     && c.TargetQuantityUOM > 0.00001
+                                                                     && c.SourceProdOrderPartslistPos != null
+                                                                     && c.SourceProdOrderPartslistPos.Material != null
+                                                                     && c.SourceProdOrderPartslistPos.Material.UsageACProgram
+
+                                                                      && (c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation == null
+                                                                      || (c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState != null
+                                                                      && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                      && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
+
+                                                                      && ((c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation == null
+                                                                      || c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation == null)
+                                                                      || (c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState != null
+                                                                      && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                      && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)) 
+                                                            
+                                                            ).OrderBy(c => c.Sequence)
+                    );
 
 
         private bool RefreshCompStateFromDBAndCheckIsAllCompleted()
@@ -2993,18 +3024,10 @@ namespace gip.mes.processapplication
 
                                     if (actWeight > 0.000001)
                                     {
-                                        //DateTime start = DateTime.Now;
-
                                         bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
                                         msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false,
                                                                       scaleOtherComp, targetQuantity);
                                         _ScaleComp = false;
-
-                                        //TimeSpan duration = DateTime.Now - start;
-                                        //if (duration.TotalSeconds > 2)
-                                        //{
-                                        //    Messages.LogMessage(eMsgLevel.Error, this.GetACUrl(), nameof(TaskCallback) + "(Perf10)", "The booking consumed: " + duration);
-                                        //}
                                     }
                                     else if (isWeighingInTol)
                                     {
