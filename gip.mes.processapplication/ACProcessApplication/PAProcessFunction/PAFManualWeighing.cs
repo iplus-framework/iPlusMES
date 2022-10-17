@@ -180,7 +180,8 @@ namespace gip.mes.processapplication
             if (!CheckInToleranceOnlyManuallyAddedQuantity)
                 DetermineTargetScaleObject();
 
-            CurrentACState = ACStateEnum.SMRunning;
+            base.SMStarting();
+            //CurrentACState = ACStateEnum.SMRunning;
 
             return null;
         }
