@@ -1,4 +1,5 @@
 ﻿using gip.core.autocomponent;
+using gip.core.ControlScriptSync;
 using gip.core.datamodel;
 using gip.core.reporthandler;
 using gip.mes.autocomponent;
@@ -14,12 +15,13 @@ using System.Threading;
 namespace gip.bso.test
 {
     [ACClassInfo(Const.PackName_VarioDevelopment, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
-    public class BSOTest : ACBSOvb
+    public class BSOTest : ACBSOvb, IMsgObserver
     {
         #region constants
         public const string BGWorkerMehtod_DoTestWork = @"BGWorkerMehtod_DoTestWork";
         public const string BGWorkerMehtod_DoTestWithSubTaskNotPlanned = @"BGWorkerMehtod_DoTestWithSubTaskNotPlanned";
         public const string BGWorkerMehtod_DoTestWithSubTaskPlanned = @"BGWorkerMehtod_DoTestWithSubTaskPlanned";
+        public const string BGWorkerMehtod_DoControlSync = @"BGWorkerMehtod_DoControlSync";
         #endregion
 
         #region c´tors
@@ -167,7 +169,7 @@ namespace gip.bso.test
         [ACMethodInfo("RunTestWork", "en{'Test work'}de{'Test work'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void RunTestWork()
         {
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWork);
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoControlSync);
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -230,6 +232,8 @@ namespace gip.bso.test
         }
 
 
+
+
         #region Methods -> Tests
 
         public void TestACPrintManagerPrint(Guid ID)
@@ -281,6 +285,11 @@ namespace gip.bso.test
                     worker.ProgressInfo.OnlyTotalProgress = false;
                     worker.ProgressInfo.ReportProgress(BGWorkerMehtod_DoTestWork, 0, string.Format("Running {0}...", command));
                     e.Result = DoTestWithSubTaskPlanned(worker, e);
+                    break;
+                case BGWorkerMehtod_DoControlSync:
+                    worker.ProgressInfo.OnlyTotalProgress = false;
+                    worker.ProgressInfo.ReportProgress(BGWorkerMehtod_DoTestWork, 0, string.Format("Running {0}...", command));
+                    DoControlSync();
                     break;
             }
         }
@@ -390,6 +399,35 @@ namespace gip.bso.test
                 }
             }
             return messages.ToArray();
+        }
+
+        public void DoControlSync()
+        {
+            ControlSync controlSync = new ControlSync();
+            // pre-perapring Resources and Query for root - this resources is used for importing
+            ACRoot.SRoot.PrepareQueriesAndResoruces();
+            controlSync.OnMessage += controlSync_OnMessage;
+            bool importSuccess = false;
+            IResources rootResources = new Resources();
+            rootResources.MsgObserver = this;
+            importSuccess = controlSync.Sync(ACRoot.SRoot, Database);
+            //using (ACMonitor.Lock(_Database.QueryLock_1X000))
+            //{
+                
+            //}
+        }
+
+        void controlSync_OnMessage(SyncMessage msg)
+        {
+            string source = "ControlSync";
+            if (!string.IsNullOrEmpty(msg.Source))
+                source = msg.Source;
+            if (msg.MessageLevel == MessageLevel.Error)
+                Root.Messages.LogError(source, "Sync", msg.Message);
+            else if (msg.MessageLevel == MessageLevel.Warning)
+                Root.Messages.LogWarning(source, "Sync", msg.Message);
+
+            gip.core.autocomponent.Messages.ConsoleMsg("ControlSync", msg.Message);
         }
 
         #endregion
