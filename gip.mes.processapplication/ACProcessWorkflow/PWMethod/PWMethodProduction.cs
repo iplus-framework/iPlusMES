@@ -257,18 +257,23 @@ namespace gip.mes.processapplication
 
                 string errorMessage = null;
                 int expectedConfigStoresCount = 0;
-                List<IACConfigStore> prodPartslistOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetProductionPartslistConfigStoreOfflineList(ContentTask.ACClassTaskID, acClassMethodID, out expectedConfigStoresCount, out errorMessage);
-                if (prodPartslistOfflineList != null)
-                    mandatoryConfigStores.AddRange(prodPartslistOfflineList);
-                else
+                if (serviceInstance != null)
                 {
-                    ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                    if (String.IsNullOrEmpty(errorMessage))
-                        errorMessage = "";
-                    errorMessage = errorMessage + " Configuration could not be loaded. Workflownodes will run with wrong parameters. If you acknowledge the alarm, the workflow will continue otherwise reset the Workflow manually!";
-                    OnNewAlarmOccurred(ProcessAlarm, new Msg(errorMessage, this, eMsgLevel.Error, PWClassName, "MandatoryConfigStores", 1000), true);
-                    Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(10)", errorMessage);
+                    List<IACConfigStore> prodPartslistOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetProductionPartslistConfigStoreOfflineList(ContentTask.ACClassTaskID, acClassMethodID, out expectedConfigStoresCount, out errorMessage);
+                    if (prodPartslistOfflineList != null)
+                        mandatoryConfigStores.AddRange(prodPartslistOfflineList);
+                    else
+                    {
+                        ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                        if (String.IsNullOrEmpty(errorMessage))
+                            errorMessage = "";
+                        errorMessage = errorMessage + " Configuration could not be loaded. Workflownodes will run with wrong parameters. If you acknowledge the alarm, the workflow will continue otherwise reset the Workflow manually!";
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(errorMessage, this, eMsgLevel.Error, PWClassName, "MandatoryConfigStores", 1000), true);
+                        Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(10)", errorMessage);
+                    }
                 }
+                else
+                    expectedConfigStoresCount = 2;
                 if (recalcExpectedConfigStoresCount)
                 {
                     using (ACMonitor.Lock(_20015_LockStoreList))
