@@ -1,0 +1,1 @@
+alter table dbo.PartslistPos add KeyOfExtSys varchar(40) null;

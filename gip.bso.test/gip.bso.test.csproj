@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D471399C-8F50-422F-8965-13FFC4D24FB6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip.bso.test</RootNamespace>
+    <AssemblyName>gip.bso.test</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BSOTest.cs" />
+    <Compile Include="VXBSOMethodTest.cs" />
+    <Compile Include="VXBSOFacilityTest.cs" />
+    <Compile Include="VXBSOPropertyTest.cs" />
+    <Compile Include="VXBSOInstallation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.ControlScriptSync\gip.core.ControlScriptSync.csproj">
+      <Project>{aa244d31-0be9-4ad9-bcaf-25d21298552e}</Project>
+      <Name>gip.core.ControlScriptSync</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
+      <Project>{66484708-85BD-47C4-92DD-3010387465F4}</Project>
+      <Name>gip.core.processapplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
+      <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
+      <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
+      <Name>gip.mes.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+      <Name>gip.mes.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj">
+      <Project>{52DC947D-677D-42CA-BCA6-153A4E027272}</Project>
+      <Name>gip.mes.facility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
+      <Project>{D1320FB8-333D-4072-880D-BD5137933D2F}</Project>
+      <Name>gip.mes.processapplication</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="VBControlScripts\2022-10-08 11-16_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,46 @@
+﻿Database:
+FB-TandTv3
+
+Tables:
+
+TandT_Direction
+TandT_ItemType
+TandT_Job
+TandT_JobMaterial
+TandT_MaterialPosType
+TandT_MixPoint
+TandT_MixPointACClass
+TandT_MixPointDeliveryNotePos
+TandT_MixPointFacility
+TandT_MixPointFacilityBookingCharge
+TandT_MixPointFacilityLot
+TandT_MixPointInOrderPos
+TandT_MixPointOutOrderPos
+TandT_MixPointProdOrderPartslistPos
+TandT_MixPointProdOrderPartslistPosRelation
+TandT_MixPointRelation
+TandT_Operation
+TandT_RelationType
+TandT_Step
+TandT_StepItem
+TandT_StepItemRelation
+TandT_StepLot
+TandT_TempPos
+TandT_TrackingStyle
+
+T&Tv2 (rest) tables: (is not used in v3)
+--------------------------------------
+Table Name					Usage
+======================================
+TandT_ItemType				Types of Step items - can be deleted
+
+T&Tv3 tables:
+--------------------------------------
+Table Name					Usage
+======================================
+Lookup tables:
+TandT_Direction				Booking Direction- Inward and outward
+TandT_ItemType				
+
+FilteringTables:
+TandT_Job					Query starting point (causes)

@@ -1,0 +1,183 @@
+using gip.core.datamodel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace gip.mes.datamodel
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'PartslistExpand'}de{'PartslistExpand'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    public class PartslistExpand : ExpandBase
+    {
+
+        #region ctors
+
+        public PartslistExpand(Partslist partsList, int index = 1, double treeQuantityRatio = 1, ExpandBase parent = null)
+            : base(partsList, index, treeQuantityRatio, parent)
+        {
+            Partslist.PartslistPos_Partslist.AutoLoad();
+            LoadDisplayProperties(partsList, TreeQuantityRatio);
+        }
+
+        public PartslistExpand(Partslist partsList, PartslistPos position, int index = 1, ExpandBase parent = null)
+            : base(partsList, index, 1, parent)
+        {
+            if (partsList.TargetQuantityUOM != 0)
+                TreeQuantityRatio = position.TargetQuantityUOM / partsList.TargetQuantityUOM;
+            if (parent.TreeQuantityRatio > 0)
+            {
+                TreeQuantityRatio = parent.TreeQuantityRatio * TreeQuantityRatio;
+            }
+            LoadDisplayProperties(partsList, TreeQuantityRatio);
+        }
+
+        #endregion
+
+        #region Properties
+
+        #region Properties -> Partslist
+
+        public Partslist Partslist
+        {
+            get
+            {
+                return Item as Partslist;
+            }
+        }
+
+
+        [ACPropertyInfo(101, "PartslistNo", "en{'No'}de{'Nr'}")]
+        public string PartslistNo { get; set; }
+
+        [ACPropertyInfo(102, "PartslistName", "en{'Bill of material name'}de{'Stückliste Name'}")]
+        public string PartslistName { get; set; }
+
+        [ACPropertyInfo(105, "TargetQuantity", "en{'Required quantity'}de{'Bedarfsmenge'}")]
+        public double TargetQuantity { get; set; }
+
+        [ACPropertyInfo(106, "TargetQuantityUOM", "en{'Required quantity (UOM)'}de{'Bedarfsmenge (UOM)'}")]
+        public double TargetQuantityUOM { get; set; }
+
+        [ACPropertyInfo(107, "MDUnit", "en{'MDUnit'}de{'MDUnit'}")]
+        public MDUnit MDUnit { get; set; }
+
+        #endregion
+
+        #region Properties -> IACContainerWithItems
+
+
+        /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
+        /// <value>  Translated description</value>
+        public override string ACCaption
+        {
+
+            get
+            {
+                if (Partslist == null) return null;
+                string name = Partslist.PartslistNo + "-" + Partslist.PartslistName;
+                name += " [" + Partslist.Material.MaterialNo + " - " + Partslist.Material.MaterialName1 + "]";
+                return name;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Tree manipulation methods
+
+        private void CheckIsPartslistPresent(PartslistExpand item, Guid partslistID, ref bool isPartslistPresent)
+        {
+            isPartslistPresent = isPartslistPresent || item.Partslist.PartslistID == partslistID;
+            if (item.Children != null)
+                foreach (PartslistExpand childItem in item.Children)
+                    CheckIsPartslistPresent(childItem, partslistID, ref isPartslistPresent);
+        }
+
+
+        /// <summary>
+        /// Load partslist reference tree
+        /// Load all materials they can be possible product of 
+        /// another partslist
+        /// </summary>
+        public override void LoadTree()
+        {
+            bool isPartslistPresent = false;
+            int i = 1;
+            var posItems =
+                Partslist
+                .PartslistPos_Partslist
+                .Where(x =>
+                        x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot
+                        && x.AlternativePartslistPosID == null
+                        && !(x.ExplosionOff ?? false))
+                .ToList();
+            foreach (PartslistPos position in posItems)
+            {
+                PartslistExpand childExpand = null;
+                if (position.ParentPartslist != null)
+                {
+                    if (
+                        position.ParentPartslist.IsEnabled
+                        && (position.ParentPartslist.IsInEnabledPeriod ?? false)
+                        && position.ParentPartslist.DeleteDate == null)
+                    {
+                        isPartslistPresent = false;
+                        CheckIsPartslistPresent((PartslistExpand)this.Root, position.ParentPartslist.PartslistID, ref isPartslistPresent);
+
+                        if (!isPartslistPresent)
+                        {
+                            childExpand = new PartslistExpand(position.ParentPartslist, position, i, this);
+                            childExpand.IsChecked = childExpand.Parent != null ? childExpand.Parent.IsChecked : true;
+                            Children.Add(childExpand);
+                            i++;
+                            childExpand.LoadTree();
+                        }
+                    }
+                }
+                else
+                {
+                    position.Material.Partslist_Material.AutoLoad();
+                    List<Partslist> positionPartslist =
+                        position
+                        .Material
+                        .Partslist_Material
+                        .Where(pl => pl.IsEnabled && (pl.IsInEnabledPeriod ?? false) && pl.DeleteDate == null)
+                        .OrderByDescending(c => c.PartslistVersion)
+                        .ToList();
+                    int localI = 0;
+                    foreach (Partslist partslistForPosition in positionPartslist)
+                    {
+                        isPartslistPresent = false;
+                        CheckIsPartslistPresent((PartslistExpand)this.Root, partslistForPosition.PartslistID, ref isPartslistPresent);
+
+                        if (!isPartslistPresent)
+                        {
+                            childExpand = new PartslistExpand(partslistForPosition, position, i, this);
+                            childExpand.IsChecked = (childExpand.Parent != null ? childExpand.Parent.IsChecked : true) && localI <= 1;
+                            Children.Add(childExpand);
+                            i++;
+                            localI++;
+                            childExpand.LoadTree();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public void LoadDisplayProperties(Partslist partslist, double treeQuantityRatio)
+        {
+            PartslistNo = partslist.PartslistNo;
+            PartslistName = partslist.PartslistName;
+            MDUnit = partslist.MDUnit;
+            TargetQuantityUOM = partslist.TargetQuantityUOM * treeQuantityRatio;
+            if (partslist.MDUnitID.HasValue)
+                TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
+        }
+        #endregion
+
+    }
+}

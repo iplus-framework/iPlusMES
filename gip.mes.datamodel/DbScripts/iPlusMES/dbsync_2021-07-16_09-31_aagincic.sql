@@ -1,0 +1,1 @@
+alter table Partslist add XMLComment text null;

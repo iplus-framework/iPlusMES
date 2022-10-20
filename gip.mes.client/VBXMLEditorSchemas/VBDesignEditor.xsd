@@ -1,0 +1,4 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://www.iplus-framework.com/visual/xaml" schemaLocation="pack://application:,,,/gip.core.visualcontrols;component/VBXMLEditorSchemas/VBVSchema.xsd" />
+  <xs:import namespace="http://www.iplus-framework.com/scichart/xaml" schemaLocation="pack://application:,,,/gip.core.scichart;component/VBXMLEditorSchemas/VBCSchema.xsd" />
+</xs:schema>

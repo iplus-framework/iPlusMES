@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{099CAF77-67A9-4ED5-B5D9-8709796F3628}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gip.mes.webservices</RootNamespace>
+    <AssemblyName>gip.mes.webservices</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Components\Controller\PAFDischargingSC.cs" />
+    <Compile Include="Components\Controller\PAFInOutOperationOnScanSC.cs" />
+    <Compile Include="Components\Controller\PAFWorkTaskScanBaseSC.cs" />
+    <Compile Include="Components\Controller\PAFManualWeighingSC.cs" />
+    <Compile Include="Components\Controller\PAFBinSelectionSC.cs" />
+    <Compile Include="Components\Controller\PAScannedCompContrBase.cs" />
+    <Compile Include="Components\Controller\PAFBinDischargingSC.cs" />
+    <Compile Include="Components\PAEScannerDecoderWS.cs" />
+    <Compile Include="Components\PAJsonServiceHostVB.cs" />
+    <Compile Include="Implementation\VBWebService_Masterdata.cs" />
+    <Compile Include="Implementation\VBWebService_Sales.cs" />
+    <Compile Include="Implementation\VBWebService_Purchasing.cs" />
+    <Compile Include="Implementation\VBWebService_Manufacturing.cs" />
+    <Compile Include="Implementation\VBWebService_Facility.cs" />
+    <Compile Include="Implementation\VBWebService_Logistics.cs" />
+    <Compile Include="Implementation\VBWebService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+      <Project>{893d3b1b-dc55-4684-8b5d-941f1049151b}</Project>
+      <Name>gip.core.autocomponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+      <Project>{16fb4111-5110-46e5-851d-38a4d7522f85}</Project>
+      <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
+      <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
+      <Name>gip.core.processapplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+      <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
+      <Name>gip.core.reporthandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.webservices\gip.core.webservices.csproj">
+      <Project>{7931f65b-3c2a-4db9-a5a6-4bc5b4d12c00}</Project>
+      <Name>gip.core.webservices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5a0c15dd-ad10-43e7-9113-c4fb1b92d3b9}</Project>
+      <Name>gip.mes.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj">
+      <Project>{52dc947d-677d-42ca-bca6-153a4e027272}</Project>
+      <Name>gip.mes.facility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj">
+      <Project>{d1320fb8-333d-4072-880d-bd5137933d2f}</Project>
+      <Name>gip.mes.processapplication</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestUrls.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="VBControlScripts\2021-06-16 08-39_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-02-10 15-24_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="..\gip.mes.webservices.shared\gip.mes.webservices.shared.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

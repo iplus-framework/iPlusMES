@@ -1,0 +1,1 @@
+﻿exec [dbo].[udp_TandT_FilterTrackingDelete] null;
