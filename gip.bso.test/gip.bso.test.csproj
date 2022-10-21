@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="VBControlScripts\2022-10-08 11-16_aagincic.zip">
+    <None Include="VBControlScripts\2022-10-21 13-58_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
