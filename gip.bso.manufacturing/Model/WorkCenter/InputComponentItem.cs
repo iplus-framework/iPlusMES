@@ -19,8 +19,11 @@ namespace gip.bso.manufacturing
             MaterialNo = sourcePos.Material.MaterialNo;
             MaterialName = sourcePos.Material.MaterialName1;
             TargetQuantityUOM = relation.TargetQuantityUOM;
+            TargetQuantity = relation.TargetQuantity;
             ActualQuantityUOM = relation.ActualQuantityUOM;
+            ActualQuantity = relation.ActualQuantity;
             DifferenceQuantityUOM = relation.DifferenceQuantityUOM;
+            DifferenceQuantity = relation.DifferenceQuantity;
             State = relation.MDProdOrderPartslistPosState;
         }
 
@@ -74,6 +77,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private double _TargetQuantity;
+        [ACPropertyInfo(100, "", "en{'Target Quantity'}de{'Sollmenge'}")]
+        public double TargetQuantity
+        {
+            get => _TargetQuantity;
+            set
+            {
+                _TargetQuantity = value;
+                OnPropertyChanged();
+            }
+        }
+
         private double _ActualQuantityUOM;
         [ACPropertyInfo(100, "", "en{'Actual Quantity (UOM)'}de{'Istmenge (BME)'}")]
         public double ActualQuantityUOM
@@ -86,8 +101,20 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private double _ActualQuantity;
+        [ACPropertyInfo(100, "", "en{'Actual Quantity'}de{'Istmenge'}")]
+        public double ActualQuantity
+        {
+            get => _ActualQuantity;
+            set
+            {
+                _ActualQuantity = value;
+                OnPropertyChanged();
+            }
+        }
+
         private double _DifferenceQuantityUOM;
-        [ACPropertyInfo(100, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        [ACPropertyInfo(100, "", "en{'Difference Quantity UOM'}de{'Differenzmenge (BME)'}")]
         public double DifferenceQuantityUOM
         {
             get => _DifferenceQuantityUOM;
@@ -95,6 +122,18 @@ namespace gip.bso.manufacturing
             {
                 _DifferenceQuantityUOM = value;
                 OnPropertyChanged("DifferenceQuantityUOM");
+            }
+        }
+
+        private double _DifferenceQuantity;
+        [ACPropertyInfo(100, "", "en{'Difference Quantity'}de{'Differenzmenge'}")]
+        public double DifferenceQuantity
+        {
+            get => _DifferenceQuantity;
+            set
+            {
+                _DifferenceQuantity = value;
+                OnPropertyChanged();
             }
         }
 
