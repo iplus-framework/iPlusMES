@@ -174,26 +174,23 @@ namespace gip.mes.processapplication
 
                     core.datamodel.ACProgramLog subProgramLog = null;
                     Guid componentClassID = invoker.ComponentClass.ACClassID;
-                    //ACClassTaskQueue.TaskQueue.ProcessAction(() =>
-                    //{
-                        subProgramLog = core.datamodel.ACProgramLog.NewACObject(ACClassTaskQueue.TaskQueue.Context, null);
-                        subProgramLog.ACProgramLog1_ParentACProgramLog = currentProgramLog;
-                        subProgramLog.ACProgram = acProgram;
-                        subProgramLog.ACUrl = invoker.GetACUrl();
-                        subProgramLog.ACClassID = componentClassID;
-                        if (acMethod != null)
-                            subProgramLog.XMLConfig = ACConvert.ObjectToXML(acMethod, true);
-                        if (currentProgramLog.XMLConfig == null)
-                            subProgramLog.XMLConfig = "";
-                        subProgramLog.StartDate = DateTime.Now;
-                    //}
-                    //);
+                    subProgramLog = core.datamodel.ACProgramLog.NewACObject(ACClassTaskQueue.TaskQueue.Context, null);
+                    subProgramLog.ACUrl = invoker.GetACUrl();
+                    subProgramLog.ACClassID = componentClassID;
+                    if (acMethod != null)
+                        subProgramLog.XMLConfig = ACConvert.ObjectToXML(acMethod, true);
+                    if (subProgramLog.XMLConfig == null)
+                        subProgramLog.XMLConfig = "";
+                    subProgramLog.StartDate = DateTime.Now;
+                    subProgramLog.NewACProgramForQueue = acProgram;
+                    subProgramLog.NewParentACProgramLogForQueue = currentProgramLog;
 
-                    //ACClassTaskQueue.TaskQueue.ProgramCache.AddProgramLog(subProgramLog);
+                    ACClassTaskQueue.TaskQueue.ProgramCache.AddProgramLog(subProgramLog);
 
                     // Eintrag in Queue, Speicherung kann verzögert erfolgen.
                     ACClassTaskQueue.TaskQueue.Add(() =>
                     {
+                        subProgramLog.PublishToChangeTrackerInQueue();
                         acProgram.ACProgramLog_ACProgram.Add(subProgramLog);
                         if (currentProgramLog != null)
                             currentProgramLog.ACProgramLog_ParentACProgramLog.Add(subProgramLog);
