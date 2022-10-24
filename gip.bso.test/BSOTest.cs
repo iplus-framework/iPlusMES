@@ -196,7 +196,7 @@ namespace gip.bso.test
         {
             if (!IsEnabledTestMethod())
                 return;
-
+            ReadWiseCount();
         }
 
         public bool IsEnabledTestMethod()
@@ -413,7 +413,7 @@ namespace gip.bso.test
             importSuccess = controlSync.Sync(ACRoot.SRoot, Database);
             //using (ACMonitor.Lock(_Database.QueryLock_1X000))
             //{
-                
+
             //}
         }
 
@@ -863,6 +863,31 @@ namespace gip.bso.test
 
         #endregion
 
+        #region Wise4000
+
+
+        private void ReadWiseCount()
+        {
+            IACComponent wiseComponent = null;
+
+            IACComponent[] appManagers = Root.ACComponentChilds.Where(c => c is ApplicationManager || c is ApplicationManagerProxy).ToArray();
+            foreach (IACComponent appManager in appManagers)
+            {
+                wiseComponent = appManager.FindChildComponents<IACComponent>(c => c.ACIdentifier == "Wise40001").FirstOrDefault();
+                if (wiseComponent != null)
+                {
+                    break;
+                }
+            }
+
+            if (wiseComponent != null)
+            {
+                object resetResult = wiseComponent.ACUrlCommand("!ResetCounter");
+                object readResult = wiseComponent.ACUrlCommand("!ReadCounter");
+                var test = readResult;
+            }
+        }
+        #endregion
     }
 
     public class ScoreBoard
