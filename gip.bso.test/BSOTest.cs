@@ -169,7 +169,7 @@ namespace gip.bso.test
         [ACMethodInfo("RunTestWork", "en{'Test work'}de{'Test work'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void RunTestWork()
         {
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoControlSync);
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWork);
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -184,6 +184,13 @@ namespace gip.bso.test
         public virtual void RunTestWorkWithSubTaskPlanned()
         {
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWithSubTaskPlanned);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        [ACMethodInfo("ControlSync", "en{'ControlSync'}de{'ControlSync'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void ControlSync()
+        {
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoControlSync);
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -272,9 +279,10 @@ namespace gip.bso.test
             {
                 case BGWorkerMehtod_DoTestWork:
                     worker.ProgressInfo.OnlyTotalProgress = true;
-                    worker.ProgressInfo.AddSubTask(BGWorkerMehtod_DoTestWork, 0, 9);
-                    worker.ProgressInfo.ReportProgress(BGWorkerMehtod_DoTestWork, 0, string.Format("Running {0}...", command));
-                    e.Result = DoTestWork(worker, e);
+                    //worker.ProgressInfo.AddSubTask(BGWorkerMehtod_DoTestWork, 0, 9);
+                    //worker.ProgressInfo.ReportProgress(BGWorkerMehtod_DoTestWork, 0, string.Format("Running {0}...", command));
+                    //e.Result = DoTestWork(worker, e);
+                    ReadWiseCount();
                     break;
                 case BGWorkerMehtod_DoTestWithSubTaskNotPlanned:
                     worker.ProgressInfo.OnlyTotalProgress = false;
@@ -313,8 +321,8 @@ namespace gip.bso.test
                 switch (command)
                 {
                     case BGWorkerMehtod_DoTestWork:
-                        string[] messages1 = e.Result as string[];
-                        DoTestWorkFinish(messages1);
+                        //string[] messages1 = e.Result as string[];
+                        //DoTestWorkFinish(messages1);
                         break;
                     case BGWorkerMehtod_DoTestWithSubTaskNotPlanned:
                         string[] messages2 = e.Result as string[];
@@ -884,6 +892,7 @@ namespace gip.bso.test
             {
                 object resetResult = wiseComponent.ACUrlCommand("!ResetCounter");
                 object readResult = wiseComponent.ACUrlCommand("!ReadCounter");
+                //object readResult = wiseComponent.ACUrlCommand("!OnlyRead");
                 var test = readResult;
             }
         }
