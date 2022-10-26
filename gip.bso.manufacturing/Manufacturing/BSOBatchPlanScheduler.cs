@@ -3627,6 +3627,60 @@ namespace gip.bso.manufacturing
                       NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
                 );
         }
+        [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
+        public void SetBatchStateCancelled2()
+        {
+            ClearMessages();
+            if (!IsEnabledSetBatchStateCancelled2())
+                return;
+            if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
+            {
+                bool isSetBatchStateCancelledForTreeDelete = IsSetBatchStateCancelledForTreeDelete();
+                if (isSetBatchStateCancelledForTreeDelete)
+                {
+                    Global.MsgResult answer = Messages.YesNoCancel(this, "Question50093");
+                    if (answer == Global.MsgResult.Yes)
+                    {
+                        // Silent delete batch plans for current ProdOrder
+                    }
+                    else if (answer == Global.MsgResult.Cancel)
+                    {
+                        // Wizard delete batch plans for current ProdOrder
+                    }
+                    else
+                    {
+                        // do nothing
+                    }
+                }
+                else
+                {
+                    // delete batches as usuall (on current linie)
+                }
+            }
+        }
+
+        private bool IsSetBatchStateCancelledForTreeDelete()
+        {
+            return
+                SelectedProdOrderBatchPlan
+                .ProdOrderPartslist
+                .ProdOrder
+                .ProdOrderPartslist_ProdOrder
+                .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                .AsEnumerable()
+                .Where(c =>
+                            !c.IsSelected
+                            && c.ProdOrderBatchPlanID != SelectedProdOrderBatchPlan.ProdOrderBatchPlanID
+                            && !NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
+                      )
+                .Any();
+        }
+
+        public bool IsEnabledSetBatchStateCancelled2()
+        {
+            return IsEnabledSetBatchStateCancelled();
+        }
+
 
         #endregion
 
@@ -3836,7 +3890,7 @@ namespace gip.bso.manufacturing
             //            partslist.ProdOrder
             //            .ProdOrderPartslist_ProdOrder
             //            .Where(c => !c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID != null)).FirstOrDefault();
-                    
+
             //        ProdOrderPartslistExpand expandItem  =new ProdOrderPartslistExpand(finalList);
             //        expandItem.LoadTree();
             //    }
@@ -3917,12 +3971,14 @@ namespace gip.bso.manufacturing
         {
             foreach (MaintainOrderInfo poInfo in prodOrders)
             {
+
                 poInfo.PO.AutoRefresh();
                 ProdOrderPartslist[] allProdPartslists = poInfo.PO.ProdOrderPartslist_ProdOrder.ToArray();
                 bool canRemoveAll = true;
+
                 if (poInfo.RemoveAll || poInfo.DeactivateAll)
                 {
-                    foreach (var batchPlan2Remove in poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).ToArray())
+                    foreach (ProdOrderBatchPlan batchPlan2Remove in poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).ToArray())
                     {
                         var parentPOList = batchPlan2Remove.ProdOrderPartslist;
                         if (batchPlan2Remove.PlanState == GlobalApp.BatchPlanState.Created)
@@ -3947,7 +4003,11 @@ namespace gip.bso.manufacturing
                     }
                 }
                 else
+                {
                     canRemoveAll = !poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any();
+                }
+
+
                 if (canRemoveAll && string.IsNullOrEmpty(poInfo.PO.KeyOfExtSys))
                 {
                     foreach (ProdOrderPartslist pl in allProdPartslists)
@@ -3957,9 +4017,13 @@ namespace gip.bso.manufacturing
                 }
                 else if (!IsBSOTemplateScheduleParent || poInfo.DeactivateAll)
                 {
-                    if ((poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any()
-                            && !poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any(c => c.PlanStateIndex < (short)GlobalApp.BatchPlanState.Completed))
-                        || poInfo.DeactivateAll)
+                    if (
+                            (
+                                poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any()
+                                && !poInfo.PO.ProdOrderPartslist_ProdOrder.SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist).Any(c => c.PlanStateIndex < (short)GlobalApp.BatchPlanState.Completed)
+                            )
+                            || poInfo.DeactivateAll
+                        )
                     {
                         foreach (ProdOrderPartslist pl in allProdPartslists)
                             SetProdorderPartslistState(mDProdOrderStateCancelled, mDProdOrderStateCompleted, pl);
@@ -3969,6 +4033,8 @@ namespace gip.bso.manufacturing
                         poInfo.PO.MDProdOrderState = mDProdOrderStateCompleted;
                     }
                 }
+
+
             }
         }
 
@@ -4925,16 +4991,21 @@ namespace gip.bso.manufacturing
         private bool SetProdorderPartslistState(MDProdOrderState mDProdOrderStateCancelled, MDProdOrderState mDProdOrderStateCompleted, ProdOrderPartslist partslist)
         {
             bool isSetState = false;
-            if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any() || partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex != (short)GlobalApp.BatchPlanState.Completed).Any())
+
+            bool noBatchPlan = !partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any();
+            bool anyNotCompleted = partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex != (short)GlobalApp.BatchPlanState.Completed).Any();
+            
+            if (noBatchPlan || anyNotCompleted)
             {
                 partslist.MDProdOrderState = mDProdOrderStateCancelled;
                 isSetState = true;
             }
-            else if (!partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex != (short)GlobalApp.BatchPlanState.Completed).Any())
+            else if (!anyNotCompleted)
             {
                 partslist.MDProdOrderState = mDProdOrderStateCompleted;
                 isSetState = true;
             }
+
             return isSetState;
         }
 
