@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +28,7 @@ namespace gip.mes.facility
         }
 
         public const string ClassName = "ACProdOrderManager";
-        public const string C_DefaultServiceACIdentifier = "ProdOrderManager";        
+        public const string C_DefaultServiceACIdentifier = "ProdOrderManager";
         #endregion
 
         #region PrecompiledQueries
@@ -173,9 +174,9 @@ namespace gip.mes.facility
         [ACPropertyBindingSource(730, "Error", "en{'ProdOrderManager-Alarm'}de{'ProdOrderManager-Alarm'}", "", false, false)]
         public IACContainerTNet<PANotifyState> IsProdOrderManagerAlarm { get; set; }
 
-#endregion
+        #endregion
 
-#region (ProdOrder)Partslist
+        #region (ProdOrder)Partslist
         /// <summary>
         /// Add Partslist to production order
         /// </summary>
@@ -639,9 +640,9 @@ namespace gip.mes.facility
                                                     .SelectMany(c => c.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist).ToList();
             return nextStages;
         }
-#endregion
+        #endregion
 
-#region Batch-Creation
+        #region Batch-Creation
         /// <summary>
         /// Create batch item
         /// </summary>
@@ -1069,7 +1070,7 @@ namespace gip.mes.facility
             {
                 // 1.0 make BOM - create partslists
                 double treeQuantityRatio = plForBatchGenerate.TargetQuantity / plForBatchGenerate.Partslist.TargetQuantityUOM;
-                PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist,1, treeQuantityRatio);
+                PartslistExpand rootPartslistExpand = new PartslistExpand(plForBatchGenerate.Partslist, 1, treeQuantityRatio);
                 rootPartslistExpand.IsChecked = true;
                 rootPartslistExpand.LoadTree();
 
@@ -1087,7 +1088,7 @@ namespace gip.mes.facility
                 foreach (ExpandResult expand in treeResult)
                 {
                     sn++;
-                    PartslistExpand partslistExpand = expand.Item as  PartslistExpand;
+                    PartslistExpand partslistExpand = expand.Item as PartslistExpand;
                     ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == partslistExpand.Partslist.PartslistID);
                     if (pl == null)
                         PartslistAdd(databaseApp, prodOrder, partslistExpand.Partslist, sn, partslistExpand.TargetQuantityUOM, out pl);
@@ -1146,7 +1147,7 @@ namespace gip.mes.facility
 
             foreach (WizardSchedulerPartslist wPl in wPls)
             {
-                if(wPl != defaultWizardPl && wPl.ProdOrderPartslistPos != null && defaultWizardPl.ProdOrderPartslistPos != null)
+                if (wPl != defaultWizardPl && wPl.ProdOrderPartslistPos != null && defaultWizardPl.ProdOrderPartslistPos != null)
                 {
                     CopyStartDepartmentFromMain(wPl.ProdOrderPartslistPos.ProdOrderPartslist, defaultWizardPl.ProdOrderPartslistPos.ProdOrderPartslist);
                 }
@@ -1190,9 +1191,17 @@ namespace gip.mes.facility
 
                         if (!targets.Any(c => c.IsChecked))
                         {
-                            POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
-                            if (selectedReservation != null)
-                                selectedReservation.IsChecked = true;
+                            if(wPl.SelectedMDSchedulingGroup != null)
+                            {
+                                FacilityReservationSelectFromSchedulingGroup(wPl.SelectedMDSchedulingGroup, targets);
+                            }
+
+                            if (!targets.Any(c => c.IsChecked))
+                            {
+                                POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
+                                if (selectedReservation != null)
+                                    selectedReservation.IsChecked = true;
+                            }
                         }
                         if (!targets.Any(c => c.IsChecked))
                         {
@@ -1212,6 +1221,29 @@ namespace gip.mes.facility
                     msgWithDetails.AddDetailMessage(tmMsg);
 
             return msgWithDetails;
+        }
+
+        /// <summary>
+        /// Select FacilityReservation for batch plan from configuration MDSchedulingGroup <-> Facility
+        /// </summary>
+        /// <param name="selectedMDSchedulingGroup"></param>
+        /// <param name="targets"></param>
+        public void FacilityReservationSelectFromSchedulingGroup(MDSchedulingGroup selectedMDSchedulingGroup, BindingList<POPartslistPosReservation> targets)
+        {
+            Facility[] withLineConnectedFacility =
+                               selectedMDSchedulingGroup
+                               .FacilityMDSchedulingGroup_MDSchedulingGroup
+                               .Select(c => c.Facility)
+                               .ToArray();
+            foreach(Facility facility in withLineConnectedFacility)
+            {
+                POPartslistPosReservation selectedReservation =
+                                    targets
+                                    .Where(c => c.FacilityOfModule?.FacilityID == facility.FacilityID)
+                                    .FirstOrDefault();
+                if (selectedReservation != null)
+                    selectedReservation.IsChecked = true;
+            }
         }
 
         public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, gip.mes.datamodel.ACClassWF vbACClassWF, ProdOrderPartslistPos intermediatePos)
@@ -1292,7 +1324,7 @@ namespace gip.mes.facility
                         routes.AddRange(rResult.Routes);
                 }
 
-#region Filter routes if is selected    ShowCellsInRoute
+                #region Filter routes if is selected    ShowCellsInRoute
                 bool checkShowCellsInRoute = showCellsInRoute && acClassWFDischarging != null && acClassWFDischarging.ACClassWF1_ParentACClassWF != null;
                 if (checkShowCellsInRoute)
                 {
@@ -1324,7 +1356,7 @@ namespace gip.mes.facility
                         }
                     }
                 }
-#endregion
+                #endregion
 
                 var availableModules = routes.Select(c => c.LastOrDefault())
                     .Distinct(new TargetEqualityComparer())
@@ -1422,13 +1454,13 @@ namespace gip.mes.facility
             return configStores;
         }
 
-#endregion
+        #endregion
 
-#region ProdOrder -> Batch
+        #region ProdOrder -> Batch
 
-#region Batch cascade creation
+        #region Batch cascade creation
 
-#region Batch cascade creation -> Public methods
+        #region Batch cascade creation -> Public methods
 
         /// <summary>
         /// Generate list of connected intermediates 
@@ -1491,9 +1523,9 @@ namespace gip.mes.facility
             return null;
         }
 
-#endregion
+        #endregion
 
-#region Batch cascade creation -> Helper methods
+        #region Batch cascade creation -> Helper methods
 
         /// <summary>
         ///  Created tree of included intermediates 
@@ -1549,11 +1581,11 @@ namespace gip.mes.facility
         }
 
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
-#region ProdOrder -> Batch -> Start
+        #region ProdOrder -> Batch -> Start
 
 
         public virtual void SetProdOrderItemsToInProduction(DatabaseApp databaseApp, ProdOrderBatchPlan prodOrderBatchPlan, ProdOrderPartslist prodOrderPartslist, ProdOrderPartslistPos intermediate)
@@ -1671,9 +1703,9 @@ namespace gip.mes.facility
             return saveMsg;
         }
 
-#endregion
+        #endregion
 
-#region Public -> Batch -> Duration Calculation
+        #region Public -> Batch -> Duration Calculation
         public TimeSpan? GetCalculatedBatchPlanDuration(DatabaseApp databaseApp, Guid materialWFACClassMethodID, Guid vBiACClassWFID)
         {
             TimeSpan? duration = null;
@@ -1701,9 +1733,9 @@ namespace gip.mes.facility
             return duration;
         }
 
-#endregion
+        #endregion
 
-#region Batch -> Select batch
+        #region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
         CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
@@ -1771,12 +1803,12 @@ namespace gip.mes.facility
         }
 
 
-#endregion
-#endregion
+        #endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
 
-#region ProdOrder
+        #region ProdOrder
         public virtual void FinishOrder(DatabaseApp dbApp, ProdOrder currentProdOrder)
         {
             MDProdOrderState state = DatabaseApp.s_cQry_GetMDProdOrderState(dbApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
@@ -1850,9 +1882,9 @@ namespace gip.mes.facility
             }
         }
 
-#endregion
+        #endregion
 
-#region BookingOutward
+        #region BookingOutward
         public FacilityPreBooking NewOutwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPosRelation partsListPosRelation,
                                                                bool onEmptyingFacility = false)
         {
@@ -1966,9 +1998,9 @@ namespace gip.mes.facility
             return result;
         }
 
-#endregion
+        #endregion
 
-#region BookingInward
+        #region BookingInward
         public FacilityPreBooking NewInwardFacilityPreBooking(ACComponent facilityManager, DatabaseApp dbApp, ProdOrderPartslistPos partsListPos)
         {
             ACMethodBooking acMethodClone = BookParamInwardMovementClone(facilityManager, dbApp);
@@ -2082,7 +2114,7 @@ namespace gip.mes.facility
             if (facilityManager == null || dbApp == null || poPartsList == null)
                 return null;
             MsgWithDetails collectedMessages = new MsgWithDetails();
-            IEnumerable<ProdOrderPartslistPos> backflushedPosFromPrevPartslist 
+            IEnumerable<ProdOrderPartslistPos> backflushedPosFromPrevPartslist
                 = poPartsList.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.SourceProdOrderPartslistID.HasValue
                                                                                     && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
                                                                         .AsEnumerable()
@@ -2179,9 +2211,9 @@ namespace gip.mes.facility
             }
             return collectedMessages.MsgDetailsCount > 0 ? collectedMessages : null;
         }
-        
-        
-        public MsgWithDetails CorrectLastInwardQuantAccordingOutwardPostings(FacilityManager facilityManager, DatabaseApp dbApp, ProdOrderBatch batch, 
+
+
+        public MsgWithDetails CorrectLastInwardQuantAccordingOutwardPostings(FacilityManager facilityManager, DatabaseApp dbApp, ProdOrderBatch batch,
                                                                              ProdOrderPartslistPos endBatchPos, IEnumerable<int> outwardSequenceNo = null, bool postWithRetry = false)
         {
             MsgWithDetails collectedMessages = null;
@@ -2195,7 +2227,7 @@ namespace gip.mes.facility
             {
                 collectedMessages = new MsgWithDetails();
                 //Error50569: The last quant is not available or not exists!
-                collectedMessages.AddDetailMessage(new Msg(this, eMsgLevel.Error, nameof(ACProdOrderManager), nameof(CorrectLastInwardQuantAccordingOutwardPostings)+"(10)",2197, "Error50569"));
+                collectedMessages.AddDetailMessage(new Msg(this, eMsgLevel.Error, nameof(ACProdOrderManager), nameof(CorrectLastInwardQuantAccordingOutwardPostings) + "(10)", 2197, "Error50569"));
                 return collectedMessages;
             }
 
@@ -2264,10 +2296,10 @@ namespace gip.mes.facility
 
             return collectedMessages;
         }
-        
+
         #endregion
 
-#region RecalcTargetQuantity
+        #region RecalcTargetQuantity
 
         ///// <summary>
         ///// RecalcIntermediateItem
@@ -2610,9 +2642,9 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-#endregion
+        #endregion
 
-#region CalcProducedBatchWeight
+        #region CalcProducedBatchWeight
         public Msg CalcProducedBatchWeight(DatabaseApp dbApp, ProdOrderPartslistPos batchIntermediatePos, out double sumWeight)
         {
             sumWeight = 0;
@@ -2656,9 +2688,9 @@ namespace gip.mes.facility
             }
         }
 
-#endregion
+        #endregion
 
-#region Methods -> Connect 
+        #region Methods -> Connect 
 
 
         /// <summary>
@@ -2803,9 +2835,9 @@ namespace gip.mes.facility
         }
 
 
-#endregion
+        #endregion
 
-#region ProdOrder -> Clone ProdOrder
+        #region ProdOrder -> Clone ProdOrder
 
         public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, DateTime scheduledStartDate, Guid[] filterProdOrderBatchPlanIds, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
         {
@@ -2865,10 +2897,6 @@ namespace gip.mes.facility
                     CloneBatchPlan(databaseApp, sourceBatchPlan, targetPartslist, maxSchedulerOrders, connectionOldNewItems, scheduledStartDate);
             }
 
-            List<ProdOrderBatch> sourceBatches = sourcePartslist.ProdOrderBatch_ProdOrderPartslist.ToList();
-            foreach (ProdOrderBatch sourceBatch in sourceBatches)
-                CloneBatch(databaseApp, sourceBatch, targetPartslist, connectionOldNewItems);
-
             List<ProdOrderPartslistPos> components = sourcePartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToList();
             foreach (ProdOrderPartslistPos sourcePos in components)
                 CloneProdPos(databaseApp, sourcePos, targetPartslist, false, connectionOldNewItems);
@@ -2891,6 +2919,11 @@ namespace gip.mes.facility
                 ProdOrderPartslistPos batchPos = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.FirstOrDefault(c => c.ProdOrderPartslistPosID == pairPos.Value);
                 targetBatchPlan.ProdOrderPartslistPos = batchPos;
             }
+
+            // Batch should not be cloned?
+            //List<ProdOrderBatch> sourceBatches = sourcePartslist.ProdOrderBatch_ProdOrderPartslist.ToList();
+            //foreach (ProdOrderBatch sourceBatch in sourceBatches)
+            //    CloneBatch(databaseApp, sourceBatch, targetPartslist, connectionOldNewItems);
 
             return targetPartslist;
         }
@@ -2962,7 +2995,10 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceBatch.ProdOrderBatchPlanID.Value);
                 if (pair.Key == Guid.Empty)
-                    throw new Exception("Missing source-target key pair!");
+                {
+                    string exceptionMessage = GetCloneExceptionMessage(typeof(ProdOrderBatch));
+                    throw new Exception(exceptionMessage);
+                }
                 targetBatch.ProdOrderBatchPlanID = targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.ProdOrderBatchPlanID == pair.Value).Select(C => C.ProdOrderBatchPlanID).FirstOrDefault();
             }
 
@@ -2993,7 +3029,10 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.SourceProdOrderPartslistID.Value);
                 if (pair.Key == Guid.Empty)
-                    throw new Exception("Missing source-target key pair!");
+                {
+                    string exceptionMessage = GetCloneExceptionMessage(typeof(ProdOrderPartslistPos));
+                    throw new Exception(exceptionMessage);
+                }
                 targetPos.SourceProdOrderPartslist = targetPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.Where(c => c.ProdOrderPartslistID == pair.Value).FirstOrDefault();
             }
 
@@ -3002,7 +3041,10 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.ParentProdOrderPartslistPosID.Value);
                 if (pair.Key == Guid.Empty)
-                    throw new Exception("Missing source-target key pair!");
+                {
+                    string exceptionMessage = GetCloneExceptionMessage(typeof(ProdOrderPartslistPos));
+                    throw new Exception(exceptionMessage);
+                }
                 targetPos.ParentProdOrderPartslistPosID = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == pair.Value).Select(C => C.ProdOrderPartslistPosID).FirstOrDefault();
             }
 
@@ -3011,7 +3053,10 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourcePos.AlternativeProdOrderPartslistPosID.Value);
                 if (pair.Key == Guid.Empty)
-                    throw new Exception("Missing source-target key pair!");
+                {
+                    string exceptionMessage = GetCloneExceptionMessage(typeof(ProdOrderPartslistPos));
+                    throw new Exception(exceptionMessage);
+                }
                 targetPos.AlternativeProdOrderPartslistPosID = targetPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.ProdOrderPartslistID == pair.Value).Select(C => C.ProdOrderPartslistPosID).FirstOrDefault();
             }
 
@@ -3101,7 +3146,10 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRel.ParentProdOrderPartslistPosRelationID.Value);
                 if (pair.Key == Guid.Empty)
-                    throw new Exception("Missing source-target key pair!");
+                {
+                    string exceptionMessage = GetCloneExceptionMessage(typeof(ProdOrderPartslistPosRelation));
+                    throw new Exception(exceptionMessage);
+                }
                 targetRel.ParentProdOrderPartslistPosRelationID = targetPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Where(c => c.ProdOrderPartslistPosRelationID == pair.Value).Select(C => C.ProdOrderPartslistPosRelationID).FirstOrDefault();
             }
             // ProdOrderBatchID
@@ -3109,7 +3157,10 @@ namespace gip.mes.facility
             {
                 KeyValuePair<Guid, Guid> pair = connectionOldNewItems.FirstOrDefault(c => c.Key == sourceRel.ProdOrderBatchID.Value);
                 if (pair.Key == Guid.Empty)
-                    throw new Exception("Missing source-target key pair!");
+                {
+                    string exceptionMessage = GetCloneExceptionMessage(typeof(ProdOrderBatch));
+                    throw new Exception(exceptionMessage);
+                }
                 targetRel.ProdOrderBatch = targetPos.ProdOrderPartslist.ProdOrderBatch_ProdOrderPartslist.Where(c => c.ProdOrderBatchID == pair.Value).FirstOrDefault();
             }
 
@@ -3119,11 +3170,23 @@ namespace gip.mes.facility
             return targetRel;
         }
 
-#endregion
+        private string GetCloneExceptionMessage(Type type)
+        {
+            string memberName = "";
+            ACClassInfo acClassInfo = (ACClassInfo)Attribute.GetCustomAttribute(type, typeof(ACClassInfo));
+            if (acClassInfo != null)
+            {
+                memberName = Translator.GetTranslation(acClassInfo.ACCaptionTranslation);
+            }
+            string exceptionMessage = Root.Environment.TranslateMessage(this, "Exception50001", memberName);
+            return exceptionMessage;
+        }
 
-#endregion
+        #endregion
 
-#region Common
+        #endregion
+
+        #region Common
         /// <summary>
         /// Batch linear resize by 
         /// </summary>
@@ -3150,9 +3213,9 @@ namespace gip.mes.facility
                 BatchLinearResize(item, factor);
             }
         }
-#endregion
+        #endregion
 
-#region Statistics
+        #region Statistics
 
 
         public MsgWithDetails RecalcAllQuantitesAndStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
@@ -3377,7 +3440,7 @@ namespace gip.mes.facility
             return msg;
         }
 
-#endregion
+        #endregion
 
     }
 
