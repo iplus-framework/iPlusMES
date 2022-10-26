@@ -196,7 +196,7 @@ namespace gip.bso.test
         {
             if (!IsEnabledTestMethod())
                 return;
-
+            ShuffleMaterial(false);
         }
 
         public bool IsEnabledTestMethod()
@@ -209,7 +209,7 @@ namespace gip.bso.test
         {
             if (!IsEnabledTestMethod1())
                 return;
-
+            ShuffleMaterial(true);
         }
 
         public bool IsEnabledTestMethod1()
@@ -231,7 +231,28 @@ namespace gip.bso.test
             return true;
         }
 
-
+        public virtual void ShuffleMaterial(bool revert)
+        {
+            foreach (var material in DatabaseApp.Material.AsEnumerable())
+            {
+                Random r = new Random();
+                if (!String.IsNullOrEmpty(material.MaterialName1))
+                {
+                    string random = material.MaterialName3;
+                    if (!revert)
+                    {
+                        random = new string(material.MaterialName1.ToCharArray().OrderBy(s => (r.Next(2) % 2) == 0).ToArray());
+                        material.MaterialName3 = material.MaterialName1;
+                    }
+                    material.MaterialName1 = random;
+                    foreach (var pl in DatabaseApp.Partslist.Where(c => c.MaterialID == material.MaterialID).AsEnumerable())
+                    {
+                        pl.PartslistName = random;
+                    }
+                }
+            }
+            DatabaseApp.SaveChanges();
+        }
 
 
         #region Methods -> Tests
