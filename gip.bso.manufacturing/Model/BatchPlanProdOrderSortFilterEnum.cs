@@ -4,7 +4,6 @@ namespace gip.bso.manufacturing
 {
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'BatchPlanProdOrderSortFilterEnum'}de{'BatchPlanProdOrderSortFilterEnum'}", Global.ACKinds.TACEnum, QRYConfig = "gip.bso.manufacturing.ACValueListBatchPlanProdOrderSortFilterEnum")]
-
     public enum BatchPlanProdOrderSortFilterEnum
     {
         StartTime,

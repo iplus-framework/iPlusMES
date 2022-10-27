@@ -300,10 +300,9 @@ namespace gip.bso.test
             {
                 case BGWorkerMehtod_DoTestWork:
                     worker.ProgressInfo.OnlyTotalProgress = true;
-                    //worker.ProgressInfo.AddSubTask(BGWorkerMehtod_DoTestWork, 0, 9);
-                    //worker.ProgressInfo.ReportProgress(BGWorkerMehtod_DoTestWork, 0, string.Format("Running {0}...", command));
-                    //e.Result = DoTestWork(worker, e);
-                    ReadWiseCount();
+                    worker.ProgressInfo.AddSubTask(BGWorkerMehtod_DoTestWork, 0, 9);
+                    worker.ProgressInfo.ReportProgress(BGWorkerMehtod_DoTestWork, 0, string.Format("Running {0}...", command));
+                    e.Result = DoTestWork(worker, e);
                     break;
                 case BGWorkerMehtod_DoTestWithSubTaskNotPlanned:
                     worker.ProgressInfo.OnlyTotalProgress = false;
@@ -892,32 +891,6 @@ namespace gip.bso.test
 
         #endregion
 
-        #region Wise4000
-
-
-        private void ReadWiseCount()
-        {
-            IACComponent wiseComponent = null;
-
-            IACComponent[] appManagers = Root.ACComponentChilds.Where(c => c is ApplicationManager || c is ApplicationManagerProxy).ToArray();
-            foreach (IACComponent appManager in appManagers)
-            {
-                wiseComponent = appManager.FindChildComponents<IACComponent>(c => c.ACIdentifier == "Wise40001").FirstOrDefault();
-                if (wiseComponent != null)
-                {
-                    break;
-                }
-            }
-
-            if (wiseComponent != null)
-            {
-                object resetResult = wiseComponent.ACUrlCommand("!ResetCounter");
-                object readResult = wiseComponent.ACUrlCommand("!ReadCounter");
-                //object readResult = wiseComponent.ACUrlCommand("!OnlyRead");
-                var test = readResult;
-            }
-        }
-        #endregion
     }
 
     public class ScoreBoard
