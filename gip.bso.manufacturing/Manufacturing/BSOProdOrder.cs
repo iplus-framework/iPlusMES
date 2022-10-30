@@ -4411,17 +4411,24 @@ namespace gip.bso.manufacturing
 
             if (string.IsNullOrEmpty(wfACUrl))
                 return null;
-
-            return DatabaseApp.OrderLog.Where(c => ((c.ProdOrderPartslistPos != null &&
-                                                     c.ProdOrderPartslistPos.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
-                                                 || (c.ProdOrderPartslistPosRelation != null
-                                                 && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID))
-                                                 && c.VBiACProgramLog.ACProgramLog1_ParentACProgramLog == null
-                                                 && c.VBiACProgramLog.ACProgramLog_ParentACProgramLog.Any(pl => pl.ACUrl.EndsWith("\\" + wfACUrl)))
-                                       .ToArray()
-                                       .Select(x => x.ACProgramLog.ACProgram)
+            Guid[] programID = DatabaseApp.OrderLog
+                                        .Where(c =>   (   (    c.ProdOrderPartslistPos != null
+                                                            && c.ProdOrderPartslistPos.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
+                                                        ||(    c.ProdOrderPartslistPosRelation != null
+                                                            && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
+                                                      )
+                                                    && c.VBiACProgramLog.ACProgramLog1_ParentACProgramLog == null
+                                                    && c.VBiACProgramLog.ACProgramLog_ParentACProgramLog.Any(pl => pl.ACUrl.EndsWith("\\" + wfACUrl)))
+                                       .Select(x => x.VBiACProgramLog.ACProgramID)
                                        .Distinct()
-                                       .OrderBy(c => c.ProgramNo);
+                                       .ToArray();
+            if (programID == null || !programID.Any())
+                return null;
+            using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
+            {
+                return DatabaseApp.ContextIPlus.ACProgram.Where(c => programID.Contains(c.ACProgramID)).ToArray();
+            }
+
         }
 
         private string _WorkflowACUrl;

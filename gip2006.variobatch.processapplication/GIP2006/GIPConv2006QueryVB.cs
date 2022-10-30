@@ -128,7 +128,7 @@ namespace gip2006.variobatch.processapplication
                     "LEFT OUTER JOIN dbo.Rezepte r ON c.RezeptNr = r.Nr ";
             SqlCommand cmdAGroup = new SqlCommand(strSQL, con);
 
-            strSQL = "SELECT l.Nr, l.Name, l.MaxInhaltKg, l.ArtikelNr, l.Bestand, l.FreigabeProduktion, l.FreigabeAnnahme, a.Bez1 " +
+            strSQL = "SELECT l.Nr, l.Name, l.MaxInhaltKg, l.ArtikelNr, l.Bestand, l.FreigabeProduktion, l.FreigabeAnnahme, l.ReservKey2, a.Bez1 " +
                     "FROM dbo.Lagerplatz l " +
                     "LEFT OUTER JOIN dbo.Artikel a ON l.ArtikelNr = a.Nr " +
                     "WHERE l.Typ = 1";
@@ -172,12 +172,18 @@ namespace gip2006.variobatch.processapplication
                     while (readerLagerplatz.Read())
                     {
                         string keyACIdentifier = readerLagerplatz["Nr"] as String;
-
                         if (String.IsNullOrEmpty(keyACIdentifier))
                             continue;
                         PAMSilo unit = silos.Where(c => c.ACIdentifier == keyACIdentifier).FirstOrDefault();
                         if (unit == null)
-                            continue;
+                        {
+                            keyACIdentifier = readerLagerplatz["ReservKey2"] as String;
+                            if (String.IsNullOrEmpty(keyACIdentifier))
+                                continue;
+                            unit = silos.Where(c => c.ACIdentifier == keyACIdentifier).FirstOrDefault();
+                            if (unit == null)
+                                continue;
+                        }
                         int fieldId = readerLagerplatz.GetOrdinal("Bestand");
                         double bestand = readerLagerplatz.IsDBNull(fieldId) ? 0 : System.Convert.ToDouble(readerLagerplatz["Bestand"]);
                         //if (bestand != 0)
