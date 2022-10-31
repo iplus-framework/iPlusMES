@@ -466,7 +466,7 @@ namespace gip.mes.datamodel
             if (Math.Abs(quantity - 0) <= Double.Epsilon)
                 return 0;
 
-            if (      ((fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+            if (((fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
                     || (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume))
                 && Density >= 0.0001)// Density g / dm³
             {
@@ -560,7 +560,10 @@ namespace gip.mes.datamodel
             }
 
             // Sonst versuche Umwandung über Maßeinheiten
-            return fromMDUnit.ConvertToUnit(quantity, toMDUnit);
+            if (fromMDUnit.IsConvertableToUnit(toMDUnit))
+                return fromMDUnit.ConvertToUnit(quantity, toMDUnit);
+            else
+                return toMDUnit.ConvertFromUnit(quantity, fromMDUnit);
         }
 
         public bool IsConvertableToUnit(MDUnit fromMDUnit, MDUnit toMDUnit)

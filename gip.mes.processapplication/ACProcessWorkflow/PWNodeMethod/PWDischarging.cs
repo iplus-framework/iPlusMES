@@ -760,7 +760,6 @@ namespace gip.mes.processapplication
                             acMethod = taskEntry.ACMethod;
                         if (ParentPWGroup == null)
                         {
-
                             Messages.LogError(this.GetACUrl(), "TaskCallback()", "ParentPWGroup is null");
                             return;
                         }
@@ -785,6 +784,7 @@ namespace gip.mes.processapplication
                                     // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
                                     OnTaskCallbackCheckQuantity(eM, taskEntry, acMethod, dbApp, dbIPlus, currentBatchPos, ref actualWeight);
 
+                                    bool exceptionHandled = false;
                                     var routeItem = CurrentDischargingDest(dbIPlus);
                                     PAProcessModule targetModule = TargetPAModule(dbIPlus); // If Discharging is to Processmodule, then targetSilo ist null
                                     if (routeItem != null && targetModule != null)
@@ -792,6 +792,15 @@ namespace gip.mes.processapplication
                                         try
                                         {
                                             DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Messages.LogException(this.GetACUrl(), "TaskCallback(20)", ex);
+                                            ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                                            OnNewAlarmOccurred(ProcessAlarm, new Msg(ex.Message, this, eMsgLevel.Error, PWClassName, "TaskCallback", 1020), true);
+                                            discharging.FunctionError.ValueT = PANotifyState.AlarmOrFault;
+                                            discharging.OnNewAlarmOccurred(discharging.FunctionError, new Msg(ex.Message, discharging, eMsgLevel.Error, nameof(PAFDischarging), "TaskCallback", 1020), true);
+                                            exceptionHandled = true;
                                         }
                                         finally
                                         {
@@ -815,7 +824,10 @@ namespace gip.mes.processapplication
                                     }
                                     if (dbApp.IsChanged)
                                     {
-                                        dbApp.ACSaveChanges();
+                                        if (exceptionHandled)
+                                            dbApp.ACUndoChanges();
+                                        else
+                                            dbApp.ACSaveChanges();
                                     }
                                 }
                                 else if (IsTransport)
