@@ -96,7 +96,7 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
-        [ACPropertyBindingTarget(501, "Read from PLC", "en{'UnlockDoor'}de{'Tür Freigabe'}", "", false, false, RemotePropID = 23)]
+        [ACPropertyBindingTarget(501, "Read from PLC", "en{'UnlockDoor'}de{'Tür Freigabe'}", "", false, false)]
         public IACContainerTNet<Boolean> UnlockDoor { get; set; }
 
         public virtual PAEScaleGravimetric Scale
