@@ -36,8 +36,8 @@ namespace gip.mes.facility
                             }
                             i++;
                         }
-                        while (rest > double.Epsilon && i < 10);
-                        if(rest >  0.1)
+                        while (rest >= wizardSchedulerPartslist.BatchSizeMinUOM && i < 10);
+                        if(rest >  0.1 && rest > wizardSchedulerPartslist.BatchSizeMinUOM)
                         {
                             suggestion2 = new KeepEqualBatchSizes(wizardSchedulerPartslist, nr, rest, wizardSchedulerPartslist.BatchSizeStandardUOM, wizardSchedulerPartslist.BatchSizeMinUOM, wizardSchedulerPartslist.BatchSizeMaxUOM);
                             if (suggestion2.Suggestion != null)
