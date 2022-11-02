@@ -1128,7 +1128,7 @@ namespace gip.mes.processapplication
 
                 bool resetToSMStarting = false;
                 ParallelNodeStats stats = GetParallelNodeStats();
-                if (stats.AreOtherParallelNodesCompletable)
+                if (stats.ActiveParallelNodesCount > 0)
                     resetToSMStarting = true;
                 int countParallelNodes = 0;
                 if (CompleteParallelNodes(out countParallelNodes))

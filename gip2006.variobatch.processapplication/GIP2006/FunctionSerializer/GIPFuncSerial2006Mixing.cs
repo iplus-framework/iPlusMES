@@ -40,6 +40,10 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Speed
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Temperature
             iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeight
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Direction
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationRight
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationLeft
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationPause
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
             if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -69,6 +73,31 @@ namespace gip2006.variobatch.processapplication
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeight")),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("Direction")),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationRight").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationLeft").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationPause").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
             }
             else if (MethodNameEquals(request.ACIdentifier, "MixingTime"))
             {
@@ -90,6 +119,31 @@ namespace gip2006.variobatch.processapplication
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeight")),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("Direction")),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationRight").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationLeft").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationPause").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
             }
             else if (MethodNameEquals(request.ACIdentifier, "MixingTemperature"))
             {
@@ -108,6 +162,31 @@ namespace gip2006.variobatch.processapplication
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeight")),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(request.ParameterValueList.GetInt16("Direction")),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationRight").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationLeft").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationPause").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
             }
 
             OnSendObjectAppend(request, dbNo, offset, miscParams, ref sendPackage1, ref iOffset);
@@ -153,6 +232,10 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Speed
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // Temperature
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // MinWeight
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Direction
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationRight
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationLeft
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationPause
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
@@ -179,6 +262,18 @@ namespace gip2006.variobatch.processapplication
 
                     response.ParameterValueList.GetACValue("MinWeight").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                     iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                    response.ParameterValueList.GetACValue("Direction").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationRight").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationLeft").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationPause").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
                 }
                 else if (MethodNameEquals(response.ACIdentifier, "MixingTime"))
                 {
@@ -193,6 +288,18 @@ namespace gip2006.variobatch.processapplication
 
                     response.ParameterValueList.GetACValue("MinWeight").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                     iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                    response.ParameterValueList.GetACValue("Direction").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationRight").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationLeft").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationPause").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
                 }
                 else if (MethodNameEquals(response.ACIdentifier, "MixingTemperature"))
                 {
@@ -207,6 +314,18 @@ namespace gip2006.variobatch.processapplication
 
                     response.ParameterValueList.GetACValue("MinWeight").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                     iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
+
+                    response.ParameterValueList.GetACValue("Direction").Value = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset);
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationRight").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationLeft").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationPause").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
                 }
 
                 OnReadObjectAppend(response, dbNo, iOffset, miscParams, readPackage1, readParameter, ref iOffset);
