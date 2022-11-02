@@ -66,6 +66,7 @@
     <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006BaseExt.cs" />
     <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Cooling.cs" />
     <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Discharging.cs" />
+    <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Temperature.cs" />
     <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Vacuum.cs" />
     <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Mixing.cs" />
     <Compile Include="GIP2006\FunctionSerializer\GIPFuncSerial2006Dosing.cs" />

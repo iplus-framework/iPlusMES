@@ -61,6 +61,12 @@ namespace gip.mes.processapplication
             paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
             method.ParameterValueList.Add(new ACValue("Direction", typeof(PAFMixingDirectionEnum), PAFMixingDirectionEnum.Right, Global.ParamOption.Optional));
             paramTranslation.Add("Direction", "en{'Direction'}de{'Richtung'}");
+            method.ParameterValueList.Add(new ACValue("DurationRight", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationRight", "en{'Duration Right'}de{'Dauer Rechts'}");
+            method.ParameterValueList.Add(new ACValue("DurationLeft", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationLeft", "en{'Duration Left'}de{'Dauer Links'}");
+            method.ParameterValueList.Add(new ACValue("DurationPause", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, null);
         }
@@ -78,6 +84,12 @@ namespace gip.mes.processapplication
             paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
             method.ParameterValueList.Add(new ACValue("Direction", typeof(PAFMixingDirectionEnum), PAFMixingDirectionEnum.Right, Global.ParamOption.Optional));
             paramTranslation.Add("Direction", "en{'Direction'}de{'Richtung'}");
+            method.ParameterValueList.Add(new ACValue("DurationRight", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationRight", "en{'Duration Right'}de{'Dauer Rechts'}");
+            method.ParameterValueList.Add(new ACValue("DurationLeft", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationLeft", "en{'Duration Left'}de{'Dauer Links'}");
+            method.ParameterValueList.Add(new ACValue("DurationPause", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActDuration", typeof(TimeSpan), 0, Global.ParamOption.Required));
@@ -99,6 +111,12 @@ namespace gip.mes.processapplication
             paramTranslation.Add("MinWeight", "en{'Minimum weight'}de{'Mindestgewicht'}");
             method.ParameterValueList.Add(new ACValue("Direction", typeof(PAFMixingDirectionEnum), PAFMixingDirectionEnum.Right, Global.ParamOption.Optional));
             paramTranslation.Add("Direction", "en{'Direction'}de{'Richtung'}");
+            method.ParameterValueList.Add(new ACValue("DurationRight", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationRight", "en{'Duration Right'}de{'Dauer Rechts'}");
+            method.ParameterValueList.Add(new ACValue("DurationLeft", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationLeft", "en{'Duration Left'}de{'Dauer Links'}");
+            method.ParameterValueList.Add(new ACValue("DurationPause", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActTemperature", typeof(Double), 0.0, Global.ParamOption.Required));
