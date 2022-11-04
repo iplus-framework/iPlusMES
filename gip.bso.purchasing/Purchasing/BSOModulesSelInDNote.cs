@@ -515,7 +515,7 @@ namespace gip.bso.purchasing
         [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 600, true)]
         public void SetRoute()
         {
-            IACVBBSORouteSelector routeSelector = ParentACComponent.GetChildComponent("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
+            IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
                 Messages.Error(this, "Route selector is not installed", true);
@@ -561,7 +561,7 @@ namespace gip.bso.purchasing
         [ACMethodInfo("", "en{'View route'}de{'Route anzeigen'}", 601, true)]
         public void OpenRoute()
         {
-            IACVBBSORouteSelector routeSelector = ParentACComponent.GetChildComponent("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
+            IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
                 Messages.Error(this, "Route selector is not installed");

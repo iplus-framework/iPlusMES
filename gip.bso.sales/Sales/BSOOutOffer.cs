@@ -9,6 +9,7 @@ using gip.core.reporthandler.Flowdoc;
 using System.Windows.Media;
 using System.Windows.Documents;
 using gip.mes.facility;
+using System.Data.Objects;
 
 namespace gip.bso.sales
 {
@@ -67,6 +68,9 @@ namespace gip.bso.sales
                 _OutDeliveryNoteManager = null;
             }
 
+            if (_AccessPrimary != null)
+                _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
+
             this._AccessOutOfferPos = null;
             this._CurrentOutOfferPos = null;
             this._SelectedOutOfferPos = null;
@@ -119,6 +123,7 @@ namespace gip.bso.sales
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<OutOffer>(OutOffer.ClassName, this);
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
             }
@@ -130,8 +135,9 @@ namespace gip.bso.sales
             {
                 return new List<ACFilterItem>()
                 {
-                    new ACFilterItem(Global.FilterTypes.filter, OutOffer.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
-                };
+                    new ACFilterItem(Global.FilterTypes.filter, OutOffer.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Comment", Global.LogicalOperators.contains, Global.Operators.and, "", false, false)
+            };
             }
         }
 
@@ -144,6 +150,22 @@ namespace gip.bso.sales
                     new ACSortItem(OutOffer.NoColumnName, Global.SortDirections.descending, true)
                 };
             }
+        }
+
+        private IQueryable<OutOffer> _AccessPrimary_NavSearchExecuting(IQueryable<OutOffer> result)
+        {
+            ObjectQuery<OutOffer> query = result as ObjectQuery<OutOffer>;
+            if (query != null)
+            {
+                query.Include(c => c.MDOutOfferState)
+                     .Include(c => c.CustomerCompany)
+                     .Include(c => c.MDOutOrderType)
+                     .Include(c => c.BillingCompanyAddress)
+                     .Include(c => c.DeliveryCompanyAddress);
+            }
+            if (FilterOfferState.HasValue)
+                result = result.Where(x => x.MDOutOfferState.MDOutOfferStateIndex == (short)FilterOfferState.Value);
+            return result;
         }
 
         [ACPropertyCurrent(600, OutOffer.ClassName)]
@@ -311,6 +333,92 @@ namespace gip.bso.sales
                 OnPropertyChanged("SelectedOutOfferPos");
             }
         }
+
+
+        #region Properties -> FilterOrderState
+
+        public gip.mes.datamodel.MDOutOfferState.OutOfferStates? FilterOfferState
+        {
+            get
+            {
+                if (SelectedFilterOfferState == null) return null;
+                return (gip.mes.datamodel.MDOutOfferState.OutOfferStates)Enum.Parse(typeof(gip.mes.datamodel.MDOutOfferState.OutOfferStates), SelectedFilterOfferState.Value.ToString());
+            }
+        }
+
+
+        private ACValueItem _SelectedFilterOfferState;
+        [ACPropertySelected(9999, "FilterOfferState", "en{'Offer state'}de{'Angebotsstatus'}")]
+        public ACValueItem SelectedFilterOfferState
+        {
+            get
+            {
+                return _SelectedFilterOfferState;
+            }
+            set
+            {
+                if (_SelectedFilterOfferState != value)
+                {
+                    _SelectedFilterOfferState = value;
+                    OnPropertyChanged("SelectedFilterOfferState");
+                }
+            }
+        }
+
+
+        private ACValueItemList _FilterOfferStateList;
+        [ACPropertyList(9999, "FilterOfferState")]
+        public ACValueItemList FilterOfferStateList
+        {
+            get
+            {
+                if (_FilterOfferStateList == null)
+                {
+                    _FilterOfferStateList = new ACValueItemList("OutOfferStatesList");
+                    _FilterOfferStateList.AddRange(DatabaseApp.MDOutOfferState.ToList().Select(x => new ACValueItem(x.MDOutOfferStateName, x.MDOutOfferStateIndex, null)).ToList());
+                }
+                return _FilterOfferStateList;
+            }
+        }
+
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Offering No.'}de{'Angebot Nr.'}")]
+        public string FilterNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(OutOffer.NoColumnName);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(OutOffer.NoColumnName);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(OutOffer.NoColumnName, value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        public string FilterComment
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("Comment", value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
 
         #region Property -> OutOfferPos -> MDUnit
 

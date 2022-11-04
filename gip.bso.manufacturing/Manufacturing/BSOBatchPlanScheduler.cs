@@ -3284,7 +3284,7 @@ namespace gip.bso.manufacturing
             acMethod.ParameterValueList["AutoFilter"] = partslistNo;
             var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(Partslist));
             if (acClass != null && acClass.ManagingBSO != null)
-                this.Root().RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
+                this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
         }
 
         #endregion

@@ -1171,6 +1171,9 @@ namespace gip.mes.processapplication
                     MsgWithDetails msg = GetACMethodFromConfig(db, route, acMethod);
                     if (msg != null)
                         return msg;
+
+                    if (IsSimulationOn)
+                        PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
                 }
                 catch (Exception e)
                 {
@@ -1213,6 +1216,7 @@ namespace gip.mes.processapplication
                     }
                 }
             }
+
             return null;
         }
 
@@ -1309,6 +1313,9 @@ namespace gip.mes.processapplication
                 try
                 {
                     route.AttachTo(db);
+
+                    if (IsSimulationOn)
+                        PAEControlModuleBase.ActivateRouteOnSimulation(route, true);
 
                     if (route == null || route.Count < 1)
                     {

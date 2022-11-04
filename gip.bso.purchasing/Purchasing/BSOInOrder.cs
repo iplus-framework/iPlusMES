@@ -18,6 +18,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 
 namespace gip.bso.purchasing
@@ -199,6 +200,90 @@ namespace gip.bso.purchasing
 
         #endregion
 
+        #region Properties -> FilterOrderState
+
+        public gip.mes.datamodel.MDInOrderState.InOrderStates? FilterOrderState
+        {
+            get
+            {
+                if (SelectedFilterOrderState == null) return null;
+                return (gip.mes.datamodel.MDInOrderState.InOrderStates)Enum.Parse(typeof(gip.mes.datamodel.MDInOrderState.InOrderStates), SelectedFilterOrderState.Value.ToString());
+            }
+        }
+
+
+        private ACValueItem _SelectedFilterOrderState;
+        [ACPropertySelected(9999, "FilterOrderState", "en{'Order state'}de{'Auftragsstatus'}")]
+        public ACValueItem SelectedFilterOrderState
+        {
+            get
+            {
+                return _SelectedFilterOrderState;
+            }
+            set
+            {
+                if (_SelectedFilterOrderState != value)
+                {
+                    _SelectedFilterOrderState = value;
+                    OnPropertyChanged("SelectedFilterOrderState");
+                }
+            }
+        }
+
+
+        private ACValueItemList _FilterOrderStateList;
+        [ACPropertyList(9999, "FilterOrderState")]
+        public ACValueItemList FilterOrderStateList
+        {
+            get
+            {
+                if (_FilterOrderStateList == null)
+                {
+                    _FilterOrderStateList = new ACValueItemList("InOrderStatesList");
+                    _FilterOrderStateList.AddRange(DatabaseApp.MDInOrderState.ToList().Select(x => new ACValueItem(x.MDInOrderStateName, x.MDInOrderStateIndex, null)).ToList());
+                }
+                return _FilterOrderStateList;
+            }
+        }
+
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Order No.'}de{'Auftrag Nr.'}")]
+        public string FilterNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(InOrder.NoColumnName);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(InOrder.NoColumnName);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(InOrder.NoColumnName, value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        public string FilterComment
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("Comment", value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Managers
@@ -249,9 +334,7 @@ namespace gip.bso.purchasing
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
                     if (navACQueryDefinition != null)
                     {
-                        ACSortItem sortItem = navACQueryDefinition.ACSortColumns.Where(c => c.ACIdentifier == "InOrderNo").FirstOrDefault();
-                        if (sortItem != null && sortItem.IsConfiguration)
-                            sortItem.SortDirection = Global.SortDirections.descending;
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
                         if (navACQueryDefinition.TakeCount == 0)
                             navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
                     }
@@ -262,12 +345,48 @@ namespace gip.bso.purchasing
             }
         }
 
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, InOrder.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Comment", Global.LogicalOperators.contains, Global.Operators.and, "", false, false)
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem(InOrder.NoColumnName, Global.SortDirections.descending, true)
+                };
+            }
+        }
+
         private IQueryable<InOrder> _AccessPrimary_NavSearchExecuting(IQueryable<InOrder> result)
         {
-            if (SelectedFilterMaterial != null)
+            ObjectQuery<InOrder> query = result as ObjectQuery<InOrder>;
+            if (query != null)
             {
-                result = result.Where(c => c.InOrderPos_InOrder.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+                query.Include(c => c.MDInOrderType)
+                     .Include(c => c.MDInOrderState)
+                     .Include(c => c.DistributorCompany)
+                     .Include(c => c.BillingCompanyAddress)
+                     .Include(c => c.DeliveryCompanyAddress)
+                     .Include(c => c.MDTermOfPayment)
+                     .Include(c => c.MDDelivType)
+                    .Include("InOrderPos_InOrder")
+                    .Include("InOrderPos_InOrder.Material");
             }
+            if (SelectedFilterMaterial != null)
+                result = result.Where(c => c.InOrderPos_InOrder.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+            if (FilterOrderState.HasValue)
+                result = result.Where(x => x.MDInOrderState.MDInOrderStateIndex == (short)FilterOrderState.Value);
             return result;
         }
 

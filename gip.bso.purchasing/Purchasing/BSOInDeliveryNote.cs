@@ -22,6 +22,8 @@ using System.Collections.Generic;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
 using System.Linq;
+using static gip.core.datamodel.Global;
+using static gip.mes.datamodel.MDDelivNoteState;
 
 namespace gip.bso.purchasing
 {
@@ -46,6 +48,13 @@ namespace gip.bso.purchasing
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "InOrderPosOpen", "en{'Open Purchase Order Pos.'}de{'Offene Bestellposition'}", typeof(InOrderPos), InOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "BookingFacility", ConstApp.Facility, typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "BookingFacilityLot", ConstApp.Lot, typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
+    [ACClassConstructorInfo(
+       new object[]
+       {
+            new object[] { "DelivNoteStateIndex", Global.ParamOption.Optional, typeof(short) } 
+       }
+       )
+    ]
     public class BSOInDeliveryNote : ACBSOvbNav
     {
         #region c´tors
@@ -85,6 +94,9 @@ namespace gip.bso.purchasing
             _LabOrderManager = ACLabOrderManager.ACRefToServiceInstance(this);
             if (_LabOrderManager == null)
                 throw new Exception("LabOrderManager not configured");
+
+            if (Parameters != null && Parameters.Any())
+                InitParams();
 
             Search();
             return true;
@@ -167,6 +179,13 @@ namespace gip.bso.purchasing
 
             return clone;
         }
+
+        public void InitParams()
+        {
+            object delivNoteStateIndex = Parameters["DelivNoteStateIndex"];
+            if (delivNoteStateIndex != null)
+                SelectedFilterDelivNoteState = FilterDelivNoteStateList.Where(c => (short)c.Value == (short)delivNoteStateIndex).FirstOrDefault();
+        }
         #endregion
 
         #region Managers
@@ -215,12 +234,18 @@ namespace gip.bso.purchasing
             ObjectQuery<DeliveryNote> query = result as ObjectQuery<DeliveryNote>;
             if (query != null)
             {
-                query.Include(c => c.MDDelivNoteState);
-                query.Include(c => c.DeliveryNotePos_DeliveryNote);
-                query.Include("DeliveryNotePos_DeliveryNote");
-                query.Include("DeliveryNotePos_DeliveryNote.InOrderPos");
-                query.Include("DeliveryNotePos_DeliveryNote.InOrderPos.Material");
+                query.Include(c => c.MDDelivNoteState)
+                    .Include(c => c.TourplanPos)
+                    .Include(c => c.VisitorVoucher)
+                    .Include(c => c.DeliveryCompanyAddress)
+                    .Include(c => c.ShipperCompanyAddress)
+                    .Include(c => c.Delivery2CompanyAddress)
+                    .Include("DeliveryNotePos_DeliveryNote")
+                    .Include("DeliveryNotePos_DeliveryNote.InOrderPos")
+                    .Include("DeliveryNotePos_DeliveryNote.InOrderPos.Material");
             }
+            if (FilterDelivNoteState.HasValue)
+                result = result.Where(x => x.MDDelivNoteState.MDDelivNoteStateIndex == (short)FilterDelivNoteState.Value);
             return result;
         }
 
@@ -264,6 +289,7 @@ namespace gip.bso.purchasing
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
                 aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteNo", Global.LogicalOperators.contains, Global.Operators.and, "", true, true));
                 aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "DeliveryNoteTypeIndex", Global.LogicalOperators.equal, Global.Operators.and, ((short)GlobalApp.DeliveryNoteType.Receipt).ToString(), true));
+                aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "Comment", Global.LogicalOperators.contains, Global.Operators.and, "", false, false));
                 return aCFilterItems;
             }
         }
@@ -543,6 +569,73 @@ namespace gip.bso.purchasing
 
         #endregion
         #endregion
+
+        #region Properties -> FilterDelivNoteState
+
+        public gip.mes.datamodel.MDDelivNoteState.DelivNoteStates? FilterDelivNoteState
+        {
+            get
+            {
+                if (SelectedFilterDelivNoteState == null) 
+                    return null;
+                return (gip.mes.datamodel.MDDelivNoteState.DelivNoteStates)Enum.Parse(typeof(gip.mes.datamodel.MDDelivNoteState.DelivNoteStates), SelectedFilterDelivNoteState.Value.ToString());
+            }
+        }
+
+
+        private ACValueItem _SelectedFilterDelivNoteState;
+        [ACPropertySelected(9999, "FilterDelivNoteState", "en{'Delivery state'}de{'Lieferstatus'}")]
+        public ACValueItem SelectedFilterDelivNoteState
+        {
+            get
+            {
+                return _SelectedFilterDelivNoteState;
+            }
+            set
+            {
+                if (_SelectedFilterDelivNoteState != value)
+                {
+                    _SelectedFilterDelivNoteState = value;
+                    OnPropertyChanged("SelectedFilterDelivNoteState");
+                }
+            }
+        }
+
+
+        private ACValueItemList _FilterDelivNoteStateList;
+        [ACPropertyList(9999, "FilterDelivNoteState")]
+        public ACValueItemList FilterDelivNoteStateList
+        {
+            get
+            {
+                if (_FilterDelivNoteStateList == null)
+                {
+                    _FilterDelivNoteStateList = new ACValueItemList("DelivNoteStatesList");
+                    _FilterDelivNoteStateList.AddRange(DatabaseApp.MDDelivNoteState.ToList().Select(x => new ACValueItem(x.MDDelivNoteStateName, x.MDDelivNoteStateIndex, null)).ToList());
+                }
+                return _FilterDelivNoteStateList;
+            }
+        }
+
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        public string FilterComment
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("Comment", value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
 
         #endregion
 

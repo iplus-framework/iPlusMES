@@ -6,6 +6,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -193,6 +194,89 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Properties -> FilterOrderState
+
+        public gip.mes.datamodel.MDOutOrderState.OutOrderStates? FilterOrderState
+        {
+            get
+            {
+                if (SelectedFilterOrderState == null) return null;
+                return (gip.mes.datamodel.MDOutOrderState.OutOrderStates)Enum.Parse(typeof(gip.mes.datamodel.MDOutOrderState.OutOrderStates), SelectedFilterOrderState.Value.ToString());
+            }
+        }
+
+
+        private ACValueItem _SelectedFilterOrderState;
+        [ACPropertySelected(9999, "FilterOrderState", "en{'Order state'}de{'Auftragsstatus'}")]
+        public ACValueItem SelectedFilterOrderState
+        {
+            get
+            {
+                return _SelectedFilterOrderState;
+            }
+            set
+            {
+                if (_SelectedFilterOrderState != value)
+                {
+                    _SelectedFilterOrderState = value;
+                    OnPropertyChanged("SelectedFilterOrderState");
+                }
+            }
+        }
+
+
+        private ACValueItemList _FilterOrderStateList;
+        [ACPropertyList(9999, "FilterOrderState")]
+        public ACValueItemList FilterOrderStateList
+        {
+            get
+            {
+                if (_FilterOrderStateList == null)
+                {
+                    _FilterOrderStateList = new ACValueItemList("OutOrderStatesList");
+                    _FilterOrderStateList.AddRange(DatabaseApp.MDOutOrderState.ToList().Select(x => new ACValueItem(x.MDOutOrderStateName, x.MDOutOrderStateIndex, null)).ToList());
+                }
+                return _FilterOrderStateList;
+            }
+        }
+
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Order No.'}de{'Auftrag Nr.'}")]
+        public string FilterNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(OutOrder.NoColumnName);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(OutOrder.NoColumnName);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(OutOrder.NoColumnName, value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        public string FilterComment
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("Comment", value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
         #endregion
 
         #region Managers
@@ -253,7 +337,8 @@ namespace gip.bso.sales
             {
                 return new List<ACFilterItem>()
                 {
-                    new ACFilterItem(Global.FilterTypes.filter, OutOrder.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, OutOrder.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, "Comment", Global.LogicalOperators.contains, Global.Operators.and, "", false, false)
                 };
             }
         }
@@ -271,10 +356,24 @@ namespace gip.bso.sales
 
         private IQueryable<OutOrder> _AccessPrimary_NavSearchExecuting(IQueryable<OutOrder> result)
         {
-            if (SelectedFilterMaterial != null)
+            ObjectQuery<OutOrder> query = result as ObjectQuery<OutOrder>;
+            if (query != null)
             {
-                result = result.Where(c => c.OutOrderPos_OutOrder.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+                query.Include(c => c.MDOutOrderType)
+                     .Include(c => c.MDOutOrderState)
+                     .Include(c => c.CPartnerCompany)
+                     .Include(c => c.CustomerCompany)
+                     .Include(c => c.BillingCompanyAddress)
+                     .Include(c => c.DeliveryCompanyAddress)
+                     .Include(c => c.MDTermOfPayment)
+                     .Include(c => c.MDDelivType)
+                    .Include("OutOrderPos_InOrder")
+                    .Include("OutOrderPos_InOrder.Material");
             }
+            if (SelectedFilterMaterial != null)
+                result = result.Where(c => c.OutOrderPos_OutOrder.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+            if (FilterOrderState.HasValue)
+                result = result.Where(x => x.MDOutOrderState.MDOutOrderStateIndex == (short)FilterOrderState.Value);
             return result;
         }
 

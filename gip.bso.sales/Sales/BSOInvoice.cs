@@ -6,6 +6,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -168,6 +169,89 @@ namespace gip.bso.sales
 
         #endregion
 
+        #region Properties -> FilterOrderState
+
+        public gip.mes.datamodel.MDInvoiceState.InvoiceStates? FilterInvoiceState
+        {
+            get
+            {
+                if (SelectedFilterInvoiceState == null) return null;
+                return (gip.mes.datamodel.MDInvoiceState.InvoiceStates)Enum.Parse(typeof(gip.mes.datamodel.MDInvoiceState.InvoiceStates), SelectedFilterInvoiceState.Value.ToString());
+            }
+        }
+
+
+        private ACValueItem _SelectedFilterInvoiceState;
+        [ACPropertySelected(9999, "FilterInvoiceState", "en{'Invoice state'}de{'Rechnungsstatus'}")]
+        public ACValueItem SelectedFilterInvoiceState
+        {
+            get
+            {
+                return _SelectedFilterInvoiceState;
+            }
+            set
+            {
+                if (_SelectedFilterInvoiceState != value)
+                {
+                    _SelectedFilterInvoiceState = value;
+                    OnPropertyChanged("SelectedFilterInvoiceState");
+                }
+            }
+        }
+
+
+        private ACValueItemList _FilterInvoiceStateList;
+        [ACPropertyList(9999, "FilterInvoiceState")]
+        public ACValueItemList FilterInvoiceStateList
+        {
+            get
+            {
+                if (_FilterInvoiceStateList == null)
+                {
+                    _FilterInvoiceStateList = new ACValueItemList("InvoiceStatesList");
+                    _FilterInvoiceStateList.AddRange(DatabaseApp.MDInvoiceState.ToList().Select(x => new ACValueItem(x.MDInvoiceStateName, x.InvoiceStateIndex, null)).ToList());
+                }
+                return _FilterInvoiceStateList;
+            }
+        }
+
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Invoice No.'}de{'Rechnungs Nr.'}")]
+        public string FilterNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(Invoice.NoColumnName);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(Invoice.NoColumnName);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(Invoice.NoColumnName, value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        public string FilterComment
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>("Comment");
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>("Comment", value);
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
         #endregion
 
         #region ControlMode
@@ -247,10 +331,20 @@ namespace gip.bso.sales
 
         private IQueryable<Invoice> _AccessPrimary_NavSearchExecuting(IQueryable<Invoice> result)
         {
-            if (SelectedFilterMaterial != null)
+            ObjectQuery<Invoice> query = result as ObjectQuery<Invoice>;
+            if (query != null)
             {
-                result = result.Where(c => c.InvoicePos_Invoice.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+                query.Include(c => c.CustomerCompany)
+                     .Include(c => c.DeliveryCompanyAddress)
+                     .Include(c => c.BillingCompanyAddress)
+                     .Include(c => c.OutOrder)
+                     .Include(c => c.IssuerCompanyAddress)
+                     .Include(c => c.IssuerCompanyPerson);
             }
+            if (SelectedFilterMaterial != null)
+                result = result.Where(c => c.InvoicePos_Invoice.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
+            if (FilterInvoiceState.HasValue)
+                result = result.Where(x => x.MDInvoiceState.InvoiceStateIndex == (short)FilterInvoiceState.Value);
             return result;
         }
 
@@ -259,10 +353,8 @@ namespace gip.bso.sales
             get
             {
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
-
-                ACFilterItem acFilterInvoiceNo = new ACFilterItem(Global.FilterTypes.filter, "InvoiceNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true);
-                aCFilterItems.Add(acFilterInvoiceNo);
-
+                aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "InvoiceNo", Global.LogicalOperators.contains, Global.Operators.and, null, true, true));
+                aCFilterItems.Add(new ACFilterItem(Global.FilterTypes.filter, "Comment", Global.LogicalOperators.contains, Global.Operators.and, "", false, false));
                 return aCFilterItems;
             }
         }

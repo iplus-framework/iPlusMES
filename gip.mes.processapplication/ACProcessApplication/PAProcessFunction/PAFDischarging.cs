@@ -289,9 +289,13 @@ namespace gip.mes.processapplication
                 try
                 {
                     route.AttachTo(db); // Global context
+
                     MsgWithDetails msg = GetACMethodFromConfig(db, route, acMethod);
                     if (msg != null)
                         return msg;
+
+                    if (IsSimulationOn)
+                        PAEControlModuleBase.ActivateRouteOnSimulation(route, false);
                 }
                 catch (Exception e)
                 {
@@ -330,23 +334,29 @@ namespace gip.mes.processapplication
             if (pamSilo != null)
                 pamSilo.UnSubscribeTransportFunction(this);
 
-            if (this.IsSimulationOn && !IsManualSimulation)
+            if (this.IsSimulationOn)
             {
-                var acValue = acMethod.ResultValueList.GetACValue("ActualQuantity");
-                PAEScaleGravimetric scale = this.CurrentScaleForWeighing as PAEScaleGravimetric;
-                if (scale != null 
-                    && acValue != null 
-                    && acValue.ParamAsDouble < 0.0000001)
+                if (!IsManualSimulation)
                 {
-                    double actualQuantity = acValue.ParamAsDouble;
-                    if (scale.StoredTareWeight.ValueT > 0.00001)
+                    var acValue = acMethod.ResultValueList.GetACValue("ActualQuantity");
+                    PAEScaleGravimetric scale = this.CurrentScaleForWeighing as PAEScaleGravimetric;
+                    if (scale != null
+                        && acValue != null
+                        && acValue.ParamAsDouble < 0.0000001)
                     {
-                        actualQuantity = scale.StoredTareWeight.ValueT;
-                        if (CurrentACState == ACStateEnum.SMAborted || CurrentACState == ACStateEnum.SMAborting)
-                            actualQuantity = scale.StoredTareWeight.ValueT - scale.ActualValue.ValueT;
+                        double actualQuantity = acValue.ParamAsDouble;
+                        if (scale.StoredTareWeight.ValueT > 0.00001)
+                        {
+                            actualQuantity = scale.StoredTareWeight.ValueT;
+                            if (CurrentACState == ACStateEnum.SMAborted || CurrentACState == ACStateEnum.SMAborting)
+                                actualQuantity = scale.StoredTareWeight.ValueT - scale.ActualValue.ValueT;
+                        }
+                        acMethod.ResultValueList["ActualQuantity"] = actualQuantity;
                     }
-                    acMethod.ResultValueList["ActualQuantity"] = actualQuantity;
                 }
+                ACValue value = acMethod.ParameterValueList.GetACValue("Route");
+                if (value != null)
+                    PAEControlModuleBase.ActivateRouteOnSimulation(value.ValueT<Route>().Clone() as Route, true);
             }
 
             var container = ParentACComponent as IPAMCont;
