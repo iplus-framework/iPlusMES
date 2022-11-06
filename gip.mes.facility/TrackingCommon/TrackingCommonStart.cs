@@ -245,9 +245,12 @@ namespace gip.mes.facility
                     .FirstOrDefault();
                 if (aCClassConfig != null)
                     tandtBSOName = aCClassConfig.Value.ToString();
+                else
+                    tandtBSOName = Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + bsoName;
 
                 acClassTT = gip.core.datamodel.Database.GlobalDatabase.ACClass.Where(c => c.ACIdentifier == bsoName).FirstOrDefault();
             }
+
             if (!string.IsNullOrEmpty(tandtBSOName) && acClassTT != null)
                 config = new TrackingCommonStart_Config() { TandtBSOName = tandtBSOName, ACClassTT = acClassTT };
             return config;
