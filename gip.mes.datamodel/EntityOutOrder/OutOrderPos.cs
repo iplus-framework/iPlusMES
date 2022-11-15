@@ -748,32 +748,54 @@ namespace gip.mes.datamodel
                 }
             }
 
-            if (this.EntityState != System.Data.EntityState.Added)
-            {
-                if (mergeOption.HasValue)
-                    this.FacilityBooking_OutOrderPos.Load(mergeOption.Value);
-                else
-                    this.FacilityBooking_OutOrderPos.AutoLoad();
-            }
-            foreach (FacilityBooking fb in FacilityBooking_OutOrderPos)
-            {
-                foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
-                {
-                    sumActualQuantityUOM += fbc.OutwardQuantityUOM;
-                    try
-                    {
-                        sumActualQuantity += fbc.OutwardMaterial.ConvertQuantity(fbc.OutwardQuantity, fbc.MDUnit, this.MDUnit);
-                    }
-                    catch (Exception ec)
-                    {
-                        string msg = ec.Message;
-                        if (ec.InnerException != null && ec.InnerException.Message != null)
-                            msg += " Inner:" + ec.InnerException.Message;
 
-                        this.Root().Messages.LogException(ClassName, "RecalcActualQuantity(10)", msg);
-                    }
+            DatabaseApp dbApp = null;
+            var sumsPerUnitID = this.FacilityBookingCharge_OutOrderPos
+                                .CreateSourceQuery()
+                                .GroupBy(c => c.MDUnitID)
+                                .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), outwardQ = t.Sum(u => u.OutwardQuantity) })
+                                .ToArray();
+            MDUnit thisMDUnit = this.MDUnit;
+            foreach (var sumPerUnit in sumsPerUnitID)
+            {
+                sumActualQuantityUOM += sumPerUnit.outwardQUOM;
+                double quantity = sumPerUnit.outwardQ;
+                if (thisMDUnit != null && sumPerUnit.MDUnitID != thisMDUnit.MDUnitID && this.Material != null)
+                {
+                    if (dbApp == null)
+                        dbApp = this.GetObjectContext() as DatabaseApp;
+                    MDUnit fromMDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == sumPerUnit.MDUnitID).FirstOrDefault();
+                    quantity = this.Material.ConvertQuantity(quantity, fromMDUnit, thisMDUnit);
                 }
+                sumActualQuantity += quantity;
             }
+
+            //if (this.EntityState != System.Data.EntityState.Added)
+            //{
+            //    if (mergeOption.HasValue)
+            //        this.FacilityBooking_OutOrderPos.Load(mergeOption.Value);
+            //    else
+            //        this.FacilityBooking_OutOrderPos.AutoLoad();
+            //}
+            //foreach (FacilityBooking fb in FacilityBooking_OutOrderPos)
+            //{
+            //    foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+            //    {
+            //        sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+            //        try
+            //        {
+            //            sumActualQuantity += fbc.OutwardMaterial.ConvertQuantity(fbc.OutwardQuantity, fbc.MDUnit, this.MDUnit);
+            //        }
+            //        catch (Exception ec)
+            //        {
+            //            string msg = ec.Message;
+            //            if (ec.InnerException != null && ec.InnerException.Message != null)
+            //                msg += " Inner:" + ec.InnerException.Message;
+
+            //            this.Root().Messages.LogException(ClassName, "RecalcActualQuantity(10)", msg);
+            //        }
+            //    }
+            //}
             this.ActualQuantity = sumActualQuantity;
             this.ActualQuantityUOM = sumActualQuantityUOM;
         }

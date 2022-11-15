@@ -572,32 +572,53 @@ namespace gip.mes.datamodel
                 }
             }
 
-            if (this.EntityState != System.Data.EntityState.Added)
+            DatabaseApp dbApp = null;
+            var sumsPerUnitID = this.FacilityBookingCharge_InOrderPos
+                                .CreateSourceQuery()
+                                .GroupBy(c => c.MDUnitID)
+                                .Select(t => new { MDUnitID = t.Key, inwardQUOM = t.Sum(u => u.InwardQuantityUOM), inwardQ = t.Sum(u => u.InwardQuantity) })
+                                .ToArray();
+            MDUnit thisMDUnit = this.MDUnit;
+            foreach (var sumPerUnit in sumsPerUnitID)
             {
-                if (mergeOption.HasValue)
-                    this.FacilityBooking_InOrderPos.Load(mergeOption.Value);
-                else
-                    this.FacilityBooking_InOrderPos.AutoLoad();
-            }
-            foreach (FacilityBooking fb in FacilityBooking_InOrderPos)
-            {
-                foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+                sumActualQuantityUOM += sumPerUnit.inwardQUOM;
+                double quantity = sumPerUnit.inwardQ;
+                if (thisMDUnit != null && sumPerUnit.MDUnitID != thisMDUnit.MDUnitID && this.Material != null)
                 {
-                    sumActualQuantityUOM += fbc.InwardQuantityUOM;
-                    try
-                    {
-                        sumActualQuantity += fbc.InwardMaterial.ConvertQuantity(fbc.InwardQuantity, fbc.MDUnit, this.MDUnit);
-                    }
-                    catch (Exception ec)
-                    {
-                        string msg = ec.Message;
-                        if (ec.InnerException != null && ec.InnerException.Message != null)
-                            msg += " Inner:" + ec.InnerException.Message;
-
-                        this.Root().Messages.LogException("InOrderPos", "RecalcActualQuantity(10)", msg);
-                    }
+                    if (dbApp == null)
+                        dbApp = this.GetObjectContext() as DatabaseApp;
+                    MDUnit fromMDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == sumPerUnit.MDUnitID).FirstOrDefault();
+                    quantity = this.Material.ConvertQuantity(quantity, fromMDUnit, thisMDUnit);
                 }
+                sumActualQuantity += quantity;
             }
+
+            //if (this.EntityState != System.Data.EntityState.Added)
+            //{
+            //    if (mergeOption.HasValue)
+            //        this.FacilityBooking_InOrderPos.Load(mergeOption.Value);
+            //    else
+            //        this.FacilityBooking_InOrderPos.AutoLoad();
+            //}
+            //foreach (FacilityBooking fb in FacilityBooking_InOrderPos)
+            //{
+            //    foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+            //    {
+            //        sumActualQuantityUOM += fbc.InwardQuantityUOM;
+            //        try
+            //        {
+            //            sumActualQuantity += fbc.InwardMaterial.ConvertQuantity(fbc.InwardQuantity, fbc.MDUnit, this.MDUnit);
+            //        }
+            //        catch (Exception ec)
+            //        {
+            //            string msg = ec.Message;
+            //            if (ec.InnerException != null && ec.InnerException.Message != null)
+            //                msg += " Inner:" + ec.InnerException.Message;
+
+            //            this.Root().Messages.LogException("InOrderPos", "RecalcActualQuantity(10)", msg);
+            //        }
+            //    }
+            //}
             this.ActualQuantity = sumActualQuantity;
             this.ActualQuantityUOM = sumActualQuantityUOM;
         }

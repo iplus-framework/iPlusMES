@@ -532,45 +532,57 @@ namespace gip.mes.datamodel
                 return;
             }
 
-            if (this.EntityState != System.Data.EntityState.Added)
-            {
-                if (mergeOption.HasValue)
-                    this.FacilityBooking_PickingPos.Load(mergeOption.Value);
-                else
-                    this.FacilityBooking_PickingPos.AutoLoad();
-            }
-
+            DatabaseApp dbApp = null;
             double sumActualQuantityUOM = 0;
-            short postingType = 0;
-            foreach (FacilityBooking fb in FacilityBooking_PickingPos)
+            var sumsPerUnitID = this.FacilityBookingCharge_PickingPos
+                                            .CreateSourceQuery()
+                                            .GroupBy(c => c.MDUnitID)
+                                            .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
+                                            .ToArray();
+            MDUnit thisMDUnit = this.MDUnit;
+            foreach (var sumPerUnit in sumsPerUnitID)
             {
-                foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+                double quantity = Math.Abs(sumPerUnit.outwardQUOM) > Double.Epsilon ? sumPerUnit.outwardQUOM : sumPerUnit.inwardQUOM;
+                if (thisMDUnit != null && sumPerUnit.MDUnitID != thisMDUnit.MDUnitID)
                 {
-                    if ((postingType == 0 || postingType == 1)
-                        && Math.Abs(fbc.OutwardQuantityUOM - 0) > Double.Epsilon)
-                    {
-                        sumActualQuantityUOM += fbc.OutwardQuantityUOM;
-                        postingType = 1;
-                    }
-                    else if (postingType == 0 || postingType == 2)
-                    {
-                        sumActualQuantityUOM += fbc.InwardQuantityUOM;
-                        postingType = 2;
-                    }
-                    //try
-                    //{
-                    //    sumActualQuantity += fbc.OutwardMaterial.ConvertQuantity(fbc.OutwardQuantity, fbc.MDUnit, this.MDUnit);
-                    //}
-                    //catch (Exception ec)
-                    //{
-                    //    string msg = ec.Message;
-                    //    if (ec.InnerException != null && ec.InnerException.Message != null)
-                    //        msg += " Inner:" + ec.InnerException.Message;
-
-                    //    this.Root().Messages.LogException(ClassName, "RecalcActualQuantity(10)", msg);
-                    //}
+                    if (dbApp == null)
+                        dbApp = this.GetObjectContext() as DatabaseApp;
+                    MDUnit fromMDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == sumPerUnit.MDUnitID).FirstOrDefault();
+                    quantity = this.Material.ConvertQuantity(quantity, fromMDUnit, thisMDUnit);
                 }
+                sumActualQuantityUOM += quantity;
             }
+
+            //double sumActualQuantityUOM = this.FacilityBooking_PickingPos.SelectMany(c => c.FacilityBookingCharge_FacilityBooking).Sum(c => c.OutwardQuantityUOM);
+            //if (Math.Abs(sumActualQuantityUOM) <= Double.Epsilon)
+            //    sumActualQuantityUOM = this.FacilityBooking_PickingPos.SelectMany(c => c.FacilityBookingCharge_FacilityBooking).Sum(c => c.InwardQuantityUOM);
+
+            //if (this.EntityState != System.Data.EntityState.Added)
+            //{
+            //    if (mergeOption.HasValue)
+            //        this.FacilityBooking_PickingPos.Load(mergeOption.Value);
+            //    else
+            //        this.FacilityBooking_PickingPos.AutoLoad();
+            //}
+
+            //short postingType = 0;
+            //foreach (FacilityBooking fb in FacilityBooking_PickingPos)
+            //{
+            //    foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+            //    {
+            //        if ((postingType == 0 || postingType == 1)
+            //            && Math.Abs(fbc.OutwardQuantityUOM - 0) > Double.Epsilon)
+            //        {
+            //            sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+            //            postingType = 1;
+            //        }
+            //        else if (postingType == 0 || postingType == 2)
+            //        {
+            //            sumActualQuantityUOM += fbc.InwardQuantityUOM;
+            //            postingType = 2;
+            //        }
+            //    }
+            //}
             if (this.PickingActualUOM != sumActualQuantityUOM)
                 this.PickingActualUOM = sumActualQuantityUOM;
         }
