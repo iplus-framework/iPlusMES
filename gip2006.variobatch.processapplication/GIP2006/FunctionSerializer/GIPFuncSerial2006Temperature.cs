@@ -95,6 +95,7 @@ namespace gip2006.variobatch.processapplication
             else
             {
                 int iOffset = 0;
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // Duration
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length; // ReachedTemperature
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
