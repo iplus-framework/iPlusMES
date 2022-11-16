@@ -262,6 +262,18 @@ namespace gip.mes.processapplication
                 CurrentACState = ACStateEnum.SMCompleted;
         }
 
+        public override void SMIdle()
+        {
+            ClearMyConfiguration();
+            base.SMIdle();
+        }
+
+        public override void Reset()
+        {
+            ClearMyConfiguration();
+            base.Reset();
+        }
+
         protected override void DumpPropertyList(XmlDocument doc, XmlElement xmlACPropertyList)
         {
             base.DumpPropertyList(doc, xmlACPropertyList);
