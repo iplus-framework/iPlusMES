@@ -1856,6 +1856,7 @@ namespace gip.bso.manufacturing
             wizardPhaseTitleList.AddEntry((short)NewScheduledBatchWizardPhaseEnum.PartslistForDefinition, "en{'Select & Plan Linie'}de{'Linie Auswählen und Planen'}");
             wizardPhaseTitleList.AddEntry((short)NewScheduledBatchWizardPhaseEnum.DefineBatch, "en{'Batch size suggestion'}de{'Vorschlag zur Chargengröße'}");
             wizardPhaseTitleList.AddEntry((short)NewScheduledBatchWizardPhaseEnum.DefineTargets, "en{'Batchplan'}de{'Batchplan'}");
+            wizardPhaseTitleList.AddEntry((short)NewScheduledBatchWizardPhaseEnum.DeleteBatchPlan, "en{'Delete batch plans'}de{'Batchplan löschen'}");
             return wizardPhaseTitleList;
         }
 
@@ -2914,6 +2915,17 @@ namespace gip.bso.manufacturing
             FactoryBatchPlans(wizardSchedulerPartslist, ref programNo, out generatedBatchPlans);
         }
 
+        private void MoveBatchSortOrderCorrect()
+        {
+            List<ProdOrderBatchPlan> notSelected =
+                   ProdOrderBatchPlanList
+                   .Where(c => !c.IsSelected)
+                   .OrderBy(c => c.ScheduledOrder ?? 0)
+                   .ThenBy(c => c.InsertDate)
+                   .ToList();
+            MoveBatchSortOrderCorrect(notSelected);
+        }
+
         private void MoveBatchSortOrderCorrect(IEnumerable<ProdOrderBatchPlan> prodOrderBatchPlans)
         {
             int nr = 0;
@@ -3500,6 +3512,88 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private void DoSetBatchStateCancelled(bool autoDeleteDependingBatchPlans, List<ProdOrderBatchPlan> selectedBatches, ref List<Guid> groupsForRefresh)
+        {
+
+            foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
+            {
+                batchPlan.AutoRefresh();
+                batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
+            }
+
+            List<MaintainOrderInfo> maintainOrderInfos = new List<MaintainOrderInfo>();
+
+            foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
+            {
+                if (NotAllowedStatesForBatchCancel.Contains(batchPlan.PlanStateIndex))
+                    return;
+
+                var prodOrderPartslist = batchPlan.ProdOrderPartslist;
+                MaintainOrderInfo maintainOrderInfo = maintainOrderInfos.Where(c => c.PO == prodOrderPartslist.ProdOrder).FirstOrDefault();
+                if (maintainOrderInfo == null)
+                {
+                    maintainOrderInfo = new MaintainOrderInfo();
+                    maintainOrderInfo.PO = prodOrderPartslist.ProdOrder;
+                    maintainOrderInfos.Add(maintainOrderInfo);
+                }
+
+                if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
+                    || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
+                {
+                    batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
+                    if (autoDeleteDependingBatchPlans)
+                        maintainOrderInfo.DeactivateAll = true;
+                }
+                else if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
+                {
+                    foreach (var reservation in batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray())
+                    {
+                        batchPlan.FacilityReservation_ProdOrderBatchPlan.Remove(reservation);
+                        reservation.DeleteACObject(this.DatabaseApp, true);
+                    }
+                    Guid mdSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(x => x.MDSchedulingGroupID).FirstOrDefault();
+                    if (!groupsForRefresh.Contains(mdSchedulingGroupID))
+                        groupsForRefresh.Add(mdSchedulingGroupID);
+
+                    batchPlan.DeleteACObject(this.DatabaseApp, true);
+                    prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Remove(batchPlan);
+                    if (autoDeleteDependingBatchPlans && !prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+                        maintainOrderInfo.RemoveAll = true;
+                }
+                else
+                {
+                    if (autoDeleteDependingBatchPlans)
+                        maintainOrderInfo.DeactivateAll = true;
+                }
+            }
+
+            MaintainProdOrderState(maintainOrderInfos);
+
+            MoveBatchSortOrderCorrect();
+
+            MsgWithDetails saveMsg = saveMsg = LocalSaveChanges();
+            if (saveMsg != null)
+                SendMessage(saveMsg);
+
+        }
+
+        private void DoRefreshLinesAfterBatchDelete(List<Guid> groupsForRefresh)
+        {
+            LoadProdOrderBatchPlanList();
+            OnPropertyChanged(nameof(ProdOrderBatchPlanList));
+            OnPropertyChanged(nameof(ProdOrderPartslistList));
+            if (!IsBSOTemplateScheduleParent)
+            {
+                if (groupsForRefresh.Any())
+                {
+                    foreach (var mdSchedulingGroupID in groupsForRefresh)
+                    {
+                        RefreshServerState(mdSchedulingGroupID);
+                    }
+                }
+            }
+        }
+
 
         [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
         public void SetBatchStateCancelled()
@@ -3509,98 +3603,19 @@ namespace gip.bso.manufacturing
                 return;
             try
             {
-                List<Guid> groupsForRefresh = new List<Guid>();
-                List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-                if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
-                {
-                    List<ProdOrderBatchPlan> notSelected =
-                    ProdOrderBatchPlanList
-                    .Where(c => !c.IsSelected)
-                    .OrderBy(c => c.ScheduledOrder ?? 0)
-                    .ThenBy(c => c.InsertDate)
-                    .ToList();
-                    foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
-                    {
-                        batchPlan.AutoRefresh();
-                        batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
-                    }
-                    bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
+                bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
                                                         && AutoRemoveMDSGroupTo > 0
                                                         && SelectedScheduleForPWNode != null
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup != null
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
                                                         && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
 
-                    List<MaintainOrderInfo> prodOrders = new List<MaintainOrderInfo>();
-                    //partslists.Select(c => new MaintainOrderInfo() { PO = c.ProdOrder }).Distinct().ToList();
-                    foreach (ProdOrderBatchPlan batchPlan in selectedBatches)
-                    {
-                        if (NotAllowedStatesForBatchCancel.Contains(batchPlan.PlanStateIndex))
-                            return;
-
-                        var parentPOList = batchPlan.ProdOrderPartslist;
-                        MaintainOrderInfo mOrderInfo = prodOrders.Where(c => c.PO == parentPOList.ProdOrder).FirstOrDefault();
-                        if (mOrderInfo == null)
-                        {
-                            mOrderInfo = new MaintainOrderInfo();
-                            mOrderInfo.PO = parentPOList.ProdOrder;
-                            prodOrders.Add(mOrderInfo);
-                        }
-
-                        if (batchPlan.PlanState >= vd.GlobalApp.BatchPlanState.Paused
-                            || batchPlan.ProdOrderBatch_ProdOrderBatchPlan.Any())
-                        {
-                            batchPlan.PlanState = GlobalApp.BatchPlanState.Cancelled;
-                            if (autoDeleteDependingBatchPlans)
-                                mOrderInfo.DeactivateAll = true;
-                        }
-                        else if (batchPlan.PlanState == GlobalApp.BatchPlanState.Created)
-                        {
-                            foreach (var reservation in batchPlan.FacilityReservation_ProdOrderBatchPlan.ToArray())
-                            {
-                                batchPlan.FacilityReservation_ProdOrderBatchPlan.Remove(reservation);
-                                reservation.DeleteACObject(this.DatabaseApp, true);
-                            }
-                            Guid mdSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(x => x.MDSchedulingGroupID).FirstOrDefault();
-                            if (!groupsForRefresh.Contains(mdSchedulingGroupID))
-                                groupsForRefresh.Add(mdSchedulingGroupID);
-
-                            batchPlan.DeleteACObject(this.DatabaseApp, true);
-                            parentPOList.ProdOrderBatchPlan_ProdOrderPartslist.Remove(batchPlan);
-                            if (autoDeleteDependingBatchPlans && !parentPOList.ProdOrderBatchPlan_ProdOrderPartslist.Any())
-                                mOrderInfo.RemoveAll = true;
-                        }
-                        else
-                        {
-                            if (autoDeleteDependingBatchPlans)
-                                mOrderInfo.DeactivateAll = true;
-                        }
-                    }
-
-                    MDProdOrderState mDProdOrderStateCompleted = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
-                    MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
-
-                    MaintainProdOrderState(prodOrders, mDProdOrderStateCancelled, mDProdOrderStateCompleted);
-
-                    MoveBatchSortOrderCorrect(notSelected);
-
-                    MsgWithDetails saveMsg = saveMsg = LocalSaveChanges();
-                    if (saveMsg != null)
-                        SendMessage(saveMsg);
-
-                    LoadProdOrderBatchPlanList();
-                    OnPropertyChanged(nameof(ProdOrderBatchPlanList));
-                    OnPropertyChanged(nameof(ProdOrderPartslistList));
-                    if (!IsBSOTemplateScheduleParent)
-                    {
-                        if (groupsForRefresh.Any())
-                        {
-                            foreach (var mdSchedulingGroupID in groupsForRefresh)
-                            {
-                                RefreshServerState(mdSchedulingGroupID);
-                            }
-                        }
-                    }
+                if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
+                {
+                    List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+                    List<Guid> groupsForRefresh = new List<Guid>();
+                    DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
+                    DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                 }
             }
             catch (Exception ex)
@@ -3627,6 +3642,11 @@ namespace gip.bso.manufacturing
                       NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
                 );
         }
+        
+        /// <summary>
+        /// Method for new behavior deleting batch plans
+        /// for test
+        /// </summary>
         [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
         public void SetBatchStateCancelled2()
         {
@@ -3635,27 +3655,65 @@ namespace gip.bso.manufacturing
                 return;
             if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
             {
-                bool isSetBatchStateCancelledForTreeDelete = IsSetBatchStateCancelledForTreeDelete();
-                if (isSetBatchStateCancelledForTreeDelete)
+                try
                 {
-                    Global.MsgResult answer = Messages.YesNoCancel(this, "Question50093");
-                    if (answer == Global.MsgResult.Yes)
+                    List<Guid> groupsForRefresh = new List<Guid>();
+                    List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+
+
+                    bool isSetBatchStateCancelledForTreeDelete = IsSetBatchStateCancelledForTreeDelete();
+                    if (isSetBatchStateCancelledForTreeDelete)
                     {
-                        // Silent delete batch plans for current ProdOrder
-                    }
-                    else if (answer == Global.MsgResult.Cancel)
-                    {
-                        // Wizard delete batch plans for current ProdOrder
+                        Global.MsgResult answer = Messages.YesNoCancel(this, "Question50093");
+                        if (answer == Global.MsgResult.Yes)
+                        {
+                            // Silent delete batch plans for current ProdOrder
+                            DoSetBatchStateCancelled(true, selectedBatches, ref groupsForRefresh);
+                            DoRefreshLinesAfterBatchDelete(groupsForRefresh);
+                        }
+                        else if (answer == Global.MsgResult.Cancel)
+                        {
+                            // Wizard delete batch plans for current ProdOrder
+                            if (SelectedProdOrderBatchPlan != null)
+                            {
+                                IsWizard = true;
+                                WizardPhase = NewScheduledBatchWizardPhaseEnum.DeleteBatchPlan;
+                                WizardForwardAction(wizardPhase: NewScheduledBatchWizardPhaseEnum.DeleteBatchPlan);
+                                OnPropertyChanged(nameof(CurrentLayout));
+                            }
+                        }
+                        else
+                        {
+                            // do nothing
+                        }
                     }
                     else
                     {
-                        // do nothing
+                        // delete batches as usuall (on current linie)
+                        bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
+                                                        && AutoRemoveMDSGroupTo > 0
+                                                        && SelectedScheduleForPWNode != null
+                                                        && SelectedScheduleForPWNode.MDSchedulingGroup != null
+                                                        && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
+                                                        && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
+                        DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
+                        DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    // delete batches as usuall (on current linie)
+                    string msg = "";
+                    Exception tmpEx = ex;
+                    while (tmpEx != null)
+                    {
+                        msg += tmpEx.Message;
+                        tmpEx = tmpEx.InnerException;
+                    }
+
+                    Msg errMsg = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = nameof(SetBatchStateCancelled2), Message = msg };
+                    SendMessage(errMsg);
                 }
+
             }
         }
 
@@ -3878,23 +3936,8 @@ namespace gip.bso.manufacturing
                                                 && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
 
             List<MaintainOrderInfo> prodOrders = new List<MaintainOrderInfo>();
-            //= plForRemove.Select(c => new MaintainOrderInfo() { PO = c.ProdOrder }).Distinct().ToList();
 
             List<ProdOrderPartslist> allForRemove = new List<ProdOrderPartslist>();
-
-            //foreach (ProdOrderPartslist partslist in plForRemove)
-            //{
-            //    if(partslist.ProdOrder.ProdOrderPartslist_ProdOrder.Count() > 1)
-            //    {
-            //        ProdOrderPartslist finalList =
-            //            partslist.ProdOrder
-            //            .ProdOrderPartslist_ProdOrder
-            //            .Where(c => !c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID != null)).FirstOrDefault();
-
-            //        ProdOrderPartslistExpand expandItem  =new ProdOrderPartslistExpand(finalList);
-            //        expandItem.LoadTree();
-            //    }
-            //}
 
 
             foreach (ProdOrderPartslist partslist in plForRemove)
@@ -3942,7 +3985,8 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            MaintainProdOrderState(prodOrders, mDProdOrderStateCancelled, mDProdOrderStateCompleted);
+
+            MaintainProdOrderState(prodOrders);
 
             MsgWithDetails saveMsg = LocalSaveChanges();
             if (saveMsg != null)
@@ -3967,8 +4011,11 @@ namespace gip.bso.manufacturing
             public bool DeactivateAll { get; set; }
         }
 
-        protected void MaintainProdOrderState(List<MaintainOrderInfo> prodOrders, MDProdOrderState mDProdOrderStateCancelled, MDProdOrderState mDProdOrderStateCompleted)
+        protected void MaintainProdOrderState(List<MaintainOrderInfo> prodOrders)
         {
+            MDProdOrderState mDProdOrderStateCompleted = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.ProdFinished).FirstOrDefault();
+            MDProdOrderState mDProdOrderStateCancelled = DatabaseApp.s_cQry_GetMDProdOrderState(DatabaseApp, MDProdOrderState.ProdOrderStates.Cancelled).FirstOrDefault();
+
             foreach (MaintainOrderInfo poInfo in prodOrders)
             {
 
@@ -4033,8 +4080,6 @@ namespace gip.bso.manufacturing
                         poInfo.PO.MDProdOrderState = mDProdOrderStateCompleted;
                     }
                 }
-
-
             }
         }
 
@@ -4134,6 +4179,31 @@ namespace gip.bso.manufacturing
             {
                 SelectedWizardSchedulerPartslist = wizardSchedulerPartslist;
                 WizardForward();
+            }
+        }
+
+        [ACMethodInfo("WizardDeletePartslist", "en{'Delete'}de{'Löschen'}", 9999)]
+        public void WizardDeletePartslist(object CommandParameter)
+        {
+            WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
+            if (
+                    wizardSchedulerPartslist != null
+                    && wizardSchedulerPartslist.WFNodeMES != null
+                    && (
+                            !wizardSchedulerPartslist.IsSolved
+                            ||
+                                (
+                                    (SelectedWizardSchedulerPartslist != null && SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null)
+                                    && wizardSchedulerPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished
+                                )
+                        ))
+            {
+                List<Guid> groupsForRefresh = new List<Guid>();
+                List<ProdOrderBatchPlan> batchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+                DoSetBatchStateCancelled(false, batchPlans, ref groupsForRefresh);
+
+                wizardSchedulerPartslist.IsSolved = true;
+                OnPropertyChanged(nameof(WizardSchedulerPartslistList));
             }
         }
 
@@ -4339,7 +4409,10 @@ namespace gip.bso.manufacturing
                         if (WizardSolvedTasks.Contains(NewScheduledBatchWizardPhaseEnum.PartslistForDefinition))
                             return true;
                         if (DefaultWizardSchedulerPartslist.ProgramNo != null)
-                            LoadExistingWizardSchedulerPartslistList(DefaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder);
+                        {
+                            List<ProdOrderPartslist> plsForDefinition = DefaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
+                            LoadExistingWizardSchedulerPartslistList(plsForDefinition);
+                        }
                         if (rootPartslistExpand != null)
                             LoadBOMExplosionItems(DefaultWizardSchedulerPartslist.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder);
 
@@ -4400,6 +4473,22 @@ namespace gip.bso.manufacturing
                             }
                             WizardSolvedTasks.Add(NewScheduledBatchWizardPhaseEnum.DefineTargets);
                         }
+                        break;
+                    case NewScheduledBatchWizardPhaseEnum.DeleteBatchPlan:
+                        List<ProdOrderPartslist> partslists = new List<ProdOrderPartslist>();
+                        ProdOrder prodOrder = SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrder;
+                        foreach (ProdOrderPartslist pl in prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToArray())
+                        {
+                            bool existBatchPlanForDeleteOrCancel = 
+                                pl
+                                .ProdOrderBatchPlan_ProdOrderPartslist
+                                .Any(c=> c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Created || c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Paused);
+                            if(existBatchPlanForDeleteOrCancel)
+                            {
+                                partslists.Add(pl);
+                            }
+                        }
+                        LoadExistingWizardSchedulerPartslistList(partslists);
                         break;
                 }
             }
@@ -4517,10 +4606,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void LoadExistingWizardSchedulerPartslistList(ProdOrder prodOrder)
+        private void LoadExistingWizardSchedulerPartslistList(List<ProdOrderPartslist> partslists)
         {
             AllWizardSchedulerPartslistList = new List<WizardSchedulerPartslist>();
-            List<ProdOrderPartslist> partslists = prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToList();
             foreach (ProdOrderPartslist prodOrderPartslist in partslists)
             {
                 bool isThere = AllWizardSchedulerPartslistList.Where(c => c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID).Any();
@@ -4994,7 +5082,7 @@ namespace gip.bso.manufacturing
 
             bool noBatchPlan = !partslist.ProdOrderBatchPlan_ProdOrderPartslist.Any();
             bool anyNotCompleted = partslist.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex != (short)GlobalApp.BatchPlanState.Completed).Any();
-            
+
             if (noBatchPlan || anyNotCompleted)
             {
                 partslist.MDProdOrderState = mDProdOrderStateCancelled;
@@ -5446,6 +5534,7 @@ namespace gip.bso.manufacturing
         BOMExplosion = 3,
         PartslistForDefinition = 4,
         DefineBatch = 5,
-        DefineTargets = 6
+        DefineTargets = 6,
+        DeleteBatchPlan = 7
     }
 }
