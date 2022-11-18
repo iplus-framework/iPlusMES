@@ -1598,7 +1598,7 @@ namespace gip.mes.facility
             intermediate.MDProdOrderPartslistPosState = DatabaseApp.s_cQry_GetMDProdOrderPosState(databaseApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.AutoStart).FirstOrDefault();
             if (prodOrderBatchPlan.PlanState != GlobalApp.BatchPlanState.AutoStart)
                 prodOrderBatchPlan.PlanState = GlobalApp.BatchPlanState.AutoStart;
-            prodOrderBatchPlan.PlannedStartDate = DateTime.Now;
+            prodOrderBatchPlan.PlannedStartDate = DateTimeUtils.NowDST;
         }
 
         public ProdOrderPartslistPos GetIntermediate(ProdOrderPartslist prodOrderPartslist, MaterialWFConnection matWFConnection)

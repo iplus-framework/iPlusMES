@@ -181,7 +181,7 @@ namespace gip.mes.processapplication
                         subProgramLog.XMLConfig = ACConvert.ObjectToXML(acMethod, true);
                     if (subProgramLog.XMLConfig == null)
                         subProgramLog.XMLConfig = "";
-                    subProgramLog.StartDate = DateTime.Now;
+                    subProgramLog.StartDate = DateTimeUtils.NowDST;
                     subProgramLog.NewACProgramForQueue = acProgram;
                     subProgramLog.NewParentACProgramLogForQueue = currentProgramLog;
 
@@ -220,7 +220,7 @@ namespace gip.mes.processapplication
                     core.datamodel.ACProgramLog subProgramLog = ACClassTaskQueue.TaskQueue.Context.ACProgramLog.Where(c => c.ParentACProgramLogID == currentProgramLog.ACProgramLogID && c.ACUrl == invokerACUrl).OrderByDescending(c => c.InsertDate).FirstOrDefault();
                     if (subProgramLog != null)
                     {
-                        subProgramLog.EndDate = DateTime.Now;
+                        subProgramLog.EndDate = DateTimeUtils.NowDST;
                         if (subProgramLog.StartDate.HasValue)
                             subProgramLog.Duration = subProgramLog.EndDate.Value - subProgramLog.StartDate.Value;
                         subProgramLog.UpdateDate = DateTime.Now;

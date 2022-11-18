@@ -442,7 +442,7 @@ namespace gip.bso.manufacturing
                 {
                     if (SelectedBatchPlanForIntermediate.PlanState == GlobalApp.BatchPlanState.AutoStart)
                     {
-                        SelectedBatchPlanForIntermediate.PlannedStartDate = DateTime.Now;
+                        SelectedBatchPlanForIntermediate.PlannedStartDate = DateTimeUtils.NowDST;
                         if (!_IsStartingBatchPlan)
                         {
                             // Eine manuelle Statusänderung auf <Autostart> hat möglicherweise keine Auswirkung auf die Prozesssteuerung. Bitte setzen Sie den Status wieder zurück auf <Neu angelegt> und drücken Sie die <Start Batch>-Taste!

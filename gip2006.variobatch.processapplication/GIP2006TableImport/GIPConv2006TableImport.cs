@@ -177,6 +177,8 @@ namespace gip2006.variobatch.processapplication
             return ImportDataTable(table, fileName, dbApp, autoSave, bgWorker);
         }
 
+        protected virtual void OnStartImportFile(string[] lines, String fileName, DatabaseApp dbApp, AutoSaveMode autoSave, ACBackgroundWorker bgWorker) { }
+        protected virtual void OnEndImportFile(string[] lines, String fileName, DatabaseApp dbApp, AutoSaveMode autoSave, ACBackgroundWorker bgWorker) { }
         private Msg ImportFile(string[] lines, String fileName, DatabaseApp dbApp, AutoSaveMode autoSave, ACBackgroundWorker bgWorker)
         {
             if (dbApp == null)
@@ -194,6 +196,7 @@ namespace gip2006.variobatch.processapplication
             //    bgWorker.ProgressInfo.SubProgressCurrent = 0;
             //}
 
+            OnStartImportFile(lines, fileName, dbApp, autoSave, bgWorker);
             List<string> fields = new List<string>();
             int row = 0;
             foreach (string line in lines)
@@ -239,6 +242,8 @@ namespace gip2006.variobatch.processapplication
                 ReportProgressSub(bgWorker);
             }
 
+            OnEndImportFile(lines, fileName, dbApp, autoSave, bgWorker);
+
             if (autoSave == AutoSaveMode.SaveAfterImport)
             {
                 Msg result = dbApp.ACSaveChanges();
@@ -252,6 +257,8 @@ namespace gip2006.variobatch.processapplication
             return null;
         }
 
+        protected virtual void OnStartImportFile(DataTable table, String fileName, DatabaseApp dbApp, AutoSaveMode autoSave, ACBackgroundWorker bgWorker) { }
+        protected virtual void OnEndImportFile(DataTable table, String fileName, DatabaseApp dbApp, AutoSaveMode autoSave, ACBackgroundWorker bgWorker) { }
         public Msg ImportDataTable(DataTable table, String fileName, DatabaseApp dbApp, AutoSaveMode autoSave, ACBackgroundWorker bgWorker)
         {
             if (dbApp == null)
@@ -268,6 +275,7 @@ namespace gip2006.variobatch.processapplication
                 //bgWorker.ProgressInfo.SubProgressCurrent = 0;
             }
 
+            OnStartImportFile(table, fileName, dbApp, autoSave, bgWorker);
             List<string> fields = new List<string>(table.Columns.Count);
             int col = 0;
             foreach (DataColumn column in table.Columns)
@@ -323,6 +331,8 @@ namespace gip2006.variobatch.processapplication
                     return result;
                 }
             }
+            OnEndImportFile(table, fileName, dbApp, autoSave, bgWorker);
+
 
             return null;
         }

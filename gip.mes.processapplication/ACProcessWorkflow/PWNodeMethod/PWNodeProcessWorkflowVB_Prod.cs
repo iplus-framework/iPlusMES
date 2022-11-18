@@ -932,6 +932,7 @@ namespace gip.mes.processapplication
                     }
                     else
                     {
+                        dbApp.ACSaveChanges();
                         if (intermediatePosition.ProdOrderPartslist.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished)
                         {
                             saveMsg = ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, intermediatePosition.ProdOrderPartslist.ProdOrder, false);
@@ -941,6 +942,8 @@ namespace gip.mes.processapplication
                                 OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(DoFinalPostingsOnCompletedBatchPlan), 1010), true);
                                 dbApp.ACUndoChanges();
                             }
+                            else
+                                dbApp.ACSaveChanges();
                         }
                     }
                 }

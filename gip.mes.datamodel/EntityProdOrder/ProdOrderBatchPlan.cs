@@ -47,7 +47,7 @@ namespace gip.mes.datamodel
             entity.PlanMode = BatchPlanMode.UseBatchCount;
             entity.PlanState = GlobalApp.BatchPlanState.Created;
             entity.IsValidated = false;
-            entity.PlannedStartDate = DateTime.Now;
+            entity.PlannedStartDate = DateTimeUtils.NowDST;
             // TODO setup batchMode
             if (parentACObject is ProdOrderPartslist)
             {
