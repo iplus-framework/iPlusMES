@@ -66,7 +66,20 @@ namespace gip.mes.processapplication
             }
         }
 
-        
+        public bool CheckIsOrderCompletedOnRelease
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("CheckIsOrderCompletedOnRelease");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
 
         #endregion
 
@@ -242,10 +255,20 @@ namespace gip.mes.processapplication
 
         public virtual Msg OnGetMessageOnReleasingProcessModule(PAFWorkTaskScanBase invoker, bool pause)
         {
+            Msg resultMsg = null;
+            //if (!pause)
+            //{
+            //    resultMsg = IsOrderCompletedOnRelease(invoker);
+            //}
+
+            if (resultMsg != null)
+                return resultMsg;
+
             PWGroupVB parentPwGroupVB = ParentPWGroup as PWGroupVB;
             if (parentPwGroupVB != null)
-                return parentPwGroupVB.OnGetMessageOnReleasingProcessModule(invoker, pause);
-            return null;
+                resultMsg = parentPwGroupVB.OnGetMessageOnReleasingProcessModule(invoker, pause);
+
+            return resultMsg;
         }
 
         public virtual Msg ChangeReceivedParams(PAFWorkTaskScanBase invoker, ACMethod acMethod)
@@ -269,6 +292,80 @@ namespace gip.mes.processapplication
             {
                 return true;
             }
+        }
+
+        public virtual Msg IsOrderCompletedOnRelease(PAFWorkTaskScanBase invoker)
+        {
+            Msg question = null;
+
+            PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
+            // If dosing is not for production, then do nothing
+            if (pwMethodProduction == null)
+                return null;
+
+            using (var dbIPlus = new Database())
+            {
+                using (var dbApp = new DatabaseApp(dbIPlus))
+                {
+                    ProdOrderBatch batch = dbApp.ProdOrderBatch.Include(c => c.ProdOrderPartslistPosRelation_ProdOrderBatch)
+                                                               .FirstOrDefault(c => c.ProdOrderBatchID == pwMethodProduction.CurrentProdOrderBatch.ProdOrderBatchID);
+
+                    ProdOrderPartslistPos endBatchPos = dbApp.ProdOrderPartslistPos
+                                                             .Include(c => c.FacilityBookingCharge_ProdOrderPartslistPos)
+                                                             .FirstOrDefault(c => c.ProdOrderPartslistID == pwMethodProduction.CurrentProdOrderPartslistPos.ProdOrderPartslistID);
+                    
+                    if (batch == null)
+                    {
+                        //// Error50570: No batch assigned to last intermediate material of this workflow.
+                        //msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(IsOrderCompletedOnRelease) + "(20)", 168, "Error50570");
+
+                        //if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                        //    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        //OnNewAlarmOccurred(ProcessAlarm, msg, false);
+                        return null;
+                    }
+                    else if (endBatchPos == null)
+                    {
+                        //// Error50572: The last intermediate material not exist!
+                        //msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CorrectInwardQuantsAccordingOutwardPostings) + "(20)", 168, "Error50572");
+
+                        //if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                        //    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        //OnNewAlarmOccurred(ProcessAlarm, msg, false);
+                        return null;
+                    }
+
+                    if (!endBatchPos.FacilityBookingCharge_ProdOrderPartslistPos.Any())
+                    {
+                        return new Msg() { Message = "Please check if you perform a inward posting. Do you want continue with release process?", 
+                                           MessageLevel = eMsgLevel.Question, 
+                                           MessageButton = eMsgButton.YesNo};
+                    }
+
+                    var relations = batch.ProdOrderPartslistPosRelation_ProdOrderBatch.Where(c => !c.SourceProdOrderPartslistPos.Material.IsIntermediate);
+
+                    foreach (var relation in relations)
+                    {
+                        if (relation.FacilityBookingCharge_ProdOrderPartslistPosRelation.Any() 
+                            || relation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                            || relation.MDProdOrderPartslistPosState.ProdOrderPartslistPosState == MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)
+                        {
+                            continue;
+                        }
+
+                        return new Msg()
+                        {
+                            Message = "Please check if you perform all outward postings. Do you want continue with release process?",
+                            MessageLevel = eMsgLevel.Question,
+                            MessageButton = eMsgButton.YesNo
+                        };
+
+                    }
+                }
+            }
+
+
+            return question;
         }
 
         public override void SMStarting()
