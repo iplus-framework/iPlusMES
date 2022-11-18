@@ -406,7 +406,12 @@ namespace gip.mes.processapplication
                 return;
             Guid intermediatePosID, intermediateChildPosID;
             pwNode.GetAssignedIntermediate(out intermediatePosID, out intermediateChildPosID);
-            infoList.Add(new PAProdOrderPartslistWFInfo()
+            infoList.Add(OnCreateNewWFInfo(infoList, activeWorkflow, pwNode, forRelease, intermediatePosID, intermediateChildPosID)); 
+        }
+
+        protected virtual PAProdOrderPartslistWFInfo OnCreateNewWFInfo(List<PAProdOrderPartslistWFInfo> infoList, PWMethodProduction activeWorkflow, PWWorkTaskScanBase pwNode, bool forRelease, Guid intermediatePosID, Guid intermediateChildPosID)
+        {
+            return new PAProdOrderPartslistWFInfo()
             {
                 POPId = activeWorkflow.CurrentProdOrderPartslistPos.ProdOrderPartslistID,
                 POPPosId = activeWorkflow.CurrentProdOrderPartslistPos.ProdOrderPartslistPosID,
@@ -416,10 +421,8 @@ namespace gip.mes.processapplication
                 ACUrlWF = pwNode.GetACUrl(),
                 ForRelease = forRelease,
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
-                WFMethod = pwNode.CurrentACMethod.ValueT,
-                PostingQSuggestionMode = pwNode.PostingQuantitySuggestionMode.HasValue ? pwNode.PostingQuantitySuggestionMode.Value : PostingQuantitySuggestionMode.OrderQuantity,
-                PostingQSuggestionMode2 = pwNode.PostingQuantitySuggestionMode2.HasValue ? pwNode.PostingQuantitySuggestionMode2.Value : PostingQuantitySuggestionMode.None
-            }) ; 
+                WFMethod = pwNode.CurrentACMethod.ValueT
+            };
         }
 
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)

@@ -188,11 +188,15 @@ namespace gip.mes.webservices
 
                             var resultToRemoveList = pwInfo.WFMethod.ResultValueList.Where(c => !c.IsPrimitiveType).ToArray();
                             foreach (var resultToRemove in resultToRemoveList)
+                            {
                                 pwInfo.WFMethod.ResultValueList.Remove(resultToRemove);
+                            }
 
                             var paramToRemoveList = pwInfo.WFMethod.ParameterValueList.Where(c => !c.IsPrimitiveType).ToArray();
                             foreach (var paramToRemove in paramToRemoveList)
+                            {
                                 pwInfo.WFMethod.ParameterValueList.Remove(paramToRemove);
+                            }
                         }
 
                         pwInfo.PostingQSuggestionMode = orderWFInfo.PostingQSuggestionMode;

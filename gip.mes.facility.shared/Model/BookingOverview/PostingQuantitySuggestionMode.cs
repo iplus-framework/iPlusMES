@@ -30,9 +30,9 @@ namespace gip.mes.facility
         public ACValueListPostingQuantitySuggestionMode() : base(nameof(PostingQuantitySuggestionMode))
         {
             AddEntry(PostingQuantitySuggestionMode.None, "en{'None'}de{'Keine'}");
-            AddEntry(PostingQuantitySuggestionMode.OrderQuantity, "en{'According order quantity'}de{'Nach Bestellmenge'}");
-            AddEntry(PostingQuantitySuggestionMode.ForceQuantQuantity, "en{'Force quant quantity'}de{'Kraft-Quant-Menge'}");
-            AddEntry(PostingQuantitySuggestionMode.ProportionallyAnotherComp, "en{'Proportionally another component (first component)'}de{'Proportionally another component (first component)'}");
+            AddEntry(PostingQuantitySuggestionMode.OrderQuantity, "en{'According order quantity'}de{'Entsprechend Auftragsgröße'}");
+            AddEntry(PostingQuantitySuggestionMode.ForceQuantQuantity, "en{'Force quant quantity'}de{'Übernehme Quantmenge'}");
+            AddEntry(PostingQuantitySuggestionMode.ProportionallyAnotherComp, "en{'Proportionally to main component'}de{'Proportional zur Hauptkomponente'}");
         }
     }
 #endif

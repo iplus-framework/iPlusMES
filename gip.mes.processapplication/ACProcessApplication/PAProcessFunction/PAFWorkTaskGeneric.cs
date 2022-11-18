@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
@@ -82,6 +83,19 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("Description", typeof(string), "", Global.ParamOption.Optional));
             paramTranslation.Add("Description", "en{'Description'}de{'Bechreibung'}");
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
+        }
+
+        protected override PAProdOrderPartslistWFInfo OnCreateNewWFInfo(List<PAProdOrderPartslistWFInfo> infoList, PWMethodProduction activeWorkflow, PWWorkTaskScanBase pwNode, bool forRelease, Guid intermediatePosID, Guid intermediateChildPosID)
+        {
+            PAProdOrderPartslistWFInfo wfInfo = base.OnCreateNewWFInfo(infoList, activeWorkflow, pwNode, forRelease, intermediatePosID, intermediateChildPosID);
+            PWWorkTaskGeneric pwGenericTask = pwNode as PWWorkTaskGeneric;
+            // TODO: Remove after resolving json-serialization problem and replacement of newer version on mobile devices
+            if (pwGenericTask != null)
+            {
+                wfInfo.PostingQSuggestionMode = pwGenericTask.PostingQuantitySuggestionMode.HasValue ? pwGenericTask.PostingQuantitySuggestionMode.Value : PostingQuantitySuggestionMode.OrderQuantity;
+                wfInfo.PostingQSuggestionMode2 = pwGenericTask.PostingQuantitySuggestionMode2.HasValue ? pwGenericTask.PostingQuantitySuggestionMode2.Value : PostingQuantitySuggestionMode.None;
+            }
+            return wfInfo;
         }
 
 
