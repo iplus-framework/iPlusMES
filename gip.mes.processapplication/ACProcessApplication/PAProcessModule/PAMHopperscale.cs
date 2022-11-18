@@ -25,6 +25,7 @@ namespace gip.mes.processapplication
         {
             _PAPointMatIn1 = new PAPoint(this, nameof(PAPointMatIn1));
             _PAPointMatOut1 = new PAPoint(this, nameof(PAPointMatOut1));
+            _PAPointMatIn2 = new PAPoint(this, nameof(PAPointMatIn2));
         }
 
         #region Points
@@ -35,6 +36,16 @@ namespace gip.mes.processapplication
             get
             {
                 return _PAPointMatIn1;
+            }
+        }
+
+        PAPoint _PAPointMatIn2;
+        [ACPropertyConnectionPoint(9999, "PointMaterial")]
+        public PAPoint PAPointMatIn2
+        {
+            get
+            {
+                return _PAPointMatIn2;
             }
         }
 
