@@ -2856,7 +2856,7 @@ namespace gip.bso.manufacturing
                         return null;
 
                     double maxWeight = 0;
-                    ACClassProperty maxWeightProp = componentClass.GetProperty(PAProcessModule.PropNameMaxWeightCapacity);
+                    ACClassProperty maxWeightProp = componentClass.GetProperty(nameof(PAProcessModule.MaxWeightCapacity));
                     if (maxWeightProp != null && maxWeightProp.Value != null && maxWeightProp.Value is string)
                         maxWeight = (double)ACConvert.ChangeType(maxWeightProp.Value as string, typeof(double), true, db);
 

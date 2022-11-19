@@ -500,7 +500,7 @@ namespace gip.mes.facility
                                         foreach (var acClassPM in pwGroup2Check.ProcessModuleList)
                                         {
                                             double maxWeight = 0;
-                                            var acClassProperty = acClassPM.GetProperty(PAProcessModule.PropNameMaxWeightCapacity);
+                                            var acClassProperty = acClassPM.GetProperty(nameof(PAProcessModule.MaxWeightCapacity));
                                             if (acClassProperty != null && acClassProperty.Value != null && acClassProperty.Value is string)
                                                 maxWeight = (double)ACConvert.ChangeType(acClassProperty.Value as string, typeof(double), true, dbIPlus);
                                             if (maxWeight > 0.001)
@@ -510,7 +510,7 @@ namespace gip.mes.facility
                                                     minMaxWeight = maxWeight;
                                                     acClassWithMinCapacity = acClassPM;
 
-                                                    acClassProperty = acClassPM.GetProperty(PAProcessModule.PropNameMaxCapacityRepeat);
+                                                    acClassProperty = acClassPM.GetProperty(nameof(PAProcessModule.MaxCapacityRepeat));
                                                     if (acClassProperty != null && acClassProperty.Value != null && acClassProperty.Value is string)
                                                         maxRepeatsInterDis = (short)ACConvert.ChangeType(acClassProperty.Value as string, typeof(short), true, dbIPlus);
                                                 }

@@ -2963,6 +2963,7 @@ namespace gip.bso.manufacturing
                         && _SelectedProdOrderIntermediateBatch.EntityState != EntityState.Detached)
                     {
                         _SelectedProdOrderIntermediateBatch.LabOrder_ProdOrderPartslistPos.AutoLoad(this.DatabaseApp);
+                        _SelectedProdOrderIntermediateBatch.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.AutoLoad(this.DatabaseApp);
                     }
                     SearchOutwardPartslistPos();
                     OnPropertyChanged("SelectedProdOrderIntermediateBatch");
@@ -3281,11 +3282,12 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (SelectedProdOrderIntermediateBatch == null) return null;
+                if (SelectedProdOrderIntermediateBatch == null) 
+                    return null;
                 return SelectedProdOrderIntermediateBatch
-               .ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos
-               .OrderBy(c => c.IsActive)
-               .ThenBy(c => c.FacilityLot.LotNo);
+                       .ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos
+                       .OrderBy(c => c.IsActive)
+                       .ThenBy(c => c.FacilityLot.LotNo);
             }
         }
 
