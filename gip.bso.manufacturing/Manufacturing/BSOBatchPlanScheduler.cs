@@ -3299,6 +3299,22 @@ namespace gip.bso.manufacturing
                 this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
         }
 
+        /// <summary>
+        /// Source Property: ShowPartslistDescription
+        /// </summary>
+        [ACMethodInfo("ShowPartslistDescription", "en{'Recipe details'}de{'Stücklistedetails'}", 999, true)]
+        public void ShowPartslistDescription()
+        {
+            if (!IsEnabledShowPartslistDescription())
+                return;
+            ShowDialog(this, "PartslistDescriptionDlg");
+        }
+
+        public bool IsEnabledShowPartslistDescription()
+        {
+            return SelectedProdOrderBatchPlan != null;
+        }
+
         #endregion
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
@@ -4182,7 +4198,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("WizardDeletePartslist", "en{'Delete'}de{'Löschen'}", 9999)]
+        [ACMethodInfo("WizardDeletePartslist", "en{'Remove'}de{'Entfernen'}", 9999)]
         public void WizardDeletePartslist(object CommandParameter)
         {
             WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
