@@ -988,6 +988,8 @@ namespace gip.mes.webservices
                         overview.MaterialSum = facManager.GetFacilityChargeSumMaterialHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
                         overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
                         overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter() { FacilityLotID = guid });
+                        if (facilityChargeList != null)
+                            facilityChargeList = facilityChargeList.Where(c => c.Facility != null && !c.Facility.DisabledForMobile).ToArray();
                         overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
                         return new WSResponse<FacilityLotSumOverview>(overview);
                     }
@@ -1120,6 +1122,8 @@ namespace gip.mes.webservices
                         overview.FacilitySum = facManager.GetFacilityChargeSumFacilityHelperList(facilityChargeList, new FacilityQueryFilter());
                         overview.FacilityLotSum = facManager.GetFacilityChargeSumLotHelperList(facilityChargeList, new FacilityQueryFilter() { MaterialID = guid });
                         overview.FacilityLocationSum = facManager.GetFacilityChargeSumLocationHelperList(facilityChargeList, new FacilityQueryFilter());
+                        if (facilityChargeList != null)
+                            facilityChargeList = facilityChargeList.Where(c => c.Facility != null && !c.Facility.DisabledForMobile).ToArray();
                         overview.FacilityCharges = ConvertFacilityChargeList(facilityChargeList);
                         return new WSResponse<MaterialSumOverview>(overview);
                     }
