@@ -46,7 +46,7 @@ namespace gip.bso.facility
         public BSOFacilityBookCharge(gip.core.datamodel.ACClass typeACClass, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(typeACClass, content, parentACObject, parameter)
         {
-
+            _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, "ExpirationDateDayPeriod", 30);
         }
 
         /// <summary>
@@ -61,6 +61,9 @@ namespace gip.bso.facility
             bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
             if (!skipSearchOnStart)
                 Search();
+
+            _ = _ExpirationDateDayPeriod.ValueT;
+
             return true;
         }
 
@@ -96,6 +99,28 @@ namespace gip.bso.facility
             }
             return b;
         }
+        #endregion
+
+        #region Configuration
+
+        private ACPropertyConfigValue<int> _ExpirationDateDayPeriod;
+        [ACPropertyConfig("en{'Expiration date filter period'}de{'Ablaufdatum Filterperiode'}")]
+        public int ExpirationDateDayPeriod
+        {
+            get
+            {
+                return _ExpirationDateDayPeriod.ValueT;
+            }
+            set
+            {
+                if (_ExpirationDateDayPeriod.ValueT != value)
+                {
+                    _ExpirationDateDayPeriod.ValueT = value;
+                    OnPropertyChanged(nameof(ExpirationDateDayPeriod));
+                }
+            }
+        }
+
         #endregion
 
         #region BSO->ACProperty
@@ -213,7 +238,7 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyInfo(715, "Filter", "en{'Stock quantity less than'}de{'Lagermenge weniger als'}")]
+        [ACPropertyInfo(716, "Filter", "en{'Stock quantity less than'}de{'Lagermenge weniger als'}")]
         public double StockQuantityLessThan
         {
             get
@@ -229,6 +254,38 @@ namespace gip.bso.facility
                     OnPropertyChanged("FilterLot");
                 }
             }
+        }
+
+        [ACPropertyInfo(717, "Filter", "en{'Expiration date less then'}de{'Mindesthaltbarkeitsdatum dann'}")]
+        public DateTime? FilterExpirationDate
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<DateTime?>(nameof(FacilityCharge.ExpirationDate));
+            }
+            set
+            {
+                DateTime? tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<DateTime?>(nameof(FacilityCharge.ExpirationDate));
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<DateTime?>(nameof(FacilityCharge.ExpirationDate), value);
+                    OnPropertyChanged(nameof(FilterExpirationDate));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private int _FilterExpirationDateDayPeriod;
+        [ACPropertyInfo(999, "FilterExpirationDateDayPeriod", "en{'TODO:FilterExpirationDateDayPeriod'}de{'TODO:FilterExpirationDateDayPeriod'}")]
+        public int FilterExpirationDateDayPeriod
+        {
+            get
+            {
+                return ExpirationDateDayPeriod;
+            }
+
         }
 
         #endregion
@@ -429,7 +486,9 @@ namespace gip.bso.facility
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
 
                     new ACFilterItem(Global.FilterTypes.filter, _CLotNoProperty, Global.LogicalOperators.contains, Global.Operators.and, "", true, true),
-                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.StockQuantityUOM), Global.LogicalOperators.lessThan, Global.Operators.and, "", true, true)
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.StockQuantityUOM), Global.LogicalOperators.lessThan, Global.Operators.and, "", true),
+
+                    new ACFilterItem(Global.FilterTypes.filter, nameof(FacilityCharge.ExpirationDate), Global.LogicalOperators.lessThanOrEqual, Global.Operators.and, null, true)
                 };
             }
         }
@@ -671,7 +730,7 @@ namespace gip.bso.facility
         #region Material reassignment
 
         private Material _SelectedRassignmentMaterial;
-        [ACPropertySelected(9999,"ReassignmentMaterial", "en{'Suggested material'}de{'Empfohlenes Material'}")]
+        [ACPropertySelected(9999, "ReassignmentMaterial", "en{'Suggested material'}de{'Empfohlenes Material'}")]
         public Material SelectedRassignmentMaterial
         {
             get => _SelectedRassignmentMaterial;
@@ -745,7 +804,7 @@ namespace gip.bso.facility
             if (msg != null)
                 return msg;
 
-            if (CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && CurrentFacilityCharge.Material.IsLotManaged 
+            if (CurrentFacilityCharge != null && CurrentFacilityCharge.Material != null && CurrentFacilityCharge.Material.IsLotManaged
                                               && CurrentFacilityCharge.FacilityLot == null)
             {
                 if (CurrentFacilityCharge.EntityState != System.Data.EntityState.Added)
@@ -1838,7 +1897,7 @@ namespace gip.bso.facility
                 info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslist), poPL.ProdOrderPartslistID));
                 service.ShowDialogOrder(this, info);
             }
-            
+
         }
 
         public bool IsEnabledShowOrder()
@@ -1850,16 +1909,69 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region BSO->ACMethod Filter ExpirationDate
+
+        /// <summary>
+        /// Source Property: SetFilterExpirationDateToday
+        /// </summary>
+        [ACMethodInfo("SetFilterExpirationDate", "en{'Today'}de{'Heute'}", 999)]
+        public void SetFilterExpirationDateToday()
+        {
+            if (!IsEnabledSetFilterExpirationDateToday())
+                return;
+            FilterExpirationDate = DateTime.Now.Date;
+        }
+
+        public bool IsEnabledSetFilterExpirationDateToday()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Source Property: SetFilterExpirationDateNextDays
+        /// </summary>
+        [ACMethodInfo("SetFilterExpirationDate", "en{'next days'}de{'nächsten Tage'}", 999)]
+        public void SetFilterExpirationDateNextDays()
+        {
+            if (!IsEnabledSetFilterExpirationDateNextDays())
+                return;
+            FilterExpirationDate = DateTime.Now.Date.AddDays(ExpirationDateDayPeriod);
+        }
+
+        public bool IsEnabledSetFilterExpirationDateNextDays()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Source Property: ResetFilterExpirationDate
+        /// </summary>
+        [ACMethodInfo("SetFilterExpirationDate", "en{'Reset'}de{'Umsetzen'}", 999)]
+        public void ResetFilterExpirationDate()
+        {
+            if (!IsEnabledResetFilterExpirationDate())
+                return;
+            FilterExpirationDate = null;
+        }
+
+        public bool IsEnabledResetFilterExpirationDate()
+        {
+            return true;
+        }
+
+        #endregion
+
         #endregion
 
         #region Eventhandling
         public override void OnPropertyChanged([CallerMemberName] string name = "")
         {
             base.OnPropertyChanged(name);
-            if (name == "ShowNotAvailable"
-                || name == "FilterMaterial"
-                || name == "FilterFacility"
-                || name == "FilterLot")
+            if (name == nameof(ShowNotAvailable)
+                || name == nameof(FilterMaterial)
+                || name == nameof(FilterFacility)
+                || name == nameof(FilterLot)
+                || name == nameof(FilterExpirationDate))
             {
                 Search();
             }
