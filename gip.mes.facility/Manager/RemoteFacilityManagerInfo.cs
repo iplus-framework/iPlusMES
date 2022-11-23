@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -11,6 +12,20 @@ namespace gip.mes.facility
 {
     public class RemoteFacilityManagerInfo : INotifyPropertyChanged
     {
+
+        #region ctor's
+        
+        public RemoteFacilityManagerInfo(ACComponent remoteFacilityManager)
+        {
+            ACUrl = remoteFacilityManager.ACUrl;
+            RemoteConnString = GetRemoteFacilityManagerConnectionString(remoteFacilityManager);
+            RemoteFacilityManager = remoteFacilityManager;
+        }
+
+        #endregion
+
+        #region Properties
+
         /// <summary>
         /// Source Property: 
         /// </summary>
@@ -62,8 +77,26 @@ namespace gip.mes.facility
             }
         }
 
-        public RemoteFacilityManager RemoteFacilityManager { get; set; }
+        public ACComponent RemoteFacilityManager { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region Methods
+
+        private string GetRemoteFacilityManagerConnectionString(ACComponent remoteFacilityManager)
+        {
+            List<string> hierarchy = ACUrlHelper.ResolveParents(remoteFacilityManager.ACUrl);
+            string remoteProxyACurl = hierarchy.FirstOrDefault();
+            if (String.IsNullOrEmpty(remoteProxyACurl))
+                return null;
+            ACComponent remoteAppManager = remoteFacilityManager.Root.ACUrlCommand(remoteProxyACurl) as ACComponent;
+            if (remoteAppManager == null)
+                return null;
+            return remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
+        }
+
+        #endregion
     }
 }

@@ -230,6 +230,18 @@ namespace gip.bso.test
             if (!IsEnabledTestMethod2())
                 return;
 
+            if(!string.IsNullOrEmpty(TestInput2))
+            {
+
+                IACComponent component = Root.ACUrlCommand(TestInput2) as IACComponent;
+                if(component != null && component is ACComponent)
+                {
+                    RemoteFacilityManagerInfo info = new RemoteFacilityManagerInfo(component as ACComponent);
+                    RemoteFacilityManagerInfoList.Add(info);
+                    OnPropertyChanged(nameof(RemoteFacilityManagerInfoList));
+                    SelectedRemoteFacilityManagerInfo = info;
+                }
+            }
 
         }
 
@@ -794,26 +806,24 @@ namespace gip.bso.test
         private List<RemoteFacilityManagerInfo> LoadRemoteFacilityManagerInfoList()
         {
             List<RemoteFacilityManagerInfo> rmList = new List<RemoteFacilityManagerInfo>();
+            
+            gip.core.datamodel.ACClass rmClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c=>c.ACIdentifier == "RemoteFacilityManager");
 
-            List<RemoteFacilityManager> remoteFacilityManagers = new List<RemoteFacilityManager>();
+            List<ACComponent> remoteFacilityManagers = new List<ACComponent>();
             IACComponent[] appManagers = Root.ACComponentChilds.Where(c => c is ApplicationManager || c is ApplicationManagerProxy).ToArray();
             foreach (IACComponent appManager in appManagers)
             {
-                RemoteFacilityManager remoteFacilityManager = appManager.FindChildComponents<RemoteFacilityManager>().FirstOrDefault();
+                IACComponent remoteFacilityManager = appManager.FindChildComponents(rmClass, 0).FirstOrDefault();
                 if (remoteFacilityManager != null)
                 {
-                    remoteFacilityManagers.Add(remoteFacilityManager);
+                    remoteFacilityManagers.Add(remoteFacilityManager as ACComponent);
                 }
             }
 
-            foreach (RemoteFacilityManager remoteFacilityManager in remoteFacilityManagers)
+            foreach (ACComponent remoteFacilityManager in remoteFacilityManagers)
             {
-                string connectionString = GetRemoteFacilityManagerConnectionString(remoteFacilityManager);
 
-                RemoteFacilityManagerInfo rm = new RemoteFacilityManagerInfo();
-                rm.ACUrl = remoteFacilityManager.ACUrl;
-                rm.RemoteConnString = GetRemoteFacilityManagerConnectionString(remoteFacilityManager);
-                rm.RemoteFacilityManager = remoteFacilityManager;
+                RemoteFacilityManagerInfo rm = new RemoteFacilityManagerInfo(remoteFacilityManager);
                 rmList.Add(rm);
             }
 
@@ -832,7 +842,7 @@ namespace gip.bso.test
             return remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
         }
 
-        private void CallRemoteFacilityManagerForPicking(RemoteFacilityManager remoteFacilityManager, string pickingNo, string remoteConnString)
+        private void CallRemoteFacilityManagerForPicking(ACComponent remoteFacilityManager, string pickingNo, string remoteConnString)
         {
 
             RemoteStorePostingData remoteStorePostingData = null;
@@ -882,7 +892,7 @@ namespace gip.bso.test
 
                 if (remoteStorePostingData != null)
                 {
-                    remoteFacilityManager.SynchronizeFacility(remoteFacilityManager.ACUrl, remoteConnString, remoteStorePostingData, false);
+                    remoteFacilityManager.ACUrlCommand("!SynchronizeFacility", remoteFacilityManager.ACUrl, remoteConnString, remoteStorePostingData, false);
                 }
             }
         }
