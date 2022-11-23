@@ -119,7 +119,31 @@ namespace gip.bso.manufacturing
             }
         }
 
+        [ACPropertyInfo(720, "Filter", ConstApp.ProdOrderProgramNo)]
+        public string FilterProgramNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(FilterProgramNoName);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(FilterProgramNoName);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(FilterProgramNoName, value);
+                    OnPropertyChanged(nameof(FilterProgramNo));
+                }
+            }
+        }
 
+        public string FilterProgramNoName
+        {
+            get
+            {
+                return $"{nameof(LabOrder.ProdOrderPartslistPos)}\\{nameof(ProdOrderPartslistPos.ProdOrderPartslist)}\\{nameof(ProdOrderPartslist.ProdOrder)}\\{nameof(ProdOrder.ProgramNo)}";
+            }
+        }
 
         #endregion
 
@@ -191,6 +215,25 @@ namespace gip.bso.manufacturing
 
         #endregion 
 
+        #region Properties
+
+        #region Properties
+
+        public override List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = base.NavigationqueryDefaultFilter;
+
+                ACFilterItem toSampleTakingDate = new ACFilterItem(Global.FilterTypes.filter, FilterProgramNoName, Global.LogicalOperators.contains, Global.Operators.and, null, true);
+                aCFilterItems.Add(toSampleTakingDate);
+
+                return aCFilterItems;
+            }
+        }
+
+        #endregion 
+
         #region Properties -> Messages
 
         Msg _CurrentMsg;
@@ -233,6 +276,10 @@ namespace gip.bso.manufacturing
             MsgList.Clear();
             OnPropertyChanged(nameof(MsgList));
         }
+
+
+        #endregion
+        
         #endregion
 
         #region BackgroundWorker

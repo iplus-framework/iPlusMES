@@ -46,13 +46,15 @@ namespace gip.mes.processapplication
         {
             worksheet.Cell("A1").Value = "Laboratory Order No";
             worksheet.Cell("B1").Value = labOrder.LabOrderNo;
-            worksheet.Cell("A2").Value = "Material Name";
-            worksheet.Cell("B2").Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
-            worksheet.Cell("A3").Value = "Production Order";
-            worksheet.Cell("B3").Value = labOrder.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
-            worksheet.Cell("A4").Value = "Update Dates";
-            worksheet.Cell("B4").Value = labOrder.SampleTakingDate;
-            worksheet.Cell("A5").Value = "Proizvodna linija";
+            worksheet.Cell("A2").Value = "Material No.";
+            worksheet.Cell("B2").Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialNo;
+            worksheet.Cell("A3").Value = "Material Name";
+            worksheet.Cell("B3").Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+            worksheet.Cell("A4").Value = "Production Order";
+            worksheet.Cell("B4").Value = labOrder.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
+            worksheet.Cell("A5").Value = "Update Dates";
+            worksheet.Cell("B5").Value = labOrder.SampleTakingDate;
+            worksheet.Cell("A6").Value = "Proizvodna linija";
 
             gip.core.datamodel.ACClass machine = null;
 
@@ -69,16 +71,16 @@ namespace gip.mes.processapplication
                 machine = database.ACClass.FirstOrDefault(c => c.ACClassID == labOrder.RefACClassID);
             }
 
-            worksheet.Cell("B5").Value = machine?.ACCaption;
+            worksheet.Cell("B6").Value = machine?.ACCaption;
 
             worksheet.Cell("A7").Value = "Reference Value";
-            worksheet.Cell("A8").Value = "Lowest value";
-            worksheet.Cell("A9").Value = "Maximum value";
-            worksheet.Cell("A10").Value = "Average Value";
+            worksheet.Cell("A9").Value = "Lowest value";
+            worksheet.Cell("A10").Value = "Maximum value";
+            worksheet.Cell("A11").Value = "Average Value";
 
-            worksheet.Cell("A12").Value = "Broj vaganja";
-            worksheet.Cell("A13").Value = "Broj vaganja u toleranciji";
-            worksheet.Cell("A14").Value = "Broj vaganja izvan tolerancije";
+            worksheet.Cell("A13").Value = "Broj vaganja";
+            worksheet.Cell("A14").Value = "Broj vaganja u toleranciji";
+            worksheet.Cell("A15").Value = "Broj vaganja izvan tolerancije";
 
             int tolCounter = 0;
             int counter = 0;
@@ -86,18 +88,18 @@ namespace gip.mes.processapplication
             foreach (LabOrderPos labOrderPosItem in labOrder.LabOrderPos_LabOrder.ToArray())
             {
                 double refValue = (double)labOrderPosItem.ReferenceValue;
-                int rowPiStats = 17;
+                int rowPiStats = 18;
 
                 worksheet.Cell("B7").Value = labOrderPosItem.ReferenceValue;
-                worksheet.Cell("B8").Value = labOrderPosItem.ValueMin;
-                worksheet.Cell("B9").Value = labOrderPosItem.ValueMax;
-                worksheet.Cell("B10").Value = labOrderPosItem.ActualValue;
+                worksheet.Cell("B9").Value = labOrderPosItem.ValueMin;
+                worksheet.Cell("B10").Value = labOrderPosItem.ValueMax;
+                worksheet.Cell("B11").Value = labOrderPosItem.ActualValue;
 
 
-                worksheet.Cell("A16").Value = "Date";
-                worksheet.Cell("B16").Value = "Weight";
-                worksheet.Cell("C16").Value = "Tolerancy Status";
-                worksheet.Cell("D16").Value = "Deviation from Reference Weight";
+                worksheet.Cell("A17").Value = "Date";
+                worksheet.Cell("B17").Value = "Weight";
+                worksheet.Cell("C17").Value = "Tolerancy Status";
+                worksheet.Cell("D17").Value = "Deviation from Reference Weight";
 
                 if (labOrderPosItem.XMLConfig != null)
                 {
@@ -131,19 +133,20 @@ namespace gip.mes.processapplication
                     }
                 }
 
-                worksheet.Cell("B12").Value = counter;
-                worksheet.Cell("B13").Value = counter - tolCounter;
-                worksheet.Cell("B14").Value = tolCounter;
+                worksheet.Cell("B13").Value = counter;
+                worksheet.Cell("B14").Value = counter - tolCounter;
+                worksheet.Cell("B15").Value = tolCounter;
 
                 #region Excel Styling
 
-                var bottomTableHeader = worksheet.Range(16, 1, 16, 4);
+                var bottomTableHeader = worksheet.Range(17, 1, 17, 4);
                 bottomTableHeader.Style.Font.Bold = true;
                 bottomTableHeader.Style.Fill.BackgroundColor = XLColor.CornflowerBlue;
 
-                var rngTable = worksheet.Range(16, 1, rowPiStats, 4);
+                var rngTable = worksheet.Range(17, 1, rowPiStats, 4);
                 rngTable.Sort("4 Desc");
 
+                worksheet.Cell("B2").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
                 worksheet.Cell("B4").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
 
                 #endregion
