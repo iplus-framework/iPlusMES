@@ -70,7 +70,7 @@ namespace gip.bso.masterdata
 
             _VisitedPartslists = null;
             _ChangedPartslists = null;
-            
+
             return b;
         }
 
@@ -472,6 +472,113 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region Properties -> BOM
+
+        #region Properties -> BOM -> Tree
+
+        private PartslistExpand RootProdOrderPartListExpand;
+        private List<ExpandResult> ExpandResult;
+        private PartslistExpand _CurrentProdOrderPartListExpand;
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyCurrent(606, "ProdOrderPartListExpand")]
+        public PartslistExpand CurrentProdOrderPartListExpand
+        {
+            get
+            {
+                return _CurrentProdOrderPartListExpand;
+            }
+            set
+            {
+                if (_CurrentProdOrderPartListExpand != value)
+                {
+                    _CurrentProdOrderPartListExpand = value;
+                    _ProdOrderPartListExpandList = null;
+                }
+            }
+        }
+
+        private List<PartslistExpand> _ProdOrderPartListExpandList;
+        [ACPropertyList(607, "ProdOrderPartListExpand")]
+        public List<PartslistExpand> ProdOrderPartListExpandList
+        {
+            get
+            {
+                if (_ProdOrderPartListExpandList == null)
+                    _ProdOrderPartListExpandList = new List<PartslistExpand>();
+                if (CurrentProdOrderPartListExpand != null)
+                    _ProdOrderPartListExpandList.Add(CurrentProdOrderPartListExpand);
+                return _ProdOrderPartListExpandList;
+            }
+        }
+
+        #endregion
+
+        #region Properties -> BOM components
+
+        #region BOMComponent
+        private PartslistPos _SelectedBOMComponent;
+        /// <summary>
+        /// Selected property for PartslistPos
+        /// </summary>
+        /// <value>The selected BOMComponent</value>
+        [ACPropertySelected(9999, "BOMComponent", "en{'TODO: BOMComponent'}de{'TODO: BOMComponent'}")]
+        public PartslistPos SelectedBOMComponent
+        {
+            get
+            {
+                return _SelectedBOMComponent;
+            }
+            set
+            {
+                if (_SelectedBOMComponent != value)
+                {
+                    _SelectedBOMComponent = value;
+                    OnPropertyChanged(nameof(SelectedBOMComponent));
+                }
+            }
+        }
+
+
+        private List<PartslistPos> _BOMComponentList;
+        /// <summary>
+        /// List property for PartslistPos
+        /// </summary>
+        /// <value>The BOMComponent list</value>
+        [ACPropertyList(9999, "BOMComponent")]
+        public List<PartslistPos> BOMComponentList
+        {
+            get
+            {
+                return _BOMComponentList;
+            }
+        }
+
+        private List<PartslistPos> LoadBOMComponentList()
+        {
+            List<PartslistPos> positions = new List<PartslistPos>();
+
+            if(ExpandResult != null)
+            {
+                ExpandResult[] items = ExpandResult.OrderByDescending(c=>c.TreeVersion).Where(c=>c.Item.IsChecked).ToArray();
+                foreach(ExpandResult item in items)
+                {
+                    Partslist pl = item.Item.Item as Partslist;
+                    PartslistPos[] components = pl.PartslistPos_Partslist.Where(c=>c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).OrderBy(c=>c.Sequence).ToArray();
+                    positions.AddRange(components);
+                }
+            }
+
+            return positions;
+        }
+        #endregion
+
+
+        #endregion
+
+        #endregion
+
         #endregion
 
         #region Partslist -> Methods
@@ -536,6 +643,54 @@ namespace gip.bso.masterdata
                 }
             }
         }
+
+        #region Method -> BOM
+
+
+        /// <summary>
+        /// Source Property: ShowBOM
+        /// </summary>
+        [ACMethodInfo("ShowBOM", "en{'TODO:ShowBOM'}de{'TODO:ShowBOM'}", 999)]
+        public void ShowBOM()
+        {
+            if (!IsEnabledShowBOM())
+                return;
+
+            RootProdOrderPartListExpand = new PartslistExpand(SelectedPartslist, 1, 1);
+            RootProdOrderPartListExpand.LoadTree();
+            RootProdOrderPartListExpand.IsEnabled = true;
+            RootProdOrderPartListExpand.IsChecked = false;
+
+            _ProdOrderPartListExpandList = null;
+            _CurrentProdOrderPartListExpand = RootProdOrderPartListExpand;
+
+            ExpandResult = new List<ExpandResult>();
+            RootProdOrderPartListExpand.BuildTreeList(ExpandResult);
+            foreach (var item in ExpandResult)
+            {
+                item.Item.PropertyChanged += PartslistExpand_PropertyChanged;
+            }
+
+            _BOMComponentList = LoadBOMComponentList();
+
+            ShowDialog(this, "PartslistBOMDlg");
+        }
+
+        private void PartslistExpand_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PartslistExpand.IsChecked))
+            {
+                _BOMComponentList = LoadBOMComponentList();
+                OnPropertyChanged(nameof(BOMComponentList));
+            }
+        }
+
+        public bool IsEnabledShowBOM()
+        {
+            return SelectedPartslist != null;
+        }
+
+        #endregion
 
         #endregion
     }
