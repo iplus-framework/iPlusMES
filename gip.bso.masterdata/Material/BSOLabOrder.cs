@@ -75,6 +75,70 @@ namespace gip.bso.masterdata
             // do nothing
         }
 
+        [ACPropertyInfo(717, "FilterSampleTakingDateFrom", "en{'From'}de{'Von'}")]
+        public DateTime? FilterSampleTakingDateFrom
+        {
+            get
+            {
+                ACFilterItem[] items = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == nameof(LabOrder.SampleTakingDate)).ToArray();
+                if (items.Length != 2)
+                    return null;
+
+                DateTime dateTime = new DateTime();
+                if (DateTime.TryParse(items[0].SearchWord, out dateTime))
+                    return dateTime;
+                else
+                    return null;
+            }
+            set
+            {
+                ACFilterItem[] items = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == nameof(LabOrder.SampleTakingDate)).ToArray();
+                if (items.Length == 2)
+                {
+                    items[0].SetSearchValue<DateTime?>(value);
+                }
+            }
+        }
+
+        [ACPropertyInfo(718, "FilterSampleTakingDateTo", "en{'To'}de{'Bis'}")]
+        public DateTime? FilterSampleTakingDateTo
+        {
+            get
+            {
+                ACFilterItem[] items = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == nameof(LabOrder.SampleTakingDate)).ToArray();
+                if (items.Length != 2)
+                    return null;
+
+                DateTime dateTime = new DateTime();
+                if (DateTime.TryParse(items[1].SearchWord, out dateTime))
+                    return dateTime;
+                else
+                    return null;
+            }
+            set
+            {
+                DateTime? tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<DateTime?>(nameof(FacilityCharge.ExpirationDate));
+                ACFilterItem[] items = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == nameof(LabOrder.SampleTakingDate)).ToArray();
+                if (items.Length == 2)
+                {
+                    items[1].SetSearchValue<DateTime?>(value);
+                }
+            }
+        }
+
+        public bool IsFilterSampleTakingDateWideRange
+        {
+            get
+            {
+                bool isWideRange = false;
+                if (FilterSampleTakingDateFrom != null && FilterSampleTakingDateTo != null)
+                {
+                    isWideRange = Math.Abs((FilterSampleTakingDateTo.Value - FilterSampleTakingDateFrom.Value).TotalDays) > 3;
+                }
+                return isWideRange;
+            }
+        }
+
 
         #region Filters -> FilterMaterialGroup
 
@@ -209,6 +273,12 @@ namespace gip.bso.masterdata
 
                 ACFilterItem phMaterialGroup = new ACFilterItem(Global.FilterTypes.filter, Const_FilterMaterialGroup, Global.LogicalOperators.equal, Global.Operators.and, null, true);
                 aCFilterItems.Add(phMaterialGroup);
+
+                ACFilterItem fromSampleTakingDate = new ACFilterItem(Global.FilterTypes.filter, nameof(LabOrder.SampleTakingDate), Global.LogicalOperators.greaterThanOrEqual, Global.Operators.and, null, true);
+                aCFilterItems.Add(fromSampleTakingDate);
+
+                ACFilterItem toSampleTakingDate = new ACFilterItem(Global.FilterTypes.filter, nameof(LabOrder.SampleTakingDate), Global.LogicalOperators.lessThan, Global.Operators.and, null, true);
+                aCFilterItems.Add(toSampleTakingDate);
 
                 return aCFilterItems;
             }
@@ -598,9 +668,9 @@ namespace gip.bso.masterdata
 
         public override bool SetCurrentSelected(LabOrder value)
         {
-            if (AccessPrimary == null) 
+            if (AccessPrimary == null)
                 return false;
-            bool isChanged =  base.SetCurrentSelected(value);
+            bool isChanged = base.SetCurrentSelected(value);
             if (isChanged)
             {
                 _LabOrderPosItemAVGList = null;
@@ -996,6 +1066,11 @@ namespace gip.bso.masterdata
         [ACMethodCommand("LabOrder", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public override void Search()
         {
+            if (IsFilterSampleTakingDateWideRange)
+                AccessPrimary.NavACQueryDefinition.TakeCount = 500;
+            else
+                AccessPrimary.NavACQueryDefinition.TakeCount = 50;
+
             base.Search();
             _LabOrderPosAVGList = null;
             OnPropertyChanged(nameof(LabOrderPosAVGList));

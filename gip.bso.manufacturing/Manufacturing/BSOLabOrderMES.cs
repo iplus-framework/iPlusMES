@@ -27,7 +27,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region c´tors
 
         public BSOLabOrderMES(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -72,7 +71,6 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
 
         #region Properties
 
@@ -121,8 +119,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        #endregion
 
+
+        #endregion
 
         #region Methods
 
@@ -191,7 +190,6 @@ namespace gip.bso.manufacturing
         }
 
         #endregion 
-
 
         #region Properties -> Messages
 

@@ -59,12 +59,12 @@ namespace gip.mes.processapplication
             if (labOrder.RefACClassID == null)
             {
                 machine = GetMachine(database, labOrder);
-                if(machine != null)
+                if (machine != null)
                 {
                     labOrder.RefACClassID = machine.ACClassID;
                 }
             }
-            else if(labOrder.RefACClassID != null)
+            else if (labOrder.RefACClassID != null)
             {
                 machine = database.ACClass.FirstOrDefault(c => c.ACClassID == labOrder.RefACClassID);
             }
@@ -205,10 +205,14 @@ namespace gip.mes.processapplication
         #region Helper Functions
         public static string TruncateAtWord(this string value, int length)
         {
-            if (value == null || value.Length < length || value.IndexOf(" ", length) == -1)
+
+            if (value == null || value.Length < length)
                 return value;
 
-            return value.Substring(0, value.IndexOf(" ", length));
+            if (value.IndexOf(" ", length) < length && value.IndexOf(" ", length) > 0)
+                return value.Substring(0, value.IndexOf(" ", length));
+            else
+                return value.Substring(0, length);
         }
 
         #endregion
