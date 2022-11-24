@@ -3658,7 +3658,7 @@ namespace gip.bso.manufacturing
                       NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
                 );
         }
-        
+
         /// <summary>
         /// Method for new behavior deleting batch plans
         /// for test
@@ -4495,11 +4495,11 @@ namespace gip.bso.manufacturing
                         ProdOrder prodOrder = SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrder;
                         foreach (ProdOrderPartslist pl in prodOrder.ProdOrderPartslist_ProdOrder.OrderBy(c => c.Sequence).ToArray())
                         {
-                            bool existBatchPlanForDeleteOrCancel = 
+                            bool existBatchPlanForDeleteOrCancel =
                                 pl
                                 .ProdOrderBatchPlan_ProdOrderPartslist
-                                .Any(c=> c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Created || c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Paused);
-                            if(existBatchPlanForDeleteOrCancel)
+                                .Any(c => c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Created || c.PlanStateIndex == (short)GlobalApp.BatchPlanState.Paused);
+                            if (existBatchPlanForDeleteOrCancel)
                             {
                                 partslists.Add(pl);
                             }
@@ -5021,7 +5021,8 @@ namespace gip.bso.manufacturing
 
         private bool FactoryBatchPlans(WizardSchedulerPartslist wizardSchedulerPartslist, ref string programNo, out List<vd.ProdOrderBatchPlan> generatedBatchPlans)
         {
-            bool success = ProdOrderManager.FactoryBatchPlans(DatabaseApp, FilterPlanningMR, CreatedBatchState, wizardSchedulerPartslist, DefaultWizardSchedulerPartslist, ref programNo, out generatedBatchPlans);
+            bool success = ProdOrderManager.FactoryBatchPlans(DatabaseApp, FilterPlanningMR, CreatedBatchState, wizardSchedulerPartslist,
+                DefaultWizardSchedulerPartslist?.ProdOrderPartslistPos?.ProdOrderPartslist, ref programNo, out generatedBatchPlans);
             if (success)
             {
                 SetBSOBatchPlan_BatchParents(wizardSchedulerPartslist.WFNodeMES, wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);

@@ -850,7 +850,7 @@ namespace gip.mes.facility
         }
 
         public bool FactoryBatchPlans(DatabaseApp databaseApp, PlanningMR filterPlanningMR, GlobalApp.BatchPlanState createdBatchState,
-            WizardSchedulerPartslist wizardSchedulerPartslist, WizardSchedulerPartslist defaultWizardSchedulerPartslist, ref string programNo, out List<ProdOrderBatchPlan> generatedBatchPlans)
+            WizardSchedulerPartslist wizardSchedulerPartslist, ProdOrderPartslist defaultProdOrderPartslist, ref string programNo, out List<ProdOrderBatchPlan> generatedBatchPlans)
         {
             bool success = false;
             ProdOrderBatchPlan firstBatchPlan = null;
@@ -882,9 +882,9 @@ namespace gip.mes.facility
                 if (prodOrderPartslist == null)
                     msg = PartslistAdd(databaseApp, prodOrder, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.Sn, wizardSchedulerPartslist.NewTargetQuantityUOM, out prodOrderPartslist);
 
-                if (prodOrderPartslist != null && defaultWizardSchedulerPartslist.ProdOrderPartslistPos != null)
+                if (prodOrderPartslist != null && defaultProdOrderPartslist != null)
                 {
-                    CopyStartDepartmentFromMain(prodOrderPartslist, defaultWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
+                    CopyStartDepartmentFromMain(prodOrderPartslist, defaultProdOrderPartslist);
                 }
 
                 success = msg == null || msg.IsSucceded();
@@ -1143,13 +1143,13 @@ namespace gip.mes.facility
                 }
             }
 
-            WizardSchedulerPartslist defaultWizardPl = wPls.Where(c => c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
+            // WizardSchedulerPartslist defaultWizardPl = wPls.Where(c => c.PartslistNo == plForBatchGenerate.Partslist.PartslistNo).FirstOrDefault();
 
             foreach (WizardSchedulerPartslist wPl in wPls)
             {
-                if (wPl != defaultWizardPl && wPl.ProdOrderPartslistPos != null && defaultWizardPl.ProdOrderPartslistPos != null)
+                if (wPl.ProdOrderPartslistPos != null && wPl.ProdOrderPartslistPos.ProdOrderPartslist != plForBatchGenerate && plForBatchGenerate != null)
                 {
-                    CopyStartDepartmentFromMain(wPl.ProdOrderPartslistPos.ProdOrderPartslist, defaultWizardPl.ProdOrderPartslistPos.ProdOrderPartslist);
+                    CopyStartDepartmentFromMain(wPl.ProdOrderPartslistPos.ProdOrderPartslist, plForBatchGenerate);
                 }
             }
 
@@ -1163,7 +1163,7 @@ namespace gip.mes.facility
             {
                 if (!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
                 {
-                    FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, defaultWizardPl, ref programNo, out prodOrderBatchPlans);
+                    FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, plForBatchGenerate, ref programNo, out prodOrderBatchPlans);
                 }
                 else
                 {
@@ -1187,15 +1187,10 @@ namespace gip.mes.facility
                     {
                         string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
                         BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
-                            wPl.ProdOrderPartslistPos, bp, configUrl, true, false, false, false, false);
+                            wPl.ProdOrderPartslistPos, bp, configUrl, true, false, true, false, false);
 
                         if (!targets.Any(c => c.IsChecked))
                         {
-                            if(wPl.SelectedMDSchedulingGroup != null)
-                            {
-                                FacilityReservationSelectFromSchedulingGroup(wPl.SelectedMDSchedulingGroup, targets);
-                            }
-
                             if (!targets.Any(c => c.IsChecked))
                             {
                                 POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
@@ -1221,29 +1216,6 @@ namespace gip.mes.facility
                     msgWithDetails.AddDetailMessage(tmMsg);
 
             return msgWithDetails;
-        }
-
-        /// <summary>
-        /// Select FacilityReservation for batch plan from configuration MDSchedulingGroup <-> Facility
-        /// </summary>
-        /// <param name="selectedMDSchedulingGroup"></param>
-        /// <param name="targets"></param>
-        public void FacilityReservationSelectFromSchedulingGroup(MDSchedulingGroup selectedMDSchedulingGroup, BindingList<POPartslistPosReservation> targets)
-        {
-            Facility[] withLineConnectedFacility =
-                               selectedMDSchedulingGroup
-                               .FacilityMDSchedulingGroup_MDSchedulingGroup
-                               .Select(c => c.Facility)
-                               .ToArray();
-            foreach(Facility facility in withLineConnectedFacility)
-            {
-                POPartslistPosReservation selectedReservation =
-                                    targets
-                                    .Where(c => c.FacilityOfModule?.FacilityID == facility.FacilityID)
-                                    .FirstOrDefault();
-                if (selectedReservation != null)
-                    selectedReservation.IsChecked = true;
-            }
         }
 
         public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, gip.mes.datamodel.ACClassWF vbACClassWF, ProdOrderPartslistPos intermediatePos)
