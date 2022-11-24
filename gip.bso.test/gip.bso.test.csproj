@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BSOTest.cs" />
+    <Compile Include="Manager\RemoteFMHelper.cs" />
     <Compile Include="VXBSOMethodTest.cs" />
     <Compile Include="VXBSOFacilityTest.cs" />
     <Compile Include="VXBSOPropertyTest.cs" />

@@ -37,7 +37,38 @@ namespace gip.bso.test
         {
             if (!base.ACInit(startChildMode))
                 return false;
+
+            _PickingManager = ACPickingManager.ACRefToServiceInstance(this);
+            if (_PickingManager == null)
+                throw new Exception("PickingManager not configured");
+
             return true;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            bool baseReturn =  base.ACDeInit(deleteACClassTask);
+
+            if (_PickingManager != null)
+                ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
+            _PickingManager = null;
+
+            return baseReturn;
+        }
+
+        #endregion
+
+        #region Managers
+
+        protected ACRef<ACPickingManager> _PickingManager = null;
+        protected ACPickingManager PickingManager
+        {
+            get
+            {
+                if (_PickingManager == null)
+                    return null;
+                return _PickingManager.ValueT;
+            }
         }
 
         #endregion
@@ -203,7 +234,7 @@ namespace gip.bso.test
         {
             if (!IsEnabledTestMethod())
                 return;
-            ShuffleMaterial(false);
+
         }
 
         public bool IsEnabledTestMethod()
@@ -216,7 +247,8 @@ namespace gip.bso.test
         {
             if (!IsEnabledTestMethod1())
                 return;
-            ShuffleMaterial(true);
+
+
         }
 
         public bool IsEnabledTestMethod1()
@@ -230,11 +262,10 @@ namespace gip.bso.test
             if (!IsEnabledTestMethod2())
                 return;
 
-            if(!string.IsNullOrEmpty(TestInput2))
+            if (!string.IsNullOrEmpty(TestInput2))
             {
-
                 IACComponent component = Root.ACUrlCommand(TestInput2) as IACComponent;
-                if(component != null && component is ACComponent)
+                if (component != null && component is ACComponent)
                 {
                     RemoteFacilityManagerInfo info = new RemoteFacilityManagerInfo(component as ACComponent);
                     RemoteFacilityManagerInfoList.Add(info);
@@ -242,7 +273,6 @@ namespace gip.bso.test
                     SelectedRemoteFacilityManagerInfo = info;
                 }
             }
-
         }
 
         public bool IsEnabledTestMethod2()
@@ -790,7 +820,7 @@ namespace gip.bso.test
         /// <summary>
         /// Source Property: ReciveRemotePicking
         /// </summary>
-        [ACMethodInfo("RecieveRemotePicking", "en{'TODO:MethodName'}de{'TODO:MethodName'}", 999)]
+        [ACMethodInfo("RecieveRemotePicking", "en{'Recive remote Picking'}de{'Recive remote Picking'}", 999)]
         public void RecieveRemotePicking()
         {
             if (!IsEnabledRecieveRemotePicking())
@@ -803,11 +833,30 @@ namespace gip.bso.test
             return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
         }
 
+        /// <summary>
+        /// Source Property: ReciveRemotePicking
+        /// </summary>
+        [ACMethodInfo("ReciveRemotePickingLocal", "en{'Recive remote Picking local'}de{'Recive remote Picking local'}", 999)]
+        public void ReciveRemotePickingLocal()
+        {
+            if (!IsEnabledReciveRemotePickingLocal())
+                return;
+            RemoteFMHelper fm = new RemoteFMHelper();
+            RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(RemotePickingNo, SelectedRemoteFacilityManagerInfo.RemoteConnString);
+            fm.SynchronizeFacility(this, Messages, PickingManager, SelectedRemoteFacilityManagerInfo.RemoteConnString, remoteStorePostingData);
+            
+        }
+
+        public bool IsEnabledReciveRemotePickingLocal()
+        {
+            return !string.IsNullOrEmpty(RemotePickingNo) && SelectedRemoteFacilityManagerInfo != null;
+        }
+
         private List<RemoteFacilityManagerInfo> LoadRemoteFacilityManagerInfoList()
         {
             List<RemoteFacilityManagerInfo> rmList = new List<RemoteFacilityManagerInfo>();
-            
-            gip.core.datamodel.ACClass rmClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c=>c.ACIdentifier == "RemoteFacilityManager");
+
+            gip.core.datamodel.ACClass rmClass = DatabaseApp.ContextIPlus.ACClass.FirstOrDefault(c => c.ACIdentifier == "RemoteFacilityManager");
 
             List<ACComponent> remoteFacilityManagers = new List<ACComponent>();
             IACComponent[] appManagers = Root.ACComponentChilds.Where(c => c is ApplicationManager || c is ApplicationManagerProxy).ToArray();
@@ -844,7 +893,17 @@ namespace gip.bso.test
 
         private void CallRemoteFacilityManagerForPicking(ACComponent remoteFacilityManager, string pickingNo, string remoteConnString)
         {
+            RemoteStorePostingData remoteStorePostingData = GetRemoteStorePostingData(pickingNo, remoteConnString);
 
+            if (remoteStorePostingData != null)
+            {
+                remoteFacilityManager.ACUrlCommand("!SynchronizeFacility", remoteFacilityManager.ACUrl, remoteConnString, remoteStorePostingData, false);
+            }
+        }
+
+
+        private RemoteStorePostingData GetRemoteStorePostingData(string pickingNo, string remoteConnString)
+        {
             RemoteStorePostingData remoteStorePostingData = null;
 
             Picking picking = null;
@@ -888,19 +947,13 @@ namespace gip.bso.test
                         });
                     }
                 }
-
-
-                if (remoteStorePostingData != null)
-                {
-                    remoteFacilityManager.ACUrlCommand("!SynchronizeFacility", remoteFacilityManager.ACUrl, remoteConnString, remoteStorePostingData, false);
-                }
             }
+            return remoteStorePostingData;
         }
 
         #endregion
 
         #endregion
-
     }
 
     public class ScoreBoard
