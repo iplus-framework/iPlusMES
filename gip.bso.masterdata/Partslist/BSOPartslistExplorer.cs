@@ -650,7 +650,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: ShowBOM
         /// </summary>
-        [ACMethodInfo("ShowBOM", "en{'TODO:ShowBOM'}de{'TODO:ShowBOM'}", 999)]
+        [ACMethodInfo("ShowBOM", "en{'Show components'}de{'Komponenten anzeigen'}", 999)]
         public void ShowBOM()
         {
             if (!IsEnabledShowBOM())
