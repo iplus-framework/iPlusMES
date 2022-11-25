@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace gip.bso.manufacturing
 {
@@ -115,49 +116,108 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private Partslist _Partslist;
+        [ACPropertyInfo(999, "Partslist", "en{'TODO:Partslist'}de{'TODO:Partslist'}")]
+        public Partslist Partslist
+        {
+            get
+            {
+                return _Partslist;
+            }
+            set
+            {
+                if (_Partslist != value)
+                {
+                    _Partslist = value;
+                    OnPropertyChanged(nameof(Partslist));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private MediaItemPresentation _PartslistImage;
+        [ACPropertyInfo(999, "PartslistImage", "en{'TODO:PartslistImage'}de{'TODO:PartslistImage'}")]
+        public MediaItemPresentation PartslistImage
+        {
+            get
+            {
+                return _PartslistImage;
+            }
+            set
+            {
+                if (_PartslistImage != value)
+                {
+                    _PartslistImage = value;
+                    OnPropertyChanged(nameof(PartslistImage));
+                }
+            }
+        }
+
+
         #endregion
 
         #region Methods
 
-        private List<ProdOrderPartslistPos> LoadComponentList(Guid prodOrderBatchPlanID)
+        private List<ProdOrderPartslistPos> LoadComponentList(DatabaseApp databaseApp, Guid prodOrderBatchPlanID)
         {
             List<ProdOrderPartslistPos> components = new List<ProdOrderPartslistPos>();
             BatchPlan = null;
-            using (DatabaseApp databaseApp = new DatabaseApp())
+            BatchPlan = databaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
+            if (BatchPlan == null)
             {
-                BatchPlan = databaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == prodOrderBatchPlanID);
-                if (BatchPlan == null)
-                {
-                    Messages.LogError(this.GetACUrl(), "LoadComponentList()", "batchPlan is null");
-                    return components;
-                }
+                Messages.LogError(this.GetACUrl(), "LoadComponentList()", "batchPlan is null");
+                return components;
+            }
 
-                components =
-                    databaseApp
-                    .ProdOrderPartslistPos
-                   .Include(x => x.ProdOrderPartslist)
-                   .Include(x => x.ProdOrderPartslist.ProdOrder)
-                   .Include(x => x.Material)
-                   .Include(x => x.Material.BaseMDUnit)
-                   .Include(x => x.MDUnit)
-                   .Where(x =>
-                           x.ProdOrderPartslistID == BatchPlan.ProdOrderPartslistID
-                        && x.AlternativeProdOrderPartslistPosID == null
-                        && x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot)
-                        && x.ParentProdOrderPartslistPosID == null
-                        && x.AlternativeProdOrderPartslistPosID == null)
-                    .OrderBy(x => x.Sequence)
-                    .ToList();
+            components =
+                databaseApp
+                .ProdOrderPartslistPos
+               .Include(x => x.ProdOrderPartslist)
+               .Include(x => x.ProdOrderPartslist.ProdOrder)
+               .Include(x => x.Material)
+               .Include(x => x.Material.BaseMDUnit)
+               .Include(x => x.MDUnit)
+               .Where(x =>
+                       x.ProdOrderPartslistID == BatchPlan.ProdOrderPartslistID
+                    && x.AlternativeProdOrderPartslistPosID == null
+                    && x.MaterialPosTypeIndex == (short)(GlobalApp.MaterialPosTypes.OutwardRoot)
+                    && x.ParentProdOrderPartslistPosID == null
+                    && x.AlternativeProdOrderPartslistPosID == null)
+                .OrderBy(x => x.Sequence)
+                .ToList();
 
-                double quantityIndex = BatchPlan.BatchSize / BatchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
-                foreach (ProdOrderPartslistPos pos in components)
-                {
-                    pos.TargetQuantityUOM *= quantityIndex;
-                    databaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
-                }
+            double quantityIndex = BatchPlan.BatchSize / BatchPlan.ProdOrderPartslistPos.TargetQuantityUOM;
+            foreach (ProdOrderPartslistPos pos in components)
+            {
+                pos.TargetQuantityUOM *= quantityIndex;
+                databaseApp.ObjectStateManager.ChangeObjectState(pos, System.Data.EntityState.Unchanged);
             }
 
             return components;
+        }
+
+        public void LoadMaterialImage(Material material)
+        {
+            MediaSettings mediaSettings = new MediaSettings();
+
+            MediaController mediaController = new MediaController(mediaSettings, material);
+            MediaSet imageMediaSet = mediaController.Items[MediaItemTypeEnum.Image];
+
+            List<MediaItemPresentation> mediaItemPresentations = imageMediaSet.GetFiles(1);
+
+            if (mediaItemPresentations != null && mediaItemPresentations.Any())
+            {
+                PartslistImage = mediaItemPresentations.Where(c => c.IsDefault).FirstOrDefault();
+                if (PartslistImage == null)
+                {
+                    PartslistImage = mediaItemPresentations.FirstOrDefault();
+                }
+            }
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
@@ -168,7 +228,25 @@ namespace gip.bso.manufacturing
             PAOrderInfoEntry entry = paOrderInfo.Entities.FirstOrDefault(c => c.EntityName == nameof(ProdOrderBatchPlan));
             if (entry != null)
             {
-                _ComponentList = LoadComponentList(entry.EntityID);
+
+                try
+                {
+                    using (DatabaseApp databaseApp = new DatabaseApp())
+                    {
+                        _ComponentList = LoadComponentList(databaseApp, entry.EntityID);
+
+                        if (BatchPlan != null)
+                        {
+                            Partslist = BatchPlan.ProdOrderPartslist.Partslist;
+                            LoadMaterialImage(Partslist.Material);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    this.Messages.LogException(this.GetACUrl(), "ShowDialogComponent(10)", ex);
+                }
+
                 OnPropertyChanged(nameof(ComponentList));
                 ShowDialog(this, "DialogComponent");
                 this.ParentACComponent.StopComponent(this);
