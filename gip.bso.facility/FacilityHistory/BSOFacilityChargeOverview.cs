@@ -270,15 +270,24 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: 
         /// </summary>
-        private int _FilterExpirationDateDayPeriod;
-        [ACPropertyInfo(999, "FilterExpirationDateDayPeriod", "en{'TODO:FilterExpirationDateDayPeriod'}de{'TODO:FilterExpirationDateDayPeriod'}")]
-        public int FilterExpirationDateDayPeriod
+        private string _SetFilterExpirationDateNextDaysCaption;
+        [ACPropertyInfo(999, "SetFilterExpirationDateNextDaysCaption", "en{'TODO:FilterExpirationDateDayPeriod'}de{'TODO:FilterExpirationDateDayPeriod'}")]
+        public string SetFilterExpirationDateNextDaysCaption
         {
             get
             {
-                return ExpirationDateDayPeriod;
-            }
+                if (_SetFilterExpirationDateNextDaysCaption == null)
+                {
 
+                    gip.core.datamodel.ACClassMethod method = this.ACType.ValueTypeACClass.Methods.Where(c => c.ACIdentifier == nameof(SetFilterExpirationDateNextDays)).FirstOrDefault();
+                    if (method != null)
+                    {
+                        _SetFilterExpirationDateNextDaysCaption = method.ACCaption;
+                        _SetFilterExpirationDateNextDaysCaption = _SetFilterExpirationDateNextDaysCaption.Replace("[0]", ExpirationDateDayPeriod.ToString());
+                    }
+                }
+                return _SetFilterExpirationDateNextDaysCaption;
+            }
         }
 
         #endregion
@@ -714,7 +723,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: SetFilterExpirationDateNextDays
         /// </summary>
-        [ACMethodInfo("SetFilterExpirationDate", "en{'next days'}de{'nächsten Tage'}", 999)]
+        [ACMethodInfo("SetFilterExpirationDate", "en{'Next [0] days'}de{'Nächste [0] Tage'}", 999)]
         public void SetFilterExpirationDateNextDays()
         {
             if (!IsEnabledSetFilterExpirationDateNextDays())
