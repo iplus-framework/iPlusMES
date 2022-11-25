@@ -253,6 +253,7 @@
 
         // Orders
         public const string ProdOrder = "en{'Production Order'}de{'Produktionsauftrag'}";
+        public const string OrderNo = "en{'Order No.'}de{'Order Nr.'}";
         public const string ProdOrderProgramNo = "en{'Order Number'}de{'Auftragsnummer'}";
         public const string ProdOrderPartslist = "en{'Prod. Order BOM'}de{'Prod.auftrag Stückliste'}";
 

@@ -126,6 +126,29 @@ namespace gip.bso.masterdata
             }
         }
 
+        [ACPropertyInfo(755, "Filter", ConstApp.OrderNo)]
+        public string FilterOrderNo
+        {
+            get
+            {
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(FilterProgramNoName);
+            }
+            set
+            {
+                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(FilterProgramNoName);
+                if (tmp != value)
+                {
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(FilterFacilityLotNoName, value);
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(FilterInOrderNoName, value);
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(FilterOutOrderNoName, value);
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(FilterProgramNoName, value);
+
+
+                    OnPropertyChanged(nameof(FilterOrderNo));
+                }
+            }
+        }
+
         public bool IsFilterSampleTakingDateWideRange
         {
             get
@@ -245,6 +268,42 @@ namespace gip.bso.masterdata
 
         #region BSO -> ACProperties
 
+        #region BSO -> ACProperties -> Filter Item Names
+
+        public string FilterFacilityLotNoName
+        {
+            get
+            {
+
+                return $"{nameof(LabOrder.FacilityLot)}\\{nameof(FacilityLot.LotNo)}";
+            }
+        }
+
+        public string FilterInOrderNoName
+        {
+            get
+            {
+                return $"{nameof(LabOrder.InOrderPos)}\\{nameof(InOrderPos.InOrder)}\\{nameof(InOrder.InOrderNo)}";
+            }
+        }
+
+        public string FilterOutOrderNoName
+        {
+            get
+            {
+                return $"{nameof(LabOrder.OutOrderPos)}\\{nameof(OutOrderPos.OutOrder)}\\{nameof(OutOrder.OutOrderNo)}";
+            }
+        }
+
+        public string FilterProgramNoName
+        {
+            get
+            {
+                return $"{nameof(LabOrder.ProdOrderPartslistPos)}\\{nameof(ProdOrderPartslistPos.ProdOrderPartslist)}\\{nameof(ProdOrderPartslist.ProdOrder)}\\{nameof(ProdOrder.ProgramNo)}";
+            }
+        }
+
+        #endregion
 
         #region BSO -> ACProperties -> AccessPrimary
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
@@ -279,6 +338,18 @@ namespace gip.bso.masterdata
 
                 ACFilterItem toSampleTakingDate = new ACFilterItem(Global.FilterTypes.filter, nameof(LabOrder.SampleTakingDate), Global.LogicalOperators.lessThan, Global.Operators.and, null, true);
                 aCFilterItems.Add(toSampleTakingDate);
+
+                List<ACFilterItem> orderFilterItems = new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterFacilityLotNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterInOrderNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterOutOrderNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterProgramNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
+                };
+
+                aCFilterItems.AddRange(orderFilterItems);
 
                 return aCFilterItems;
             }

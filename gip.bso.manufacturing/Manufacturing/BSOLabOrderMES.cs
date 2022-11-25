@@ -119,32 +119,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(720, "Filter", ConstApp.ProdOrderProgramNo)]
-        public string FilterProgramNo
-        {
-            get
-            {
-                return AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(FilterProgramNoName);
-            }
-            set
-            {
-                string tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<string>(FilterProgramNoName);
-                if (tmp != value)
-                {
-                    AccessPrimary.NavACQueryDefinition.SetSearchValue<string>(FilterProgramNoName, value);
-                    OnPropertyChanged(nameof(FilterProgramNo));
-                }
-            }
-        }
-
-        public string FilterProgramNoName
-        {
-            get
-            {
-                return $"{nameof(LabOrder.ProdOrderPartslistPos)}\\{nameof(ProdOrderPartslistPos.ProdOrderPartslist)}\\{nameof(ProdOrderPartslist.ProdOrder)}\\{nameof(ProdOrder.ProgramNo)}";
-            }
-        }
-
         #endregion
 
         #region Methods
@@ -207,7 +181,7 @@ namespace gip.bso.manufacturing
 
         private void DoExportToExcel(string exportFilePath, LabOrder[] selectedLabOrders)
         {
-            using(Database database = new core.datamodel.Database())
+            using (Database database = new core.datamodel.Database())
             {
                 LabOrderToExcel.DoLabOrderToExcel(database, exportFilePath, selectedLabOrders);
             }
@@ -217,22 +191,6 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
-        #region Properties
-
-        public override List<ACFilterItem> NavigationqueryDefaultFilter
-        {
-            get
-            {
-                List<ACFilterItem> aCFilterItems = base.NavigationqueryDefaultFilter;
-
-                ACFilterItem toSampleTakingDate = new ACFilterItem(Global.FilterTypes.filter, FilterProgramNoName, Global.LogicalOperators.contains, Global.Operators.and, null, true);
-                aCFilterItems.Add(toSampleTakingDate);
-
-                return aCFilterItems;
-            }
-        }
-
-        #endregion 
 
         #region Properties -> Messages
 
@@ -279,7 +237,7 @@ namespace gip.bso.manufacturing
 
 
         #endregion
-        
+
         #endregion
 
         #region BackgroundWorker
@@ -410,14 +368,17 @@ namespace gip.bso.manufacturing
             try
             {
                 _PiStats = CurrentLabOrderPos[PWSamplePiLightBox.C_LabOrderExtFieldStats] as SamplePiStats;
-                if (   (_PiStats.TolPlus <= double.Epsilon || _PiStats.TolMinus <= double.Epsilon || _PiStats.SetPoint <= double.Epsilon)
-                    && (CurrentLabOrderPos.ReferenceValue.HasValue && CurrentLabOrderPos.ValueMax.HasValue && CurrentLabOrderPos.ValueMin.HasValue))
-                    _PiStats.SetToleranceAndRecalc(CurrentLabOrderPos.ReferenceValue.Value, CurrentLabOrderPos.ValueMax.Value - CurrentLabOrderPos.ReferenceValue.Value, CurrentLabOrderPos.ReferenceValue.Value - CurrentLabOrderPos.ValueMin.Value, true);
-                if (_PiStats != null && _PiStats.Values.Any())
+                if (_PiStats != null)
                 {
-                    _SamplePiMaxList = _PiStats.Values.Select(c => new SamplePiValue() { DTStamp = c.DTStamp, Value = CurrentLabOrderPos.ValueMax.HasValue ? CurrentLabOrderPos.ValueMax.Value : 0.0 }).ToArray();
-                    _SamplePiMinList = _PiStats.Values.Select(c => new SamplePiValue() { DTStamp = c.DTStamp, Value = CurrentLabOrderPos.ValueMin.HasValue ? CurrentLabOrderPos.ValueMin.Value : 0.0 }).ToArray();
-                    _SamplePiSetPointList = _PiStats.Values.Select(c => new SamplePiValue() { DTStamp = c.DTStamp, Value = CurrentLabOrderPos.ReferenceValue.HasValue ? CurrentLabOrderPos.ReferenceValue.Value : 0.0 }).ToArray();
+                    if ((_PiStats.TolPlus <= double.Epsilon || _PiStats.TolMinus <= double.Epsilon || _PiStats.SetPoint <= double.Epsilon)
+                    && (CurrentLabOrderPos.ReferenceValue.HasValue && CurrentLabOrderPos.ValueMax.HasValue && CurrentLabOrderPos.ValueMin.HasValue))
+                        _PiStats.SetToleranceAndRecalc(CurrentLabOrderPos.ReferenceValue.Value, CurrentLabOrderPos.ValueMax.Value - CurrentLabOrderPos.ReferenceValue.Value, CurrentLabOrderPos.ReferenceValue.Value - CurrentLabOrderPos.ValueMin.Value, true);
+                    if (_PiStats.Values.Any())
+                    {
+                        _SamplePiMaxList = _PiStats.Values.Select(c => new SamplePiValue() { DTStamp = c.DTStamp, Value = CurrentLabOrderPos.ValueMax.HasValue ? CurrentLabOrderPos.ValueMax.Value : 0.0 }).ToArray();
+                        _SamplePiMinList = _PiStats.Values.Select(c => new SamplePiValue() { DTStamp = c.DTStamp, Value = CurrentLabOrderPos.ValueMin.HasValue ? CurrentLabOrderPos.ValueMin.Value : 0.0 }).ToArray();
+                        _SamplePiSetPointList = _PiStats.Values.Select(c => new SamplePiValue() { DTStamp = c.DTStamp, Value = CurrentLabOrderPos.ReferenceValue.HasValue ? CurrentLabOrderPos.ReferenceValue.Value : 0.0 }).ToArray();
+                    }
                 }
             }
             catch (Exception e)
