@@ -2096,6 +2096,7 @@ namespace gip.mes.facility
                 List<FacilityPreBooking> newPreBookings = new List<FacilityPreBooking>();
                 foreach (ProdOrderPartslistPos backflushedPos in backflushedPosFromPrevPartslist)
                 {
+                    bool backflushedPosRecalced = false;
                     if (Math.Abs(backflushedPos.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
                         continue;
                     ProdOrderPartslistPos finalPosFromPrevPartslist =
@@ -2107,6 +2108,12 @@ namespace gip.mes.facility
                     {
                         if (Math.Abs(finalPosFromPrevPartslist.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
                             continue;
+                        if (!backflushedPosRecalced)
+                        {
+                            backflushedPos.RecalcActualQuantity();
+                            backflushedPosRecalced = true;
+                        }
+                        finalPosFromPrevPartslist.RecalcActualQuantity();
                         double diff = backflushedPos.ActualQuantityUOM - finalPosFromPrevPartslist.ActualQuantityUOM;
                         if (Math.Abs(diff) > FacilityConst.C_ZeroCompare)
                         {

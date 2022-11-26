@@ -403,20 +403,50 @@ namespace gip.mes.datamodel
                 sumActualQuantityUOM += childPos.ActualQuantityUOM;
             }
 
-            if (mergeOption.HasValue)
-                this.FacilityBooking_ProdOrderPartslistPosRelation.Load(mergeOption.Value);
-            else
-                this.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
-            foreach (FacilityBooking fb in FacilityBooking_ProdOrderPartslistPosRelation)
+            DatabaseApp dbApp = null;
+            var sumsPerUnitID = this.FacilityBookingCharge_ProdOrderPartslistPosRelation
+                                            .CreateSourceQuery()
+                                            .GroupBy(c => c.MDUnitID)
+                                            .Select(t => new { MDUnitID = t.Key, quantity = t.Sum(u => u.OutwardQuantity), quantityUOM = t.Sum(u => u.OutwardQuantityUOM) })
+                                            .ToArray();
+            MDUnit thisMDUnit = this.SourceProdOrderPartslistPos.MDUnit;
+            foreach (var sumPerUnit in sumsPerUnitID)
             {
-                foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+                double quantity = sumPerUnit.quantityUOM;
+                sumActualQuantityUOM += quantity;
+                quantity = sumPerUnit.quantity;
+                if (thisMDUnit != null && sumPerUnit.MDUnitID != thisMDUnit.MDUnitID)
                 {
-                    sumActualQuantity += fbc.OutwardQuantity;
-                    sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+                    if (dbApp == null)
+                        dbApp = this.GetObjectContext() as DatabaseApp;
+                    MDUnit fromMDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == sumPerUnit.MDUnitID).FirstOrDefault();
+                    quantity = this.SourceProdOrderPartslistPos.Material.ConvertQuantity(quantity, fromMDUnit, thisMDUnit);
                 }
+                sumActualQuantity += quantity;
             }
             this.ActualQuantity = sumActualQuantity;
             this.ActualQuantityUOM = sumActualQuantityUOM;
+
+            //if (sums != null)
+            //{
+            //    this.ActualQuantity = sums.quantity;
+            //    this.ActualQuantityUOM = sums.quantityUOM;
+            //}
+
+            //if (mergeOption.HasValue)
+            //    this.FacilityBooking_ProdOrderPartslistPosRelation.Load(mergeOption.Value);
+            //else
+            //    this.FacilityBooking_ProdOrderPartslistPosRelation.AutoLoad();
+            //foreach (FacilityBooking fb in FacilityBooking_ProdOrderPartslistPosRelation)
+            //{
+            //    foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+            //    {
+            //        sumActualQuantity += fbc.OutwardQuantity;
+            //        sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+            //    }
+            //}
+            //this.ActualQuantity = sumActualQuantity;
+            //this.ActualQuantityUOM = sumActualQuantityUOM;
         }
 
         #endregion

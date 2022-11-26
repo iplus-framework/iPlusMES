@@ -818,51 +818,72 @@ namespace gip.mes.datamodel
                 }
             }
 
-            if (mergeOption.HasValue)
-                this.FacilityBooking_ProdOrderPartslistPos.Load(mergeOption.Value);
-            else
-                this.FacilityBooking_ProdOrderPartslistPos.AutoLoad();
-            foreach (FacilityBooking fb in FacilityBooking_ProdOrderPartslistPos)
+            DatabaseApp dbApp = null;
+            var sumsPerUnitID = this.FacilityBookingCharge_ProdOrderPartslistPos
+                                        .CreateSourceQuery()
+                                        .GroupBy(c => c.MDUnitID)
+                                        .Select(t => new { MDUnitID = t.Key, outwardQUOM = t.Sum(u => u.OutwardQuantityUOM), inwardQUOM = t.Sum(u => u.InwardQuantityUOM) })
+                                        .ToArray();
+            MDUnit thisMDUnit = this.MDUnit;
+            foreach (var sumPerUnit in sumsPerUnitID)
             {
-                foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+                double quantity = Math.Abs(sumPerUnit.outwardQUOM) > Double.Epsilon ? sumPerUnit.outwardQUOM : sumPerUnit.inwardQUOM;
+                sumActualQuantityUOM += quantity;
+                if (thisMDUnit != null && sumPerUnit.MDUnitID != thisMDUnit.MDUnitID)
                 {
-                    try
-                    {
-                        if (this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardRoot
-                            || this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
-                            || this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPart
-                            || this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern
-                            || this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardInternInwardExtern)
-                        {
-                            if (this.MDUnit == null)
-                                sumActualQuantity += fbc.InwardQuantityUOM;
-                            else
-                                sumActualQuantity += fbc.InwardMaterial.ConvertQuantity(fbc.InwardQuantity, fbc.MDUnit, this.MDUnit);
-                            sumActualQuantityUOM += fbc.InwardQuantityUOM;
-                        }
-                        else if (this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot
-                            || this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardPart)
-                        {
-                            if (this.MDUnit == null)
-                            {
-                                sumActualQuantity += fbc.OutwardQuantityUOM;
-                            }
-                            else
-                                sumActualQuantity += fbc.OutwardMaterial.ConvertQuantity(fbc.OutwardQuantity, fbc.MDUnit, this.MDUnit);
-                            sumActualQuantityUOM += fbc.OutwardQuantityUOM;
-
-                        }
-                    }
-                    catch (Exception ec)
-                    {
-                        string msg = ec.Message;
-                        if (ec.InnerException != null && ec.InnerException.Message != null)
-                            msg += " Inner:" + ec.InnerException.Message;
-
-                        this.Root().Messages.LogException(ClassName, "RecalcActualQuantity(10)", msg);
-                    }
+                    if (dbApp == null)
+                        dbApp = this.GetObjectContext() as DatabaseApp;
+                    MDUnit fromMDUnit = dbApp.MDUnit.Where(c => c.MDUnitID == sumPerUnit.MDUnitID).FirstOrDefault();
+                    quantity = this.Material.ConvertQuantity(quantity, fromMDUnit, thisMDUnit);
                 }
+                sumActualQuantity += quantity;
             }
+
+            //if (mergeOption.HasValue)
+            //    this.FacilityBooking_ProdOrderPartslistPos.Load(mergeOption.Value);
+            //else
+            //    this.FacilityBooking_ProdOrderPartslistPos.AutoLoad();
+            //foreach (FacilityBooking fb in FacilityBooking_ProdOrderPartslistPos)
+            //{
+            //    foreach (FacilityBookingCharge fbc in fb.FacilityBookingCharge_FacilityBooking)
+            //    {
+            //        try
+            //        {
+            //            if (this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardRoot
+            //                || this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern
+            //                || this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPart
+            //                || this.MaterialPosType == GlobalApp.MaterialPosTypes.InwardPartIntern
+            //                || this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardInternInwardExtern)
+            //            {
+            //                if (this.MDUnit == null)
+            //                    sumActualQuantity += fbc.InwardQuantityUOM;
+            //                else
+            //                    sumActualQuantity += fbc.InwardMaterial.ConvertQuantity(fbc.InwardQuantity, fbc.MDUnit, this.MDUnit);
+            //                sumActualQuantityUOM += fbc.InwardQuantityUOM;
+            //            }
+            //            else if (this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot
+            //                || this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardPart)
+            //            {
+            //                if (this.MDUnit == null)
+            //                {
+            //                    sumActualQuantity += fbc.OutwardQuantityUOM;
+            //                }
+            //                else
+            //                    sumActualQuantity += fbc.OutwardMaterial.ConvertQuantity(fbc.OutwardQuantity, fbc.MDUnit, this.MDUnit);
+            //                sumActualQuantityUOM += fbc.OutwardQuantityUOM;
+
+            //            }
+            //        }
+            //        catch (Exception ec)
+            //        {
+            //            string msg = ec.Message;
+            //            if (ec.InnerException != null && ec.InnerException.Message != null)
+            //                msg += " Inner:" + ec.InnerException.Message;
+
+            //            this.Root().Messages.LogException(ClassName, "RecalcActualQuantity(10)", msg);
+            //        }
+            //    }
+            //}
 
             if (this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardRoot || this.MaterialPosType == GlobalApp.MaterialPosTypes.OutwardPart)
             {
@@ -874,8 +895,7 @@ namespace gip.mes.datamodel
                 {
                     foreach (var relationItem in this.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
                     {
-                        // aagincic NOTE: maybe shuld be called this: relationItem.RecalcActualQuantity() ?
-                        // aagincic NOTE: why sumation?
+                        relationItem.RecalcActualQuantity();
                         if (relationItem.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation != null)
                             continue;
                         if (this.MDUnit == null)

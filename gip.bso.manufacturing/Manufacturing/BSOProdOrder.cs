@@ -3158,6 +3158,17 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderIntermediateBatch != null;
         }
 
+        [ACMethodInteraction("Intermediate", "en{'Sum bookings to Actual Quantity'}de{'Summiere Buchungen auf Istmenge'}", (short)MISort.New, true, "SelectedIntermediate")]
+        public void RecalcProdOrderIntermediate()
+        {
+            SelectedIntermediate.RecalcActualQuantity();
+        }
+
+        public bool IsEnabledProdOrderIntermediate()
+        {
+            return SelectedIntermediate != null;
+        }
+
         #region ProdOrderIntermediateBatch -> Methods -> IsEnabled
 
         public bool IsEnabledProdOrderIntermediateBatchCreateDlg()
@@ -4815,8 +4826,14 @@ namespace gip.bso.manufacturing
                 case nameof(RecalcProdOrderIntermediateBatch):
                     RecalcProdOrderIntermediateBatch();
                     return true;
+                case nameof(RecalcProdOrderIntermediate):
+                    RecalcProdOrderIntermediate();
+                    return true;
                 case nameof(IsEnabledProdOrderIntermediateBatch):
                     result = IsEnabledProdOrderIntermediateBatch();
+                    return true;
+                case nameof(IsEnabledProdOrderIntermediate):
+                    result = IsEnabledProdOrderIntermediate();
                     return true;
                 case nameof(IsEnabledProdOrderIntermediateBatchCreateDlg):
                     result = IsEnabledProdOrderIntermediateBatchCreateDlg();
