@@ -933,7 +933,8 @@ namespace gip.mes.processapplication
                     else
                     {
                         dbApp.ACSaveChanges();
-                        if (intermediatePosition.ProdOrderPartslist.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished)
+                        if (   intermediatePosition.ProdOrderPartslist.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished
+                            && intermediatePosition.ProdOrderPartslist.IsFinalProdOrderPartslist)
                         {
                             saveMsg = ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, intermediatePosition.ProdOrderPartslist.ProdOrder, false);
                             if (saveMsg != null)
