@@ -183,6 +183,38 @@ namespace gip.mes.datamodel
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _OrderNo;
+        [ACPropertyInfo(999, "DocumentNo", ConstApp.OrderNo)]
+        public string OrderNo
+        {
+            get
+            {
+                if (_OrderNo == null)
+                {
+                    if (OutOrderPos != null)
+                    {
+                        _OrderNo = OutOrderPos.OutOrder.OutOrderNo;
+                    }
+                    if (InOrderPos != null)
+                    {
+                        _OrderNo = InOrderPos.InOrder.InOrderNo;
+                    }
+                    else if (ProdOrderPartslistPos != null)
+                    {
+                        _OrderNo = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    }
+                    else if (FacilityLot != null)
+                    {
+                        _OrderNo = FacilityLot.LotNo;
+                    }
+                }
+                return _OrderNo;
+            }
+        }
+
         #endregion
     }
 
