@@ -1,4 +1,5 @@
 ﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 #if NETFRAMEWORK
@@ -124,5 +125,13 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<List<Facility>>> GetPOBatchTargetFacilitiesAsync(string intermBatchID);
 #endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriProdOrderVerOrderPostings, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<Msg> VerifyOrderPostingsOnRelease(BarcodeEntity entity);
+#elif NETSTANDARD
+        Task<WSResponse<Msg>> VerifyOrderPostingsOnReleaseAsync(BarcodeEntity entity);
+#endif
     }
-}
+}   

@@ -1094,6 +1094,24 @@ namespace gip.mes.webservices
             };
         }
 
+        public WSResponse<Msg> VerifyOrderPostingsOnRelease(BarcodeEntity entity)
+        {
+            if (entity == null)
+                return new WSResponse<Msg>(null, new Msg(eMsgLevel.Error, "entity is null."));
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>();
+            if (myServiceHost == null)
+                return new WSResponse<Msg>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PWWorkTaskGeneric pwWorkTaskGeneric = myServiceHost.ACUrlCommand(entity.SelectedOrderWF.ACUrlWF) as PWWorkTaskGeneric;
+            if (pwWorkTaskGeneric != null)
+            {
+                return new WSResponse<Msg>(pwWorkTaskGeneric.VerifyOrderPostingsOnRelease(), null);
+            }
+
+            return null;
+        }
+
         #endregion
     }
 }

@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Generic work task'}de{'Allgemeine Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, nameof(PWWorkTaskGeneric), true, BSOConfig = "BSOWorkTaskOnHold")]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Generic work task'}de{'Allgemeine Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, nameof(PWWorkTaskGeneric), true)]
     public class PAFWorkTaskGeneric : PAFWorkTaskScanBase
     {
         #region Constructors
@@ -97,7 +98,6 @@ namespace gip.mes.processapplication
             }
             return wfInfo;
         }
-
 
         #endregion
     }
