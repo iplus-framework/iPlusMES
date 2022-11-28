@@ -507,8 +507,8 @@ namespace gip.mes.datamodel
             if (withReferences)
             {
                 PartslistID = from.PartslistID;
-                MaterialID = from.MaterialID;
-                MDUnitID = from.MDUnitID;
+                Material = from.Material;
+                MDUnit = from.MDUnit;
                 ParentPartslistPosID = from.ParentPartslistPosID;
                 AlternativePartslistPosID = from.AlternativePartslistPosID;
                 ParentPartslistID = from.ParentPartslistID;
