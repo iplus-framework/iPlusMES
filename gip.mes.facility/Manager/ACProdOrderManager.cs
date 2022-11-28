@@ -3284,10 +3284,21 @@ namespace gip.mes.facility
             //   .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
             //   .ToList();
 
+            ProdOrderPartslistPos[] mixures =
+                prodOrderPartslist
+                .ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                .ToArray();
+
+            ProdOrderPartslistPos finalMixure = mixures.Where(c => c.IsFinalMixure).FirstOrDefault();
+
+            if(finalMixure == null)
+                return;
+
             IEnumerable<ProdOrderPartslistPos> batches =
                 prodOrderPartslist
                 .ProdOrderPartslistPos_ProdOrderPartslist
-                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern && c.ParentProdOrderPartslistPosID == finalMixure.ProdOrderPartslistPosID)
                 .ToArray();
 
             IEnumerable<FacilityBooking> facilityBookings =
