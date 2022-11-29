@@ -3293,7 +3293,7 @@ namespace gip.mes.facility
             ProdOrderPartslistPos finalMixure = mixures.Where(c => c.IsFinalMixure).FirstOrDefault();
 
             if (finalMixure == null)
-                return;
+                return null;
 
             IEnumerable<ProdOrderPartslistPos> batches =
                 prodOrderPartslist
