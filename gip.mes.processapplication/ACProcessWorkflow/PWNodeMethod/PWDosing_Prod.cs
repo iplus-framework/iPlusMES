@@ -602,7 +602,7 @@ namespace gip.mes.processapplication
                             {
                                 if (!prioSilo.VBiFacilityACClassID.HasValue)
                                     continue;
-                                dosingRoute = routes.Where(c => c.LastOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
+                                dosingRoute = routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
                                 if (dosingRoute != null)
                                     break;
                             }
