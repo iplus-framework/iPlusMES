@@ -47,7 +47,7 @@ namespace gip.mes.webservices
 
             WorkTaskScanResult result = component.ExecuteMethod(nameof(PAFWorkTaskScanBase.OnScanEvent),
                 new BarcodeSequenceBase() { State = sequence.State, Message = sequence.Message, QuestionSequence = sequence.QuestionSequence },
-                sequence.State == BarcodeSequenceBase.ActionState.Selection ? ConvertWFInfoToPA(sequence.Sequence.LastOrDefault().SelectedOrderWF) : null,
+                sequence.State >= BarcodeSequenceBase.ActionState.Question ? ConvertWFInfoToPA(sequence.Sequence.LastOrDefault().SelectedOrderWF) : null,
                 facilityChargeID, 
                 sequence.Sequence.Count,
                 sequence.State == BarcodeSequenceBase.ActionState.Question ? (short?)sequence.Sequence.LastOrDefault().MsgResult : null,

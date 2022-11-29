@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Objects;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Windows.Input;
 using static gip.core.datamodel.Global;
 
@@ -393,6 +394,7 @@ namespace gip.bso.masterdata
                     OnPropertyChanged("MDUnitList");
                     OnPropertyChanged("CurrentMDUnit");
                     OnPropertyChanged("ConfigurationTransferList");
+                    LoadBOM(value);
                     if (value != null)
                         if (!_VisitedPartslists.Any(c => c.PartslistID == value.PartslistID))
                             _VisitedPartslists.Add(value);
@@ -428,7 +430,6 @@ namespace gip.bso.masterdata
                         AccessPrimary.Selected = value;
                         if (AccessPrimary.Selected != null)
                             AccessPrimary.Selected.PropertyChanged += SelectedPartslist_PropertyChanged;
-
 
                         PropagateParslistSelection(value);
                         OnPropertyChanged("SelectedPartslist");
@@ -555,23 +556,6 @@ namespace gip.bso.masterdata
             }
         }
 
-        private List<PartslistPos> LoadBOMComponentList()
-        {
-            List<PartslistPos> positions = new List<PartslistPos>();
-
-            if(ExpandResult != null)
-            {
-                ExpandResult[] items = ExpandResult.OrderByDescending(c=>c.TreeVersion).Where(c=>c.Item.IsChecked).ToArray();
-                foreach(ExpandResult item in items)
-                {
-                    Partslist pl = item.Item.Item as Partslist;
-                    PartslistPos[] components = pl.PartslistPos_Partslist.Where(c=>c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).OrderBy(c=>c.Sequence).ToArray();
-                    positions.AddRange(components);
-                }
-            }
-
-            return positions;
-        }
         #endregion
 
 
@@ -650,30 +634,39 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: ShowBOM
         /// </summary>
-        [ACMethodInfo("ShowBOM", "en{'Show components'}de{'Komponenten anzeigen'}", 999)]
-        public void ShowBOM()
+        public void LoadBOM(Partslist partslist)
         {
-            if (!IsEnabledShowBOM())
-                return;
-
-            RootProdOrderPartListExpand = new PartslistExpand(SelectedPartslist, 1, 1);
-            RootProdOrderPartListExpand.LoadTree();
-            RootProdOrderPartListExpand.IsEnabled = true;
-            RootProdOrderPartListExpand.IsChecked = false;
-
+            _BOMComponentList = null;
+            RootProdOrderPartListExpand = null;
+            _CurrentProdOrderPartListExpand = null;
             _ProdOrderPartListExpandList = null;
-            _CurrentProdOrderPartListExpand = RootProdOrderPartListExpand;
 
-            ExpandResult = new List<ExpandResult>();
-            RootProdOrderPartListExpand.BuildTreeList(ExpandResult);
-            foreach (var item in ExpandResult)
+            ExpandResult = null;
+
+            if (partslist != null)
             {
-                item.Item.PropertyChanged += PartslistExpand_PropertyChanged;
+                RootProdOrderPartListExpand = new PartslistExpand(partslist, 1, 1);
+                RootProdOrderPartListExpand.LoadTree();
+                RootProdOrderPartListExpand.IsEnabled = true;
+                RootProdOrderPartListExpand.IsChecked = false;
+
+
+                _CurrentProdOrderPartListExpand = RootProdOrderPartListExpand;
+
+                ExpandResult = new List<ExpandResult>();
+                RootProdOrderPartListExpand.BuildTreeList(ExpandResult);
+                foreach (var item in ExpandResult)
+                {
+                    item.Item.PropertyChanged += PartslistExpand_PropertyChanged;
+                }
+
+                _BOMComponentList = LoadBOMComponentList();
             }
 
-            _BOMComponentList = LoadBOMComponentList();
-
-            ShowDialog(this, "PartslistBOMDlg");
+            OnPropertyChanged(nameof(BOMComponentList));
+            OnPropertyChanged(nameof(RootProdOrderPartListExpand));
+            OnPropertyChanged(nameof(CurrentProdOrderPartListExpand));
+            OnPropertyChanged(nameof(ProdOrderPartListExpandList));
         }
 
         private void PartslistExpand_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -685,9 +678,31 @@ namespace gip.bso.masterdata
             }
         }
 
-        public bool IsEnabledShowBOM()
+        private List<PartslistPos> LoadBOMComponentList()
         {
-            return SelectedPartslist != null;
+            List<PartslistPos> positions = new List<PartslistPos>();
+
+            if (ExpandResult != null)
+            {
+                ExpandResult[] items = ExpandResult.OrderByDescending(c => c.TreeVersion).Where(c => c.Item.IsChecked).ToArray();
+                foreach (ExpandResult item in items)
+                {
+                    Partslist pl = item.Item.Item as Partslist;
+                    PartslistPos[] components = pl.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).OrderBy(c => c.Sequence).ToArray();
+                    List<PartslistPos> clonedComponents = new List<PartslistPos>();
+                    foreach (PartslistPos component in components)
+                    {
+                        PartslistPos clonedComponent = component.Clone(true) as PartslistPos;
+                        clonedComponent.TargetQuantityUOM *= item.Item.TreeQuantityRatio;
+                        clonedComponent.PartslistPosID = Guid.NewGuid();
+                        DatabaseApp.ObjectStateManager.ChangeObjectState(clonedComponent, System.Data.EntityState.Unchanged);
+                        clonedComponents.Add(clonedComponent);
+                    }
+                    positions.AddRange(clonedComponents);
+                }
+            }
+
+            return positions;
         }
 
         #endregion

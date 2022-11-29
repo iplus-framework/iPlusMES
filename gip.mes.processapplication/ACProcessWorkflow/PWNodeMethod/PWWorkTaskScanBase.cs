@@ -84,6 +84,7 @@ namespace gip.mes.processapplication
         {
             intermediatePosID = Guid.Empty;
             intermediateChildPosID = Guid.Empty;
+
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
                 return;
@@ -107,6 +108,23 @@ namespace gip.mes.processapplication
                     }
                 }
             }
+        }
+
+        public bool GetAssignedIntermediate(DatabaseApp dbApp, out ProdOrderPartslistPos intermediatePos, out ProdOrderPartslistPos intermediateChildPos)
+        {
+            intermediatePos = null;
+            intermediateChildPos = null;
+
+            PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
+            if (pwMethodProduction == null)
+                return false;
+
+            MaterialWFConnection matWFConnection;
+            ProdOrderBatch batch;
+            ProdOrderBatchPlan batchPlan;
+            ProdOrderPartslistPos endBatchPos;
+            return PWDosing.GetRelatedProdOrderPosForWFNode(this, dbApp.ContextIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
+                out endBatchPos, out matWFConnection, out batch, out batchPlan);
         }
 
         public virtual Msg OnGetMessageAfterOccupyingProcessModule(PAFWorkTaskScanBase invoker)

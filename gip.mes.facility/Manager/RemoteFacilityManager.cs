@@ -335,6 +335,10 @@ namespace gip.mes.facility
 
                                     localPicking.DeleteACObject(dbLocal, false);
                                 }
+                                else
+                                {
+                                    Messages.LogDebug(GetACUrl(), nameof(SynchronizeFacility), $"Remote picking is null: {entry.KeyId}! Local picking for delete not present to!");
+                                }
                             }
                         }
                     }

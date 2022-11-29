@@ -74,6 +74,7 @@
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFInOutOperationOnScan.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskOnHold.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskScanBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAScaleMappingHelper.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFBinDischarging.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosingSkip.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskOnHold.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\ScaleBoundaries.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Rework.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWSamplePiLightBox.cs" />
@@ -277,6 +279,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-10-09 22-40_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-11-27 09-27_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

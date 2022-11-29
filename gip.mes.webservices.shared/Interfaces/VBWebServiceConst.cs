@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Text;
 
@@ -99,6 +100,9 @@ namespace gip.mes.webservices
         public const string UriProdOrderPLPosRel_F = "ProdOrderPLPosRel/{0}";
         public const string UriProdOrderBatchTargetFacilities = "ProdOrderBTF/{intermBatchID}";
         public const string UriProdOrderBatchTargetFacilities_F = "ProdOrderBTF/{0}";
+
+        public const string UriProdOrderVerOrderPostings = "VerProdOrderPostings";
+        public const string UriProdOrderVerOrderPostings_F = "VerProdOrderPostings/{0}";
 
         #endregion
 

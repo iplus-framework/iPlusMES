@@ -467,6 +467,11 @@ namespace gip.mes.processapplication
                     scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
                 }
             }
+            else if (wfMsg != null && wfMsg.MessageLevel == eMsgLevel.Question)
+            {
+                actionMsg = wfMsg;
+                scanResult.Result.State = BarcodeSequenceBase.ActionState.Question;
+            }
             else
             {
                 actionMsg = wfMsg;
