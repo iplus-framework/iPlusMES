@@ -275,7 +275,18 @@ namespace gip.mes.facility
         #endregion
 
         #region Materials -> Inward
-        public Material InwardMaterial { get; set; }
+        Material _InwardMaterial;
+        public Material InwardMaterial 
+        {
+            get
+            {
+                return _InwardMaterial;
+            }
+            set
+            {
+                _InwardMaterial = value;
+            }
+        }
         #endregion
 
         #endregion

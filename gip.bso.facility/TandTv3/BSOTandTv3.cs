@@ -111,6 +111,8 @@ namespace gip.bso.facility
             if (_TandTv3Manager == null)
                 throw new Exception("TandTv3Manager not configured");
 
+            _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
+
             GraphCommand = new GraphCommand(DatabaseApp, this, RoutingService);
 
             // Warmup for components in graph
@@ -136,7 +138,6 @@ namespace gip.bso.facility
             ActiveTandTPaths = new List<IACObject>();
             InitSelectionManger(Const.SelectionManagerCDesign_ClassName);
 
-            _RoutingService = ACRoutingService.ACRefToServiceInstance(this);
 
             //Test();
             return true;

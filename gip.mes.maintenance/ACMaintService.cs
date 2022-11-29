@@ -49,7 +49,7 @@ namespace gip.mes.maintenance
         {
             ThreadPool.QueueUserWorkItem((object state) => RebuildMaintCacheInternal());
             if (this.ApplicationManager != null)
-                this.ApplicationManager.ProjectWorkCycleR1min += ApplicationManager_ProjectWorkCycleR1min;
+                this.ApplicationManager.ProjectWorkCycleR20sec += ApplicationManager_ProjectWorkCycle;
             (Root as ACRoot).OnSendPropertyValueEvent += OnMaintPropertyChanged;
             Task.Run(() => CheckWarningOnStartUp());
             return base.ACPostInit();
@@ -58,7 +58,7 @@ namespace gip.mes.maintenance
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            this.ApplicationManager.ProjectWorkCycleR1min -= ApplicationManager_ProjectWorkCycleR1min;
+            this.ApplicationManager.ProjectWorkCycleR20sec -= ApplicationManager_ProjectWorkCycle;
             (Root as ACRoot).OnSendPropertyValueEvent -= OnMaintPropertyChanged;
             return base.ACDeInit(deleteACClassTask);
         }
@@ -286,7 +286,7 @@ namespace gip.mes.maintenance
         [ACMethodInfo("", "en{'Rebuild maintenance cache'}de{'Wartungscache neu aufbauen'}", 500, true)]
         public void RebuildMaintCache()
         {
-            _RebuildCacheAt = DateTime.Now.AddMinutes(5);
+            _RebuildCacheAt = DateTime.Now.AddMinutes(1);
         }
 
         #endregion
@@ -294,7 +294,7 @@ namespace gip.mes.maintenance
 
         #region Cache building
 
-        private void ApplicationManager_ProjectWorkCycleR1min(object sender, EventArgs e)
+        private void ApplicationManager_ProjectWorkCycle(object sender, EventArgs e)
         {
             if (_RebuildCacheAt == null || !_CacheRebuilded)
                 return;

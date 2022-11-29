@@ -227,40 +227,8 @@ namespace gip.mes.processapplication
         protected override void OnRebuildMandatoryConfigStoresCache(IACComponentPWNode invoker, List<IACConfigStore> mandatoryConfigStores, bool recalcExpectedConfigStoresCount)
         {
             base.OnRebuildMandatoryConfigStoresCache(invoker, mandatoryConfigStores, recalcExpectedConfigStoresCount);
-            Guid acClassMethodID = invoker != null ? invoker.ContentACClassWF.ACClassMethodID : ContentACClassWF.ACClassMethodID;
 
-            if (CurrentPicking != null)
-            {
-                ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
-
-                string errorMessage = null;
-                int expectedConfigStoresCount = 0;
-
-                List<IACConfigStore> pickingOfflineList = (serviceInstance as ConfigManagerIPlusMES).GetPickingConfigStoreOfflineList(ContentTask.ACClassTaskID, CurrentPicking.PickingID, 
-                                                                                                                                      out expectedConfigStoresCount, out errorMessage);
-
-                if (pickingOfflineList != null)
-                {
-                    mandatoryConfigStores.AddRange(pickingOfflineList);
-                }
-                else
-                {
-                    ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                    if (String.IsNullOrEmpty(errorMessage))
-                        errorMessage = "";
-                    errorMessage = errorMessage + " Configuration could not be loaded. Workflownodes will run with wrong parameters. If you acknowledge the alarm, the workflow will continue otherwise reset the Workflow manually!";
-                    OnNewAlarmOccurred(ProcessAlarm, new Msg(errorMessage, this, eMsgLevel.Error, PWClassName, "MandatoryConfigStores", 1000), true);
-                    Messages.LogError(this.GetACUrl(), "Start(0)", errorMessage);
-                }
-                if (recalcExpectedConfigStoresCount)
-                {
-                    using (ACMonitor.Lock(_20015_LockStoreList))
-                    {
-                        _ExpectedConfigStoresCount += expectedConfigStoresCount;
-                    }
-                }
-            }
-            else if (recalcExpectedConfigStoresCount && CurrentFacilityBooking == null)
+            if (CurrentPicking == null && CurrentFacilityBooking == null && recalcExpectedConfigStoresCount)
             {
                 Messages.LogError(this.GetACUrl(), "OnRebuildMandatoryConfigStoresCache(20)", "CurrentPicking is null => ConfigStore-Validation will fail!");
                 using (ACMonitor.Lock(_20015_LockStoreList))
