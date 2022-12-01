@@ -7,7 +7,7 @@ using System.Data.Objects;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioMaterial, ConstApp.ESUnit, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "MDBSOUnit")]
-    [ACPropertyEntity(3, "TechnicalSymbol", "en{'Symbol Tech.'}de{'Zeichen tech.'}", "", "", true)]
+    [ACPropertyEntity(3, "TechnicalSymbol", ConstApp.TechnicalSymbol, "", "", true)]
     [ACPropertyEntity(4, "SIDimensionIndex", "en{'Dimension'}de{'Maß'}", typeof(GlobalApp.SIDimensions), Const.ContextDatabase + "\\SIDimensionList", "", true)]
     [ACPropertyEntity(5, "IsSIUnit", "en{'SI-Unit'}de{'Ist SI-Einheit'}", "", "", true, DefaultValue = false)]
     [ACPropertyEntity(6, "Rounding", "en{'Rounding'}de{'Genauigkeit'}", "", "", true, DefaultValue = (int)-1)]

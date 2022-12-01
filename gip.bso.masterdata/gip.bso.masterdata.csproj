@@ -125,6 +125,7 @@
     <Compile Include="Material\BSOMaterialOptions.cs" />
     <Compile Include="Material\LOPosValueFieldEnum.cs" />
     <Compile Include="Material\MDBSOLabOrderPosState.cs" />
+    <Compile Include="Partslist\BOMModel.cs" />
     <Compile Include="Partslist\BSOPartsList.cs" />
     <Compile Include="Partslist\BSOPartslistExplorer.cs" />
     <Compile Include="Production\MDBSOProdOrderPartslistPosState.cs" />
@@ -405,6 +406,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2022-11-28 16-15_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2022-12-01 15-37_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -519,13 +519,13 @@ namespace gip.bso.masterdata
         #region Properties -> BOM components
 
         #region BOMComponent
-        private PartslistPos _SelectedBOMComponent;
+        private BOMModel _SelectedBOMComponent;
         /// <summary>
         /// Selected property for PartslistPos
         /// </summary>
         /// <value>The selected BOMComponent</value>
         [ACPropertySelected(9999, "BOMComponent", "en{'TODO: BOMComponent'}de{'TODO: BOMComponent'}")]
-        public PartslistPos SelectedBOMComponent
+        public BOMModel SelectedBOMComponent
         {
             get
             {
@@ -542,13 +542,13 @@ namespace gip.bso.masterdata
         }
 
 
-        private List<PartslistPos> _BOMComponentList;
+        private List<BOMModel> _BOMComponentList;
         /// <summary>
         /// List property for PartslistPos
         /// </summary>
         /// <value>The BOMComponent list</value>
         [ACPropertyList(9999, "BOMComponent")]
-        public List<PartslistPos> BOMComponentList
+        public List<BOMModel> BOMComponentList
         {
             get
             {
@@ -678,9 +678,9 @@ namespace gip.bso.masterdata
             }
         }
 
-        private List<PartslistPos> LoadBOMComponentList()
+        private List<BOMModel> LoadBOMComponentList()
         {
-            List<PartslistPos> positions = new List<PartslistPos>();
+            List<BOMModel> positions = new List<BOMModel>();
 
             if (ExpandResult != null)
             {
@@ -689,14 +689,26 @@ namespace gip.bso.masterdata
                 {
                     Partslist pl = item.Item.Item as Partslist;
                     PartslistPos[] components = pl.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).OrderBy(c => c.Sequence).ToArray();
-                    List<PartslistPos> clonedComponents = new List<PartslistPos>();
+                    List<BOMModel> clonedComponents = new List<BOMModel>();
                     foreach (PartslistPos component in components)
                     {
-                        PartslistPos clonedComponent = component.Clone(true) as PartslistPos;
-                        clonedComponent.TargetQuantityUOM *= item.Item.TreeQuantityRatio;
-                        clonedComponent.PartslistPosID = Guid.NewGuid();
-                        DatabaseApp.ObjectStateManager.ChangeObjectState(clonedComponent, System.Data.EntityState.Unchanged);
-                        clonedComponents.Add(clonedComponent);
+
+                        BOMModel model = new BOMModel();
+                        
+                        model.Sequence= component.Sequence;
+                        model.PartslistNo = component.Partslist.PartslistNo;
+                        model.MaterialNo = component.Partslist.Material.MaterialNo;
+                        model.MaterialName = component.Partslist.Material.MaterialName1;
+
+                        double targetQuantityUOM = item.Item.TreeQuantityRatio * component.TargetQuantityUOM;
+                        double targetQuantity = item.Item.TreeQuantityRatio * component.TargetQuantity;
+                        model.TargetQuantityUOM = targetQuantityUOM; 
+                        model.TargetQuantity = targetQuantity;
+
+                        model.BaseMDUnit = component.Material.BaseMDUnit.TechnicalSymbol;
+                        model.MDUnit = component.MDUnit?.TechnicalSymbol;
+                        
+                        clonedComponents.Add(model);
                     }
                     positions.AddRange(clonedComponents);
                 }

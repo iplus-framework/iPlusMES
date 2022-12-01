@@ -181,6 +181,7 @@
         public const string YearBalanceDate = "en{'Year Balance Date'}de{'Jahresbilanz Datum'}";
 
         public const string MDUnit = "en{'Unit of Measure'}de{'Maßeinheit'}";
+        public const string TechnicalSymbol = "en{'Symbol Tech.'}de{'Zeichen tech.'}";
 
         // Name, Description
         public const string Name = "en{'Name'}de{'Bezeichnung'}";
