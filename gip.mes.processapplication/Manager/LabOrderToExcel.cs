@@ -1,15 +1,9 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using DocumentFormat.OpenXml.Spreadsheet;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -20,12 +14,19 @@ namespace gip.mes.processapplication
         public static void DoLabOrderToExcel(Database database, string fileName, LabOrder[] labOrders)
         {
             XLWorkbook workBook = new XLWorkbook();
-            List<String> sheetNames = new List<String>();
+            List<string> sheetNames = new List<string>();
             int indexOfMaterial = 0;
+
+            labOrders = labOrders.Where(c => c.ProdOrderPartslistPos != null).ToArray();
+
+            if (labOrders != null && labOrders.Count() > 1)
+            {
+                DoSummaryWorksheet(database, workBook, labOrders);
+            }
 
             foreach (LabOrder labOrder in labOrders)
             {
-                String sheetName = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                string sheetName = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
                 sheetName = TruncateAtWord(sheetName, 20);
                 sheetNames.Add(sheetName);
                 indexOfMaterial = sheetNames.Where(s => s != null && s.Equals(sheetName)).Count();
@@ -42,8 +43,85 @@ namespace gip.mes.processapplication
 
         #region Excel Cell Printing
 
+        public static void DoSummaryWorksheet(Database database, XLWorkbook workBook, LabOrder[] labOrders)
+        {
+            IXLWorksheet worksheet = workBook.Worksheets.Add("Summary");
+            worksheet.Cell(1, 1).Value = "Laboratory Order No";
+            worksheet.Cell(1, 2).Value = "Material No.";
+            worksheet.Cell(1, 3).Value = "Material Name";
+            worksheet.Cell(1, 4).Value = "Production Order";
+            worksheet.Cell(1, 5).Value = "Update Dates";
+            worksheet.Cell(1, 6).Value = "Proizvodna linija";
+            worksheet.Cell(1, 7).Value = "Reference Value";
+            worksheet.Cell(1, 8).Value = "Lowest value";
+            worksheet.Cell(1, 9).Value = "Maximum value";
+            worksheet.Cell(1, 10).Value = "Average Value";
+            worksheet.Cell(1, 11).Value = "Broj vaganja";
+            worksheet.Cell(1, 12).Value = "Broj vaganja u toleranciji";
+            worksheet.Cell(1, 13).Value = "Broj vaganja izvan tolerancije";
+
+            int row = 2;
+            foreach (LabOrder labOrder in labOrders)
+            {
+                DoSummaryWorksheetRow(database, row, worksheet, labOrder);
+                row++;
+            }
+
+            var rngTable = worksheet.Range(1, 1, row, 13);
+            rngTable.CreateTable("summary");
+        }
+
+        private static void DoSummaryWorksheetRow(Database database, int row, IXLWorksheet worksheet, LabOrder labOrder)
+        {
+            worksheet.Cell(row, 1).Value = labOrder.LabOrderNo;
+            worksheet.Cell(row, 2).Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialNo;
+            worksheet.Cell(row, 3).Value = labOrder.ProdOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+            worksheet.Cell(row, 4).Value = labOrder.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
+            worksheet.Cell(row, 5).Value = labOrder.SampleTakingDate;
+
+            core.datamodel.ACClass machine = GetLabOrderMachine(database, labOrder);
+            worksheet.Cell(row, 6).Value = machine?.ACCaption;
+
+            int tolCounter = 0;
+            int counter = 0;
+
+            foreach (LabOrderPos labOrderPosItem in labOrder.LabOrderPos_LabOrder.ToArray())
+            {
+                double refValue = (double)labOrderPosItem.ReferenceValue;
+                worksheet.Cell(row, 7).Value = labOrderPosItem.ReferenceValue;
+                worksheet.Cell(row, 8).Value = labOrderPosItem.ValueMin;
+                worksheet.Cell(row, 9).Value = labOrderPosItem.ValueMax;
+                worksheet.Cell(row, 10).Value = labOrderPosItem.ActualValue;
+
+                if (labOrderPosItem.XMLConfig != null)
+                {
+                    SamplePiStats piStats = null;
+                    try
+                    {
+                        piStats = labOrderPosItem[PWSamplePiLightBox.C_LabOrderExtFieldStats] as SamplePiStats;
+                    }
+                    catch { }
+
+                    if (piStats != null)
+                    {
+                        foreach (SamplePiValue item in piStats.Values)
+                        {
+                            if (item.TolState == 1 || item.TolState == -1)
+                                tolCounter++;
+                            counter++;
+                        }
+                    }
+                }
+            }
+
+            worksheet.Cell(row, 11).Value = counter;
+            worksheet.Cell(row, 12).Value = counter - tolCounter;
+            worksheet.Cell(row, 13).Value = tolCounter;
+        }
+
         public static void DoLabOrderToExcel(Database database, IXLWorksheet worksheet, LabOrder labOrder)
         {
+
             worksheet.Cell("A1").Value = "Laboratory Order No";
             worksheet.Cell("B1").Value = labOrder.LabOrderNo;
             worksheet.Cell("A2").Value = "Material No.";
@@ -56,21 +134,7 @@ namespace gip.mes.processapplication
             worksheet.Cell("B5").Value = labOrder.SampleTakingDate;
             worksheet.Cell("A6").Value = "Proizvodna linija";
 
-            gip.core.datamodel.ACClass machine = null;
-
-            if (labOrder.RefACClassID == null)
-            {
-                machine = GetMachine(database, labOrder);
-                if (machine != null)
-                {
-                    labOrder.RefACClassID = machine.ACClassID;
-                }
-            }
-            else if (labOrder.RefACClassID != null)
-            {
-                machine = database.ACClass.FirstOrDefault(c => c.ACClassID == labOrder.RefACClassID);
-            }
-
+            core.datamodel.ACClass machine = GetLabOrderMachine(database, labOrder);
             worksheet.Cell("B6").Value = machine?.ACCaption;
 
             worksheet.Cell("A7").Value = "Reference Value";
@@ -154,6 +218,26 @@ namespace gip.mes.processapplication
 
 
 
+        }
+
+        private static core.datamodel.ACClass GetLabOrderMachine(Database database, LabOrder labOrder)
+        {
+            gip.core.datamodel.ACClass machine = null;
+
+            if (labOrder.RefACClassID == null)
+            {
+                machine = GetMachine(database, labOrder);
+                if (machine != null)
+                {
+                    labOrder.RefACClassID = machine.ACClassID;
+                }
+            }
+            else if (labOrder.RefACClassID != null)
+            {
+                machine = database.ACClass.FirstOrDefault(c => c.ACClassID == labOrder.RefACClassID);
+            }
+
+            return machine;
         }
 
         #endregion

@@ -176,7 +176,11 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledExportToExcel()
         {
-            return !BackgroundWorker.IsBusy && LabOrderList != null && LabOrderList.Any(c => c.IsSelected);
+            return
+                !BackgroundWorker.IsBusy
+                && LabOrderList != null
+                && LabOrderList.Any(c => c.IsSelected)
+                && LabOrderList.Any(c => c.IsSelected && c.ProdOrderPartslistPos != null);
         }
 
         private void DoExportToExcel(string exportFilePath, LabOrder[] selectedLabOrders)
@@ -259,7 +263,7 @@ namespace gip.bso.manufacturing
             switch (command)
             {
                 case BGWorkerMehtod_DoExportExcel:
-                    LabOrder[] selectedLabOrders = LabOrderList.Where(c => c.IsSelected).ToArray();
+                    LabOrder[] selectedLabOrders = LabOrderList.Where(c => c.IsSelected && c.ProdOrderPartslistPos != null).ToArray();
                     DoExportToExcel(ExportFilePath, selectedLabOrders);
                     break;
             }
