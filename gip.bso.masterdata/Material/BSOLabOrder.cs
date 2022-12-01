@@ -342,10 +342,10 @@ namespace gip.bso.masterdata
                 List<ACFilterItem> orderFilterItems = new List<ACFilterItem>()
                 {
                     new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
-                    new ACFilterItem(Global.FilterTypes.filter, FilterFacilityLotNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
-                    new ACFilterItem(Global.FilterTypes.filter, FilterInOrderNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
-                    new ACFilterItem(Global.FilterTypes.filter, FilterOutOrderNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
-                    new ACFilterItem(Global.FilterTypes.filter, FilterProgramNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterFacilityLotNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterInOrderNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterOutOrderNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true),
+                    new ACFilterItem(Global.FilterTypes.filter, FilterProgramNoName, Global.LogicalOperators.contains, Global.Operators.or, null, true),
                     new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true),
                 };
 
