@@ -697,8 +697,8 @@ namespace gip.bso.masterdata
                         
                         model.Sequence= component.Sequence;
                         model.PartslistNo = component.Partslist.PartslistNo;
-                        model.MaterialNo = component.Partslist.Material.MaterialNo;
-                        model.MaterialName = component.Partslist.Material.MaterialName1;
+                        model.MaterialNo = component.Material.MaterialNo;
+                        model.MaterialName = component.Material.MaterialName1;
 
                         double targetQuantityUOM = item.Item.TreeQuantityRatio * component.TargetQuantityUOM;
                         double targetQuantity = item.Item.TreeQuantityRatio * component.TargetQuantity;
