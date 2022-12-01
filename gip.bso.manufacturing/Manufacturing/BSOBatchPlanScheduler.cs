@@ -3595,63 +3595,63 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
-        public void SetBatchStateCancelled()
-        {
-            ClearMessages();
-            if (!IsEnabledSetBatchStateCancelled())
-                return;
-            try
-            {
-                bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
-                                                        && AutoRemoveMDSGroupTo > 0
-                                                        && SelectedScheduleForPWNode != null
-                                                        && SelectedScheduleForPWNode.MDSchedulingGroup != null
-                                                        && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
-                                                        && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
+        //[ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
+        //public void SetBatchStateCancelled()
+        //{
+        //    ClearMessages();
+        //    if (!IsEnabledSetBatchStateCancelled())
+        //        return;
+        //    try
+        //    {
+        //        bool autoDeleteDependingBatchPlans = AutoRemoveMDSGroupFrom > 0
+        //                                                && AutoRemoveMDSGroupTo > 0
+        //                                                && SelectedScheduleForPWNode != null
+        //                                                && SelectedScheduleForPWNode.MDSchedulingGroup != null
+        //                                                && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex >= AutoRemoveMDSGroupFrom
+        //                                                && SelectedScheduleForPWNode.MDSchedulingGroup.MDSchedulingGroupIndex <= AutoRemoveMDSGroupTo;
 
-                if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
-                {
-                    List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
-                    List<Guid> groupsForRefresh = new List<Guid>();
-                    DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
-                    DoRefreshLinesAfterBatchDelete(groupsForRefresh);
-                }
-            }
-            catch (Exception ex)
-            {
-                string msg = "";
-                Exception tmpEx = ex;
-                while (tmpEx != null)
-                {
-                    msg += tmpEx.Message;
-                    tmpEx = tmpEx.InnerException;
-                }
+        //        if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
+        //        {
+        //            List<ProdOrderBatchPlan> selectedBatches = ProdOrderBatchPlanList.Where(c => c.IsSelected).ToList();
+        //            List<Guid> groupsForRefresh = new List<Guid>();
+        //            DoSetBatchStateCancelled(autoDeleteDependingBatchPlans, selectedBatches, ref groupsForRefresh);
+        //            DoRefreshLinesAfterBatchDelete(groupsForRefresh);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string msg = "";
+        //        Exception tmpEx = ex;
+        //        while (tmpEx != null)
+        //        {
+        //            msg += tmpEx.Message;
+        //            tmpEx = tmpEx.InnerException;
+        //        }
 
-                Msg errMsg = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = nameof(SetBatchStateCancelled), Message = msg };
-                SendMessage(errMsg);
-            }
-        }
+        //        Msg errMsg = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = nameof(SetBatchStateCancelled), Message = msg };
+        //        SendMessage(errMsg);
+        //    }
+        //}
 
-        public bool IsEnabledSetBatchStateCancelled()
-        {
-            return
-                ProdOrderBatchPlanList != null
-                && ProdOrderBatchPlanList.Any(c => c.IsSelected)
-                && !ProdOrderBatchPlanList.Where(c => c.IsSelected).Any(c =>
-                      NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
-                );
-        }
+        //public bool IsEnabledSetBatchStateCancelled()
+        //{
+        //    return
+        //        ProdOrderBatchPlanList != null
+        //        && ProdOrderBatchPlanList.Any(c => c.IsSelected)
+        //        && !ProdOrderBatchPlanList.Where(c => c.IsSelected).Any(c =>
+        //              NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
+        //        );
+        //}
 
         /// <summary>
         /// Method for new behavior deleting batch plans
         /// for test
         /// </summary>
         [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
-        public void SetBatchStateCancelled2()
+        public void SetBatchStateCancelled()
         {
             ClearMessages();
-            if (!IsEnabledSetBatchStateCancelled2())
+            if (!IsEnabledSetBatchStateCancelled())
                 return;
             if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
             {
@@ -3710,7 +3710,7 @@ namespace gip.bso.manufacturing
                         tmpEx = tmpEx.InnerException;
                     }
 
-                    Msg errMsg = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = nameof(SetBatchStateCancelled2), Message = msg };
+                    Msg errMsg = new Msg() { MessageLevel = eMsgLevel.Error, ACIdentifier = nameof(SetBatchStateCancelled), Message = msg };
                     SendMessage(errMsg);
                 }
 
@@ -3734,11 +3734,15 @@ namespace gip.bso.manufacturing
                 .Any();
         }
 
-        public bool IsEnabledSetBatchStateCancelled2()
+        public bool IsEnabledSetBatchStateCancelled()
         {
-            return IsEnabledSetBatchStateCancelled();
+            return
+                ProdOrderBatchPlanList != null
+                && ProdOrderBatchPlanList.Any(c => c.IsSelected)
+                && !ProdOrderBatchPlanList.Where(c => c.IsSelected).Any(c =>
+                      NotAllowedStatesForBatchCancel.Contains(c.PlanStateIndex)
+                );
         }
-
 
         #endregion
 
