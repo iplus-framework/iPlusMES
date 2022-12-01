@@ -6,6 +6,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using System.Threading;
+using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {
@@ -44,17 +45,27 @@ namespace gip.mes.processapplication
             if (!base.ACInit(startChildMode))
                 return false;
 
+            _LabOrderManager = ACLabOrderManager.ACRefToServiceInstance(this);
+            if (_LabOrderManager == null)
+                throw new Exception("LabOrderManager not configured");
+            _InDeliveryNoteManager = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
+            if (_InDeliveryNoteManager == null)
+                throw new Exception("ACInDeliveryNoteManager not configured");
+
             return true;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
+            _LabOrderManager = null;
+            ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
+            _InDeliveryNoteManager = null;
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
                 _CurrentDeliveryNotePos = null;
             }
-
 
             if (!base.ACDeInit(deleteACClassTask))
                 return false;
@@ -92,6 +103,28 @@ namespace gip.mes.processapplication
                 {
                     return _CurrentDeliveryNotePos;
                 }
+            }
+        }
+
+        protected ACRef<ACLabOrderManager> _LabOrderManager = null;
+        public ACLabOrderManager LabOrderManager
+        {
+            get
+            {
+                if (_LabOrderManager == null)
+                    return null;
+                return _LabOrderManager.ValueT;
+            }
+        }
+
+        protected ACRef<ACInDeliveryNoteManager> _InDeliveryNoteManager = null;
+        public ACInDeliveryNoteManager InDeliveryNoteManager
+        {
+            get
+            {
+                if (_InDeliveryNoteManager == null)
+                    return null;
+                return _InDeliveryNoteManager.ValueT as ACInDeliveryNoteManager;
             }
         }
         #endregion

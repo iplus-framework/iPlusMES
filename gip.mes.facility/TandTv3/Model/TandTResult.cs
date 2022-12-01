@@ -241,6 +241,7 @@ namespace gip.mes.facility.TandTv3
                     {
                         IsInputPoint = true,
                         Step = step,
+                        InwardMaterial = outOrderPos.Material,
                         InwardMaterialNo = outOrderPos.Material.MaterialNo,
                         InwardMaterialName = outOrderPos.Material.MaterialName1
                     };

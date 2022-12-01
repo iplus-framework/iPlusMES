@@ -23,7 +23,10 @@ namespace gip.bso.facility
             DatabaseApp = databaseApp;
             ComponentFactory = componentFactory;
             RoutingService = routingService;
-            FacilityIDAndACClassIDs = databaseApp.Facility.Where(c => c.VBiFacilityACClassID != null).ToList().ToDictionary(key => key.VBiFacilityACClassID ?? Guid.Empty, val => val);
+            FacilityIDAndACClassIDs = databaseApp.Facility.Where(c => c.VBiFacilityACClassID != null)
+                .ToList()
+                .GroupBy(c => c.VBiFacilityACClassID)
+                .ToDictionary(key => key.Key ?? Guid.Empty, val => val.FirstOrDefault());
         }
 
         #endregion

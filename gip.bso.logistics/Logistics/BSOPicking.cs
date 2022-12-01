@@ -43,7 +43,8 @@ namespace gip.bso.logistics
             new object[] { "PickingType", Global.ParamOption.Optional, typeof(string) },
             new object[] { "FromFacility", Global.ParamOption.Optional, typeof(string) },
             new object[] { "ToFacility", Global.ParamOption.Optional, typeof(string) },
-            new object[] { "CompanyNo", Global.ParamOption.Optional, typeof(string) }
+            new object[] { "CompanyNo", Global.ParamOption.Optional, typeof(string) },
+            new object[] { "PickingStateIndex", Global.ParamOption.Optional, typeof(short) }
        }
    )]
     public partial class BSOPicking : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider
@@ -90,8 +91,6 @@ namespace gip.bso.logistics
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
-
-
 
             AccessFilterFromFacility.NavSearch();
             AccessFilterToFacility.NavSearch();
@@ -142,6 +141,9 @@ namespace gip.bso.logistics
                 SelectedFilterDeliveryAddress = FilterDeliveryAddressList.FirstOrDefault();
             }
 
+            object stateIndex = Parameters["PickingStateIndex"];
+            if (stateIndex != null)
+                SelectedFilterPickingState = FilterPickingStateList.FirstOrDefault(c => (short)c.Value == (short)stateIndex);
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
@@ -563,7 +565,7 @@ namespace gip.bso.logistics
                 short? filterPickingStateIndex = AccessPrimary.NavACQueryDefinition.GetSearchValue<short?>("PickingStateIndex");
                 if (filterPickingStateIndex != null)
                 {
-                    SelectedFilterPickingState = FilterPickingStateList.FirstOrDefault(c => (short)c.Value == (short)filterPickingStateIndex.Value);
+                    SelectedFilterPickingState = _FilterPickingStateList.FirstOrDefault(c => (short)c.Value == (short)filterPickingStateIndex.Value);
                 }
                 return _FilterPickingStateList;
             }

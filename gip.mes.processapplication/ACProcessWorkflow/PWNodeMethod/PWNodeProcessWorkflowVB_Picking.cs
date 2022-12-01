@@ -115,8 +115,9 @@ namespace gip.mes.processapplication
 
 
                 PickingPos pickingPos = null;
-                if (!picking.PickingPos_Picking.Where(c => c.InOrderPosID.HasValue || c.OutOrderPosID.HasValue || c.PickingPosProdOrderPartslistPos_PickingPos.Any()).Any())
-                {
+                //var queryOrderRelatedPickingLines = picking.PickingPos_Picking.Where(c => c.InOrderPosID.HasValue || c.OutOrderPosID.HasValue || c.PickingPosProdOrderPartslistPos_PickingPos.Any());
+                //if (queryOrderRelatedPickingLines.Any())
+                //{
                     pickingPos = picking.PickingPos_Picking
                         .Where(c => !c.MDDelivPosLoadStateID.HasValue || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                         .OrderBy(c => c.Sequence)
@@ -145,15 +146,15 @@ namespace gip.mes.processapplication
                         if (queryProject.Any())
                             startNextBatchAtProjectID2 = queryProject.FirstOrDefault();
                     }
-                }
-                else
-                {
-                    message = "TODO: Orderhandling with Picking is not implemented";
-                    if (IsAlarmActive(ProcessAlarm, message) == null)
-                        Messages.LogError(this.GetACUrl(), "StartDischargingPicking(2)", message);
-                    OnNewAlarmOccurred(ProcessAlarm, message, true);
-                    return StartNextBatchResult.Done;
-                }
+                //}
+                //else
+                //{
+                //    message = "No order related lines found";
+                //    if (IsAlarmActive(ProcessAlarm, message) == null)
+                //        Messages.LogError(this.GetACUrl(), "StartDischargingPicking(2)", message);
+                //    OnNewAlarmOccurred(ProcessAlarm, message, true);
+                //    return StartNextBatchResult.Done;
+                //}
 
                 if (WillReadAndStartNextBatchCompleteNode_Picking(30))
                     return StartNextBatchResult.Done;
