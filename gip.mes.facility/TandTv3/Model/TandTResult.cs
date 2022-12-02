@@ -187,9 +187,23 @@ namespace gip.mes.facility.TandTv3
             {
                 mixPoint = MixPoints.FirstOrDefault(c => c.IsInputPoint && c.InwardLot.LotNo == facilityLot.LotNo);
             }
-            else
+            if (mixPoint == null)
             {
-                mixPoint = MixPoints.FirstOrDefault(c => c.IsInputPoint && c.InOrderPositions.Select(x => x.InOrderPosID).Contains(inOrderPos.InOrderPosID));
+                foreach (TandTv3Point tmpMixPoint in MixPoints)
+                {
+                    if (tmpMixPoint.IsInputPoint)
+                    {
+                        foreach (InOrderPos tmpInOrderPos in tmpMixPoint.InOrderPositions)
+                        {
+                            if (tmpInOrderPos.TopParentInOrderPos.InOrderPosID == inOrderPos.TopParentInOrderPos.InOrderPosID)
+                            {
+                                mixPoint = tmpMixPoint;
+                                break;
+                            }
+                        }
+                    }
+                }
+                //mixPoint = MixPoints.FirstOrDefault(c => c.IsInputPoint && c.InOrderPositions.Select(x => x.InOrderPosID).Contains(inOrderPos.InOrderPosID));
             }
             if (mixPoint == null)
             {
@@ -209,14 +223,16 @@ namespace gip.mes.facility.TandTv3
                         InwardMaterial = inOrderPos.Material,
                         DeliveryNo = dns != null ? dns.DeliveryNote.DeliveryNoteNo : ""
                     };
-                if (facilityLot != null)
-                {
-                    mixPoint.AddInwardLot(facilityLot);
-                }
+               
                 mixPoint.InOrderPositions.Add(inOrderPos);
                 MixPoints.Add(mixPoint);
                 CurrentStep.MixingPoints.Add(mixPoint);
                 mixPoint.IsInputPoint = true;
+            }
+
+            if (facilityLot != null && (mixPoint.InwardLot == null || mixPoint.InwardLot.FacilityLotID == Guid.Empty))
+            {
+                mixPoint.AddInwardLot(facilityLot);
             }
 
             return mixPoint;

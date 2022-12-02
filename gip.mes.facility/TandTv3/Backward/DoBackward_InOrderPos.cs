@@ -25,10 +25,15 @@ namespace gip.mes.facility.TandTv3
             InOrderPos childInOrderPos = Item.InOrderPos_ParentInOrderPos.FirstOrDefault();
             if (childInOrderPos != null)
             {
+                sameStepItems.Add(childInOrderPos);
                 sameStepItems.AddRange(childInOrderPos.DeliveryNotePos_InOrderPos);
                 InOrderPos ccInorderPos = childInOrderPos.InOrderPos_ParentInOrderPos.FirstOrDefault();
                 if (ccInorderPos != null)
                     sameStepItems.AddRange(ccInorderPos.FacilityBookingCharge_InOrderPos);
+            }
+            if(Item.InOrderPos1_ParentInOrderPos != null)
+            {
+                sameStepItems.Add(Item.InOrderPos1_ParentInOrderPos);
             }
             return sameStepItems;
         }

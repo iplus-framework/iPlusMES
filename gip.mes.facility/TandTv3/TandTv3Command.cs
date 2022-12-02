@@ -979,14 +979,16 @@ namespace gip.mes.facility.TandTv3
                 //// TandTv3_MixPointDeliveryNotePos
                 foreach (var dns in mixPoint.DeliveryNotePositions)
                 {
-                    TandTv3MixPointDeliveryNotePos dbMixPointDeliveryNotePos = new TandTv3MixPointDeliveryNotePos()
+                    if (!dbMixPoint.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint.Any(c => c.DeliveryNotePosID == dns.DeliveryNotePosID))
                     {
-                        TandTv3MixPointDeliveryNotePosID = Guid.NewGuid(),
-                        DeliveryNotePos = dns
-                    };
-                    dbMixPoint.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint.Add(dbMixPointDeliveryNotePos);
+                        TandTv3MixPointDeliveryNotePos dbMixPointDeliveryNotePos = new TandTv3MixPointDeliveryNotePos()
+                        {
+                            TandTv3MixPointDeliveryNotePosID = Guid.NewGuid(),
+                            DeliveryNotePos = dns
+                        };
+                        dbMixPoint.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint.Add(dbMixPointDeliveryNotePos);
+                    }
                 }
-
             }
 
             // TandTv3_MixPointRelation
