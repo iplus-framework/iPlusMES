@@ -84,7 +84,6 @@ namespace gip.mes.processapplication
             if (WillReadAndStartNextBatchCompleteNode_Picking(20))
                 return StartNextBatchResult.Done;
 
-            string message = "";
             using (Database dbiPlus = new Database())
             using (DatabaseApp dbApp = new DatabaseApp())
             {

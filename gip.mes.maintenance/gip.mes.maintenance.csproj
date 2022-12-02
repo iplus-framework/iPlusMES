@@ -68,6 +68,10 @@
       <Project>{16fb4111-5110-46e5-851d-38a4d7522f85}</Project>
       <Name>gip.core.datamodel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
+      <Project>{3A9383D8-5C6D-429C-89D3-57C1D2565AD1}</Project>
+      <Name>gip.core.manager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
       <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
       <Name>gip.core.processapplication</Name>

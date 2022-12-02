@@ -16,7 +16,8 @@ namespace gip.mes.maintenance
         public BSOMaintOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _CN_BSOProcessControl = new ACPropertyConfigValue<string>(this, "CN_BSOProcessControl", "");
+            _CN_BSOVisualisation = new ACPropertyConfigValue<string>(this, "CN_BSOVisualisation", "");
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -62,6 +63,63 @@ namespace gip.mes.maintenance
         #endregion
 
         #region BSO -> ACProperty
+
+        #region Config
+        private ACPropertyConfigValue<string> _CN_BSOProcessControl;
+        [ACPropertyConfig("en{'Classname BSOProcessControl'}de{'Klassenname BSOProcessControl'}")]
+        public string CN_BSOProcessControl
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(_CN_BSOProcessControl.ValueT))
+                    return _CN_BSOProcessControl.ValueT;
+                gip.core.datamodel.ACClass classOfBso = typeof(BSOProcessControl).GetACType() as gip.core.datamodel.ACClass;
+                if (classOfBso != null)
+                {
+                    var derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
+                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
+                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
+                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
+                    if (derivation != null)
+                        _CN_BSOProcessControl.ValueT = derivation.ACIdentifier;
+                    else
+                        _CN_BSOProcessControl.ValueT = classOfBso.ACIdentifier;
+                    return _CN_BSOProcessControl.ValueT;
+                }
+                return BSOProcessControl.BSOClassName;
+            }
+            set { _CN_BSOProcessControl.ValueT = value; }
+        }
+
+        private ACPropertyConfigValue<string> _CN_BSOVisualisation;
+        [ACPropertyConfig("en{'Classname BSOVisualisation'}de{'Klassenname BSOVisualisation'}")]
+        public string CN_BSOVisualisation
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(_CN_BSOVisualisation.ValueT))
+                    return _CN_BSOVisualisation.ValueT;
+                gip.core.datamodel.ACClass classOfBso = typeof(BSOVisualisationStudio).GetACType() as gip.core.datamodel.ACClass;
+                if (classOfBso != null)
+                {
+                    var derivation = gip.core.datamodel.Database.GlobalDatabase.ACClass
+                                                .Where(c => c.BasedOnACClassID == classOfBso.ACClassID
+                                                        && !String.IsNullOrEmpty(c.AssemblyQualifiedName)
+                                                        && c.AssemblyQualifiedName != classOfBso.AssemblyQualifiedName).FirstOrDefault();
+                    if (derivation != null)
+                        _CN_BSOVisualisation.ValueT = derivation.ACIdentifier;
+                    else
+                        _CN_BSOVisualisation.ValueT = classOfBso.ACIdentifier;
+                    return _CN_BSOVisualisation.ValueT;
+                }
+                return BSOVisualisationStudio.BSOClassName;
+            }
+            set { _CN_BSOVisualisation.ValueT = value; }
+        }
+
+        #endregion
+
+
 
         #region ACProperty => MaintOrder
 
@@ -741,6 +799,129 @@ namespace gip.mes.maintenance
             return cm;
         }
 
+        #region Navigation
+        IACBSOAlarmPresenter _BSOAlarmPresenter = null;
+        MaintOrder _DelegatedMaintOrder = null;
+        FocusBSOResult? _DelegateFocus = null;
+
+        //[ACMethodInteraction("MaintOrder", "en{'Start Maintenance and Navigate'}de{'Starte Wartung und Navigiere'}", 311, true, "CurrentMaintOrder")]
+        //public void SwitchToMaintenanceAndShow()
+        //{
+        //}
+
+        [ACMethodInteraction("MaintOrder", "en{'Navigate to visualisation'}de{'Navigiere zur Visualisierung'}", 310, true, "CurrentMaintOrder")]
+        public void NavigateToVisualisation()
+        {
+            bool startNewBSO = false;
+            if (_BSOAlarmPresenter != null)
+                return;
+            _DelegateFocus = null;
+            _DelegatedMaintOrder = null;
+
+            IACBSOAlarmPresenter alarmPresenter = null;
+            if (ACUrlHelper.IsUrlDynamicInstance(SelectedMaintOrder.ComponentACUrl))
+            {
+                alarmPresenter = Root.Businessobjects.FindChildComponents<BSOProcessControl>(c => c is BSOProcessControl, null, 1).FirstOrDefault();
+                startNewBSO = alarmPresenter == null;
+                if (startNewBSO)
+                    this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + CN_BSOProcessControl, null);
+                alarmPresenter = Root.Businessobjects.FindChildComponents<BSOProcessControl>(c => c is BSOProcessControl, null, 1).FirstOrDefault();
+            }
+            else
+            {
+                alarmPresenter = Root.Businessobjects.FindChildComponents<BSOVisualisationStudio>(c => c is BSOVisualisationStudio, null, 1).FirstOrDefault();
+                startNewBSO = alarmPresenter == null;
+                if (startNewBSO)
+                    this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + CN_BSOVisualisation, null);
+                alarmPresenter = Root.Businessobjects.FindChildComponents<BSOVisualisationStudio>(c => c is BSOVisualisationStudio, null, 1).FirstOrDefault();
+            }
+            if (alarmPresenter == null)
+                return;
+            if (startNewBSO)
+            {
+                _BSOAlarmPresenter = alarmPresenter;
+                _DelegatedMaintOrder = SelectedMaintOrder;
+                // Wait until view is loaded
+                _BSOAlarmPresenter.ACActionEvent += AlarmPresenter_ACActionEvent;
+            }
+            else
+                SwitchToViewOnAlarm(alarmPresenter, SelectedMaintOrder);
+        }
+
+        public bool IsEnabledNavigateToVisualisation()
+        {
+            return SelectedMaintOrder != null;
+        }
+
+        private void AlarmPresenter_ACActionEvent(object sender, ACActionArgs e)
+        {
+            if (e.ElementAction == Global.ElementActionType.VBDesignLoaded)
+            {
+                if (_BSOAlarmPresenter != null)
+                {
+                    FocusBSOResult focusBSOResult = FocusBSOResult.NotFocusable;
+                    try
+                    {
+                        _BSOAlarmPresenter.ACActionEvent -= AlarmPresenter_ACActionEvent;
+                        // Invoked first time after new bso loaded
+                        if (_DelegateFocus == null)
+                            focusBSOResult = SwitchToViewOnAlarm(_BSOAlarmPresenter, _DelegatedMaintOrder);
+                        // Invoked second time after Tabitem with already running bso was switched and loaded to view
+                        else
+                        {
+                            _DelegateFocus = null;
+                            _BSOAlarmPresenter.SwitchToViewOnAlarm(CreateMsgFromMaintOrder(_DelegatedMaintOrder));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Messages.LogException(this.GetACUrl(), "AlarmPresenter_ACActionEvent", ex.Message);
+                    }
+                    finally
+                    {
+                        if (focusBSOResult != FocusBSOResult.SelectionSwitched)
+                        {
+                            _BSOAlarmPresenter = null;
+                            _DelegatedMaintOrder = null;
+                        }
+                    }
+                }
+            }
+        }
+
+        private FocusBSOResult SwitchToViewOnAlarm(IACBSOAlarmPresenter alarmPresenter, MaintOrder currentACMsgAlarm)
+        {
+            FocusBSOResult focusResult = this.Root.RootPageWPF.FocusBSO(alarmPresenter);
+            if (focusResult == FocusBSOResult.AlreadyFocused)
+                alarmPresenter.SwitchToViewOnAlarm(CreateMsgFromMaintOrder(SelectedMaintOrder));
+            else if (focusResult == FocusBSOResult.SelectionSwitched)
+            {
+                _BSOAlarmPresenter = alarmPresenter;
+                _DelegatedMaintOrder = currentACMsgAlarm;
+                _DelegateFocus = focusResult;
+                // Wait until view is loaded
+                _BSOAlarmPresenter.ACActionEvent += AlarmPresenter_ACActionEvent;
+            }
+            return focusResult;
+        }
+
+        private Msg CreateMsgFromMaintOrder(MaintOrder maintOrder)
+        {
+            if (maintOrder != null)
+            {
+                IACComponent instance = this.ACUrlCommand(maintOrder.ComponentACUrl) as IACComponent;
+                if (instance != null)
+                {
+                    //instance.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PAClassPhysicalBase.SwitchToManual));
+                    //instance.ACUrlCommand(ACUrlHelper.Delimiter_InvokeMethod + nameof(PAClassPhysicalBase.SwitchToMaintenance));
+                    return new Msg("Maintenance", instance, eMsgLevel.Info, "", "", 0);
+                }
+            }
+            return new Msg("Maintenance", this, eMsgLevel.Info, "", "", 0);
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -806,6 +987,12 @@ namespace gip.mes.maintenance
                     return true;
                 case "IsEnabledDelete":
                     result = IsEnabledDelete();
+                    return true;
+                case "NavigateToVisualisation":
+                    NavigateToVisualisation();
+                    return true;
+                case "IsEnabledNavigateToVisualisation":
+                    result = IsEnabledNavigateToVisualisation();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

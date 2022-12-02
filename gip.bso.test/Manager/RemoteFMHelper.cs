@@ -161,7 +161,7 @@ namespace gip.bso.test
             // Search charge with same ID
             localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
 
-            bool successSaveCharge = true;
+            //bool successSaveCharge = true;
             if (localFC == null)
             {
                 FacilityLot localLot = null;
@@ -195,7 +195,7 @@ namespace gip.bso.test
                 if (msgSaveCharge != null)
                 {
                     messages.LogMessageMsg(msgSaveCharge);
-                    successSaveCharge = false;
+                    //successSaveCharge = false;
                 }
             }
             else
@@ -206,7 +206,7 @@ namespace gip.bso.test
                 if (msgSaveCharge != null)
                 {
                     messages.Msg(msgSaveCharge);
-                    successSaveCharge = false;
+                    //successSaveCharge = false;
                 }
             }
 
