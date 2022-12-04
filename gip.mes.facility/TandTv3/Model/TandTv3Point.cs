@@ -72,7 +72,7 @@ namespace gip.mes.facility
 
         public TandTv3.TandTStep Step { get; set; }
 
-        [ACPropertyInfo(9999, "StepNo", "en{'StepNo.'}de{'Schritnummer'}")]
+        [ACPropertyInfo(1, "StepNo", "en{'Step'}de{'Schritt'}")]
         public int StepNo
         {
             get
@@ -82,7 +82,7 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(9999, "BatchNos", "en{'Batch No.'}de{'Batch Nr.'}")]
+        [ACPropertyInfo(2, "BatchNos", "en{'Batch No.'}de{'Batch Nr.'}")]
         public string BatchNos
         {
             get
@@ -109,14 +109,14 @@ namespace gip.mes.facility
 
         #region Lots -> Properties
 
-        [ACPropertyInfo(9999, "InwardLot", "en{'Lot No.'}de{'Losnummer'}")]
-
+        #region Inward to store, Produced Lots from Order, Output
+        [ACPropertyInfo(11, "InwardLot", "en{'Lot info'}de{'Los Info'}")]
         public FacilityLotModel InwardLot { get; set; }
 
-        [ACPropertyInfo(9999, "InwardBatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
+        [ACPropertyInfo(12, "InwardBatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
         public string InwardBatchNo { get; set; }
 
-        [ACPropertyInfo(9999, "InwardBatchNos", "en{'Batch Nos.'}de{'Batchnummers'}")]
+        [ACPropertyInfo(13, "InwardBatchNos", "en{'Produced Batches'}de{'Hergestellte Batche'}")]
         public string InwardBatchNos
         {
             get
@@ -129,36 +129,25 @@ namespace gip.mes.facility
             }
         }
 
-
-        [ACPropertyInfo(9999, "InwardLotsNos", "en{'Output lots'}de{'Ergebnislosnummerns'}")]
+        [ACPropertyInfo(14, "InwardLotsNos", "en{'Produced lots'}de{'Hergestellte Lose'}")]
         public virtual string InwardLotsNos
         {
             get
             {
-                if (InwardLot != null) return InwardLot.LotNo;
+                if (InwardLot != null) 
+                    return InwardLot.LotNo;
                 return TandTv3Command.EmptyLotName;
             }
         }
+        #endregion
 
 
-        [ACPropertyInfo(9999, "OutwardLotsNos", "en{'Input lots'}de{'Einsatzlosnummerns'}")]
-        public string OutwardLotsNos
-        {
-            get
-            {
-                if (OutwardLotsList == null || !OutwardLotsList.Any()) return "";
-                return string.Join(",", OutwardLotsList.Select(c => c.LotNo).OrderBy(c => c));
-            }
-        }
-
-        #region Lots -> (Selected)OutwardLots
-
-
-        [ACPropertyList(9999, "OutwardLots", "en{'Outward lots'}de{'Ergebnislosnummerns'}")]
+        #region Outward from Store, Used Lots in Order, Input
+        [ACPropertyList(20, "OutwardLots", "en{'Used lots'}de{'Eingesetzte Lose'}")]
         public List<FacilityLotModel> OutwardLotsList { get; set; }
 
         private FacilityLotModel _SelectedOutwardLots;
-        [ACPropertySelected(9999, "OutwardLots")]
+        [ACPropertySelected(21, "OutwardLots")]
         public FacilityLotModel SelectedOutwardLots
         {
             get
@@ -172,6 +161,17 @@ namespace gip.mes.facility
                     _SelectedOutwardLots = value;
                     OnPropertyChanged("SelectedOutwardLots");
                 }
+            }
+        }
+
+        [ACPropertyInfo(22, "OutwardLotsNos", "en{'Used lots'}de{'Eingesetzte Lose'}")]
+        public string OutwardLotsNos
+        {
+            get
+            {
+                if (OutwardLotsList == null || !OutwardLotsList.Any())
+                    return "";
+                return string.Join(",", OutwardLotsList.Select(c => c.LotNo).OrderBy(c => c));
             }
         }
 
@@ -263,10 +263,10 @@ namespace gip.mes.facility
 
 
         #region Materials -> Preview
-        [ACPropertyInfo(9999, "InwardMaterialNo", "en{'Material-No.'}de{'Artikel-Nr.'}")]
+        [ACPropertyInfo(3, "InwardMaterialNo", "en{'Material-No.'}de{'Artikel-Nr.'}")]
         public string InwardMaterialNo { get; set; }
 
-        [ACPropertyInfo(9999, "InwardMaterialName", "en{'Material Desc.'}de{'Materialbez.'}")]
+        [ACPropertyInfo(4, "InwardMaterialName", "en{'Material Desc.'}de{'Materialbez.'}")]
         public string InwardMaterialName { get; set; }
         #endregion
 
@@ -359,7 +359,7 @@ namespace gip.mes.facility
 
         #region Purchase
 
-        [ACPropertyInfo(9999, "DeliveryNo", "en{'Delivery Note No.'}de{'Lieferschein-Nr.'}")]
+        [ACPropertyInfo(5, "DeliveryNo", "en{'Delivery Note No.'}de{'Lieferschein-Nr.'}")]
         public string DeliveryNo { get; set; }
 
         public List<DeliveryNotePos> DeliveryNotePositions { get; set; }
@@ -377,7 +377,7 @@ namespace gip.mes.facility
 
 
         private double? _PositionsActualQuantityUOM;
-        [ACPropertyInfo(9999, "PositionsActualQuantityUOM", "en{'Actual Quantity (UOM)'}de{'Istmenge (BME)'}")]
+        [ACPropertyInfo(6, "PositionsActualQuantityUOM", "en{'Actual Quantity (UOM)'}de{'Istmenge (BME)'}")]
         public double PositionsActualQuantityUOM
         {
             get
@@ -395,12 +395,12 @@ namespace gip.mes.facility
         public List<ProdOrderPartslistPosRelation> Relations { get; set; }
 
 
-        [ACPropertyInfo(9999, "ProgramNo", "en{'Pr. No.'}de{'Pr.Auf. Nr.'}")]
+        [ACPropertyInfo(7, "ProgramNo", "en{'Prod.-Order'}de{'Prod.-Auftrag'}")]
         public string ProgramNo { get; set; }
 
         public ProdOrder ProdOrder { get; set; }
 
-        [ACPropertyInfo(9999, "PartslistSequence", "en{'Pl. Nr.'}de{'Stückl. Nr.'}")]
+        [ACPropertyInfo(8, "PartslistSequence", "en{'Production depth'}de{'Produktionstiefe'}")]
         public int PartslistSequence { get; set; }
 
         public List<string> BatchNoList { get; set; }
@@ -484,7 +484,7 @@ namespace gip.mes.facility
         #endregion
 
         #region LabOrders
-        [ACPropertyInfo(9999, "ExistLabOrder", "en{'Exist Lab Report'}de{'Laborbericht existieren'}")]
+        [ACPropertyInfo(9, "ExistLabOrder", "en{'Lab.-Order'}de{'Laborauftrag'}")]
         public bool ExistLabOrder { get; set; }
 
         public List<MixPointLabOrder> ItemsWithLabOrder { get; set; }

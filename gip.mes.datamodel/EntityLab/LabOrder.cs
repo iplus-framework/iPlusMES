@@ -12,7 +12,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(4, OutOrderPos.ClassName, "en{'Sales Order Pos.'}de{'Auftragsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName, "", true)]
     [ACPropertyEntity(5, ProdOrderPartslistPos.ClassName, "en{'Bill of Material Pos.'}de{'Stücklistenposition'}", Const.ContextDatabase + "\\" + ProdOrderPartslistPos.ClassName, "", true)]
     [ACPropertyEntity(6, FacilityLot.ClassName, "en{'Lot/Charge'}de{'Los/Charge'}", Const.ContextDatabase + "\\" + FacilityLot.ClassName, "", true)]
-    [ACPropertyEntity(7, "SampleTakingDate", "en{'Sample Extraction'}de{'Probenentnahme'}", "", "", true)]
+    [ACPropertyEntity(7, "SampleTakingDate", "en{'Sample taken at'}de{'Probe am'}", "", "", true)]
     [ACPropertyEntity(8, "TestDate", "en{'Test Date'}de{'Testzeitpunkt'}", "", "", true)]
     [ACPropertyEntity(9, "MDLabOrderState", ConstApp.ESLabOrderState, Const.ContextDatabase + "\\MDLabOrderState", "", true)]
     [ACPropertyEntity(10, "LabOrderTypeIndex", "en{'Type of Order'}de{'Auftragstyp'}", typeof(GlobalApp.LabOrderType), Const.ContextDatabase + "\\LabOrderTypeList", "", true)]

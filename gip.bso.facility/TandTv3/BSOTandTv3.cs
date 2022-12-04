@@ -19,7 +19,7 @@ using TandTv3 = gip.mes.facility.TandTv3;
 namespace gip.bso.facility
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Tracking and Tracing'}de{'Verfolgung/Rückverfolgung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, "")]
-    [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "BSOTandTv3", "en{'Tracking and Tracing'}de{'Verfolgung/Rückverfolgung'}", typeof(TandTv3FilterTracking), TandTv3FilterTracking.ClassName, "ItemSystemNo", "ItemSystemNo")]
+    [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "BSOTandTv3", "en{'Tracking and Tracing'}de{'Verfolgung/Rückverfolgung'}", typeof(TandTv3FilterTracking), TandTv3FilterTracking.ClassName, "ItemSystemNo", "StartTime")]
     [ACClassConstructorInfo(
        new object[]
        {
@@ -418,6 +418,12 @@ namespace gip.bso.facility
                 if (_AccessPrimary == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
+                        if (navACQueryDefinition.TakeCount == 0)
+                            navACQueryDefinition.TakeCount = ACQueryDefinition.C_DefaultTakeCount;
+                    }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<TandTv3FilterTracking>(TandTv3FilterTracking.ClassName, this);
                     _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
@@ -434,6 +440,28 @@ namespace gip.bso.facility
                 query.Include(c => c.TandTv3MDTrackingStartItemType);
             }
             return result;
+        }
+
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, "ItemSystemNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("StartTime", Global.SortDirections.descending, true)
+                };
+            }
         }
         #endregion
 

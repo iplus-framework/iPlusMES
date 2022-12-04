@@ -519,7 +519,7 @@ namespace gip.mes.facility.TandTv3
                         ProgramNo = item.Key.ProgramNo
                     },
                     item.ToList());
-                TandTv3PointPosGrouped groupMixPoint = BuldGrouppedMixPoint(databaseApp, dItem);
+                TandTv3PointPosGrouped groupMixPoint = BuildGroupedMixPoint(databaseApp, dItem);
                 groupResult.MixPoints.Add(groupMixPoint);
                 groupResult.CurrentStep.MixingPoints.Add(groupMixPoint);
             }
@@ -529,7 +529,7 @@ namespace gip.mes.facility.TandTv3
             return groupResult;
         }
 
-        public TandTv3PointPosGrouped BuldGrouppedMixPoint(DatabaseApp databaseApp, KeyValuePair<MixPointGroup, List<TandTv3Point>> item)
+        public TandTv3PointPosGrouped BuildGroupedMixPoint(DatabaseApp databaseApp, KeyValuePair<MixPointGroup, List<TandTv3Point>> item)
         {
             TandTv3PointPosGrouped groupMixPoint = new TandTv3PointPosGrouped();
             groupMixPoint.ProgramNo = item.Key.ProgramNo;

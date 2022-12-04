@@ -11,14 +11,14 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, TandTv3MDTrackingDirection.ClassName, "en{'TrackingStyle'}de{'TrackingStyle'}", Const.ContextDatabase + "\\" + TandTv3MDTrackingDirection.ClassName, "", true)]
     [ACPropertyEntity(2, TandTv3MDTrackingStartItemType.ClassName, "en{'ItemType'}de{'ItemType'}", Const.ContextDatabase + "\\" + TandTv3MDTrackingStartItemType.ClassName, "", true)]
     [ACPropertyEntity(3, "FilterNo", "en{'FilterNo'}de{'FilterNo'}", "", "", true)]
-    [ACPropertyEntity(4, "StartTime", "en{'Started'}de{'Started'}", "", "", true)]
-    [ACPropertyEntity(5, "EndTime", "en{'Finished'}de{'Beendet'}", "", "", true)]
-    [ACPropertyEntity(6, "FilterDateFrom", "en{'Start time'}de{'Startzeit'}", "", "", true)]
-    [ACPropertyEntity(7, "FilterDateTo", "en{'End Time'}de{'Endzeit'}", "", "", true)]
+    [ACPropertyEntity(4, "StartTime", "en{'Tracking started at'}de{'Verfolgung gestartet am'}", "", "", true)]
+    [ACPropertyEntity(5, "EndTime", "en{'Tracking completed at'}de{'Verfolgung beendet am'}", "", "", true)]
+    [ACPropertyEntity(6, "FilterDateFrom", "en{'Filter from'}de{'Filter von'}", "", "", true)]
+    [ACPropertyEntity(7, "FilterDateTo", "en{'Filter to'}de{'Filter bis'}", "", "", true)]
     [ACPropertyEntity(8, "ItemSystemNo", "en{'ItemSystemNo'}de{'ItemSystemNo'}", "", "", true)]
     [ACPropertyEntity(9, "PrimaryKeyID", "en{'PrimaryKeyID'}de{'PrimaryKeyID'}", "", "", true)]
     [ACPropertyEntity(10, Const.EntityInsertName, Const.EntityTransInsertName)]
-    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + TandTv3FilterTracking.ClassName, "en{'FilterTracking'}de{'FilterTracking'}", typeof(TandTv3FilterTracking), TandTv3FilterTracking.ClassName, "ItemSystemNo", "ItemSystemNo")]
+    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + TandTv3FilterTracking.ClassName, "en{'FilterTracking'}de{'FilterTracking'}", typeof(TandTv3FilterTracking), TandTv3FilterTracking.ClassName, "ItemSystemNo", "StartTime")]
     public partial class TandTv3FilterTracking
     {
         public const string ClassName = "TandTv3FilterTracking";

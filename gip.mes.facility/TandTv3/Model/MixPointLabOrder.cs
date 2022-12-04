@@ -11,10 +11,10 @@ namespace gip.mes.facility
     {
         public Guid ID { get; set; }
 
-        [ACPropertyInfo(9999, "ACIdentifier", "en{'ACIdentifier'}de{'ACIdentifier'}")]
+        [ACPropertyInfo(9999, "ACIdentifier", "en{'Entity'}de{'Entität'}")]
         public string ACIdentifier { get; set; }
 
-        [ACPropertyInfo(9999, "ACCaption", "en{'Name'}de{'Name'}")]
+        [ACPropertyInfo(9999, "ACCaption", "en{'Description'}de{'Beschreibung'}")]
         public string ACCaption { get; set; }
 
 
