@@ -25,9 +25,6 @@ namespace gip.mes.cmdlet.Translation
         public string ProjectName { get; set; }
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ClassACIdentifier { get; set; }
-
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public MessageTypeEnum MessageType { get; set; }
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
@@ -46,18 +43,41 @@ namespace gip.mes.cmdlet.Translation
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string ACIdentifier { get; set; }
 
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public string ClassACIdentifier { get; set; }
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public string ACURLComponentCached { get; set; }
+
+
         #endregion
 
         #region Process
 
         protected override void ProcessRecord()
         {
+            if (string.IsNullOrEmpty(ClassACIdentifier) && string.IsNullOrEmpty(ACURLComponentCached))
+            {
+                WriteObject(string.Format("Missing object {0} - {1}", ClassACIdentifier, ACURLComponentCached));
+                return;
+            }
+            string identifier = "";
             VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
-            string identifier = ACIdentifier;
+
             string aCCaptionTranslation = "";
             using (Database database = new Database())
             {
-                ACClass aCClass = database.ACClass.Where(c => c.ACProject.ACProjectName == ProjectName && c.ACIdentifier == ClassACIdentifier).FirstOrDefault();
+                ACClass aCClass =
+                    database
+                    .ACClass
+                    .Where(c =>
+                                c.ACProject.ACProjectName == ProjectName
+                                && (
+                                       (ClassACIdentifier != null && c.ACIdentifier == ClassACIdentifier)
+                                       || (ACURLComponentCached != null && c.ACURLComponentCached == ACURLComponentCached)
+                                    )
+                            )
+                   .FirstOrDefault();
                 if (aCClass != null)
                 {
                     aCCaptionTranslation = string.Format(@"en{{'{0}'}}de{{'{1}'}}", EnText, DeText);
@@ -65,14 +85,14 @@ namespace gip.mes.cmdlet.Translation
                     if (MessageType == MessageTypeEnum.None)
                     {
                         ACClassText acClassText = ACClassText.NewACObject(database, aCClass);
-                        acClassText.ACIdentifier = identifier;
+                        acClassText.ACIdentifier = ACIdentifier;
                         acClassText.ACCaptionTranslation = aCCaptionTranslation;
 
                         acClassText.InsertDate = nowTime;
                         acClassText.UpdateDate = nowTime;
                         acClassText.InsertName = UpdateName;
                         acClassText.UpdateName = UpdateName;
-                        
+
                         database.ACClassText.AddObject(acClassText);
                     }
                     else
