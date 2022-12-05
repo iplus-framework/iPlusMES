@@ -44,6 +44,7 @@ namespace gip2006.variobatch.processapplication
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationRight
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationLeft
             iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationPause
+            iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationPause2
 
             OnSendObjectGetLength(request, dbNo, offset, miscParams, ref iOffset);
             if (s7Session.HashCodeValidation != HashCodeValidationEnum.Off)
@@ -98,6 +99,13 @@ namespace gip2006.variobatch.processapplication
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationPause2").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
             }
             else if (MethodNameEquals(request.ACIdentifier, "MixingTime"))
             {
@@ -144,6 +152,13 @@ namespace gip2006.variobatch.processapplication
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationPause2").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
             }
             else if (MethodNameEquals(request.ACIdentifier, "MixingTemperature"))
             {
@@ -182,6 +197,13 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 totalSec = request.ParameterValueList.GetTimeSpan("DurationPause").TotalSeconds;
+                if (totalSec > Int16.MaxValue)
+                    totalSec = Int16.MaxValue;
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
+                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                totalSec = request.ParameterValueList.GetTimeSpan("DurationPause2").TotalSeconds;
                 if (totalSec > Int16.MaxValue)
                     totalSec = Int16.MaxValue;
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(Convert.ToInt16(totalSec)),
@@ -236,6 +258,7 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationRight
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationLeft
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationPause
+                iOffset += gip.core.communication.ISOonTCP.Types.Int.Length; // DurationPause2
 
                 OnReadObjectGetLength(response, dbNo, offset, miscParams, readParameter, ref iOffset);
 
@@ -274,6 +297,9 @@ namespace gip2006.variobatch.processapplication
 
                     response.ParameterValueList.GetACValue("DurationPause").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                     iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationPause2").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
                 }
                 else if (MethodNameEquals(response.ACIdentifier, "MixingTime"))
                 {
@@ -300,6 +326,9 @@ namespace gip2006.variobatch.processapplication
 
                     response.ParameterValueList.GetACValue("DurationPause").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                     iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationPause2").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
                 }
                 else if (MethodNameEquals(response.ACIdentifier, "MixingTemperature"))
                 {
@@ -325,6 +354,9 @@ namespace gip2006.variobatch.processapplication
                     iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                     response.ParameterValueList.GetACValue("DurationPause").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
+                    iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
+
+                    response.ParameterValueList.GetACValue("DurationPause2").Value = TimeSpan.FromSeconds(gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage1, iOffset));
                     iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
                 }
 

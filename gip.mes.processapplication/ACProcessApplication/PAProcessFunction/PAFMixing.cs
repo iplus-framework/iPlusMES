@@ -67,6 +67,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("DurationLeft", "en{'Duration Left'}de{'Dauer Links'}");
             method.ParameterValueList.Add(new ACValue("DurationPause", typeof(TimeSpan), 0, Global.ParamOption.Optional));
             paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
+            method.ParameterValueList.Add(new ACValue("DurationPause2", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationPause2", "en{'Duration Pause 2'}de{'Dauer Pause 2'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, null);
         }
@@ -90,6 +92,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("DurationLeft", "en{'Duration Left'}de{'Dauer Links'}");
             method.ParameterValueList.Add(new ACValue("DurationPause", typeof(TimeSpan), 0, Global.ParamOption.Optional));
             paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
+            method.ParameterValueList.Add(new ACValue("DurationPause2", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationPause2", "en{'Duration Pause 2'}de{'Dauer Pause 2'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActDuration", typeof(TimeSpan), 0, Global.ParamOption.Required));
@@ -117,6 +121,8 @@ namespace gip.mes.processapplication
             paramTranslation.Add("DurationLeft", "en{'Duration Left'}de{'Dauer Links'}");
             method.ParameterValueList.Add(new ACValue("DurationPause", typeof(TimeSpan), 0, Global.ParamOption.Optional));
             paramTranslation.Add("DurationPause", "en{'Duration Pause'}de{'Dauer Pause'}");
+            method.ParameterValueList.Add(new ACValue("DurationPause2", typeof(TimeSpan), 0, Global.ParamOption.Optional));
+            paramTranslation.Add("DurationPause2", "en{'Duration Pause 2'}de{'Dauer Pause 2'}");
 
             Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
             method.ResultValueList.Add(new ACValue("ActTemperature", typeof(Double), 0.0, Global.ParamOption.Required));

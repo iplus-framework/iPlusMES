@@ -199,8 +199,8 @@ namespace gip.mes.webservices
                             }
                         }
 
-                        pwInfo.PostingQSuggestionMode = orderWFInfo.PostingQSuggestionMode;
-                        pwInfo.PostingQSuggestionMode2 = orderWFInfo.PostingQSuggestionMode2;
+                        //pwInfo.PostingQSuggestionMode = orderWFInfo.PostingQSuggestionMode;
+                        //pwInfo.PostingQSuggestionMode2 = orderWFInfo.PostingQSuggestionMode2;
 
                         pwInfo.ProdOrderPartslist = vbWebService.ConvertToWSProdOrderPartslists(poPartslist.Where(c => c.ProdOrderPartslistID == orderWFInfo.POPId).AsQueryable()).FirstOrDefault();
                         if (orderWFInfo.IntermPOPPosId != Guid.Empty)

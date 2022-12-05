@@ -97,20 +97,6 @@ namespace gip.mes.processapplication
         {
             get; set;
         }
-
-        [DataMember(Name = "PQSM")]
-        public PostingQuantitySuggestionMode PostingQSuggestionMode
-        {
-            get;
-            set;
-        }
-
-        [DataMember(Name = "PQSM2")]
-        public PostingQuantitySuggestionMode PostingQSuggestionMode2
-        {
-            get;
-            set;
-        }
     }
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Register work task'}de{'Erfassung Arbeitsaufgabe'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, PWWorkTaskScanBase.PWClassName, true)]
