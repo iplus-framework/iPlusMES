@@ -255,7 +255,9 @@ namespace gip.mes.processapplication
                                                                             && (c.PartialActualCount.HasValue || c.PartialTargetCount == c.PartialTargetCount)).FirstOrDefault();
                                     if (nextBatchPlan != null)
                                     {
-                                        PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist.ProdOrderPartslistID == nextBatchPlan.ProdOrderPartslistID).FirstOrDefault();
+                                        PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist != null 
+                                                                                                                            && c.CurrentProdOrderPartslist.ProdOrderPartslistID == nextBatchPlan.ProdOrderPartslistID)
+                                                                                                                    .FirstOrDefault();
                                         if (activeInstanceForBatchplan == null)
                                         {
                                             if (nextBatchPlan.BatchActualCount >= nextBatchPlan.BatchTargetCount)
@@ -289,7 +291,9 @@ namespace gip.mes.processapplication
 
                         foreach (ProdOrderBatchPlan startableBatchPlan in startableBatchPlans)
                         {
-                            PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist.ProdOrderPartslistID == startableBatchPlan.ProdOrderPartslistID).FirstOrDefault();
+                            PWNodeProcessWorkflowVB activeInstanceForBatchplan = instancesOfThisSchedule.Where(c => c.CurrentProdOrderPartslist != null 
+                                                                                                                && c.CurrentProdOrderPartslist.ProdOrderPartslistID == startableBatchPlan.ProdOrderPartslistID)
+                                                                                                        .FirstOrDefault();
                             //if (!startableBatchPlan.IsValidated)
                             //{
                             //    if (activeInstanceForBatchplan == null)
