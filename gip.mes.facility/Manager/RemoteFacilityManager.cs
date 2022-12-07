@@ -134,8 +134,8 @@ namespace gip.mes.facility
             }
         }
 
-        [ACPropertyInfo(true, 401, DefaultValue = false)]
-        bool LoggingOn { get; set; }
+        [ACPropertyInfo(true, 401, "", "en{'LoggingOn'}de{'LoggingOn'}", DefaultValue = false)]
+        public bool LoggingOn { get; set; }
 
         #endregion
 
