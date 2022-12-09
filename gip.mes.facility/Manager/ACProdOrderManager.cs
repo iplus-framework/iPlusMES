@@ -2115,7 +2115,7 @@ namespace gip.mes.facility
                         }
                         finalPosFromPrevPartslist.RecalcActualQuantity();
                         double diff = backflushedPos.ActualQuantityUOM - finalPosFromPrevPartslist.ActualQuantityUOM;
-                        if (Math.Abs(diff) > FacilityConst.C_ZeroCompare)
+                        if (Math.Abs(diff) > 0.0000001)
                         {
                             FacilityBookingCharge lastInwardPosting =
                             dbApp.FacilityBookingCharge.Include(c => c.ProdOrderPartslistPos)
