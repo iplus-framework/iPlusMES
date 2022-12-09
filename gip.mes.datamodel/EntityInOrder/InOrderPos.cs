@@ -2,6 +2,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace gip.mes.datamodel
@@ -58,31 +59,39 @@ namespace gip.mes.datamodel
             entity.DefaultValuesACObject();
             entity.TargetDeliveryDate = DateTime.Now;
             InOrder inOrder = null;
-            if (parentACObject is InOrderPos)
+            InOrderPos parentInOrderPos = parentACObject as InOrderPos;
+            if (parentInOrderPos != null)
             {
-                InOrderPos parentInOrderPos = parentACObject as InOrderPos;
                 entity.InOrderPos1_ParentInOrderPos = parentInOrderPos;
                 entity.CopyFromParent(parentInOrderPos);
                 inOrder = attachToOrder != null ? attachToOrder : parentInOrderPos.InOrder;
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.InwardPart;
             }
-            if (parentACObject is InOrder)
-            {
+            else
                 inOrder = parentACObject as InOrder;
-                entity.TargetDeliveryDate = inOrder.TargetDeliveryDate;
-                entity.TargetDeliveryMaxDate = inOrder.TargetDeliveryMaxDate;
-            }
+
             if (inOrder != null)
             {
-                if (inOrder.EntityState != System.Data.EntityState.Added
-                    && inOrder.InOrderPos_InOrder != null
-                    && inOrder.InOrderPos_InOrder.Any())
-                    entity.Sequence = inOrder.InOrderPos_InOrder.Select(c => c.Sequence).Max() + 1;
+                entity.TargetDeliveryDate = inOrder.TargetDeliveryDate;
+                entity.TargetDeliveryMaxDate = inOrder.TargetDeliveryMaxDate;
+
+                if (!inOrder.InOrderPos_InOrder.IsLoaded
+                    && (inOrder.EntityState == System.Data.EntityState.Modified || inOrder.EntityState == System.Data.EntityState.Unchanged))
+                    entity.Sequence = inOrder.InOrderPos_InOrder.CreateSourceQuery().Max(c => c.Sequence) + 1;
+                else if (inOrder.InOrderPos_InOrder.Any())
+                {
+                    IEnumerable<int> querySequence = inOrder.InOrderPos_InOrder.Select(c => c.Sequence);
+                    entity.Sequence = querySequence.Any() ? querySequence.Max() + 1 : 1;
+                }
                 else
                     entity.Sequence = 1;
+
                 entity.InOrder = inOrder;
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.InwardRoot;
-                inOrder.InOrderPos_InOrder.Add(entity);
+                if (parentInOrderPos == null || inOrder.InOrderPos_InOrder.IsLoaded)
+                    inOrder.InOrderPos_InOrder.Add(entity);
+                else
+                    dbApp.InOrderPos.AddObject(entity);
             }
             entity.TargetQuantityUOM = 1;
             entity.MDInOrderPosState = MDInOrderPosState.DefaultMDInOrderPosState(dbApp);

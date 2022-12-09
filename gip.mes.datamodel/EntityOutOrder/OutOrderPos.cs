@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Objects;
 using System.Linq;
 
@@ -63,53 +64,61 @@ namespace gip.mes.datamodel
             entity.OutOrderPosID = Guid.NewGuid();
             entity.DefaultValuesACObject();
             OutOrder outOrder = null;
-            if (parentACObject is OutOrderPos)
+            OutOrderPos parentOutOrderPos = parentACObject as OutOrderPos;
+            if (parentOutOrderPos != null)
             {
-                OutOrderPos parentOutOrderPos = parentACObject as OutOrderPos;
                 entity.OutOrderPos1_ParentOutOrderPos = parentOutOrderPos;
                 entity.CopyFromParent(parentOutOrderPos);
                 outOrder = parentOutOrderPos.OutOrder;
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardPart;
             }
-            if (parentACObject is OutOrder)
-            {
+            else
                 outOrder = parentACObject as OutOrder;
-            }
+
             if (outOrder != null)
             {
-                if (outOrder.EntityState != System.Data.EntityState.Added
-                    && outOrder.OutOrderPos_OutOrder != null
-                    && outOrder.OutOrderPos_OutOrder.Select(c => c.Sequence).Any())
-                    entity.Sequence = outOrder.OutOrderPos_OutOrder.Select(c => c.Sequence).Max() + 1;
-                else
-                    entity.Sequence = 1;
-                entity.OutOrder = outOrder;
-                entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardRoot;
-                outOrder.OutOrderPos_OutOrder.Add(entity);
-            }
-
-            if (parentGroupPos == null)
-            {
-                var existingOutOrderPos = outOrder?.OutOrderPos_OutOrder.Where(c => !c.GroupOutOrderPosID.HasValue
-                                                                                  && c.EntityState != System.Data.EntityState.Added).Select(c => c.Sequence);
-
-                if (existingOutOrderPos != null && existingOutOrderPos.Any())
+                if (!outOrder.OutOrderPos_OutOrder.IsLoaded 
+                    && (outOrder.EntityState == System.Data.EntityState.Modified || outOrder.EntityState == System.Data.EntityState.Unchanged))
                 {
-                    entity.Sequence = existingOutOrderPos.Max() + 1;
+                    if (parentGroupPos == null)
+                        entity.Sequence = outOrder.OutOrderPos_OutOrder
+                                                .CreateSourceQuery()
+                                                .Where(c => !c.GroupOutOrderPosID.HasValue)
+                                                .Max(c => c.Sequence) + 1;
+                    else
+                        entity.Sequence = outOrder.OutOrderPos_OutOrder
+                                                .CreateSourceQuery()
+                                                .Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID)
+                                                .Max(c => c.Sequence) + 1;
+
+                }
+                else if (outOrder.OutOrderPos_OutOrder.Any())
+                {
+                    IEnumerable<int> querySequence = null;
+                    if (parentGroupPos == null)
+                    {
+                        querySequence = outOrder.OutOrderPos_OutOrder
+                                                .Where(c => !c.GroupOutOrderPosID.HasValue) // && c.EntityState != System.Data.EntityState.Added)
+                                                .Select(c => c.Sequence);
+                    }
+                    else
+                    {
+                        querySequence = outOrder.OutOrderPos_OutOrder
+                                                .Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID)
+                                                .Select(c => c.Sequence);
+                    }
+                    entity.Sequence = querySequence.Any() ? querySequence.Max() + 1 : 1;
                 }
                 else
                     entity.Sequence = 1;
-            }
-            else
-            {
-                var existingOutOrderPos = outOrder?.OutOrderPos_OutOrder.Where(c => c.GroupOutOrderPosID == parentGroupPos.OutOrderPosID).Select(c => c.Sequence);
 
-                if (existingOutOrderPos != null && existingOutOrderPos.Any())
-                    entity.Sequence = existingOutOrderPos.Max() + 1;
+                entity.OutOrder = outOrder;
+                entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardRoot;
+                if (parentOutOrderPos == null || outOrder.OutOrderPos_OutOrder.IsLoaded)
+                    outOrder.OutOrderPos_OutOrder.Add(entity);
                 else
-                    entity.Sequence = 1;
+                    dbApp.OutOrderPos.AddObject(entity);
             }
-
 
             entity.TargetQuantityUOM = 0;
             entity.MDOutOrderPosState = MDOutOrderPosState.DefaultMDOutOrderPosState(dbApp);
@@ -160,7 +169,7 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(OutOrder outOrder, int sequence)
         {
-            if (outOrder == null
+            if (   outOrder == null
                 || !outOrder.OutOrderPos_OutOrder.Any())
                 return;
 
