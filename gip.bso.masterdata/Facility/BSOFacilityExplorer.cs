@@ -175,7 +175,11 @@ namespace gip.bso.masterdata
                             {
                                 aCFSItem.IsVisible = false;
                                 Facility facility = aCFSItem.ACObject as Facility;
-                                if (facility.FacilityNo.ToLower().Contains(value.ToLower()) || facility.FacilityName.ToLower().Contains(value.ToLower()))
+                                if (
+                                        facility.FacilityNo.ToLower().Contains(value.ToLower()) 
+                                        || facility.FacilityName.ToLower().Contains(value.ToLower())
+                                        || (!string.IsNullOrEmpty(facility.KeyOfExtSys) && facility.KeyOfExtSys.Contains(value))
+                                   )
                                 {
                                     aCFSItem.IsVisible = true;
                                     FacilityTree.SetupCurrentVisible(aCFSItem);
