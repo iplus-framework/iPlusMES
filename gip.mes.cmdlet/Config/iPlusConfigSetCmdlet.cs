@@ -1,10 +1,5 @@
 ﻿using gip.mes.cmdlet.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Management.Automation;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.cmdlet.Config
 {
@@ -14,8 +9,8 @@ namespace gip.mes.cmdlet.Config
     {
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(".\\");
-
+            SessionState ss = new SessionState();
+            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(ss.Path.CurrentFileSystemLocation.Path);
             WriteObject(iPlusCmdLetSettings);
         }
     }

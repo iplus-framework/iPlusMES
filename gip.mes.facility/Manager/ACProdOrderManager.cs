@@ -1179,33 +1179,14 @@ namespace gip.mes.facility
             // 5.1 If many target - select first and remind
             foreach (WizardSchedulerPartslist wPl in wPls)
             {
-                //gip.core.datamodel.ACClassWF wf = GetACClassWFDischarging(databaseApp, wPl.ProdOrderPartslistPos.ProdOrderPartslist, wPl.WFNodeMES, wPl.ProdOrderPartslistPos);
-
                 foreach (ProdOrderBatchPlan bp in wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos)
                 {
                     if (!bp.FacilityReservation_ProdOrderBatchPlan.Any())
                     {
-                        string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
-                        BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos.ProdOrderPartslist,
-                            wPl.ProdOrderPartslistPos, bp, configUrl, true, false, true, false, false);
+                        Msg addTargetMsg = BatchPlanSelectTarget(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos, bp);
+                        if (addTargetMsg != null)
+                            msgWithDetails.AddDetailMessage(addTargetMsg);
 
-                        if (!targets.Any(c => c.IsChecked))
-                        {
-                            if (!targets.Any(c => c.IsChecked))
-                            {
-                                POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
-                                if (selectedReservation != null)
-                                    selectedReservation.IsChecked = true;
-                            }
-                        }
-                        if (!targets.Any(c => c.IsChecked))
-                        {
-                            // Warning50051
-                            // For prodorder {0} recipe #{1} {2} {3} no target for batch plan!
-                            Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50051",
-                                bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
-                            msgWithDetails.AddDetailMessage(msg);
-                        }
                     }
                 }
             }
@@ -1216,6 +1197,31 @@ namespace gip.mes.facility
                     msgWithDetails.AddDetailMessage(tmMsg);
 
             return msgWithDetails;
+        }
+
+        public Msg BatchPlanSelectTarget(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, datamodel.ACClassWF wfNodeMES, ProdOrderPartslistPos pos, ProdOrderBatchPlan bp)
+        {
+            Msg msg = null;
+            string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
+            BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wfNodeMES, pos.ProdOrderPartslist, pos, bp, configUrl, true, false, true, false, false);
+
+            if (!targets.Any(c => c.IsChecked))
+            {
+                if (!targets.Any(c => c.IsChecked))
+                {
+                    POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
+                    if (selectedReservation != null)
+                        selectedReservation.IsChecked = true;
+                }
+            }
+            if (!targets.Any(c => c.IsChecked))
+            {
+                // Warning50051
+                // For prodorder {0} recipe #{1} {2} {3} no target for batch plan!
+                msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "GenerateBatchPlan()", 1137, "Warning50051",
+                    bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
+            }
+            return msg;
         }
 
         public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, gip.mes.datamodel.ACClassWF vbACClassWF, ProdOrderPartslistPos intermediatePos)
