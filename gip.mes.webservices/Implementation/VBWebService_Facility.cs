@@ -89,7 +89,7 @@ namespace gip.mes.webservices
                         .Include(gip.mes.datamodel.MDReleaseState.ClassName)
                         .Where(c => c.FacilityID == facilityID
                                  && c.MaterialID == materialID
-                                 && c.FacilityLotID == facilityLotID
+                                 && (facilityLotID == Guid.Empty || c.FacilityLotID == facilityLotID)
                                  && (splitNo == null || c.SplitNo == splitNo))
                         .Select(c => new gip.mes.webservices.FacilityCharge()
                         {
