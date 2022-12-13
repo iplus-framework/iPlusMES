@@ -77,7 +77,7 @@ namespace gip.mes.datamodel
             {
                 if (Partslist == null) return null;
                 string name = Partslist.PartslistNo + "-" + Partslist.PartslistName;
-                name += " [" + Partslist.Material.MaterialNo + " - " + Partslist.Material.MaterialName1 + "]";
+                name += " [" + Partslist.Material?.MaterialNo + " - " + Partslist.Material?.MaterialName1 + "]";
                 return name;
             }
         }
