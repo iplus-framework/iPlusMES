@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BSOTest.cs" />
+    <Compile Include="BSOTest_RemoteFM.cs" />
     <Compile Include="Manager\RemoteFMHelper.cs" />
     <Compile Include="VXBSOMethodTest.cs" />
     <Compile Include="VXBSOFacilityTest.cs" />
@@ -97,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="VBControlScripts\2022-10-21 13-58_aagincic.zip">
+    <None Include="VBControlScripts\2022-12-14 10-58_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
