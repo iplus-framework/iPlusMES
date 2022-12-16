@@ -750,6 +750,8 @@ namespace gip.mes.datamodel
             {
                 name += Environment.NewLine
                     + "("
+                    + pl.Partslist.Material.MaterialNo.Trim()
+                    + " "
                     + pl.Partslist.Material.MaterialName1.Trim()
                     + ")";
             }

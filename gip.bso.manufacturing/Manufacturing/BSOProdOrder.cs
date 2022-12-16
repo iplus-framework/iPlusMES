@@ -4618,6 +4618,7 @@ namespace gip.bso.manufacturing
             clone.SelectedIntermediate = this.SelectedIntermediate;
             clone.SelectedProdOrderIntermediateBatch = this.SelectedProdOrderIntermediateBatch;
             clone.SelectedBatch = this.SelectedBatch;
+            clone.SelectedInwardFacilityBookingCharge = this.SelectedInwardFacilityBookingCharge;
             return clone;
         }
 
