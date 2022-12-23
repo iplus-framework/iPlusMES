@@ -36,7 +36,7 @@ namespace gip.mes.facility
         }
 
         public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager,
-            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups) : this(databaseApp, prodOrderManager, configManager)
+            Partslist partslist, double targetQuantityUOM, int sn, List<MDSchedulingGroup> schedulingGroups, MDSchedulingGroup selectedSchedulingGroup = null) : this(databaseApp, prodOrderManager, configManager)
         {
             Partslist = partslist;
             PartslistNo = partslist.PartslistNo;
@@ -50,7 +50,14 @@ namespace gip.mes.facility
                     TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
             }
             MDSchedulingGroupList = schedulingGroups;
-            SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
+            if (selectedSchedulingGroup != null)
+            {
+                SelectedMDSchedulingGroup = MDSchedulingGroupList.Where(c => c.MDSchedulingGroupID == selectedSchedulingGroup.MDSchedulingGroupID).FirstOrDefault();
+            }
+            if (selectedSchedulingGroup == null)
+            {
+                SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
+            }
             ProductionUnitsUOM = partslist.ProductionUnits;
         }
 
@@ -64,7 +71,7 @@ namespace gip.mes.facility
 
             var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(WFNodeMES, prodOrderPartslist.Partslist.MaterialWFID);
             ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, materialWFConnection);
-            
+
             // Read selected MDSchedulingGroup
             if (finalMix != null)
             {

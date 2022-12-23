@@ -1342,8 +1342,10 @@ namespace gip.mes.facility
                 if (availableModules.Any())
                 {
                     FacilityReservation[] selectedModules = new FacilityReservation[] { };
-                    if (batchPlan.EntityState != System.Data.EntityState.Added
-                        && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged))
+                    if (
+                            batchPlan.EntityState != System.Data.EntityState.Added
+                            && !batchPlan.FacilityReservation_ProdOrderBatchPlan.Any(c => c.EntityState != System.Data.EntityState.Unchanged)
+                        )
                     {
                         batchPlan.FacilityReservation_ProdOrderBatchPlan.AutoRefresh();
                         selectedModules = batchPlan
