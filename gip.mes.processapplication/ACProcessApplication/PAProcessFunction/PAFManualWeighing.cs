@@ -273,6 +273,21 @@ namespace gip.mes.processapplication
             }
         }
 
+        internal void CompleteOnDifferenceWeighing(bool onlyComplete = false)
+        {
+            if (!onlyComplete)
+            {
+                PAEScaleGravimetric scale = ActiveScaleObject;
+                if (scale == null)
+                {
+                    //TODO: error
+                    return;
+                }
+                SetPAFResult(scale.ActualValue.ValueT + ManuallyAddedQuantity.ValueT);
+            }
+            CurrentACState = ACStateEnum.SMCompleted;
+        }
+
         internal void SetPAFResult(double actualQuantity, bool isComponentConsumed = false)
         {
             CurrentACMethod.ValueT.ResultValueList["ActualQuantity"] = actualQuantity;
@@ -926,6 +941,12 @@ namespace gip.mes.processapplication
 
             if (!Root.Initialized)
                 return;
+
+            if (ManualWeighingPW != null && ManualWeighingPW.DiffWeighing)
+            {
+                UnSubscribeToProjectWorkCycle();
+                return;
+            }
 
             if (!CheckInToleranceOnlyManuallyAddedQuantity)
                 DetermineTargetScaleObject();

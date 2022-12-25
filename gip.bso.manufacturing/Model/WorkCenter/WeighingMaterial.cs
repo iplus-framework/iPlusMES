@@ -208,6 +208,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private bool _DiffWeighOnEnd;
+        [ACPropertyInfo(9999)]
+        public bool DiffWeighOnEnd
+        {
+            get => _DiffWeighOnEnd;
+            set
+            {
+                _DiffWeighOnEnd = value;
+                OnPropertyChanged();
+            }
+        }
+
         public BSOManualWeighing ParentBSO
         {
             get => ParentACObject as BSOManualWeighing;
@@ -429,6 +441,27 @@ namespace gip.bso.manufacturing
 
                 }
             }
+
+            bool? diffWeighing = ParentBSO?.DiffWeighing;
+
+            if(diffWeighing.HasValue && diffWeighing.Value)
+            {
+                try
+                {
+                    PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoLoad();
+                    PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.AutoRefresh();
+                    DiffWeighOnEnd = PosRelation.FacilityPreBooking_ProdOrderPartslistPosRelation.Any();
+
+                    PosRelation.AutoRefresh();
+                    ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
+                }
+                catch
+
+                {
+
+                }
+            }
+
             if (newState != WeighingComponentState.PartialCompleted)
                 WeighingMatState = newState;
             ParentBSO?.OnComponentStateChanged(this);

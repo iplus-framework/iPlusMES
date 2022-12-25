@@ -88,6 +88,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("AutoInterDis", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoInterDis", "en{'Auto inter discharging'}de{'Automatische Zwischenentleerung'}");
 
+            method.ParameterValueList.Add(new ACValue("DiffWeighing", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("DiffWeighing", "en{'Difference weighing'}de{'Differenzwägung'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWManualWeighing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWManualWeighing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWManualWeighing), HandleExecuteACMethod_PWManualWeighing);
@@ -580,6 +583,21 @@ namespace gip.mes.processapplication
 
         }
 
+        public bool DiffWeighing
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("DiffWeighing");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
         #endregion
 
         #region Properties => Materials, Relations and FacilityCharge
@@ -999,7 +1017,7 @@ namespace gip.mes.processapplication
 
             _IsBinChangeActivated = false;
             _IsAborted = false;
-            
+
             _IsLotChanged = false;
 
             base.SMIdle();
@@ -1139,7 +1157,11 @@ namespace gip.mes.processapplication
                     //Check if manual weighing currently active
                     if (manualWeighing != null)
                     {
-                        Guid? currentOpenMat = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetGuid("PLPosRelation");
+                        ACValue plPosRelation = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetACValue("PLPosRelation");
+                        Guid? currentOpenMat = null;
+                        if (plPosRelation != null && plPosRelation.Value != null)
+                            currentOpenMat = plPosRelation.ParamAsGuid;
+
                         if (currentOpenMat == null)
                         {
                             SubscribeToProjectWorkCycle();
@@ -1159,24 +1181,6 @@ namespace gip.mes.processapplication
                         ACValue facilityCharge = manualWeighing.CurrentACMethod.ValueT.ParameterValueList.GetACValue("FacilityCharge");
                         if (facilityCharge != null && facilityCharge.Value != null)
                         {
-                            //using (DatabaseApp dbApp = new DatabaseApp())
-                            //{
-                            //    FacilityCharge fc = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == facilityCharge.ParamAsGuid);
-                            //    if (fc == null)
-                            //    {
-                            //        Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A10)",
-                            //                          string.Format("The facility charge with ID: {0} not exist in the database.", facilityCharge.ParamAsGuid));
-                            //    }
-                            //    else
-                            //    {
-                            //        if (fc.MaterialID != comp.Material)
-                            //        {
-                            //            Messages.LogError(this.GetACUrl(), nameof(SMRunning) + "(A20)",
-                            //                          string.Format("The facility charge is not correct. ID: {0}, MaterialID: {1}", facilityCharge.ParamAsGuid, comp.Material));
-                            //        }
-                            //    }
-                            //}
-
                             CurrentFacilityCharge = facilityCharge.ParamAsGuid;
                             comp.SwitchState(WeighingComponentState.InWeighing);
                             SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, facilityCharge.ParamAsGuid);
@@ -1275,7 +1279,7 @@ namespace gip.mes.processapplication
                         StartManualWeighingNextComp(ParentPWGroup.AccessedProcessModule, nextComp, null); //Man Comp && Auto Lot || ManLot
                         UnSubscribeToProjectWorkCycle();
                     }
-                    else if (AutoSelectLot)
+                    else if (AutoSelectLot && currentOpenMaterial != null)
                     {
                         bool hasQuants = TryAutoSelectFacilityCharge(currentOpenMaterial);
                         if (currentFacilityCharge != null)
@@ -1382,22 +1386,45 @@ namespace gip.mes.processapplication
 
         #region Methods => Commands
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public Msg StartWeighing(Guid? prodOrderPartslistPosRelation, Guid? facilityCharge, Guid? facility, bool forceSetFC_F)
         {
-            using (ACMonitor.Lock(_65001_CanStartFromBSOLock))
+            if (!DiffWeighing)
             {
-                if (!_CanStartFromBSO)
-                    return null;
-                _CanStartFromBSO = false;
+                using (ACMonitor.Lock(_65001_CanStartFromBSOLock))
+                {
+                    if (!_CanStartFromBSO)
+                        return null;
+                    _CanStartFromBSO = false;
+                }
             }
 
             if (prodOrderPartslistPosRelation == null)
                 return null;
 
+            if (DiffWeighing)
+            {
+                Guid? currentOpenMaterial = CurrentOpenMaterial;
+                if (currentOpenMaterial.HasValue)
+                {
+                    WeighingComponent currentComp = GetWeighingComponent(currentOpenMaterial);
+                    if (currentComp != null && currentComp.WeighState == WeighingComponentState.InWeighing)
+                    {
+                        currentComp.SwitchState(WeighingComponentState.ReadyToWeighing);
+                        SetInfo(currentComp, WeighingComponentInfoType.State, null);
+                    }
+                }
+            }
+
             WeighingComponent comp = GetWeighingComponent(prodOrderPartslistPosRelation);
             if (comp == null || comp.WeighState == WeighingComponentState.WeighingCompleted)
                 return null;
+
+            if (FreeSelectionMode && AutoSelectLot && !facilityCharge.HasValue)
+            {
+                TryAutoSelectFacilityCharge(prodOrderPartslistPosRelation);
+                facilityCharge = CurrentFacilityCharge;
+            }
 
             if (facilityCharge.HasValue)
             {
@@ -1433,6 +1460,20 @@ namespace gip.mes.processapplication
                         if (acMethod != null)
                         {
                             UpdatePAFACMethod(comp, acMethod);
+                            if (manWeighing.CurrentACState == ACStateEnum.SMRunning)
+                            {
+                                if (comp.WeighState < WeighingComponentState.InWeighing)
+                                {
+                                    comp.SwitchState(WeighingComponentState.InWeighing);
+
+                                    SetRelationState(comp.PLPosRelation.ProdOrderPartslistPosRelationID, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess);
+
+                                    WeighingComponentInfoType infoType = WeighingComponentInfoType.StateSelectCompAndFC_F;
+                                    Guid? currentFacilityCharge = CurrentFacilityCharge;
+                                    SetInfo(comp, infoType, currentFacilityCharge.Value);
+                                }
+                            }
+                            manWeighing.SubscribeToProjectWorkCycle();
                         }
                         else
                         {
@@ -1446,75 +1487,86 @@ namespace gip.mes.processapplication
                 }
             }
             else
+            {
                 SetCanStartFromBSO(true);
+            }
 
             CurrentOpenMaterial = prodOrderPartslistPosRelation;
             return null;
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public virtual void CompleteWeighing(double actualWeight, bool bookAndWeighRest)
         {
             PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
 
-            if (bookAndWeighRest && manualWeighing != null)
+            if (manualWeighing != null)
             {
-                ACMethod currentACMethod = CurrentACMethod.ValueT;
-                var targetQ = currentACMethod.ParameterValueList.GetACValue("TargetQuantity");
-                double targetWeight = 0;
-                if (targetQ != null)
-                    targetWeight = targetQ.ParamAsDouble;
-
-                if (actualWeight > 0.000001 && actualWeight < targetWeight)
+                if (!DiffWeighing)
                 {
-                    Guid? currentFacilityCharge = CurrentFacilityCharge;
-                    bool isForInterdischarge = true;
-                    if (_IsLotChanged)
+                    if (bookAndWeighRest)
                     {
-                        isForInterdischarge = false;
-                        _IsLotChanged = false;
+                        ACMethod currentACMethod = CurrentACMethod.ValueT;
+                        var targetQ = currentACMethod.ParameterValueList.GetACValue("TargetQuantity");
+                        double targetWeight = 0;
+                        if (targetQ != null)
+                            targetWeight = targetQ.ParamAsDouble;
+
+                        if (actualWeight > 0.000001 && actualWeight < targetWeight)
+                        {
+                            Guid? currentFacilityCharge = CurrentFacilityCharge;
+                            bool isForInterdischarge = true;
+                            if (_IsLotChanged)
+                            {
+                                isForInterdischarge = false;
+                                _IsLotChanged = false;
+                            }
+
+                            Guid? currentOpenMaterial = CurrentOpenMaterial;
+
+                            //Guid? correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, currentACMethod);
+                            //if (correctedFc.HasValue)
+                            //    currentFacilityCharge = correctedFc;
+
+                            var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentOpenMaterial, currentFacilityCharge, isForInterdischarge);
+                            if (msgBooking != null)
+                            {
+                                Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, msgBooking, false);
+                                ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
+                                return;
+                            }
+
+                            double rest = targetWeight - actualWeight;
+                            manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = rest;
+                            manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
+
+                            WeighingComponent comp = GetWeighingComponent(currentOpenMaterial);
+                            if (comp == null)
+                            {
+                                return;
+                            }
+
+                            comp.SwitchState(WeighingComponentState.PartialCompleted);
+                            SetInfo(comp, WeighingComponentInfoType.State, null);
+                            comp.SwitchState(WeighingComponentState.InWeighing);
+                            SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, currentFacilityCharge);
+                        }
                     }
-
-                    Guid? currentOpenMaterial = CurrentOpenMaterial;
-
-                    //Guid? correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, currentACMethod);
-                    //if (correctedFc.HasValue)
-                    //    currentFacilityCharge = correctedFc;
-
-                    var msgBooking = DoManualWeighingBooking(actualWeight, false, false, currentOpenMaterial, currentFacilityCharge, isForInterdischarge);
-                    if (msgBooking != null)
+                    else
                     {
-                        Messages.LogError(this.GetACUrl(), msgBooking.ACIdentifier, msgBooking.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msgBooking, false);
-                        ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
-                        return;
+                        manualWeighing.CompleteWeighing(actualWeight);
                     }
-
-                    double rest = targetWeight - actualWeight;
-                    manualWeighing.CurrentACMethod.ValueT.ParameterValueList["TargetQuantity"] = rest;
-                    manualWeighing.ReSendACMethod(manualWeighing.CurrentACMethod.ValueT);
-
-
-
-                    WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial); //TODO:lock currentOpenMaterial
-                    if (comp == null)
-                    {
-                        return;
-                    }
-
-                    comp.SwitchState(WeighingComponentState.PartialCompleted);
-                    SetInfo(comp, WeighingComponentInfoType.State, null);
-                    comp.SwitchState(WeighingComponentState.InWeighing);
-                    SetInfo(comp, WeighingComponentInfoType.StateSelectCompAndFC_F, currentFacilityCharge);
                 }
-            }
-            else if (manualWeighing != null)
-            {
-                manualWeighing.CompleteWeighing(actualWeight);
+                else
+                {
+                    manualWeighing.CompleteOnDifferenceWeighing(true);
+                    CurrentACState = ACStateEnum.SMCompleted;
+                }
             }
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public void TareScale()
         {
             PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
@@ -1524,104 +1576,188 @@ namespace gip.mes.processapplication
 
         protected internal Msg SelectFCFromPAF(Guid? newFacilityCharge, double actualQuantity, LotUsedUpEnum? isConsumed, bool forceSetFC_F)
         {
-            Guid? currentOpenMaterial = CurrentOpenMaterial;
-
-            if (!currentOpenMaterial.HasValue)
+            if (DiffWeighing)
             {
-                // Error50373: Manual weighing error, the property {0} is null!
-                // Fehler bei Handverwiegung, die Eigenschaft {0} ist null!
-                return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(10)", 910, "Error50373", "CurrentOpenMaterial");
-            }
-
-            Guid? currentFacilityCharge = CurrentFacilityCharge;
-
-            using (Database db = new core.datamodel.Database())
-            using (DatabaseApp dbApp = new DatabaseApp(db))
-            {
-                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
-                                                                       .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial.Value);
-                if (rel == null)
+                using (Database db = new core.datamodel.Database())
+                using (DatabaseApp dbApp = new DatabaseApp(db))
                 {
-                    //Error50374: ProdOrderPartslistPosRelation {0} doesn't exist in the database.
-                    return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(20)", 921, "Error50374", currentOpenMaterial.Value);
-                }
+                    FacilityCharge newFC = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
 
-                var facilityCharges = GetFacilityChargesForMaterial(dbApp, rel);
-                var fc = facilityCharges?.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
-
-                if (fc == null)
-                {
-                    return new Msg(this, eMsgLevel.Error, PWClassName, nameof(SelectFCFromPAF), 935, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
-                                                                                                               rel.SourceProdOrderPartslistPos.Material.MaterialName1);
-                }
-
-                if (!currentFacilityCharge.HasValue)
-                {
-                    //if (fc != null)
-                    //{
-                    if (fc.MaterialID != rel.SourceProdOrderPartslistPos?.MaterialID)
+                    if (newFC != null)
                     {
-                        Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
-                                                           rel.SourceProdOrderPartslistPos?.MaterialID);
-                    }
+                        Guid materialID = newFC.MaterialID;
+                        WeighingComponent comp = GetWeighingComponentByMaterial(materialID);
 
-                    Msg msg = SetFacilityCharge(newFacilityCharge.Value, currentOpenMaterial, forceSetFC_F);
-                    if (msg != null)
-                        return msg;
-
-                    currentFacilityCharge = CurrentFacilityCharge;
-                    SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
-                    //}
-                    //else
-                    //{
-                    //    //Error50266: The weighing cannot be started because the selected quant cannot be used at this work center {0} {1}.
-                    //    // Die Verwiegung kann nicht gestartet werden weil das ausgewählte Quant nicht an diesem Arbeitsplatz {0} {1} nicht verwendet werden kann.
-                    //    return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF", 935, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
-                    //                                                                                                      rel.SourceProdOrderPartslistPos.Material.MaterialName1);
-                    //}
-
-                }
-                else if (currentFacilityCharge.HasValue)
-                {
-                    bool isLotConsumed = false;
-
-                    if (isConsumed == null)
-                    {
-                        FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
-                        if (currentFC != null)
+                        if (comp != null)
                         {
-                            //Question50089: Was the material with the lot number {0} used up?
-                            return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo,
-                                           currentFC.FacilityLot.LotNo);
+                            ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation
+                                                                     .Include(c => c.SourceProdOrderPartslistPos)
+                                                                     .Include(c => c.FacilityPreBooking_ProdOrderPartslistPosRelation)
+                                                                     .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == comp.PLPosRelation.ProdOrderPartslistPosRelationID);
+
+                            var facilityCharges = GetFacilityChargesForMaterial(dbApp, rel);
+                            var fc = facilityCharges?.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
+                            if (fc == null)
+                            {
+                                return new Msg(this, eMsgLevel.Error, PWClassName, nameof(SelectFCFromPAF), 1602, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
+                                                                                                                   rel.SourceProdOrderPartslistPos.Material.MaterialName1);
+                            }
+
+
+                            if (rel.ProdOrderPartslistPosRelationID != CurrentOpenMaterial)
+                            {
+                                Guid? currentOpenMaterial = CurrentOpenMaterial;
+                                if (currentOpenMaterial.HasValue)
+                                {
+                                    WeighingComponent currentComp = GetWeighingComponent(currentOpenMaterial);
+                                    if (currentComp != null && currentComp.WeighState == WeighingComponentState.InWeighing)
+                                    {
+                                        currentComp.SwitchState(WeighingComponentState.ReadyToWeighing);
+                                        SetInfo(currentComp, WeighingComponentInfoType.State, null);
+                                    }
+                                }
+                            }
+
+                            if (rel.FacilityPreBooking_ProdOrderPartslistPosRelation.Any())
+                            {
+                                //Error : Missing the weighing at the end. Please perform a weigh at the end, then you can change lot!
+
+                                return new Msg(eMsgLevel.Error, "Nedostaje vaganje na kraju!");
+                            }
+
+                            Msg msg = SetFacilityCharge(newFacilityCharge.Value, rel.ProdOrderPartslistPosRelationID, forceSetFC_F);
+                            if (msg != null)
+                                return msg;
+
+                            var currentFacilityCharge = CurrentFacilityCharge;
+                            SelectFacilityChargeOrFacility(rel.ProdOrderPartslistPosRelationID, currentFacilityCharge, WeighingComponentInfoType.State);
+
+                            PAFManualWeighing manWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+
+                            if (manWeighing != null)
+                            {
+                                ACMethod acMethod = manWeighing.CurrentACMethod.ValueT;
+                                if (acMethod != null)
+                                {
+                                    UpdatePAFACMethod(comp, acMethod);
+                                    if (manWeighing.CurrentACState == ACStateEnum.SMRunning)
+                                    {
+                                        if (comp.WeighState < WeighingComponentState.InWeighing)
+                                        {
+                                            comp.SwitchState(WeighingComponentState.InWeighing);
+
+                                            SetRelationState(comp.PLPosRelation.ProdOrderPartslistPosRelationID, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess);
+
+                                            WeighingComponentInfoType infoType = WeighingComponentInfoType.StateSelectCompAndFC_F;
+                                            //Guid? currentFacilityCharge = CurrentFacilityCharge;
+                                            SetInfo(comp, infoType, currentFacilityCharge);
+                                        }
+                                    }
+                                    manWeighing.SubscribeToProjectWorkCycle();
+                                }
+                                else
+                                {
+                                    Messages.LogMessage(eMsgLevel.Error, this.GetACUrl(), nameof(StartWeighing), "The ACMethod from function is null!");
+                                }
+                            }
+                            else
+                            {
+                                SubscribeToProjectWorkCycle();
+                            }
                         }
                     }
-                    else if (isConsumed == LotUsedUpEnum.Yes)
+                }
+            }
+            else
+            {
+                Guid? currentOpenMaterial = CurrentOpenMaterial;
+
+                if (!currentOpenMaterial.HasValue)
+                {
+                    // Error50373: Manual weighing error, the property {0} is null!
+                    // Fehler bei Handverwiegung, die Eigenschaft {0} ist null!
+                    return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(10)", 910, "Error50373", "CurrentOpenMaterial");
+                }
+
+                Guid? currentFacilityCharge = CurrentFacilityCharge;
+
+                using (Database db = new core.datamodel.Database())
+                using (DatabaseApp dbApp = new DatabaseApp(db))
+                {
+                    ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                                           .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial.Value);
+                    if (rel == null)
                     {
-                        FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot)
-                                                                       .Include(c => c.Material).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
-                        if (currentFC != null)
+                        //Error50374: ProdOrderPartslistPosRelation {0} doesn't exist in the database.
+                        return new Msg(this, eMsgLevel.Error, PWClassName, "SelectFC_FFromPAF(20)", 921, "Error50374", currentOpenMaterial.Value);
+                    }
+
+                    var facilityCharges = GetFacilityChargesForMaterial(dbApp, rel);
+                    var fc = facilityCharges?.FirstOrDefault(c => c.FacilityChargeID == newFacilityCharge.Value);
+
+                    if (fc == null)
+                    {
+                        return new Msg(this, eMsgLevel.Error, PWClassName, nameof(SelectFCFromPAF), 935, "Error50266", rel.SourceProdOrderPartslistPos.Material.MaterialNo,
+                                                                                                                   rel.SourceProdOrderPartslistPos.Material.MaterialName1);
+                    }
+
+                    if (!currentFacilityCharge.HasValue)
+                    {
+                        if (fc.MaterialID != rel.SourceProdOrderPartslistPos?.MaterialID)
                         {
-                            if (currentFC.StockQuantityUOM > currentFC.Material.ZeroBookingTolerance)
+                            Messages.LogError(this.GetACUrl(), "Wrong quant(10)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
+                                                               rel.SourceProdOrderPartslistPos?.MaterialID);
+                        }
+
+                        Msg msg = SetFacilityCharge(newFacilityCharge.Value, currentOpenMaterial, forceSetFC_F);
+                        if (msg != null)
+                            return msg;
+
+                        currentFacilityCharge = CurrentFacilityCharge;
+                        SelectFacilityChargeOrFacility(currentOpenMaterial, currentFacilityCharge, WeighingComponentInfoType.State);
+                    }
+                    else if (currentFacilityCharge.HasValue)
+                    {
+                        bool isLotConsumed = false;
+
+                        if (isConsumed == null)
+                        {
+                            FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
+                            if (currentFC != null)
                             {
-                                //Question50090: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
-                                return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo,
+                                //Question50089: Was the material with the lot number {0} used up?
+                                return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50089", eMsgButton.YesNo,
                                                currentFC.FacilityLot.LotNo);
                             }
-                            isLotConsumed = true;
                         }
-                    }
-                    else
-                    {
-                        isLotConsumed = isConsumed == LotUsedUpEnum.Yes || isConsumed == LotUsedUpEnum.YesVerified ? true : false;
-                    }
+                        else if (isConsumed == LotUsedUpEnum.Yes)
+                        {
+                            FacilityCharge currentFC = dbApp.FacilityCharge.Include(c => c.FacilityLot)
+                                                                           .Include(c => c.Material).FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge.Value);
+                            if (currentFC != null)
+                            {
+                                if (currentFC.StockQuantityUOM > currentFC.Material.ZeroBookingTolerance)
+                                {
+                                    //Question50090: The remaining stock of the batch (quant) is too large. Are you sure the batch is used up?
+                                    return new Msg(this, eMsgLevel.Question, nameof(PWManualWeighing), nameof(SelectFCFromPAF), 1617, "Question50090", eMsgButton.YesNo,
+                                                   currentFC.FacilityLot.LotNo);
+                                }
+                                isLotConsumed = true;
+                            }
+                        }
+                        else
+                        {
+                            isLotConsumed = isConsumed == LotUsedUpEnum.Yes || isConsumed == LotUsedUpEnum.YesVerified ? true : false;
+                        }
 
-                    return LotChange(newFacilityCharge, actualQuantity, isLotConsumed, forceSetFC_F);
+                        return LotChange(newFacilityCharge, actualQuantity, isLotConsumed, forceSetFC_F);
+                    }
                 }
             }
             return null;
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public virtual Msg LotChange(Guid? newFacilityCharge, double actualWeight, bool isConsumed, bool forceSetFC_F)
         {
             if (newFacilityCharge == null)
@@ -1681,7 +1817,7 @@ namespace gip.mes.processapplication
             return msgSet;
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public virtual void BinChange()
         {
 
@@ -1706,7 +1842,7 @@ namespace gip.mes.processapplication
             RaiseOutEvent();
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public virtual Msg OnApplyManuallyEnteredLot(string enteredLotNo, Guid plPosRelation)
         {
             Msg msg = null;
@@ -1767,7 +1903,7 @@ namespace gip.mes.processapplication
             return msg;
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "", 9999)]
         public virtual void Abort(bool isConsumed, bool scaleComp = false)
         {
             _ScaleComp = scaleComp;
@@ -1776,7 +1912,7 @@ namespace gip.mes.processapplication
             if (_IsAborted)
                 return;
             _IsAborted = true;
-            
+
             if (paf != null)
                 paf.Abort(isConsumed);
         }
@@ -1982,8 +2118,8 @@ namespace gip.mes.processapplication
                                                                       || c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation == null)
                                                                       || (c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState != null
                                                                       && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
-                                                                      && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled)) 
-                                                            
+                                                                      && c.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex != (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled))
+
                                                             ).OrderBy(c => c.Sequence)
                     );
 
@@ -2961,136 +3097,143 @@ namespace gip.mes.processapplication
                 _CurrentMethodEventArgs = eM;
                 if (taskEntry.State == PointProcessingState.Deleted && CurrentACState != ACStateEnum.SMIdle)
                 {
-                    try
+                    if (DiffWeighing)
                     {
-                        PAProcessModule module = sender.ParentACComponent as PAProcessModule;
-                        if (module != null)
+                        CompleteOnDifferenceWeighing(sender, e, eM);
+                    }
+                    else
+                    {
+                        try
                         {
-                            PAProcessFunction function = module.GetExecutingFunction<PAProcessFunction>(eM.ACRequestID);
-                            if (function != null)
+                            PAProcessModule module = sender.ParentACComponent as PAProcessModule;
+                            if (module != null)
                             {
-                                WeighingComponentState state = WeighingComponentState.WeighingCompleted;
-                                Msg msg = null;
-                                bool changeState = false;
-
-                                Guid? currentOpenMaterial = CurrentOpenMaterial;
-                                Guid? currentFacilityCharge = CurrentFacilityCharge;
-
-                                if (function.CurrentACState == ACStateEnum.SMCompleted || function.CurrentACState == ACStateEnum.SMAborted ||
-                                   (function.CurrentACState == ACStateEnum.SMIdle && function.LastACState == ACStateEnum.SMResetting))
+                                PAProcessFunction function = module.GetExecutingFunction<PAProcessFunction>(eM.ACRequestID);
+                                if (function != null)
                                 {
-                                    bool isComponentConsumed = false;
-                                    ACValue isCC = e.GetACValue("IsComponentConsumed");
-                                    if (isCC != null)
-                                        isComponentConsumed = isCC.ParamAsBoolean;
+                                    WeighingComponentState state = WeighingComponentState.WeighingCompleted;
+                                    Msg msg = null;
+                                    bool changeState = false;
 
-                                    ACMethod parentACMethod = e.ParentACMethod;
+                                    Guid? currentOpenMaterial = CurrentOpenMaterial;
+                                    Guid? currentFacilityCharge = CurrentFacilityCharge;
 
-                                    double? actWeight = e.GetDouble("ActualQuantity");
-                                    //double? tolerancePlus = (double)e.ParentACMethod["TolerancePlus"];
-                                    double? toleranceMinus = (double)parentACMethod["ToleranceMinus"];
-                                    double? targetQuantity = (double)parentACMethod["TargetQuantity"];
-
-                                    bool isWeighingInTol = true;
-
-                                    if (targetQuantity.HasValue && actWeight.HasValue && toleranceMinus.HasValue)
+                                    if (function.CurrentACState == ACStateEnum.SMCompleted || function.CurrentACState == ACStateEnum.SMAborted ||
+                                       (function.CurrentACState == ACStateEnum.SMIdle && function.LastACState == ACStateEnum.SMResetting))
                                     {
-                                        double actWeightRounded = Math.Round(actWeight.Value, 5);
-                                        if (actWeightRounded < Math.Round(targetQuantity.Value - toleranceMinus.Value, 5))
-                                        {
-                                            isWeighingInTol = false;
-                                        }
+                                        bool isComponentConsumed = false;
+                                        ACValue isCC = e.GetACValue("IsComponentConsumed");
+                                        if (isCC != null)
+                                            isComponentConsumed = isCC.ParamAsBoolean;
 
-                                        if (AutoInterDis && currentOpenMaterial != null)
+                                        ACMethod parentACMethod = e.ParentACMethod;
+
+                                        double? actWeight = e.GetDouble("ActualQuantity");
+                                        //double? tolerancePlus = (double)e.ParentACMethod["TolerancePlus"];
+                                        double? toleranceMinus = (double)parentACMethod["ToleranceMinus"];
+                                        double? targetQuantity = (double)parentACMethod["TargetQuantity"];
+
+                                        bool isWeighingInTol = true;
+
+                                        if (targetQuantity.HasValue && actWeight.HasValue && toleranceMinus.HasValue)
                                         {
-                                            using (DatabaseApp dbApp = new DatabaseApp())
+                                            double actWeightRounded = Math.Round(actWeight.Value, 5);
+                                            if (actWeightRounded < Math.Round(targetQuantity.Value - toleranceMinus.Value, 5))
                                             {
-                                                var relation = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
-                                                if (relation != null)
+                                                isWeighingInTol = false;
+                                            }
+
+                                            if (AutoInterDis && currentOpenMaterial != null)
+                                            {
+                                                using (DatabaseApp dbApp = new DatabaseApp())
                                                 {
-                                                    var tempTargetQ = Math.Abs(relation.RemainingDosingQuantityUOM);
-                                                    if (actWeightRounded < Math.Round(tempTargetQ - toleranceMinus.Value, 5))
+                                                    var relation = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
+                                                    if (relation != null)
                                                     {
-                                                        isWeighingInTol = false;
+                                                        var tempTargetQ = Math.Abs(relation.RemainingDosingQuantityUOM);
+                                                        if (actWeightRounded < Math.Round(tempTargetQ - toleranceMinus.Value, 5))
+                                                        {
+                                                            isWeighingInTol = false;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+
+                                        //var correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, parentACMethod);
+                                        //if (correctedFc.HasValue)
+                                        //    currentFacilityCharge = correctedFc;
+
+                                        if (actWeight > 0.000001)
+                                        {
+                                            bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
+                                            msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false,
+                                                                          scaleOtherComp, targetQuantity);
+                                            _ScaleComp = false;
+                                        }
+                                        else if (isWeighingInTol)
+                                        {
+                                            SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
+                                        }
+
+                                        if (isComponentConsumed)
+                                        {
+                                            Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed, true);
+                                            if (msgResult != null)
+                                                ActivateProcessAlarmWithLog(msgResult);
+                                        }
+
+                                        if (CurrentACMethod?.ValueT != null)
+                                        {
+                                            RecalcTimeInfo();
+                                            FinishProgramLog(CurrentACMethod.ValueT);
+                                        }
+
+                                        if (_IsBinChangeActivated)
+                                        {
+                                            Reset();
+                                            RaiseOutEvent();
+                                        }
+
+                                        changeState = true;
                                     }
 
-                                    //var correctedFc = IsCurrentFacilityChargeCorrect(currentFacilityCharge, currentOpenMaterial, parentACMethod);
-                                    //if (correctedFc.HasValue)
-                                    //    currentFacilityCharge = correctedFc;
+                                    if (msg != null || function.CurrentACState == ACStateEnum.SMAborted ||
+                                        (function.LastACState == ACStateEnum.SMResetting && function.CurrentACState == ACStateEnum.SMIdle && _IsAborted))
+                                    {
+                                        _IsAborted = false;
 
-                                    if (actWeight > 0.000001)
-                                    {
-                                        bool scaleOtherComp = ScaleOtherComp && _ScaleComp && (_IsAborted || function.CurrentACState == ACStateEnum.SMAborted);
-                                        msg = DoManualWeighingBooking(actWeight, isWeighingInTol, false, currentOpenMaterial, currentFacilityCharge, false,
-                                                                      scaleOtherComp, targetQuantity);
-                                        _ScaleComp = false;
-                                    }
-                                    else if (isWeighingInTol)
-                                    {
-                                        SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
-                                    }
-
-                                    if (isComponentConsumed)
-                                    {
-                                        Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed, true);
+                                        Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
                                         if (msgResult != null)
                                             ActivateProcessAlarmWithLog(msgResult);
+
+                                        state = WeighingComponentState.Aborted;
+                                        changeState = true;
                                     }
 
-                                    if (CurrentACMethod?.ValueT != null)
+                                    if (currentOpenMaterial != null && changeState)
                                     {
-                                        RecalcTimeInfo();
-                                        FinishProgramLog(CurrentACMethod.ValueT);
-                                    }
-
-                                    if (_IsBinChangeActivated)
-                                    {
-                                        Reset();
-                                        RaiseOutEvent();
-                                    }
-
-                                    changeState = true;
-                                }
-
-                                if (msg != null || function.CurrentACState == ACStateEnum.SMAborted ||
-                                    (function.LastACState == ACStateEnum.SMResetting && function.CurrentACState == ACStateEnum.SMIdle && _IsAborted))
-                                {
-                                    _IsAborted = false;
-
-                                    Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
-                                    if (msgResult != null)
-                                        ActivateProcessAlarmWithLog(msgResult);
-
-                                    state = WeighingComponentState.Aborted;
-                                    changeState = true;
-                                }
-
-                                if (currentOpenMaterial != null && changeState)
-                                {
-                                    WeighingComponent weighingComp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
-                                    if (weighingComp != null)
-                                    {
-                                        weighingComp.SwitchState(state);
-                                        SetInfo(weighingComp, WeighingComponentInfoType.State, currentFacilityCharge);
+                                        WeighingComponent weighingComp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial);
+                                        if (weighingComp != null)
+                                        {
+                                            weighingComp.SwitchState(state);
+                                            SetInfo(weighingComp, WeighingComponentInfoType.State, currentFacilityCharge);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    catch (Exception exc)
-                    {
-                        Messages.LogException(this.GetACUrl(), "TaskCallback(10)", exc);
-                    }
-                    finally
-                    {
-                        SetCanStartFromBSO(true);
-                        CurrentOpenMaterial = null;
-                        CurrentFacilityCharge = null;
-                        SubscribeToProjectWorkCycle();
+                        catch (Exception exc)
+                        {
+                            Messages.LogException(this.GetACUrl(), "TaskCallback(10)", exc);
+                        }
+                        finally
+                        {
+                            SetCanStartFromBSO(true);
+                            CurrentOpenMaterial = null;
+                            CurrentFacilityCharge = null;
+                            SubscribeToProjectWorkCycle();
+                        }
                     }
                 }
                 else if (taskEntry.State == PointProcessingState.Accepted && CurrentACState != ACStateEnum.SMIdle)
@@ -3105,11 +3248,14 @@ namespace gip.mes.processapplication
                             {
                                 Guid? currentOpenMaterial = CurrentOpenMaterial;
 
-                                WeighingComponent comp = GetWeighingComponent(currentOpenMaterial); //WeighingComponents.FirstOrDefault(c => c.PLPosRelation == CurrentOpenMaterial.Value);
+                                WeighingComponent comp = GetWeighingComponent(currentOpenMaterial);
                                 if (comp == null)
                                 {
-                                    //Error50270: The component {0} doesn't exist for weighing.
-                                    ActivateProcessAlarmWithLog(new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(20)", 1866, "Error50270", currentOpenMaterial));
+                                    if (!FreeSelectionMode)
+                                    {
+                                        //Error50270: The component {0} doesn't exist for weighing.
+                                        ActivateProcessAlarmWithLog(new Msg(this, eMsgLevel.Error, PWClassName, "TaskCallback(20)", 1866, "Error50270", currentOpenMaterial));
+                                    }
                                     return;
                                 }
 
@@ -3477,6 +3623,217 @@ namespace gip.mes.processapplication
             return null;
         }
 
+        public virtual void CompleteOnDifferenceWeighing(IACPointNetBase sender, ACEventArgs e, ACMethodEventArgs eM)
+        {
+            try
+            {
+                PAProcessModule module = sender.ParentACComponent as PAProcessModule;
+                if (module != null)
+                {
+                    PAProcessFunction function = module.GetExecutingFunction<PAProcessFunction>(eM.ACRequestID);
+                    if (function != null)
+                    {
+                        WeighingComponentState state = WeighingComponentState.InWeighing;
+                        Msg msg = null;
+                        bool changeState = false;
+
+                        Guid? currentOpenMaterial = CurrentOpenMaterial;
+                        Guid? currentFacilityCharge = CurrentFacilityCharge;
+
+                        if (function.CurrentACState == ACStateEnum.SMCompleted || function.CurrentACState == ACStateEnum.SMAborted ||
+                           (function.CurrentACState == ACStateEnum.SMIdle && function.LastACState == ACStateEnum.SMResetting))
+                        {
+
+                            bool isComponentConsumed = false;
+                            ACValue isCC = e.GetACValue("IsComponentConsumed");
+                            if (isCC != null)
+                                isComponentConsumed = isCC.ParamAsBoolean;
+
+                            using (DatabaseApp dbApp = new DatabaseApp())
+                            {
+                                var relation = dbApp.ProdOrderPartslistPosRelation.Include(c => c.FacilityPreBooking_ProdOrderPartslistPosRelation)
+                                                                                  .FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == currentOpenMaterial);
+                                if (relation == null)
+                                {
+                                    //Error50592 : The ProdOrderPartslistPosRelation with ID: {0} doesn't exists in the database!
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(10)", 3659, "Error50592", currentOpenMaterial);
+                                    return;
+                                }
+
+                                double? grossWeight = e.GetDouble("ActualQuantity");
+                                if (grossWeight.HasValue)
+                                {
+                                    FacilityCharge facilityCharge = null;
+                                    Facility facility = null;
+
+                                    if (currentFacilityCharge != null)
+                                    {
+                                        facilityCharge = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == currentFacilityCharge) as FacilityCharge;
+                                        if (facilityCharge == null)
+                                        {
+                                            // Error50367: The quant {0} doesn't exist in the database!
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(20)", 3675, "Error50367", currentFacilityCharge);
+                                            ActivateProcessAlarmWithLog(msg, false);
+                                            return;
+                                        }
+                                        facility = facilityCharge.Facility;
+                                    }
+
+                                    var prebookings = relation.FacilityPreBooking_ProdOrderPartslistPosRelation.ToArray();
+                                    var preBooking = prebookings.LastOrDefault();
+
+                                    if (preBooking != null)
+                                    {
+                                        double? prevQuantity = preBooking.OutwardQuantity;
+                                        if (!prevQuantity.HasValue)
+                                        {
+                                            //Error50593 : The quantity from the first weighing is not saved!
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(30)", 3691, "Error50593");
+                                            ActivateProcessAlarmWithLog(msg, false);
+                                            return;
+                                        }
+
+                                        if (preBooking.OutwardFacilityCharge.FacilityChargeID != facilityCharge.FacilityChargeID)
+                                        {
+                                            //Error : The quant from the first weighing is not equal to the quant from the second weighing!
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(40)", 3699, "Error50594");
+                                            ActivateProcessAlarmWithLog(msg, false);
+                                            return;
+                                        }
+
+                                        double bookingQuantity = prevQuantity.Value - grossWeight.Value;
+                                        if (bookingQuantity > 0.000001)
+                                        {
+                                            Msg msgBooking = DoManualWeighingBooking(bookingQuantity, false, isComponentConsumed, currentOpenMaterial, currentFacilityCharge);
+                                            if (msgBooking != null)
+                                            {
+                                                ActivateProcessAlarmWithLog(msgBooking);
+                                            }
+                                            else
+                                            {
+                                                preBooking.DeleteACObject(dbApp, true);
+                                                msg = dbApp.ACSaveChangesWithRetry();
+
+                                                if (msg != null)
+                                                {
+                                                    ActivateProcessAlarmWithLog(msg);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if (grossWeight > 0.000001)
+                                    {
+                                        //create prebooking and remember gross quantity
+                                        FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(this.ACFacilityManager, dbApp, relation);
+                                        ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                                        bookingParam.OutwardQuantity = (double)grossWeight;
+                                        bookingParam.OutwardFacility = facility;
+                                        bookingParam.OutwardFacilityCharge = facilityCharge;
+                                        bookingParam.SetCompleted = false;
+                                        if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
+                                            bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                                        msg = dbApp.ACSaveChangesWithRetry();
+
+                                        if (msg != null)
+                                        {
+                                            ActivateProcessAlarmWithLog(msg);
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if (isComponentConsumed)
+                                {
+                                    Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed, true);
+                                    if (msgResult != null)
+                                        ActivateProcessAlarmWithLog(msgResult);
+                                }
+
+                                if (CurrentACMethod?.ValueT != null)
+                                {
+                                    RecalcTimeInfo();
+                                    FinishProgramLog(CurrentACMethod.ValueT);
+                                }
+
+                                changeState = true;
+                            }
+
+                            if (msg != null || function.CurrentACState == ACStateEnum.SMAborted ||
+                                (function.LastACState == ACStateEnum.SMResetting && function.CurrentACState == ACStateEnum.SMIdle && _IsAborted))
+                            {
+                                _IsAborted = false;
+
+                                Msg msgResult = SetRelationState(currentOpenMaterial, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled);
+                                if (msgResult != null)
+                                    ActivateProcessAlarmWithLog(msgResult);
+
+                                state = WeighingComponentState.Aborted;
+                                changeState = true;
+                            }
+
+                            if (currentOpenMaterial != null && changeState)
+                            {
+                                WeighingComponent weighingComp = GetWeighingComponent(currentOpenMaterial);
+                                if (weighingComp != null)
+                                {
+                                    weighingComp.SwitchState(state);
+                                    SetInfo(weighingComp, WeighingComponentInfoType.StateSelectCompAndFC_F, currentFacilityCharge);
+                                }
+
+                                PAFManualWeighing currentFunction = CurrentExecutingFunction<PAFManualWeighing>();
+                                if (currentFunction != null)
+                                {
+                                    ACMethod acMethod = currentFunction.CurrentACMethod.ValueT;
+                                    if (acMethod != null)
+                                    {
+                                        UpdatePAFACMethod(weighingComp, acMethod);
+                                        currentFunction.SubscribeToProjectWorkCycle();
+                                    }
+                                    else
+                                    {
+                                        Messages.LogMessage(eMsgLevel.Error, this.GetACUrl(), nameof(StartWeighing), "The ACMethod from function is null!");
+                                    }
+                                }
+                                else
+                                {
+                                    SubscribeToProjectWorkCycle();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                Messages.LogException(this.GetACUrl(), "TaskCallback(10)", exc);
+            }
+            finally
+            {
+                SetCanStartFromBSO(true);
+                _LastOpenMaterial = null;
+                //CurrentOpenMaterial = null;
+                //CurrentFacilityCharge = null;
+                SubscribeToProjectWorkCycle();
+            }
+        }
+
+        [ACMethodInfo("", "en{'Weigh difference'}de{'Unterschiedliche Gewichte'}", 999)]
+        public virtual Msg WeighDifference()
+        {
+            Msg msg = null;
+
+            PAFManualWeighing manWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+
+            if (manWeighing == null)
+            {
+                return new Msg(eMsgLevel.Error, "The manual weighing currently is not active.");
+            }
+
+            manWeighing.CompleteOnDifferenceWeighing();
+
+            return msg;
+        }
+
         #endregion
 
         #region Methods => Misc.
@@ -3581,6 +3938,17 @@ namespace gip.mes.processapplication
                     return null;
 
                 return WeighingComponents.FirstOrDefault(c => c.PLPosRelation.ProdOrderPartslistPosRelationID == currentOpenMaterial);
+            }
+        }
+
+        public WeighingComponent GetWeighingComponentByMaterial(Guid? materialID)
+        {
+            using (ACMonitor.Lock(_65050_WeighingCompLock))
+            {
+                if (WeighingComponents == null)
+                    return null;
+
+                return WeighingComponents.FirstOrDefault(c => c.Material == materialID);
             }
         }
 

@@ -382,6 +382,28 @@ namespace gip.bso.manufacturing
 
         protected bool ScaleOtherComponentOnAbort = false;
 
+        public bool _DiffWeighing;
+        public bool DiffWeighing
+        {
+            get => _DiffWeighing;
+            set
+            {
+                _DiffWeighing = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool _AutoSelectLot;
+        public bool AutoSelectLot
+        {
+            get => _AutoSelectLot;
+            set
+            {
+                _AutoSelectLot = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Properties => OrderInfo
@@ -426,18 +448,6 @@ namespace gip.bso.manufacturing
             {
                 _IsBinChangeAvailable = value;
                 OnPropertyChanged("IsBinChangeAvailable");
-            }
-        }
-
-        private bool _BtnWeighBlink = false;
-        [ACPropertyInfo(621)]
-        public bool BtnWeighBlink
-        {
-            get => _BtnWeighBlink;
-            set
-            {
-                _BtnWeighBlink = value;
-                OnPropertyChanged("BtnWeighBlink");
             }
         }
 
@@ -538,7 +548,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Properties => Components and Facility/FacilityCharge selection
+        #region Properties => Components and FacilityCharge selection
 
         private WeighingMaterial _SelectedWeighingMaterial;
         [ACPropertySelected(624, "WeighingMaterial")]
@@ -549,17 +559,38 @@ namespace gip.bso.manufacturing
             {
                 if (_SelectedWeighingMaterial != value)
                 {
+
+                    if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
+                    {
+                        _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.ReadyToWeighing, DatabaseApp);
+                    }
+
                     _SelectedWeighingMaterial = value;
                     _FacilityChargeList = null;
                     FacilityChargeListCount = 0;
-                    OnPropertyChanged("SelectedWeighingMaterial");
-                    OnPropertyChanged("FacilityChargeList");
+                    OnPropertyChanged(nameof(SelectedWeighingMaterial));
+                    OnPropertyChanged(nameof(FacilityChargeList));
                     FacilityChargeNo = null;
                     ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
                     SelectedFacilityCharge = null;
                     if (_SelectedWeighingMaterial != null)
                         ShowSelectFacilityLotInfo = true;
-                    BtnWeighBlink = false;
+                    
+                    if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing)
+                    {
+                        _StartWeighingFromF_FC = true;
+                        _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
+
+                        if (AutoSelectLot)
+                        {
+                            if (FacilityChargeListCount > 1 && MultipleLotsSelectionRule.HasValue && MultipleLotsSelectionRule.Value > LotSelectionRuleEnum.None)
+                            {
+                                return;
+                            }
+
+                            StartWeighing(false);
+                        }
+                    }
                 }
             }
         }
@@ -645,11 +676,6 @@ namespace gip.bso.manufacturing
                     _CallPWLotChange = false;
                     _IsLotConsumed = false;
                 }
-                else if (_SelectedFacilityCharge != null && WeighingMaterialsFSM && SelectedWeighingMaterial != null
-                       && SelectedWeighingMaterial.WeighingMatState != WeighingComponentState.InWeighing)
-                {
-                    BtnWeighBlink = true;
-                }
 
                 if (_SelFacilityCharge != null && value == null && SelectedWeighingMaterial == null)
                 {
@@ -657,7 +683,6 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-
 
         public int FacilityChargeListCount
         {
@@ -766,7 +791,7 @@ namespace gip.bso.manufacturing
             {
                 _PAFCurrentMaterial = value;
                 OnPropertyChanged("PAFCurrentMaterial");
-                ShowScaleGross = string.IsNullOrEmpty(_PAFCurrentMaterial);
+                ShowScaleGross = string.IsNullOrEmpty(_PAFCurrentMaterial) || DiffWeighing;
             }
         }
 
@@ -925,14 +950,16 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Weigh'}de{'Wiegen'}", 601, true)]
         public virtual void Weigh()
         {
-            var result = StartWeighing(false);
-            if (result != null)
-                Messages.Msg(result);
+            IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+            if (componentPWNode != null)
+            {
+                componentPWNode.ExecuteMethod(nameof(PWManualWeighing.WeighDifference));
+            }
         }
 
         public virtual bool IsEnabledWeigh()
         {
-            return true; //ComponentPWNode != null && ComponentPWNode.ValueT != null;
+            return DiffWeighing;
         }
 
         public Msg StartWeighing(bool forceSetFC_F)
@@ -1022,7 +1049,8 @@ namespace gip.bso.manufacturing
         public virtual bool IsEnabledAcknowledge()
         {
             return (MessagesList.Any(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton) || (MaxScaleWeight.HasValue && TargetWeight > MaxScaleWeight)
-                                                                                            || ScaleBckgrState == ScaleBackgroundState.InTolerance);
+                                                                                            || ScaleBckgrState == ScaleBackgroundState.InTolerance
+                                                                                            || DiffWeighing);
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
@@ -1134,7 +1162,7 @@ namespace gip.bso.manufacturing
 
         public virtual bool IsEnabledLotChange()
         {
-            return SelectedWeighingMaterial != null;
+            return SelectedWeighingMaterial != null && !SelectedWeighingMaterial.DiffWeighOnEnd;
         }
 
         public virtual double OnDetermineLotChangeActualQuantity()
@@ -1773,7 +1801,15 @@ namespace gip.bso.manufacturing
                 {
                     using (ACMonitor.Lock(db.QueryLock_1X000))
                     {
-                        vd.ProdOrderPartslistPosRelation[] queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
+                        vd.ProdOrderPartslistPosRelation[] queryOpenDosings = new vd.ProdOrderPartslistPosRelation[0];
+                        try
+                        {
+                            queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
+                        }
+                        catch
+                        {
+                            queryOpenDosings = PWManualWeighing.Qry_WeighMaterials(db, intermediateChildPosPOPartslistID);
+                        }
 
                         foreach (vd.ProdOrderPartslistPosRelation rel in queryOpenDosings)
                         {
@@ -1859,6 +1895,14 @@ namespace gip.bso.manufacturing
             if (multipleLotSelRule != null)
                 MultipleLotsSelectionRule = multipleLotSelRule.Value as LotSelectionRuleEnum?;
 
+            var diffWeighing = acMethod.ParameterValueList.GetACValue("DiffWeighing");
+            if (diffWeighing != null)
+                DiffWeighing = diffWeighing.ParamAsBoolean;
+
+            var autoSelectLot = acMethod.ParameterValueList.GetACValue("AutoSelectLot");
+            if (autoSelectLot != null)
+                AutoSelectLot = autoSelectLot.ParamAsBoolean;
+
             OnLoadPWConfiguration(acMethod);
 
             //TODO: lot order
@@ -1905,7 +1949,7 @@ namespace gip.bso.manufacturing
             scales = null;
 
             BtnAckBlink = false;
-            BtnWeighBlink = false;
+            //BtnWeighBlink = false;
             NextTaskInfo = ManualWeighingTaskInfo.None;
 
             _PAFManuallyAddedQuantity = null;
@@ -2223,8 +2267,8 @@ namespace gip.bso.manufacturing
                             {
                                 comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                                 SelectActiveScaleObject(comp);
-                                if (comp.WeighingMatState == WeighingComponentState.InWeighing)
-                                    BtnWeighBlink = false;
+                                //if (comp.WeighingMatState == WeighingComponentState.InWeighing)
+                                //    BtnWeighBlink = false;
                             }
                             break;
                         }
@@ -2241,8 +2285,8 @@ namespace gip.bso.manufacturing
 
                                     comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                                     SelectActiveScaleObject(comp);
-                                    if (comp.WeighingMatState == WeighingComponentState.InWeighing)
-                                        BtnWeighBlink = false;
+                                    //if (comp.WeighingMatState == WeighingComponentState.InWeighing)
+                                    //    BtnWeighBlink = false;
 
                                     if (compInfo.FacilityCharge != null)
                                     {
