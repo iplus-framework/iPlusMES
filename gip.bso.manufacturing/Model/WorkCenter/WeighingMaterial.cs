@@ -456,7 +456,6 @@ namespace gip.bso.manufacturing
                     ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
                 }
                 catch
-
                 {
 
                 }
