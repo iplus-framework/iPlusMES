@@ -188,6 +188,7 @@ namespace gip.mes.facility
 
         #region Booking and Picking-Sync -> SynchronizeFacility
 
+        [ACMethodInfo("", "en{'SynchronizeFacility2'}de{'SynchronizeFacility2'}", 1002)]
         public void SynchronizeFacility(string acUrlOfCaller, string remoteConnString, RemoteStorePostingData remoteStorePosting, bool syncRemoteStore = true)
         {
             try
