@@ -109,7 +109,11 @@ namespace gip.mes.facility
                                         &&
                                         (
                                             c.NotAvailable
-                                            || (c.NewStockQuantity != null && (Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > Double.Epsilon))
+                                            || 
+                                            (
+                                                c.NewStockQuantity != null 
+                                                && Math.Abs(c.StockQuantity - (c.NewStockQuantity ?? 0)) > FacilityConst.C_ZeroCompare
+                                            )
                                         )
                                    )
                             .ToList();
