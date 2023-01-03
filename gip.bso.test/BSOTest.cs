@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace gip.bso.test
 {
-    [ACClassInfo(Const.PackName_VarioDevelopment, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
+    [ACClassInfo(Const.PackName_VarioDevelopment, "en{'BSOTest'}de{'BSOTest'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
     public partial class BSOTest : ACBSOvb, IMsgObserver
     {
         #region constants
@@ -47,7 +47,7 @@ namespace gip.bso.test
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseReturn =  base.ACDeInit(deleteACClassTask);
+            bool baseReturn = base.ACDeInit(deleteACClassTask);
 
             if (_PickingManager != null)
                 ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
@@ -248,7 +248,17 @@ namespace gip.bso.test
             if (!IsEnabledTestMethod1())
                 return;
 
+            // -sendviče š.433,435,443,4435,444,447,449,454,456,619,629
+            // - pečena peciva š.262,624,158,159,613,392,358
 
+            // org schema pečeno po narudžbu: 515,516,517,543
+            // material WF: MW_ProdBake
+
+            if (!string.IsNullOrEmpty(TestInput) && !string.IsNullOrEmpty(TestInput1))
+            {
+                MsgList = new ObservableCollection<Msg>();
+                ApplyMaterialWF(TestInput, TestInput1);
+            }
         }
 
         public bool IsEnabledTestMethod1()
@@ -292,7 +302,6 @@ namespace gip.bso.test
             DatabaseApp.SaveChanges();
         }
 
-
         #region Methods -> Tests
 
         public void TestACPrintManagerPrint(Guid ID)
@@ -307,7 +316,6 @@ namespace gip.bso.test
         }
 
         #endregion
-
 
         #endregion
 
@@ -738,7 +746,68 @@ namespace gip.bso.test
         #endregion
 
         #endregion
-        
+
+        #region apply material wf
+
+
+        private void ApplyMaterialWF(string ordSchemaIDs, string materialWFNo)
+        {
+            try
+            {
+                int[] ordSchemaIDsArr = ordSchemaIDs.Split(',').Where(c => !string.IsNullOrEmpty(c)).Select(c => int.Parse(c)).ToArray();
+                MaterialWF materialWF = DatabaseApp.MaterialWF.Where(c => c.MaterialWFNo == materialWFNo).FirstOrDefault();
+                if (materialWF != null)
+                {
+                    gip.mes.datamodel.MaterialWFACClassMethod workflow = materialWF.MaterialWFACClassMethod_MaterialWF.FirstOrDefault();
+
+                    List<Partslist> partslists = DatabaseApp.Partslist.Where(c => c.MaterialWFID == null && c.PartslistConfig_Partslist.Any(x => x.KeyACUrl == "OrgShemaId")).ToList();
+                    List<Partslist> filteredList = new List<Partslist>();
+                    foreach (Partslist partslist in partslists)
+                    {
+                        if (partslist.PartslistConfig_Partslist.Any())
+                        {
+                            PartslistConfig partslistConfig = partslist.PartslistConfig_Partslist.FirstOrDefault(c => c.KeyACUrl == "OrgShemaId");
+                            if (partslistConfig != null)
+                            {
+                                int orgSchemaId = (int)partslistConfig.Value;
+                                if (ordSchemaIDsArr.Contains(orgSchemaId))
+                                {
+                                    filteredList.Add(partslist);
+                                   
+                                }
+                            }
+                        }
+                    }
+
+                    foreach(Partslist partslist in filteredList)
+                    {
+                        Msg info = new Msg() { MessageLevel = eMsgLevel.Info, Message = $"Apply {materialWFNo} to [{partslist.PartslistNo}] {partslist.PartslistName}"};
+                        SendMessage(info);
+                        partslist.MaterialWF = materialWF;
+                        if (workflow != null)
+                        {
+                            PartslistACClassMethod plMth = PartslistACClassMethod.NewACObject(DatabaseApp, partslist);
+                            plMth.MaterialWFACClassMethod = workflow;
+                            partslist.PartslistACClassMethod_Partslist.Add(plMth);
+                        }
+                    }
+
+                    MsgWithDetails msg = DatabaseApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        SendMessage(msg);
+                    }
+                }
+            }
+            catch (Exception ec)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Exception, Message = ec.Message });
+            }
+
+        }
+
+        #endregion
+
     }
 
     public class ScoreBoard
