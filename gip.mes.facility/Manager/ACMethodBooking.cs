@@ -514,6 +514,15 @@ namespace gip.mes.facility
                 acValue.Value = value;
             }
         }
+
+        [IgnoreDataMember]
+        private bool _AutoRefresh = false;
+        [IgnoreDataMember]
+        public bool AutoRefresh
+        {
+            get => _AutoRefresh;
+            set => _AutoRefresh = value;
+        }
         #endregion
 
         #region Booking parameters

@@ -907,11 +907,11 @@ namespace gip.bso.logistics
                 result = result.Where(c => c.PickingPos_Picking.Any(x => x.ToFacility != null && x.ToFacility.FacilityID == SelectedFilterToFacility.FacilityID));
 
             if (!string.IsNullOrEmpty(FilterMaterialNo))
-                result = 
+                result =
                     result
-                    .Where(c => 
+                    .Where(c =>
                                 c.PickingPos_Picking
-                                .Any(x => 
+                                .Any(x =>
                                             (
                                                 x.InOrderPos != null
                                                 && (x.InOrderPos.Material.MaterialNo.Contains(FilterMaterialNo) || x.InOrderPos.Material.MaterialName1.Contains(FilterMaterialNo))
@@ -1834,12 +1834,14 @@ namespace gip.bso.logistics
                 if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                   || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle) && CurrentPickingPos.InOrderPos != null)
                 {
+                    CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoLoad();
                     CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.AutoRefresh(this.DatabaseApp);
                     return CurrentPickingPos.InOrderPos.FacilityBooking_InOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
                 else if ((CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Issue
                        || CurrentPicking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.IssueVehicle) && CurrentPickingPos.OutOrderPos != null)
                 {
+                    CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoLoad();
                     CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.AutoRefresh(this.DatabaseApp);
                     return CurrentPickingPos.OutOrderPos.FacilityBooking_OutOrderPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
@@ -1853,6 +1855,7 @@ namespace gip.bso.logistics
 
                 if (bookingList == null || !bookingList.Any())
                 {
+                    CurrentPickingPos.FacilityBooking_PickingPos.AutoLoad();
                     CurrentPickingPos.FacilityBooking_PickingPos.AutoRefresh(this.DatabaseApp);
                     bookingList = CurrentPickingPos.FacilityBooking_PickingPos.OrderBy(c => c.FacilityBookingNo).ToList();
                 }
@@ -3014,8 +3017,10 @@ namespace gip.bso.logistics
             Save();
             if (DatabaseApp.IsChanged)
                 return;
-            if (!PreExecute("BookCurrentACMethodBooking"))
+            if (!PreExecute(nameof(BookCurrentACMethodBooking)))
                 return;
+
+            CurrentACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentACMethodBooking.ValidMessage.IsSucceded() || CurrentACMethodBooking.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentACMethodBooking.ValidMessage);
@@ -3060,7 +3065,8 @@ namespace gip.bso.logistics
                         fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
                         fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
 
-                        ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, DatabaseApp);
+                        fbtZeroBookingClone.AutoRefresh = true;
+                        ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
                         if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                         {
                             //return fbtZeroBooking.ValidMessage;
@@ -3075,7 +3081,8 @@ namespace gip.bso.logistics
                     }
                 }
             }
-            PostExecute("BookCurrentACMethodBooking");
+
+            PostExecute(nameof(BookCurrentACMethodBooking));
         }
 
         public bool IsEnabledBookCurrentACMethodBooking()
@@ -3911,7 +3918,7 @@ namespace gip.bso.logistics
         [ACMethodCommand("BroadCastPicking", "en{'Broadcast picking'}de{'Sende Kommissionierauftrag'}", 800, true)]
         public void BroadCastPicking()
         {
-            if(!IsEnabledBroadCastPicking())
+            if (!IsEnabledBroadCastPicking())
                 return;
             PickingPos[] pickingPositions = CurrentPicking.PickingPos_Picking.ToArray();
 
@@ -3928,15 +3935,15 @@ namespace gip.bso.logistics
                 }
             }
 
-            foreach(Facility facility in facilities)
+            foreach (Facility facility in facilities)
             {
                 facility.CallSendPicking(false, CurrentPicking.PickingID);
             }
 
             facilities = new List<Facility>();
-            FacilityBooking[] facilityBookings = CurrentPicking.PickingPos_Picking.SelectMany(c=>c.FacilityBooking_PickingPos).ToArray();
+            FacilityBooking[] facilityBookings = CurrentPicking.PickingPos_Picking.SelectMany(c => c.FacilityBooking_PickingPos).ToArray();
 
-            foreach(FacilityBooking facilityBooking in facilityBookings)
+            foreach (FacilityBooking facilityBooking in facilityBookings)
             {
                 if (facilityBooking.InwardFacility != null && facilityBooking.InwardFacility.IsMirroredOnMoreDatabases && !facilities.Contains(facilityBooking.InwardFacility))
                 {

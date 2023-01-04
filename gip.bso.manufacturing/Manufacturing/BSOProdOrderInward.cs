@@ -118,8 +118,11 @@ namespace gip.bso.manufacturing
             Save();
             if (DatabaseApp.IsChanged)
                 return;
-            if (!PreExecute("BookSelectedInwardACMethodBooking"))
+            if (!PreExecute(nameof(BookSelectedInwardACMethodBooking)))
                 return;
+
+
+            SelectedInwardACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(SelectedInwardACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!SelectedInwardACMethodBooking.ValidMessage.IsSucceded() || SelectedInwardACMethodBooking.ValidMessage.HasWarnings())
                 Messages.Msg(SelectedInwardACMethodBooking.ValidMessage);
@@ -128,7 +131,7 @@ namespace gip.bso.manufacturing
                 if (String.IsNullOrEmpty(SelectedInwardACMethodBooking.ValidMessage.Message))
                     SelectedInwardACMethodBooking.ValidMessage.Message = result.ResultState.ToString();
                 Messages.Msg(SelectedInwardACMethodBooking.ValidMessage);
-                OnPropertyChanged("InwardFacilityBookingList");
+                OnPropertyChanged(nameof(InwardFacilityBookingList));
             }
             else
             {
@@ -139,7 +142,7 @@ namespace gip.bso.manufacturing
                 ProdOrderPartslistPos bookingPos = SelectedInwardACMethodBooking.PartslistPos;
 
                 DeleteInwardFacilityPreBooking();
-                OnPropertyChanged("InwardFacilityBookingList");
+                OnPropertyChanged(nameof(InwardFacilityBookingList));
                 if (unit != null)
                     bookingPos.IncreaseActualQuantity(quantity, unit, true);
                 else
@@ -148,7 +151,7 @@ namespace gip.bso.manufacturing
                 if (SelectedIntermediate.IsFinalMixure)
                 {
                     SelectedIntermediate.ProdOrderPartslist.RecalcActualQuantitySP(DatabaseApp);
-                    OnPropertyChanged("SelectedProdOrder");
+                    OnPropertyChanged(nameof(SelectedProdOrder));
                 }
                 if (isCancellation)
                 {
@@ -164,13 +167,13 @@ namespace gip.bso.manufacturing
                     if (SelectedIntermediate.IsFinalMixure)
                     {
                         SelectedIntermediate.ProdOrderPartslist.RecalcActualQuantitySP(DatabaseApp);
-                        OnPropertyChanged("SelectedProdOrder");
+                        OnPropertyChanged(nameof(SelectedProdOrder));
                     }
                     Save();
                 }
-
             }
-            PostExecute("BookSelectedInwardACMethodBooking");
+
+            PostExecute(nameof(BookSelectedInwardACMethodBooking));
         }
 
         public virtual bool IsEnabledBookSelectedInwardACMethodBooking()

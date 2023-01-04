@@ -1096,7 +1096,10 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost)]
         public void InwardFacilityChargeMovement()
         {
-            if (!PreExecute("InwardFacilityChargeMovement")) return;
+            if (!PreExecute(nameof(InwardFacilityChargeMovement))) 
+                return;
+
+            CurrentBookParamInwardMovement.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamInwardMovement, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamInwardMovement.ValidMessage.IsSucceded() || CurrentBookParamInwardMovement.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamInwardMovement.ValidMessage);
@@ -1107,8 +1110,11 @@ namespace gip.bso.facility
                 Messages.Msg(result.ValidMessage);
             }
             else
+            {
                 ClearBookingData();
-            PostExecute("InwardFacilityChargeMovement");
+            }
+
+            PostExecute(nameof(InwardFacilityChargeMovement));
         }
         /// <summary>
         /// Determines whether [is enabled inward facility charge movement].
@@ -1131,7 +1137,10 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Post Outward Movement'}de{'Buche Lagerabgang'}", 703, true, Global.ACKinds.MSMethodPrePost)]
         public void OutwardFacilityChargeMovement()
         {
-            if (!PreExecute("OutwardFacilityChargeMovement")) return;
+            if (!PreExecute(nameof(OutwardFacilityChargeMovement))) 
+                return;
+
+            CurrentBookParamOutwardMovement.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamOutwardMovement, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamOutwardMovement.ValidMessage.IsSucceded() || CurrentBookParamOutwardMovement.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamOutwardMovement.ValidMessage);
@@ -1142,8 +1151,11 @@ namespace gip.bso.facility
                 Messages.Msg(result.ValidMessage);
             }
             else
+            {
                 ClearBookingData();
-            PostExecute("OutwardFacilityChargeMovement");
+            }
+
+            PostExecute(nameof(OutwardFacilityChargeMovement));
         }
         /// <summary>
         /// Determines whether [is enabled outward facility charge movement].
@@ -1273,6 +1285,7 @@ namespace gip.bso.facility
                     CurrentBookParamRelocation.FacilityBooking.InwardFacilityLot = CurrentBookParamRelocation.InwardFacilityLot;
             }
 
+            CurrentBookParamRelocation.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamRelocation, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamRelocation.ValidMessage.IsSucceded() || CurrentBookParamRelocation.ValidMessage.HasWarnings())
             {
@@ -1287,7 +1300,10 @@ namespace gip.bso.facility
                 return false;
             }
             else
+            {
                 ClearBookingData();
+            }
+            
             return true;
         }
 
@@ -1323,8 +1339,12 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Lock'}de{'Sperren'}", 705, true, Global.ACKinds.MSMethodPrePost)]
         public void LockFacilityCharge()
         {
-            if (!PreExecute("LockFacilityCharge")) return;
+            if (!PreExecute(nameof(LockFacilityCharge)))
+                return;
+
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.Locked);
+
+            CurrentBookParamReleaseAndLock.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
@@ -1337,9 +1357,9 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
-            PostExecute("LockFacilityCharge");
+            PostExecute(nameof(LockFacilityCharge));
         }
         /// <summary>
         /// Determines whether [is enabled lock facility charge].
@@ -1368,8 +1388,13 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Lock absolute'}de{'Absolut sperren'}", 706, true, Global.ACKinds.MSMethodPrePost)]
         public void LockFacilityChargeAbsolute()
         {
-            if (!PreExecute("LockFacilityChargeAbsolute")) return;
+            if (!PreExecute(nameof(LockFacilityChargeAbsolute))) 
+                return;
+
+
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.AbsLocked);
+            CurrentBookParamReleaseAndLock.AutoRefresh = true;
+
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
@@ -1382,9 +1407,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
-            PostExecute("LockFacilityChargeAbsolute");
+            
+            PostExecute(nameof(LockFacilityChargeAbsolute));
         }
 
         /// <summary>
@@ -1414,8 +1440,12 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Unlock'}de{'Freigeben'}", 707, true, Global.ACKinds.MSMethodPrePost)]
         public void ReleaseFacilityCharge()
         {
-            if (!PreExecute("ReleaseFacilityCharge")) return;
+            if (!PreExecute(nameof(ReleaseFacilityCharge))) 
+                return;
+
+
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.Free);
+            CurrentBookParamReleaseAndLock.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
@@ -1428,9 +1458,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
-            PostExecute("ReleaseFacilityCharge");
+            
+            PostExecute(nameof(ReleaseFacilityCharge));
         }
 
         /// <summary>
@@ -1460,8 +1491,11 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Unlock absolute'}de{'Absolut freigeben'}", 708, true, Global.ACKinds.MSMethodPrePost)]
         public void ReleaseFacilityChargeAbsolute()
         {
-            if (!PreExecute("ReleaseFacilityChargeAbsolute")) return;
+            if (!PreExecute(nameof(ReleaseFacilityChargeAbsolute))) 
+                return;
+
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.AbsFree);
+            CurrentBookParamReleaseAndLock.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
@@ -1474,9 +1508,10 @@ namespace gip.bso.facility
             else
             {
                 ClearBookingData();
-                OnPropertyChanged("CurrentFacilityCharge");
+                OnPropertyChanged(nameof(CurrentFacilityCharge));
             }
-            PostExecute("ReleaseFacilityChargeAbsolute");
+
+            PostExecute(nameof(ReleaseFacilityChargeAbsolute));
         }
         /// <summary>
         /// Determines whether [is enabled release facility charge absolute].
@@ -1507,15 +1542,16 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Quant not available'}de{'Quant nicht verfügbar'}", 709, true, Global.ACKinds.MSMethodPrePost)]
         public void NotAvailableFacilityCharge()
         {
-            if (!PreExecute("NotAvailableFacilityCharge"))
+            if (!PreExecute(nameof(NotAvailableFacilityCharge)))
                 return;
             BookNotAvailableFacilityCharge(false);
-            PostExecute("NotAvailableFacilityCharge");
+            PostExecute(nameof(NotAvailableFacilityCharge));
         }
 
         public bool BookNotAvailableFacilityCharge(bool withRefresh)
         {
             CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+            CurrentBookParamNotAvailable.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);
@@ -1531,7 +1567,7 @@ namespace gip.bso.facility
                 if (withRefresh)
                 {
                     AccessNav.NavSearch();
-                    OnPropertyChanged("FacilityChargeList");
+                    OnPropertyChanged(nameof(FacilityChargeList));
                 }
                 return true;
             }
@@ -1692,7 +1728,10 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 711, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityReassign()
         {
-            if (!PreExecute("FacilityReassign")) return;
+            if (!PreExecute(nameof(FacilityReassign))) 
+                return;
+
+            CurrentBookParamReassignMat.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReassignMat, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReassignMat.ValidMessage.IsSucceded() || CurrentBookParamReassignMat.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamReassignMat.ValidMessage);
@@ -1706,7 +1745,8 @@ namespace gip.bso.facility
             {
                 ClearBookingData();
             }
-            PostExecute("FacilityReassign");
+
+            PostExecute(nameof(FacilityReassign));
         }
 
         /// <summary>
@@ -1728,7 +1768,11 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Split Quant'}de{'Quant Splitten'}", 712, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void SplitQuant()
         {
-            if (!PreExecute("SplitQuant")) return;
+            if (!PreExecute(nameof(SplitQuant))) 
+                return;
+
+
+            CurrentBookParamSplit.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamSplit, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamSplit.ValidMessage.IsSucceded() || CurrentBookParamSplit.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamSplit.ValidMessage);
@@ -1742,7 +1786,8 @@ namespace gip.bso.facility
             {
                 ClearBookingData();
             }
-            PostExecute("SplitQuant");
+            
+            PostExecute(nameof(SplitQuant));
         }
 
         /// <summary>

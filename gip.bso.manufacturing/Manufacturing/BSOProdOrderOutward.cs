@@ -415,6 +415,9 @@ namespace gip.bso.manufacturing
 
             if (SelectedOutwardACMethodBooking.OutwardFacilityCharge != null)
                 SelectedOutwardACMethodBooking.OutwardFacilityLot = SelectedOutwardACMethodBooking.OutwardFacilityCharge.FacilityLot;
+
+
+            SelectedOutwardACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(SelectedOutwardACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!SelectedOutwardACMethodBooking.ValidMessage.IsSucceded() || SelectedOutwardACMethodBooking.ValidMessage.HasWarnings())
                 Messages.Msg(SelectedOutwardACMethodBooking.ValidMessage);
@@ -424,7 +427,7 @@ namespace gip.bso.manufacturing
                     SelectedOutwardACMethodBooking.ValidMessage.Message = result.ResultState.ToString();
                 Messages.Msg(SelectedOutwardACMethodBooking.ValidMessage);
                 if (refreshList)
-                    OnPropertyChanged("OutwardFacilityBookingList");
+                    OnPropertyChanged(nameof(OutwardFacilityBookingList));
             }
             else
             {
@@ -434,7 +437,7 @@ namespace gip.bso.manufacturing
                 MDUnit unit = SelectedOutwardACMethodBooking.MDUnit;
 
                 DeleteOutwardFacilityPreBooking();
-                OnPropertyChanged("OutwardFacilityBookingList");
+                OnPropertyChanged(nameof(OutwardFacilityBookingList));
 
                 // First recalc actual quantity for relation parts
                 if (unit != null)
@@ -461,7 +464,6 @@ namespace gip.bso.manufacturing
                 {
                     Save();
                 }
-
             }
         }
 
