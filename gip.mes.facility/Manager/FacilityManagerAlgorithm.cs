@@ -690,7 +690,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLotID,
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
-                                                                                                splitNo));
+                                                                                                splitNo), BP);
                     }
                     else
                     {
@@ -699,7 +699,7 @@ namespace gip.mes.facility
                                                                                                 null,
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
-                                                                                                splitNo));
+                                                                                                splitNo), BP);
                     }
                     // Falls ja, dann buche darauf
                     if (facilityChargeList.Any())
@@ -719,7 +719,7 @@ namespace gip.mes.facility
                                                                                                     BP.ParamsAdjusted.InwardFacility.FacilityID,
                                                                                                     BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
                                                                                                     BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
-                                                                                                    null));
+                                                                                                    null), BP);
                         }
                         // Falls ja, dann mache daraus eine nicht anonyme (Was passiert mit Chargenverfolgung?) und buche
                         if (facilityChargeList.Any())
@@ -793,7 +793,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.FacilityLotID,
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
                                                                                                 BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
-                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo));
+                                                                                                BP.ParamsAdjusted.OutwardFacilityCharge.SplitNo), BP);
                     }
                     // Falls ja,
                     if (facilityChargeList.Any())
@@ -814,7 +814,7 @@ namespace gip.mes.facility
                                                                                                     BP.ParamsAdjusted.InwardFacilityLocation.IncomingFacilityID.Value,
                                                                                                     BP.ParamsAdjusted.OutwardFacilityCharge.MaterialID,
                                                                                                     BP.ParamsAdjusted.OutwardFacilityCharge.PartslistID,
-                                                                                                    null));
+                                                                                                    null), BP);
                         }
                         // Falls ja, dann mache daraus eine nicht anonyme und buche
                         if (facilityChargeList.Any())
@@ -1315,10 +1315,10 @@ namespace gip.mes.facility
             // Liste von FacilityChargen, die nach buchungsparameter FacilityLot und Material gefiltert sind,
             // um herauszufinden ob FacilityCharge überhaupt existiert und evtl. angelegt werden muss.
             FacilityChargeList facilityInwardChargeSubList = null;
-            FacilityChargeList facilityOutwardChargeSubList = BP.ParamsAdjusted.OutwardFacilityChargeList != null ? new FacilityChargeList(BP.ParamsAdjusted.OutwardFacilityChargeList) : null;
+            FacilityChargeList facilityOutwardChargeSubList = BP.ParamsAdjusted.OutwardFacilityChargeList != null ? new FacilityChargeList(BP.ParamsAdjusted.OutwardFacilityChargeList, BP) : null;
             // Liste von allen FacilityChargen/Schichten im Silo
             FacilityChargeList cellInwardChargeList = null;
-            FacilityChargeList cellOutwardChargeList = BP.ParamsAdjusted.OutwardFacilityChargeList != null ? new FacilityChargeList(BP.ParamsAdjusted.OutwardFacilityChargeList) : null;
+            FacilityChargeList cellOutwardChargeList = BP.ParamsAdjusted.OutwardFacilityChargeList != null ? new FacilityChargeList(BP.ParamsAdjusted.OutwardFacilityChargeList, BP) : null;
 
             // Überprüfe für Quelle und Ziel:
             if (BP.ParamsAdjusted.InwardFacility != null)
@@ -1357,7 +1357,7 @@ namespace gip.mes.facility
                     }
 
                     // Ermittle Schichten im Silo
-                    cellInwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.InwardFacility.FacilityID, false));
+                    cellInwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.InwardFacility.FacilityID, false), BP);
                 }
 
                 // Ermittle FacilityCharge's auf Ziel-lagerplatz 
@@ -1374,7 +1374,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
                                                                                                 false,
-                                                                                                BP.InwardSplitNo.Value));
+                                                                                                BP.InwardSplitNo.Value), BP);
                     }
                     else if ((BP.ParamsAdjusted.InwardFacilityLot != null) && (BP.ParamsAdjusted.InwardMaterial != null))
                     {
@@ -1385,7 +1385,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.InwardMaterial.MaterialID,
                                                                                                 BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                                                                                                false), BP);
                     }
                     else if (BP.ParamsAdjusted.InwardFacilityLot != null)
                     {
@@ -1394,7 +1394,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.InwardFacility.FacilityID,
                                                                                                 BP.ParamsAdjusted.InwardFacilityLot.FacilityLotID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                                                                                                false), BP);
                     }
                     // Ermittle FacilityCharge's auf Ziel-lagerplatz 
                     else if (BP.ParamsAdjusted.InwardMaterial != null)
@@ -1405,7 +1405,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.InwardMaterial.MaterialID,
                                                                                                 BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                                                                                                false), BP);
                     }
                     // Keine Materialnummer vorgegeben
                     else
@@ -1414,7 +1414,7 @@ namespace gip.mes.facility
                         facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
                                                                                                 BP.ParamsAdjusted.InwardFacility.FacilityID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                                                                                                false), BP);
                     }
                 }
                 else
@@ -1428,7 +1428,7 @@ namespace gip.mes.facility
                                                                                                 BP.ParamsAdjusted.InwardMaterial.MaterialID,
                                                                                                 BP.ParamsAdjusted.InwardMaterial.ProductionMaterialID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                                                                                                false), BP);
                     }
                     // Keine Materialnummer vorgegeben
                     else
@@ -1437,7 +1437,7 @@ namespace gip.mes.facility
                         facilityInwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
                                                                                                 BP.ParamsAdjusted.InwardFacility.FacilityID,
                                                                                                 BP.ParamsAdjusted.InwardPartslist != null ? BP.ParamsAdjusted.InwardPartslist.PartslistID : guidNull,
-                                                                                                false));
+                                                                                                false), BP);
                     }
                 }
             }
@@ -1478,7 +1478,7 @@ namespace gip.mes.facility
                     }
 
                     // Ermittle Schichten im Silo
-                    cellOutwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacility.FacilityID, false));
+                    cellOutwardChargeList = new FacilityChargeList(s_cQry_FCList_Fac_NotAvailable(BP.DatabaseApp, BP.ParamsAdjusted.OutwardFacility.FacilityID, false), BP);
                 }
 
                 if (facilityOutwardChargeSubList == null)
@@ -1495,7 +1495,7 @@ namespace gip.mes.facility
                                                                                                     BP.ParamsAdjusted.OutwardMaterial.MaterialID,
                                                                                                     BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
                                                                                                     BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                    false));
+                                                                                                    false), BP);
                         }
                         else if (BP.ParamsAdjusted.OutwardFacilityLot != null)
                         {
@@ -1504,7 +1504,7 @@ namespace gip.mes.facility
                                                                                                     BP.ParamsAdjusted.OutwardFacility.FacilityID,
                                                                                                     BP.ParamsAdjusted.OutwardFacilityLot.FacilityLotID,
                                                                                                     BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                    false));
+                                                                                                    false), BP);
                         }
                         // Kein Material vorgegeben
                         else
@@ -1513,7 +1513,7 @@ namespace gip.mes.facility
                             facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
                                                                                                     BP.ParamsAdjusted.OutwardFacility.FacilityID,
                                                                                                     BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                    false));
+                                                                                                    false), BP);
                         }
                     }
                     else
@@ -1527,7 +1527,7 @@ namespace gip.mes.facility
                                                                                                     BP.ParamsAdjusted.OutwardMaterial.MaterialID,
                                                                                                     BP.ParamsAdjusted.OutwardMaterial.ProductionMaterialID,
                                                                                                     BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                    false));
+                                                                                                    false), BP);
                         }
                         // Kein Material vorgegeben
                         else
@@ -1536,7 +1536,7 @@ namespace gip.mes.facility
                             facilityOutwardChargeSubList = new FacilityChargeList(s_cQry_FCList_Fac_Pl_NotAvailable(BP.DatabaseApp,
                                                                                                     BP.ParamsAdjusted.OutwardFacility.FacilityID,
                                                                                                     BP.ParamsAdjusted.OutwardPartslist != null ? BP.ParamsAdjusted.OutwardPartslist.PartslistID : guidNull,
-                                                                                                    false));
+                                                                                                    false), BP);
                         }
                     }
                 }
@@ -2290,14 +2290,14 @@ namespace gip.mes.facility
                                                                             storeForRetrogradePosting.FacilityID,
                                                                             relationForRPost.SourceProdOrderPartslistPos.MaterialID,
                                                                             relationForRPost.SourceProdOrderPartslistPos.Material.ProductionMaterialID,
-                                                                            false));
+                                                                            false), BP);
 
                             ProdOrder prodOrder = relationForRPost?.SourceProdOrderPartslistPos?.ProdOrderPartslist?.ProdOrder;
                             ProdOrderPartslist plMat = prodOrder?.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.Partslist.MaterialID == relationForRPost.SourceProdOrderPartslistPos.MaterialID);
                             
                             if (plMat != null && !relationForRPost.SourceProdOrderPartslistPos.TakeMatFromOtherOrder)
                             {
-                                facilityOutwardChargeSubList = new FacilityChargeList(facilityOutwardChargeSubList.Where(c => c.ProdOrderProgramNo == prodOrder.ProgramNo));
+                                facilityOutwardChargeSubList = new FacilityChargeList(facilityOutwardChargeSubList.Where(c => c.ProdOrderProgramNo == prodOrder.ProgramNo), BP);
 
                                 if (!facilityOutwardChargeSubList.Any())
                                 {
@@ -2361,6 +2361,7 @@ namespace gip.mes.facility
                 outwardMethod.CPartnerCompany = partsListPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.CPartnerCompany;
             outwardMethod.Database = BP.DatabaseApp;
             outwardMethod.CheckAndAdjustPropertiesForBooking(BP.DatabaseApp);
+            outwardMethod.AutoRefresh = BP.AutoRefresh;
             return outwardMethod;
         }
 
@@ -2387,6 +2388,7 @@ namespace gip.mes.facility
             method.Database = BP.DatabaseApp;
             method.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(BP.DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
             method.CheckAndAdjustPropertiesForBooking(BP.DatabaseApp);
+            method.AutoRefresh = BP.AutoRefresh;
             return method;
         }
 
@@ -2577,6 +2579,7 @@ namespace gip.mes.facility
             inwardMethod.InwardFacilityLot = facilityLot;
             inwardMethod.Database = dbApp;
             inwardMethod.CheckAndAdjustPropertiesForBooking(dbApp);
+            inwardMethod.AutoRefresh = BP.AutoRefresh;
             return inwardMethod;
         }
 

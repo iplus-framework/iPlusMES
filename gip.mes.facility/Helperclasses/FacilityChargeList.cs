@@ -9,9 +9,13 @@ namespace gip.mes.facility
 {
     public class FacilityChargeList : List<FacilityCharge>
     {
-        public FacilityChargeList(IEnumerable<FacilityCharge> list) 
+        public FacilityChargeList(IEnumerable<FacilityCharge> list, ACMethodBooking BP) 
             : base(list)
         {
+            if (BP.AutoRefresh)
+            {
+                this.ForEach(c => c.AutoRefresh(BP.DatabaseApp));
+            }
         }
     }
 }

@@ -2400,7 +2400,7 @@ namespace gip.bso.logistics
                 if (CurrentPicking.VisitorVoucher != null)
                     CurrentPicking.VisitorVoucher.ACProperties.Refresh();
 
-                CurrentPicking.PickingPos_Picking.AutoRefresh(RefreshMode.StoreWins);
+                CurrentPicking.PickingPos_Picking.AutoRefresh();
             }
             PostExecute("Load");
             OnPropertyChanged(nameof(PickingPosList));

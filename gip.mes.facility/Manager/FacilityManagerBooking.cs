@@ -133,6 +133,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "InwardMaterialStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.InwardMaterialStock.AutoRefresh();
 
             //if (Math.Abs(FBC.InwardQuantityUOM - 0) > Double.Epsilon)
             //    FBC.InwardMaterialStock.StockWeight += FBC.InwardWeightInMU;
@@ -208,6 +210,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "OutwardMaterialStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.OutwardMaterialStock.AutoRefresh();
 
             //if (Math.Abs(FBC.OutwardWeightInMU - 0) > Double.Epsilon)
             //    FBC.OutwardMaterialStock.StockWeight -= FBC.OutwardWeightInMU;
@@ -290,6 +294,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "InwardCompanyMaterialStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.InwardCompanyMaterialStock.AutoRefresh();
 
             if (Math.Abs(FBC.InwardQuantityUOM - 0) > Double.Epsilon)
             {
@@ -363,6 +369,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "OutwardCompanyMaterialStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.OutwardCompanyMaterialStock.AutoRefresh();
 
             if (Math.Abs(FBC.OutwardQuantityUOM - 0) > Double.Epsilon)
             {
@@ -439,6 +447,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "InwardCPartnerCompMatStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.InwardCPartnerCompMatStock.AutoRefresh();
 
             //if (Math.Abs(FBC.InwardQuantityUOM - 0) > Double.Epsilon)
             //    FBC.InwardMaterialStock.StockWeight += FBC.InwardWeightInMU;
@@ -516,6 +526,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "OutwardCPartnerCompMatStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.OutwardCPartnerCompMatStock.AutoRefresh();
 
             //if (Math.Abs(FBC.OutwardWeightInMU - 0) > Double.Epsilon)
             //    FBC.OutwardCPartnerCompMatStock.StockWeight -= FBC.OutwardWeightInMU;
@@ -590,6 +602,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "InwardFacilityStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.InwardFacilityStock.AutoRefresh();
 
             //if (Math.Abs(FBC.InwardWeightInMU - 0) > Double.Epsilon)
             //    FBC.InwardFacilityStock.StockWeight += FBC.InwardWeightInMU;
@@ -678,6 +692,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "OutwardFacilityStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.OutwardFacilityStock.AutoRefresh();
 
             if (Math.Abs(FBC.OutwardQuantityUOM - 0) > Double.Epsilon)
             {
@@ -768,6 +784,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "InwardFacilityLotStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.InwardFacilityLotStock.AutoRefresh();
 
             if (Math.Abs(FBC.InwardQuantityUOM - 0) > Double.Epsilon)
             {
@@ -843,6 +861,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "OutwardFacilityLotStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.OutwardFacilityLotStock.AutoRefresh();
 
             //if (Math.Abs(FBC.OutwardWeightInMU - 0) > Double.Epsilon)
             //    FBC.OutwardFacilityLotStock.StockWeight -= FBC.OutwardWeightInMU;
@@ -923,6 +943,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "InwardPartslistStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.InwardPartslistStock.AutoRefresh();
 
             if (Math.Abs(FBC.InwardQuantityUOM - 0) > Double.Epsilon)
             {
@@ -982,6 +1004,8 @@ namespace gip.mes.facility
                 BP.AddBookingMessage(ACMethodBooking.eResultCodes.EntityPropertyNotSet, Root.Environment.TranslateMessage(this, "Error00011", "OutwardPartslistStock", FacilityBooking.ClassName));
                 return Global.ACMethodResultState.Notpossible;
             }
+            else if (BP.AutoRefresh)
+                FBC.OutwardPartslistStock.AutoRefresh();
 
             if (Math.Abs(FBC.OutwardQuantityUOM - 0) > Double.Epsilon)
             {
@@ -1034,6 +1058,8 @@ namespace gip.mes.facility
             // Ohne Charge funzt es nicht, darf aber nicht vorkommen, weil zuvor durch Checkalgorithmus vin Bookingparamter überprüft
             if (FBC.InwardFacilityCharge == null)
                 return Global.ACMethodResultState.Failed;
+            else if (BP.AutoRefresh)
+                FBC.InwardFacilityCharge.AutoRefresh();
 
             // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
             if (   (   FBC.InwardFacilityCharge.EntityState == System.Data.EntityState.Added
@@ -1076,6 +1102,8 @@ namespace gip.mes.facility
             // Ohne Charge funzt es nicht, darf aber nicht vorkommen, weil zuvor durch Checkalgorithmus vin Bookingparamter überprüft
             if (FBC.OutwardFacilityCharge == null)
                 return Global.ACMethodResultState.Failed;
+            else if (BP.AutoRefresh)
+                FBC.OutwardFacilityCharge.AutoRefresh();
 
             if (Math.Abs(FBC.OutwardQuantityUOM - 0) > Double.Epsilon)
             {
