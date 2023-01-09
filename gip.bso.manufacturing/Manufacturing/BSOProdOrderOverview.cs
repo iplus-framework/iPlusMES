@@ -868,7 +868,7 @@ namespace gip.bso.manufacturing
                     break;
                 case BGWorkerMehtod_LoadOrderPositionsForInputList:
                     bool loadRelatedLists = OverviewProdOrderPartslistList == null || !OverviewProdOrderPartslistList.Any();
-                    e.Result = DoLoadOrderPositionsForInputList(DatabaseApp, SelectedInput.MaterialNo, OverviewProdOrderPartslistList, loadRelatedLists);
+                    e.Result = DoLoadOrderPositionsForInputList(SelectedInput.MaterialNo, OverviewProdOrderPartslistList, loadRelatedLists);
                     break;
             }
         }
@@ -1039,7 +1039,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        private BSOProdOrderOverview_SearchResult DoLoadOrderPositionsForInputList(DatabaseApp databaseApp, string materialNo, List<ProdOrderPartslistOverview> prodOrderPartslistOverviews, bool loadRelatedLists)
+        private BSOProdOrderOverview_SearchResult DoLoadOrderPositionsForInputList(string materialNo, List<ProdOrderPartslistOverview> prodOrderPartslistOverviews, bool loadRelatedLists)
         {
             BSOProdOrderOverview_SearchResult result = new BSOProdOrderOverview_SearchResult()
             {
@@ -1047,36 +1047,44 @@ namespace gip.bso.manufacturing
                 OperationStartTime = DateTime.Now
             };
 
-            if (loadRelatedLists)
+            using (DatabaseApp databaseApp = new DatabaseApp())
             {
-                BSOProdOrderOverview_SearchResult preparedData = DoSearch("", true, false);
-                result.OverviewProdOrderPartslist = preparedData.OverviewProdOrderPartslist;
-                result.OverviewMaterial = preparedData.OverviewMaterial;
+                databaseApp.CommandTimeout = 60 * 3;
 
-                prodOrderPartslistOverviews = result.OverviewProdOrderPartslist;
+                if (loadRelatedLists)
+                {
+                    BSOProdOrderOverview_SearchResult preparedData = DoSearch("", true, false);
+                    result.OverviewProdOrderPartslist = preparedData.OverviewProdOrderPartslist;
+                    result.OverviewMaterial = preparedData.OverviewMaterial;
+
+                    prodOrderPartslistOverviews = result.OverviewProdOrderPartslist;
+                }
+
+                List<ProdOrderPartslistPos> list = new List<ProdOrderPartslistPos>();
+
+                Material material = databaseApp.Material.FirstOrDefault(c => c.MaterialNo == materialNo);
+                if (material != null && prodOrderPartslistOverviews != null)
+                {
+                    Guid[] plIds = prodOrderPartslistOverviews.Select(c => c.ProdOrderPartslist.ProdOrderPartslistID).ToArray();
+
+                    list =
+                        databaseApp
+                        .ProdOrderPartslistPos
+                        .Include("ProdOrderPartslist")
+                        .Include("ProdOrderPartslist.Partslist")
+                        .Include("ProdOrderPartslist.ProdOrder")
+                        .Where(c => plIds.Contains(c.ProdOrderPartslistID) && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.Material.MaterialNo == materialNo)
+                        .ToList();
+                }
+
+                if (list.Any())
+                {
+                    list = list.OrderByDescending(c => c.InputQForFinalScrapActualOutputPer).ToList();
+                }
+
+                result.OrderPositionsForInputList = list;
             }
 
-            List<ProdOrderPartslistPos> list = new List<ProdOrderPartslistPos>();
-
-            Material material = databaseApp.Material.FirstOrDefault(c => c.MaterialNo == materialNo);
-            if (material != null && prodOrderPartslistOverviews != null)
-            {
-                Guid[] plIds = prodOrderPartslistOverviews.Select(c => c.ProdOrderPartslist.ProdOrderPartslistID).ToArray();
-                list =
-                    databaseApp
-                    .ProdOrderPartslist
-                    .Where(c => plIds.Contains(c.ProdOrderPartslistID))
-                    .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-                    .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.Material.MaterialNo == materialNo)
-                    .ToList();
-            }
-
-            if (list.Any())
-            {
-                list = list.OrderByDescending(c => c.InputQForFinalScrapActualOutputPer).ToList();
-            }
-
-            result.OrderPositionsForInputList = list;
             result.OperationEndTime = DateTime.Now;
             return result;
         }
