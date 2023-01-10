@@ -402,6 +402,8 @@ namespace gip.bso.sales
                     if (CurrentInvoice != null)
                         CurrentInvoice.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(CurrentInvoice_PropertyChanged);
 
+                    _AlternativeCurrExchList = null;
+                    _SelectedAlternativeCurrExch = null;
                     OnPropertyChanged("CurrentInvoice");
                     OnPropertyChanged("InvoicePosList");
                     OnPropertyChanged("CompanyList");
@@ -409,6 +411,7 @@ namespace gip.bso.sales
                     OnPropertyChanged("DeliveryCompanyAddressList");
                     OnPropertyChanged("CurrentBillingCompanyAddress");
                     OnPropertyChanged("CurrentDeliveryCompanyAddress");
+                    OnPropertyChanged("AlternativeCurrExchList");
 
                     SetSelectedPos();
 
@@ -604,7 +607,35 @@ namespace gip.bso.sales
 
         #endregion
 
-        Nullable<double> _ChangeTargetQuantity = null;
+        #region Alternative Currency
+        MDCurrencyExchange _SelectedAlternativeCurrExch;
+        [ACPropertySelected(211, "MDCurrencyExchange", "en{'Alternative Currency'}de{'Alternative Währung'}")]
+        public MDCurrencyExchange SelectedAlternativeCurrExch
+        {
+            get
+            {
+                return _SelectedAlternativeCurrExch;
+            }
+            set
+            {
+                _SelectedAlternativeCurrExch = value;
+            }
+        }
+        List<MDCurrencyExchange> _AlternativeCurrExchList;
+        [ACPropertyList(210, "MDCurrencyExchange")]
+        public IEnumerable<MDCurrencyExchange> AlternativeCurrExchList
+        {
+            get
+            {
+                if (_AlternativeCurrExchList != null)
+                    return _AlternativeCurrExchList;
+                _AlternativeCurrExchList = CurrentInvoice?.MDCurrency?.GetAlternativeExchangeRates(CurrentInvoice.InvoiceDate).ToList();
+                return _AlternativeCurrExchList;
+            }
+        }
+        #endregion
+
+                Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
         public Nullable<double> ChangeTargetQuantity
         {
@@ -1519,6 +1550,35 @@ namespace gip.bso.sales
                 return false;
             return !CurrentInvoice.IsExchangeRateValid;
         }
+
+        [ACMethodCommand("AssignAlternativeCurrency", "en{'Alternative Currency'}de{'Alternative Währung'}", (short)300)]
+        public void AssignAlternativeCurrency()
+        {
+            ShowDialog(this, "AssignAlternativeCurrency");
+        }
+
+        public bool IsEnabledAssignAlternativeCurrency()
+        {
+            if (CurrentInvoice == null)
+                return false;
+            return true;
+        }
+
+        [ACMethodCommand("AssignAlternativeCurrency", "en{'OK'}de{'OK'}", (short)301)]
+        public void DialogAssignAlternativeCurrencyOK()
+        {
+            if (CurrentInvoice != null)
+                CurrentInvoice.MDCurrencyExchange = _SelectedAlternativeCurrExch;
+            CloseTopDialog();
+            _SelectedAlternativeCurrExch = null;
+        }
+
+        [ACMethodCommand("AssignAlternativeCurrency", "en{'Cancel'}de{'Abbrechen'}", (short)302)]
+        public void DialogAssignAlternativeCurrencyCancel()
+        {
+            _SelectedAlternativeCurrExch = null;
+            CloseTopDialog();
+        }
         #endregion
 
         #region InvoicePos
@@ -1845,7 +1905,11 @@ namespace gip.bso.sales
                     }
                 }
             }
-            if (e.FlowDocObj != null && e.FlowDocObj.VBContent == "CurrentInvoice\\MDCurrencyExchange\\ExchangeNo")
+            if (e.FlowDocObj != null 
+                && e.FlowDocObj.VBContent != null 
+                && (   e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\MDCurrencyExchange\\")
+                    || e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\Foreign"))
+                )
             {
                 if (CurrentInvoice != null && CurrentInvoice.MDCurrencyExchange == null)
                 {
@@ -1962,6 +2026,18 @@ namespace gip.bso.sales
                     return true;
                 case "IsEnabledUpdateExchangeRate":
                     result = IsEnabledUpdateExchangeRate();
+                    return true;
+                case nameof(AssignAlternativeCurrency):
+                    AssignAlternativeCurrency();
+                    return true;
+                case nameof(IsEnabledAssignAlternativeCurrency):
+                    result = IsEnabledAssignAlternativeCurrency();
+                    return true;
+                case nameof(DialogAssignAlternativeCurrencyOK):
+                    DialogAssignAlternativeCurrencyOK();
+                    return true;
+                case nameof(DialogAssignAlternativeCurrencyCancel):
+                    DialogAssignAlternativeCurrencyCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

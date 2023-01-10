@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel;
 
 namespace gip.mes.datamodel
 {
@@ -43,6 +44,8 @@ namespace gip.mes.datamodel
             {
                 if (InputQForActualOutput == null || Math.Abs(InputQForActualOutput.Value) <= double.Epsilon || IsExcludedFromStat)
                     return null;
+                else if (IsBaseQuantityExcluded)
+                    return 1;
                 return ActualQuantityUOM / InputQForActualOutput;
             }
         }
@@ -73,6 +76,8 @@ namespace gip.mes.datamodel
             {
                 if (InputQForGoodActualOutput == null || Math.Abs(InputQForGoodActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
                     return null;
+                else if (IsBaseQuantityExcluded)
+                    return 1;
                 return ActualQuantityUOM / InputQForGoodActualOutput;
             }
         }
@@ -96,6 +101,8 @@ namespace gip.mes.datamodel
             get
             {
                 if (InputQForScrapActualOutput == null || Math.Abs(InputQForScrapActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                else if (IsBaseQuantityExcluded)
                     return null;
                 return ActualQuantityUOM / InputQForScrapActualOutput;
             }
@@ -124,6 +131,8 @@ namespace gip.mes.datamodel
             {
                 if (InputQForFinalActualOutput == null || Math.Abs(InputQForFinalActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
                     return null;
+                else if (IsBaseQuantityExcluded)
+                    return 1;
                 return ActualQuantityUOM / InputQForFinalActualOutput;
             }
         }
@@ -154,6 +163,8 @@ namespace gip.mes.datamodel
             {
                 if (InputQForFinalGoodActualOutput == null || Math.Abs(InputQForFinalGoodActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
                     return null;
+                else if (IsBaseQuantityExcluded)
+                    return 1;
                 return ActualQuantityUOM / InputQForFinalGoodActualOutput;
             }
         }
@@ -183,6 +194,8 @@ namespace gip.mes.datamodel
             get
             {
                 if (InputQForFinalScrapActualOutput == null || Math.Abs(InputQForFinalScrapActualOutput.Value) <= double.Epsilon|| IsExcludedFromStat)
+                    return null;
+                else if (IsBaseQuantityExcluded)
                     return null;
                 return ActualQuantityUOM / InputQForFinalScrapActualOutput;
             }
