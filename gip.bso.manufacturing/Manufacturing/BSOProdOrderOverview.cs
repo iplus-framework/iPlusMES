@@ -30,7 +30,8 @@ namespace gip.bso.manufacturing
         public BSOProdOrderOverview(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _CalculateStatistics = new ACPropertyConfigValue<bool>(this, "CalculateStatistics", true);
+            _CalculateStatistics = new ACPropertyConfigValue<bool>(this, nameof(CalculateStatistics), true);
+            _CommandTimeout = new ACPropertyConfigValue<int>(this, nameof(CommandTimeout), 3);
         }
 
 
@@ -52,6 +53,14 @@ namespace gip.bso.manufacturing
 
 
             return true;
+        }
+
+        public override bool ACPostInit()
+        {
+            bool postInit = base.ACPostInit();
+            _ = CalculateStatistics;
+            _ = CommandTimeout;
+            return postInit;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
@@ -91,6 +100,20 @@ namespace gip.bso.manufacturing
             set
             {
                 _CalculateStatistics.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<int> _CommandTimeout;
+        [ACPropertyConfig("en{'CommandTimeout (min)'}de{'CommandTimeout (min)'}")]
+        public int CommandTimeout
+        {
+            get
+            {
+                return _CommandTimeout.ValueT;
+            }
+            set
+            {
+                _CommandTimeout.ValueT = value;
             }
         }
 
@@ -976,7 +999,7 @@ namespace gip.bso.manufacturing
 
             using (DatabaseApp databaseApp = new DatabaseApp())
             {
-                databaseApp.CommandTimeout = 60 * 3;
+                databaseApp.CommandTimeout = 60 * CommandTimeout;
 
                 List<ProdOrderPartslistOverview> overviewPl = null;
                 List<ProdOrderPartslistOverview> overviewMt = null;
@@ -1049,7 +1072,7 @@ namespace gip.bso.manufacturing
 
             using (DatabaseApp databaseApp = new DatabaseApp())
             {
-                databaseApp.CommandTimeout = 60 * 3;
+                databaseApp.CommandTimeout = 60 * CommandTimeout;
 
                 if (loadRelatedLists)
                 {
