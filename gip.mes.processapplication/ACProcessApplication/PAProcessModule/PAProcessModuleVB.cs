@@ -34,6 +34,7 @@ namespace gip.mes.processapplication
         public override bool ACPostInit()
         {
             _ = ReworkEnabled;
+            _ = ACUrlExtraDisDest;
             return base.ACPostInit();
         }
         #endregion

@@ -544,7 +544,7 @@ namespace gip.bso.purchasing
 
             IEnumerable<string> sourceCompsACUrl = sources.Routes.Select(c => c.FirstOrDefault().Source.ACUrlComponent);
 
-            routeSelector.GetAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module });
+            routeSelector.ShowAvailableRoutes(sources.Routes.Select(c => c.FirstOrDefault().Source), new core.datamodel.ACClass[] { SelectedTarget.Module });
 
             if (routeSelector.RouteResult != null)
             {
