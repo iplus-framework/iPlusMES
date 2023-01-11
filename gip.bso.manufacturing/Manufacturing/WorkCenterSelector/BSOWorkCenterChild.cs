@@ -71,8 +71,8 @@ namespace gip.bso.manufacturing
             }
         }
 
-        protected ACRef<IACPickingManager> _ACPickingManager = null;
-        public IACPickingManager ACPickingManager
+        protected ACRef<ACPickingManager> _ACPickingManager = null;
+        public ACPickingManager ACPickingManager
         {
             get
             {
@@ -216,16 +216,16 @@ namespace gip.bso.manufacturing
             {
                 Messages.Msg(msgDetails);
                 ClearBookingData();
-                ACUndoChanges();
+                dbApp.ACUndoChanges();
                 return false;
             }
             if (picking == null)
             {
-                ACUndoChanges();
+                dbApp.ACUndoChanges();
                 ClearBookingData();
                 return false;
             }
-            ACSaveChanges();
+            dbApp.ACSaveChanges();
 
             bool result = PreStartWorkflow(dbApp, validRoute, workflow, picking);
             if (!result)
@@ -234,7 +234,7 @@ namespace gip.bso.manufacturing
                 return false;
             }
 
-            msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
+            msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
                 Messages.Msg(msgDetails);
@@ -259,29 +259,10 @@ namespace gip.bso.manufacturing
             CurrentBookParamRelocation = clone;
         }
 
-        protected ACRef<IACPickingManager> ACRefToPickingManager()
+        protected ACRef<ACPickingManager> ACRefToPickingManager()
         {
-            // Falls als Unterobjekt Konfiguriert:
-            IACPickingManager facilityMgr = this.ACUrlCommand("PickingManager") as IACPickingManager;
-
-            // Falls als lokaler Dienst konfiguriert
-            if (facilityMgr == null)
-            {
-                if (this.Root == null || this.Root.InitState == ACInitState.Destructing || this.Root.InitState == ACInitState.Destructed)
-                    return null;
-
-                facilityMgr = this.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as IACPickingManager;
-
-                // Falls als Service Konfiguriert
-                if (facilityMgr == null)
-                    facilityMgr = this.ACUrlCommand("\\Service\\PickingManager") as IACPickingManager;
-            }
-
-            if (facilityMgr != null)
-                return new ACRef<IACPickingManager>(facilityMgr, this);
-            return null;
+            return ACPickingManager.ACRefToServiceInstance(this);
         }
-
 
         protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager,
                                                     out Route validRoute, core.datamodel.ACClassWF workflow, bool sourceFacilityValidation = true)
@@ -342,9 +323,6 @@ namespace gip.bso.manufacturing
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
-            //TODO:
-            //if (this.ACFacilityManager != null)
-            //    return this.ACFacilityManager.C_PWMethodRelocClass; //TODO: single dosing info
             return "PWMethodSingleDosing";
         }
 

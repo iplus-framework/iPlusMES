@@ -1625,7 +1625,7 @@ namespace gip.bso.sales
             {
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
                 if (msg != null)
-                    Root.Messages.Msg(msg);
+                    Messages.Msg(msg);
             }
             PostExecute("CreateInvoice");
         }

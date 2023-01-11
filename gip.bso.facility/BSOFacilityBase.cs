@@ -48,8 +48,8 @@ namespace gip.bso.facility
             }
         }
 
-        protected ACRef<IACPickingManager> _ACPickingManager = null;
-        public IACPickingManager ACPickingManager
+        protected ACRef<ACPickingManager> _ACPickingManager = null;
+        public ACPickingManager ACPickingManager
         {
             get
             {
@@ -139,10 +139,10 @@ namespace gip.bso.facility
             }
         }
 
-        protected ACRef<IACPickingManager> ACRefToPickingManager()
+        protected ACRef<ACPickingManager> ACRefToPickingManager()
         {
             // Falls als Unterobjekt Konfiguriert:
-            IACPickingManager facilityMgr = this.ACUrlCommand("PickingManager") as IACPickingManager;
+            ACPickingManager facilityMgr = this.ACUrlCommand("PickingManager") as ACPickingManager;
 
             // Falls als lokaler Dienst konfiguriert
             if (facilityMgr == null)
@@ -150,23 +150,23 @@ namespace gip.bso.facility
                 if (this.Root == null || this.Root.InitState == ACInitState.Destructing || this.Root.InitState == ACInitState.Destructed)
                     return null;
 
-                facilityMgr = this.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as IACPickingManager;
+                facilityMgr = this.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
 
                 // Falls als Service Konfiguriert
                 if (facilityMgr == null)
-                    facilityMgr = this.ACUrlCommand("\\Service\\PickingManager") as IACPickingManager;
+                    facilityMgr = this.ACUrlCommand("\\Service\\PickingManager") as ACPickingManager;
             }
 
             if (facilityMgr != null)
-                return new ACRef<IACPickingManager>(facilityMgr, this);
+                return new ACRef<ACPickingManager>(facilityMgr, this);
             return null;
         }
 
-        protected void DetachACRefToPickingManager(ACRef<IACPickingManager> acRef)
+        protected void DetachACRefToPickingManager(ACRef<ACPickingManager> acRef)
         {
             if (acRef == null)
                 return;
-            IACPickingManager manager = acRef.ValueT;
+            ACPickingManager manager = acRef.ValueT;
             acRef.Detach();
             if (manager != null)
             {

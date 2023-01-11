@@ -1533,7 +1533,7 @@ namespace gip.bso.manufacturing
             Msg isPartslistNotValid = IsPartslistValid(BSOPartslistExplorer_Child.Value.SelectedPartslist);
             if (isPartslistNotValid != null)
             {
-                Root.Messages.Msg(isPartslistNotValid);
+                Messages.Msg(isPartslistNotValid);
                 return;
             }
             int sequence = AddPartslistSequence ?? 0;
@@ -2707,7 +2707,7 @@ namespace gip.bso.manufacturing
                 Do you want to perform the sum-calculation over the entire network of the material workflow?
                 If you only want to get the sum of the Input-Materials per intermediate, press the No button.
             */
-            Global.MsgResult mr = Root.Messages.YesNoCancel(this, "Question50059", Global.MsgResult.Yes);
+            Global.MsgResult mr = Messages.YesNoCancel(this, "Question50059", Global.MsgResult.Yes);
             if (mr != Global.MsgResult.Cancel)
             {
                 msgWithDetails = ProdOrderManager.IsRecalcIntermediateSumPossible(lastIntermediateProduct);
@@ -2716,7 +2716,7 @@ namespace gip.bso.manufacturing
                 {
                     foreach (Msg msg in msgWithDetails.MsgDetails)
                     {
-                        if (Root.Messages.YesNoCancel(this, msg.Message, Global.MsgResult.OK, true) != Global.MsgResult.Yes)
+                        if (Messages.YesNoCancel(this, msg.Message, Global.MsgResult.OK, true) != Global.MsgResult.Yes)
                         {
                             makeCalc = false;
                         }
@@ -2731,7 +2731,7 @@ namespace gip.bso.manufacturing
 
                 if (msgWithDetails != null && !msgWithDetails.IsSucceded())
                 {
-                    Root.Messages.Msg(msgWithDetails);
+                    Messages.Msg(msgWithDetails);
                 }
             }
 

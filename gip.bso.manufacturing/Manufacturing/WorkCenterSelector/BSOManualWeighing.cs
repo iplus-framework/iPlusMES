@@ -2617,7 +2617,7 @@ namespace gip.bso.manufacturing
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)
             {
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
                 return;
             }
 
