@@ -190,6 +190,7 @@ namespace gip.mes.datamodel
             Merchandise = 8,
             Service = 9,
             Rework = 20,
+            Picking = 30,
             //Services = 100,
             Textarticle = 110,
             Licence = 120       // Nur für Softwarelizenzen
