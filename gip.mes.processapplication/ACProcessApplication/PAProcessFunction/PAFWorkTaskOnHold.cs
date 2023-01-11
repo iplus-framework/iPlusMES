@@ -38,6 +38,11 @@ namespace gip.mes.processapplication
             return base.Start(acMethod);
         }
 
+        public override void SMStarting()
+        {
+            base.SMStarting();
+        }
+
         protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
         {
             ACMethod method = new ACMethod(acIdentifier);

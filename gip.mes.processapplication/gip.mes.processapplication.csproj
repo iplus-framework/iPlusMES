@@ -70,6 +70,7 @@
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAEScrew.cs" />
     <Compile Include="ACProcessApplication\PAModule\3_Assembled\PAETransport.cs" />
     <Compile Include="ACProcessApplication\PAModule\PAEScannerDecoderVB.cs" />
+    <Compile Include="ACProcessApplication\PAProcessFunction\PAFPickingByMaterial.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFTemperature.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkCenterSelItemBase.cs" />
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFWorkTaskGeneric.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="ACProcessApplication\PAProcessModule\PAProcessModuleVB.cs" />
     <Compile Include="ACProcessWorkflow\PWMethod\PWMethodSingleDosing.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWDosingSkip.cs" />
+    <Compile Include="ACProcessWorkflow\PWNodeMethod\PWPickingByMaterial.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWWorkTaskOnHold.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\ScaleBoundaries.cs" />
     <Compile Include="ACProcessWorkflow\PWNodeMethod\PWManualWeighing_Rework.cs" />

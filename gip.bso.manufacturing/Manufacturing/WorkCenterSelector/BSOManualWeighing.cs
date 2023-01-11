@@ -13,7 +13,6 @@ using System.Data;
 using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
-using gip.core.reporthandler;
 
 namespace gip.bso.manufacturing
 {
@@ -127,8 +126,11 @@ namespace gip.bso.manufacturing
 
         private IACContainerT<string> _OrderInfo;
         private IACContainerT<WeighingComponentInfo> _WeighingComponentInfo;
-        private IACContainerT<double> _ScaleActualWeight;
-        private IACContainerT<double> _ScaleActualValue;
+        protected IACContainerT<double> _ScaleActualWeight;
+        protected IACContainerT<double> _ScaleActualValue;
+
+        protected Type _PAFManualWeighingType = typeof(PAFManualWeighing);
+        protected Type _PAFManualAdditionType = typeof(PAFManualAddition);
 
         #endregion
 
@@ -1414,8 +1416,8 @@ namespace gip.bso.manufacturing
 
         public virtual IACComponent GetTargetFunction(IEnumerable<IACComponent> processModuleChildrenComponents)
         {
-            return processModuleChildrenComponents.FirstOrDefault(c => typeof(PAFManualWeighing).IsAssignableFrom(c.ComponentClass.ObjectType)
-                                                                    && !typeof(PAFManualAddition).IsAssignableFrom(c.ComponentClass.ObjectType));
+            return processModuleChildrenComponents.FirstOrDefault(c => _PAFManualWeighingType.IsAssignableFrom(c.ComponentClass.ObjectType)
+                                                                    && !_PAFManualAdditionType.IsAssignableFrom(c.ComponentClass.ObjectType));
         }
 
         public virtual void OnGetPWGroup(IACComponentPWNode pwGroup)
@@ -2113,7 +2115,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void ActWeightProp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected void ActWeightProp_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT && _ScaleActualWeight != null)
             {
@@ -2144,7 +2146,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void OnTargetWeightChanged(double targetWeight)
+        protected void OnTargetWeightChanged(double targetWeight)
         {
             var facilityCharges = FacilityChargeList;
             if (facilityCharges == null || !facilityCharges.Any())
@@ -3058,7 +3060,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void ScaleActualValue_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected void ScaleActualValue_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == Const.ValueT)
             {
