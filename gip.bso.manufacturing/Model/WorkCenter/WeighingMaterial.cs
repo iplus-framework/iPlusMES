@@ -32,6 +32,22 @@ namespace gip.bso.manufacturing
             OnPropertyChanged("MaterialUnitList");
         }
 
+        public WeighingMaterial(vd.PickingPos pickingPos, WeighingComponentState state, ACClassDesign materialIconDesign)
+        {
+            PickingPosition = pickingPos;
+
+            MaterialName = pickingPos.Material.MaterialName1;
+            MaterialNo = pickingPos.Material.MaterialNo;
+            IsLotManaged = pickingPos.Material.IsLotManaged;
+            UnitName = pickingPos.Material?.BaseMDUnit?.MDUnitName;
+
+            MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
+            WeighingMatState = state;
+            MaterialIconDesign = materialIconDesign;
+            ///_ParentACObject = parent;
+            OnPropertyChanged("MaterialUnitList");
+        }
+
         #endregion
 
         #region Properties
@@ -78,6 +94,13 @@ namespace gip.bso.manufacturing
                 }
                 OnPropertyChanged("PosRelation");
             }
+        }
+
+        [ACPropertyInfo(100)]
+        public vd.PickingPos PickingPosition
+        {
+            get;
+            set;
         }
 
         private string _MaterialName;

@@ -38,7 +38,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region Properties
 
         private Type _PAFPickingByMaterialType = typeof(PAFPickingByMaterial);
@@ -60,6 +59,19 @@ namespace gip.bso.manufacturing
             get;
             set;
         }
+
+        public DateTime PWPickingsFrom
+        {
+            get;
+            set;
+        }
+
+        public DateTime PWPickingsTo
+        {
+            get;
+            set;
+        }
+
 
         [ACPropertyInfo(9999, "", "en{'From'}de{'From'}")]
         public DateTime PickingsFrom
@@ -83,10 +95,17 @@ namespace gip.bso.manufacturing
             set
             {
                 _CurrentPicking = value;
+
+                if (_CurrentPicking != null)
+                {
+                    CurrentPickingPos = _CurrentPicking.PickingPos_Picking.FirstOrDefault(c => c.Material.MaterialID == SelectedWeighingMaterial.PickingPosition.Material.MaterialID);
+                }
+
                 OnPropertyChanged();
             }
         }
 
+        private List<Picking> _PickingItems;
 
         private List<Picking> _PickingsList;
         [ACPropertyList(9999, "Picking")]
@@ -107,6 +126,12 @@ namespace gip.bso.manufacturing
             set
             {
                 _CurrentPickingPos = value;
+
+                if (_CurrentPickingPos != null)
+                {
+                    _SelectedWeighingMaterial.TargetQuantity = _CurrentPickingPos.TargetQuantityUOM;
+                    _SelectedWeighingMaterial.ActualQuantity = _CurrentPickingPos.ActualQuantityUOM;
+                }
                 OnPropertyChanged();
             }
         }
@@ -114,13 +139,130 @@ namespace gip.bso.manufacturing
         public override FacilityChargeItem SelectedFacilityCharge 
         { 
             get => base.SelectedFacilityCharge; 
-            set => base.SelectedFacilityCharge = value; 
+            set
+            {
+                _SelectedFacilityCharge = value;
+                if (value != null)
+                    ShowSelectFacilityLotInfo = false;
+
+                OnPropertyChanged("SelectedFacilityCharge");
+
+                if (value != null && InformUserWithMsgNegQuantStock
+                        && (_SelFacilityCharge == null
+                            || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID))
+                {
+                    CheckIsQuantStockNegAndInformUser(value);
+                    _SelFacilityCharge = value;
+                }
+            }
         }
+
+        public override IEnumerable<FacilityChargeItem> FacilityChargeList
+        {
+            get
+            {
+                try
+                {
+                    IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+
+                    if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
+                    {
+                        ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
+                                                                                SelectedWeighingMaterial.PickingPosition.PickingPosID) as ACValueList;
+
+                        var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
+                        if (facilityIDs == null)
+                            return null;
+
+                        using (DatabaseApp dbApp = new DatabaseApp())
+                        {
+                            //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
+
+                            if (_ACFacilityManager == null)
+                            {
+                                _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+                                if (_ACFacilityManager == null)
+                                {
+                                    //Error50432: The facility manager is null.
+                                    Messages.Error(this, "Error50432");
+                                }
+                            }
+
+                            if (SelectedWeighingMaterial.PickingPosition != null)
+                                _FacilityChargeList = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PickingPosition.Material.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
+
+
+
+                            //ACValueList facilityCharges = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetAvailableFacilityCharges), 
+                            //                                                             SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
+                            //if (facilityCharges == null)
+                            //    return null;
+
+                            //    _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge
+                            //                                                                                    .Include(d => d.FacilityLot).Include(d => d.MDUnit).Include(d => d.Material).Include(d => d.Facility)
+                            //                                                                                     .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
+                            //                                         .ToArray();
+
+                            FacilityChargeListCount = _FacilityChargeList.Count();
+                        }
+                    }
+                    return _FacilityChargeList;
+                }
+                catch (Exception e)
+                {
+                    string message = null;
+                    if (e.InnerException != null)
+                        message = string.Format("ManualWeighingModel(FacilityChargeList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
+                    else
+                        message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
+
+                    Messages.Error(this, message, true);
+                }
+                return null;
+            }
+        }
+
 
         public override WeighingMaterial SelectedWeighingMaterial 
         { 
             get => base.SelectedWeighingMaterial; 
-            set => base.SelectedWeighingMaterial = value; 
+            set
+            {
+                if (_SelectedWeighingMaterial != value)
+                {
+
+                    if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
+                    {
+                        _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.ReadyToWeighing, DatabaseApp);
+                    }
+
+                    _SelectedWeighingMaterial = value;
+                    _FacilityChargeList = null;
+                    FacilityChargeListCount = 0;
+                    CurrentPicking = null;
+                    CurrentPickingPos = null;
+                    OnPropertyChanged(nameof(SelectedWeighingMaterial));
+                    OnPropertyChanged(nameof(FacilityChargeList));
+                    FacilityChargeNo = null;
+                    ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
+                    SelectedFacilityCharge = null;
+                    if (_SelectedWeighingMaterial != null)
+                        ShowSelectFacilityLotInfo = true;
+
+                    if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing)
+                    {
+                        //_StartWeighingFromF_FC = true;
+                        _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
+
+                        PickingsList = _PickingItems.Where(c => c.PickingPos_Picking.Any(x => x.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)).ToList();
+                        var temp = PickingsList.SelectMany(c => c.PickingPos_Picking)
+                                                     .Where(c => c.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)
+                                                     .FirstOrDefault(x => x.MDDelivPosLoadState.MDDelivPosLoadStateIndex < (short)MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck);
+
+                        CurrentPicking = temp?.Picking;
+                    }
+                }
+            }
         }
 
         public override ACComponent CurrentProcessModule 
@@ -186,7 +328,47 @@ namespace gip.bso.manufacturing
 
             _PAFACStateProp = pafACState as IACContainerTNet<ACStateEnum>;
 
+            HandlePAFACState(_PAFACStateProp.ValueT);
+
             _PAFACStateProp.PropertyChanged += _PAFACStateProp_PropertyChanged;
+
+            WeighingMaterialsFSM = true;
+        }
+
+        public override void DeActivate()
+        {
+            CurrentProcessModule = null;
+            CurrentPicking = null;
+            CurrentPickingPos = null;
+
+            if (ComponentPWNode != null)
+            {
+                ComponentPWNode.Detach();
+                ComponentPWNode = null;
+            }
+
+            if (_PAFACStateProp != null)
+            {
+                _PAFACStateProp.PropertyChanged -= _PAFACStateProp_PropertyChanged;
+                _PAFACStateProp = null;
+            }
+
+            if (_PAFPickingByMaterial != null)
+            {
+                _PAFPickingByMaterial.Detach();
+                _PAFPickingByMaterial = null;
+            }
+
+            if (_ProcessModuleScales != null && _ProcessModuleScales.Any())
+            {
+                foreach (var scale in _ProcessModuleScales)
+                {
+                    scale.Detach();
+                }
+                _ProcessModuleScales = null;
+            }
+
+            base.DeActivate();
         }
 
         private void _PAFACStateProp_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -217,6 +399,8 @@ namespace gip.bso.manufacturing
 
                     if (pwNode != null)
                     {
+                        ComponentPWNode = new ACRef<IACComponentPWNode>(pwNode, this);
+
                         ACMethod acMethod = pwNode?.ACUrlCommand(nameof(PWPickingByMaterial.MyConfiguration)) as ACMethod;
                         if (acMethod == null)
                         {
@@ -234,27 +418,56 @@ namespace gip.bso.manufacturing
                         if (sourceFacilityNoACValue != null)
                             SourceFacilityNo = sourceFacilityNoACValue.ParamAsString;
 
+                        ACValue fromDTACValue = acMethod.ParameterValueList.GetACValue("FromDT");
+                        if (fromDTACValue != null)
+                            PWPickingsFrom = fromDTACValue.ParamAsDateTime;
+
+                        ACValue toDTACValue = acMethod.ParameterValueList.GetACValue("ToDT");
+                        if (toDTACValue != null)
+                            PWPickingsTo = toDTACValue.ParamAsDateTime;
+
+                        GenerateWeighingModel(PickingType, SourceFacilityNo, PWPickingsFrom, PWPickingsTo);
 
                     }
                 }
             }
             else if (acState == ACStateEnum.SMCompleted)
             {
-
+                
             }
         }
 
-        private void GenerateWeighingModel(string pickingType, string sourceFacilityNo)
+        private void GenerateWeighingModel(string pickingType, string sourceFacilityNo, DateTime from, DateTime to)
         {
+            Guid? pickingTypeID = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDKey == pickingType)?.MDPickingTypeID;
+            if (!pickingTypeID.HasValue)
+            {
+                //todo: error
+                return;
+            }
+
+            Guid? sourceFacilityID = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo)?.FacilityID;
+            if (!sourceFacilityID.HasValue)
+            {
+                //todo error
+                return;
+            }
 
 
+            _PickingItems = DatabaseApp.Picking.Where(c => c.DeliveryDateFrom >= from 
+                                                       && c.DeliveryDateTo <= to
+                                                       && c.MDPickingTypeID == pickingTypeID.Value
+                                                       && (c.PickingStateIndex == (short)PickingStateEnum.New || c.PickingStateIndex == (short)PickingStateEnum.InProcess)
+                                                       && (c.PickingPos_Picking.Any(x => x.FromFacilityID == sourceFacilityID || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == sourceFacilityID))))
+                                              .ToList();
+
+            WeighingMaterialList = _PickingItems.SelectMany(c => c.PickingPos_Picking)
+                                           .GroupBy(c => c.Material.MaterialID)
+                                           .Select(p => new WeighingMaterial(p.FirstOrDefault(), WeighingComponentState.ReadyToWeighing, DefaultMaterialIcon)).ToList();
 
         }
 
-        public override void DeActivate()
-        {
-            base.DeActivate();
-        }
+
 
         [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true)]
         public void RunPickingByMaterial()
@@ -449,7 +662,5 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
-
     }
 }
