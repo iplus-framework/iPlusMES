@@ -752,7 +752,7 @@ namespace gip.bso.manufacturing
                                         .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
                                         .DefaultIfEmpty()
                                         .Sum(),
-                       GroupedPos = c.Where(x => calculateStatistics).ToList()
+                       GroupedPos = c.Where(x => calculateStatistics)
 
 
                    })
@@ -1356,7 +1356,7 @@ namespace gip.bso.manufacturing
                         GroupedPos = new List<ProdOrderPartslistPos>()
                     };
 
-                    tmpOverview.GroupedPos.Add(pos);
+                    (tmpOverview.GroupedPos as List<ProdOrderPartslistPos>).Add(pos);
 
                     tmpOverview.PlannedQuantityUOM += CalculateStatistics ? 0 : pos.TargetQuantityUOM;
 
@@ -1707,7 +1707,7 @@ namespace gip.bso.manufacturing
                                     .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
                                     .DefaultIfEmpty()
                                     .Sum(),
-                   GroupedPos = c.Where(x => calculateStatistics).ToList()
+                   GroupedPos = c.Where(x => calculateStatistics)
 
 
                })

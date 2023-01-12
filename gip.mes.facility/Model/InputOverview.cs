@@ -64,7 +64,7 @@ namespace gip.mes.facility
 
         #endregion
 
-        public List<ProdOrderPartslistPos> GroupedPos { get; set; }
+        public IEnumerable<ProdOrderPartslistPos> GroupedPos { get; set; }
 
         #region Methods
 
