@@ -11,6 +11,16 @@ namespace gip.mes.facility
     public class InputOverview
     {
 
+        #region Final product
+
+        [ACPropertyInfo(301, "General", "en{'Final MaterialNo'}de{'Endgültiger MaterialNr.'}")]
+        public string FinalProductMaterialNo { get; set; }
+
+        [ACPropertyInfo(302, "General", "en{'Final Material name'}de{'Endgültiger Produktname'}")]
+        public string FinalProductMaterialName { get; set; }
+
+        #endregion
+
         #region General
 
         [ACPropertyInfo(101, "General", "en{'MaterialNo'}de{'MaterialNo.'}")]
@@ -54,7 +64,7 @@ namespace gip.mes.facility
 
         #endregion
 
-        public IEnumerable<ProdOrderPartslistPos> GroupedPos { get; set; }
+        public List<ProdOrderPartslistPos> GroupedPos { get; set; }
 
         #region Methods
 

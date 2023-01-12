@@ -2954,14 +2954,14 @@ namespace gip.bso.manufacturing
             {
                 // Error50393
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1839, "Error50393");
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
                 SendMessage(msg);
             }
             if (moveBatchCount <= 0 || moveBatchCount > batchTargetCount)
             {
                 //Error50394.
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1847, "Error50394", batchTargetCount);
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
                 SendMessage(msg);
                 moveBatchCount = 0;
             }
@@ -2975,14 +2975,14 @@ namespace gip.bso.manufacturing
             {
                 // Error50395
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1885, "Error50395");
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
                 SendMessage(msg);
             }
             if (moveQuantity <= Double.Epsilon || moveQuantity > targetQuantity)
             {
                 //Error50396
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1894, "Error50396", targetQuantity);
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
                 SendMessage(msg);
                 moveQuantity = 0;
             }
@@ -3005,7 +3005,7 @@ namespace gip.bso.manufacturing
                     {
                         //Error50397
                         Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1908, "Error50397", tmpWizardPl.BatchSizeMin, moveQuantity);
-                        Root.Messages.Msg(msg);
+                        Messages.Msg(msg);
                         SendMessage(msg);
                         moveQuantity = 0;
                     }

@@ -356,7 +356,28 @@ namespace gip.mes.processapplication
                 }
                 ACValue value = acMethod.ParameterValueList.GetACValue("Route");
                 if (value != null)
-                    PAEControlModuleBase.ActivateRouteOnSimulation(value.ValueT<Route>().Clone() as Route, true);
+                {
+                    using (var db = new Database())
+                    {
+                        core.datamodel.Route route = value.ValueT<core.datamodel.Route>().Clone() as core.datamodel.Route;
+                        try
+                        {
+                            route.AttachTo(db); // Global context
+                            PAEControlModuleBase.ActivateRouteOnSimulation(route, true);
+
+                        }
+                        catch (Exception e)
+                        {
+                            Messages.LogException(this.GetACUrl(), "AnalyzeACMethodResult(20)", e);
+                        }
+                        finally
+                        {
+                            route.Detach(true);
+                        }
+                    }
+
+
+                }
             }
 
             var container = ParentACComponent as IPAMCont;

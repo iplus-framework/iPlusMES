@@ -407,6 +407,25 @@ namespace gip.mes.datamodel
 
         //[ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
 
+        public ProdOrderPartslist _FinalProdOrderPartslist;
+        public ProdOrderPartslist FinalProdOrderPartslist
+        {
+            get
+            {
+                if (_FinalProdOrderPartslist == null)
+                {
+                    if (ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
+                    {
+                        _FinalProdOrderPartslist = ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault().FinalProdOrderPartslist;
+                    }
+                    else
+                    {
+                        _FinalProdOrderPartslist = ProdOrderPartslist;
+                    }
+                }
+                return _FinalProdOrderPartslist;
+            }
+        }
 
         #endregion
 

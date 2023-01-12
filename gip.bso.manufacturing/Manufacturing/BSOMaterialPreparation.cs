@@ -467,7 +467,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
             }
         }
         public bool IsEnabledDeletePicking()

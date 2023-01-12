@@ -1344,7 +1344,7 @@ namespace gip.bso.sales
                 return;
             Msg msg = OutDeliveryNoteManager.NewOutOrderFromOutOffer(DatabaseApp, CurrentOutOffer);
             if (msg != null)
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
         }
 
         public bool IsEnabledCreateOutOrder()

@@ -92,6 +92,7 @@
     <Compile Include="ACProcessApplication\PAProcessFunction\PAFMixing.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMBeltscale.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMContinuosfurnace.cs" />
+    <Compile Include="ACProcessApplication\PAProcessModule\PAMRelocationStation.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMWorkPlaceGeneric.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMDryer.cs" />
     <Compile Include="ACProcessApplication\PAProcessModule\PAMExtruder.cs" />

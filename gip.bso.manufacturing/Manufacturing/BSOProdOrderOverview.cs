@@ -17,13 +17,6 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder overview'}de{'Auftrag Überblick'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOProdOrderOverview : ACBSOvb
     {
-        #region const
-
-        public const string BGWorkerMehtod_Search = "Search";
-        public const string BGWorkerMehtod_SearchInput = "SearchInput";
-        public const string BGWorkerMehtod_LoadOrderPositionsForInputList = "LoadOrderPositionsForInputList";
-
-        #endregion
 
         #region ctor's
 
@@ -72,6 +65,23 @@ namespace gip.bso.manufacturing
             return b;
         }
 
+        #endregion
+
+        #region Database
+
+        private DatabaseApp _DatabaseApp;
+        public override DatabaseApp DatabaseApp
+        {
+            get
+            {
+                if (_DatabaseApp == null)
+                {
+                    _DatabaseApp = GetDatabaseApp();
+                }
+
+                return _DatabaseApp;
+            }
+        }
         #endregion
 
         #region Manager
@@ -578,7 +588,48 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Input
 
+        #region FinalInput
 
+        private InputOverview _SelectedFinalInput;
+        /// <summary>
+        /// Selected property for InputOverview
+        /// </summary>
+        /// <value>The selected Input</value>
+        [ACPropertySelected(9999, "FinalInput", "en{'TODO: Input'}de{'TODO: Input'}")]
+        public InputOverview SelectedFinalInput
+        {
+            get
+            {
+                return _SelectedFinalInput;
+            }
+            set
+            {
+                if (_SelectedFinalInput != value)
+                {
+                    _SelectedFinalInput = value;
+                    OnPropertyChanged(nameof(SelectedFinalInput));
+                }
+            }
+        }
+
+
+        private List<InputOverview> _FinalInputList;
+        /// <summary>
+        /// List property for InputOverview
+        /// </summary>
+        /// <value>The Input list</value>
+        [ACPropertyList(9999, "FinalInput")]
+        public List<InputOverview> FinalInputList
+        {
+            get
+            {
+                if (_FinalInputList == null)
+                    _FinalInputList = new List<InputOverview>();
+                return _FinalInputList;
+            }
+        }
+
+        #endregion
 
         #region Input
 
@@ -626,6 +677,91 @@ namespace gip.bso.manufacturing
             string filterDepartmentName, string filterFacilityNo)
         {
             List<InputOverview> items = s_cQry_Inputs(databaseApp, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, filterFacilityNo, CalculateStatistics).ToList();
+            foreach (InputOverview item in items)
+            {
+                if (CalculateStatistics)
+                    item.CalculateStatistics();
+                item.CalculateDiff();
+            }
+            return items;
+        }
+
+        private List<InputOverview> LoadInputList1(List<ProdOrderPartslistOverview> overviewPl, string filterFacilityNo, bool calculateStatistics)
+        {
+            List<InputOverview> items = new List<InputOverview>();
+
+            foreach (ProdOrderPartslistOverview pl in overviewPl)
+            {
+                List<InputOverview> tempItems =
+                    pl
+                    .ProdOrderPartslist
+                    .ProdOrderPartslistPos_ProdOrderPartslist
+                    .Where(c =>
+                     c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+                        && (
+                                string.IsNullOrEmpty(filterFacilityNo)
+                                || c
+                                    .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                    .Where(x =>
+                                                    x.OutwardFacility != null
+                                                    && (
+                                                            x.OutwardFacility.FacilityNo == filterFacilityNo
+                                                            || (x.OutwardFacility.Facility1_ParentFacility != null && x.OutwardFacility.Facility1_ParentFacility.FacilityNo == filterFacilityNo)
+                                                        )
+                                            ).Any()
+                    )).GroupBy(c => new { c.Material.MaterialNo, c.Material.MaterialName1 })
+
+                   .Select(c => new InputOverview()
+                   {
+                       // General
+                       MaterialNo = c.Key.MaterialNo,
+                       MaterialName = c.Key.MaterialName1,
+                       MDUnitName = c.Where(x => x.Material.BaseMDUnit != null).Select(x => x.Material.BaseMDUnit.TechnicalSymbol).DefaultIfEmpty().FirstOrDefault(),
+
+                       // Quantites
+                       PlannedQuantityUOM = calculateStatistics ? 0 :
+                                       c.Select(x => x.TargetQuantityUOM)
+                                       .DefaultIfEmpty()
+                                       .Sum(),
+
+                       TargetQuantityUOM =
+                                       c.SelectMany(x => x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                                       .Where(x => x.TargetProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+                                       .Select(x => x.TargetQuantityUOM)
+                                       .DefaultIfEmpty()
+                                       .Sum(),
+
+                       // Output
+                       ActualQuantityUOM = calculateStatistics ? 0 :
+                                        c.SelectMany(x => x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                                        .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                        .Select(x => x.OutwardQuantity)
+                                        .DefaultIfEmpty()
+                                        .Sum(),
+
+                       ZeroPostingQuantityUOM = c.SelectMany(x => x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos)
+                                        .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                        .Where(x => x.OutwardFacilityCharge != null)
+                                        .Select(x => x.OutwardFacilityCharge)
+                                        .SelectMany(x => x.FacilityBooking_InwardFacilityCharge)
+                                        .Where(x => x.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
+                                        .SelectMany(x => x.FacilityBookingCharge_FacilityBooking)
+                                        .Select(x => new { x.FacilityBookingChargeID, x.InwardQuantityUOM, x.OutwardQuantityUOM })
+                                        .Distinct()
+                                        .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
+                                        .DefaultIfEmpty()
+                                        .Sum(),
+                       GroupedPos = c.Where(x => calculateStatistics).ToList()
+
+
+                   })
+                   .OrderBy(c => c.MaterialNo)
+                   .ToList();
+
+                items.AddRange(tempItems);
+            }
+
             foreach (InputOverview item in items)
             {
                 if (CalculateStatistics)
@@ -704,7 +840,30 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
             OnPropertyChanged(nameof(OverviewMaterialList));
 
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_Search);
+            BackgroundWorker.RunWorkerAsync(nameof(DoLoadOverviewProdOrderPartslistAndMaterial));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        /// <summary>
+        /// Source Property: Search
+        /// </summary>
+        [ACMethodInfo("Search2", "en{'Search'}de{'Suchen'}", 999)]
+        public void Search2()
+        {
+            if (!IsEnabledSearch())
+                return;
+
+            _OverviewProdOrderPartslistList = null;
+            _OverviewMaterialList = null;
+            _InputList = null;
+            _FinalInputList = null;
+
+            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
+            OnPropertyChanged(nameof(OverviewMaterialList));
+            OnPropertyChanged(nameof(InputList));
+            OnPropertyChanged(nameof(FinalInputList));
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoSearch2));
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -782,7 +941,7 @@ namespace gip.bso.manufacturing
             _InputList = null;
             OnPropertyChanged(nameof(InputList));
 
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchInput);
+            BackgroundWorker.RunWorkerAsync(nameof(DoLoadInput));
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -821,7 +980,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledShowOrderPositionsForInput())
                 return;
 
-            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_LoadOrderPositionsForInputList);
+            BackgroundWorker.RunWorkerAsync(nameof(DoLoadOrderPositionsForInputList));
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -879,19 +1038,22 @@ namespace gip.bso.manufacturing
             string updateName = Root.Environment.User.Initials;
             switch (command)
             {
-                case BGWorkerMehtod_Search:
-                    e.Result = DoSearch(command, true, false);
+                case nameof(DoLoadOverviewProdOrderPartslistAndMaterial):
+                    e.Result = DoLoadOverviewProdOrderPartslistAndMaterial();
                     break;
 
-                case BGWorkerMehtod_SearchInput:
-                    e.Result = DoSearch(command, false, true);
+                case nameof(DoLoadInput):
+                    e.Result = DoLoadInput();
                     break;
                 case nameof(DoRecalculateAllStatsAsync):
                     e.Result = DoRecalculateAllStatsAsync();
                     break;
-                case BGWorkerMehtod_LoadOrderPositionsForInputList:
+                case nameof(DoLoadOrderPositionsForInputList):
                     bool loadRelatedLists = OverviewProdOrderPartslistList == null || !OverviewProdOrderPartslistList.Any();
                     e.Result = DoLoadOrderPositionsForInputList(SelectedInput.MaterialNo, OverviewProdOrderPartslistList, loadRelatedLists);
+                    break;
+                case nameof(DoSearch2):
+                    e.Result = DoSearch2();
                     break;
             }
         }
@@ -917,7 +1079,7 @@ namespace gip.bso.manufacturing
                 BSOProdOrderOverview_SearchResult result = null;
                 switch (command)
                 {
-                    case BGWorkerMehtod_Search:
+                    case nameof(DoLoadOverviewProdOrderPartslistAndMaterial):
                         result = e.Result as BSOProdOrderOverview_SearchResult;
                         if (result != null)
                         {
@@ -928,7 +1090,7 @@ namespace gip.bso.manufacturing
                             OnPropertyChanged(nameof(OverviewMaterialList));
                         }
                         break;
-                    case BGWorkerMehtod_SearchInput:
+                    case nameof(DoLoadInput):
                         result = e.Result as BSOProdOrderOverview_SearchResult;
                         if (result != null)
                         {
@@ -940,7 +1102,7 @@ namespace gip.bso.manufacturing
                     case nameof(DoRecalculateAllStatsAsync):
                         break;
 
-                    case BGWorkerMehtod_LoadOrderPositionsForInputList:
+                    case nameof(DoLoadOrderPositionsForInputList):
                         result = e.Result as BSOProdOrderOverview_SearchResult;
                         if (result != null)
                         {
@@ -958,6 +1120,23 @@ namespace gip.bso.manufacturing
                             ShowDialog(this, "OrderPositionsForInputDlg");
                         }
                         break;
+                    case nameof(DoSearch2):
+                        result = e.Result as BSOProdOrderOverview_SearchResult;
+                        if (result != null)
+                        {
+                            _OverviewProdOrderPartslistList = result.OverviewProdOrderPartslist;
+                            _OverviewMaterialList = result.OverviewMaterial;
+
+                            OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
+                            OnPropertyChanged(nameof(OverviewMaterialList));
+
+                            _InputList = result.InputOverview;
+                            OnPropertyChanged(nameof(InputList));
+
+                            _FinalInputList = result.FinalProductInputOverview;
+                            OnPropertyChanged(nameof(FinalInputList));
+                        }
+                        break;
                 }
                 if (result != null)
                 {
@@ -970,6 +1149,16 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Background worker DoMethods
+
+        private BSOProdOrderOverview_SearchResult DoLoadOverviewProdOrderPartslistAndMaterial()
+        {
+            return DoSearch(nameof(DoLoadOverviewProdOrderPartslistAndMaterial), true, false);
+        }
+
+        private BSOProdOrderOverview_SearchResult DoLoadInput()
+        {
+            return DoSearch(nameof(DoLoadInput), false, true);
+        }
 
         private BSOProdOrderOverview_SearchResult DoSearch(string operationName, bool searchPlAndMt, bool searchInputs)
         {
@@ -997,37 +1186,34 @@ namespace gip.bso.manufacturing
                 endProdTime = null;
             }
 
-            using (DatabaseApp databaseApp = new DatabaseApp())
+
+            List<ProdOrderPartslistOverview> overviewPl = null;
+            List<ProdOrderPartslistOverview> overviewMt = null;
+
+            if (searchPlAndMt)
             {
-                databaseApp.CommandTimeout = 60 * CommandTimeout;
-
-                List<ProdOrderPartslistOverview> overviewPl = null;
-                List<ProdOrderPartslistOverview> overviewMt = null;
-
-                if (searchPlAndMt)
-                {
-                    overviewPl = LoadOverviewProdOrderPartslist(databaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName);
-                    if (overviewPl != null)
-                        overviewMt = LoadOverviewMaterialList(overviewPl);
-                }
-
-                List<InputOverview> inputOverview = null;
-                if (searchInputs)
-                {
-                    inputOverview = LoadInputList(databaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, facilityNo);
-                }
-
-                return new BSOProdOrderOverview_SearchResult()
-                {
-                    OperationName = operationName,
-                    OperationStartTime = startTime,
-                    OperationEndTime = DateTime.Now,
-
-                    OverviewProdOrderPartslist = overviewPl,
-                    OverviewMaterial = overviewMt,
-                    InputOverview = inputOverview
-                };
+                overviewPl = LoadOverviewProdOrderPartslist(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName);
+                if (overviewPl != null)
+                    overviewMt = LoadOverviewMaterialList(overviewPl);
             }
+
+            List<InputOverview> inputOverview = null;
+            if (searchInputs)
+            {
+                inputOverview = LoadInputList(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, facilityNo);
+                //inputOverview = LoadInputList1(OverviewProdOrderPartslistList, facilityNo, CalculateStatistics);
+            }
+
+            return new BSOProdOrderOverview_SearchResult()
+            {
+                OperationName = operationName,
+                OperationStartTime = startTime,
+                OperationEndTime = DateTime.Now,
+
+                OverviewProdOrderPartslist = overviewPl,
+                OverviewMaterial = overviewMt,
+                InputOverview = inputOverview
+            };
         }
 
         private bool DoRecalculateAllStatsAsync()
@@ -1070,47 +1256,247 @@ namespace gip.bso.manufacturing
                 OperationStartTime = DateTime.Now
             };
 
-            using (DatabaseApp databaseApp = new DatabaseApp())
+
+            if (loadRelatedLists)
             {
-                databaseApp.CommandTimeout = 60 * CommandTimeout;
+                BSOProdOrderOverview_SearchResult preparedData = DoSearch("", true, false);
+                result.OverviewProdOrderPartslist = preparedData.OverviewProdOrderPartslist;
+                result.OverviewMaterial = preparedData.OverviewMaterial;
 
-                if (loadRelatedLists)
-                {
-                    BSOProdOrderOverview_SearchResult preparedData = DoSearch("", true, false);
-                    result.OverviewProdOrderPartslist = preparedData.OverviewProdOrderPartslist;
-                    result.OverviewMaterial = preparedData.OverviewMaterial;
-
-                    prodOrderPartslistOverviews = result.OverviewProdOrderPartslist;
-                }
-
-                List<ProdOrderPartslistPos> list = new List<ProdOrderPartslistPos>();
-
-                Material material = databaseApp.Material.FirstOrDefault(c => c.MaterialNo == materialNo);
-                if (material != null && prodOrderPartslistOverviews != null)
-                {
-                    Guid[] plIds = prodOrderPartslistOverviews.Select(c => c.ProdOrderPartslist.ProdOrderPartslistID).ToArray();
-
-                    list =
-                        databaseApp
-                        .ProdOrderPartslistPos
-                        .Include("ProdOrderPartslist")
-                        .Include("ProdOrderPartslist.Partslist")
-                        .Include("ProdOrderPartslist.ProdOrder")
-                        .Where(c => plIds.Contains(c.ProdOrderPartslistID) && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.Material.MaterialNo == materialNo)
-                        .ToList();
-                }
-
-                if (list.Any())
-                {
-                    list = list.OrderByDescending(c => c.InputQForFinalScrapActualOutputPer).ToList();
-                }
-
-                result.OrderPositionsForInputList = list;
+                prodOrderPartslistOverviews = result.OverviewProdOrderPartslist;
             }
+
+            List<ProdOrderPartslistPos> list = new List<ProdOrderPartslistPos>();
+
+            Material material = DatabaseApp.Material.FirstOrDefault(c => c.MaterialNo == materialNo);
+            if (material != null && prodOrderPartslistOverviews != null)
+            {
+                Guid[] plIds = prodOrderPartslistOverviews.Select(c => c.ProdOrderPartslist.ProdOrderPartslistID).ToArray();
+
+                list =
+                    DatabaseApp
+                    .ProdOrderPartslistPos
+                    .Include("ProdOrderPartslist")
+                    .Include("ProdOrderPartslist.Partslist")
+                    .Include("ProdOrderPartslist.ProdOrder")
+                    .Where(c => plIds.Contains(c.ProdOrderPartslistID) && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.Material.MaterialNo == materialNo)
+                    .ToList();
+            }
+
+            if (list.Any())
+            {
+                list = list.OrderByDescending(c => c.InputQForFinalScrapActualOutputPer).ToList();
+            }
+
+            result.OrderPositionsForInputList = list;
 
             result.OperationEndTime = DateTime.Now;
             return result;
         }
+
+
+        private BSOProdOrderOverview_SearchResult DoSearch2()
+        {
+            BSOProdOrderOverview_SearchResult result = new BSOProdOrderOverview_SearchResult() { OperationStartTime = DateTime.Now, OperationName = nameof(DoSearch2) };
+
+            DateTime startTime = DateTime.Now;
+
+            DateTime? startProdTime = FilterStartDate;
+            DateTime? endProdTime = FilterEndDate;
+
+            DateTime? startBookingTime = null;
+            DateTime? endBookingTime = null;
+
+            string facilityNo = null;
+
+            if (SelectedFilterFacility != null)
+            {
+                facilityNo = SelectedFilterFacility.FacilityNo;
+            }
+
+            if (FilterTimeFilterType != null && FilterTimeFilterType == TimeFilterTypeEnum.BookingTime)
+            {
+                startBookingTime = FilterStartDate;
+                endBookingTime = FilterEndDate;
+
+                startProdTime = null;
+                endProdTime = null;
+            }
+
+            ProdOrderPartslistPos[] query = s_cQry_Inputs1(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, CalculateStatistics).ToArray();
+
+            result.OverviewProdOrderPartslist = new List<ProdOrderPartslistOverview>();
+            result.OverviewMaterial = new List<ProdOrderPartslistOverview>();
+            result.InputOverview = new List<InputOverview>();
+            result.FinalProductInputOverview = new List<InputOverview>();
+
+
+            foreach (ProdOrderPartslistPos pos in query)
+            {
+                string finalMaterialNo = pos.FinalProdOrderPartslist.Partslist.Material.MaterialNo;
+                string finalMaterialName = pos.FinalProdOrderPartslist.Partslist.Material.MaterialName1;
+                // FinalProductInputOverview
+                InputOverview tmpOverview =
+                    result
+                    .FinalProductInputOverview
+                    .Where(c =>
+                        c.FinalProductMaterialNo == finalMaterialNo
+                        && c.MaterialNo == pos.Material.MaterialNo
+                    )
+                    .FirstOrDefault();
+
+                if (tmpOverview == null)
+                {
+                    tmpOverview = new InputOverview()
+                    {
+                        FinalProductMaterialNo = finalMaterialNo,
+                        FinalProductMaterialName = finalMaterialName,
+                        MaterialNo = pos.Material.MaterialNo,
+                        MaterialName = pos.Material.MaterialName1,
+                        GroupedPos = new List<ProdOrderPartslistPos>()
+                    };
+
+                    tmpOverview.GroupedPos.Add(pos);
+
+                    tmpOverview.PlannedQuantityUOM += CalculateStatistics ? 0 : pos.TargetQuantityUOM;
+
+                    tmpOverview.TargetQuantityUOM +=
+                                       pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                                       .Where(x => x.TargetProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+                                       .Select(x => x.TargetQuantityUOM)
+                                       .DefaultIfEmpty()
+                                       .Sum();
+
+                    // Output
+                    tmpOverview.ActualQuantityUOM += CalculateStatistics ? 0 :
+                                    pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                    .Select(x => x.OutwardQuantity)
+                                    .DefaultIfEmpty()
+                                    .Sum();
+
+                    tmpOverview.ZeroPostingQuantityUOM += pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                                    .Where(x => x.OutwardFacilityCharge != null)
+                                    .Select(x => x.OutwardFacilityCharge)
+                                    .SelectMany(x => x.FacilityBooking_InwardFacilityCharge)
+                                    .Where(x => x.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
+                                    .SelectMany(x => x.FacilityBookingCharge_FacilityBooking)
+                                    .Select(x => new { x.FacilityBookingChargeID, x.InwardQuantityUOM, x.OutwardQuantityUOM })
+                                    .Distinct()
+                                    .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
+                                    .DefaultIfEmpty()
+                                    .Sum();
+
+
+
+                    result.FinalProductInputOverview.Add(tmpOverview);
+                }
+
+
+                // OverviewProdOrderPartslist
+                ProdOrderPartslistOverview plOverview =
+                    result
+                    .OverviewProdOrderPartslist
+                    .Where(c => c.ProdOrderPartslist.ProdOrderPartslistID == pos.ProdOrderPartslistID)
+                    .FirstOrDefault();
+                if (plOverview == null)
+                {
+                    plOverview = new ProdOrderPartslistOverview();
+                    plOverview.ProdOrderPartslist = pos.ProdOrderPartslist;
+
+                    plOverview.ProgramNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                    plOverview.MaterialNo = pos.ProdOrderPartslist.Partslist.Material.MaterialNo;
+                    plOverview.MaterialName = pos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                    plOverview.MDUnitName = pos.ProdOrderPartslist.Partslist.MDUnit.TechnicalSymbol;
+                    plOverview.DepartmentUserName = pos.ProdOrderPartslist.DepartmentUserName;
+
+                    // Output
+                    plOverview.InwardPlannedQuantityUOM = pos.ProdOrderPartslist.TargetQuantity;
+
+                    plOverview.InwardTargetQuantityUOM =
+                                    pos.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern && !x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                                    .SelectMany(x => x.ProdOrderPartslistPos_ParentProdOrderPartslistPos)
+                                    .Select(x => x.TargetQuantityUOM)
+                                    .DefaultIfEmpty()
+                                    .Sum();
+
+                    plOverview.InwardActualQuantityUOM = pos.ProdOrderPartslist.ActualQuantity;
+
+                    plOverview.InwardActualQuantityScrapUOM = pos.ProdOrderPartslist.ActualQuantityScrapUOM;
+
+                    // Usage
+                    plOverview.UsageTargetQuantityUOM =
+                             pos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist
+                            .Select(x => x.TargetQuantityUOM)
+                            .DefaultIfEmpty()
+                            .Sum();
+
+                    plOverview.UsageActualQuantityUOM =
+                            pos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist
+                            .Select(x => x.ActualQuantityUOM)
+                            .DefaultIfEmpty()
+                            .Sum();
+
+                    plOverview.CalculateDiff();
+                    if (CalculateStatistics)
+                        plOverview.CalculateStatistics();
+
+                    result.OverviewProdOrderPartslist.Add(plOverview);
+                }
+            }
+
+            result.OverviewProdOrderPartslist = result.OverviewProdOrderPartslist.OrderBy(c => c.ProgramNo).ThenBy(c => c.MaterialNo).ToList();
+
+
+            // OverviewMaterial
+            result.OverviewMaterial = LoadOverviewMaterialList(result.OverviewProdOrderPartslist);
+
+
+            foreach (var finalInputOverview in result.FinalProductInputOverview)
+            {
+                if (CalculateStatistics)
+                    finalInputOverview.CalculateStatistics();
+                finalInputOverview.CalculateDiff();
+            }
+
+            result.InputOverview =
+                result.FinalProductInputOverview
+                .GroupBy(c => new { c.MaterialNo, c.MaterialName })
+                .Select(c => new InputOverview()
+                {
+                    MaterialNo = c.Key.MaterialNo,
+                    MaterialName = c.Key.MaterialName,
+
+                    PlannedQuantityUOM = c.Select(x => x.PlannedQuantityUOM).Sum(),
+                    TargetQuantityUOM = c.Select(x => x.TargetQuantityUOM).Sum(),
+                    ActualQuantityUOM = c.Select(x => x.ActualQuantityUOM).Sum(),
+                    ZeroPostingQuantityUOM = c.Select(x => x.ZeroPostingQuantityUOM).Sum(),
+
+                    GroupedPos = c.SelectMany(x => x.GroupedPos).ToList()
+
+                })
+                .OrderBy(c => c.MaterialNo)
+                .ToList();
+
+            foreach (var inputOverview in result.InputOverview)
+            {
+                if (CalculateStatistics)
+                    inputOverview.CalculateStatistics();
+                inputOverview.CalculateDiff();
+            }
+
+     
+
+            result.FinalProductInputOverview = result.FinalProductInputOverview.OrderBy(c=>c.FinalProductMaterialNo).ThenBy(c=>c.MaterialNo).ToList();
+
+            result.OperationEndTime = DateTime.Now;
+
+            return result;
+        }
+
+
 
         #endregion
 
@@ -1321,12 +1707,60 @@ namespace gip.bso.manufacturing
                                     .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
                                     .DefaultIfEmpty()
                                     .Sum(),
-                   GroupedPos = c.Where(x => calculateStatistics)
+                   GroupedPos = c.Where(x => calculateStatistics).ToList()
 
 
                })
                .OrderBy(c => c.MaterialNo)
        );
+
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>> s_cQry_Inputs1 =
+       CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>>(
+           (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, calculateStatistics) =>
+              ctx
+              .ProdOrderPartslistPos
+
+               .Include("ProdOrderPartslist")
+               .Include("ProdOrderPartslist.Partslist")
+               .Include("ProdOrderPartslist.ProdOrder")
+               .Include("ProdOrderPartslist.Partslist.Material")
+
+               .Include("FacilityBooking_ProdOrderPartslistPos")
+
+
+               .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos")
+               .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.TargetProdOrderPartslistPos")
+               .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation")
+               .Include("ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.FacilityBooking_ProdOrderPartslistPosRelation.OutwardFacility")
+
+               .Where(c =>
+
+                        // filtering partslist
+                        (filterProdStartDate == null || c.ProdOrderPartslist.StartDate >= filterProdStartDate)
+                        && (filterProdEndDate == null || c.ProdOrderPartslist.StartDate < filterProdEndDate)
+                        && (filterStartBookingDate == null || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.InsertDate >= filterStartBookingDate).Any())
+                        && (filterEndBookingDate == null || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.InsertDate < filterEndBookingDate).Any())
+                        && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(filterProgramNo))
+                        && (string.IsNullOrEmpty(filterMaterialNo) || c.Material.MaterialNo.Contains(filterMaterialNo) || c.Material.MaterialName1.Contains(filterMaterialNo))
+                        && (string.IsNullOrEmpty(filterDepartmentName) || c.ProdOrderPartslist.DepartmentUserName.Contains(filterDepartmentName))
+
+                       // filtering pos
+                       && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
+               //&& (
+               //        string.IsNullOrEmpty(filterFacilityNo)
+               //        || c
+               //            .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+               //            .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+               //            .Where(x =>
+               //                            x.OutwardFacility != null
+               //                            && (
+               //                                    x.OutwardFacility.FacilityNo == filterFacilityNo
+               //                                    || (x.OutwardFacility.Facility1_ParentFacility != null && x.OutwardFacility.Facility1_ParentFacility.FacilityNo == filterFacilityNo)
+               //                                )
+               //                    ).Any()
+               //        )
+               )
+      );
 
         #endregion
 
@@ -1348,6 +1782,36 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
+
+        #region Private methods
+
+        private DatabaseApp GetDatabaseApp()
+        {
+            DatabaseApp databaseApp = null;
+            if (ParentACComponent is Businessobjects
+                    || !(ParentACComponent is ACBSOvb || ParentACComponent is ACBSOvbNav))
+            {
+                databaseApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>(this.GetACUrl());
+            }
+            else
+            {
+                ACBSOvbNav parentNav = ParentACComponent as ACBSOvbNav;
+                if (parentNav != null)
+                    return parentNav.DatabaseApp;
+                ACBSOvb parent = ParentACComponent as ACBSOvb;
+                if (parent != null)
+                    return parent.DatabaseApp;
+                databaseApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>(this.GetACUrl());
+            }
+
+            if (databaseApp != null)
+            {
+                databaseApp.CommandTimeout = CommandTimeout * 60;
+            }
+            return databaseApp;
+        }
+
+        #endregion
     }
 
 
@@ -1356,6 +1820,7 @@ namespace gip.bso.manufacturing
         public List<ProdOrderPartslistOverview> OverviewProdOrderPartslist { get; set; }
         public List<ProdOrderPartslistOverview> OverviewMaterial { get; set; }
         public List<InputOverview> InputOverview { get; set; }
+        public List<InputOverview> FinalProductInputOverview { get; set; }
         public List<ProdOrderPartslistPos> OrderPositionsForInputList { get; set; }
         public DateTime OperationStartTime { get; set; }
         public DateTime OperationEndTime { get; set; }

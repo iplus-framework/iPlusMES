@@ -483,10 +483,10 @@ namespace gip.bso.manufacturing
                 if (msgWithDetails == null)
                 {
                     string[] generatedNos = generated.Select(c => c.ProgramNo).OrderBy(c => c).ToArray();
-                    Root.Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
+                    Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
                 }
                 else
-                    Root.Messages.Msg(msgWithDetails);
+                    Messages.Msg(msgWithDetails);
 
                 foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
                 {
@@ -496,7 +496,7 @@ namespace gip.bso.manufacturing
             catch (Exception ec)
             {
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
-                Root.Messages.Msg(msg);
+                Messages.Msg(msg);
             }
         }
 
