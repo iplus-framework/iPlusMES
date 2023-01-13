@@ -82,6 +82,7 @@ namespace gip.bso.manufacturing
                 return _DatabaseApp;
             }
         }
+
         #endregion
 
         #region Manager
@@ -323,6 +324,8 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Filter -> Facility
 
+
+        #region Properties -> Filter -> Facility -> Common
         public List<ACFilterItem> FilterFacilityNavigationqueryDefaultFilter
         {
             get
@@ -372,8 +375,12 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999, "FilterFacility")]
-        public IEnumerable<Facility> FilterFacilityList
+        #endregion
+
+        #region Properties -> Filter -> Facility -> Input
+
+        [ACPropertyInfo(9999, "InputFilterFacility")]
+        public IEnumerable<Facility> InputFilterFacilityList
         {
             get
             {
@@ -381,23 +388,56 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private Facility _SelectedFilterFacility;
-        [ACPropertySelected(9999, "FilterFacility", ConstApp.Facility)]
-        public Facility SelectedFilterFacility
+        private Facility _SelectedInputFilterFacility;
+        [ACPropertySelected(9999, "InputFilterFacility", ConstApp.Facility)]
+        public Facility SelectedInputFilterFacility
         {
             get
             {
-                return _SelectedFilterFacility;
+                return _SelectedInputFilterFacility;
             }
             set
             {
-                if (_SelectedFilterFacility != value)
+                if (_SelectedInputFilterFacility != value)
                 {
-                    _SelectedFilterFacility = value;
-                    OnPropertyChanged(nameof(SelectedFilterFacility));
+                    _SelectedInputFilterFacility = value;
+                    OnPropertyChanged();
                 }
             }
         }
+
+        #endregion
+
+        #region Properties -> Filter -> Facility -> FinalInput
+
+        [ACPropertyInfo(9999, "FinalInputFilterFacility")]
+        public IEnumerable<Facility> FinalInputFilterFacilityList
+        {
+            get
+            {
+                return AccessFilterFacility.NavList;
+            }
+        }
+
+        private Facility _SelectedFinalInputFilterFacility;
+        [ACPropertySelected(9999, "FinalInputFilterFacility", ConstApp.Facility)]
+        public Facility SelectedFinalInputFilterFacility
+        {
+            get
+            {
+                return _SelectedFinalInputFilterFacility;
+            }
+            set
+            {
+                if (_SelectedFinalInputFilterFacility != value)
+                {
+                    _SelectedFinalInputFilterFacility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -613,6 +653,7 @@ namespace gip.bso.manufacturing
         }
 
 
+        private List<InputOverview> _FinalInputListFull;
         private List<InputOverview> _FinalInputList;
         /// <summary>
         /// List property for InputOverview
@@ -656,6 +697,7 @@ namespace gip.bso.manufacturing
         }
 
 
+        private List<InputOverview> _InputListFull;
         private List<InputOverview> _InputList;
         /// <summary>
         /// List property for InputOverview
@@ -855,8 +897,13 @@ namespace gip.bso.manufacturing
 
             _OverviewProdOrderPartslistList = null;
             _OverviewMaterialList = null;
+            _InputListFull = null;
             _InputList = null;
             _FinalInputList = null;
+            _FinalInputListFull = null;
+
+            SelectedInputFilterFacility = null;
+            SelectedFinalInputFilterFacility = null;
 
             OnPropertyChanged(nameof(OverviewProdOrderPartslistList));
             OnPropertyChanged(nameof(OverviewMaterialList));
@@ -897,30 +944,63 @@ namespace gip.bso.manufacturing
             return SelectedOverviewProdOrderPartslist != null && SelectedOverviewProdOrderPartslist.ProdOrderPartslist != null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [ACMethodInfo("ShowDlgFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
-        public void ShowDlgFilterFacility()
+        private Tuple<bool, Facility> SelectFilterFacilityCommon(Facility preSelectedFacility)
         {
-            if (!IsEnabledShowDlgFilterToFacility())
-                return;
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterFacility != null ? SelectedFilterFacility : null);
+            Facility selectedFacility = null;
+            bool userSelection = false;
+            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(preSelectedFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
+                userSelection = true;
                 Facility facility = dlgResult.ReturnValue as Facility;
                 if (facility != null)
                     if (!AccessFilterFacility.NavList.Contains(facility))
                         AccessFilterFacility.NavList.Add(facility);
 
-                if (SelectedFilterFacility != facility)
+                if (selectedFacility != facility)
                 {
-                    SelectedFilterFacility = facility;
+                    selectedFacility = facility;
                 }
+            }
+            return new Tuple<bool, Facility>(userSelection, selectedFacility);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgInputFilterFacility()
+        {
+            if (!IsEnabledShowDlgFilterToFacility())
+                return;
+            Tuple<bool, Facility> userSelection = SelectFilterFacilityCommon(SelectedInputFilterFacility);
+            if (userSelection.Item1)
+            {
+                SelectedInputFilterFacility = userSelection.Item2;
             }
         }
 
         public bool IsEnabledShowDlgFilterToFacility()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        public void ShowDlgFinalInputFilterFacility()
+        {
+            if (!IsEnabledShowDlgFinalInputFilterFacility())
+                return;
+            Tuple<bool, Facility> userSelection = SelectFilterFacilityCommon(SelectedFinalInputFilterFacility);
+            if (userSelection.Item1)
+            {
+                SelectedFinalInputFilterFacility = userSelection.Item2;
+            }
+        }
+
+        public bool IsEnabledShowDlgFinalInputFilterFacility()
         {
             return true;
         }
@@ -939,6 +1019,7 @@ namespace gip.bso.manufacturing
                 return;
 
             _InputList = null;
+            _InputListFull = null;
             OnPropertyChanged(nameof(InputList));
 
             BackgroundWorker.RunWorkerAsync(nameof(DoLoadInput));
@@ -948,6 +1029,48 @@ namespace gip.bso.manufacturing
         public bool IsEnabledSearchInputs()
         {
             return IsEnabledSearch();
+        }
+
+        /// <summary>
+        /// Source Property: SearchInputs
+        /// </summary>
+        [ACMethodInfo("FilterFacilityInputs", "en{'Filter'}de{'Filter'}", 999)]
+        public void FilterFacilityInputs()
+        {
+            if (!IsEnabledFilterFacilityInputs())
+                return;
+
+            _InputList = null;
+            OnPropertyChanged(nameof(InputList));
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoFilterFacilityInputs));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledFilterFacilityInputs()
+        {
+            return _InputListFull != null && _InputListFull.Any();
+        }
+
+        /// <summary>
+        /// Source Property: SearchInputs
+        /// </summary>
+        [ACMethodInfo("FilterFacilityFinalInputs", "en{'Filter'}de{'Filter'}", 999)]
+        public void FilterFacilityFinalInputs()
+        {
+            if (!IsEnabledFilterFacilityInputs())
+                return;
+
+            _FinalInputList = null;
+            OnPropertyChanged(nameof(FinalInputList));
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoFilterFacilityFinalInputs));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledFilterFacilityFinalInputs()
+        {
+            return _FinalInputListFull != null && _FinalInputListFull.Any();
         }
 
         #endregion
@@ -1055,6 +1178,12 @@ namespace gip.bso.manufacturing
                 case nameof(DoSearch2):
                     e.Result = DoSearch2();
                     break;
+                case nameof(DoFilterFacilityInputs):
+                    break;
+
+                case nameof(DoFilterFacilityFinalInputs):
+
+                    break;
             }
         }
 
@@ -1131,11 +1260,21 @@ namespace gip.bso.manufacturing
                             OnPropertyChanged(nameof(OverviewMaterialList));
 
                             _InputList = result.InputOverview;
+                            _InputListFull = result.InputOverview;
                             OnPropertyChanged(nameof(InputList));
 
                             _FinalInputList = result.FinalProductInputOverview;
+                            _FinalInputListFull = result.FinalProductInputOverview;
                             OnPropertyChanged(nameof(FinalInputList));
                         }
+                        break;
+                    case nameof(DoFilterFacilityInputs):
+                        _InputList = DoFilterFacilityInputs(SelectedInputFilterFacility != null ? SelectedInputFilterFacility.FacilityNo : "");
+                        OnPropertyChanged(nameof(InputList));
+                        break;
+                    case nameof(DoFilterFacilityFinalInputs):
+                        _FinalInputList = DoFilterFacilityFinalInputs(SelectedFinalInputFilterFacility != null ? SelectedFinalInputFilterFacility.FacilityNo : "");
+                        OnPropertyChanged(nameof(FinalInputList));
                         break;
                 }
                 if (result != null)
@@ -1172,9 +1311,9 @@ namespace gip.bso.manufacturing
 
             string facilityNo = null;
 
-            if (SelectedFilterFacility != null)
+            if (SelectedFinalInputFilterFacility != null)
             {
-                facilityNo = SelectedFilterFacility.FacilityNo;
+                facilityNo = SelectedFinalInputFilterFacility.FacilityNo;
             }
 
             if (FilterTimeFilterType != null && FilterTimeFilterType == TimeFilterTypeEnum.BookingTime)
@@ -1201,7 +1340,6 @@ namespace gip.bso.manufacturing
             if (searchInputs)
             {
                 inputOverview = LoadInputList(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, facilityNo);
-                //inputOverview = LoadInputList1(OverviewProdOrderPartslistList, facilityNo, CalculateStatistics);
             }
 
             return new BSOProdOrderOverview_SearchResult()
@@ -1309,9 +1447,9 @@ namespace gip.bso.manufacturing
 
             string facilityNo = null;
 
-            if (SelectedFilterFacility != null)
+            if (SelectedInputFilterFacility != null)
             {
-                facilityNo = SelectedFilterFacility.FacilityNo;
+                facilityNo = SelectedInputFilterFacility.FacilityNo;
             }
 
             if (FilterTimeFilterType != null && FilterTimeFilterType == TimeFilterTypeEnum.BookingTime)
@@ -1323,7 +1461,7 @@ namespace gip.bso.manufacturing
                 endProdTime = null;
             }
 
-            ProdOrderPartslistPos[] query = s_cQry_Inputs1(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, CalculateStatistics).ToArray();
+            ProdOrderPartslistPos[] query = s_cQry_FinalInput(DatabaseApp, startProdTime, endProdTime, startBookingTime, endBookingTime, FilterProgramNo, FilterMaterialNo, FilterDepartmentName, CalculateStatistics).ToArray();
 
             result.OverviewProdOrderPartslist = new List<ProdOrderPartslistOverview>();
             result.OverviewMaterial = new List<ProdOrderPartslistOverview>();
@@ -1499,7 +1637,58 @@ namespace gip.bso.manufacturing
             return result;
         }
 
+        private List<InputOverview> DoFilterFacilityInputs(string facilityNo)
+        {
+            if(_InputListFull == null)
+                return null;
 
+            return 
+                _InputListFull
+                .Where(c=>
+                    c.GroupedPos
+                    .Where(x=>
+                        string.IsNullOrEmpty(facilityNo)
+                        || x
+                            .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                            .SelectMany(y => y.FacilityBooking_ProdOrderPartslistPosRelation)
+                            .Where(y =>
+                                            y.OutwardFacility != null
+                                            && (
+                                                    y.OutwardFacility.FacilityNo == facilityNo
+                                                    || (y.OutwardFacility.Facility1_ParentFacility != null && y.OutwardFacility.Facility1_ParentFacility.FacilityNo == facilityNo)
+                                                )
+                                    ).Any()
+                                )
+                    .Any())
+                .ToList();
+        }
+
+
+        private List<InputOverview> DoFilterFacilityFinalInputs(string facilityNo)
+        {
+            if (_FinalInputListFull == null)
+                return null;
+
+            return
+                _FinalInputListFull
+                .Where(c =>
+                    c.GroupedPos
+                    .Where(x =>
+                        string.IsNullOrEmpty(facilityNo)
+                        || x
+                            .ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                            .SelectMany(y => y.FacilityBooking_ProdOrderPartslistPosRelation)
+                            .Where(y =>
+                                            y.OutwardFacility != null
+                                            && (
+                                                    y.OutwardFacility.FacilityNo == facilityNo
+                                                    || (y.OutwardFacility.Facility1_ParentFacility != null && y.OutwardFacility.Facility1_ParentFacility.FacilityNo == facilityNo)
+                                                )
+                                    ).Any()
+                                )
+                    .Any())
+                .ToList();
+        }
 
         #endregion
 
@@ -1717,7 +1906,7 @@ namespace gip.bso.manufacturing
                .OrderBy(c => c.MaterialNo)
        );
 
-        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>> s_cQry_Inputs1 =
+        protected static readonly Func<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>> s_cQry_FinalInput =
        CompiledQuery.Compile<DatabaseApp, DateTime?, DateTime?, DateTime?, DateTime?, string, string, string, bool, IQueryable<ProdOrderPartslistPos>>(
            (ctx, filterProdStartDate, filterProdEndDate, filterStartBookingDate, filterEndBookingDate, filterProgramNo, filterMaterialNo, filterDepartmentName, calculateStatistics) =>
               ctx
