@@ -1353,7 +1353,8 @@ namespace gip.bso.manufacturing
                         FinalProductMaterialName = finalMaterialName,
                         MaterialNo = pos.Material.MaterialNo,
                         MaterialName = pos.Material.MaterialName1,
-                        GroupedPos = new List<ProdOrderPartslistPos>()
+                        GroupedPos = new List<ProdOrderPartslistPos>(),
+                        MDUnitName = pos.MDUnit != null ? pos.MDUnit.TechnicalSymbol : pos.Material.BaseMDUnit.TechnicalSymbol
                     };
 
                     (tmpOverview.GroupedPos as List<ProdOrderPartslistPos>).Add(pos);
@@ -1408,7 +1409,8 @@ namespace gip.bso.manufacturing
                     plOverview.ProgramNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo;
                     plOverview.MaterialNo = pos.ProdOrderPartslist.Partslist.Material.MaterialNo;
                     plOverview.MaterialName = pos.ProdOrderPartslist.Partslist.Material.MaterialName1;
-                    plOverview.MDUnitName = pos.ProdOrderPartslist.Partslist.MDUnit.TechnicalSymbol;
+                    plOverview.MDUnitName = pos.ProdOrderPartslist.Partslist.MDUnit != null ?
+                        pos.ProdOrderPartslist.Partslist.MDUnit.TechnicalSymbol : pos.ProdOrderPartslist.Partslist.Material.BaseMDUnit.TechnicalSymbol;
                     plOverview.DepartmentUserName = pos.ProdOrderPartslist.DepartmentUserName;
 
                     // Output
@@ -1474,8 +1476,9 @@ namespace gip.bso.manufacturing
                     ActualQuantityUOM = c.Select(x => x.ActualQuantityUOM).Sum(),
                     ZeroPostingQuantityUOM = c.Select(x => x.ZeroPostingQuantityUOM).Sum(),
 
-                    GroupedPos = c.SelectMany(x => x.GroupedPos).ToList()
+                    GroupedPos = c.SelectMany(x => x.GroupedPos).ToList(),
 
+                    MDUnitName = c.Select(x => x.MDUnitName).FirstOrDefault()
                 })
                 .OrderBy(c => c.MaterialNo)
                 .ToList();
@@ -1487,9 +1490,9 @@ namespace gip.bso.manufacturing
                 inputOverview.CalculateDiff();
             }
 
-     
 
-            result.FinalProductInputOverview = result.FinalProductInputOverview.OrderBy(c=>c.FinalProductMaterialNo).ThenBy(c=>c.MaterialNo).ToList();
+
+            result.FinalProductInputOverview = result.FinalProductInputOverview.OrderBy(c => c.FinalProductMaterialNo).ThenBy(c => c.MaterialNo).ToList();
 
             result.OperationEndTime = DateTime.Now;
 
