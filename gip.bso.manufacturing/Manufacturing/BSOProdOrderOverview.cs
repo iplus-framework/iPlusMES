@@ -1311,9 +1311,9 @@ namespace gip.bso.manufacturing
 
             string facilityNo = null;
 
-            if (SelectedFinalInputFilterFacility != null)
+            if (SelectedInputFilterFacility != null)
             {
-                facilityNo = SelectedFinalInputFilterFacility.FacilityNo;
+                facilityNo = SelectedInputFilterFacility.FacilityNo;
             }
 
             if (FilterTimeFilterType != null && FilterTimeFilterType == TimeFilterTypeEnum.BookingTime)
