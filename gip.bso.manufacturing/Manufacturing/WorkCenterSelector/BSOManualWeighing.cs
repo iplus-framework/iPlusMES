@@ -13,6 +13,7 @@ using System.Data;
 using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
+using gip.core.layoutengine;
 
 namespace gip.bso.manufacturing
 {
@@ -154,7 +155,7 @@ namespace gip.bso.manufacturing
 
         #region Properties => ScaleObjects
 
-        ACRef<IACComponent>[] _ProcessModuleScales;
+        protected ACRef<IACComponent>[] _ProcessModuleScales;
 
         public ACValueItem _CurrentScaleObject;
         [ACPropertyCurrent(603, "ScaleObject")]
@@ -552,7 +553,7 @@ namespace gip.bso.manufacturing
 
         #region Properties => Components and FacilityCharge selection
 
-        private WeighingMaterial _SelectedWeighingMaterial;
+        protected WeighingMaterial _SelectedWeighingMaterial;
         [ACPropertySelected(624, "WeighingMaterial")]
         public virtual WeighingMaterial SelectedWeighingMaterial
         {
@@ -611,7 +612,7 @@ namespace gip.bso.manufacturing
 
         protected FacilityChargeItem _SelFacilityCharge;
 
-        private FacilityChargeItem _SelectedFacilityCharge;
+        protected FacilityChargeItem _SelectedFacilityCharge;
         [ACPropertySelected(628, "FacilityCharge")]
         public virtual FacilityChargeItem SelectedFacilityCharge
         {
@@ -693,7 +694,7 @@ namespace gip.bso.manufacturing
         }
 
         //TODO: take it in one query from db
-        FacilityChargeItem[] _FacilityChargeList;
+        protected FacilityChargeItem[] _FacilityChargeList;
         [ACPropertyList(629, "FacilityCharge")]
         public virtual IEnumerable<FacilityChargeItem> FacilityChargeList
         {
@@ -1104,7 +1105,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603, true)]
-        public void Tare()
+        public virtual void Tare()
         {
             if (!IsEnabledTare())
                 return;
@@ -1291,7 +1292,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'+ 1 kg'}de{'+ 1 kg'}", 608, true)]
-        public void AddKg()
+        public virtual void AddKg()
         {
             if (IsEnabledAddKg())
             {
@@ -1305,7 +1306,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'- 1 kg'}de{'- 1 kg'}", 609, true)]
-        public void RemoveKg()
+        public virtual void RemoveKg()
         {
             if (IsEnabledRemoveKg())
             {
@@ -1476,7 +1477,7 @@ namespace gip.bso.manufacturing
             return temp;
         }
 
-        private void ActivateScale(IACComponent scale)
+        protected void ActivateScale(IACComponent scale)
         {
             if (scale == null)
                 return;
@@ -2644,7 +2645,7 @@ namespace gip.bso.manufacturing
             return result;
         }
 
-        private void CheckIsQuantStockNegAndInformUser(FacilityChargeItem facilityCharge)
+        protected void CheckIsQuantStockNegAndInformUser(FacilityChargeItem facilityCharge)
         {
             if (facilityCharge == null)
                 return;
@@ -3190,7 +3191,7 @@ namespace gip.bso.manufacturing
         #region Methods => Print
 
         [ACMethodInfo("", "en{'Print last quant'}de{'Letztes Quant drucken'}", 9999, true)]
-        public void PrintLastQuant()
+        public virtual void PrintLastQuant()
         {
             var currentProcessModule = CurrentProcessModule;
 
