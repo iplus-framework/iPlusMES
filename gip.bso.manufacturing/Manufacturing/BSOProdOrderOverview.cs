@@ -193,7 +193,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         /// <summary>
         /// Source Property: 
         /// </summary>
@@ -258,7 +257,6 @@ namespace gip.bso.manufacturing
         }
 
         #region Properties -> Filter -> FilterTimeFilterType (TimeFilterTypeEnum)
-
 
         public TimeFilterTypeEnum? FilterTimeFilterType
         {
@@ -628,7 +626,7 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Input
 
-        #region FinalInput
+        #region Properties -> Input -> FinalInput
 
         private InputOverview _SelectedFinalInput;
         /// <summary>
@@ -672,7 +670,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Input
+        #region Properties -> Input -> Input
 
         private InputOverview _SelectedInput;
         /// <summary>
@@ -1153,10 +1151,7 @@ namespace gip.bso.manufacturing
             string command = e.Argument.ToString();
 
             worker.ProgressInfo.OnlyTotalProgress = true;
-            //worker.ProgressInfo.AddSubTask(command, 0, 9);
-            //string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
-            //worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
-            worker.ProgressInfo.TotalProgress.ProgressText = "Calculating...";
+            worker.ProgressInfo.TotalProgress.ProgressText = $"Doing {command}...";
 
             string updateName = Root.Environment.User.Initials;
             switch (command)
@@ -1179,10 +1174,10 @@ namespace gip.bso.manufacturing
                     e.Result = DoSearch2();
                     break;
                 case nameof(DoFilterFacilityInputs):
+                    e.Result = DoFilterFacilityInputs(SelectedInputFilterFacility != null ? SelectedInputFilterFacility.FacilityNo : "");
                     break;
-
                 case nameof(DoFilterFacilityFinalInputs):
-
+                    e.Result = DoFilterFacilityFinalInputs(SelectedFinalInputFilterFacility != null ? SelectedFinalInputFilterFacility.FacilityNo : "");
                     break;
             }
         }
@@ -1227,10 +1222,8 @@ namespace gip.bso.manufacturing
                             OnPropertyChanged(nameof(InputList));
                         }
                         break;
-
                     case nameof(DoRecalculateAllStatsAsync):
                         break;
-
                     case nameof(DoLoadOrderPositionsForInputList):
                         result = e.Result as BSOProdOrderOverview_SearchResult;
                         if (result != null)
@@ -1269,11 +1262,11 @@ namespace gip.bso.manufacturing
                         }
                         break;
                     case nameof(DoFilterFacilityInputs):
-                        _InputList = DoFilterFacilityInputs(SelectedInputFilterFacility != null ? SelectedInputFilterFacility.FacilityNo : "");
+                        _InputList = e.Result as List<InputOverview>;
                         OnPropertyChanged(nameof(InputList));
                         break;
                     case nameof(DoFilterFacilityFinalInputs):
-                        _FinalInputList = DoFilterFacilityFinalInputs(SelectedFinalInputFilterFacility != null ? SelectedFinalInputFilterFacility.FacilityNo : "");
+                        _FinalInputList = e.Result as List<InputOverview>;
                         OnPropertyChanged(nameof(FinalInputList));
                         break;
                 }
@@ -1431,7 +1424,6 @@ namespace gip.bso.manufacturing
             result.OperationEndTime = DateTime.Now;
             return result;
         }
-
 
         private BSOProdOrderOverview_SearchResult DoSearch2()
         {
@@ -1662,7 +1654,6 @@ namespace gip.bso.manufacturing
                     .Any())
                 .ToList();
         }
-
 
         private List<InputOverview> DoFilterFacilityFinalInputs(string facilityNo)
         {
@@ -2005,7 +1996,6 @@ namespace gip.bso.manufacturing
 
         #endregion
     }
-
 
     public class BSOProdOrderOverview_SearchResult
     {
