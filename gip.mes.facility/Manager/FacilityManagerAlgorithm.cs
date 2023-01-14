@@ -2579,7 +2579,10 @@ namespace gip.mes.facility
             inwardMethod.InwardFacilityLot = facilityLot;
             inwardMethod.Database = dbApp;
             inwardMethod.CheckAndAdjustPropertiesForBooking(dbApp);
-            inwardMethod.AutoRefresh = BP.AutoRefresh;
+            if(BP != null)
+            {
+                inwardMethod.AutoRefresh = BP.AutoRefresh;
+            }
             return inwardMethod;
         }
 
