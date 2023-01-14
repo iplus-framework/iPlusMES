@@ -14,6 +14,7 @@ using System.Data;
 using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
+using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -22,7 +23,7 @@ namespace gip.bso.manufacturing
     {
         #region c'tors
 
-        public WeighingMaterial(vd.ProdOrderPartslistPosRelation posRelation, WeighingComponentState state, ACClassDesign materialIconDesign, IACObject parent)
+        public WeighingMaterial(vd.ProdOrderPartslistPosRelation posRelation, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign, IACObject parent)
         {
             PosRelation = posRelation;
             MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
@@ -32,7 +33,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged("MaterialUnitList");
         }
 
-        public WeighingMaterial(vd.PickingPos pickingPos, WeighingComponentState state, ACClassDesign materialIconDesign)
+        public WeighingMaterial(vd.PickingPos pickingPos, WeighingComponentState state, core.datamodel.ACClassDesign materialIconDesign)
         {
             PickingPosition = pickingPos;
 
@@ -159,7 +160,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACPropertyInfo(105)]
-        public ACClassDesign MaterialIconDesign
+        public core.datamodel.ACClassDesign MaterialIconDesign
         {
             get;
             set;
@@ -487,6 +488,15 @@ namespace gip.bso.manufacturing
             if (newState != WeighingComponentState.PartialCompleted)
                 WeighingMatState = newState;
             ParentBSO?.OnComponentStateChanged(this);
+        }
+
+        public void RefreshFromPickingPos(PickingPos pos)
+        {
+            if (PickingPosition == null)
+                return;
+
+            TargetQuantity = pos.TargetQuantityUOM;
+            ActualQuantity = pos.ActualQuantityUOM;
         }
 
         #endregion

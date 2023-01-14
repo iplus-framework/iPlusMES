@@ -1,15 +1,19 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.processapplication;
+using gip.core.reporthandler;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Interop;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
@@ -33,7 +37,16 @@ namespace gip.bso.manufacturing
                 PickingsTo = DateTime.Now.AddDays(1).Date;
             }
 
+            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+            if (_ACFacilityManager == null)
+                throw new Exception("FacilityManager not configured");
+
             return result;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            return base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -41,8 +54,6 @@ namespace gip.bso.manufacturing
         #region Properties
 
         private Type _PAFPickingByMaterialType = typeof(PAFPickingByMaterial);
-
-        ACRef<IACComponent>[] _ProcessModuleScales;
 
         private ACRef<IACComponent> _PAFPickingByMaterial;
 
@@ -96,11 +107,12 @@ namespace gip.bso.manufacturing
             {
                 _CurrentPicking = value;
 
-                if (_CurrentPicking != null)
+                if (_CurrentPicking != null && SelectedWeighingMaterial != null)
                 {
                     CurrentPickingPos = _CurrentPicking.PickingPos_Picking.FirstOrDefault(c => c.Material.MaterialID == SelectedWeighingMaterial.PickingPosition.Material.MaterialID);
                 }
 
+                ActivateWeighing();
                 OnPropertyChanged();
             }
         }
@@ -154,6 +166,8 @@ namespace gip.bso.manufacturing
                     CheckIsQuantStockNegAndInformUser(value);
                     _SelFacilityCharge = value;
                 }
+
+                ActivateWeighing();
             }
         }
 
@@ -221,7 +235,6 @@ namespace gip.bso.manufacturing
                 return null;
             }
         }
-
 
         public override WeighingMaterial SelectedWeighingMaterial 
         { 
@@ -317,6 +330,9 @@ namespace gip.bso.manufacturing
             {
                 _ProcessModuleScales = scaleObjects.Select(c => new ACRef<IACComponent>(c, this)).ToArray();
                 ActivateScale(scaleObjects.FirstOrDefault());
+
+                var scaleObjectInfoList = new List<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
+                ScaleObjectsList = scaleObjectInfoList;
             }
 
             var pafACState = pafPickingByMaterial.GetPropertyNet(nameof(ACState));
@@ -340,6 +356,10 @@ namespace gip.bso.manufacturing
             CurrentProcessModule = null;
             CurrentPicking = null;
             CurrentPickingPos = null;
+            PickingsList = null;
+            SelectedWeighingMaterial = null;
+            WeighingMaterialList = null;
+            _FacilityChargeList = null;
 
             if (ComponentPWNode != null)
             {
@@ -431,9 +451,25 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            else if (acState == ACStateEnum.SMCompleted)
+            else if (acState == ACStateEnum.SMResetting)
             {
-                
+                PickingType = null;
+                SourceFacilityNo = null;
+                PWPickingsFrom = DateTime.MinValue;
+                PWPickingsTo = DateTime.MinValue;
+
+                WeighingMaterialList = null;
+                PickingsList = null;
+                _PickingItems = null;
+                CurrentPickingPos = null;
+                _FacilityChargeList = null;
+                SelectedWeighingMaterial = null;
+
+                if (ComponentPWNode != null)
+                {
+                    ComponentPWNode.Detach();
+                    ComponentPWNode = null;
+                }
             }
         }
 
@@ -467,6 +503,113 @@ namespace gip.bso.manufacturing
 
         }
 
+        private void ActivateWeighing()
+        {
+            if (SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPicking != null && CurrentPickingPos != null)
+            {
+                PAFCurrentMaterial = SelectedWeighingMaterial.MaterialName;
+                TargetWeight = SelectedWeighingMaterial.TargetQuantity;
+            }
+            else
+            {
+                PAFCurrentMaterial = null;
+                TargetWeight = 0;
+            }
+        }
+
+        private void BookPickingPosition()
+        {
+            FacilityCharge fc = DatabaseApp.FacilityCharge.Include("Facility").FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
+            if (fc == null)
+            {
+                //todo:error
+                return;
+            }
+
+            FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(DatabaseApp, CurrentPickingPos, ScaleActualWeight);
+
+            Msg msg = DatabaseApp.ACSaveChangesWithRetry();
+
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+            }
+            else if (preBooking != null)
+            {
+                ACMethodBooking bookingMethod = preBooking.ACMethodBooking as ACMethodBooking;
+                bookingMethod.OutwardFacility = fc.Facility;
+                bookingMethod.OutwardFacilityCharge = fc;
+                ACMethodEventArgs result = ACFacilityManager.BookFacility(bookingMethod, DatabaseApp);
+
+
+                if (!bookingMethod.ValidMessage.IsSucceded() || bookingMethod.ValidMessage.HasWarnings())
+                    Messages.Msg(bookingMethod.ValidMessage);
+                else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+                {
+                    if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                        result.ValidMessage.Message = result.ResultState.ToString();
+                    Messages.Msg(result.ValidMessage);
+                }
+                else
+                {
+                    double changedQuantity = 0;
+                    FacilityCharge outwardFC = null;
+
+                    if (bookingMethod != null)
+                    {
+                        if (bookingMethod.OutwardQuantity.HasValue)
+                            changedQuantity = bookingMethod.OutwardQuantity.Value;
+                        else if (bookingMethod.InwardQuantity.HasValue)
+                            changedQuantity = bookingMethod.InwardQuantity.Value;
+
+                        outwardFC = bookingMethod.OutwardFacilityCharge;
+                    }
+
+                    msg = preBooking.DeleteACObject(DatabaseApp, true);
+                    if (msg != null)
+                    {
+                        Messages.Msg(msg);
+                        return;
+                    }
+
+                    ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, false, true);
+                    DatabaseApp.ACSaveChanges();
+
+                    SelectedWeighingMaterial.RefreshFromPickingPos(CurrentPickingPos);
+
+                    msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
+                    if (msg != null)
+                    {
+                        if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                        {
+                            if (ACFacilityManager == null)
+                                return;
+
+                            ACMethodBooking fbtZeroBooking = ACPickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, DatabaseApp);
+                            ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
+
+                            fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
+                            fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                            fbtZeroBookingClone.AutoRefresh = true;
+                            ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
+                            if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                            {
+                                //return fbtZeroBooking.ValidMessage;
+                            }
+                            else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                            {
+                                if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                                    result.ValidMessage.Message = result.ResultState.ToString();
+
+                                //return result.ValidMessage;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
 
 
         [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true)]
@@ -601,64 +744,124 @@ namespace gip.bso.manufacturing
             return base.OnPreStartWorkflow(dbApp, picking, configItems, validRoute, rootWF);
         }
 
-        private void ActivateScale(IACComponent scale)
+        //private void ActivateScale(IACComponent scale)
+        //{
+        //    if (scale == null)
+        //        return;
+
+        //    var actWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualWeight));
+        //    if (actWeightProp == null)
+        //    {
+        //        //Error50292: Initialization error: The scale component doesn't have the property {0}.
+        //        // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
+        //        Messages.Error(this, "Error50292", false, "ActualWeight");
+        //        return;
+        //    }
+
+        //    MaxScaleWeight = null;
+        //    var actValProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualValue)) as IACContainerTNet<double>;
+        //    if (actValProp == null)
+        //    {
+        //        //Error50292: Initialization error: The scale component doesn't have the property {0}.
+        //        // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
+        //        Messages.Error(this, "Error50292", false, "ActualValue");
+        //        return;
+        //    }
+
+        //    double digitWeight = 1.0;
+        //    var digitWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.DigitWeight));
+        //    if (digitWeightProp != null)
+        //    {
+        //        digitWeight = (digitWeightProp as IACContainerTNet<double>).ValueT;
+        //        if (digitWeight <= double.Epsilon)
+        //            digitWeight = 1.0;
+        //    }
+        //    if (digitWeight >= 999.99999)
+        //        ScalePrecisionFormat = "F0";
+        //    else if (digitWeight >= 99.99999)
+        //        ScalePrecisionFormat = "F1";
+        //    else if (digitWeight >= 9.99999)
+        //        ScalePrecisionFormat = "F2";
+        //    else if (digitWeight >= 0.99999)
+        //        ScalePrecisionFormat = "F3";
+        //    else if (digitWeight >= 0.09999)
+        //        ScalePrecisionFormat = "F4";
+        //    else if (digitWeight >= 0.00999)
+        //        ScalePrecisionFormat = "F5";
+        //    else if (digitWeight >= 0.00099)
+        //        ScalePrecisionFormat = "F6";
+
+        //    _ScaleActualValue = actValProp;
+
+        //    _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
+        //    (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged += ActWeightProp_PropertyChanged;
+        //    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
+        //    ScaleRealWeight = _ScaleActualWeight.ValueT;
+        //    ScaleGrossWeight = _ScaleActualValue.ValueT;
+        //    OnPropertyChanged("TargetWeight");
+        //    OnPropertyChanged("ScaleDifferenceWeight");
+
+        //   OnPropertyChanged(nameof(CurrentScaleObject));
+        //}
+
+        public override void Acknowledge()
         {
-            if (scale == null)
-                return;
+            BookPickingPosition();
+        }
 
-            var actWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualWeight));
-            if (actWeightProp == null)
+        public override bool IsEnabledAcknowledge()
+        {
+            return SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPickingPos != null && CurrentPicking != null && ScaleActualWeight > 0.000001;
+        }
+
+        public override void AddKg()
+        {
+            ScaleAddAcutalWeight = SelectedWeighingMaterial.AddKg(ScaleAddAcutalWeight);
+        }
+
+        public override void RemoveKg()
+        {
+            ScaleAddAcutalWeight = SelectedWeighingMaterial.RemoveKg(ScaleAddAcutalWeight);
+        }
+
+        public override void Tare()
+        {
+            ACValueItem currentScaleObject = CurrentScaleObject;
+            if (currentScaleObject != null)
             {
-                //Error50292: Initialization error: The scale component doesn't have the property {0}.
-                // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50292", false, "ActualWeight");
-                return;
+                ACRef<IACComponent> scaleRef = _ProcessModuleScales?.FirstOrDefault(c => c.ACUrl == _CurrentScaleObject.Value.ToString());
+                if (scaleRef != null)
+                {
+                    scaleRef.ValueT.ExecuteMethod(nameof(PAEScaleGravimetric.Tare));
+                }
             }
+        }
 
-            MaxScaleWeight = null;
-            var actValProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualValue)) as IACContainerTNet<double>;
-            if (actValProp == null)
+        public override void Abort()
+        {
+            if (_PAFPickingByMaterial != null)
             {
-                //Error50292: Initialization error: The scale component doesn't have the property {0}.
-                // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50292", false, "ActualValue");
-                return;
+                _PAFPickingByMaterial.ValueT.ExecuteMethod(nameof(PAFPickingByMaterial.Abort));
             }
+        }
 
-            double digitWeight = 1.0;
-            var digitWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.DigitWeight));
-            if (digitWeightProp != null)
+        public override void PrintLastQuant()
+        {
+            var currentProcessModule = CurrentProcessModule;
+
+            if (CurrentPicking != null && CurrentPickingPos != null && currentProcessModule != null)
             {
-                digitWeight = (digitWeightProp as IACContainerTNet<double>).ValueT;
-                if (digitWeight <= double.Epsilon)
-                    digitWeight = 1.0;
+                PAOrderInfo info = new PAOrderInfo();
+                info.Add(nameof(Picking), CurrentPicking.PickingID);
+                info.Add(nameof(PickingPos), CurrentPickingPos.PickingPosID);
+                info.Add(nameof(core.datamodel.ACClass), currentProcessModule.ComponentClass.ACClassID);
+
+                ACPrintManager printManger = ACPrintManager.GetServiceInstance(this);
+                if (printManger != null)
+                {
+                    Msg msg = printManger.Print(info, 1);
+                }
             }
-            if (digitWeight >= 999.99999)
-                ScalePrecisionFormat = "F0";
-            else if (digitWeight >= 99.99999)
-                ScalePrecisionFormat = "F1";
-            else if (digitWeight >= 9.99999)
-                ScalePrecisionFormat = "F2";
-            else if (digitWeight >= 0.99999)
-                ScalePrecisionFormat = "F3";
-            else if (digitWeight >= 0.09999)
-                ScalePrecisionFormat = "F4";
-            else if (digitWeight >= 0.00999)
-                ScalePrecisionFormat = "F5";
-            else if (digitWeight >= 0.00099)
-                ScalePrecisionFormat = "F6";
-
-            _ScaleActualValue = actValProp;
-
-            _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
-            (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged += ActWeightProp_PropertyChanged;
-            (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
-            ScaleRealWeight = _ScaleActualWeight.ValueT;
-            ScaleGrossWeight = _ScaleActualValue.ValueT;
-            OnPropertyChanged("TargetWeight");
-            OnPropertyChanged("ScaleDifferenceWeight");
-
-           OnPropertyChanged(nameof(CurrentScaleObject));
         }
 
         #endregion

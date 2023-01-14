@@ -155,7 +155,7 @@ namespace gip.bso.manufacturing
 
         #region Properties => ScaleObjects
 
-        ACRef<IACComponent>[] _ProcessModuleScales;
+        protected ACRef<IACComponent>[] _ProcessModuleScales;
 
         public ACValueItem _CurrentScaleObject;
         [ACPropertyCurrent(603, "ScaleObject")]
@@ -1105,7 +1105,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603, true)]
-        public void Tare()
+        public virtual void Tare()
         {
             if (!IsEnabledTare())
                 return;
@@ -1292,7 +1292,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'+ 1 kg'}de{'+ 1 kg'}", 608, true)]
-        public void AddKg()
+        public virtual void AddKg()
         {
             if (IsEnabledAddKg())
             {
@@ -1306,7 +1306,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'- 1 kg'}de{'- 1 kg'}", 609, true)]
-        public void RemoveKg()
+        public virtual void RemoveKg()
         {
             if (IsEnabledRemoveKg())
             {
@@ -1477,7 +1477,7 @@ namespace gip.bso.manufacturing
             return temp;
         }
 
-        private void ActivateScale(IACComponent scale)
+        protected void ActivateScale(IACComponent scale)
         {
             if (scale == null)
                 return;
@@ -3191,7 +3191,7 @@ namespace gip.bso.manufacturing
         #region Methods => Print
 
         [ACMethodInfo("", "en{'Print last quant'}de{'Letztes Quant drucken'}", 9999, true)]
-        public void PrintLastQuant()
+        public virtual void PrintLastQuant()
         {
             var currentProcessModule = CurrentProcessModule;
 
