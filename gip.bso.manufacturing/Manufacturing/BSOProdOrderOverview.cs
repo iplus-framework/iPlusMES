@@ -1459,131 +1459,15 @@ namespace gip.bso.manufacturing
             result.OverviewMaterial = new List<ProdOrderPartslistOverview>();
             result.InputOverview = new List<InputOverview>();
             result.FinalProductInputOverview = new List<InputOverview>();
+            result.InputOverview = new List<InputOverview>();
 
 
             foreach (ProdOrderPartslistPos pos in query)
             {
-                string finalMaterialNo = pos.FinalProdOrderPartslist.Partslist.Material.MaterialNo;
-                string finalMaterialName = pos.FinalProdOrderPartslist.Partslist.Material.MaterialName1;
-                // FinalProductInputOverview
-                InputOverview tmpOverview =
-                    result
-                    .FinalProductInputOverview
-                    .Where(c =>
-                        c.FinalProductMaterialNo == finalMaterialNo
-                        && c.MaterialNo == pos.Material.MaterialNo
-                    )
-                    .FirstOrDefault();
-
-                if (tmpOverview == null)
-                {
-                    tmpOverview = new InputOverview()
-                    {
-                        FinalProductMaterialNo = finalMaterialNo,
-                        FinalProductMaterialName = finalMaterialName,
-                        MaterialNo = pos.Material.MaterialNo,
-                        MaterialName = pos.Material.MaterialName1,
-                        GroupedPos = new List<ProdOrderPartslistPos>(),
-                        MDUnitName = pos.MDUnit != null ? pos.MDUnit.TechnicalSymbol : pos.Material.BaseMDUnit.TechnicalSymbol
-                    };
-
-                    (tmpOverview.GroupedPos as List<ProdOrderPartslistPos>).Add(pos);
-
-                    tmpOverview.PlannedQuantityUOM += CalculateStatistics ? 0 : pos.TargetQuantityUOM;
-
-                    tmpOverview.TargetQuantityUOM +=
-                                       pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
-                                       .Where(x => x.TargetProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
-                                       .Select(x => x.TargetQuantityUOM)
-                                       .DefaultIfEmpty()
-                                       .Sum();
-
-                    // Output
-                    tmpOverview.ActualQuantityUOM += CalculateStatistics ? 0 :
-                                    pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
-                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
-                                    .Select(x => x.OutwardQuantity)
-                                    .DefaultIfEmpty()
-                                    .Sum();
-
-                    tmpOverview.ZeroPostingQuantityUOM += pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
-                                    .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
-                                    .Where(x => x.OutwardFacilityCharge != null)
-                                    .Select(x => x.OutwardFacilityCharge)
-                                    .SelectMany(x => x.FacilityBooking_InwardFacilityCharge)
-                                    .Where(x => x.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
-                                    .SelectMany(x => x.FacilityBookingCharge_FacilityBooking)
-                                    .Select(x => new { x.FacilityBookingChargeID, x.InwardQuantityUOM, x.OutwardQuantityUOM })
-                                    .Distinct()
-                                    .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
-                                    .DefaultIfEmpty()
-                                    .Sum();
-
-
-
-                    result.FinalProductInputOverview.Add(tmpOverview);
-                }
-
-
-                // OverviewProdOrderPartslist
-                ProdOrderPartslistOverview plOverview =
-                    result
-                    .OverviewProdOrderPartslist
-                    .Where(c => c.ProdOrderPartslist.ProdOrderPartslistID == pos.ProdOrderPartslistID)
-                    .FirstOrDefault();
-                if (plOverview == null)
-                {
-                    plOverview = new ProdOrderPartslistOverview();
-                    plOverview.ProdOrderPartslist = pos.ProdOrderPartslist;
-
-                    plOverview.ProgramNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    plOverview.MaterialNo = pos.ProdOrderPartslist.Partslist.Material.MaterialNo;
-                    plOverview.MaterialName = pos.ProdOrderPartslist.Partslist.Material.MaterialName1;
-                    plOverview.MDUnitName = pos.ProdOrderPartslist.Partslist.MDUnit != null ?
-                        pos.ProdOrderPartslist.Partslist.MDUnit.TechnicalSymbol : pos.ProdOrderPartslist.Partslist.Material.BaseMDUnit.TechnicalSymbol;
-                    plOverview.DepartmentUserName = pos.ProdOrderPartslist.DepartmentUserName;
-
-                    // Output
-                    plOverview.InwardPlannedQuantityUOM = pos.ProdOrderPartslist.TargetQuantity;
-
-                    plOverview.InwardTargetQuantityUOM =
-                                    pos.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
-                                    .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern && !x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
-                                    .SelectMany(x => x.ProdOrderPartslistPos_ParentProdOrderPartslistPos)
-                                    .Select(x => x.TargetQuantityUOM)
-                                    .DefaultIfEmpty()
-                                    .Sum();
-
-                    plOverview.InwardActualQuantityUOM = pos.ProdOrderPartslist.ActualQuantity;
-
-                    plOverview.InwardActualQuantityScrapUOM = pos.ProdOrderPartslist.ActualQuantityScrapUOM;
-
-                    // Usage
-                    plOverview.UsageTargetQuantityUOM =
-                             pos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist
-                            .Select(x => x.TargetQuantityUOM)
-                            .DefaultIfEmpty()
-                            .Sum();
-
-                    plOverview.UsageActualQuantityUOM =
-                            pos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist
-                            .Select(x => x.ActualQuantityUOM)
-                            .DefaultIfEmpty()
-                            .Sum();
-
-                    plOverview.CalculateDiff();
-                    if (CalculateStatistics)
-                        plOverview.CalculateStatistics();
-
-                    result.OverviewProdOrderPartslist.Add(plOverview);
-                }
+                AddFinalInput(result, pos);
+                AddInput(result, pos);
+                AddProdOrderPartslistOverview(result, pos);
             }
-
-            result.OverviewProdOrderPartslist = result.OverviewProdOrderPartslist.OrderBy(c => c.ProgramNo).ThenBy(c => c.MaterialNo).ToList();
-
-
-            // OverviewMaterial
-            result.OverviewMaterial = LoadOverviewMaterialList(result.OverviewProdOrderPartslist);
 
 
             foreach (var finalInputOverview in result.FinalProductInputOverview)
@@ -1593,25 +1477,6 @@ namespace gip.bso.manufacturing
                 finalInputOverview.CalculateDiff();
             }
 
-            result.InputOverview =
-                result.FinalProductInputOverview
-                .GroupBy(c => new { c.MaterialNo, c.MaterialName })
-                .Select(c => new InputOverview()
-                {
-                    MaterialNo = c.Key.MaterialNo,
-                    MaterialName = c.Key.MaterialName,
-
-                    PlannedQuantityUOM = c.Select(x => x.PlannedQuantityUOM).Sum(),
-                    TargetQuantityUOM = c.Select(x => x.TargetQuantityUOM).Sum(),
-                    ActualQuantityUOM = c.Select(x => x.ActualQuantityUOM).Sum(),
-                    ZeroPostingQuantityUOM = c.Select(x => x.ZeroPostingQuantityUOM).Sum(),
-
-                    GroupedPos = c.SelectMany(x => x.GroupedPos).ToList(),
-
-                    MDUnitName = c.Select(x => x.MDUnitName).FirstOrDefault()
-                })
-                .OrderBy(c => c.MaterialNo)
-                .ToList();
 
             foreach (var inputOverview in result.InputOverview)
             {
@@ -1620,13 +1485,189 @@ namespace gip.bso.manufacturing
                 inputOverview.CalculateDiff();
             }
 
+            //result.InputOverview =
+            //    result.FinalProductInputOverview
+            //    .GroupBy(c => new { c.MaterialNo, c.MaterialName })
+            //    .Select(c => new InputOverview()
+            //    {
+            //        MaterialNo = c.Key.MaterialNo,
+            //        MaterialName = c.Key.MaterialName,
+
+            //        PlannedQuantityUOM = c.Select(x => x.PlannedQuantityUOM).Sum(),
+            //        TargetQuantityUOM = c.Select(x => x.TargetQuantityUOM).Sum(),
+            //        ActualQuantityUOM = c.Select(x => x.ActualQuantityUOM).Sum(),
+            //        ZeroPostingQuantityUOM = c.Select(x => x.ZeroPostingQuantityUOM).Sum(),
+
+            //        GroupedPos = c.SelectMany(x => x.GroupedPos).ToList(),
+
+            //        MDUnitName = c.Select(x => x.MDUnitName).FirstOrDefault()
+            //    })
+            //    .OrderBy(c => c.MaterialNo)
+            //    .ToList();
+
+            //foreach (var inputOverview in result.InputOverview)
+            //{
+            //    if (CalculateStatistics)
+            //        inputOverview.CalculateStatistics();
+            //    inputOverview.CalculateDiff();
+            //}
 
 
+            // Finalize
+            result.OverviewProdOrderPartslist = result.OverviewProdOrderPartslist.OrderBy(c => c.ProgramNo).ThenBy(c => c.MaterialNo).ToList();
+            result.OverviewMaterial = LoadOverviewMaterialList(result.OverviewProdOrderPartslist);
             result.FinalProductInputOverview = result.FinalProductInputOverview.OrderBy(c => c.FinalProductMaterialNo).ThenBy(c => c.MaterialNo).ToList();
+            result.InputOverview = result.InputOverview.OrderBy(c => c.MaterialNo).ToList();
 
             result.OperationEndTime = DateTime.Now;
 
             return result;
+        }
+
+        private void AddProdOrderPartslistOverview(BSOProdOrderOverview_SearchResult result, ProdOrderPartslistPos pos)
+        {
+            // OverviewProdOrderPartslist
+            ProdOrderPartslistOverview plOverview =
+                result
+                .OverviewProdOrderPartslist
+                .Where(c => c.ProdOrderPartslist.ProdOrderPartslistID == pos.ProdOrderPartslistID)
+                .FirstOrDefault();
+            if (plOverview == null)
+            {
+                plOverview = new ProdOrderPartslistOverview();
+                plOverview.ProdOrderPartslist = pos.ProdOrderPartslist;
+
+                plOverview.ProgramNo = pos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                plOverview.MaterialNo = pos.ProdOrderPartslist.Partslist.Material.MaterialNo;
+                plOverview.MaterialName = pos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                plOverview.MDUnitName = pos.ProdOrderPartslist.Partslist.MDUnit != null ?
+                    pos.ProdOrderPartslist.Partslist.MDUnit.TechnicalSymbol : pos.ProdOrderPartslist.Partslist.Material.BaseMDUnit.TechnicalSymbol;
+                plOverview.DepartmentUserName = pos.ProdOrderPartslist.DepartmentUserName;
+
+                // Output
+                plOverview.InwardPlannedQuantityUOM = pos.ProdOrderPartslist.TargetQuantity;
+
+                plOverview.InwardTargetQuantityUOM =
+                                pos.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
+                                .Where(x => x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern && !x.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any())
+                                .SelectMany(x => x.ProdOrderPartslistPos_ParentProdOrderPartslistPos)
+                                .Select(x => x.TargetQuantityUOM)
+                                .DefaultIfEmpty()
+                                .Sum();
+
+                plOverview.InwardActualQuantityUOM = pos.ProdOrderPartslist.ActualQuantity;
+
+                plOverview.InwardActualQuantityScrapUOM = pos.ProdOrderPartslist.ActualQuantityScrapUOM;
+
+                // Usage
+                plOverview.UsageTargetQuantityUOM =
+                         pos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist
+                        .Select(x => x.TargetQuantityUOM)
+                        .DefaultIfEmpty()
+                        .Sum();
+
+                plOverview.UsageActualQuantityUOM =
+                        pos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist
+                        .Select(x => x.ActualQuantityUOM)
+                        .DefaultIfEmpty()
+                        .Sum();
+
+                plOverview.CalculateDiff();
+                if (CalculateStatistics)
+                    plOverview.CalculateStatistics();
+
+                result.OverviewProdOrderPartslist.Add(plOverview);
+            }
+        }
+
+        private void AddFinalInput(BSOProdOrderOverview_SearchResult result, ProdOrderPartslistPos pos)
+        {
+            string finalMaterialNo = pos.FinalProdOrderPartslist.Partslist.Material.MaterialNo;
+            string finalMaterialName = pos.FinalProdOrderPartslist.Partslist.Material.MaterialName1;
+            // FinalProductInputOverview
+            InputOverview tmpOverview =
+                result
+                .FinalProductInputOverview
+                .Where(c =>
+                    c.FinalProductMaterialNo == finalMaterialNo
+                    && c.MaterialNo == pos.Material.MaterialNo
+                )
+                .FirstOrDefault();
+
+            if (tmpOverview == null)
+            {
+                tmpOverview = new InputOverview()
+                {
+                    FinalProductMaterialNo = finalMaterialNo,
+                    FinalProductMaterialName = finalMaterialName,
+                    MaterialNo = pos.Material.MaterialNo,
+                    MaterialName = pos.Material.MaterialName1,
+                    GroupedPos = new List<ProdOrderPartslistPos>(),
+                    MDUnitName = pos.MDUnit != null ? pos.MDUnit.TechnicalSymbol : pos.Material.BaseMDUnit.TechnicalSymbol
+                };
+                result.FinalProductInputOverview.Add(tmpOverview);
+            }
+            InputOverviewProcessPos(pos, tmpOverview);
+        }
+
+        private void AddInput(BSOProdOrderOverview_SearchResult result, ProdOrderPartslistPos pos)
+        {
+            // FinalProductInputOverview
+            InputOverview tmpOverview =
+                result
+                .InputOverview
+                .Where(c =>
+                     c.MaterialNo == pos.Material.MaterialNo
+                )
+                .FirstOrDefault();
+
+            if (tmpOverview == null)
+            {
+                tmpOverview = new InputOverview()
+                {
+                    MaterialNo = pos.Material.MaterialNo,
+                    MaterialName = pos.Material.MaterialName1,
+                    GroupedPos = new List<ProdOrderPartslistPos>(),
+                    MDUnitName = pos.MDUnit != null ? pos.MDUnit.TechnicalSymbol : pos.Material.BaseMDUnit.TechnicalSymbol
+                };
+                result.InputOverview.Add(tmpOverview);
+            }
+            InputOverviewProcessPos(pos, tmpOverview);
+        }
+
+        private void InputOverviewProcessPos(ProdOrderPartslistPos pos, InputOverview tmpOverview)
+        {
+            (tmpOverview.GroupedPos as List<ProdOrderPartslistPos>).Add(pos);
+
+            tmpOverview.PlannedQuantityUOM += CalculateStatistics ? 0 : pos.TargetQuantityUOM;
+
+            tmpOverview.TargetQuantityUOM +=
+                               pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                               .Where(x => x.TargetProdOrderPartslistPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
+                               .Select(x => x.TargetQuantityUOM)
+                               .DefaultIfEmpty()
+                               .Sum();
+
+            // Output
+            tmpOverview.ActualQuantityUOM += CalculateStatistics ? 0 :
+                            pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                            .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                            .Select(x => x.OutwardQuantity)
+                            .DefaultIfEmpty()
+                            .Sum();
+
+            tmpOverview.ZeroPostingQuantityUOM += pos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
+                            .SelectMany(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
+                            .Where(x => x.OutwardFacilityCharge != null)
+                            .Select(x => x.OutwardFacilityCharge)
+                            .SelectMany(x => x.FacilityBooking_InwardFacilityCharge)
+                            .Where(x => x.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge)
+                            .SelectMany(x => x.FacilityBookingCharge_FacilityBooking)
+                            .Select(x => new { x.FacilityBookingChargeID, x.InwardQuantityUOM, x.OutwardQuantityUOM })
+                            .Distinct()
+                            .Select(x => x.InwardQuantityUOM - x.OutwardQuantityUOM)
+                            .DefaultIfEmpty()
+                            .Sum();
         }
 
         private List<InputOverview> DoFilterFacilityInputs(string facilityNo)
