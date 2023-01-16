@@ -54,7 +54,7 @@ namespace gip.mes.facility
             {
                 SelectedMDSchedulingGroup = MDSchedulingGroupList.Where(c => c.MDSchedulingGroupID == selectedSchedulingGroup.MDSchedulingGroupID).FirstOrDefault();
             }
-            if (selectedSchedulingGroup == null)
+            if (SelectedMDSchedulingGroup == null)
             {
                 SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
             }
