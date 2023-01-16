@@ -1965,7 +1965,7 @@ namespace gip.bso.manufacturing
                         && (filterStartBookingDate == null || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.InsertDate >= filterStartBookingDate).Any())
                         && (filterEndBookingDate == null || c.FacilityBooking_ProdOrderPartslistPos.Where(x => x.InsertDate < filterEndBookingDate).Any())
                         && (string.IsNullOrEmpty(filterProgramNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(filterProgramNo))
-                        && (string.IsNullOrEmpty(filterMaterialNo) || c.Material.MaterialNo.Contains(filterMaterialNo) || c.Material.MaterialName1.Contains(filterMaterialNo))
+                        && (string.IsNullOrEmpty(filterMaterialNo) || c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(filterMaterialNo) || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(filterMaterialNo))
                         && (string.IsNullOrEmpty(filterDepartmentName) || c.ProdOrderPartslist.DepartmentUserName.Contains(filterDepartmentName))
 
                        // filtering pos
