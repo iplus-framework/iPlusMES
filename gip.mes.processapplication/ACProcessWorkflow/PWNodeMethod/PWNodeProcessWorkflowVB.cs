@@ -46,40 +46,40 @@ namespace gip.mes.processapplication
             #region Batch Duration Planning - Forecast Scheduler - Params
 
             // BatchSizeStandard
-            method.ParameterValueList.Add(new ACValue("BatchSizeStandard", typeof(double), false, Global.ParamOption.Optional));
-            paramTranslation.Add("BatchSizeStandard", "en{'Standard Batchsize'}de{'Standard Batchgröße'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_BatchSizeStandard, typeof(double), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_BatchSizeStandard, "en{'Standard Batchsize'}de{'Standard Batchgröße'}");
             
             // BatchSizeMin
-            method.ParameterValueList.Add(new ACValue("BatchSizeMin", typeof(double), false, Global.ParamOption.Optional));
-            paramTranslation.Add("BatchSizeMin", "en{'Min. Batchsize'}de{'Min. Batchgröße'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_BatchSizeMin, typeof(double), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_BatchSizeMin, "en{'Min. Batchsize'}de{'Min. Batchgröße'}");
             
             // BatchSizeMax
-            method.ParameterValueList.Add(new ACValue("BatchSizeMax", typeof(double), false, Global.ParamOption.Optional));
-            paramTranslation.Add("BatchSizeMax", "en{'Max. Batchsize'}de{'Max. Batchgröße'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_BatchSizeMax, typeof(double), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_BatchSizeMax, "en{'Max. Batchsize'}de{'Max. Batchgröße'}");
             
             // PlanMode
-            method.ParameterValueList.Add(new ACValue("PlanMode", typeof(BatchPlanMode), false, Global.ParamOption.Optional));
-            paramTranslation.Add("PlanMode", "en{'Batch planning mode'}de{'Batch Planmodus'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_PlanMode, typeof(BatchPlanMode), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_PlanMode, "en{'Batch planning mode'}de{'Batch Planmodus'}");
             
             // BatchSuggestionCommandModeEnum
-            method.ParameterValueList.Add(new ACValue("BatchSuggestionMode", typeof(BatchSuggestionCommandModeEnum), false, Global.ParamOption.Optional));
-            paramTranslation.Add("BatchSuggestionMode", "en{'Batch suggestion mode'}de{'Batch-Vorschlagsmodus'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_BatchSuggestionMode, typeof(BatchSuggestionCommandModeEnum), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_BatchSuggestionMode, "en{'Batch suggestion mode'}de{'Batch-Vorschlagsmodus'}");
 
             // DurationSecAVG
-            method.ParameterValueList.Add(new ACValue("DurationSecAVG", typeof(int), false, Global.ParamOption.Optional));
-            paramTranslation.Add("DurationSecAVG", "en{'Batch Duration AVG (s)'}de{'Batch Duration AVG (s)'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_DurationSecAVG, typeof(int), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_DurationSecAVG, "en{'Batch Duration AVG (s)'}de{'Batch Duration AVG (s)'}");
 
             // StartOffsetSecAVG
-            method.ParameterValueList.Add(new ACValue("StartOffsetSecAVG", typeof(int), false, Global.ParamOption.Optional));
-            paramTranslation.Add("StartOffsetSecAVG", "en{'Starting Batch Offset AVG (s)'}de{'Starting Batch Offset AVG (s)'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_StartOffsetSecAVG, typeof(int), false, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_StartOffsetSecAVG, "en{'Starting Batch Offset AVG (s)'}de{'Starting Batch Offset AVG (s)'}");
 
             // LineOrderInPlan
             method.ParameterValueList.Add(new ACValue("LineOrderInPlan", typeof(int), false, Global.ParamOption.Optional));
             paramTranslation.Add("LineOrderInPlan", "en{'Order of line selection in production plan'}de{'Reihenfolge der Linienauswahl im Produktionsplan'}");
 
             // OffsetToEndTime
-            method.ParameterValueList.Add(new ACValue("OffsetToEndTime", typeof(TimeSpan?), null, Global.ParamOption.Optional));
-            paramTranslation.Add("OffsetToEndTime", "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}");
+            method.ParameterValueList.Add(new ACValue(ProdOrderBatchPlan.C_OffsetToEndTime, typeof(TimeSpan?), null, Global.ParamOption.Optional));
+            paramTranslation.Add(ProdOrderBatchPlan.C_OffsetToEndTime, "en{'Duration offset for completion date based scheduling'}de{'Daueroffset zur Fertigstellungszeit-basierten Planung'}");
 
             #endregion
 

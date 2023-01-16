@@ -106,7 +106,7 @@ namespace gip.mes.facility
                     SchedulingDurationAVG duration = GetBPDuration(databaseApp, mdSchedulingGroupID, batchPlan.ProdOrderPartslist.PartslistID ?? Guid.Empty, batchPlan.BatchTargetCount, batchPlan.BatchSize);
                     if ((duration.DurationSecAVG ?? 0) == 0)
                     {
-                        IACConfig defaultDurationSecAVGConfig = GetConfig("DurationSecAVG",
+                        IACConfig defaultDurationSecAVGConfig = GetConfig(ProdOrderBatchPlan.C_DurationSecAVG,
                             batchPlan.IplusVBiACClassWF,
                             batchPlan.VBiACClassWF,
                             batchPlan.MaterialWFACClassMethod.MaterialWFID,
@@ -118,7 +118,7 @@ namespace gip.mes.facility
 
                     if ((duration.StartOffsetSecAVG ?? 0) == 0)
                     {
-                        IACConfig defaultStartOffsetSecAVGConfig = GetConfig("StartOffsetSecAVG",
+                        IACConfig defaultStartOffsetSecAVGConfig = GetConfig(ProdOrderBatchPlan.C_StartOffsetSecAVG,
                               batchPlan.IplusVBiACClassWF,
                             batchPlan.VBiACClassWF,
                             batchPlan.MaterialWFACClassMethod.MaterialWFID,

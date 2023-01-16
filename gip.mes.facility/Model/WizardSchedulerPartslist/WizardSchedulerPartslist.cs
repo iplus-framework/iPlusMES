@@ -549,7 +549,7 @@ namespace gip.mes.facility
         #region Properties -> Batch -> BatchSizes
 
         private double _BatchSizeMin;
-        [ACPropertyInfo(999, "BatchSizeMin", "en{'Min. Batchsize'}de{'Min. Batchgröße'}")]
+        [ACPropertyInfo(999, ProdOrderBatchPlan.C_BatchSizeMin, "en{'Min. Batchsize'}de{'Min. Batchgröße'}")]
         public double BatchSizeMin
         {
             get
@@ -579,7 +579,7 @@ namespace gip.mes.facility
 
         private double _BatchSizeMax;
 
-        [ACPropertyInfo(999, "BatchSizeMax", "en{'Max. Batchsize'}de{'Max. Batchgröße'}")]
+        [ACPropertyInfo(999, ProdOrderBatchPlan.C_BatchSizeMax, "en{'Max. Batchsize'}de{'Max. Batchgröße'}")]
         public double BatchSizeMax
         {
             get
@@ -731,11 +731,11 @@ namespace gip.mes.facility
         protected void RecalcLimitsFromUOM()
         {
             _BatchSizeMin = ConvertQuantity(_BatchSizeMinUOM, toBaseQuantity: false);
-            OnPropertyChanged("BatchSizeMin");
+            OnPropertyChanged(nameof(BatchSizeMin));
             _BatchSizeMax = ConvertQuantity(_BatchSizeMaxUOM, toBaseQuantity: false);
-            OnPropertyChanged("BatchSizeMax");
+            OnPropertyChanged(nameof(BatchSizeMax));
             _BatchSizeStandard = ConvertQuantity(_BatchSizeStandardUOM, toBaseQuantity: false);
-            OnPropertyChanged("BatchSizeStandard");
+            OnPropertyChanged(nameof(BatchSizeStandard));
         }
 
 
@@ -844,6 +844,13 @@ namespace gip.mes.facility
             return ProdOrderManager.GetCalculatedBatchPlanDuration(DatabaseApp, materialWFConnection.MaterialWFACClassMethodID, vbACClassWF.ACClassWFID);
         }
 
+        public const string C_WFParam_OffsetToEndTime = "OffsetToEndTime";
+        public const string C_WFParam_BatchSuggestionMode = "BatchSuggestionMode";
+        public const string C_WFParam_PlanMode = "PlanMode";
+        public const string C_WFParam_BatchSizeStandard = "BatchSizeStandard";
+        public const string C_WFParam_BatchSizeMin = "BatchSizeMin";
+        public const string C_WFParam_BatchSizeMax = "BatchSizeMax";
+
         public void LoadConfiguration()
         {
             Partslist partslist = Partslist;
@@ -852,14 +859,14 @@ namespace gip.mes.facility
                 return;
             gip.mes.datamodel.ACClassWF vbACClassWF = WFNodeMES;
 
-            IACConfig batchSizeMin = GetConfig("BatchSizeMin", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSizeMax = GetConfig("BatchSizeMax", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSizeStandard = GetConfig("BatchSizeStandard", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchPlanMode = GetConfig("PlanMode", partslist, aCClassWF, vbACClassWF);
-            IACConfig batchSuggestionMode = GetConfig("BatchSuggestionMode", partslist, aCClassWF, vbACClassWF);
-            IACConfig durationSecAVG = GetConfig("DurationSecAVG", partslist, aCClassWF, vbACClassWF);
-            IACConfig startOffsetSecAVG = GetConfig("StartOffsetSecAVG", partslist, aCClassWF, vbACClassWF);
-            IACConfig offsetToEndTime = GetConfig("OffsetToEndTime", partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSizeMin = GetConfig(ProdOrderBatchPlan.C_BatchSizeMin, partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSizeMax = GetConfig(ProdOrderBatchPlan.C_BatchSizeMax, partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSizeStandard = GetConfig(ProdOrderBatchPlan.C_BatchSizeStandard, partslist, aCClassWF, vbACClassWF);
+            IACConfig batchPlanMode = GetConfig(ProdOrderBatchPlan.C_PlanMode, partslist, aCClassWF, vbACClassWF);
+            IACConfig batchSuggestionMode = GetConfig(ProdOrderBatchPlan.C_BatchSuggestionMode, partslist, aCClassWF, vbACClassWF);
+            IACConfig durationSecAVG = GetConfig(ProdOrderBatchPlan.C_DurationSecAVG, partslist, aCClassWF, vbACClassWF);
+            IACConfig startOffsetSecAVG = GetConfig(ProdOrderBatchPlan.C_StartOffsetSecAVG, partslist, aCClassWF, vbACClassWF);
+            IACConfig offsetToEndTime = GetConfig(ProdOrderBatchPlan.C_OffsetToEndTime, partslist, aCClassWF, vbACClassWF);
 
             if (batchSizeMin != null && batchSizeMin.Value != null)
                 BatchSizeMinUOM = (double)batchSizeMin.Value;

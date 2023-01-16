@@ -26,8 +26,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(20, "CalculatedEndDate", "en{'Calculated End Date'}de{'Berechnete Endezeit'}", "", "", true)]
     [ACPropertyEntity(21, "PartialTargetCount", "en{'Partial Target Count'}de{'Teil B.-Anzahl'}", "", "", true)]
     [ACPropertyEntity(22, "PartialActualCount", "en{'Partial Actual Count'}de{'Teil Ist B.-Anzahl'}", "", "", true)]
-    [ACPropertyEntity(23, "StartOffsetSecAVG", "en{'Starting Batch Offset AVG (s)'}de{'Starting Batch Offset AVG (s)'}", "", "", true)]
-    [ACPropertyEntity(24, "DurationSecAVG", "en{'Batch Duration AVG (s)'}de{'Batch Duration AVG (s)'}", "", "", true)]
+    [ACPropertyEntity(23, ProdOrderBatchPlan.C_StartOffsetSecAVG, "en{'Starting Batch Offset AVG (s)'}de{'Starting Batch Offset AVG (s)'}", "", "", true)]
+    [ACPropertyEntity(24, ProdOrderBatchPlan.C_DurationSecAVG, "en{'Batch Duration AVG (s)'}de{'Batch Duration AVG (s)'}", "", "", true)]
     [ACPropertyEntity(25, nameof(MDBatchPlanGroup), "en{'Batchplan group'}de{'Batchplan Gruppe'}", Const.ContextDatabase + "\\" + nameof(MDBatchPlanGroup), "", true)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -37,6 +37,14 @@ namespace gip.mes.datamodel
     public partial class ProdOrderBatchPlan
     {
         public const string ClassName = "ProdOrderBatchPlan";
+        public const string C_DurationSecAVG = "DurationSecAVG";
+        public const string C_StartOffsetSecAVG = "StartOffsetSecAVG";
+        public const string C_OffsetToEndTime = "OffsetToEndTime";
+        public const string C_BatchSuggestionMode = "BatchSuggestionMode";
+        public const string C_PlanMode = "PlanMode";
+        public const string C_BatchSizeStandard = "BatchSizeStandard";
+        public const string C_BatchSizeMin = "BatchSizeMin";
+        public const string C_BatchSizeMax = "BatchSizeMax";
 
         #region New/Delete
         public static ProdOrderBatchPlan NewACObject(DatabaseApp dbApp, IACObject parentACObject)
