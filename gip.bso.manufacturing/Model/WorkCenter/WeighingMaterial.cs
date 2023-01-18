@@ -45,7 +45,7 @@ namespace gip.bso.manufacturing
             MaterialUnitList = PosRelation?.SourceProdOrderPartslistPos?.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToArray();
             WeighingMatState = state;
             MaterialIconDesign = materialIconDesign;
-            ///_ParentACObject = parent;
+            //_ParentACObject = parent;
             OnPropertyChanged("MaterialUnitList");
         }
 
