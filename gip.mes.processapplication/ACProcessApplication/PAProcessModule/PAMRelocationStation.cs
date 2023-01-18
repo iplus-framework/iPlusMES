@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Loadingstation'}de{'Befüllstation'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Relocation station'}de{'Umlagerstation'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
     public class PAMRelocationStation : PAMLoadingstation
     {
         #region c'tors
