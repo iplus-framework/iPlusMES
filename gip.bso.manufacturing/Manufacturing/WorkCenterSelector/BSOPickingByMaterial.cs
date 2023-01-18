@@ -312,9 +312,9 @@ namespace gip.bso.manufacturing
 
             if (currentProcessModule.ConnectionState == ACObjectConnectionState.DisConnected)
             {
-                //Info50040: The server is unreachable. Reopen the program once the connection to the server has been established.
-                // Der Server ist nicht erreichbar. Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
-                //Messages.Info(this, "Info50040");
+                //Info50040: The server is unreachable.Reopen the program once the connection to the server has been established.
+                //     Der Server ist nicht erreichbar.Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
+                Messages.Info(this, "Info50040");
                 return;
             }
 
@@ -325,7 +325,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50286: The manual weighing component can not be initialized. The process module {0} has not a child component of type PAFManualWeighing.
                 // Die Verwiegekomponente konnte nicht initialisiert werden. Das Prozessmodul {0} hat keine Kindkomponente vom Typ PAFManualWeighing.
-                //Messages.Info(this, "Error50286", false, PAProcessModuleACUrl); TODO
+                Messages.Info(this, "Error50286", false, PAProcessModuleACUrl);
                 return;
             }
 
@@ -344,7 +344,7 @@ namespace gip.bso.manufacturing
             var pafACState = pafPickingByMaterial.GetPropertyNet(nameof(ACState));
             if (pafACState == null)
             {
-                //todo: error
+                Messages.Error(this, "50285", false, nameof(ACState));
                 return;
             }
 
@@ -489,14 +489,14 @@ namespace gip.bso.manufacturing
             Guid? pickingTypeID = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDKey == pickingType)?.MDPickingTypeID;
             if (!pickingTypeID.HasValue)
             {
-                //todo: error
+                Messages.Error(this, "Can not find a MDPickingType with MDkey: " + pickingType);
                 return;
             }
 
             Guid? sourceFacilityID = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo)?.FacilityID;
             if (!sourceFacilityID.HasValue)
             {
-                //todo error
+                Messages.Error(this, "Can not find a Facility with FacilityNo: " + sourceFacilityNo);
                 return;
             }
 
@@ -529,10 +529,10 @@ namespace gip.bso.manufacturing
 
         private void BookPickingPosition()
         {
-            FacilityCharge fc = DatabaseApp.FacilityCharge.Include("Facility").FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
+            FacilityCharge fc = DatabaseApp.FacilityCharge.Include(nameof(Facility)).FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
             if (fc == null)
             {
-                //todo:error
+                Messages.Error(this, "Can not find in the database a FacilityCharge with ID: " + SelectedFacilityCharge.FacilityChargeID);
                 return;
             }
 
@@ -605,14 +605,14 @@ namespace gip.bso.manufacturing
                             ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
                             if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                             {
-                                //return fbtZeroBooking.ValidMessage;
+                                Messages.Msg(fbtZeroBooking.ValidMessage);
                             }
                             else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                             {
                                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                     result.ValidMessage.Message = result.ResultState.ToString();
 
-                                //return result.ValidMessage;
+                                Messages.Msg(result.ValidMessage);
                             }
                         }
                     }
@@ -631,9 +631,8 @@ namespace gip.bso.manufacturing
         {
             if (_PAFACStateProp != null && _PAFACStateProp.ValueT != ACStateEnum.SMIdle)
             {
-                //todo:
-                //Error :The function PickingByMaterial is currently active. Please perform abort on the function then try start again.
-                Messages.Warning(this, "");
+                //Error50595 :The function PickingByMaterial is currently active. Please perform abort on the function then try start again.
+                Messages.Error(this, "Error50595");
                 return;
             }
 
@@ -647,7 +646,6 @@ namespace gip.bso.manufacturing
                     Messages.Error(this, "Error50283");
                     return;
                 }
-
 
                 if (ACFacilityManager == null)
                 {
