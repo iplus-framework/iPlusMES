@@ -284,6 +284,12 @@ namespace gip.bso.manufacturing
             protected set;
         }
 
+        public bool AutoPrintOnPosting
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #region Methods
@@ -306,9 +312,9 @@ namespace gip.bso.manufacturing
 
             if (currentProcessModule.ConnectionState == ACObjectConnectionState.DisConnected)
             {
-                //Info50040: The server is unreachable. Reopen the program once the connection to the server has been established.
-                // Der Server ist nicht erreichbar. Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
-                //Messages.Info(this, "Info50040");
+                //Info50040: The server is unreachable.Reopen the program once the connection to the server has been established.
+                //     Der Server ist nicht erreichbar.Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
+                Messages.Info(this, "Info50040");
                 return;
             }
 
@@ -319,7 +325,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50286: The manual weighing component can not be initialized. The process module {0} has not a child component of type PAFManualWeighing.
                 // Die Verwiegekomponente konnte nicht initialisiert werden. Das Prozessmodul {0} hat keine Kindkomponente vom Typ PAFManualWeighing.
-                //Messages.Info(this, "Error50286", false, PAProcessModuleACUrl); TODO
+                Messages.Info(this, "Error50286", false, PAProcessModuleACUrl);
                 return;
             }
 
@@ -338,7 +344,7 @@ namespace gip.bso.manufacturing
             var pafACState = pafPickingByMaterial.GetPropertyNet(nameof(ACState));
             if (pafACState == null)
             {
-                //todo: error
+                Messages.Error(this, "50285", false, nameof(ACState));
                 return;
             }
 
@@ -438,6 +444,12 @@ namespace gip.bso.manufacturing
                         if (sourceFacilityNoACValue != null)
                             SourceFacilityNo = sourceFacilityNoACValue.ParamAsString;
 
+                        ACValue autoPrintACValue = acMethod.ParameterValueList.GetACValue("AutoPrintOnPosting");
+                        if (autoPrintACValue != null)
+                            AutoPrintOnPosting = autoPrintACValue.ParamAsBoolean;
+                        else
+                            AutoPrintOnPosting = false;
+
                         ACValue fromDTACValue = acMethod.ParameterValueList.GetACValue("FromDT");
                         if (fromDTACValue != null)
                             PWPickingsFrom = fromDTACValue.ParamAsDateTime;
@@ -447,7 +459,6 @@ namespace gip.bso.manufacturing
                             PWPickingsTo = toDTACValue.ParamAsDateTime;
 
                         GenerateWeighingModel(PickingType, SourceFacilityNo, PWPickingsFrom, PWPickingsTo);
-
                     }
                 }
             }
@@ -478,17 +489,16 @@ namespace gip.bso.manufacturing
             Guid? pickingTypeID = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDKey == pickingType)?.MDPickingTypeID;
             if (!pickingTypeID.HasValue)
             {
-                //todo: error
+                Messages.Error(this, "Can not find a MDPickingType with MDkey: " + pickingType);
                 return;
             }
 
             Guid? sourceFacilityID = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo)?.FacilityID;
             if (!sourceFacilityID.HasValue)
             {
-                //todo error
+                Messages.Error(this, "Can not find a Facility with FacilityNo: " + sourceFacilityNo);
                 return;
             }
-
 
             _PickingItems = DatabaseApp.Picking.Where(c => c.DeliveryDateFrom >= from 
                                                        && c.DeliveryDateTo <= to
@@ -519,10 +529,10 @@ namespace gip.bso.manufacturing
 
         private void BookPickingPosition()
         {
-            FacilityCharge fc = DatabaseApp.FacilityCharge.Include("Facility").FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
+            FacilityCharge fc = DatabaseApp.FacilityCharge.Include(nameof(Facility)).FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
             if (fc == null)
             {
-                //todo:error
+                Messages.Error(this, "Can not find in the database a FacilityCharge with ID: " + SelectedFacilityCharge.FacilityChargeID);
                 return;
             }
 
@@ -595,19 +605,23 @@ namespace gip.bso.manufacturing
                             ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
                             if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                             {
-                                //return fbtZeroBooking.ValidMessage;
+                                Messages.Msg(fbtZeroBooking.ValidMessage);
                             }
                             else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                             {
                                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                     result.ValidMessage.Message = result.ResultState.ToString();
 
-                                //return result.ValidMessage;
+                                Messages.Msg(result.ValidMessage);
                             }
                         }
                     }
-                }
 
+                    if (AutoPrintOnPosting)
+                    {
+                        PrintLastQuant();
+                    }
+                }
             }
         }
 
@@ -615,6 +629,13 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true)]
         public void RunPickingByMaterial()
         {
+            if (_PAFACStateProp != null && _PAFACStateProp.ValueT != ACStateEnum.SMIdle)
+            {
+                //Error50595 :The function PickingByMaterial is currently active. Please perform abort on the function then try start again.
+                Messages.Error(this, "Error50595");
+                return;
+            }
+
             if (PickingsFrom > DateTime.MinValue && PickingsTo > DateTime.MinValue && PickingsFrom < PickingsTo)
             {
                 ACComponent currentProcessModule = CurrentProcessModule;
@@ -625,7 +646,6 @@ namespace gip.bso.manufacturing
                     Messages.Error(this, "Error50283");
                     return;
                 }
-
 
                 if (ACFacilityManager == null)
                 {
@@ -744,66 +764,6 @@ namespace gip.bso.manufacturing
             return base.OnPreStartWorkflow(dbApp, picking, configItems, validRoute, rootWF);
         }
 
-        //private void ActivateScale(IACComponent scale)
-        //{
-        //    if (scale == null)
-        //        return;
-
-        //    var actWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualWeight));
-        //    if (actWeightProp == null)
-        //    {
-        //        //Error50292: Initialization error: The scale component doesn't have the property {0}.
-        //        // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-        //        Messages.Error(this, "Error50292", false, "ActualWeight");
-        //        return;
-        //    }
-
-        //    MaxScaleWeight = null;
-        //    var actValProp = scale.GetPropertyNet(nameof(PAEScaleBase.ActualValue)) as IACContainerTNet<double>;
-        //    if (actValProp == null)
-        //    {
-        //        //Error50292: Initialization error: The scale component doesn't have the property {0}.
-        //        // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-        //        Messages.Error(this, "Error50292", false, "ActualValue");
-        //        return;
-        //    }
-
-        //    double digitWeight = 1.0;
-        //    var digitWeightProp = scale.GetPropertyNet(nameof(PAEScaleBase.DigitWeight));
-        //    if (digitWeightProp != null)
-        //    {
-        //        digitWeight = (digitWeightProp as IACContainerTNet<double>).ValueT;
-        //        if (digitWeight <= double.Epsilon)
-        //            digitWeight = 1.0;
-        //    }
-        //    if (digitWeight >= 999.99999)
-        //        ScalePrecisionFormat = "F0";
-        //    else if (digitWeight >= 99.99999)
-        //        ScalePrecisionFormat = "F1";
-        //    else if (digitWeight >= 9.99999)
-        //        ScalePrecisionFormat = "F2";
-        //    else if (digitWeight >= 0.99999)
-        //        ScalePrecisionFormat = "F3";
-        //    else if (digitWeight >= 0.09999)
-        //        ScalePrecisionFormat = "F4";
-        //    else if (digitWeight >= 0.00999)
-        //        ScalePrecisionFormat = "F5";
-        //    else if (digitWeight >= 0.00099)
-        //        ScalePrecisionFormat = "F6";
-
-        //    _ScaleActualValue = actValProp;
-
-        //    _ScaleActualWeight = actWeightProp as IACContainerTNet<double>;
-        //    (_ScaleActualWeight as IACPropertyNetBase).PropertyChanged += ActWeightProp_PropertyChanged;
-        //    (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
-        //    ScaleRealWeight = _ScaleActualWeight.ValueT;
-        //    ScaleGrossWeight = _ScaleActualValue.ValueT;
-        //    OnPropertyChanged("TargetWeight");
-        //    OnPropertyChanged("ScaleDifferenceWeight");
-
-        //   OnPropertyChanged(nameof(CurrentScaleObject));
-        //}
-
         public override void Acknowledge()
         {
             BookPickingPosition();
@@ -839,10 +799,49 @@ namespace gip.bso.manufacturing
 
         public override void Abort()
         {
+            base.Abort();
+        }
+
+        [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999)]
+        public void FinishPickingOrder()
+        {
+            ACRef<ACInDeliveryNoteManager> inManagerRef = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
+            ACRef<ACOutDeliveryNoteManager> outManagerRef = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
+
+            DeliveryNote delNote = null;
+            InOrder inOrder = null;
+            OutOrder outOrder = null;
+
+            if (ACPickingManager == null)
+            {
+                _ACPickingManager = ACRefToPickingManager();
+            }
+
+            if (ACPickingManager == null)
+            {
+                Messages.Error(this, "ACPickingManager is null!");
+                return;
+            }
+
+            foreach (var picking in _PickingItems)
+            {
+                ACPickingManager.FinishOrder(DatabaseApp, picking, inManagerRef.ValueT, outManagerRef.ValueT, ACFacilityManager, out delNote, out inOrder, out outOrder, true);
+            }
+
             if (_PAFPickingByMaterial != null)
             {
                 _PAFPickingByMaterial.ValueT.ExecuteMethod(nameof(PAFPickingByMaterial.Abort));
             }
+
+            CloseTopDialog();
+        }
+
+        [ACMethodInfo("", "en{'Cancel component'}de{'Cancel component'}", 9999)]
+        public void CancelCurrentComponent()
+        {
+            ShowSelectFacilityLotInfo = true;
+            SelectedFacilityCharge = null;
+            CloseTopDialog();
         }
 
         public override void PrintLastQuant()

@@ -260,6 +260,7 @@ namespace gip.bso.logistics
             if (clone != null)
             {
                 clone._SelectedFacilityBooking = this._SelectedFacilityBooking;
+                clone._SelectedFacilityBookingCharge = this._SelectedFacilityBookingCharge;
             }
             return clone;
         }

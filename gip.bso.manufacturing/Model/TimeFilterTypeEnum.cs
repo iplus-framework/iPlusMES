@@ -25,6 +25,7 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'POPosTimeFilterTypeEnum'}de{'POPosTimeFilterTypeEnum'}", Global.ACKinds.TACEnum, QRYConfig = "gip.bso.manufacturing.ACValueListPOPosTimeFilterTypeEnum")]
     public enum POPosTimeFilterTypeEnum
     {
+        InsertDate,
         ProdOrderPosStartTime,
         ProdOrderPosEndTime,
         ProdOrderPosStartEndTime
@@ -35,6 +36,7 @@ namespace gip.bso.manufacturing
     {
         public ACValueListPOPosTimeFilterTypeEnum() : base("POPosTimeFilterType")
         {
+            AddEntry(POPosTimeFilterTypeEnum.InsertDate, Const.EntityTransInsertDate);
             AddEntry(POPosTimeFilterTypeEnum.ProdOrderPosStartTime, "en{'Start time'}de{'Startzeit'}");
             AddEntry(POPosTimeFilterTypeEnum.ProdOrderPosEndTime, "en{'End time'}de{'Endzeit'}");
             AddEntry(POPosTimeFilterTypeEnum.ProdOrderPosStartEndTime, "en{'Time period'}de{'Zeitraum'}");
