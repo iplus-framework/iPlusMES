@@ -824,6 +824,11 @@ namespace gip.bso.manufacturing
                 DateTime fromDT = ProdOrderPosFilterFrom.Value.Date;
                 DateTime toDT = ProdOrderPosFilterTo.Value.Date.AddDays(1).AddTicks(-1);
 
+                if ((POPosTimeFilterTypeEnum)SelectedPOPosTimeFilterMode.Value == POPosTimeFilterTypeEnum.InsertDate)
+                {
+                    return prodOrders.Where(c => c.InsertDate >= fromDT && c.InsertDate <= toDT);
+                }
+
                 if ((POPosTimeFilterTypeEnum)SelectedPOPosTimeFilterMode.Value == POPosTimeFilterTypeEnum.ProdOrderPosStartTime)
                 {
                     return prodOrders.Where(c => c.ProdOrderPartslist_ProdOrder.Any(x => x.StartDate >= fromDT && x.StartDate <= toDT));
