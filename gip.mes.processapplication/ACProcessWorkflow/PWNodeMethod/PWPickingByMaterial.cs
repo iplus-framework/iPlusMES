@@ -243,12 +243,5 @@ namespace gip.mes.processapplication
         }
 
         #endregion
-
-
-
-
-
-
-
     }
 }
