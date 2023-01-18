@@ -59,6 +59,8 @@ namespace gip.bso.manufacturing
 
         private IACContainerTNet<ACStateEnum> _PAFACStateProp;
 
+        private IACContainerTNet<Guid> _ScannedFCProp;
+
         public string PickingType
         {
             get;
@@ -349,13 +351,21 @@ namespace gip.bso.manufacturing
             }
 
             _PAFACStateProp = pafACState as IACContainerTNet<ACStateEnum>;
-
             HandlePAFACState(_PAFACStateProp.ValueT);
-
             _PAFACStateProp.PropertyChanged += _PAFACStateProp_PropertyChanged;
+
+
+            var scannedFC = pafPickingByMaterial.GetPropertyNet(nameof(PAFPickingByMaterial.ScannedFacilityCharge));
+            if (scannedFC != null)
+            {
+                _ScannedFCProp = scannedFC as IACContainerTNet<Guid>;
+                _ScannedFCProp.PropertyChanged += _ScannedFCProp_PropertyChanged;
+            }
 
             WeighingMaterialsFSM = true;
         }
+
+
 
         public override void DeActivate()
         {
@@ -371,6 +381,12 @@ namespace gip.bso.manufacturing
             {
                 ComponentPWNode.Detach();
                 ComponentPWNode = null;
+            }
+
+            if (_ScannedFCProp != null)
+            {
+                _ScannedFCProp.PropertyChanged -= _ScannedFCProp_PropertyChanged;
+                _ScannedFCProp = null;
             }
 
             if (_PAFACStateProp != null)
@@ -406,6 +422,19 @@ namespace gip.bso.manufacturing
                 {
                     ACStateEnum tempState = tempSender.ValueT;
                     ParentBSOWCS?.ApplicationQueue.Add(() => HandlePAFACState(tempState));
+                }
+            }
+        }
+
+        private void _ScannedFCProp_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                var tempSender = sender as IACContainerTNet<Guid>;
+                if (tempSender != null)
+                {
+                    Guid tempGuid = tempSender.ValueT;
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandleScannedFC(tempGuid));
                 }
             }
         }
@@ -480,6 +509,48 @@ namespace gip.bso.manufacturing
                 {
                     ComponentPWNode.Detach();
                     ComponentPWNode = null;
+                }
+            }
+        }
+
+        private void HandleScannedFC(Guid facilityChargeID)
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityChargeID == facilityChargeID)
+            {
+                return;
+            }
+
+            var tempFCList = FacilityChargeList;
+            if (tempFCList != null && tempFCList.Any())
+            {
+                var tempFC = tempFCList.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                if (tempFC != null)
+                {
+                    SelectedFacilityCharge = tempFC;
+                }
+            }
+
+            var tempMaterialsList = WeighingMaterialList;
+            if (tempMaterialsList != null && tempMaterialsList.Any())
+            {
+                FacilityCharge fcDB = DatabaseApp.FacilityCharge.Include(nameof(Material)).FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                if (fcDB != null)
+                {
+                    var tempMaterial = tempMaterialsList.FirstOrDefault(c => c.MaterialNo == fcDB.Material.MaterialNo);
+                    if (tempMaterial != null)
+                    {
+                        SelectedWeighingMaterial = tempMaterial;
+
+                        tempFCList = FacilityChargeList;
+                        if (tempFCList != null && tempFCList.Any())
+                        {
+                            var tempFC = tempFCList.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                            if (tempFC != null)
+                            {
+                                SelectedFacilityCharge = tempFC;
+                            }
+                        }
+                    }
                 }
             }
         }
