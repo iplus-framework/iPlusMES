@@ -219,6 +219,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("SourceFacilityNo", typeof(string), "", Global.ParamOption.Optional));
             paramTranslation.Add("SourceFacilityNo", "en{'Source facility No'}de{'Source facility No'}");
 
+            method.ParameterValueList.Add(new ACValue("SourceFacilityNo2", typeof(string), "", Global.ParamOption.Optional));
+            paramTranslation.Add("SourceFacilityNo2", "en{'Source facility No 2'}de{'Source facility No 2'}");
+
             method.ParameterValueList.Add(new ACValue("AutoPrintOnPosting", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoPrintOnPosting", "en{'Auto print on posting'}de{'Auto print on posting'}");
 
