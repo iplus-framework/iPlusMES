@@ -452,7 +452,6 @@ namespace gip.bso.manufacturing
                         }
 
                         string pickingType = null, sourceFacilityNo = null, sourceFacilityNo2 = null;
-                        bool autoprintOnPosting = false;
 
                         ACValue pickingTypeACValue = acMethod.ParameterValueList.GetACValue("PickingType");
                         if (pickingTypeACValue != null)
@@ -468,7 +467,9 @@ namespace gip.bso.manufacturing
 
                         ACValue autoPrintACValue = acMethod.ParameterValueList.GetACValue("AutoPrintOnPosting");
                         if (autoPrintACValue != null)
-                            autoprintOnPosting = autoPrintACValue.ParamAsBoolean;
+                            AutoPrintOnPosting = autoPrintACValue.ParamAsBoolean;
+                        else
+                            AutoPrintOnPosting = false;
 
                         ACValue fromDTACValue = acMethod.ParameterValueList.GetACValue("FromDT");
                         if (fromDTACValue != null)
@@ -486,6 +487,7 @@ namespace gip.bso.manufacturing
             {
                 PWPickingsFrom = DateTime.MinValue;
                 PWPickingsTo = DateTime.MinValue;
+                AutoPrintOnPosting = false;
 
                 WeighingMaterialList = null;
                 PickingsList = null;
