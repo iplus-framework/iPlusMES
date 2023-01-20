@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,21 +18,18 @@ namespace gip.mes.processapplication
             RegisterExecuteHandler(typeof(PAFPickingByMaterial), HandleExecuteACMethod_PAFPickingByMaterial);
         }
 
-        public PAFPickingByMaterial(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") 
+        public PAFPickingByMaterial(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") 
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
 
         }
 
-        //protected override bool PWWorkTaskScanDeSelector(IACComponent c)
-        //{
-        //    return c is PWPickingByMaterial;
-        //}
-
-        //protected override bool PWWorkTaskScanSelector(IACComponent c)
-        //{
-        //    return c is PWPickingByMaterial;
-        //}
+        [ACPropertyBindingTarget]
+        public IACContainerTNet<Guid> ScannedFacilityCharge
+        {
+            get;
+            set;
+        }
 
         [ACMethodAsync("Process", "en{'Start'}de{'Start'}", (short)MISort.Start, false)]
         public override ACMethodEventArgs Start(ACMethod acMethod)
@@ -63,6 +61,38 @@ namespace gip.mes.processapplication
         public static bool HandleExecuteACMethod_PAFPickingByMaterial(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PAProcessFunction(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
+        [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
+        public BarcodeSequenceBase OnScanEvent(BarcodeSequenceBase sequence, bool previousLotConsumed, Guid facilityID, Guid facilityChargeID, int scanSequence, short? questionResult)
+        {
+            BarcodeSequenceBase resultSequence = new BarcodeSequenceBase();
+            if (scanSequence == 1)
+            {
+                // Info50050: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
+                resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(10)", 10, "Info50050");
+                resultSequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
+            }
+            else
+            {
+                if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
+                {
+                    // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFPickingByMaterial), "OnScanEvent(20)", 20, "Error50354");
+                    resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
+                }
+                else
+                {
+                    if (ScannedFacilityCharge.ValueT != facilityChargeID)
+                        ScannedFacilityCharge.ValueT = facilityChargeID;
+                    
+                    // Info50052: A new lot was activated or changed. (Neue Charge wurde aktiviert bzw. gewechselt.)
+                    resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(40)", 40, "Info50052");
+                    resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
+                    
+                }
+            }
+            return resultSequence;
         }
     }
 }

@@ -59,17 +59,7 @@ namespace gip.bso.manufacturing
 
         private IACContainerTNet<ACStateEnum> _PAFACStateProp;
 
-        public string PickingType
-        {
-            get;
-            set;
-        }
-
-        public string SourceFacilityNo
-        {
-            get;
-            set;
-        }
+        private IACContainerTNet<Guid> _ScannedFCProp;
 
         public DateTime PWPickingsFrom
         {
@@ -349,10 +339,16 @@ namespace gip.bso.manufacturing
             }
 
             _PAFACStateProp = pafACState as IACContainerTNet<ACStateEnum>;
-
             HandlePAFACState(_PAFACStateProp.ValueT);
-
             _PAFACStateProp.PropertyChanged += _PAFACStateProp_PropertyChanged;
+
+
+            var scannedFC = pafPickingByMaterial.GetPropertyNet(nameof(PAFPickingByMaterial.ScannedFacilityCharge));
+            if (scannedFC != null)
+            {
+                _ScannedFCProp = scannedFC as IACContainerTNet<Guid>;
+                _ScannedFCProp.PropertyChanged += _ScannedFCProp_PropertyChanged;
+            }
 
             WeighingMaterialsFSM = true;
         }
@@ -371,6 +367,12 @@ namespace gip.bso.manufacturing
             {
                 ComponentPWNode.Detach();
                 ComponentPWNode = null;
+            }
+
+            if (_ScannedFCProp != null)
+            {
+                _ScannedFCProp.PropertyChanged -= _ScannedFCProp_PropertyChanged;
+                _ScannedFCProp = null;
             }
 
             if (_PAFACStateProp != null)
@@ -410,6 +412,19 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private void _ScannedFCProp_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                var tempSender = sender as IACContainerTNet<Guid>;
+                if (tempSender != null)
+                {
+                    Guid tempGuid = tempSender.ValueT;
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandleScannedFC(tempGuid));
+                }
+            }
+        }
+
         private void HandlePAFACState(ACStateEnum acState)
         {
             if (acState == ACStateEnum.SMRunning)
@@ -436,13 +451,19 @@ namespace gip.bso.manufacturing
                             return;
                         }
 
+                        string pickingType = null, sourceFacilityNo = null, sourceFacilityNo2 = null;
+
                         ACValue pickingTypeACValue = acMethod.ParameterValueList.GetACValue("PickingType");
                         if (pickingTypeACValue != null)
-                            PickingType = pickingTypeACValue.ParamAsString;
+                            pickingType = pickingTypeACValue.ParamAsString;
 
                         ACValue sourceFacilityNoACValue = acMethod.ParameterValueList.GetACValue("SourceFacilityNo");
                         if (sourceFacilityNoACValue != null)
-                            SourceFacilityNo = sourceFacilityNoACValue.ParamAsString;
+                            sourceFacilityNo = sourceFacilityNoACValue.ParamAsString;
+
+                        ACValue sourceFacilityNo2ACValue = acMethod.ParameterValueList.GetACValue("SourceFacilityNo2");
+                        if (sourceFacilityNo2ACValue != null)
+                            sourceFacilityNo2 = sourceFacilityNo2ACValue.ParamAsString;
 
                         ACValue autoPrintACValue = acMethod.ParameterValueList.GetACValue("AutoPrintOnPosting");
                         if (autoPrintACValue != null)
@@ -458,16 +479,15 @@ namespace gip.bso.manufacturing
                         if (toDTACValue != null)
                             PWPickingsTo = toDTACValue.ParamAsDateTime;
 
-                        GenerateWeighingModel(PickingType, SourceFacilityNo, PWPickingsFrom, PWPickingsTo);
+                        GenerateWeighingModel(pickingType, sourceFacilityNo, sourceFacilityNo2, PWPickingsFrom, PWPickingsTo);
                     }
                 }
             }
             else if (acState == ACStateEnum.SMResetting)
             {
-                PickingType = null;
-                SourceFacilityNo = null;
                 PWPickingsFrom = DateTime.MinValue;
                 PWPickingsTo = DateTime.MinValue;
+                AutoPrintOnPosting = false;
 
                 WeighingMaterialList = null;
                 PickingsList = null;
@@ -484,7 +504,49 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void GenerateWeighingModel(string pickingType, string sourceFacilityNo, DateTime from, DateTime to)
+        private void HandleScannedFC(Guid facilityChargeID)
+        {
+            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityChargeID == facilityChargeID)
+            {
+                return;
+            }
+
+            var tempFCList = FacilityChargeList;
+            if (tempFCList != null && tempFCList.Any())
+            {
+                var tempFC = tempFCList.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                if (tempFC != null)
+                {
+                    SelectedFacilityCharge = tempFC;
+                }
+            }
+
+            var tempMaterialsList = WeighingMaterialList;
+            if (tempMaterialsList != null && tempMaterialsList.Any())
+            {
+                FacilityCharge fcDB = DatabaseApp.FacilityCharge.Include(nameof(Material)).FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                if (fcDB != null)
+                {
+                    var tempMaterial = tempMaterialsList.FirstOrDefault(c => c.MaterialNo == fcDB.Material.MaterialNo);
+                    if (tempMaterial != null)
+                    {
+                        SelectedWeighingMaterial = tempMaterial;
+
+                        tempFCList = FacilityChargeList;
+                        if (tempFCList != null && tempFCList.Any())
+                        {
+                            var tempFC = tempFCList.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
+                            if (tempFC != null)
+                            {
+                                SelectedFacilityCharge = tempFC;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void GenerateWeighingModel(string pickingType, string sourceFacilityNo, string sourceFacilityNo2, DateTime from, DateTime to)
         {
             Guid? pickingTypeID = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDKey == pickingType)?.MDPickingTypeID;
             if (!pickingTypeID.HasValue)
@@ -500,16 +562,25 @@ namespace gip.bso.manufacturing
                 return;
             }
 
+            Guid? sourceFacilityID2 = null;
+            if (sourceFacilityNo2 != null)
+            {
+                sourceFacilityID2 = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo2)?.FacilityID;
+            }
+
             _PickingItems = DatabaseApp.Picking.Where(c => c.DeliveryDateFrom >= from 
                                                        && c.DeliveryDateTo <= to
                                                        && c.MDPickingTypeID == pickingTypeID.Value
                                                        && (c.PickingStateIndex == (short)PickingStateEnum.New || c.PickingStateIndex == (short)PickingStateEnum.InProcess)
-                                                       && (c.PickingPos_Picking.Any(x => x.FromFacilityID == sourceFacilityID || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == sourceFacilityID))))
+                                                       && (c.PickingPos_Picking.Any(x => (x.FromFacilityID == sourceFacilityID || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == sourceFacilityID))
+                                                                                      || (x.FromFacilityID == sourceFacilityID2 || (x.FromFacility.ParentFacilityID.HasValue && x.FromFacility.ParentFacilityID == sourceFacilityID2)))))
                                               .ToList();
 
             WeighingMaterialList = _PickingItems.SelectMany(c => c.PickingPos_Picking)
                                            .GroupBy(c => c.Material.MaterialID)
-                                           .Select(p => new WeighingMaterial(p.FirstOrDefault(), WeighingComponentState.ReadyToWeighing, DefaultMaterialIcon)).ToList();
+                                           .Select(p => new WeighingMaterial(p.FirstOrDefault(), WeighingComponentState.ReadyToWeighing, DefaultMaterialIcon))
+                                           .OrderBy(x => x.MaterialName)
+                                           .ToList();
 
         }
 
