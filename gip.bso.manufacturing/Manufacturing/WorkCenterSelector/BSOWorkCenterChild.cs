@@ -274,12 +274,13 @@ namespace gip.bso.manufacturing
 
             Msg msg = null;
 
-            if ((sourceFacilityValidation && (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue))
-                || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue
-                || (!sourceFacilityValidation && forBooking.OutwardMaterial == null))
+            if (   (sourceFacilityValidation && (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue))
+                || (!sourceFacilityValidation && forBooking.OutwardMaterial == null)
+                || forBooking.InwardFacility == null 
+                || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                 return false;
 
-            if (sourceFacilityValidation)
+            if (sourceFacilityValidation && forBooking.OutwardFacility != forBooking.InwardFacility)
             {
                 msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
                 if (msg != null)

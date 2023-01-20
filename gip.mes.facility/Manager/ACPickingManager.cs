@@ -1240,6 +1240,8 @@ namespace gip.mes.facility
 
             var fromClass = pos.FromFacility.GetFacilityACClass(dbiPlus);
             var toClass = pos.ToFacility.GetFacilityACClass(dbiPlus);
+            if (fromClass == toClass)
+                return;
 
             RoutingResult result = ACRoutingService.SelectRoutes(RoutingService, this.Database.ContextIPlus, false,
                                     fromClass, toClass, RouteDirections.Forwards, "", new object[] { },
