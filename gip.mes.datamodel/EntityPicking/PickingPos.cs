@@ -447,6 +447,12 @@ namespace gip.mes.datamodel
             }
         }
 
+        [ACPropertyInfo(9999)]
+        public double CompleteFactor
+        {
+            get => (ActualQuantity / TargetQuantity) * 100;
+        }
+
         public void RecalcAfterPosting(DatabaseApp dbApp, double postedQuantityUOM, bool isCancellation, bool autoSetState = false)
         {
             if (InOrderPos != null)
@@ -585,6 +591,11 @@ namespace gip.mes.datamodel
             //}
             if (this.PickingActualUOM != sumActualQuantityUOM)
                 this.PickingActualUOM = sumActualQuantityUOM;
+        }
+
+        public void OnRefreshCompleteFactor()
+        {
+            OnPropertyChanged(nameof(CompleteFactor));
         }
 
         partial void OnPickingMaterialIDChanged()
