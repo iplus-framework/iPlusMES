@@ -1664,6 +1664,8 @@ namespace gip.mes.processapplication
                             {
                                 SubscribeToProjectWorkCycle();
                             }
+
+                            CurrentOpenMaterial = rel.ProdOrderPartslistPosRelationID;
                         }
                     }
                 }
