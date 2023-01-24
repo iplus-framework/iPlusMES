@@ -897,14 +897,14 @@ namespace gip.bso.manufacturing
 
         public override void PrintLastQuant()
         {
-            var currentProcessModule = CurrentProcessModule;
+            var pickingByMat = _PAFPickingByMaterial?.ValueT;
 
-            if (CurrentPicking != null && currentProcessModule != null)
+            if (CurrentPicking != null && pickingByMat != null)
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Add(nameof(Picking), CurrentPicking.Picking.PickingID);
                 info.Add(nameof(PickingPos), CurrentPicking.PickingPosID);
-                info.Add(nameof(core.datamodel.ACClass), currentProcessModule.ComponentClass.ACClassID);
+                info.Add(nameof(core.datamodel.ACClass), pickingByMat.ComponentClass.ACClassID);
 
                 ACPrintManager printManger = ACPrintManager.GetServiceInstance(this);
                 if (printManger != null)
