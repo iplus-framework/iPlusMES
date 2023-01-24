@@ -75,6 +75,8 @@ namespace gip.mes.processapplication
             }
             else
             {
+                ScannedFacilityCharge.ValueT = Guid.Empty;
+
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
                     // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
@@ -83,8 +85,7 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
-                    if (ScannedFacilityCharge.ValueT != facilityChargeID)
-                        ScannedFacilityCharge.ValueT = facilityChargeID;
+                    ScannedFacilityCharge.ValueT = facilityChargeID;
                     
                     // Info50052: A new lot was activated or changed. (Neue Charge wurde aktiviert bzw. gewechselt.)
                     resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(40)", 40, "Info50052");

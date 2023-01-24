@@ -88,9 +88,9 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        private Picking _CurrentPicking;
+        private PickingPos _CurrentPicking;
         [ACPropertySelected(9999, "Picking")]
-        public Picking CurrentPicking
+        public PickingPos CurrentPicking
         {
             get => _CurrentPicking;
             set
@@ -99,7 +99,8 @@ namespace gip.bso.manufacturing
 
                 if (_CurrentPicking != null && SelectedWeighingMaterial != null)
                 {
-                    CurrentPickingPos = _CurrentPicking.PickingPos_Picking.FirstOrDefault(c => c.Material.MaterialID == SelectedWeighingMaterial.PickingPosition.Material.MaterialID);
+                    _SelectedWeighingMaterial.TargetQuantity = _CurrentPicking.TargetQuantityUOM;
+                    _SelectedWeighingMaterial.ActualQuantity = _CurrentPicking.ActualQuantityUOM;
                 }
 
                 ActivateWeighing();
@@ -109,31 +110,14 @@ namespace gip.bso.manufacturing
 
         private List<Picking> _PickingItems;
 
-        private List<Picking> _PickingsList;
+        private List<PickingPos> _PickingsList;
         [ACPropertyList(9999, "Picking")]
-        public List<Picking> PickingsList
+        public List<PickingPos> PickingsList
         {
             get => _PickingsList;
             set
             {
                 _PickingsList = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private PickingPos _CurrentPickingPos;
-        public PickingPos CurrentPickingPos
-        {
-            get => _CurrentPickingPos;
-            set
-            {
-                _CurrentPickingPos = value;
-
-                if (_CurrentPickingPos != null)
-                {
-                    _SelectedWeighingMaterial.TargetQuantity = _CurrentPickingPos.TargetQuantityUOM;
-                    _SelectedWeighingMaterial.ActualQuantity = _CurrentPickingPos.ActualQuantityUOM;
-                }
                 OnPropertyChanged();
             }
         }
@@ -243,7 +227,6 @@ namespace gip.bso.manufacturing
                     _FacilityChargeList = null;
                     FacilityChargeListCount = 0;
                     CurrentPicking = null;
-                    CurrentPickingPos = null;
                     OnPropertyChanged(nameof(SelectedWeighingMaterial));
                     OnPropertyChanged(nameof(FacilityChargeList));
                     FacilityChargeNo = null;
@@ -257,12 +240,9 @@ namespace gip.bso.manufacturing
                         //_StartWeighingFromF_FC = true;
                         _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
 
-                        PickingsList = _PickingItems.Where(c => c.PickingPos_Picking.Any(x => x.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)).ToList();
-                        var temp = PickingsList.SelectMany(c => c.PickingPos_Picking)
-                                                     .Where(c => c.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)
-                                                     .FirstOrDefault(x => x.MDDelivPosLoadState.MDDelivPosLoadStateIndex < (short)MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck);
-
-                        CurrentPicking = temp?.Picking;
+                        PickingsList = _PickingItems.SelectMany(c => c.PickingPos_Picking).Where(c => c.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)
+                                                    .OrderBy(c => c.Picking.PickingNo)
+                                                    .ToList();
                     }
                 }
             }
@@ -357,7 +337,6 @@ namespace gip.bso.manufacturing
         {
             CurrentProcessModule = null;
             CurrentPicking = null;
-            CurrentPickingPos = null;
             PickingsList = null;
             SelectedWeighingMaterial = null;
             WeighingMaterialList = null;
@@ -492,7 +471,7 @@ namespace gip.bso.manufacturing
                 WeighingMaterialList = null;
                 PickingsList = null;
                 _PickingItems = null;
-                CurrentPickingPos = null;
+                CurrentPicking = null;
                 _FacilityChargeList = null;
                 SelectedWeighingMaterial = null;
 
@@ -506,7 +485,7 @@ namespace gip.bso.manufacturing
 
         private void HandleScannedFC(Guid facilityChargeID)
         {
-            if (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityChargeID == facilityChargeID)
+            if (facilityChargeID == Guid.Empty || (SelectedFacilityCharge != null && SelectedFacilityCharge.FacilityChargeID == facilityChargeID))
             {
                 return;
             }
@@ -538,7 +517,7 @@ namespace gip.bso.manufacturing
                             var tempFC = tempFCList.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
                             if (tempFC != null)
                             {
-                                SelectedFacilityCharge = tempFC;
+                                DelegateToMainThread((object state) => SelectedFacilityCharge = tempFC);
                             }
                         }
                     }
@@ -586,7 +565,7 @@ namespace gip.bso.manufacturing
 
         private void ActivateWeighing()
         {
-            if (SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPicking != null && CurrentPickingPos != null)
+            if (SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPicking != null)
             {
                 PAFCurrentMaterial = SelectedWeighingMaterial.MaterialName;
                 TargetWeight = SelectedWeighingMaterial.TargetQuantity;
@@ -607,7 +586,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(DatabaseApp, CurrentPickingPos, ScaleActualWeight);
+            FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(DatabaseApp, CurrentPicking, ScaleActualWeight);
 
             Msg msg = DatabaseApp.ACSaveChangesWithRetry();
 
@@ -653,10 +632,11 @@ namespace gip.bso.manufacturing
                         return;
                     }
 
-                    ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPickingPos, changedQuantity, false, true);
+                    ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPicking, changedQuantity, false, true);
                     DatabaseApp.ACSaveChanges();
 
-                    SelectedWeighingMaterial.RefreshFromPickingPos(CurrentPickingPos);
+                    SelectedWeighingMaterial.RefreshFromPickingPos(CurrentPicking);
+                    CurrentPicking.OnRefreshCompleteFactor();
 
                     msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
                     if (msg != null)
@@ -842,7 +822,7 @@ namespace gip.bso.manufacturing
 
         public override bool IsEnabledAcknowledge()
         {
-            return SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPickingPos != null && CurrentPicking != null && ScaleActualWeight > 0.000001;
+            return SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPicking != null && ScaleActualWeight > 0.000001;
         }
 
         public override void AddKg()
@@ -917,14 +897,14 @@ namespace gip.bso.manufacturing
 
         public override void PrintLastQuant()
         {
-            var currentProcessModule = CurrentProcessModule;
+            var pickingByMat = _PAFPickingByMaterial?.ValueT;
 
-            if (CurrentPicking != null && CurrentPickingPos != null && currentProcessModule != null)
+            if (CurrentPicking != null && pickingByMat != null)
             {
                 PAOrderInfo info = new PAOrderInfo();
-                info.Add(nameof(Picking), CurrentPicking.PickingID);
-                info.Add(nameof(PickingPos), CurrentPickingPos.PickingPosID);
-                info.Add(nameof(core.datamodel.ACClass), currentProcessModule.ComponentClass.ACClassID);
+                info.Add(nameof(Picking), CurrentPicking.Picking.PickingID);
+                info.Add(nameof(PickingPos), CurrentPicking.PickingPosID);
+                info.Add(nameof(core.datamodel.ACClass), pickingByMat.ComponentClass.ACClassID);
 
                 ACPrintManager printManger = ACPrintManager.GetServiceInstance(this);
                 if (printManger != null)

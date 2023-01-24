@@ -1410,6 +1410,7 @@ namespace gip.mes.processapplication
                     WeighingComponent currentComp = GetWeighingComponent(currentOpenMaterial);
                     if (currentComp != null && currentComp.WeighState == WeighingComponentState.InWeighing)
                     {
+                        CurrentFacilityCharge = null;
                         currentComp.SwitchState(WeighingComponentState.ReadyToWeighing);
                         SetInfo(currentComp, WeighingComponentInfoType.State, null);
                     }
@@ -1664,6 +1665,8 @@ namespace gip.mes.processapplication
                             {
                                 SubscribeToProjectWorkCycle();
                             }
+
+                            CurrentOpenMaterial = rel.ProdOrderPartslistPosRelationID;
                         }
                     }
                 }
@@ -2584,7 +2587,14 @@ namespace gip.mes.processapplication
                                                                                                             && c.KeyACUrl == MaterialConfigLastUsedLotKeyACUrl);
 
             if (lastUsedFC == null || lastUsedFC.Value == null)
+            {
+                if (facilityCharges != null && facilityCharges.Count() == 1)
+                {
+                    return facilityCharges;
+                }
+
                 return new List<FacilityCharge>();
+            }
 
             Guid? fcID = lastUsedFC.Value as Guid?;
             if (fcID.HasValue)
