@@ -868,7 +868,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", 999)]
+        [ACMethodInfo("Search", "en{'Search (ProdOrder/Mat)'}de{'Suchen (ProdOrder/Mat)'}", 999)]
         public void Search()
         {
             if (!IsEnabledSearch())
@@ -887,7 +887,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search2", "en{'Search'}de{'Suchen'}", 999)]
+        [ACMethodInfo("Search2", "en{'Search (All)'}de{'Search (All)'}", 999)]
         public void Search2()
         {
             if (!IsEnabledSearch())
@@ -1010,7 +1010,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("SearchInputs", "en{'Search'}de{'Suchen'}", 999)]
+        [ACMethodInfo("SearchInputs", "en{'Search (Inputs)'}de{'Suchen (Inputs)'}", 999)]
         public void SearchInputs()
         {
             if (!IsEnabledSearchInputs())
