@@ -69,8 +69,8 @@ namespace gip.mes.processapplication
             BarcodeSequenceBase resultSequence = new BarcodeSequenceBase();
             if (scanSequence == 1)
             {
-                // Info50050: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
-                resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(10)", 10, "Info50050");
+                // Info50088: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
+                resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(10)", 10, "Info50088");
                 resultSequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
             }
             else
@@ -79,16 +79,16 @@ namespace gip.mes.processapplication
 
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
-                    // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
-                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFPickingByMaterial), "OnScanEvent(20)", 20, "Error50354");
+                    // Error50596: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, nameof(PAFPickingByMaterial), "OnScanEvent(20)", 20, "Error50596");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                 }
                 else
                 {
                     ScannedFacilityCharge.ValueT = facilityChargeID;
                     
-                    // Info50052: A new lot was activated or changed. (Neue Charge wurde aktiviert bzw. gewechselt.)
-                    resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(40)", 40, "Info50052");
+                    // Info50089: A new lot was activated or changed. (Neue Charge wurde aktiviert bzw. gewechselt.)
+                    resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFPickingByMaterial), "OnScanEvent(40)", 40, "Info50089");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
                     
                 }
