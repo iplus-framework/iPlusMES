@@ -164,7 +164,7 @@ namespace gip.mes.facility.TandTv3
         #endregion
 
         #region PosOperations -> Common
-        public bool UseLotCheck(ProdOrderPartslistPos pos)
+        public virtual bool UseLotCheck(ProdOrderPartslistPos pos)
         {
             bool useLotCheck = false;
             if (pos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern)
