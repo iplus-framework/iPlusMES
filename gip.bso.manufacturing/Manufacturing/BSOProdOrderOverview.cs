@@ -1371,7 +1371,7 @@ namespace gip.bso.manufacturing
                     ProdOrder prodOrder = databaseApp.ProdOrder.FirstOrDefault(c => c.ProdOrderID == prodOrderID);
                     if (prodOrder != null)
                     {
-                        this.ProdOrderManager.RecalcAllQuantitesAndStatistics(databaseApp, prodOrder, true);
+                        this.ProdOrderManager.RecalcAllQuantitesAndStatistics(databaseApp, prodOrder, true, this);
                         CurrentProgressInfo.TotalProgress.ProgressCurrent++;
                     }
                 }

@@ -1179,7 +1179,7 @@ namespace gip.bso.manufacturing
             if (this.ProdOrderManager != null)
             {
                 this.ProdOrderManager.FinishOrder(this.DatabaseApp, CurrentProdOrder);
-                ProdOrderManager.RecalcAllQuantitesAndStatistics(this.DatabaseApp, CurrentProdOrder, true);
+                ProdOrderManager.RecalcAllQuantitesAndStatistics(this.DatabaseApp, CurrentProdOrder, true, this);
             }
         }
 
@@ -5158,7 +5158,7 @@ namespace gip.bso.manufacturing
 
         private MsgWithDetails RecalcAllQuantities(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
         {
-            return ProdOrderManager.RecalcAllQuantitesAndStatistics(databaseApp, prodOrder, saveChanges);
+            return ProdOrderManager.RecalcAllQuantitesAndStatistics(databaseApp, prodOrder, saveChanges, this);
         }
 
         private MsgWithDetails DoRecalcAllQuantitiesForSelected(DatabaseApp databaseApp, ProdOrder[] prodOrders)

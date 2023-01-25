@@ -535,6 +535,10 @@ namespace gip.mes.facility
             if (mixItem.Material.ExcludeFromSumCalc)
             {
                 mixItem.TargetQuantityUOM = 0;
+                foreach (var rel in mixItem.PartslistPosRelation_SourcePartslistPos)
+                {
+                    rel.TargetQuantityUOM = 0;
+                }
                 return;
             }
 

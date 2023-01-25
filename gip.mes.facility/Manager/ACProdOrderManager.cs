@@ -3205,7 +3205,7 @@ namespace gip.mes.facility
         #region Statistics
 
 
-        public MsgWithDetails RecalcAllQuantitesAndStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges)
+        public virtual MsgWithDetails RecalcAllQuantitesAndStatistics(DatabaseApp databaseApp, ProdOrder prodOrder, bool saveChanges, ACComponent caller)
         {
             MsgWithDetails msg = new MsgWithDetails();
             try

@@ -1818,7 +1818,7 @@ namespace gip.bso.masterdata
             {
                 if (CurrentPartslist == null || CurrentPartslist.Material == null)
                     return null;
-                return CurrentPartslist.Material.MDUnitList.OrderBy(x => x.MDUnitName);
+                return CurrentPartslist.Material.MDUnitList.Where(c => c.MDUnitID != CurrentPartslist.Material.BaseMDUnitID);
             }
         }
 
