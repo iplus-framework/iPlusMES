@@ -327,6 +327,18 @@
 
         #endregion
 
+        #region OrderLotItem
+
+        public const string TimeEntered     = "en{'Time Entered'}de{'Eingabezeit'}";
+        public const string Duration        = "en{'Duration'}de{'Dauer'}";
+        public const string HintDuration    = "en{'Hint Duration'}de{'Hinweisdauer'}";
+        public const string ElapsedTime     = "en{'Elapsed Time'}de{'Verstrichene Zeit'}";
+        public const string FinishTime      = "en{'Finish Time'}de{'Endzeit'}";
+        public const string RestTime        = "en{'Rest Time'}de{'Verbleibende Zeit'}";
+        public const string OperationitemTimeStatus = "en{'Operation item status'}de{'Vorgangspositionsstatus'}";
+
+        #endregion
+
 
     }
 

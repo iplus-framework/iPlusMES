@@ -111,7 +111,10 @@
     <Compile Include="EntityMD\MDSchedulingGroup.cs" />
     <Compile Include="EntityMD\MDSchedulingGroupWF.cs" />
     <Compile Include="EntityMD\MDPickingType.cs" />
+    <Compile Include="EntityOperation\OperationitemTimeStatusEnum.cs" />
     <Compile Include="EntityOperation\OperationLog.cs" />
+    <Compile Include="EntityOperation\OperationLogItem.cs" />
+    <Compile Include="EntityOperation\OperationLogItemList.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />

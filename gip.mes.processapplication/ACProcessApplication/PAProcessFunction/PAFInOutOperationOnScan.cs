@@ -29,6 +29,16 @@ namespace gip.mes.processapplication
 
         #endregion
 
+        #region Properties
+
+        public IACContainerTNet<OperationLogItemList> OperationLogItems
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
         #region Methods
 
         [ACMethodAsync("Process", "en{'Start'}de{'Start'}", (short)MISort.Start, false)]
