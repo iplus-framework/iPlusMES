@@ -1,17 +1,13 @@
 ﻿using gip.core.datamodel;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
     [DataContract]
-    [KnownType("GetKnownType")]
     [ACSerializeableInfo]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'OperationLogItem'}de{'OperationLogItem'}", Global.ACKinds.TACClass)]
     public class OperationLogItem : INotifyPropertyChanged
     {
 
@@ -27,7 +23,6 @@ namespace gip.mes.datamodel
 - FinishTime (DateTime) = TimeEntered + Duration
 - RestTime (TimeSpan)= FinishTime - Now
          */
-
 
         #region DataMembers
         [DataMember]
@@ -59,7 +54,6 @@ namespace gip.mes.datamodel
         public TimeSpan HintDuration { get; set; }
 
         #endregion
-
 
         #region Calculated
 
@@ -118,7 +112,6 @@ namespace gip.mes.datamodel
         }
 
         #endregion
-
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
