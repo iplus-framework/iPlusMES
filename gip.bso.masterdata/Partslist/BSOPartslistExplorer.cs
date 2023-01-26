@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Objects;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using static gip.core.datamodel.Global;
@@ -648,7 +649,10 @@ namespace gip.bso.masterdata
                 RootProdOrderPartListExpand.LoadTree();
                 RootProdOrderPartListExpand.IsEnabled = true;
                 RootProdOrderPartListExpand.IsChecked = false;
-
+                foreach (ExpandBase child in RootProdOrderPartListExpand.Children)
+                {
+                    child.DoAction(c => c.IsChecked = true);
+                }
 
                 _CurrentProdOrderPartListExpand = RootProdOrderPartListExpand;
 
@@ -693,20 +697,20 @@ namespace gip.bso.masterdata
                     {
 
                         BOMModel model = new BOMModel();
-                        
-                        model.Sequence= component.Sequence;
+
+                        model.Sequence = component.Sequence;
                         model.PartslistNo = component.Partslist.PartslistNo;
                         model.MaterialNo = component.Material.MaterialNo;
                         model.MaterialName = component.Material.MaterialName1;
 
                         double targetQuantityUOM = item.Item.TreeQuantityRatio * component.TargetQuantityUOM;
                         double targetQuantity = item.Item.TreeQuantityRatio * component.TargetQuantity;
-                        model.TargetQuantityUOM = targetQuantityUOM; 
+                        model.TargetQuantityUOM = targetQuantityUOM;
                         model.TargetQuantity = targetQuantity;
 
                         model.BaseMDUnit = component.Material.BaseMDUnit.TechnicalSymbol;
                         model.MDUnit = component.MDUnit?.TechnicalSymbol;
-                        
+
                         clonedComponents.Add(model);
                     }
                     positions.AddRange(clonedComponents);

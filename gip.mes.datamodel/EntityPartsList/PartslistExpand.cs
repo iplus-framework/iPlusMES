@@ -51,7 +51,10 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(101, "PartslistNo", "en{'No'}de{'Nr'}")]
         public string PartslistNo { get; set; }
 
-        [ACPropertyInfo(102, "PartslistName", "en{'Bill of material name'}de{'Stückliste Name'}")]
+        [ACPropertyInfo(102, "PartslistNo", "en{'No'}de{'Nr'}")]
+        public string PartslistVersion { get; set; }
+
+        [ACPropertyInfo(103, "PartslistName", "en{'Bill of material name'}de{'Stückliste Name'}")]
         public string PartslistName { get; set; }
 
         [ACPropertyInfo(105, "TargetQuantity", "en{'Required quantity'}de{'Bedarfsmenge'}")]
@@ -91,6 +94,8 @@ namespace gip.mes.datamodel
         private void CheckIsPartslistPresent(PartslistExpand item, Guid partslistID, ref bool isPartslistPresent)
         {
             isPartslistPresent = isPartslistPresent || item.Partslist.PartslistID == partslistID;
+            if(isPartslistPresent)
+                return;
             if (item.Children != null)
                 foreach (PartslistExpand childItem in item.Children)
                     CheckIsPartslistPresent(childItem, partslistID, ref isPartslistPresent);
@@ -110,7 +115,7 @@ namespace gip.mes.datamodel
                 Partslist
                 .PartslistPos_Partslist
                 .Where(x =>
-                        x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot
+                        x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
                         && x.AlternativePartslistPosID == null
                         && !(x.ExplosionOff ?? false))
                 .ToList();
@@ -133,7 +138,6 @@ namespace gip.mes.datamodel
                             childExpand.IsChecked = childExpand.Parent != null ? childExpand.Parent.IsChecked : true;
                             Children.Add(childExpand);
                             i++;
-                            childExpand.LoadTree();
                         }
                     }
                 }
@@ -160,10 +164,14 @@ namespace gip.mes.datamodel
                             Children.Add(childExpand);
                             i++;
                             localI++;
-                            childExpand.LoadTree();
                         }
                     }
                 }
+            }
+
+            foreach(ExpandBase item in Children)
+            {
+                item.LoadTree();
             }
         }
 
@@ -172,6 +180,7 @@ namespace gip.mes.datamodel
         {
             PartslistNo = partslist.PartslistNo;
             PartslistName = partslist.PartslistName;
+            PartslistVersion = partslist.PartslistVersion;
             MDUnit = partslist.MDUnit;
             TargetQuantityUOM = partslist.TargetQuantityUOM * treeQuantityRatio;
             if (partslist.MDUnitID.HasValue)
