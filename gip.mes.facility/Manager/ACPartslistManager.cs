@@ -402,15 +402,6 @@ namespace gip.mes.facility
                 source.ForEach(x => item.PartslistPosRelation_SourcePartslistPos.Add(x));
             }
 
-            foreach (var pos in positions)
-            {
-                int i = 0;
-                foreach (var sourceItem in pos.PartslistPosRelation_TargetPartslistPos)
-                {
-                    sourceItem.Sequence = ++i;
-                }
-            }
-
             PartslistPos lastIntermediate = partsList.PartslistPos_Partslist.OrderByDescending(x => x.Sequence).FirstOrDefault();
             if (lastIntermediate.Material.BaseMDUnit == partsList.Material.BaseMDUnit)
                 lastIntermediate.TargetQuantityUOM = partsList.TargetQuantityUOM;
