@@ -159,7 +159,7 @@ namespace gip.mes.processapplication
             }
 
             if (OrderReservationInfo.ValueT != null)
-                OrderReservationInfo = null;
+                OrderReservationInfo.ValueT = null;
         }
 
         [ACMethodInfo("","",9999)]
