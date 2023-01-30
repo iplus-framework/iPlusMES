@@ -116,41 +116,35 @@ namespace gip.bso.masterdata
                 .Include(c => c.MDMaterialType)
                 .Include(c => c.MDGMPMaterialGroup)
                 .Include(c => c.MDInventoryManagementType)
+                .Include(c => c.PartslistPos_Material)
+                .Include(c => c.Partslist_Material)
+                .Include("Partslist_Material.PartslistACClassMethod_Partslist")
+                .Include("Partslist_Material.PartslistACClassMethod_Partslist.MaterialWFACClassMethod")
+                .Include("Partslist_Material.PartslistACClassMethod_Partslist.MaterialWFACClassMethod.ACClassMethod")
+                .Include("Partslist_Material.PartslistACClassMethod_Partslist.MaterialWFACClassMethod.ACClassMethod.ACClassWF_ACClassMethod")
+                .Include("Partslist_Material.PartslistACClassMethod_Partslist.MaterialWFACClassMethod.ACClassMethod.ACClassWF_ACClassMethod.MDSchedulingGroupWF_VBiACClassWF")
                 .Include(c => c.MDFacilityManagementType);
             }
 
             if (FilterMDSchedulingGroupID != null)
             {
-                Guid[] linieMaterials = DatabaseApp
-                   .MDSchedulingGroup
-                   .Where(c => c.MDSchedulingGroupID == FilterMDSchedulingGroupID)
-                   .SelectMany(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
-                   .Select(c => c.VBiACClassWF.ACClassMethod)
-                   .SelectMany(c => c.MaterialWFACClassMethod_ACClassMethod)
-                   .SelectMany(c => c.PartslistACClassMethod_MaterialWFACClassMethod)
-                   //.Where(c => c.Partslist.IsEnabled)
-                   .Select(c => c.Partslist.MaterialID)
-                    .Distinct()
-                    .ToArray();
 
-                //Guid[] linieMaterials = DatabaseApp
-                //                       .MDSchedulingGroup
-                //                       .Where(c => c.MDSchedulingGroupID == FilterMDSchedulingGroupID)
-                //                       .SelectMany(c => c.MDSchedulingGroupWF_MDSchedulingGroup)
-                //                       .Select(c => c.VBiACClassWF)
-                //                       .SelectMany(c => c.MaterialWFConnection_ACClassWF)
-                //                       .Select(c => c.Material)
-                //                       .SelectMany(c => c.PartslistPos_Material)
-                //                       .Select(c => c.Partslist)
-                //                       .Select(c => c.MaterialID)
-                //                       .Distinct()
-                //                       .ToArray();
-                query = query
-                    .Where(c =>
-                        c.Partslist_Material.Any(x => x.IsEnabled)
-                        //&& x.PartslistACClassMethod_Partslist.FirstOrDefault().MaterialWFACClassMethod.ACClassMethod.ACClassWF_ACClassMethod)
-                        && linieMaterials.Contains(c.MaterialID)
-                        ) as ObjectQuery<Material>;
+                query =
+                    query
+                    .Where(c=>
+                               c.Partslist_Material.Any(x => x.IsEnabled)
+                               && 
+                               c
+                               .Partslist_Material
+                               .SelectMany(x=>x.PartslistACClassMethod_Partslist)
+                               .Select(x=>x.MaterialWFACClassMethod)
+                               .Select(x=>x.ACClassMethod)
+                               .SelectMany(x=> x.ACClassWF_ACClassMethod)
+                               .SelectMany(x=>x.MDSchedulingGroupWF_VBiACClassWF)
+                               .Any(x=>x.MDSchedulingGroupID == FilterMDSchedulingGroupID)
+                    )
+                    as ObjectQuery<Material>;
+
             }
 
             if (FilterIsNotDeleted != null)
