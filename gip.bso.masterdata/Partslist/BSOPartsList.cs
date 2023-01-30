@@ -230,8 +230,10 @@ namespace gip.bso.masterdata
 
             var changedPartslists = ProcessLastFormulaChange();
             foreach (Partslist changedPartslist in changedPartslists)
+            {
                 if (!ChangedPartslists.Contains(changedPartslist))
                     ChangedPartslists.Add(changedPartslist);
+            }
 
             ProcessChangedPartslists();
 
