@@ -182,7 +182,6 @@ namespace gip.mes.processapplication
             }
         }
 
-        private const string MN_ReadAndStartNextBatch = "ReadAndStartNextBatch";
         protected virtual StartNextBatchResult ReadAndStartNextBatch(out ProdOrderBatchPlan batchPlanEntry, out ProdOrderBatch nextBatch, out ProdOrderPartslistPos newChildPosForBatch, out Guid? startNextBatchAtProjectID, out bool isLastBatch)
         {
             batchPlanEntry = null;
@@ -194,21 +193,21 @@ namespace gip.mes.processapplication
             if (ACProgramVB == null || ContentACClassWF == null || ProdOrderManager == null || PartslistManager == null)
             {
                 //Error50146:ACProgramVB is null or ContentACClassWF or ProdOrderManager or PartslistManager is null.
-                msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1000, "Error50146");
+                msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1000, "Error50146");
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 return StartNextBatchResult.CycleWait;
             }
             if (!IsProduction)
             {
                 //Error50147:Root-Node must be a PWMethodProduction.
-                msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1010, "Error50147");
+                msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1010, "Error50147");
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 return StartNextBatchResult.CycleWait;
             }
             if (CurrentProdOrderPartslist == null)
             {
                 // Error00122: No Bill of material assigned to Workflow
-                msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1020, "Error00122");
+                msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1020, "Error00122");
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
 
                 return StartNextBatchResult.CycleWait;
@@ -256,7 +255,7 @@ namespace gip.mes.processapplication
                         // an all other nodes are waiting like this one
                         // then complete this node
                         if (_NoBatchPlanFoundCounter > 0
-                            && stats.AreOtherParallelNodesCompletable)
+                            && (stats.AreOtherParallelNodesCompletable || CompleteIfNotPlan))
                         //&& stats.ActiveParallelNodesCount <= 0
                         //&& (stats.WaitingParallelNodesCount == stats.CountParallelNodes - stats.IdleParallelNodesCount))
                         {
@@ -282,7 +281,7 @@ namespace gip.mes.processapplication
                         return StartNextBatchResult.Done;
                     }
                     // Error00125: Batchplan-Values are invalid
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1040, "Error00125");
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1040, "Error00125");
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     return StartNextBatchResult.CycleWait;
                 }
@@ -314,7 +313,7 @@ namespace gip.mes.processapplication
                 if (matWFConnection == null)
                 {
                     // Error00124: No relation defined between Workflownode and intermediate material in Materialworkflow
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1050, "Error00124");
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1050, "Error00124");
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     return StartNextBatchResult.CycleWait;
                 }
@@ -328,7 +327,7 @@ namespace gip.mes.processapplication
                 if (intermediatePosition == null)
                 {
                     //Error50149:ProdOrderPartslistPos not found for intermediate Material.
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1060, "Error50149");
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1060, "Error50149");
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     return StartNextBatchResult.CycleWait;
                 }
@@ -337,7 +336,7 @@ namespace gip.mes.processapplication
                 //if (!startableBatchPlans.Any())
                 //{
                 //    // Error00123: No batchplan found for this intermediate material
-                //    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1070, "Error00123");
+                //    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1070, "Error00123");
                 //    OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 //    return StartNextBatchResult.CycleWait;
                 //}
@@ -404,9 +403,9 @@ namespace gip.mes.processapplication
                                                         intermediatePosition.ProdOrderPartslist.ProdOrder.ProgramNo,
                                                         intermediatePosition.ProdOrderPartslist.Partslist.PartslistNo,
                                                         intermediatePosition.BookingMaterial.MaterialName1);
-                        msg = new Msg(message, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1080);
+                        msg = new Msg(message, this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1080);
                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogDebug(this.GetACUrl(), "MN_ReadAndStartNextBatch", msg.InnerMessage);
+                            Messages.LogDebug(this.GetACUrl(), nameof(ReadAndStartNextBatch), msg.InnerMessage);
                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     }
 
@@ -452,7 +451,7 @@ namespace gip.mes.processapplication
                           && uncompletedBatchPlans.Where(c => c.PlanState == GlobalApp.BatchPlanState.Created || c.PlanState == GlobalApp.BatchPlanState.Paused).Any())
                 {
                     //// Error00123: No batchplan found for this intermediate material
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1090, "Error00123");
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1090, "Error00123");
                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                     return StartNextBatchResult.CycleWait;
                 }
@@ -496,7 +495,7 @@ namespace gip.mes.processapplication
                             if (msg2 != null)
                             {
                                 if (!String.IsNullOrEmpty(msg2.InnerMessage))
-                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1200), true);
+                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1200), true);
                                 if (!msg2.IsSucceded())
                                 {
                                     validationSuccess = false;
@@ -584,7 +583,7 @@ namespace gip.mes.processapplication
                                 if (msg != null)
                                 {
                                     Messages.LogError(this.GetACUrl(), "ReadAndStartNextBatch(4)", msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Exception, PWClassName, MN_ReadAndStartNextBatch, 1220), true);
+                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Exception, PWClassName, nameof(ReadAndStartNextBatch), 1220), true);
                                     dbApp.ACUndoChanges();
                                     return StartNextBatchResult.CycleWait;
                                 }
@@ -601,7 +600,7 @@ namespace gip.mes.processapplication
                     else
                     {
                         Messages.LogError(this.GetACUrl(), "ReadAndStartNextBatch(5)", "No Batch created");
-                        OnNewAlarmOccurred(ProcessAlarm, new Msg("No Batch created", this, eMsgLevel.Exception, PWClassName, MN_ReadAndStartNextBatch, 1230), true);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg("No Batch created", this, eMsgLevel.Exception, PWClassName, nameof(ReadAndStartNextBatch), 1230), true);
                         dbApp.ACUndoChanges();
                         return StartNextBatchResult.CycleWait;
                     }
@@ -617,7 +616,7 @@ namespace gip.mes.processapplication
                 if (saveMsg != null)
                 {
                     Messages.LogError(this.GetACUrl(), "ReadAndStartNextBatch(5)", saveMsg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Exception, PWClassName, MN_ReadAndStartNextBatch, 1210), true);
+                    OnNewAlarmOccurred(ProcessAlarm, new Msg(saveMsg.InnerMessage, this, eMsgLevel.Exception, PWClassName, nameof(ReadAndStartNextBatch), 1210), true);
                     dbApp.ACUndoChanges();
                     return StartNextBatchResult.CycleWait;
                 }
@@ -690,8 +689,13 @@ namespace gip.mes.processapplication
             }
         }
 
-        protected bool WillReadAndStartNextBatchCompleteNode_Prod()
+        protected virtual bool WillReadAndStartNextBatchCompleteNode_Prod()
         {
+            if (CompleteIfNotPlan && CurrentACState == ACStateEnum.SMStarting)
+            {
+                if (BatchPlanningTimes != null && !BatchPlanningTimes.Any())
+                    return true;
+            }
             return false;
         }
 

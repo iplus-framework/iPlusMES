@@ -846,6 +846,16 @@ namespace gip.mes.processapplication
             _LastCalculatedRouteablePMList = null;
             _SkipGroup = null;
         }
+
+        protected override void OnProcessModuleReleased(PAProcessModule module)
+        {
+            base.OnProcessModuleReleased(module);
+            PAProcessModuleVB pAProcessModuleVB = module as PAProcessModuleVB;
+            if (   pAProcessModuleVB != null 
+                && pAProcessModuleVB.OrderReservationInfo != null 
+                && !String.IsNullOrEmpty(pAProcessModuleVB.OrderReservationInfo.ValueT)) 
+                pAProcessModuleVB.OrderReservationInfo.ValueT = null;
+        }
         #endregion
 
 
@@ -928,7 +938,7 @@ namespace gip.mes.processapplication
         #endregion
 
 
-        #region Order-Infor
+        #region Order-Info
         bool _PAOrderRecursionLock = false;
         public override PAOrderInfo GetPAOrderInfo()
         {

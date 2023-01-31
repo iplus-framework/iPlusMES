@@ -72,7 +72,7 @@ namespace gip.mes.processapplication
             if (ACProgramVB == null || ContentACClassWF == null || PickingManager == null)
             {
                 //Error50155: ACProgramVB is null or ContentACClassWF or PickingManager is null.
-                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1000, "Error50155");
+                Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1000, "Error50155");
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
                 return StartNextBatchResult.CycleWait;
             }
@@ -101,7 +101,7 @@ namespace gip.mes.processapplication
                 {
                     if (!msg2.IsSucceded())
                     {
-                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Error, PWClassName, MN_ReadAndStartNextBatch, 1010), true);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Error, PWClassName, nameof(ReadAndStartNextBatch), 1010), true);
                         validationSuccess = false;
                         return StartNextBatchResult.CycleWait;
                     }
