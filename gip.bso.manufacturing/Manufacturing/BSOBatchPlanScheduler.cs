@@ -4949,6 +4949,12 @@ namespace gip.bso.manufacturing
                             result = Global.ControlModes.EnabledWrong;
                         }
                         break;
+                    case "BSOPartslistExplorer_Child(1)\\BSOMaterialExplorer_Child(1)\\SearchWord":
+                        if(string.IsNullOrEmpty(BSOPartslistExplorer_Child?.Value?.BSOMaterialExplorer_Child?.Value?.SearchWord))
+                        {
+                            BSOPartslistExplorer_Child?.Value?.BSOMaterialExplorer_Child?.Value?.Search();
+                        }
+                        break;
                 }
             }
             return result;
