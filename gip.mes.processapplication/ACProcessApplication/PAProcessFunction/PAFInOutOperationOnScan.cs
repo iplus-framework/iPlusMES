@@ -4,6 +4,8 @@ using vd = gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 
 namespace gip.mes.processapplication
@@ -25,39 +27,10 @@ namespace gip.mes.processapplication
                                            "en{'In/out operation on scan'}de{'Ein/Aus-Betrieb beim Scannen'}", typeof(PWWorkTaskGeneric)));
         }
 
-
-        public override bool ACPostInit()
-        {
-            //if (ApplicationManager != null)
-            //{
-            //    ApplicationManager.ProjectWorkCycleR1min += ApplicationManager_ProjectWorkCycleR1min;
-            //    ApplicationManager.ProjectWorkCycleR5min += ApplicationManager_ProjectWorkCycleR5min;
-            //}
-            return base.ACPostInit();
-        }
-
-        private void ApplicationManager_ProjectWorkCycleR5min(object sender, EventArgs e)
-        {;
-            OperationLogItems.ValueT = GenerateSomeRendomTestList();
-        }
-
-        private void ApplicationManager_ProjectWorkCycleR1min(object sender, EventArgs e)
-        {
-            if (OperationLogItems != null && OperationLogItems.ValueT != null)
-            {
-                List<OperationLogItem> exceededItems = OperationLogItems.ValueT.Where(c => c.OperationitemTimeStatus == OperationitemTimeStatusEnum.TimeExceeded).ToList();
-                foreach (OperationLogItem oli in exceededItems)
-                {
-                    string excededTime = (DateTime.Now - oli.FinishTime).ToString("");
-                    Messages.LogError(GetACUrl(), nameof(OperationLogItems), $"Material {oli.MaterialNo} {oli.MaterialName} in prod order {oli.ProgramNo} is exceded time in oven for: {excededTime}!");
-                }
-            }
-        }
         #endregion
 
         #region Properties
 
-        //[ACPropertyBindingSource(730, "OperationLogItems", "en{'OperationLogItems'}de{'OperationLogItems'}", "", false, false)]
         public IACContainerTNet<OperationLogItemList> OperationLogItems
         {
             get;
@@ -523,36 +496,6 @@ namespace gip.mes.processapplication
             resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
 
             return null;
-        }
-
-        private OperationLogItemList GenerateSomeRendomTestList()
-        {
-            OperationLogItemList operationLogItems = new OperationLogItemList();
-            using (DatabaseApp databaseApp = new DatabaseApp())
-            {
-                Partslist[] backPls = databaseApp.Partslist.Where(c => c.MaterialWF.MaterialWFNo == "MW_ProdBake").OrderBy(c => c.PartslistNo).ToArray();
-                int count = backPls.Count();
-                Random random = new Random();
-                int[] randomIndexes = Enumerable.Range(0, 4).OrderBy(t => random.Next(0, count)).ToArray();
-                foreach (int index in randomIndexes)
-                {
-                    OperationLogItem item = new OperationLogItem();
-                    Partslist pl = backPls[index];
-                    item.MaterialNo = pl.Material.MaterialNo;
-                    item.MaterialName = pl.Material.MaterialName1;
-                    item.ProgramNo = "P" + random.Next(10000, 99999);
-
-
-                    item.TimeEntered = DateTime.Now;
-                    int secondsDuration = random.Next(3 * 60, 6 * 60);
-                    item.Duration = TimeSpan.FromSeconds(secondsDuration);
-                    item.HintDuration = TimeSpan.FromMinutes(2);
-
-                    operationLogItems.Add(item);
-                }
-
-            }
-            return operationLogItems;
         }
 
         #endregion
