@@ -226,11 +226,6 @@ namespace gip.mes.processapplication
         public override void RefreshOrderInfo()
         {
             base.RefreshOrderInfo();
-
-            if (!string.IsNullOrEmpty(OrderInfo.ValueT))
-            {
-                OrderReservationInfo.ValueT = null;
-            }
         }
 
         #endregion

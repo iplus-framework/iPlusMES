@@ -86,6 +86,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("SkipWaitingNodes", typeof(bool), false, Global.ParamOption.Required));
             paramTranslation.Add("SkipWaitingNodes", "en{'Skip waiting nodes'}de{'Ignoriere wartende Knoten'}");
 
+            method.ParameterValueList.Add(new ACValue("CompleteIfNotPlan", typeof(bool), false, Global.ParamOption.Required));
+            paramTranslation.Add("CompleteIfNotPlan", "en{'Complete if no batches planned'}de{'Beende falls kein Batche geplant'}");
+
             method.ParameterValueList.Add(new ACValue("StartNextStage", typeof(StartNextStageMode), (short)StartNextStageMode.DoNothing, Global.ParamOption.Required));
             paramTranslation.Add("StartNextStage", "en{'Start next production stage'}de{'Nächste Fertigungsstufe starten'}");
 
@@ -295,6 +298,26 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("SkipWaitingNodes");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Wokflownode should be automatically completed if no batch was planned for this node
+        /// </summary>
+        public bool CompleteIfNotPlan
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("CompleteIfNotPlan");
                     if (acValue != null)
                     {
                         return acValue.ParamAsBoolean;
@@ -1136,7 +1159,7 @@ namespace gip.mes.processapplication
                     CurrentACSubState = ACSubStateEnum.SMIdle;
                     // Falls durch tiefere Callstacks der Status schon weitergeschaltet worden ist, dann schalte Status nicht weiter
                     if (CurrentACState == ACStateEnum.SMStopping)
-                        CurrentACState = resetToSMStarting ? ACStateEnum.SMStarting : ACStateEnum.SMCompleted;
+                        CurrentACState = resetToSMStarting && !CompleteIfNotPlan ? ACStateEnum.SMStarting : ACStateEnum.SMCompleted;
                 }
                 else if (resetToSMStarting)
                 {
@@ -1146,7 +1169,7 @@ namespace gip.mes.processapplication
                     }
                     SubscribeToProjectWorkCycle();
                     CurrentACSubState = ACSubStateEnum.SMIdle;
-                    CurrentACState = ACStateEnum.SMStarting;
+                    CurrentACState = CompleteIfNotPlan ? ACStateEnum.SMCompleted : ACStateEnum.SMStarting;
                     OnSubworkflowsCompleted();
                 }
             }
@@ -1571,8 +1594,10 @@ namespace gip.mes.processapplication
                         if (CurrentACState == ACStateEnum.SMRunning)
                         {
                             OnSubworkflowsCompleted();
-                            CurrentACState = ACStateEnum.SMStarting;
+                            CurrentACState = CompleteIfNotPlan ? ACStateEnum.SMCompleted : ACStateEnum.SMStarting;
                         }
+                        else if (CurrentACState == ACStateEnum.SMStarting && CompleteIfNotPlan)
+                            CurrentACState = ACStateEnum.SMCompleted;
                         SubscribeToProjectWorkCycle();
                         return;
                     }
