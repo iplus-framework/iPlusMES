@@ -62,7 +62,7 @@ namespace gip.bso.facility
             if (!skipSearchOnStart)
                 Search();
 
-            _ = _ExpirationDateDayPeriod.ValueT;
+            _ = ExpirationDateDayPeriod;
 
             return true;
         }
