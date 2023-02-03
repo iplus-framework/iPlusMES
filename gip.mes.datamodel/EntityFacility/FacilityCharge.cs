@@ -516,7 +516,7 @@ namespace gip.mes.datamodel
         /// Charge is direct input into stock from outside
         /// recived from distributor company
         /// </summary>
-        private bool IsInputOutside
+        public bool IsInputOutside
         {
             get
             {
@@ -530,7 +530,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Charge belong to final product (placed on stock but shuld not be delivered until yet
         /// </summary>
-        private bool IsFinalOutput
+        public bool IsFinalOutput
         {
             get
             {
@@ -541,7 +541,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Charge belong to delivered final product
         /// </summary>
-        private bool IsFinalOutputDelivered
+        public bool IsFinalOutputDelivered
         {
             get
             {
@@ -555,7 +555,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// @aagincic: this is implemented temporaly before InOrder preparing (for export purpurose)
         /// </summary>
-        private bool IsNoConnectionWithProduction
+        public bool IsNoConnectionWithProduction
         {
             get
             {
@@ -566,10 +566,7 @@ namespace gip.mes.datamodel
             }
         }
 
-
-        #region #region FacilityCharge Origin -> Private
-
-        private ProdOrderPartslistPos FinalRootPositionFromFB
+        public ProdOrderPartslistPos FinalRootPositionFromFB
         {
             get
             {
@@ -587,7 +584,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        private ProdOrderPartslistPos FinalPositionFromFB
+        public ProdOrderPartslistPos FinalPositionFromFB
         {
             get
             {
@@ -599,7 +596,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        private ProdOrderPartslistPos FinalRootPositionFromFbc
+        public ProdOrderPartslistPos FinalRootPositionFromFbc
         {
             get
             {
@@ -616,7 +613,7 @@ namespace gip.mes.datamodel
             }
         }
 
-        private ProdOrderPartslistPos FinalPositionFromFbc
+        public ProdOrderPartslistPos FinalPositionFromFbc
         {
             get
             {
@@ -628,9 +625,6 @@ namespace gip.mes.datamodel
                                                 .FirstOrDefault();
             }
         }
-
-        #endregion
-
 
         #endregion
 
@@ -654,7 +648,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999, "BatchNo", "en{'Batch No.'}de{'Batchnummer'}")]
-        private string BatchNo
+        public string BatchNo
         {
             get
             {
