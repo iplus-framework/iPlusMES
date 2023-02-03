@@ -131,17 +131,17 @@ namespace gip.bso.masterdata
 
                 query =
                     query
-                    .Where(c=>
+                    .Where(c =>
                                c.Partslist_Material.Any(x => x.IsEnabled)
-                               && 
+                               &&
                                c
                                .Partslist_Material
-                               .SelectMany(x=>x.PartslistACClassMethod_Partslist)
-                               .Select(x=>x.MaterialWFACClassMethod)
-                               .Select(x=>x.ACClassMethod)
-                               .SelectMany(x=> x.ACClassWF_ACClassMethod)
-                               .SelectMany(x=>x.MDSchedulingGroupWF_VBiACClassWF)
-                               .Any(x=>x.MDSchedulingGroupID == FilterMDSchedulingGroupID)
+                               .SelectMany(x => x.PartslistACClassMethod_Partslist)
+                               .Select(x => x.MaterialWFACClassMethod)
+                               .Select(x => x.ACClassMethod)
+                               .SelectMany(x => x.ACClassWF_ACClassMethod)
+                               .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                               .Any(x => x.MDSchedulingGroupID == FilterMDSchedulingGroupID)
                     )
                     as ObjectQuery<Material>;
 
@@ -150,7 +150,7 @@ namespace gip.bso.masterdata
             if (FilterIsNotDeleted != null)
             {
                 query = query
-                    .Where(c => 
+                    .Where(c =>
                                 c.Partslist_Material
                                 .Any(x => (x.DeleteDate == null) == (FilterIsNotDeleted ?? false))
                            ) as ObjectQuery<Material>;
@@ -313,10 +313,10 @@ namespace gip.bso.masterdata
                     {
                         _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord = value;
                         OnPropertyChanged("SearchWord");
-                        if (string.IsNullOrEmpty(value))
-                            ClearSearch();
-                        else
-                            Search();
+                        //if (string.IsNullOrEmpty(value))
+                        //    ClearSearch();
+                        //else
+                        Search();
                     }
                 }
             }
