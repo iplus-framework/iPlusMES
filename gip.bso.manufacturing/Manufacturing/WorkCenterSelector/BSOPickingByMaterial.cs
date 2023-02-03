@@ -906,10 +906,10 @@ namespace gip.bso.manufacturing
                 info.Add(nameof(PickingPos), CurrentPicking.PickingPosID);
                 info.Add(nameof(core.datamodel.ACClass), pickingByMat.ComponentClass.ACClassID);
 
-                ACPrintManager printManger = ACPrintManager.GetServiceInstance(this);
-                if (printManger != null)
+                Msg msg = pickingByMat.ExecuteMethod(nameof(PAFPickingByMaterial.PrintOverPAOrderInfo), info) as Msg;
+                if (msg != null && msg.MessageLevel > eMsgLevel.Info)
                 {
-                    Msg msg = printManger.Print(info, 1);
+                    Messages.Msg(msg);
                 }
             }
         }
