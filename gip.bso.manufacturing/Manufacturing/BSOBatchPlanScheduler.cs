@@ -227,9 +227,9 @@ namespace gip.bso.manufacturing
 
             _CreatedBatchState = new ACPropertyConfigValue<vd.GlobalApp.BatchPlanState>(this, nameof(CreatedBatchState), vd.GlobalApp.BatchPlanState.Created);
             _AutoRemoveMDSGroupFrom = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupFrom), 0);
-            _ = _AutoRemoveMDSGroupFrom.ValueT;
+            _ = AutoRemoveMDSGroupFrom;
             _AutoRemoveMDSGroupTo = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupTo), 0);
-            _ = _AutoRemoveMDSGroupTo.ValueT;
+            _ = AutoRemoveMDSGroupTo;
 
             return true;
         }

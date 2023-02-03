@@ -72,7 +72,7 @@ namespace gip.bso.facility
             _ = BSOTandTFastView_Child;
             Search();
 
-            _ = _ExpirationDateDayPeriod.ValueT;
+            _ = ExpirationDateDayPeriod;
 
             return true;
         }
