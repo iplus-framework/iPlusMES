@@ -44,7 +44,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("KeepPlannedDestOnEmptying", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("KeepPlannedDestOnEmptying", "en{'Keep planned destination on emptying mode'}de{'Geplantes Ziel im Entleerungsmodus beibehalten'}");
             method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
-            paramTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
+            paramTranslation.Add("SkipPredCount", "en{'Search limit predecessors (- outside of group)'}de{'Begrenzung Vorgängersuche (- ausserhalb von Gruppe)'}");
             method.ParameterValueList.Add(new ACValue("PostingBehaviour", typeof(PostingBehaviourEnum), PostingBehaviourEnum.NotSet, Global.ParamOption.Optional));
             paramTranslation.Add("PostingBehaviour", "en{'Posting behaviour'}de{'Buchungsverhalten'}");
 
@@ -540,7 +540,7 @@ namespace gip.mes.processapplication
             if (SkipIfNoComp)
             {
                 bool hasRunSomeDosings = false;
-                List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this, SkipPredCount <= 0 ? 40 : SkipPredCount);
+                List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this, Math.Abs(SkipPredCount) == 0 ? 40 : SkipPredCount, SkipPredCount >= 0);
                 if (previousDosings != null)
                     hasRunSomeDosings = previousDosings.Where(c => c.HasRunSomeDosings).Any();
                 if (!hasRunSomeDosings)
