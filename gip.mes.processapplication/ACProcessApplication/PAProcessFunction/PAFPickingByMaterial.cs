@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.reporthandler;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,17 @@ namespace gip.mes.processapplication
             if (CurrentTask != null && CurrentTask.ValueT != null)
                 return CurrentTask.ValueT.ACUrl;
             return null;
+        }
+
+        [ACMethodInfo("", "", 9999)]
+        public Msg PrintOverPAOrderInfo(PAOrderInfo info)
+        {
+            ACPrintManager printManger = ACPrintManager.GetServiceInstance(this);
+            if (printManger != null)
+            {
+                return printManger.Print(info, 1);
+            }
+            return new Msg(eMsgLevel.Error, "ACPrintManager is not configured!");
         }
 
         protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
