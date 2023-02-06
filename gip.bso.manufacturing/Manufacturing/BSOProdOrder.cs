@@ -884,17 +884,8 @@ namespace gip.bso.manufacturing
             {
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
-                ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
-                aCFilterItems.Add(phOpen);
-
                 ACFilterItem phProgramNo = new ACFilterItem(Global.FilterTypes.filter, nameof(ProdOrder.ProgramNo), Global.LogicalOperators.contains, Global.Operators.or, null, true, true);
                 aCFilterItems.Add(phProgramNo);
-
-                ACFilterItem phKeyOfExtSys = new ACFilterItem(Global.FilterTypes.filter, nameof(ProdOrder.KeyOfExtSys), Global.LogicalOperators.contains, Global.Operators.or, null, true, true);
-                aCFilterItems.Add(phKeyOfExtSys);
-
-                ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
-                aCFilterItems.Add(phClose);
 
                 return aCFilterItems;
             }
