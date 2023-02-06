@@ -58,7 +58,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(32, "ContractorStock", "en{'Manage Contractor Stock'}de{'Vertragspartnerbestand'}", "", "", true)]
     [ACPropertyEntity(34, "PetroleumGroupIndex", "en{'Petroleum Group'}de{'Mineralölgruppe'}", typeof(GlobalApp.PetroleumGroups), Const.ContextDatabase + "\\PetroleumGroupList", "", true)]
     [ACPropertyEntity(35, "DensityAmb", "en{'Ambient Density'}de{'Umgebungsdichte'}", "", "", true)]
-    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(45, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

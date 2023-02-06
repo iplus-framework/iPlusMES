@@ -15,7 +15,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(8, "ISOCode", "en{'ISO Code'}de{'ISO-Code'}", "", "", true, MinLength = 1)]
     [ACPropertyEntity(9, Const.SortIndex, Const.EntitySortSequence, "", "", true)]
     [ACPropertyEntity(9999, "MDUnitNameTrans", "en{'Name'}de{'Bezeichnung'}", "", "", true)]
-    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(10, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
