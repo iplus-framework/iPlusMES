@@ -381,9 +381,10 @@ namespace gip.mes.processapplication
                             if (box.StopOrder())
                             {
                                 SamplePiStats stats = box.GetArchivedValues(startTimeFrom, DateTime.Now, true);
-                                stats.SetToleranceAndRecalc(setPoint, tolPlus, tolMinus);
                                 if (stats != null)
                                 {
+                                    stats.SetToleranceAndRecalc(setPoint, tolPlus, tolMinus);
+
                                     LabOrderPos labOrderPos;
                                     msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, out labOrderPos);
                                     if (msg == null && labOrderPos == null)

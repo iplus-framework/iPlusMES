@@ -274,7 +274,7 @@ namespace gip.mes.datamodel
                 catch (Exception e)
                 {
                     Database.Root.Messages.LogException("ProdOrderPartslistPosRelation", "RemainingDosingWeight", e);
-                    return 0;
+                    return double.NaN;
                 }
             }
         }
@@ -447,6 +447,22 @@ namespace gip.mes.datamodel
             //}
             //this.ActualQuantity = sumActualQuantity;
             //this.ActualQuantityUOM = sumActualQuantityUOM;
+        }
+
+        public string RemainingDosingWeightError
+        {
+            get
+            {
+                try
+                {
+                    SourceProdOrderPartslistPos.Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
+            }
         }
 
         #endregion

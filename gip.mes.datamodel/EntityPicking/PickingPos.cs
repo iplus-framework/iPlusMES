@@ -427,7 +427,31 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                try
+                {
+                    return Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                }
+                catch (Exception e)
+                {
+                    Database.Root.Messages.LogException(nameof(PickingPos), nameof(RemainingDosingWeight), e);
+                    return double.NaN;
+                }
+            }
+        }
+
+        public string RemainingDosingWeightError
+        {
+            get
+            {
+                try
+                {
+                    Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
             }
         }
 

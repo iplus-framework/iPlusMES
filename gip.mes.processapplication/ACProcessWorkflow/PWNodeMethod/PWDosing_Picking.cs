@@ -5,7 +5,6 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System.Threading;
 
 namespace gip.mes.processapplication
 {
@@ -75,7 +74,7 @@ namespace gip.mes.processapplication
                 if (pickingPos == null)
                     return StartNextCompResult.Done;
                 double targetWeight = 0;
-                if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)))
+                if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
                 {
                     pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
                     dbApp.ACSaveChanges();
@@ -209,7 +208,7 @@ namespace gip.mes.processapplication
                     CurrentDosingRoute = dosingRoute;
                     NoSourceFoundForDosing.ValueT = 0;
                 }
-                else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any())
+                else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any() || (double.IsNaN(pickingPos.RemainingDosingWeight) && NoSourceFoundForDosing.ValueT == 1 || NoSourceFoundForDosing.ValueT == 2))
                 {
                     if (NoSourceFoundForDosing.ValueT == 0)
                     {
@@ -337,6 +336,16 @@ namespace gip.mes.processapplication
                             targetWeight = configuredQuantity;
                         }
                     }
+                }
+
+                if (pickingPos != null && double.IsNaN(pickingPos.RemainingDosingWeight) &&  double.IsNaN(targetWeight))
+                {
+                    NoSourceFoundForDosing.ValueT = 1;
+                    //Error50597: Dosing error on the component {0} {1}, {2};
+                    string error = pickingPos.RemainingDosingWeightError;
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", pickingPos.Material.MaterialNo, pickingPos.Material.MaterialName1, error);
+                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                    return StartNextCompResult.CycleWait;
                 }
 
                 acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;

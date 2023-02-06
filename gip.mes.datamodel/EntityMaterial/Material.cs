@@ -642,7 +642,7 @@ namespace gip.mes.datamodel
             }
             MDUnit weightUnit = MDUnitList.Where(c => c.ISOCode == ConstApp.UOM_ISOCode_kg).FirstOrDefault();
             if (weightUnit == null)
-                throw new ArgumentException("Not convertable");
+                throw new ArgumentException("Not convertable to KG!");
             return ConvertQuantity(fromQuantity, fromMDUnit, weightUnit);
         }
 
