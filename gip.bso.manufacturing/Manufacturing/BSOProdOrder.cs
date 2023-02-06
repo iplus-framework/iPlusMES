@@ -882,10 +882,21 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return new List<ACFilterItem>()
-                {
-                    new ACFilterItem(Global.FilterTypes.filter, "ProgramNo", Global.LogicalOperators.contains, Global.Operators.or, null, true, true)
-                };
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
+                aCFilterItems.Add(phOpen);
+
+                ACFilterItem phProgramNo = new ACFilterItem(Global.FilterTypes.filter, nameof(ProdOrder.ProgramNo), Global.LogicalOperators.contains, Global.Operators.or, null, true, true);
+                aCFilterItems.Add(phProgramNo);
+
+                ACFilterItem phKeyOfExtSys = new ACFilterItem(Global.FilterTypes.filter, nameof(ProdOrder.KeyOfExtSys), Global.LogicalOperators.contains, Global.Operators.or, null, true, true);
+                aCFilterItems.Add(phKeyOfExtSys);
+
+                ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
+                aCFilterItems.Add(phClose);
+
+                return aCFilterItems;
             }
         }
 
@@ -2703,7 +2714,7 @@ namespace gip.bso.manufacturing
         [ACMethodInteraction("IntermediateParts", "en{'Recalculate Totals'}de{'Summenberechnung'}", 606, true, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
         public void RecalcIntermediateSum()
         {
-            if (!IsEnabledRecalcIntermediateSum()) 
+            if (!IsEnabledRecalcIntermediateSum())
                 return;
 
             MsgWithDetails msgWithDetails = null;
@@ -3298,7 +3309,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (SelectedProdOrderIntermediateBatch == null) 
+                if (SelectedProdOrderIntermediateBatch == null)
                     return null;
                 return SelectedProdOrderIntermediateBatch
                        .ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos
@@ -4430,9 +4441,9 @@ namespace gip.bso.manufacturing
             if (string.IsNullOrEmpty(wfACUrl))
                 return null;
             Guid[] programID = DatabaseApp.OrderLog
-                                        .Where(c =>   (   (    c.ProdOrderPartslistPos != null
+                                        .Where(c => ((c.ProdOrderPartslistPos != null
                                                             && c.ProdOrderPartslistPos.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
-                                                        ||(    c.ProdOrderPartslistPosRelation != null
+                                                        || (c.ProdOrderPartslistPosRelation != null
                                                             && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
                                                       )
                                                     && c.VBiACProgramLog.ACProgramLog1_ParentACProgramLog == null
