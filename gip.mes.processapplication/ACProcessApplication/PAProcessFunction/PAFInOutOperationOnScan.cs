@@ -499,5 +499,47 @@ namespace gip.mes.processapplication
         }
 
         #endregion
+
+        #region LoadList
+
+        public OperationLogItemList GetOperationList()
+        {
+            OperationLogItemList list = null;
+            using (DatabaseApp databaseApp = new DatabaseApp())
+            {
+                OperationLogItem[] items =
+                    databaseApp
+                    .OperationLog
+                    .GroupBy(c => new { c.ACProgramLog, c.FacilityChargeID })
+                    .Where(c => c.Count() == 1)
+                    .Select(c => c.FirstOrDefault())
+                    .OrderBy(c => c.InsertDate)
+                    .Select(c => new OperationLogItem()
+                    {
+                        MaterialNo = c.FacilityCharge.Material.MaterialNo,
+                        MaterialName = c.FacilityCharge.Material.MaterialName1,
+                        ProgramNo = "",
+                        TimeEntered = c.InsertDate
+                    })
+                    .ToArray();
+
+                // TODO: @aagincic replace with values read from workflow configuration
+                TimeSpan defDuration = TimeSpan.FromMinutes(4);
+                TimeSpan defHintDuration = TimeSpan.FromMinutes(1);
+
+                int nr = 0;
+                foreach (var item in items)
+                {
+                    nr++;
+                    item.Sn = nr;
+                    item.Duration = defDuration;
+                    item.HintDuration = defHintDuration;
+                    list.Add(item);
+                }
+            }
+            return list;
+        }
+
+        #endregion
     }
 }

@@ -8,7 +8,15 @@ namespace gip.mes.datamodel
     {
         #region
 
-        public static readonly string[] PropertiesForRefreshDefault = new string[] { nameof(OperationLogItem.RestTime), nameof(OperationLogItem.ElapsedTime), nameof(OperationLogItem.OperationitemTimeStatus) };
+        public static readonly string[] PropertiesForRefreshDefault = new string[] 
+        { 
+            nameof(OperationLogItem.RestTime), 
+            nameof(OperationLogItem.ElapsedTime), 
+            nameof(OperationLogItem.OperationitemTimeStatus) ,
+            
+            nameof(OperationLogItem.TimeEntered) ,
+            nameof(OperationLogItem.FinishTime) 
+        };
 
         #endregion
 
