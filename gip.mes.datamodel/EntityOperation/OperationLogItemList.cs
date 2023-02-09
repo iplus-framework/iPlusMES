@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace gip.mes.datamodel
@@ -6,7 +7,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioSystem, "en{'OperationLogItemList'}de{'OperationLogItemList'}", Global.ACKinds.TACClass)]
     public class OperationLogItemList : ObservableCollection<OperationLogItem>, ICyclicRefreshableCollection
     {
-        #region
+        #region const
 
         public static readonly string[] PropertiesForRefreshDefault = new string[] 
         { 
@@ -17,6 +18,20 @@ namespace gip.mes.datamodel
             nameof(OperationLogItem.TimeEntered) ,
             nameof(OperationLogItem.FinishTime) 
         };
+
+        #endregion
+
+        #region ctor's
+
+        public OperationLogItemList():base()
+        {
+
+        }
+
+        public OperationLogItemList(List<OperationLogItem> list):base(list)
+        {
+
+        }
 
         #endregion
 
