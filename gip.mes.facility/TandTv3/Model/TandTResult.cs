@@ -10,9 +10,13 @@ namespace gip.mes.facility.TandTv3
 {
     public class TandTResult
     {
+        #region DI
+        public TandTv3Command TandTv3Command { get; private set; }
+        #endregion
+
         #region ctor's
 
-        public TandTResult()
+        public TandTResult(TandTv3Command tandTv3Command)
         {
             Ids = new Dictionary<Guid, string>();
             BatchIDs = new List<Guid>();
@@ -23,6 +27,8 @@ namespace gip.mes.facility.TandTv3
             FacilityChargeIDs = new List<FacilityChargeIDModel>();
             ProgramNos = new List<string>();
             MixPointRelations = new List<MixPointRelation>();
+
+            TandTv3Command = tandTv3Command;
         }
 
         #endregion
@@ -223,7 +229,7 @@ namespace gip.mes.facility.TandTv3
                         InwardMaterial = inOrderPos.Material,
                         DeliveryNo = dns != null ? dns.DeliveryNote.DeliveryNoteNo : ""
                     };
-               
+
                 mixPoint.InOrderPositions.Add(inOrderPos);
                 MixPoints.Add(mixPoint);
                 CurrentStep.MixingPoints.Add(mixPoint);

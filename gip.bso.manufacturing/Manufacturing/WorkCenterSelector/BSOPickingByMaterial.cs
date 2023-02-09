@@ -309,6 +309,7 @@ namespace gip.bso.manufacturing
 
                 var scaleObjectInfoList = new List<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
                 ScaleObjectsList = scaleObjectInfoList;
+                CurrentScaleObject = ScaleObjectsList.FirstOrDefault();
             }
 
             var pafACState = pafPickingByMaterial.GetPropertyNet(nameof(ACState));

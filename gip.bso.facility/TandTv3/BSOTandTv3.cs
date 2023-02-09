@@ -1594,7 +1594,7 @@ namespace gip.bso.facility
             if (nextFilter != null)
                 result = TandTv3Manager.DoSelect(DatabaseApp, nextFilter, Root.Environment.User.Initials, UseGroupResult);
             else
-                result = new TandTv3.TandTResult() { Success = false };
+                result = new TandTv3.TandTResult(TandTv3Manager.TandTv3Command) { Success = false };
             return new KeyValuePair<TandTv3.TandTResult, MsgWithDetails>(result, msg);
         }
 

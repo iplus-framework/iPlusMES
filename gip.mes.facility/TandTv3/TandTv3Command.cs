@@ -50,15 +50,18 @@ namespace gip.mes.facility.TandTv3
 
         #region ctor's
 
-        public TandTv3Command()
+        public TandTv3Command(bool filterFaciltiyAtSearchInwardCharges)
         {
             if (TrackingConfiguration != null && !string.IsNullOrEmpty(TrackingConfiguration.RootLogFolder))
                 RootLogFolder = TrackingConfiguration.RootLogFolder;
+            FilterFaciltiyAtSearchInwardCharges = filterFaciltiyAtSearchInwardCharges;
         }
 
         #endregion
 
         #region Properties
+
+        public bool FilterFaciltiyAtSearchInwardCharges { get;set; }
 
         #endregion
 
@@ -78,7 +81,7 @@ namespace gip.mes.facility.TandTv3
 
         public virtual TandTResult FactoryTandTResult(TandTv3FilterTracking filter)
         {
-            return new TandTResult() { Filter = filter };
+            return new TandTResult(this) { Filter = filter };
         }
 
         public TandTv3FilterTracking ProcessFilter(DatabaseApp databaseApp, TandTv3FilterTracking filter, string vBUserNo)

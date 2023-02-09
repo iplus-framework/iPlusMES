@@ -65,7 +65,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(37, "PostingBehaviourIndex", "en{'Posting behaviour'}de{'Buchungsverhalten'}", typeof(PostingBehaviourEnum), Const.ContextDatabase + "\\PostingBehaviourEnumList", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNo", "en{'Charge Sort No.'}de{'Charge Sortiernr.'}", "", "", true)]
     [ACPropertyEntity(9999, "LastFCSortNoReverse", "en{'Charge Sort No.'}de{'Charge Sortiernr2.'}", "", "", true)]
-    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(38, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

@@ -4,8 +4,6 @@ using vd = gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.mes.datamodel;
 
 namespace gip.mes.processapplication
@@ -30,11 +28,17 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
-
+        [ACPropertyBindingSource(800, "", "en{'Operation log'}de{'Operation log'}", "", true, true)]
         public IACContainerTNet<OperationLogItemList> OperationLogItems
         {
             get;
             set;
+        }
+
+        public override bool ACPostInit()
+        {
+            OperationLogItems.ValueT = GetOperationList();
+            return base.ACPostInit();
         }
 
         #endregion
@@ -403,6 +407,10 @@ namespace gip.mes.processapplication
                                 resultSequence.Message = msg;
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                             }
+                            else
+                            {
+                                OperationLogItems.ValueT = GetOperationList();
+                            }
 
                             // Info50086: Input operation is successfully performed!
                             resultSequence.Message = new Msg(this, eMsgLevel.Info, nameof(PAFInOutOperationOnScan), "OnScanEvent(40)", 40, "Info50086");
@@ -496,6 +504,80 @@ namespace gip.mes.processapplication
             resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
 
             return null;
+        }
+
+        #region Methods -> SubscribeToWorkCycle
+
+
+
+        private void objectManager_ProjectWorkCycle1Min(object sender, EventArgs e)
+        {
+            OperationLogItems.ValueT = GetOperationList();
+        }
+
+        #endregion
+
+        public OperationLogItemList GetOperationList()
+        {
+            OperationLogItemList list = null;
+            try
+            {
+                using (DatabaseApp databaseApp = new DatabaseApp())
+                {
+                    List<OperationLogItem> items =
+                         databaseApp
+                         .OperationLog
+                         .GroupBy(c => new { c.ACProgramLogID, c.FacilityChargeID })
+                         .Where(c => c.Count() == 1)
+                         .Select(c => c.FirstOrDefault())
+                         .Join(databaseApp.ACProgramLog, ol => ol.ACProgramLogID, acPr => acPr.ACProgramLogID, (ol, acPr) => new { ol, acPr })
+                         .Join(databaseApp.ACProgramLog, ol => ol.acPr.ParentACProgramLogID, parAcPr => parAcPr.ACProgramLogID, (ol, parAcPr) => new { ol.ol, ol.acPr, parAcPr })
+                         .Join(databaseApp.OrderLog, ol => ol.parAcPr.ACProgramLogID, orlog => orlog.VBiACProgramLogID, (ol, orlog) => new { ol.ol, ol.acPr, ol.parAcPr, orlog })
+                         .OrderBy(c => c.ol.InsertDate)
+                         .Select(c => new OperationLogItem()
+                         {
+                             MaterialNo = c.ol.FacilityCharge.Material.MaterialNo,
+                             MaterialName = c.ol.FacilityCharge.Material.MaterialName1,
+                             ProgramNo = c.orlog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                             TimeEntered = c.ol.InsertDate,
+                             ACProgramLog = c.ol.ACProgramLog
+                         })
+                         .ToList();
+
+                    // TODO: @aagincic replace with values read from workflow configuration
+                    TimeSpan defDuration = TimeSpan.FromMinutes(4);
+                    TimeSpan defHintDuration = TimeSpan.FromMinutes(1);
+
+
+                    int nr = 0;
+                    foreach (var item in items)
+                    {
+                        nr++;
+                        item.Sn = nr;
+                        item.Duration = defDuration;
+                        item.HintDuration = defHintDuration;
+
+                        Guid? parentProgramLogID = item.ACProgramLog?.ACProgramLog1_ParentACProgramLog?.ACProgramLogID;
+                        if (parentProgramLogID != null)
+                        {
+                            OrderLog orderLog = databaseApp.OrderLog.Where(c => c.VBiACProgramLogID == (parentProgramLogID ?? Guid.Empty)).FirstOrDefault();
+                            if(orderLog != null)
+                            {
+                                item.ProgramNo = orderLog.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo;
+                            }
+                        }
+                    }
+                    items = items.OrderBy(c => c.FinishTime).ToList();
+
+                    list = new OperationLogItemList(items);
+                }
+            }
+            catch (Exception ex)
+            {
+                Messages.LogException(GetACUrl(), nameof(GetOperationList), ex);
+            }
+
+            return list;
         }
 
         #endregion

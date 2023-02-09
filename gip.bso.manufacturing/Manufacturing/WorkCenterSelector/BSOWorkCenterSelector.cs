@@ -234,6 +234,8 @@ namespace gip.bso.manufacturing
                 if (AccessPrimary == null || AccessPrimary.Current == value)
                     return;
 
+                DeinitFunctionMonitor();
+
                 if (AccessPrimary.Current != null)
                     AccessPrimary.Current.OnItemDeselected();
 
@@ -259,6 +261,8 @@ namespace gip.bso.manufacturing
                     moduleACUrl = value.ProcessModule.GetACUrl();
                 if (lastSelected != moduleACUrl)
                     SetSelectedWorkCenterItemConfig(value);
+
+                ApplicationQueue?.Add(() => InitFunctionMonitor());
             }
         }
 
@@ -1052,6 +1056,8 @@ namespace gip.bso.manufacturing
                 EndBatchPos = null;
                 CurrentPicking = null;
 
+                DeinitFunctionMonitor();
+
                 using (ACMonitor.Lock(_70050_MembersLock))
                 {
                     if (_CurrentPWGroup != null)
@@ -1130,10 +1136,12 @@ namespace gip.bso.manufacturing
                         _AlarmsInPhysicalModel.PropertyChanged += _AlarmsInPhysicalModel_PropertyChanged;
                     }
 
-                    if (CurrentVBContent == FunctionMonitorTabVBContent)
-                    {
-                        _MainSyncContext?.Send((object state) => InitFunctionMonitor(), new object());
-                    }
+                    ApplicationQueue?.Add(() => InitFunctionMonitor());
+
+                    //if (CurrentVBContent == FunctionMonitorTabVBContent)
+                    //{
+                    //_MainSyncContext?.Send((object state) => InitFunctionMonitor(), new object());
+                    //}
 
                     PAOrderInfoEntry entry = currentOrderInfo.Entities.FirstOrDefault(c => c.EntityName == ProdOrderBatch.ClassName);
                     if (entry != null)
@@ -1275,7 +1283,7 @@ namespace gip.bso.manufacturing
                 if (CurrentChildBSO != null)
                     CurrentChildBSO.DeActivate();
 
-                DeinitFunctionMonitor();
+                //DeinitFunctionMonitor();
 
                 CurrentChildBSO = childBSO;
 
@@ -1297,10 +1305,10 @@ namespace gip.bso.manufacturing
                 {
                     LoadPartslist();
                 }
-                else if (actionArgs.DropObject.VBContent == FunctionMonitorTabVBContent)
-                {
-                    InitFunctionMonitor();
-                }
+                //else if (actionArgs.DropObject.VBContent == FunctionMonitorTabVBContent)
+                //{
+                //    InitFunctionMonitor();
+                //}
 
                 CurrentVBContent = actionArgs.DropObject.VBContent;
 

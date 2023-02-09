@@ -20,9 +20,19 @@ namespace gip.mes.facility
         public TandTv3Manager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _TandTBSOName = new ACPropertyConfigValue<string>(this, "TandTBSOName", Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + "BSOTandTv3");
-            TandTv3Command = new TandTv3Command();
+            _TandTBSOName = new ACPropertyConfigValue<string>(this, nameof(TandTBSOName), Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + "BSOTandTv3");
+            _FilterFaciltiyAtSearchInwardCharges = new ACPropertyConfigValue<bool>(this, nameof(FilterFaciltiyAtSearchInwardCharges), true);
+            TandTv3Command = new TandTv3Command(FilterFaciltiyAtSearchInwardCharges);
         }
+
+        public override bool ACPostInit()
+        {
+            bool postInit = base.ACPostInit();
+            _ = TandTBSOName;
+            _ = FilterFaciltiyAtSearchInwardCharges;
+            return postInit;
+        }
+
         #endregion
 
         #region Configuration
@@ -38,6 +48,20 @@ namespace gip.mes.facility
             set
             {
                 _TandTBSOName.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<bool> _FilterFaciltiyAtSearchInwardCharges;
+        [ACPropertyConfig("en{'T&T-BSO-StartURL'}de{'T&T-BSO-StartURL'}")]
+        public virtual bool FilterFaciltiyAtSearchInwardCharges
+        {
+            get
+            {
+                return _FilterFaciltiyAtSearchInwardCharges.ValueT;
+            }
+            set
+            {
+                _FilterFaciltiyAtSearchInwardCharges.ValueT = value;
             }
         }
 
@@ -114,7 +138,7 @@ namespace gip.mes.facility
 
         public virtual TandTv3.TandTResult DoSelect(DatabaseApp databaseApp, TandTv3FilterTracking filter, string vbUserNo, bool useGroupResult)
         {
-            if(filter.RecalcAgain)
+            if (filter.RecalcAgain)
             {
                 DoTracking(databaseApp, filter, vbUserNo, useGroupResult);
             }

@@ -357,7 +357,7 @@ namespace gip.bso.masterdata
                                                        && x.ProdOrder.MDProdOrderState.ProdOrderState == MDProdOrderState.ProdOrderStates.NewCreated).ToArray();
 
             MsgWithDetails msgDetails = new MsgWithDetails();
-            ACProdOrderManager prodOrderManager = null;
+            //ACProdOrderManager prodOrderManager = null;
 
             foreach (ProdOrderPartslist poPls in prodOrders)
             {
@@ -408,16 +408,16 @@ namespace gip.bso.masterdata
 
                 if (intPos != null)
                 {
-                    if (prodOrderManager == null)
-                    {
-                        prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
-                    }
+                    //if (prodOrderManager == null)
+                    //{
+                    //    prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                    //}
 
-                    ProdOrderPartslistPos finalIntermediate = poPls.FinalIntermediate;
-                    if (prodOrderManager != null)
-                    {
-                        prodOrderManager.RecalcIntermediateItem(finalIntermediate, true, finalIntermediate.MDUnit != null ? finalIntermediate.MDUnit : finalIntermediate.Material.BaseMDUnit);
-                    }
+                    //ProdOrderPartslistPos finalIntermediate = poPls.FinalIntermediate;
+                    //if (prodOrderManager != null)
+                    //{
+                    //    prodOrderManager.RecalcIntermediateItem(finalIntermediate, true, finalIntermediate.MDUnit != null ? finalIntermediate.MDUnit : finalIntermediate.Material.BaseMDUnit);
+                    //}
 
                     msg = DatabaseApp.ACSaveChanges();
                     if (msg != null)

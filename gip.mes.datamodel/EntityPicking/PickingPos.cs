@@ -19,7 +19,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(16, InOrderPos.ClassName, "en{'Purchase Order Pos.'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName, "", true)]
     [ACPropertyEntity(17, MDDelivPosLoadState.ClassName, "en{'Loading State'}de{'Beladungszustand'}", Const.ContextDatabase + "\\" + MDDelivPosLoadState.ClassName, "", true)]
     [ACPropertyEntity(18, Picking.ClassName, ConstApp.PickingNo, Const.ContextDatabase + "\\" + Picking.ClassName, "", true)]
-    [ACPropertyEntity(9999, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
+    [ACPropertyEntity(19, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -427,7 +427,31 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                try
+                {
+                    return Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                }
+                catch (Exception e)
+                {
+                    Database.Root.Messages.LogException(nameof(PickingPos), nameof(RemainingDosingWeight), e);
+                    return double.NaN;
+                }
+            }
+        }
+
+        public string RemainingDosingWeightError
+        {
+            get
+            {
+                try
+                {
+                    Material.ConvertToBaseWeight(RemainingDosingQuantityUOM);
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
             }
         }
 

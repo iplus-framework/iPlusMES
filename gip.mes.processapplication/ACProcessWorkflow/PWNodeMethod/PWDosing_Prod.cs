@@ -605,9 +605,9 @@ namespace gip.mes.processapplication
                                 if (dosingRoute != null)
                                     break;
                             }
-                            if (dosingRoute == null)
+                            if (dosingRoute == null || double.IsNaN(relation.RemainingDosingWeight))
                             {
-                                if (NoSourceFoundForDosing.ValueT == 0)
+                                if (NoSourceFoundForDosing.ValueT == 0 && dosingRoute == null)
                                 {
                                     NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
                                     NoSourceFoundForDosing.ValueT = 1;
@@ -688,6 +688,16 @@ namespace gip.mes.processapplication
                             responsibleFunc = CanStartProcessFunc(module, acMethod, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo);
                             if (responsibleFunc == null)
                                 return StartNextCompResult.CycleWait;
+
+                            if (relation != null && double.IsNaN(relation.RemainingDosingWeight))
+                            {
+                                NoSourceFoundForDosing.ValueT = 1;
+                                //Error50597: Dosing error on the component {0} {1}, {2};
+                                string error = relation.RemainingDosingWeightError;
+                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", relation.SourceProdOrderPartslistPos.MaterialNo, relation.SourceProdOrderPartslistPos.MaterialName, error);
+                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                return StartNextCompResult.CycleWait;
+                            }
 
                             if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
                                 return StartNextCompResult.CycleWait;
@@ -888,12 +898,13 @@ namespace gip.mes.processapplication
         protected virtual ProdOrderPartslistPosRelation[] OnGetOpenDosingsForNextComponent(Database dbIPlus, DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos)
         {
             ProdOrderPartslistPosRelation[] queryOpenDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-                                .Where(c => c.RemainingDosingWeight < (MinDosQuantity * -1)
+                                .Where(c => (c.RemainingDosingWeight < (MinDosQuantity * -1) || double.IsNaN(c.RemainingDosingWeight))
                                             && c.MDProdOrderPartslistPosState != null
                                             && (c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created
                                                || c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.PartialCompleted))
                                 .OrderBy(c => c.Sequence)
                                 .ToArray();
+
             return queryOpenDosings;
         }
 

@@ -87,6 +87,8 @@ namespace gip.mes.datamodel
             }
         }
 
+        public ACProgramLog ACProgramLog { get; set; }
+
         [IgnoreDataMember]
         [ACPropertyInfo(11, nameof(OperationitemTimeStatus), ConstApp.OperationitemTimeStatus)]
         public OperationitemTimeStatusEnum OperationitemTimeStatus
@@ -99,11 +101,11 @@ namespace gip.mes.datamodel
                 - TimeReaching   - (FinishTime - HintDuration) <= Now <= FinishTime (žuto)
                 - TimeExceeded   - Now > FinishTime (crveno)
                 */
-                if((FinishTime - HintDuration) <= DateTime.Now  && DateTime.Now <= FinishTime)
+                if ((FinishTime - HintDuration) <= DateTime.Now && DateTime.Now <= FinishTime)
                 {
                     item = OperationitemTimeStatusEnum.TimeReaching;
                 }
-                else if(DateTime.Now > FinishTime)
+                else if (DateTime.Now > FinishTime)
                 {
                     item = OperationitemTimeStatusEnum.TimeExceeded;
                 }
