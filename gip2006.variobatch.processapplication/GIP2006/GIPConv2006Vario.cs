@@ -1420,7 +1420,10 @@ namespace gip2006.variobatch.processapplication
                     && !_ResponseValue.Bit08_Active 
                     && (ACState.ValueT == ACStateEnum.SMStarting || ACState.ValueT == ACStateEnum.SMIdle))
                 {
-                    translatedState = ACStateEnum.SMStarting;
+                    if (ACState.ValueT == ACStateEnum.SMStarting && _ResponseValue.Bit15_Completed)
+                        translatedState = ACStateEnum.SMCompleted;
+                    else
+                        translatedState = ACStateEnum.SMStarting;
                 }
                 else if (       _RequestValue.Bit08_Start 
                             && (     _ResponseValue.Bit08_Active

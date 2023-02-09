@@ -1512,16 +1512,20 @@ namespace gip.mes.processapplication
         public virtual IEnumerable<Route> GetRoutes(ProdOrderPartslistPosRelation relation,
                                                 DatabaseApp dbApp, Database dbIPlus,
                                                 RouteQueryParams queryParams,
+                                                PAProcessModule useIfNotAccessedProcessModule,
                                                 out IList<Facility> possibleSilos)
         {
-            if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PartslistManager == null)
-            {
+            if (ParentPWGroup == null || PartslistManager == null)
+                throw new NullReferenceException("ParentPWGroup || PartslistManager  is null");
+            PAProcessModule pAProcessModule = ParentPWGroup.AccessedProcessModule;
+            if (pAProcessModule == null)
+                pAProcessModule = useIfNotAccessedProcessModule;
+            if (pAProcessModule == null)
                 throw new NullReferenceException("AccessedProcessModule is null");
-            }
 
             // FacilityNoSort
 
-            core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
+            core.datamodel.ACClass accessAClass = pAProcessModule.ComponentClass;
             IEnumerable<Route> routes = PartslistManager.GetRoutes(relation, dbApp, dbIPlus,
                                         accessAClass,
                                         queryParams.SearchMode,
@@ -1537,14 +1541,18 @@ namespace gip.mes.processapplication
         public virtual IEnumerable<Route> GetRoutes(PickingPos pickingPos,
                                                     DatabaseApp dbApp, Database dbIPlus,
                                                     RouteQueryParams queryParams,
+                                                    PAProcessModule useIfNotAccessedProcessModule,
                                                     out IList<Facility> possibleSilos)
         {
-            if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PickingManager == null)
-            {
+            if (ParentPWGroup == null || PickingManager == null)
+                throw new NullReferenceException("ParentPWGroup || PickingManager  is null");
+            PAProcessModule pAProcessModule = ParentPWGroup.AccessedProcessModule;
+            if (pAProcessModule == null)
+                pAProcessModule = useIfNotAccessedProcessModule;
+            if (pAProcessModule == null)
                 throw new NullReferenceException("AccessedProcessModule is null");
-            }
 
-            core.datamodel.ACClass accessAClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
+            core.datamodel.ACClass accessAClass = pAProcessModule.ComponentClass;
             IEnumerable<Route> routes = PickingManager.GetRoutes(pickingPos, dbApp, dbIPlus,
                                         accessAClass,
                                         queryParams.SearchMode,

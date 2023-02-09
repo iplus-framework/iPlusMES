@@ -137,7 +137,7 @@ namespace gip.mes.processapplication
                     RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
                                                                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                                                         null, null, ExcludedSilos);
-                    routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, out possibleSilos);
+                    routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                 }
                 else
                 {
@@ -544,7 +544,7 @@ namespace gip.mes.processapplication
                     RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                         null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
-                    IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, out possibleSilos);
+                    IEnumerable<Route> routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     if (routes == null || !routes.Any())
                     {
                         if (AutoChangeScale && possibleSilos != null && possibleSilos.Any())
@@ -563,7 +563,7 @@ namespace gip.mes.processapplication
                                     RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.HandleEmptySilo,
                                         OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
                                         null, silo.Facility.ValueT.ValueT.FacilityID, ExcludedSilos);
-                                    IEnumerable<Route> alternativeRoutes = otherDosing.GetRoutes(pickingPos, dbApp, dbIPlus, queryParams2, out alternativeSilos);
+                                    IEnumerable<Route> alternativeRoutes = otherDosing.GetRoutes(pickingPos, dbApp, dbIPlus, queryParams2, null, out alternativeSilos);
                                     if (alternativeRoutes != null && alternativeRoutes.Any())
                                     {
                                         CachedEmptySiloHandlingOption = EmptySiloHandlingOptions.OtherSilosAvailable | EmptySiloHandlingOptions.AvailableOnOtherModule;
