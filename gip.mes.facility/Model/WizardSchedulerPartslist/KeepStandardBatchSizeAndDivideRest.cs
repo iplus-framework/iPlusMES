@@ -15,9 +15,9 @@ namespace gip.mes.facility
             if (totalSize <= Double.Epsilon)
                 return;
 
-            if (   (   Math.Abs(standardBatchSize) <= Double.Epsilon
+            if ((Math.Abs(standardBatchSize) <= Double.Epsilon
                     && Math.Abs(maxBatchSize) <= Double.Epsilon)
-                || (   Math.Abs(minBatchSize) > Double.Epsilon 
+                || (Math.Abs(minBatchSize) > Double.Epsilon
                     && totalSize < minBatchSize))
             {
                 return;
@@ -32,7 +32,7 @@ namespace gip.mes.facility
             if (minBatchSize > standardBatchSize)
                 minBatchSize = standardBatchSize - 0.00001;
 
-            if (   (totalSize <= standardBatchSize && totalSize >= minBatchSize)
+            if ((totalSize <= standardBatchSize && totalSize >= minBatchSize)
                 || (totalSize > standardBatchSize && totalSize < maxBatchSize))
             {
                 calcBatchCount = 1;
@@ -41,8 +41,18 @@ namespace gip.mes.facility
             else
             {
                 calcBatchSize = standardBatchSize;
-                calcBatchCount = (int)(totalSize / standardBatchSize);
+                int tempBatchCount = (int)(totalSize / standardBatchSize);
                 Rest = totalSize - (calcBatchCount * calcBatchSize);
+
+                for (int i = 1; i <= tempBatchCount; i++)
+                {
+                    Rest = totalSize - (i * calcBatchSize);
+                    if(Rest < maxBatchSize)
+                    {
+                        calcBatchCount = i;
+                        break;
+                    }
+                }
             }
 
             calcBatchSize = wizardSchedulerPartslist.CorrectQuantityWithProductionUnits(calcBatchSize);

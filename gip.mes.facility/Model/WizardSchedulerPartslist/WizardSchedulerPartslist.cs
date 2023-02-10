@@ -50,15 +50,72 @@ namespace gip.mes.facility
                     TargetQuantity = partslist.Material.ConvertQuantity(TargetQuantityUOM, partslist.Material.BaseMDUnit, partslist.MDUnit);
             }
             MDSchedulingGroupList = schedulingGroups;
-            if (selectedSchedulingGroup != null)
-            {
-                SelectedMDSchedulingGroup = MDSchedulingGroupList.Where(c => c.MDSchedulingGroupID == selectedSchedulingGroup.MDSchedulingGroupID).FirstOrDefault();
-            }
-            if (SelectedMDSchedulingGroup == null)
-            {
-                SelectedMDSchedulingGroup = MDSchedulingGroupList.FirstOrDefault();
-            }
+            DefineSelectedSchedulingGroup(selectedSchedulingGroup);
             ProductionUnitsUOM = partslist.ProductionUnits;
+        }
+
+        private void DefineSelectedSchedulingGroup(MDSchedulingGroup selectedSchedulingGroup)
+        {
+            MDSchedulingGroup firstGroupInList = MDSchedulingGroupList.FirstOrDefault();
+            if (firstGroupInList != null && selectedSchedulingGroup != null)
+            {
+                SelectedMDSchedulingGroup = SortSchedulingGroup(firstGroupInList, selectedSchedulingGroup);
+            }
+        }
+
+        private MDSchedulingGroup SortSchedulingGroup(MDSchedulingGroup first, MDSchedulingGroup second)
+        {
+            MDSchedulingGroup selectedGroup = null;
+            int firstOrder = 0;
+            int secondOrder = 0;
+            
+            IEnumerable<Tuple<int, Guid>> items =
+                Partslist
+                .PartslistConfig_Partslist
+                .Where(c => !string.IsNullOrEmpty(c.LocalConfigACUrl) && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
+                .ToArray()
+                .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
+                .OrderBy(c => c.Item1)
+                .ToArray();
+
+            if (items.Any())
+            {
+                firstOrder = items.Where(c => first.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == c.Item2)).Select(c => c.Item1).FirstOrDefault();
+                secondOrder = items.Where(c => second.MDSchedulingGroupWF_MDSchedulingGroup.Any(x => x.VBiACClassWFID == c.Item2)).Select(c => c.Item1).FirstOrDefault();
+            }
+
+
+            // #1 case
+            // firstOrder = 0
+            // secondOrder = 2
+
+            // #2 case
+            // firstOrder = 2
+            // secondOrder = 0
+
+            // #3 case
+            // firstOrder = 0
+            // secondOrder = 0
+
+            // #4 case
+            // firstOrder = 1
+            // secondOrder = 2
+
+            // #4 case
+            // firstOrder = 2
+            // secondOrder = 1
+
+            selectedGroup = first;
+            if (firstOrder == 0 && secondOrder != 0)
+            {
+                selectedGroup = second;
+            }
+            else if (firstOrder == secondOrder || firstOrder > secondOrder)
+            {
+                selectedGroup = second;
+            }
+
+            return selectedGroup;
         }
 
         public WizardSchedulerPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ConfigManagerIPlus configManager,

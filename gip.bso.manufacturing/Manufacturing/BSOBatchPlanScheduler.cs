@@ -4706,8 +4706,8 @@ namespace gip.bso.manufacturing
                         partslist,
                         targetQuantity,
                         1,
-                        schedulingGroups);
-            DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup = schedulingGroup;
+                        schedulingGroups,
+                        SelectedScheduleForPWNode?.MDSchedulingGroup);
             AllWizardSchedulerPartslistList.Clear();
             AddWizardSchedulerPartslistList(DefaultWizardSchedulerPartslist);
             SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
