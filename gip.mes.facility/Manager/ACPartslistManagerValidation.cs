@@ -204,8 +204,10 @@ namespace gip.mes.facility
 
             // Valid from to date validation
             if (partslist.EnabledFrom.HasValue && partslist.EnabledTo.HasValue)
+            {
                 if (partslist.EnabledFrom >= partslist.EnabledTo)
                     msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50039", partslist.EnabledFrom, partslist.EnabledTo) });
+            }
         }
 
         private void ValidateFinalQuantity(Partslist partslist, MsgWithDetails msg)
