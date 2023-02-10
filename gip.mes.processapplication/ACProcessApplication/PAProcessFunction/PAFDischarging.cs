@@ -451,7 +451,7 @@ namespace gip.mes.processapplication
 
                     if (setTarget)
                     {
-                        PAProcessModule pamTarget = sourceRouteItem.TargetACComponent as PAProcessModule;
+                        PAProcessModule pamTarget = targetRouteItem.TargetACComponent as PAProcessModule;
                         if (pamTarget != null)
                         {
                             if (valueDest.Value is Int16)
