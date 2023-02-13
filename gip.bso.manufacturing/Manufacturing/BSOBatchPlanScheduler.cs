@@ -2871,7 +2871,7 @@ namespace gip.bso.manufacturing
         {
             double totalSize = moveBatchCount * prodOrderBatchPlan.BatchSize;
             int sn = 1;
-            WizardSchedulerPartslist wizardSchedulerPartslist = 
+            WizardSchedulerPartslist wizardSchedulerPartslist =
                 new WizardSchedulerPartslist(
                     DatabaseApp,
                     ProdOrderManager,
@@ -2901,7 +2901,7 @@ namespace gip.bso.manufacturing
         private void CreateNewBatchWithSize(ProdOrderBatchPlan prodOrderBatchPlan, double moveQuantity, PAScheduleForPWNode selectedTargetScheduleForPWNode, out List<vd.ProdOrderBatchPlan> generatedBatchPlans)
         {
             int sn = 1;
-            WizardSchedulerPartslist wizardSchedulerPartslist = 
+            WizardSchedulerPartslist wizardSchedulerPartslist =
                 new WizardSchedulerPartslist(DatabaseApp,
                     ProdOrderManager,
                     LocalBSOBatchPlan.VarioConfigManager,
@@ -2930,7 +2930,7 @@ namespace gip.bso.manufacturing
         {
             List<ProdOrderBatchPlan> notSelected =
                    ProdOrderBatchPlanList
-                   .Where(c => !c.IsSelected)
+                   .Where(c => !c.IsSelected && c.EntityState != EntityState.Deleted && c.EntityState != EntityState.Detached)
                    .OrderBy(c => c.ScheduledOrder ?? 0)
                    .ThenBy(c => c.InsertDate)
                    .ToList();
@@ -4606,7 +4606,7 @@ namespace gip.bso.manufacturing
 
                     List<MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, partslistExpand.Partslist, PartslistMDSchedulerGroupConnections);
                     if (prodOrderPartslist != null)
-                        wizardSchedulerPartslist = 
+                        wizardSchedulerPartslist =
                             new WizardSchedulerPartslist(
                                 DatabaseApp,
                                 ProdOrderManager,
@@ -4617,7 +4617,7 @@ namespace gip.bso.manufacturing
                                 schedulingGroups,
                                 prodOrderPartslist);
                     else
-                        wizardSchedulerPartslist = 
+                        wizardSchedulerPartslist =
                             new WizardSchedulerPartslist(
                                 DatabaseApp,
                                 ProdOrderManager,
@@ -4650,7 +4650,7 @@ namespace gip.bso.manufacturing
                 if (!isThere)
                 {
                     List<MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, prodOrderPartslist.Partslist, PartslistMDSchedulerGroupConnections);
-                    WizardSchedulerPartslist item = 
+                    WizardSchedulerPartslist item =
                         new WizardSchedulerPartslist(
                             DatabaseApp,
                             ProdOrderManager,
@@ -4687,7 +4687,7 @@ namespace gip.bso.manufacturing
         {
             List<MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, partslist, PartslistMDSchedulerGroupConnections);
             if (prodOrderPartslist != null)
-                DefaultWizardSchedulerPartslist = 
+                DefaultWizardSchedulerPartslist =
                     new WizardSchedulerPartslist(
                         DatabaseApp,
                         ProdOrderManager,
@@ -4698,7 +4698,7 @@ namespace gip.bso.manufacturing
                         schedulingGroups,
                         prodOrderPartslist);
             else
-                DefaultWizardSchedulerPartslist = 
+                DefaultWizardSchedulerPartslist =
                     new WizardSchedulerPartslist(
                         DatabaseApp,
                         ProdOrderManager,
