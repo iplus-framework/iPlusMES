@@ -855,10 +855,10 @@ namespace gip.bso.manufacturing
                 //ProcessModulePAFName = ruleValue.Item2
             };
             _TempRules.Add(rule);
-
-            var tempRules = AssignedProcessModulesList.ToList();
-            tempRules.AddRange(tempRules);
-            AssignedProcessModulesList = tempRules.ToList();
+            
+            //var tempRules = AssignedProcessModulesList.ToList();
+            //tempRules.Add(rule);
+            AssignedProcessModulesList = _TempRules.ToList();
         }
 
         public bool IsEnabledAddRule()

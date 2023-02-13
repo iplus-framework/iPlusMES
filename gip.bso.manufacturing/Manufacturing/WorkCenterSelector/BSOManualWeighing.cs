@@ -3013,7 +3013,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Interdischarge'}de{'Interdischarge'}", 696, true)]
-        public void Interdischarge()
+        public virtual void Interdischarge()
         {
             IACComponentPWNode currentPWNode = ComponentPWNodeLocked;
             InterdischargeStart(currentPWNode, false);
@@ -3085,7 +3085,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public bool IsEnabledInterdischarge()
+        public virtual bool IsEnabledInterdischarge()
         {
             return InInterdischargingQ.HasValue ? false : true;
         }
