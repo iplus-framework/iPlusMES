@@ -3697,6 +3697,7 @@ namespace gip.bso.manufacturing
                                 WizardPhase = NewScheduledBatchWizardPhaseEnum.DeleteBatchPlan;
                                 WizardForwardAction(wizardPhase: NewScheduledBatchWizardPhaseEnum.DeleteBatchPlan);
                                 OnPropertyChanged(nameof(CurrentLayout));
+                                OnPropertyChanged(nameof(WizardSchedulerPartslistList));
                             }
                         }
                         else
