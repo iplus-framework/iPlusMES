@@ -852,29 +852,17 @@ namespace gip.mes.processapplication
             {
                 IEnumerable<PAEScaleGravimetric> possibleScales;
                 if (ScaleMappingHelper.AssignedScales.Any())
-                {
-                    possibleScales = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>();
-                }
+                    possibleScales = ScaleMappingHelper.AssignedScales.OfType<PAEScaleGravimetric>().ToList();
                 else
-                {
                     possibleScales = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric);
-                }
 
                 PAEScaleGravimetric scale = null;
-
-                if (ScaleMappingHelper.AssignedScales.Any())
-                {
-                    scale = possibleScales.Where(c => c.MinDosingWeight.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT).FirstOrDefault();
-
-                    if (scale == null)
-                        scale = possibleScales.OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
-                }
-                else
-                {
-                    scale = possibleScales.Where(c => c.MinDosingWeight?.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT).FirstOrDefault();
-                    if (scale == null)
-                        scale = possibleScales.OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
-                }
+                scale = possibleScales
+                               .OrderBy(c => c.MaxScaleWeight.ValueT)
+                              .Where(c => c.MinDosingWeight.ValueT <= targetQuantity && targetQuantity <= c.MaxScaleWeight.ValueT)
+                              .FirstOrDefault();
+                if (scale == null)
+                    scale = possibleScales.OrderByDescending(c => c.MaxScaleWeight.ValueT).FirstOrDefault();
                 if (scale == null)
                 {
                     //Error50363: Can not determine appropriate scale object. Please check your scale configuration (MinDosingWeight, MaxScaleWeight or FunctionScaleConfiguration).
@@ -882,9 +870,9 @@ namespace gip.mes.processapplication
                     OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
-
                     return;
                 }
+
                 bool isOccupied = OccupyAndSetActiveScaleObject(scale);
                 if (!isOccupied)
                 {

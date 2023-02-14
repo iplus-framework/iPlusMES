@@ -322,6 +322,7 @@ namespace gip.mes.processapplication
 
                     bool hasOpenDosings = false;
                     bool isAnyCompDosableFromAnyRoutableSilo = false;
+                    bool componentsSkippable = ComponentsSkippable;
                     StartNextCompResult openDosingsResult = StartNextCompResult.Done;
                     // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
                     if (queryOpenDosings != null && queryOpenDosings.Any())
@@ -484,7 +485,7 @@ namespace gip.mes.processapplication
                                     .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
                                                 && c.ACClassWFID != thisContentACClassWF.ACClassWFID
                                                 && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                && c.ACClassWF.PWACClassID == thisACClassID)
+                                                && (componentsSkippable || c.ACClassWF.PWACClassID == thisACClassID))
                                     .Select(c => c.ACClassWFID)
                                     .ToArray();
                                 }
@@ -497,7 +498,7 @@ namespace gip.mes.processapplication
                                                                 .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
                                                                 && c.ACClassWFID != thisContentACClassWF.ACClassWFID
                                                                 && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                                && c.ACClassWF.PWACClassID == thisACClassID)
+                                                                && (componentsSkippable || c.ACClassWF.PWACClassID == thisACClassID))
                                                 .Select(c => c.ACClassWFID)
                                                 .ToArray();
                                     }
@@ -509,20 +510,21 @@ namespace gip.mes.processapplication
                                                         && c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
                                                         && c.ACClassWFID != thisContentACClassWF.ACClassWFID
                                                         && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                        && c.ACClassWF.PWACClassID == thisACClassID)
+                                                        && (componentsSkippable || c.ACClassWF.PWACClassID == thisACClassID))
                                             .Select(c => c.ACClassWFID)
                                             .ToArray();
                                     }
                                 }
 
-                                if (otherDosingNodes != null && otherDosingNodes.Any() && possibleSilos != null && possibleSilos.Any())
+                                if (   otherDosingNodes != null && otherDosingNodes.Any() 
+                                    && (componentsSkippable || (possibleSilos != null && possibleSilos.Any())))
                                 {
-                                    List<PWDosing> otherDosingWFs = this.RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
-                                                                                                && (c as PWDosing).ContentACClassWF != null
-                                                                                                && otherDosingNodes.Contains((c as PWDosing).ContentACClassWF.ACClassWFID)
-                                                                                                && (   (c as PWDosing).IterationCount.ValueT <= 0 
-                                                                                                    || (   (c as PWDosing).ParentPWGroup != null 
-                                                                                                        && (c as PWDosing).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
+                                    List<IPWNodeReceiveMaterial> otherDosingWFs = this.RootPW.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial
+                                                                                                && (c as IPWNodeReceiveMaterial).ContentACClassWF != null
+                                                                                                && otherDosingNodes.Contains((c as IPWNodeReceiveMaterial).ContentACClassWF.ACClassWFID)
+                                                                                                && (   (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0 
+                                                                                                    || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null 
+                                                                                                        && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
                                                                                                 /*&& (c.CurrentACState == PABaseState.SMIdle || c.CurrentACState == PABaseState.SMBreakPoint)*/);
                                     // Remove potential WFNodes which are out of the SequenceRange
                                     if (otherDosingWFs.Any())
@@ -797,7 +799,7 @@ namespace gip.mes.processapplication
                     }
 
 
-                    if ((hasOpenDosings && ComponentsSkippable) || !hasOpenDosings)
+                    if ((hasOpenDosings && componentsSkippable) || !hasOpenDosings)
                         openDosingsResult = StartNextCompResult.Done;
                     else
                         openDosingsResult = StartNextCompResult.CycleWait;
