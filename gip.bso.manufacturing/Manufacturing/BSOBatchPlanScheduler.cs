@@ -4618,6 +4618,8 @@ namespace gip.bso.manufacturing
                                 schedulingGroups,
                                 prodOrderPartslist);
                     else
+                    {
+                        MDSchedulingGroup schedulingGroup = DatabaseApp.MDSchedulingGroup.Where(c=>c.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID).FirstOrDefault();
                         wizardSchedulerPartslist =
                             new WizardSchedulerPartslist(
                                 DatabaseApp,
@@ -4627,7 +4629,9 @@ namespace gip.bso.manufacturing
                                 partslistExpand.TargetQuantityUOM,
                                 sn,
                                 schedulingGroups,
-                                SelectedScheduleForPWNode?.MDSchedulingGroup);
+                                schedulingGroup);
+                    }    
+                        
 
                     AddWizardSchedulerPartslistList(wizardSchedulerPartslist, sn);
                 }
