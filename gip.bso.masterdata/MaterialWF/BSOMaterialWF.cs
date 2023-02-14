@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.core.manager;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using gip.mes.manager;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,8 @@ namespace gip.bso.masterdata
     /// <summary>
     /// </summary>
     [ACClassConstructorInfo(
-        new object[] 
-        { 
+        new object[]
+        {
             new object[] {"AutoFilter", Global.ParamOption.Optional, typeof(String)},
         }
     )]
@@ -46,6 +47,12 @@ namespace gip.bso.masterdata
         {
             if (!base.ACInit(startChildMode))
                 return false;
+
+            _PartslistManager = ACPartslistManager.ACRefToServiceInstance(this);
+            if (_PartslistManager == null)
+                throw new Exception("PartslistManager not configured");
+
+
             Search();
             return true;
         }
@@ -62,6 +69,10 @@ namespace gip.bso.masterdata
                 _VBDesignerMaterialWF.PropertyChanged -= _VBDesignerMaterialWF_PropertyChanged;
                 _VBDesignerMaterialWF = null;
             }
+
+            if (_PartslistManager != null)
+                ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
+            _PartslistManager = null;
 
             this._ProcessWorkflow = null;
             this._selectedMaterial = null;
@@ -168,6 +179,21 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region Properties (Manager)
+
+        protected ACRef<ACPartslistManager> _PartslistManager = null;
+        protected ACPartslistManager PartslistManager
+        {
+            get
+            {
+                if (_PartslistManager == null)
+                    return null;
+                return _PartslistManager.ValueT;
+            }
+        }
+
+        #endregion
+
         #region MaterialWF
 
         #region MaterialWF -> AccessNav
@@ -226,9 +252,9 @@ namespace gip.bso.masterdata
                 if (AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
-                    
-                    if (   value != null 
-                        && value.XMLDesign == null 
+
+                    if (value != null
+                        && value.XMLDesign == null
                         && VBDesignerMaterialWF != null)
                         VBDesignerMaterialWF.DoInsertRoot(value, null);
                     if (MaterialWFPresenter != null)
@@ -256,7 +282,7 @@ namespace gip.bso.masterdata
                 AccessPrimary.Selected = value;
                 CurrentMaterialWF = value;
                 OnPropertyChanged("SelectedMaterialWF");
-                
+
             }
         }
 
@@ -273,16 +299,16 @@ namespace gip.bso.masterdata
         [ACPropertyInfo(604, "", "en{'Material Workflow No.'}de{'Material-Workflow Nr.'}")]
         public string CurrentMaterialWFNo
         {
-            get 
+            get
             {
                 return _currentMaterialWFNo;
             }
             set
             {
                 _currentMaterialWFNo = value;
-                if (   !string.IsNullOrEmpty(_currentMaterialWFNo)
+                if (!string.IsNullOrEmpty(_currentMaterialWFNo)
                     && VBDesignerMaterialWF != null
-                    && VBDesignerMaterialWF.IsDesignMode 
+                    && VBDesignerMaterialWF.IsDesignMode
                     && _IsCurrentMaterialWFNoChanged
                     && MaterialWFPresenter != null)
                 {
@@ -290,7 +316,7 @@ namespace gip.bso.masterdata
                     CurrentMaterialWF.MaterialWFNo = _currentMaterialWFNo;
                     VBDesignerMaterialWF.ChangeMaterialWFName(oldName, CurrentMaterialWF.MaterialWFNo);
                     MaterialWFPresenter.Load(CurrentMaterialWF);
-                    BroadcastToVBControls(Const.CmdDesignModeOff, null, new object[1]{this});
+                    BroadcastToVBControls(Const.CmdDesignModeOff, null, new object[1] { this });
                 }
                 OnPropertyChanged("CurrentMaterialWFNo");
                 _IsCurrentMaterialWFNoChanged = true;
@@ -504,7 +530,7 @@ namespace gip.bso.masterdata
             }
             set
             {
-                SetSelectedMaterial(value,true);
+                SetSelectedMaterial(value, true);
             }
         }
 
@@ -548,7 +574,7 @@ namespace gip.bso.masterdata
                 relation = MaterialWFRelation.NewACObject(DatabaseApp, null);
                 relation.TargetMaterial = SelectedInputMaterials;
                 CurrentMaterialWF.MaterialWFRelation_MaterialWF.Add(relation);
-                
+
             }
             else if (MaterialList.Count() == 1 && CurrentMaterialWF.MaterialWFRelation_MaterialWF.Count() == 1)
             {
@@ -569,11 +595,11 @@ namespace gip.bso.masterdata
                 relation.TargetMaterial = SelectedMaterial;
                 CurrentMaterialWF.MaterialWFRelation_MaterialWF.Add(relation);
             }
-            
+
             CloseTopDialog();
             OnPropertyChanged("MaterialList");
             OnPropertyChanged("MixureList");
-           //VBDesignerMaterialWF.UpdateDesigner(relation, this);
+            //VBDesignerMaterialWF.UpdateDesigner(relation, this);
         }
 
 
@@ -581,7 +607,7 @@ namespace gip.bso.masterdata
 
         public bool IsEnabledAddMaterialDlg()
         {
-            return SelectedMaterialWF != null && !CurrentMaterialWF.Partslist_MaterialWF.Any(); 
+            return SelectedMaterialWF != null && !CurrentMaterialWF.Partslist_MaterialWF.Any();
         }
 
         public bool IsEnabledAddMaterialOK()
@@ -621,7 +647,7 @@ namespace gip.bso.masterdata
             get
             {
                 if (SelectedMaterial == null) return null;
-                return SelectedMaterial.MaterialWFRelation_TargetMaterial.Where(x=>x.MaterialWFID == CurrentMaterialWF.MaterialWFID).OrderBy(x => x.Sequence).ToList();
+                return SelectedMaterial.MaterialWFRelation_TargetMaterial.Where(x => x.MaterialWFID == CurrentMaterialWF.MaterialWFID).OrderBy(x => x.Sequence).ToList();
             }
         }
 
@@ -787,7 +813,7 @@ namespace gip.bso.masterdata
                 if (connection != null)
                 {
                     var material = this.MaterialList.Where(c => c.MaterialID == connection.MaterialID).FirstOrDefault();
-                    SetSelectedMaterial(material,false);
+                    SetSelectedMaterial(material, false);
                 }
             }
         }
@@ -872,7 +898,7 @@ namespace gip.bso.masterdata
         /// <param name="actionArgs">Information about the type of interaction and the source</param>
         public override void ACAction(ACActionArgs actionArgs)
         {
-            if (  (    actionArgs.ElementAction == Global.ElementActionType.TabItemActivated
+            if ((actionArgs.ElementAction == Global.ElementActionType.TabItemActivated
                     && actionArgs.DropObject.VBContent == "*TabMaterials")
                 || actionArgs.ElementAction == Global.ElementActionType.DesignModeOn)
             {
@@ -883,8 +909,8 @@ namespace gip.bso.masterdata
             }
             else if (
                         (
-                            (   actionArgs.DropObject.VBContent == "*Workflows"
-                             && (   actionArgs.ElementAction == Global.ElementActionType.TabItemActivated
+                            (actionArgs.DropObject.VBContent == "*Workflows"
+                             && (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated
                                  || actionArgs.ElementAction == Global.ElementActionType.TabItemLoaded)
                             )
                           || actionArgs.ElementAction == Global.ElementActionType.DesignModeOff
@@ -943,7 +969,7 @@ namespace gip.bso.masterdata
 
         private bool SelectProcessWorkflowNode(Guid acClassWFID)
         {
-            if (this.ProcessWorkflowPresenter == null || this.ProcessWorkflowPresenter.SelectedRootWFNode == null) 
+            if (this.ProcessWorkflowPresenter == null || this.ProcessWorkflowPresenter.SelectedRootWFNode == null)
                 return false;
 
             if (acClassWFID == Guid.Empty)
@@ -1028,7 +1054,7 @@ namespace gip.bso.masterdata
         private void RemoveProcessWorkflowConnections(MaterialWFACClassMethod item)
         {
             List<PartslistACClassMethod> plMethods = item.PartslistACClassMethod_MaterialWFACClassMethod.ToList();
-            foreach(PartslistACClassMethod plMethod in plMethods)
+            foreach (PartslistACClassMethod plMethod in plMethods)
                 plMethod.DeleteACObject(DatabaseApp, false);
 
             List<ProdOrderBatchPlan> batchPlans = item.ProdOrderBatchPlan_MaterialWFACClassMethod.ToList();
@@ -1054,8 +1080,8 @@ namespace gip.bso.masterdata
                 gip.core.datamodel.ACClassWF relationWf = actionArgs.DropObject.ACContentList.OfType<gip.core.datamodel.ACClassWF>().FirstOrDefault();
                 Material relationMaterial = targetVBDataObject.ACContentList.OfType<Material>().FirstOrDefault();
 
-                if (relationWf != null 
-                    && relationMaterial != null 
+                if (relationWf != null
+                    && relationMaterial != null
                     && !relationMaterial.MaterialWFConnection_Material.Where(w => w.MaterialWFACClassMethodID == this.CurrentProcessWorkflow.MaterialWFACClassMethodID && w.ACClassWFID == relationWf.ACClassWFID).Any())
                 {
                     MaterialWFConnection entry = MaterialWFConnection.NewACObject(DatabaseApp, this.CurrentProcessWorkflow);
@@ -1088,7 +1114,7 @@ namespace gip.bso.masterdata
                 Material relationMaterial = targetVBDataObject.ACContentList.OfType<Material>().FirstOrDefault();
 
                 // Connection is allowed only if 'relationMaterial' doesn't have any connections with current process workflow
-                return relationWf != null 
+                return relationWf != null
                     && relationMaterial != null
                     && !relationMaterial.MaterialWFConnection_Material.Where(w => w.MaterialWFACClassMethodID == this.CurrentProcessWorkflow.MaterialWFACClassMethodID && w.ACClassWFID == relationWf.ACClassWFID).Any();
             }
@@ -1098,7 +1124,7 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("Materials", "en{'Remove WF connection'}de{'Entferne Verbindung zu Steuerschritten'}", (short)MISort.Delete, false)]
         public void RemoveMaterialConnection()
         {
-            if (!this.IsEnabledRemoveMaterialConnection()) 
+            if (!this.IsEnabledRemoveMaterialConnection())
                 return;
             // Möchten Sie nur die Beziehung zum dem aktuell angezeigten Steuerschritt löschen? (Sonst werden alle Beziehungen zu dem ausgewählten Zwischenprodukt gelöscht)
             var result = Messages.YesNoCancel(this, "Question50029", Global.MsgResult.Yes, false);
@@ -1106,8 +1132,8 @@ namespace gip.bso.masterdata
                 return;
 
 
-            if (result == Global.MsgResult.Yes 
-                && this.ProcessWorkflowPresenter != null 
+            if (result == Global.MsgResult.Yes
+                && this.ProcessWorkflowPresenter != null
                 && this.ProcessWorkflowPresenter.SelectedWFNode != null
                 && this.ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null)
             {
@@ -1130,11 +1156,11 @@ namespace gip.bso.masterdata
 
         public bool IsEnabledRemoveMaterialConnection()
         {
-            return this.SelectedMaterial != null 
-                && this.CurrentProcessWorkflow != null 
+            return this.SelectedMaterial != null
+                && this.CurrentProcessWorkflow != null
                 && this.SelectedMaterial.MaterialWFConnection_Material.Where(m => m.MaterialWFACClassMethodID == this.CurrentProcessWorkflow.MaterialWFACClassMethodID).Any();
         }
-        
+
 
         #endregion
 
@@ -1289,19 +1315,19 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case"Search":
+                case "Search":
                     Search();
                     return true;
-                case"Save":
+                case "Save":
                     Save();
                     return true;
-                case"Load":
+                case "Load":
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"UndoSave":
+                case "UndoSave":
                     UndoSave();
                     return true;
-                case"New":
+                case "New":
                     New();
                     return true;
                 case "IsEnabledNew":
@@ -1310,78 +1336,281 @@ namespace gip.bso.masterdata
                 case "Delete":
                     Delete();
                     return true;
-                case"IsEnabledSave":
+                case "IsEnabledSave":
                     result = IsEnabledSave();
                     return true;
                 case "IsEnabledUndoSave":
                     result = IsEnabledUndoSave();
                     return true;
-                case"IsEnabledDelete":
+                case "IsEnabledDelete":
                     result = IsEnabledDelete();
                     return true;
-                case"SetSelectedMaterial":
+                case "SetSelectedMaterial":
                     SetSelectedMaterial((Material)acParameter[0], acParameter.Count() == 2 ? (Boolean)acParameter[1] : false);
                     return true;
-                case"AddMaterialDlg":
+                case "AddMaterialDlg":
                     AddMaterialDlg();
                     return true;
-                case"AddMaterialDlgCancel":
+                case "AddMaterialDlgCancel":
                     AddMaterialDlgCancel();
                     return true;
-                case"AddMaterialOK":
+                case "AddMaterialOK":
                     AddMaterialOK();
                     return true;
-                case"IsEnabledAddMaterialDlg":
+                case "IsEnabledAddMaterialDlg":
                     result = IsEnabledAddMaterialDlg();
                     return true;
-                case"IsEnabledAddMaterialOK":
+                case "IsEnabledAddMaterialOK":
                     result = IsEnabledAddMaterialOK();
                     return true;
-                case"NewMaterialWFRelation":
+                case "NewMaterialWFRelation":
                     NewMaterialWFRelation();
                     return true;
-                case"DeleteMaterialWFRelation":
+                case "DeleteMaterialWFRelation":
                     DeleteMaterialWFRelation();
                     return true;
-                case"IsEnabledNewMaterialWFRelation":
+                case "IsEnabledNewMaterialWFRelation":
                     result = IsEnabledNewMaterialWFRelation();
                     return true;
-                case"IsEnabledDeleteMaterialWFRelation":
+                case "IsEnabledDeleteMaterialWFRelation":
                     result = IsEnabledDeleteMaterialWFRelation();
                     return true;
-                case"AddProcessWorkflow":
+                case "AddProcessWorkflow":
                     AddProcessWorkflow();
                     return true;
-                case"IsEnabledAddProcessWorkflow":
+                case "IsEnabledAddProcessWorkflow":
                     result = IsEnabledAddProcessWorkflow();
                     return true;
-                case"RemoveProcessWorkflow":
+                case "RemoveProcessWorkflow":
                     RemoveProcessWorkflow();
                     return true;
-                case"IsEnabledRemoveProcessWorkflow":
+                case "IsEnabledRemoveProcessWorkflow":
                     result = IsEnabledRemoveProcessWorkflow();
                     return true;
-                case"NewProcessWorkflowOk":
+                case "NewProcessWorkflowOk":
                     NewProcessWorkflowOk();
                     return true;
-                case"IsEnabledNewProcessWorkflowOk":
+                case "IsEnabledNewProcessWorkflowOk":
                     result = IsEnabledNewProcessWorkflowOk();
                     return true;
-                case"NewProcessWorkflowCancel":
+                case "NewProcessWorkflowCancel":
                     NewProcessWorkflowCancel();
                     return true;
-                case"IsEnabledACActionToTarget":
+                case "IsEnabledACActionToTarget":
                     result = IsEnabledACActionToTarget((IACInteractiveObject)acParameter[0], (ACActionArgs)acParameter[1]);
                     return true;
-                case"RemoveMaterialConnection":
+                case "RemoveMaterialConnection":
                     RemoveMaterialConnection();
                     return true;
-                case"IsEnabledRemoveMaterialConnection":
+                case "IsEnabledRemoveMaterialConnection":
                     result = IsEnabledRemoveMaterialConnection();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
+
+        #endregion
+
+        #region Clone
+
+        #region Clone MaterialWF
+
+
+
+        #endregion
+
+        #region Clone WF Relations
+
+        // SourceProcWF
+        // MaterialWFACClassMethod
+
+        #region SourceProcWF
+
+        private MaterialWFACClassMethod _SelectedSourceProcWF;
+        /// <summary>
+        /// Selected property for MaterialWFACClassMethod
+        /// </summary>
+        /// <value>The selected SourceProcWF</value>
+        [ACPropertySelected(9999, "SourceProcWF", "en{'TODO: SourceProcWF'}de{'TODO: SourceProcWF'}")]
+        public MaterialWFACClassMethod SelectedSourceProcWF
+        {
+            get
+            {
+                return _SelectedSourceProcWF;
+            }
+            set
+            {
+                if (_SelectedSourceProcWF != value)
+                {
+                    _SelectedSourceProcWF = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// List property for MaterialWFACClassMethod
+        /// </summary>
+        /// <value>The SourceProcWF list</value>
+        [ACPropertyList(9999, "SourceProcWF")]
+        public IEnumerable<MaterialWFACClassMethod> SourceProcWFList
+        {
+            get
+            {
+                return CurrentMaterialWF?.MaterialWFACClassMethod_MaterialWF;
+            }
+        }
+
+
+        #endregion
+
+        #region TargetProcWF
+
+        private MaterialWFACClassMethod _SelectedTargetProcWF;
+        /// <summary>
+        /// Selected property for MaterialWFACClassMethod
+        /// </summary>
+        /// <value>The selected SourceProcWF</value>
+        [ACPropertySelected(9999, "TargetProcWF", "en{'TODO: SourceProcWF'}de{'TODO: SourceProcWF'}")]
+        public MaterialWFACClassMethod SelectedTargetProcWF
+        {
+            get
+            {
+                return _SelectedTargetProcWF;
+            }
+            set
+            {
+                if (_SelectedTargetProcWF != value)
+                {
+                    _SelectedTargetProcWF = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// List property for MaterialWFACClassMethod
+        /// </summary>
+        /// <value>The SourceProcWF list</value>
+        [ACPropertyList(9999, "TargetProcWF")]
+        public IEnumerable<MaterialWFACClassMethod> TargetProcWFList
+        {
+            get
+            {
+                return CurrentMaterialWF?.MaterialWFACClassMethod_MaterialWF;
+            }
+        }
+
+
+        #endregion
+
+        #region CompareConnections
+
+        private ApplyMatConnectionToOtherWF _SelectedApplyToOtherWF;
+        /// <summary>
+        /// Selected property for CompareConnections
+        /// </summary>
+        /// <value>The selected CompareConnections</value>
+        [ACPropertySelected(9999, "ApplyToOtherWF", "en{'TODO: CompareConnections'}de{'TODO: CompareConnections'}")]
+        public ApplyMatConnectionToOtherWF SelectedApplyToOtherWF
+        {
+            get
+            {
+                return _SelectedApplyToOtherWF;
+            }
+            set
+            {
+                if (_SelectedApplyToOtherWF != value)
+                {
+                    _SelectedApplyToOtherWF = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private List<ApplyMatConnectionToOtherWF> _ApplyToOtherWFList;
+        /// <summary>
+        /// List property for CompareConnections
+        /// </summary>
+        /// <value>The CompareConnections list</value>
+        [ACPropertyList(9999, "ApplyToOtherWF")]
+        public List<ApplyMatConnectionToOtherWF> ApplyToOtherWFList
+        {
+            get
+            {
+                return _ApplyToOtherWFList;
+            }
+        }
+
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Source Property: GetConnectionCloneSuggestion
+        /// </summary>
+        [ACMethodInfo("GetApplyToOtherWFList", "en{'Get connections'}de{'Get connections'}", 999)]
+        public void GetApplyToOtherWFList()
+        {
+            if (!IsEnabledGetApplyToOtherWFList())
+                return;
+            _ApplyToOtherWFList = PartslistManager.GetMaterialWFConnections(CurrentMaterialWF, SelectedSourceProcWF.ACClassMethodID, SelectedTargetProcWF.ACClassMethodID);
+            OnPropertyChanged(nameof(ApplyToOtherWFList));
+        }
+
+        public bool IsEnabledGetApplyToOtherWFList()
+        {
+            return
+                SelectedSourceProcWF != null
+                && SelectedTargetProcWF != null
+                && SelectedSourceProcWF.ACClassMethodID != SelectedTargetProcWF.ACClassMethodID;
+        }
+
+        /// <summary>
+        /// Source Property: GetConnectionCloneSuggestion
+        /// </summary>
+        [ACMethodInfo("ApplyConnectionCloneSuggestion", "en{'Apply to target'}de{'Apply to target'}", 999)]
+        public void ApplyToOtherWF()
+        {
+            if (!IsEnabledApplyToOtherWF())
+                return;
+            PartslistManager.ApplyMaterialWFConnections(DatabaseApp, CurrentMaterialWF, _ApplyToOtherWFList, SelectedTargetProcWF.ACClassMethodID);
+            _ApplyToOtherWFList = null;
+            OnPropertyChanged(nameof(ApplyToOtherWFList));
+        }
+
+        public bool IsEnabledApplyToOtherWF()
+        {
+            return
+                _ApplyToOtherWFList != null
+                && _ApplyToOtherWFList.Any();
+        }
+
+
+        /// <summary>
+        /// Source Property: MethodName
+        /// </summary>
+        [ACMethodInfo("ShowApplyToOtherWFDlg", "en{'Copy mat.conn'}de{'Copy mat.conn'}", 999)]
+        public void ShowApplyToOtherWFDlg()
+        {
+            if (!IsEnabledShowApplyToOtherWFDlg())
+                return;
+            ShowDialog(this, "ApplyToOtherWFDlg");
+        }
+
+        public bool IsEnabledShowApplyToOtherWFDlg()
+        {
+            return CurrentMaterialWF != null;
+        }
+
+
+        #endregion
+
+
+        #endregion
 
         #endregion
 

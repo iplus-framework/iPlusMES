@@ -760,7 +760,7 @@ namespace gip.mes.facility
             if (!isChangedPartslist)
             {
                 IEnumerable<ObjectStateEntry> deletedItems = partslist.GetObjectContext().ObjectStateManager.GetObjectStateEntries(EntityState.Deleted);
-                if(deletedItems.Any())
+                if (deletedItems.Any())
                 {
                     IEnumerable<ObjectStateEntry> deletedPositions = deletedItems.Where(c => c.EntityKey.EntitySetName == nameof(PartslistPos));
                     foreach (ObjectStateEntry deletedPos in deletedPositions)
@@ -903,6 +903,79 @@ namespace gip.mes.facility
             }
 
             return msg;
+        }
+        #endregion
+
+        #region Clone WF Relations
+
+        public void GetMaterialWFConnections(List<ApplyMatConnectionToOtherWF> connections, gip.mes.datamodel.MaterialWFACClassMethod mwfMethod, gip.mes.datamodel.ACClassMethod method, string preACUrl = "")
+        {
+            foreach (datamodel.ACClassWF wf in method.ACClassWF_ACClassMethod.Where(c=>c.RefPAACClassID != null))
+            {
+                GetMaterialWFConnections(connections, mwfMethod, wf, preACUrl);
+            }
+        }
+
+        public void GetMaterialWFConnections(List<ApplyMatConnectionToOtherWF> connections, gip.mes.datamodel.MaterialWFACClassMethod mwfMethod, gip.mes.datamodel.ACClassWF wf, string preACUrl = "")
+        {
+            ApplyMatConnectionToOtherWF item = new ApplyMatConnectionToOtherWF();
+            item.WF = wf;
+            gip.core.datamodel.ACClassWF iWf = wf.FromIPlusContext<gip.core.datamodel.ACClassWF>();
+            item.ACUrl = preACUrl + "\\" + iWf.ConfigACUrl;
+            item.WFConnection = mwfMethod.MaterialWFConnection_MaterialWFACClassMethod.Where(c => c.ACClassWFID == wf.ACClassWFID).ToList();
+            item.MaterialWFACClassMethod = mwfMethod;
+            if (wf.RefPAACClassMethod != null)
+            {
+                GetMaterialWFConnections(connections, mwfMethod, wf.RefPAACClassMethod, preACUrl + "\\" + iWf.ConfigACUrl);
+            }
+
+            connections.Add(item);
+            foreach (datamodel.ACClassWF childWf in wf.ACClassWF_ParentACClassWF.Where(c => c.RefPAACClassID != null))
+            {
+                GetMaterialWFConnections(connections, mwfMethod, childWf, preACUrl);
+            }
+        }
+
+        public List<ApplyMatConnectionToOtherWF> GetMaterialWFConnections(MaterialWF materialWF, Guid aCClassMethodID, Guid? targetACClassMethodID)
+        {
+            List<ApplyMatConnectionToOtherWF> connections = new List<ApplyMatConnectionToOtherWF>();
+            MaterialWFACClassMethod wfMth = materialWF.MaterialWFACClassMethod_MaterialWF.FirstOrDefault(c => c.ACClassMethodID == aCClassMethodID);
+            GetMaterialWFConnections(connections, wfMth, wfMth.ACClassMethod, "");
+            connections = connections.Where(c => c.WFConnection.Any()).ToList();
+            return connections;
+        }
+
+
+        public void ApplyMaterialWFConnections(DatabaseApp databaseApp, MaterialWF materialWF, List<ApplyMatConnectionToOtherWF> connections, Guid targetACClassMethodID)
+        {
+            List<ApplyMatConnectionToOtherWF> targetConnections = new List<ApplyMatConnectionToOtherWF>();
+            MaterialWFACClassMethod targetMethod = materialWF.MaterialWFACClassMethod_MaterialWF.FirstOrDefault(c => c.ACClassMethodID == targetACClassMethodID);
+            GetMaterialWFConnections(targetConnections, targetMethod, targetMethod.ACClassMethod, "");
+
+            foreach (ApplyMatConnectionToOtherWF sourceConnection in connections)
+            {
+                ApplyMatConnectionToOtherWF targetConnection = targetConnections.Where(c => c.ACUrl == sourceConnection.ACUrl && c.WF.RefPAACClassID == sourceConnection.WF.RefPAACClassID).FirstOrDefault();
+                if (targetConnection != null)
+                {
+                    foreach (MaterialWFConnection mwf in sourceConnection.WFConnection)
+                    {
+                        MaterialWFConnection targetMwf = targetConnection.WFConnection.Where(c => c.MaterialID == mwf.MaterialID).FirstOrDefault();
+                        if (targetMwf == null)
+                        {
+                            targetMwf = MaterialWFConnection.NewACObject(databaseApp, targetConnection.MaterialWFACClassMethod);
+                            targetMwf.ACClassWF = targetConnection.WF;
+                            targetMwf.Material = mwf.Material;
+                            targetConnection.MaterialWFACClassMethod.MaterialWFConnection_MaterialWFACClassMethod.Add(targetMwf);
+                            targetConnection.WFConnection.Add(targetMwf);
+                        }
+                    }
+                }
+                else
+                {
+                    var sasa = "";
+                }
+            }
+
         }
         #endregion
     }
