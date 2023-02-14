@@ -1,10 +1,11 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace gip.mes.datamodel
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'ApplyMatConnectionToOtherWF'}de{'ApplyMatConnectionToOtherWF'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]
     public class ApplyMatConnectionToOtherWF
@@ -30,8 +31,9 @@ namespace gip.mes.datamodel
                     materialNo = string.Join(",", WFConnection.Select(c => c.Material.MaterialNo).Distinct());
 
                 }
-                catch (Exception ec)
-                { }
+                catch (Exception)
+                { 
+                }
                 return materialNo;
             }
         }

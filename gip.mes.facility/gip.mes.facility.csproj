@@ -97,6 +97,7 @@
     <Compile Include="Manager\TandTv3Manager.cs" />
     <Compile Include="Manager\TrackingAndTracingBackwardCommand.cs" />
     <Compile Include="Manager\TrackingAndTracingForwardCommand.cs" />
+    <Compile Include="Model\ApplyMatConnectionToOtherWF.cs" />
     <Compile Include="Model\BackwardPoint\BackwardPointDeliveryNote.cs" />
     <Compile Include="Model\BackwardPoint\BackwardPointDeliveryNotePos.cs" />
     <Compile Include="Model\BackwardPoint\BackwardPointFacilityBooking.cs" />

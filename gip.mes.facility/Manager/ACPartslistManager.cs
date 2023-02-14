@@ -970,10 +970,6 @@ namespace gip.mes.facility
                         }
                     }
                 }
-                else
-                {
-                    var sasa = "";
-                }
             }
 
         }
