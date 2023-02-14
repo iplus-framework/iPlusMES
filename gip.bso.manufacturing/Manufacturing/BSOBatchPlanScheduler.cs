@@ -4699,16 +4699,20 @@ namespace gip.bso.manufacturing
                         schedulingGroups,
                         prodOrderPartslist);
             else
+            {
+                MDSchedulingGroup selectedMDSchedulingGroup = DatabaseApp.MDSchedulingGroup.Where(c => c.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID).FirstOrDefault();
                 DefaultWizardSchedulerPartslist =
-                    new WizardSchedulerPartslist(
-                        DatabaseApp,
-                        ProdOrderManager,
-                        LocalBSOBatchPlan.VarioConfigManager,
-                        partslist,
-                        targetQuantity,
-                        1,
-                        schedulingGroups,
-                        SelectedScheduleForPWNode?.MDSchedulingGroup);
+                                    new WizardSchedulerPartslist(
+                                        DatabaseApp,
+                                        ProdOrderManager,
+                                        LocalBSOBatchPlan.VarioConfigManager,
+                                        partslist,
+                                        targetQuantity,
+                                        1,
+                                        schedulingGroups,
+                                        selectedMDSchedulingGroup);
+            }
+
             AllWizardSchedulerPartslistList.Clear();
             AddWizardSchedulerPartslistList(DefaultWizardSchedulerPartslist);
             SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
