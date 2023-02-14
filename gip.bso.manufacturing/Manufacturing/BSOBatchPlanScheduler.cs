@@ -3688,7 +3688,7 @@ namespace gip.bso.manufacturing
                             DoSetBatchStateCancelled(true, selectedBatches, ref groupsForRefresh);
                             DoRefreshLinesAfterBatchDelete(groupsForRefresh);
                         }
-                        else if (answer == Global.MsgResult.Cancel)
+                        else if (answer == Global.MsgResult.No)
                         {
                             // Wizard delete batch plans for current ProdOrder
                             if (SelectedProdOrderBatchPlan != null)

@@ -61,6 +61,10 @@ namespace gip.mes.facility
             {
                 SelectedMDSchedulingGroup = SortSchedulingGroup(firstGroupInList, selectedSchedulingGroup);
             }
+            else
+            {
+                SelectedMDSchedulingGroup = firstGroupInList;
+            }
         }
 
         private MDSchedulingGroup SortSchedulingGroup(MDSchedulingGroup first, MDSchedulingGroup second)
@@ -68,7 +72,7 @@ namespace gip.mes.facility
             MDSchedulingGroup selectedGroup = null;
             int firstOrder = 0;
             int secondOrder = 0;
-            
+
             IEnumerable<Tuple<int, Guid>> items =
                 Partslist
                 .PartslistConfig_Partslist
