@@ -152,7 +152,7 @@ namespace gip.bso.masterdata
             set
             {
                 _TempReportData = value;
-                OnPropertyChanged("TempReportData");
+                OnPropertyChanged();
             }
         }
 
@@ -179,9 +179,9 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
-            if (!PreExecute("Save")) return;
+            if (!PreExecute()) return;
             OnSave();
-            PostExecute("Save");
+            PostExecute();
         }
 
         /// <summary>
@@ -190,13 +190,13 @@ namespace gip.bso.masterdata
         [ACMethodCommand("Partslist", "en{'Undo'}de{'Rückgängig'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
         public void UndoSave()
         {
-            if (!PreExecute("UndoSave")) return;
+            if (!PreExecute()) return;
             OnUndoSave();
 
             ClearChangeTracking();
 
             Search(SelectedPartslist);
-            PostExecute("UndoSave");
+            PostExecute();
             this.VisitedMethods = null;
         }
 
@@ -290,14 +290,14 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("Partslist", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
-            if (!PreExecute("New")) return;
+            if (!PreExecute()) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Partslist), Partslist.NoColumnName, Partslist.FormatNewNo, this);
             Partslist partsList = Partslist.NewACObject(DatabaseApp, null, secondaryKey);
             DatabaseApp.Partslist.AddObject(partsList);
             CurrentPartslist = partsList;
             AccessPrimary.NavList.Add(CurrentPartslist);
-            OnPropertyChanged("PartslistList");
-            PostExecute("New");
+            OnPropertyChanged(nameof(PartslistList));
+            PostExecute();
         }
 
         /// <summary>
@@ -306,15 +306,15 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("Partslist", "en{'New BOM version'}de{'Neue Rezeptversion'}", (short)MISort.New, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void NewVersion()
         {
-            if (!PreExecute("NewVersion")) return;
+            if (!PreExecute()) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Partslist), Partslist.NoColumnName, Partslist.FormatNewNo, this);
             Partslist partslistNewVersion = Partslist.NewACObject(DatabaseApp, null, secondaryKey);
             partslistNewVersion = Partslist.PartsListNewVersionGet(DatabaseApp, SelectedPartslist, partslistNewVersion);
             AccessPrimary.NavList.Add(partslistNewVersion);
             Load(true);
             CurrentPartslist = partslistNewVersion;
-            OnPropertyChanged("PartslistList");
-            PostExecute("NewVersion");
+            OnPropertyChanged(nameof(PartslistList));
+            PostExecute();
         }
 
 
@@ -325,7 +325,7 @@ namespace gip.bso.masterdata
         [ACMethodInteraction(Partslist.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
-            if (!PreExecute("Delete"))
+            if (!PreExecute())
                 return;
             if (!IsEnabledDelete())
                 return;
@@ -333,7 +333,7 @@ namespace gip.bso.masterdata
                 ShowDialog(this, ACBSONav.CDialogSoftDelete);
             else
                 OnDelete(true);
-            PostExecute("Delete");
+            PostExecute();
         }
 
         public override void OnDelete(bool softDelete)
@@ -363,13 +363,14 @@ namespace gip.bso.masterdata
             if (msg == null)
             {
                 IsLoadDisabled = true;
-                if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentPartslist);
+                if (AccessPrimary == null) 
+                    return; 
+                AccessPrimary.NavList.Remove(CurrentPartslist);
                 SelectedPartslist = AccessPrimary.NavList.FirstOrDefault();
                 CurrentPartslist = SelectedPartslist;
-                PostExecute("Delete");
                 IsLoadDisabled = false;
                 Load();
-                OnPropertyChanged("PartslistList");
+                OnPropertyChanged(nameof(PartslistList));
             }
         }
 
@@ -398,7 +399,7 @@ namespace gip.bso.masterdata
             base.OnRestore();
             DatabaseApp.ACSaveChanges();
             Search();
-            OnPropertyChanged("PartslistList");
+            OnPropertyChanged(nameof(PartslistList));
         }
 
         #endregion
@@ -411,11 +412,6 @@ namespace gip.bso.masterdata
         {
             if (name == nameof(CurrentPartslist) && prevPartslist != partsList)
             {
-                //if (CurrentPartslist != partsList)
-                //    CurrentPartslist = partsList;
-                //if (SelectedPartslist != partsList)
-                //    SelectedPartslist = partsList;
-
                 SearchPos();
                 SearchIntermediate();
                 LoadProcessWorkflows();
@@ -547,8 +543,10 @@ namespace gip.bso.masterdata
         [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
-            if (!PreExecute("Load")) return;
-            if (IsLoadDisabled) return;
+            if (!PreExecute()) 
+                return;
+            if (IsLoadDisabled) 
+                return;
             IsLoadDisabled = true;
 
             LoadEntity<Partslist>(requery, () => SelectedPartslist, () => CurrentPartslist, c => CurrentPartslist = c,
@@ -570,9 +568,9 @@ namespace gip.bso.masterdata
                     item.PartslistPosRelation_TargetPartslistPos.AutoLoad(this.DatabaseApp);
             }
 
-            PostExecute("Load");
-            OnPropertyChanged("PartslistPosList");
-            OnPropertyChanged("MaterialWFList");
+            PostExecute();
+            OnPropertyChanged(nameof(PartslistPosList));
+            OnPropertyChanged(nameof(MaterialWFList));
             IsLoadDisabled = false;
         }
 
@@ -621,18 +619,18 @@ namespace gip.bso.masterdata
                         SelectedInputMaterial = value.Material;
                     else
                         SelectedInputMaterial = null;
-                    OnPropertyChanged("SelectedPartslistPos");
-                    OnPropertyChanged("SelectedPartslistQueryForPartslistpos");
-                    OnPropertyChanged("PartslistQueryForPartslistposList");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedPartslistQueryForPartslistpos));
+                    OnPropertyChanged(nameof(PartslistQueryForPartslistposList));
                 }
             }
         }
 
         public virtual void _SelectedPartslistPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "MaterialID")
+            if (e.PropertyName == nameof(PartslistPos.MaterialID))
             {
-                OnPropertyChanged("SelectedPartslistPos");
+                OnPropertyChanged(nameof(SelectedPartslistPos));
             }
         }
 
@@ -662,20 +660,20 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("PartslistPos", "en{'New Component'}de{'Neue Komponente'}", (short)MISort.New, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void NewPartslistPos()
         {
-            if (!PreExecute("NewPartslistPos")) return;
+            if (!PreExecute()) return;
             var partsListPos = PartslistPos.NewACObject(DatabaseApp, SelectedPartslist);
             partsListPos.Sequence = PartslistPosList.Count();
             CurrentPartslist.PartslistPos_Partslist.Add(partsListPos);
             SelectedPartslistPos = partsListPos;
             ACState = Const.SMNew;
-            OnPropertyChanged("PartslistPosList");
-            PostExecute("NewPartslistPos");
+            OnPropertyChanged(nameof(PartslistPosList));
+            PostExecute();
         }
 
         [ACMethodInteraction("PartslistPos", "en{'Delete Component'}de{'Komponente löschen'}", (short)MISort.Delete, true, "CurrentPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void DeletePartslistPos()
         {
-            if (!PreExecute("DeletePartslistPos")) return;
+            if (!PreExecute()) return;
             MsgWithDetails msg = new MsgWithDetails();
 
 
@@ -731,11 +729,11 @@ namespace gip.bso.masterdata
                     SelectedPartslist.PartslistPos_Partslist.Remove(SelectedPartslistPos);
                     SequenceManager<PartslistPos>.Order(PartslistPosList);
                     SelectedPartslistPos = PartslistPosList.FirstOrDefault();
-                    OnPropertyChanged("PartslistPosList");
-                    OnPropertyChanged("IntermediatePartsList");
+                    OnPropertyChanged(nameof(PartslistPosList));
+                    OnPropertyChanged(nameof(IntermediatePartsList));
                 }
             }
-            PostExecute("DeletePartslistPos");
+            PostExecute();
         }
 
         #region Partslistpos -> Methods -> IsEnabled
@@ -776,7 +774,7 @@ namespace gip.bso.masterdata
                     SelectedPartslistPos = PartslistPosList.FirstOrDefault();
                 }
             }
-            OnPropertyChanged("PartslistPosList");
+            OnPropertyChanged(nameof(PartslistPosList));
         }
 
         public void RefreshPos()
@@ -817,7 +815,7 @@ namespace gip.bso.masterdata
                     {
                         SelectedPartslistPos.ParentPartslist = null;
                     }
-                    OnPropertyChanged("SelectedPartslistQueryForPartslistpos");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -870,7 +868,7 @@ namespace gip.bso.masterdata
                 if (_AlternativeSelectedPartslistPos != value)
                 {
                     _AlternativeSelectedPartslistPos = value;
-                    OnPropertyChanged("AlternativeSelectedPartslistPos");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -880,7 +878,8 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (SelectedPartslist == null || SelectedPartslistPos == null) return null;
+                if (SelectedPartslist == null || SelectedPartslistPos == null) 
+                    return null;
                 return SelectedPartslist.PartslistPos_Partslist.Where(x => x.AlternativePartslistPosID == SelectedPartslistPos.PartslistPosID).OrderBy(x => x.Sequence);
             }
         }
@@ -892,21 +891,21 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("AlternativeNewPartlistPos", "en{'New alternative component'}de{'Neue Alternativkomponente'}", (short)MISort.New, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void AlternativeNewPartlistPos()
         {
-            if (!PreExecute("AlternativeNewPartlistPos")) return;
+            if (!PreExecute()) return;
             PartslistPos alternativePartslistpos = PartslistPos.NewAlternativePartslistPos(DatabaseApp, SelectedPartslist, SelectedPartslistPos);
             alternativePartslistpos.Sequence = AlternativePartslistPosList.Count();
             SelectedPartslist.PartslistPos_Partslist.Add(alternativePartslistpos);
             AlternativeSelectedPartslistPos = alternativePartslistpos;
-            OnPropertyChanged("AlternativePartslistPosList");
+            OnPropertyChanged(nameof(AlternativePartslistPosList));
             ACState = Const.SMNew;
-            PostExecute("AlternativeNewPartlistPos");
+            PostExecute();
         }
 
 
         [ACMethodInteraction("AlternativeDeletePartslistPos", "en{'Delete alternative component'}de{'Alternativkomponente löschen'}", (short)MISort.Delete, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void AlternativeDeletePartslistPos()
         {
-            if (!PreExecute("AlternativeDeletePartslistPos")) return;
+            if (!PreExecute()) return;
             Msg msg = AlternativeSelectedPartslistPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
@@ -925,9 +924,9 @@ namespace gip.bso.masterdata
                 SelectedPartslist.PartslistPos_Partslist.Remove(AlternativeSelectedPartslistPos);
                 SequenceManager<PartslistPos>.Order(AlternativePartslistPosList);
                 AlternativeSelectedPartslistPos = AlternativePartslistPosList.FirstOrDefault();
-                OnPropertyChanged("AlternativePartslistPosList");
+                OnPropertyChanged(nameof(AlternativePartslistPosList));
             }
-            PostExecute("AlternativeDeletePartslistPos");
+            PostExecute();
         }
 
 
@@ -965,7 +964,7 @@ namespace gip.bso.masterdata
                     AlternativeSelectedPartslistPos = AlternativePartslistPosList.FirstOrDefault();
                 }
             }
-            OnPropertyChanged("AlternativePartslistPosList");
+            OnPropertyChanged(nameof(AlternativePartslistPosList));
         }
 
         public void RefreshAlternative()
@@ -999,7 +998,7 @@ namespace gip.bso.masterdata
                     if (_SelectedIntermediate != null)
                         _SelectedIntermediate.PropertyChanged += _SelectedIntermediate_PropertyChanged;
                     SearchIntermediateParts();
-                    OnPropertyChanged("SelectedIntermediate");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1046,7 +1045,7 @@ namespace gip.bso.masterdata
                     SelectedIntermediate = IntermediateList.FirstOrDefault();
                 }
             }
-            OnPropertyChanged("IntermediateList");
+            OnPropertyChanged(nameof(IntermediateList));
         }
 
 
@@ -1055,7 +1054,7 @@ namespace gip.bso.masterdata
         {
             PartslistManager.RecalcIntermediateSum(CurrentPartslist);
             PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
-            OnPropertyChanged("IntermediateList");
+            OnPropertyChanged(nameof(IntermediateList));
         }
 
 
@@ -1088,14 +1087,14 @@ namespace gip.bso.masterdata
                     _SelectedIntermediateParts = value;
                     if (_SelectedIntermediateParts != null)
                         _SelectedIntermediateParts.PropertyChanged += _SelectedIntermediateParts_PropertyChanged;
-                    OnPropertyChanged("SelectedIntermediateParts");
+                    OnPropertyChanged();
                 }
             }
         }
 
         void _SelectedIntermediateParts_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "SourcePartslistPosID")
+            if (e.PropertyName == nameof(PartslistPosRelation.SourcePartslistPosID))
             {
                 //_SelectedIntermediateParts.TargetQuantity = 0;
                 if (_SelectedIntermediateParts != null)
@@ -1132,10 +1131,10 @@ namespace gip.bso.masterdata
                         _SelectedIntermediateParts.TargetQuantityUOM = _SelectedIntermediateParts.TargetQuantityUOM - usedQuantityUOM;
                     }
 
-                    _SelectedIntermediateParts.OnEntityPropertyChanged("TargetQuantity");
-                    _SelectedIntermediateParts.OnEntityPropertyChanged("TargetQuantityUOM");
-                    OnPropertyChanged("SelectedIntermediateParts");
-                    OnPropertyChanged("IntermediatePartsList");
+                    _SelectedIntermediateParts.OnEntityPropertyChanged(nameof(PartslistPosRelation.TargetQuantity));
+                    _SelectedIntermediateParts.OnEntityPropertyChanged(nameof(PartslistPosRelation.TargetQuantityUOM));
+                    OnPropertyChanged(nameof(SelectedIntermediateParts));
+                    OnPropertyChanged(nameof(IntermediatePartsList));
                 }
             }
         }
@@ -1157,22 +1156,22 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("IntermediateParts", "en{'New Input'}de{'Neuer Einsatz'}", (short)MISort.New, true, "SelectedIntermediateParts", Global.ACKinds.MSMethodPrePost)]
         public void NewIntermediateParts()
         {
-            if (!PreExecute("NewIntermediateParts")) return;
+            if (!PreExecute()) return;
             PartslistPosRelation partslistPosRelation = new PartslistPosRelation();
             partslistPosRelation.PartslistPosRelationID = Guid.NewGuid();
             partslistPosRelation.TargetPartslistPos = SelectedIntermediate;
             partslistPosRelation.Sequence = IntermediatePartsList.Count();
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
             SelectedIntermediateParts = partslistPosRelation;
-            OnPropertyChanged("IntermediatePartsList");
-            OnPropertyChanged("PartslistPosList");
-            PostExecute("NewIntermediateParts");
+            OnPropertyChanged(nameof(IntermediatePartsList));
+            OnPropertyChanged(nameof(PartslistPosList));
+            PostExecute();
         }
 
         [ACMethodInteraction("IntermediateParts", "en{'Delete Input'}de{'Lösche Einsatz'}", (short)MISort.New, true, "SelectedIntermediateParts", Global.ACKinds.MSMethodPrePost)]
         public void DeleteIntermediateParts()
         {
-            if (!PreExecute("DeleteIntermediateParts")) return;
+            if (!PreExecute()) return;
             Msg msg = SelectedIntermediateParts.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
@@ -1192,17 +1191,17 @@ namespace gip.bso.masterdata
                 SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Remove(SelectedIntermediateParts);
                 SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
-                OnPropertyChanged("IntermediatePartsList");
-                OnPropertyChanged("PartslistPosList");
+                OnPropertyChanged(nameof(IntermediatePartsList));
+                OnPropertyChanged(nameof(PartslistPosList));
             }
-            PostExecute("DeleteIntermediateParts");
+            PostExecute();
         }
 
         [ACMethodInteraction("IntermediateParts", "en{'Sum remaining quantitiy'}de{'Restmengen berechnen'}", (short)MISort.Modify, true, "SelectPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void RecalcRemainingQuantity()
         {
             PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
-            OnPropertyChanged("PartslistPosList");
+            OnPropertyChanged(nameof(PartslistPosList));
         }
 
         #region IntermedateParts -> Methods -> IsEnabled
@@ -1250,7 +1249,7 @@ namespace gip.bso.masterdata
                     SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
                 }
             }
-            OnPropertyChanged("IntermediatePartsList");
+            OnPropertyChanged(nameof(IntermediatePartsList));
         }
 
         #endregion
@@ -1274,7 +1273,7 @@ namespace gip.bso.masterdata
                 if (_selectedMaterialWF != value)
                 {
                     _selectedMaterialWF = value;
-                    OnPropertyChanged("SelectedMaterialWF");
+                    OnPropertyChanged();
                     LoadProcessWorkflows();
                 }
             }
@@ -1296,7 +1295,7 @@ namespace gip.bso.masterdata
         [ACMethodCommand(MaterialWF.ClassName, "en{'Assign Materialworkflow'}de{'Materialworkflow zuweisen'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void SetMaterialWF()
         {
-            if (!PreExecute("SetMaterialWF")) return;
+            if (!PreExecute()) return;
             if (CurrentPartslist != null && SelectedMaterialWF != null && CurrentPartslist.MaterialWFID != SelectedMaterialWF.MaterialWFID)
             {
                 Msg msg = PartslistManager.UnAssignMaterialWF(DatabaseApp, CurrentPartslist);
@@ -1315,7 +1314,7 @@ namespace gip.bso.masterdata
 
                 Save();
 
-                OnPropertyChanged("CurrentPartslist");
+                OnPropertyChanged(nameof(CurrentPartslist));
 
                 SearchIntermediate();
                 this.LoadProcessWorkflows();
@@ -1327,13 +1326,13 @@ namespace gip.bso.masterdata
 
                 SelectedMaterialWF = null;
             }
-            PostExecute("SetMaterialWF");
+            PostExecute();
         }
 
         [ACMethodCommand(MaterialWF.ClassName, "en{'Unassign Materialworkflow'}de{'Materialworkflow entfernen'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void UnSetMaterialWF()
         {
-            if (!PreExecute("UnSetMaterialWF")) return;
+            if (!PreExecute()) return;
 
             Msg msg = PartslistManager.UnAssignMaterialWF(DatabaseApp, CurrentPartslist);
             if (msg != null)
@@ -1344,10 +1343,10 @@ namespace gip.bso.masterdata
 
             Save();
 
-            OnPropertyChanged("CurrentPartslist");
+            OnPropertyChanged(nameof(CurrentPartslist));
             SearchIntermediate();
             LoadMaterialWorkflows();
-            PostExecute("UnSetMaterialWF");
+            PostExecute();
         }
 
         /// <summary>
@@ -1481,9 +1480,9 @@ namespace gip.bso.masterdata
                         this.ProcessWorkflowPresenter.Load(_ProcessWorkflow.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>());
                 }
 
-                OnPropertyChanged("CurrentProcessWorkflow");
+                OnPropertyChanged();
                 AccessConfigurationTransfer.NavSearch();
-                OnPropertyChanged("ConfigurationTransferList");
+                OnPropertyChanged(nameof(ConfigurationTransferList));
             }
         }
 
@@ -1567,7 +1566,7 @@ namespace gip.bso.masterdata
             set
             {
                 _VisitedMethods = value;
-                OnPropertyChanged("VisitedMethods");
+                OnPropertyChanged();
             }
         }
         public void AddVisitedMethods(core.datamodel.ACClassMethod acClassMethod)
@@ -1641,20 +1640,20 @@ namespace gip.bso.masterdata
 
 
         #region Config Transfer -> Soruce partslist
-        private Partslist _ConfigurationTransferSelectedSource;
+        private Partslist _SelectedConfigurationTransfer;
         [ACPropertySelected(9999, "ConfigurationTransfer", "en{'Copy WF-Parameter from:'}de{'Kopiere WF-Parameter von:'}")]
         public Partslist SelectedConfigurationTransfer
         {
             get
             {
-                return _ConfigurationTransferSelectedSource;
+                return _SelectedConfigurationTransfer;
             }
             set
             {
-                if (_ConfigurationTransferSelectedSource != value)
+                if (_SelectedConfigurationTransfer != value)
                 {
-                    _ConfigurationTransferSelectedSource = value;
-                    OnPropertyChanged("ConfigurationTransferSelectedSource");
+                    _SelectedConfigurationTransfer = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1667,14 +1666,6 @@ namespace gip.bso.masterdata
                 if (PartslistList == null || CurrentPartslist == null || CurrentPartslist.PartslistACClassMethod_Partslist == null)
                     return null;
                 return AccessConfigurationTransfer.NavList;
-                //List<Guid> includedMehtodIDs = CurrentPartslist.PartslistACClassMethod_Partslist.Select(x => x.MaterialWFACClassMethod.ACClassMethod.ACClassMethodID).ToList();
-                //return 
-                //    AccessConfigurationTransfer
-                //    .NavList
-                //    .Where(x => x.PartslistACClassMethod_Partslist.Select(a => a.MaterialWFACClassMethod.ACClassMethod.ACClassMethodID).Intersect(includedMehtodIDs).Any())
-                //    .OrderByDescending(x => x.PartslistNo)
-                //    .ThenBy(x => x.PartslistVersion)
-                //    .ToList();
             }
         }
 
@@ -1697,7 +1688,7 @@ namespace gip.bso.masterdata
                     {
                         foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
                         {
-                            if (filterItem.PropertyName == "IsEnabled")
+                            if (filterItem.PropertyName == nameof(Partslist.IsEnabled))
                             {
                                 if (!(!String.IsNullOrEmpty(filterItem.SearchWord) && filterItem.SearchWord.ToLower() == "true" && filterItem.LogicalOperator == Global.LogicalOperators.equal && filterItem.Operator == Global.Operators.and))
                                 {
@@ -1710,7 +1701,7 @@ namespace gip.bso.masterdata
                     if (rebuildACQueryDef)
                     {
                         navACQueryDefinition.ClearFilter(true);
-                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, "IsEnabled", Global.LogicalOperators.equal, Global.Operators.and, "True", true));
+                        navACQueryDefinition.ACFilterColumns.Add(new ACFilterItem(Global.FilterTypes.filter, nameof(Partslist.IsEnabled), Global.LogicalOperators.equal, Global.Operators.and, "True", true));
                         navACQueryDefinition.SaveConfig(true);
                     }
 
@@ -1807,7 +1798,7 @@ namespace gip.bso.masterdata
                 {
                     CurrentPartslist.MDUnit = value;
                     CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.Material.BaseMDUnit, CurrentPartslist.MDUnit);
-                    OnPropertyChanged("CurrentMDUnit");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1874,8 +1865,8 @@ namespace gip.bso.masterdata
             set
             {
                 _CurrentProdMDUnit = value;
-                OnPropertyChanged("CurrentProdMDUnit");
-                OnPropertyChanged("ProductionUnits");
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ProductionUnits));
             }
         }
 
@@ -1951,7 +1942,7 @@ namespace gip.bso.masterdata
             if (acAccess == _AccessInputMaterial)
             {
                 _AccessInputMaterial.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("InputMaterialsList");
+                OnPropertyChanged(nameof(InputMaterialList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -1984,7 +1975,7 @@ namespace gip.bso.masterdata
                 if (SelectedPartslistPos != null)
                 {
                     SelectedPartslistPos.Material = value;
-                    OnPropertyChanged("SelectedInputMaterial");
+                    OnPropertyChanged(nameof(SelectedInputMaterial));
                 }
             }
         }
@@ -2040,7 +2031,7 @@ namespace gip.bso.masterdata
             set
             {
                 _NewProcessWorkflow = value;
-                OnPropertyChanged("NewProcessWorkflow");
+                OnPropertyChanged();
             }
         }
 
@@ -2050,7 +2041,7 @@ namespace gip.bso.masterdata
 
         private void LoadProcessWorkflows()
         {
-            OnPropertyChanged("ProcessWorkflowList");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
             if (ProcessWorkflowList != null)
                 this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
             else
@@ -2061,7 +2052,7 @@ namespace gip.bso.masterdata
         {
             switch (e.PropertyName)
             {
-                case "MaterialID":
+                case nameof(Partslist.MaterialID):
                     {
                         OnPropertyChanged(nameof(MDUnitList));
                         OnPropertyChanged(nameof(MaterialUnitList));
@@ -2069,16 +2060,13 @@ namespace gip.bso.masterdata
                             CurrentMDUnit = CurrentPartslist.Material.BaseMDUnit;
                         else
                             CurrentMDUnit = null;
-                        OnPropertyChanged("CurrentPartslist");
+                        OnPropertyChanged(nameof(CurrentPartslist));
                     }
                     break;
-                //case "MDUnitID":
-                //    {
-                //        CurrentPartslist.TargetQuantity = CurrentPartslist.Material.ConvertToBaseQuantity(CurrentPartslist.TargetQuantityUOM, CurrentPartslist.MDUnit);
-                //    }
-                //    break;
-                case "ProductionUnits":
-                    OnPropertyChanged("ProductionUnits");
+                case nameof(Partslist.ProductionUnits):
+                    OnPropertyChanged(nameof(ProductionUnits));
+                    break;
+                default:
                     break;
             }
         }
@@ -2108,16 +2096,13 @@ namespace gip.bso.masterdata
                 this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
             }
 
-            OnPropertyChanged("ProcessWorkflowList");
-            OnPropertyChanged("IsEnabledAddProcessWorkflow");
-            OnPropertyChanged("IsEnabledRemoveProcessWorkflow");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
         }
 
         public bool IsEnabledRemoveProcessWorkflow()
         {
             return CurrentProcessWorkflow != null;
         }
-
 
 
         [ACMethodCommand("NewProcessWorkflow", "en{'OK'}de{'OK'}", (short)MISort.Okay)]
@@ -2130,7 +2115,7 @@ namespace gip.bso.masterdata
             item = PartslistACClassMethod.NewACObject(this.DatabaseApp, CurrentPartslist);
             item.MaterialWFACClassMethod = this.NewProcessWorkflow;
             CurrentPartslist.PartslistACClassMethod_Partslist.Add(item);
-            OnPropertyChanged("ProcessWorkflowList");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
             this.CurrentProcessWorkflow = this.NewProcessWorkflow;
 
             CloseTopDialog();
@@ -2341,7 +2326,7 @@ namespace gip.bso.masterdata
 
         private void OnVBDesignLoaded(string vbContent)
         {
-            if (vbContent == "SelectedRootWFNode"
+            if (vbContent == nameof(VBPresenter.SelectedRootWFNode)
                 && SelectedIntermediate != null
                 && MaterialWFPresenter != null)
             {
@@ -2358,169 +2343,169 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "NewVersion":
+                case nameof(NewVersion):
                     NewVersion();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "IsEnabledNewVersion":
+                case nameof(IsEnabledNewVersion):
                     result = IsEnabledNewVersion();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search(acParameter.Count() == 1 ? (Partslist)acParameter[0] : null);
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "NewPartslistPos":
+                case nameof(NewPartslistPos):
                     NewPartslistPos();
                     return true;
-                case "DeletePartslistPos":
+                case nameof(DeletePartslistPos):
                     DeletePartslistPos();
                     return true;
-                case "IsEnabledNewPartslistPos":
+                case nameof(IsEnabledNewPartslistPos):
                     result = IsEnabledNewPartslistPos();
                     return true;
-                case "IsEnabledDeletePartslistPos":
+                case nameof(IsEnabledDeletePartslistPos):
                     result = IsEnabledDeletePartslistPos();
                     return true;
-                case "AlternativeNewPartlistPos":
+                case nameof(AlternativeNewPartlistPos):
                     AlternativeNewPartlistPos();
                     return true;
-                case "AlternativeDeletePartslistPos":
+                case nameof(AlternativeDeletePartslistPos):
                     AlternativeDeletePartslistPos();
                     return true;
-                case "IsEnabledAlternativeNewPartlistPos":
+                case nameof(IsEnabledAlternativeNewPartlistPos):
                     result = IsEnabledAlternativeNewPartlistPos();
                     return true;
-                case "IsEnabledAlternativeDeletePartslistPos":
+                case nameof(IsEnabledAlternativeDeletePartslistPos):
                     result = IsEnabledAlternativeDeletePartslistPos();
                     return true;
-                case "SearchIntermediate":
+                case nameof(SearchIntermediate):
                     SearchIntermediate(acParameter.Count() == 1 ? (PartslistPos)acParameter[0] : null);
                     return true;
-                case "RecalcIntermediateSum":
+                case nameof(RecalcIntermediateSum):
                     RecalcIntermediateSum();
                     return true;
-                case "IsEnabledRecalcIntermediateSum":
+                case nameof(IsEnabledRecalcIntermediateSum):
                     result = IsEnabledRecalcIntermediateSum();
                     return true;
-                case "NewIntermediateParts":
+                case nameof(NewIntermediateParts):
                     NewIntermediateParts();
                     return true;
-                case "DeleteIntermediateParts":
+                case nameof(DeleteIntermediateParts):
                     DeleteIntermediateParts();
                     return true;
-                case "RecalculateRestQuantity":
+                case nameof(RecalcRemainingQuantity):
                     RecalcRemainingQuantity();
                     return true;
-                case "IsEnabledNewIntermediateParts":
+                case nameof(IsEnabledNewIntermediateParts):
                     result = IsEnabledNewIntermediateParts();
                     return true;
-                case "IsEnabledDeleteIntermediateParts":
+                case nameof(IsEnabledDeleteIntermediateParts):
                     result = IsEnabledDeleteIntermediateParts();
                     return true;
-                case "IsEnabledRecalculateRestQuantity":
+                case nameof(IsEnabledRecalculateRestQuantity):
                     result = IsEnabledRecalculateRestQuantity();
                     return true;
-                case "SetMaterialWF":
+                case nameof(SetMaterialWF):
                     SetMaterialWF();
                     return true;
-                case "UnSetMaterialWF":
+                case nameof(UnSetMaterialWF):
                     UnSetMaterialWF();
                     return true;
-                case "IsEnabledSetMaterialWF":
+                case nameof(IsEnabledSetMaterialWF):
                     result = IsEnabledSetMaterialWF();
                     return true;
-                case "IsEnabledUnSetMaterialWF":
+                case nameof(IsEnabledUnSetMaterialWF):
                     result = IsEnabledUnSetMaterialWF();
                     return true;
-                case "ConfigurationTransferSetSource":
+                case nameof(ConfigurationTransferSetSource):
                     ConfigurationTransferSetSource();
                     return true;
-                case "IsEnabledConfigurationTransferSetSource":
+                case nameof(IsEnabledConfigurationTransferSetSource):
                     result = IsEnabledConfigurationTransferSetSource();
                     return true;
-                case "AddProcessWorkflow":
+                case nameof(AddProcessWorkflow):
                     AddProcessWorkflow();
                     return true;
-                case "IsEnabledAddProcessWorkflow":
+                case nameof(IsEnabledAddProcessWorkflow):
                     result = IsEnabledAddProcessWorkflow();
                     return true;
-                case "RemoveProcessWorkflow":
+                case nameof(RemoveProcessWorkflow):
                     RemoveProcessWorkflow();
                     return true;
-                case "IsEnabledRemoveProcessWorkflow":
+                case nameof(IsEnabledRemoveProcessWorkflow):
                     result = IsEnabledRemoveProcessWorkflow();
                     return true;
-                case "NewProcessWorkflowOk":
+                case nameof(NewProcessWorkflowOk):
                     NewProcessWorkflowOk();
                     return true;
-                case "IsEnabledNewProcessWorkflowOk":
+                case nameof(IsEnabledNewProcessWorkflowOk):
                     result = IsEnabledNewProcessWorkflowOk();
                     return true;
-                case "NewProcessWorkflowCancel":
+                case nameof(NewProcessWorkflowCancel):
                     NewProcessWorkflowCancel();
                     return true;
-                case "ValidateRoutes":
+                case nameof(ValidateRoutes):
                     ValidateRoutes();
                     return true;
-                case "IsEnabledValidateRoutes":
+                case nameof(IsEnabledValidateRoutes):
                     result = IsEnabledValidateRoutes();
                     return true;
-                case "InitStandardPartslistConfigParams":
+                case nameof(InitStandardPartslistConfigParams):
                     InitStandardPartslistConfigParams();
                     return true;
-                case "IsEnabledInitStandardPartslistConfigParams":
+                case nameof(IsEnabledInitStandardPartslistConfigParams):
                     result = IsEnabledInitStandardPartslistConfigParams();
                     return true;
-                case "InitAllStandardPartslistConfigParams":
+                case nameof(InitAllStandardPartslistConfigParams):
                     InitAllStandardPartslistConfigParams();
                     return true;
-                case "InitAllStandardPartslistConfigParamsOK":
+                case nameof(InitAllStandardPartslistConfigParamsOK):
                     InitAllStandardPartslistConfigParamsOK();
                     return true;
-                case "InitAllStandardPartslistConfigParamsCancel":
+                case nameof(InitAllStandardPartslistConfigParamsCancel):
                     InitAllStandardPartslistConfigParamsCancel();
                     return true;
-                case "IsEnabledInitAllStandardPartslistConfigParams":
+                case nameof(IsEnabledInitAllStandardPartslistConfigParams):
                     result = IsEnabledInitAllStandardPartslistConfigParams();
                     return true;
-                case "Restore":
+                case nameof(Restore):
                     Restore();
                     return true;
-                case Const.IsEnabledPrefix + "Restore":
+                case nameof(IsEnabledRestore):
                     result = IsEnabledRestore();
                     return true;
-                case "UpdateFromMaterialWF":
+                case nameof(UpdateFromMaterialWF):
                     UpdateFromMaterialWF();
                     return true;
-                case "IsEnabledUpdateFromMaterialWF":
+                case nameof(IsEnabledUpdateFromMaterialWF):
                     result = IsEnabledUpdateFromMaterialWF();
                     return true;
-                case "UpdateAllFromMaterialWF":
+                case nameof(UpdateAllFromMaterialWF):
                     UpdateAllFromMaterialWF();
                     return true;
-                case "IsEnabledUpdateAllFromMaterialWF":
+                case nameof(IsEnabledUpdateAllFromMaterialWF):
                     result = IsEnabledUpdateAllFromMaterialWF();
                     return true;
             }

@@ -76,7 +76,7 @@ namespace gip.bso.masterdata
 
         private void BSOMaterialExplorer_Child_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "SelectedMaterial")
+            if (e.PropertyName == nameof(BSOMaterialExplorer.SelectedMaterial))
             {
                 SetMaterialIDFilter();
             }
@@ -111,15 +111,15 @@ namespace gip.bso.masterdata
         {
             get
             {
-                return AccessPrimary.NavACQueryDefinition.GetSearchValue<bool?>("IsEnabled");
+                return AccessPrimary.NavACQueryDefinition.GetSearchValue<bool?>(nameof(Partslist.IsEnabled));
             }
             set
             {
-                bool? tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<bool?>("IsEnabled");
+                bool? tmp = AccessPrimary.NavACQueryDefinition.GetSearchValue<bool?>(nameof(Partslist.IsEnabled));
                 if (tmp != value)
                 {
-                    AccessPrimary.NavACQueryDefinition.SetSearchValue<bool?>("IsEnabled", value);
-                    OnPropertyChanged("FilterIsEnabled");
+                    AccessPrimary.NavACQueryDefinition.SetSearchValue<bool?>(nameof(Partslist.IsEnabled), value);
+                    OnPropertyChanged();
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace gip.bso.masterdata
                 if (value != _FilterMDSchedulingGroup)
                 {
                     _FilterMDSchedulingGroup = value;
-                    OnPropertyChanged("FilterMDSchedulingGroup");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -148,7 +148,8 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (_AccessPrimary == null || _AccessPrimary.NavACQueryDefinition == null) return null;
+                if (_AccessPrimary == null || _AccessPrimary.NavACQueryDefinition == null) 
+                    return null;
                 return _AccessPrimary.NavACQueryDefinition.SearchWord;
             }
             set
@@ -158,7 +159,7 @@ namespace gip.bso.masterdata
                     if (_AccessPrimary.NavACQueryDefinition.SearchWord != value)
                     {
                         _AccessPrimary.NavACQueryDefinition.SearchWord = value;
-                        OnPropertyChanged("SearchWord");
+                        OnPropertyChanged();
                         if (string.IsNullOrEmpty(value))
                         {
                             ClearSearch();
@@ -222,7 +223,7 @@ namespace gip.bso.masterdata
             if (_AccessPrimary != null && _AccessPrimary.NavACQueryDefinition != null)
             {
                 _AccessPrimary.NavSearch();
-                OnPropertyChanged("PartslistList");
+                OnPropertyChanged(nameof(PartslistList));
             }
         }
 
@@ -235,7 +236,7 @@ namespace gip.bso.masterdata
                 if (items != null)
                 {
                     if (e.ListChangedType == ListChangedType.ItemAdded
-                            || (e.ListChangedType == ListChangedType.ItemChanged && e.PropertyDescriptor != null && e.PropertyDescriptor.Name == "SearchWord"))
+                            || (e.ListChangedType == ListChangedType.ItemChanged && e.PropertyDescriptor != null && e.PropertyDescriptor.Name == nameof(SearchWord)))
                     {
                         if (e.NewIndex >= 0 && items.Count() > e.NewIndex)
                         {
@@ -245,7 +246,7 @@ namespace gip.bso.masterdata
                     }
                     else if (e.ListChangedType == ListChangedType.ItemDeleted)
                     {
-                        string[] allPropertes = new string[] { "PartslistNo", "PartslistName", "IsEnabled" };
+                        string[] allPropertes = new string[] { nameof(Partslist.PartslistNo), nameof(Partslist.PartslistName), nameof(Partslist.IsEnabled) };
                         string[] missingProperties = allPropertes.Where(c => !items.Select(x => x.PropertyName).Contains(c)).ToArray();
                         foreach (var missingProperty in missingProperties)
                             OnPropertyChangedFromFilter(missingProperty);
@@ -260,10 +261,10 @@ namespace gip.bso.masterdata
             {
                 List<ACSortItem> acSortItems = new List<ACSortItem>();
 
-                ACSortItem partslistNo = new ACSortItem("PartslistNo", SortDirections.ascending, true);
+                ACSortItem partslistNo = new ACSortItem(nameof(Partslist.PartslistNo), SortDirections.ascending, true);
                 acSortItems.Add(partslistNo);
 
-                ACSortItem version = new ACSortItem("PartslistVersion", SortDirections.ascending, true);
+                ACSortItem version = new ACSortItem(nameof(Partslist.PartslistVersion), SortDirections.ascending, true);
                 acSortItems.Add(version);
 
                 return acSortItems;
@@ -274,8 +275,8 @@ namespace gip.bso.masterdata
         {
             switch (filterPropertyName)
             {
-                case "IsEnabled":
-                    OnPropertyChanged("FilterIsEnabled");
+                case nameof(Partslist.IsEnabled):
+                    OnPropertyChanged(nameof(FilterIsEnabled));
                     break;
             }
         }
@@ -286,25 +287,25 @@ namespace gip.bso.masterdata
             {
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
-                ACFilterItem isDeletedFilter = new ACFilterItem(Global.FilterTypes.filter, "DeleteDate", Global.LogicalOperators.isNull, Global.Operators.and, null, true);
+                ACFilterItem isDeletedFilter = new ACFilterItem(Global.FilterTypes.filter, nameof(Partslist.DeleteDate), Global.LogicalOperators.isNull, Global.Operators.and, null, true);
                 aCFilterItems.Add(isDeletedFilter);
 
                 ACFilterItem phOpen = new ACFilterItem(Global.FilterTypes.parenthesisOpen, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
                 aCFilterItems.Add(phOpen);
 
-                ACFilterItem partslistNoFilter = new ACFilterItem(FilterTypes.filter, "PartslistNo", LogicalOperators.contains, Operators.or, "", true, true);
+                ACFilterItem partslistNoFilter = new ACFilterItem(FilterTypes.filter, nameof(Partslist.PartslistNo), LogicalOperators.contains, Operators.or, "", true, true);
                 aCFilterItems.Add(partslistNoFilter);
 
-                ACFilterItem filterPartslistName = new ACFilterItem(FilterTypes.filter, "PartslistName", LogicalOperators.contains, Operators.or, "", true, true);
+                ACFilterItem filterPartslistName = new ACFilterItem(FilterTypes.filter, nameof(Partslist.PartslistName), LogicalOperators.contains, Operators.or, "", true, true);
                 aCFilterItems.Add(filterPartslistName);
 
                 ACFilterItem phClose = new ACFilterItem(Global.FilterTypes.parenthesisClose, null, Global.LogicalOperators.none, Global.Operators.and, null, true);
                 aCFilterItems.Add(phClose);
 
-                ACFilterItem filterIsEnabled = new ACFilterItem(FilterTypes.filter, "IsEnabled", LogicalOperators.contains, Operators.and, "", true);
+                ACFilterItem filterIsEnabled = new ACFilterItem(FilterTypes.filter, nameof(Partslist.IsEnabled), LogicalOperators.contains, Operators.and, "", true);
                 aCFilterItems.Add(filterIsEnabled);
 
-                ACFilterItem filterMaterial = new ACFilterItem(FilterTypes.filter, "Material\\MaterialNo", LogicalOperators.contains, Operators.and, "", true);
+                ACFilterItem filterMaterial = new ACFilterItem(FilterTypes.filter, nameof(Material) + ACUrlHelper.Delimiter_DirSeperator + nameof(Material.MaterialNo), LogicalOperators.contains, Operators.and, "", true);
                 aCFilterItems.Add(filterMaterial);
 
                 return aCFilterItems;
@@ -436,7 +437,7 @@ namespace gip.bso.masterdata
                         if (AccessPrimary.Selected != null)
                             AccessPrimary.Selected.PropertyChanged += SelectedPartslist_PropertyChanged;
                         OnPartslistSelectionChanged(value, prev);
-                        OnPropertyChanged("SelectedPartslist");
+                        OnPropertyChanged();
                     }
                 }
             }
@@ -540,7 +541,7 @@ namespace gip.bso.masterdata
                 if (_SelectedBOMComponent != value)
                 {
                     _SelectedBOMComponent = value;
-                    OnPropertyChanged(nameof(SelectedBOMComponent));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -577,7 +578,7 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Search material'}de{'Stückliste Suche'}", (short)MISort.Search)]
         public void Search(Partslist selectedPartslist = null)
         {
-            if (!PreExecute("Search")) 
+            if (!PreExecute()) 
                 return;
             if (AccessPrimary == null) 
                 return;
@@ -592,8 +593,8 @@ namespace gip.bso.masterdata
                 AccessPrimary.Selected.PropertyChanged -= SelectedPartslist_PropertyChanged;
                 AccessPrimary.Selected.PropertyChanged += SelectedPartslist_PropertyChanged;
             }
-            OnPropertyChanged("PartslistList");
-            PostExecute("Search");
+            OnPropertyChanged(nameof(PartslistList));
+            PostExecute();
         }
 
         /// <summary>
@@ -602,15 +603,15 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Remove'}de{'Entfernen'}", (short)MISort.Search)]
         public void ClearSearch()
         {
-            if (!PreExecute("ClearSearch")) 
+            if (!PreExecute()) 
                 return;
             if (AccessPrimary == null) 
                 return;
             AccessPrimary.NavList.Clear();
             SelectedPartslist = null;
             CurrentPartslist = null;
-            OnPropertyChanged("PartslistList");
-            PostExecute("ClearSearch");
+            OnPropertyChanged(nameof(PartslistList));
+            PostExecute();
         }
 
         public virtual void OnPartslistSelectionChanged(Partslist partsList, Partslist prevPartslist, [CallerMemberName] string name = "")
@@ -621,7 +622,7 @@ namespace gip.bso.masterdata
         public void OnKeyEvent(KeyEventArgs e)
         {
             IVBContent control = e.Source as IVBContent;
-            if (control != null && control.VBContent == "SearchWord")
+            if (control != null && control.VBContent == nameof(SearchWord))
             {
                 if (e.Key == Key.Enter)
                 {
