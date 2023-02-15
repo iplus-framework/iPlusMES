@@ -7,6 +7,7 @@ using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -131,7 +132,7 @@ namespace gip.bso.manufacturing
                 if (value != null)
                     ShowSelectFacilityLotInfo = false;
 
-                OnPropertyChanged("SelectedFacilityCharge");
+                OnPropertyChanged();
 
                 if (value != null && InformUserWithMsgNegQuantStock
                         && (_SelFacilityCharge == null
@@ -145,69 +146,53 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public override IEnumerable<FacilityChargeItem> FacilityChargeList
+        protected override ObservableCollection<FacilityChargeItem> FillFacilityChargeList()
         {
-            get
+            try
             {
-                try
+                IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+
+                if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
                 {
-                    IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+                    ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
+                                                                            SelectedWeighingMaterial.PickingPosition.PickingPosID) as ACValueList;
 
-                    if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
+                    var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
+                    if (facilityIDs == null)
+                        return null;
+
+                    using (DatabaseApp dbApp = new DatabaseApp())
                     {
-                        ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
-                                                                                SelectedWeighingMaterial.PickingPosition.PickingPosID) as ACValueList;
-
-                        var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
-                        if (facilityIDs == null)
-                            return null;
-
-                        using (DatabaseApp dbApp = new DatabaseApp())
+                        if (_ACFacilityManager == null)
                         {
-                            //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
-
+                            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
                             if (_ACFacilityManager == null)
                             {
-                                _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
-                                if (_ACFacilityManager == null)
-                                {
-                                    //Error50432: The facility manager is null.
-                                    Messages.Error(this, "Error50432");
-                                }
+                                //Error50432: The facility manager is null.
+                                Messages.Error(this, "Error50432");
                             }
-
-                            if (SelectedWeighingMaterial.PickingPosition != null)
-                                _FacilityChargeList = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PickingPosition.Material.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
-
-
-
-                            //ACValueList facilityCharges = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetAvailableFacilityCharges), 
-                            //                                                             SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
-                            //if (facilityCharges == null)
-                            //    return null;
-
-                            //    _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge
-                            //                                                                                    .Include(d => d.FacilityLot).Include(d => d.MDUnit).Include(d => d.Material).Include(d => d.Facility)
-                            //                                                                                     .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
-                            //                                         .ToArray();
-
-                            FacilityChargeListCount = _FacilityChargeList.Count();
                         }
-                    }
-                    return _FacilityChargeList;
-                }
-                catch (Exception e)
-                {
-                    string message = null;
-                    if (e.InnerException != null)
-                        message = string.Format("ManualWeighingModel(FacilityChargeList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
-                    else
-                        message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
-                    Messages.Error(this, message, true);
+                        if (SelectedWeighingMaterial.PickingPosition != null)
+                            _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PickingPosition.Material.MaterialID)
+                                                                                                                 .Select(s => new FacilityChargeItem(s, TargetWeight)));
+
+                        FacilityChargeListCount = _FacilityChargeList.Count();
+                    }
                 }
-                return null;
+                return _FacilityChargeList;
             }
+            catch (Exception e)
+            {
+                string message = null;
+                if (e.InnerException != null)
+                    message = string.Format("ManualWeighingModel(FacilityChargeList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
+                else
+                    message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
+
+                Messages.Error(this, message, true);
+            }
+            return null;
         }
 
         public override WeighingMaterial SelectedWeighingMaterial 
@@ -224,11 +209,11 @@ namespace gip.bso.manufacturing
                     }
 
                     _SelectedWeighingMaterial = value;
-                    _FacilityChargeList = null;
+                    FacilityChargeList = null;
                     FacilityChargeListCount = 0;
                     CurrentPicking = null;
                     OnPropertyChanged(nameof(SelectedWeighingMaterial));
-                    OnPropertyChanged(nameof(FacilityChargeList));
+                    FacilityChargeList = FillFacilityChargeList();
                     FacilityChargeNo = null;
                     ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
                     SelectedFacilityCharge = null;
@@ -307,7 +292,7 @@ namespace gip.bso.manufacturing
                 _ProcessModuleScales = scaleObjects.Select(c => new ACRef<IACComponent>(c, this)).ToArray();
                 ActivateScale(scaleObjects.FirstOrDefault());
 
-                var scaleObjectInfoList = new List<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
+                var scaleObjectInfoList = new ObservableCollection<ACValueItem>(_ProcessModuleScales.Select(c => new ACValueItem(c.ValueT.ACCaption, c.ACUrl, null)));
                 ScaleObjectsList = scaleObjectInfoList;
                 CurrentScaleObject = ScaleObjectsList.FirstOrDefault();
             }
@@ -341,7 +326,7 @@ namespace gip.bso.manufacturing
             PickingsList = null;
             SelectedWeighingMaterial = null;
             WeighingMaterialList = null;
-            _FacilityChargeList = null;
+            FacilityChargeList = null;
 
             if (ComponentPWNode != null)
             {
@@ -473,7 +458,7 @@ namespace gip.bso.manufacturing
                 PickingsList = null;
                 _PickingItems = null;
                 CurrentPicking = null;
-                _FacilityChargeList = null;
+                FacilityChargeList = null;
                 SelectedWeighingMaterial = null;
 
                 if (ComponentPWNode != null)
@@ -518,7 +503,7 @@ namespace gip.bso.manufacturing
                             var tempFC = tempFCList.FirstOrDefault(c => c.FacilityChargeID == facilityChargeID);
                             if (tempFC != null)
                             {
-                                DelegateToMainThread((object state) => SelectedFacilityCharge = tempFC);
+                               SelectedFacilityCharge = tempFC;
                             }
                         }
                     }

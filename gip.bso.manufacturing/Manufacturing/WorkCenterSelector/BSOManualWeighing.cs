@@ -14,6 +14,7 @@ using gip.core.processapplication;
 using System.Threading;
 using gip.mes.facility;
 using gip.core.layoutengine;
+using System.Collections.ObjectModel;
 
 namespace gip.bso.manufacturing
 {
@@ -47,7 +48,7 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
-        public const string ClassName = "BSOManualWeighing";
+        public const string ClassName = nameof(BSOManualWeighing);
 
         #endregion
 
@@ -75,7 +76,7 @@ namespace gip.bso.manufacturing
         }
         private ACComponent _CurrentProcessModule;
         [ACPropertyInfo(601)]
-        public override  ACComponent CurrentProcessModule
+        public override ACComponent CurrentProcessModule
         {
             get
             {
@@ -86,12 +87,12 @@ namespace gip.bso.manufacturing
             }
             protected set
             {
-                DeactivateManualWeighingModel();
+                ParentBSOWCS.ApplicationQueue.Add(() => DeactivateManualWeighingModel());
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     _CurrentProcessModule = value;
                 }
-                OnPropertyChanged("CurrentProcessModule");
+                OnPropertyChanged();
                 if (value != null)
                 {
                     IsCurrentProcessModuleNull = false;
@@ -165,6 +166,8 @@ namespace gip.bso.manufacturing
             set
             {
                 _CurrentScaleObject = value;
+                OnPropertyChanged();
+
                 if (value != null)
                 {
                     DeactivateScale();
@@ -185,14 +188,12 @@ namespace gip.bso.manufacturing
                 }
                 else
                     DeactivateScale();
-
-                OnPropertyChanged("CurrentScaleObject");
             }
         }
 
-        private List<ACValueItem> _ScaleObjectsList;
+        private ObservableCollection<ACValueItem> _ScaleObjectsList;
         [ACPropertyList(604, "ScaleObject")]
-        public List<ACValueItem> ScaleObjectsList
+        public ObservableCollection<ACValueItem> ScaleObjectsList
         {
             get
             {
@@ -201,7 +202,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScaleObjectsList = value;
-                OnPropertyChanged("ScaleObjectsList");
+                OnPropertyChanged();
             }
         }
 
@@ -225,8 +226,8 @@ namespace gip.bso.manufacturing
             {
                 _ScaleAddAcutalWeight = value;
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value + ScaleRealWeight);
-                OnPropertyChanged("ScaleActualWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                OnPropertyChanged(nameof(ScaleActualWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 
@@ -241,8 +242,8 @@ namespace gip.bso.manufacturing
             {
                 _ScaleRealWeight = value;
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, TargetWeight, value + ScaleAddAcutalWeight);
-                OnPropertyChanged("ScaleActualWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                OnPropertyChanged(nameof(ScaleActualWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
             }
         }
 
@@ -266,11 +267,10 @@ namespace gip.bso.manufacturing
             set
             {
                 _TargetWeight = value;
-                OnPropertyChanged("TargetWeight");
-                OnPropertyChanged("ScaleDifferenceWeight");
+                OnPropertyChanged(nameof(TargetWeight));
+                OnPropertyChanged(nameof(ScaleDifferenceWeight));
                 ScaleBckgrState = DetermineBackgroundState(_TolerancePlus, _ToleranceMinus, _TargetWeight, ScaleActualWeight);
-
-                DelegateToMainThread((object state) => OnTargetWeightChanged(value));
+                OnTargetWeightChanged(value);
             }
         }
 
@@ -308,7 +308,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScaleBckgrState = value;
-                OnPropertyChanged("ScaleBckgrState");
+                OnPropertyChanged();
             }
         }
 
@@ -332,7 +332,7 @@ namespace gip.bso.manufacturing
                 using (ACMonitor.Lock(_70500_ComponentPWNodeLock))
                 {
                     return ComponentPWNode?.ValueT;
-                }    
+                }
             }
         }
 
@@ -373,7 +373,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _EnterLotManually = value;
-                OnPropertyChanged("EnterLotManually");
+                OnPropertyChanged();
             }
         }
 
@@ -420,7 +420,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _EndBatchPos = value;
-                OnPropertyChanged("EndBatchPos");
+                OnPropertyChanged();
             }
         }
 
@@ -450,7 +450,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _IsBinChangeAvailable = value;
-                OnPropertyChanged("IsBinChangeAvailable");
+                OnPropertyChanged();
             }
         }
 
@@ -462,7 +462,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _BtnAckBlink = value;
-                OnPropertyChanged("BtnAckBlink");
+                OnPropertyChanged();
             }
         }
 
@@ -476,7 +476,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _NextTaskInfo = value;
-                OnPropertyChanged("NextTaskInfo");
+                OnPropertyChanged();
             }
         }
 
@@ -488,7 +488,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedLastUsedLot = value;
-                OnPropertyChanged("SelectedLastUsedLot");
+                OnPropertyChanged();
             }
         }
 
@@ -500,7 +500,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _LastUsedLotList = value;
-                OnPropertyChanged("LastUsedLotList");
+                OnPropertyChanged();
             }
         }
 
@@ -512,7 +512,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _InInterdischargingQ = value;
-                OnPropertyChanged("InInterdischargingQ");
+                OnPropertyChanged();
                 InterdischargingCompleteQ = _InInterdischargingQ.HasValue ? _InInterdischargingQ / 2 : _InInterdischargingQ;
             }
         }
@@ -568,17 +568,18 @@ namespace gip.bso.manufacturing
                         _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.ReadyToWeighing, DatabaseApp);
                     }
 
+                    SelectedFacilityCharge = null;
                     _SelectedWeighingMaterial = value;
-                    _FacilityChargeList = null;
+                    FacilityChargeList = null;
                     FacilityChargeListCount = 0;
-                    OnPropertyChanged(nameof(SelectedWeighingMaterial));
-                    OnPropertyChanged(nameof(FacilityChargeList));
+                    OnPropertyChanged();
+                    FacilityChargeList = FillFacilityChargeList();
                     FacilityChargeNo = null;
                     ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
-                    SelectedFacilityCharge = null;
+
                     if (_SelectedWeighingMaterial != null)
                         ShowSelectFacilityLotInfo = true;
-                    
+
                     if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing)
                     {
                         _StartWeighingFromF_FC = true;
@@ -606,7 +607,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _WeighingMaterialList = value;
-                OnPropertyChanged("WeighingMaterialList");
+                OnPropertyChanged();
             }
         }
 
@@ -620,10 +621,11 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedFacilityCharge = value;
+
+                OnPropertyChanged();
+
                 if (value != null)
                     ShowSelectFacilityLotInfo = false;
-
-                OnPropertyChanged("SelectedFacilityCharge");
 
                 if (value != null && InformUserWithMsgNegQuantStock
                         && (_SelFacilityCharge == null
@@ -694,71 +696,20 @@ namespace gip.bso.manufacturing
         }
 
         //TODO: take it in one query from db
-        protected FacilityChargeItem[] _FacilityChargeList;
+        protected ObservableCollection<FacilityChargeItem> _FacilityChargeList;
         [ACPropertyList(629, "FacilityCharge")]
-        public virtual IEnumerable<FacilityChargeItem> FacilityChargeList
+        public virtual ObservableCollection<FacilityChargeItem> FacilityChargeList
         {
             get
             {
-                try
-                {
-                    IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
-
-                    if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
-                    {
-                        ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
-                                                                                SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
-
-                        var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
-                        if (facilityIDs == null)
-                            return null;
-
-                        using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
-                        {
-                            //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
-
-                            if (_ACFacilityManager == null)
-                            {
-                                _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
-                                if (_ACFacilityManager == null)
-                                {
-                                    //Error50432: The facility manager is null.
-                                    Messages.Error(this, "Error50432");
-                                }
-                            }
-
-                            if (SelectedWeighingMaterial.PosRelation != null)
-                                _FacilityChargeList = ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)).ToArray();
-
-
-
-                        //ACValueList facilityCharges = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetAvailableFacilityCharges), 
-                        //                                                             SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
-                        //if (facilityCharges == null)
-                        //    return null;
-
-                        //    _FacilityChargeList = facilityCharges.Select(c => new FacilityChargeItem(dbApp.FacilityCharge
-                        //                                                                                    .Include(d => d.FacilityLot).Include(d => d.MDUnit).Include(d => d.Material).Include(d => d.Facility)
-                        //                                                                                     .FirstOrDefault(x => x.FacilityChargeID == c.ParamAsGuid), TargetWeight))
-                        //                                         .ToArray();
-
-                            FacilityChargeListCount = _FacilityChargeList.Count();
-                        }
-                    }
-                    return _FacilityChargeList;
-                }
-                catch (Exception e)
-                {
-                    string message = null;
-                    if (e.InnerException != null)
-                        message = string.Format("ManualWeighingModel(FacilityChargeList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
-                    else
-                        message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
-
-                    Messages.Error(this, message, true);
-                }
-                return null;
+                return _FacilityChargeList;
             }
+            set
+            {
+                _FacilityChargeList = value;
+                OnPropertyChanged();
+            }
+            
         }
 
         private string _FacilityChargeNo;
@@ -769,7 +720,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _FacilityChargeNo = value;
-                OnPropertyChanged("FacilityChargeNo");
+                OnPropertyChanged();
             }
         }
 
@@ -781,7 +732,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ShowSelectFacilityLotInfo = value;
-                OnPropertyChanged("ShowSelectFacilityLotInfo");
+                OnPropertyChanged();
             }
         }
 
@@ -793,7 +744,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _PAFCurrentMaterial = value;
-                OnPropertyChanged("PAFCurrentMaterial");
+                OnPropertyChanged();
                 ShowScaleGross = string.IsNullOrEmpty(_PAFCurrentMaterial) || DiffWeighing;
             }
         }
@@ -822,7 +773,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedSingleDosingItem = value;
-                OnPropertyChanged("SelectedSingleDosingItem");
+                OnPropertyChanged();
                 if (_SelectedSingleDosingItem != null)
                 {
                     BroadcastToVBControls(Const.CmdFocusAndSelectAll, nameof(SingleDosTargetQuantity), null);
@@ -845,12 +796,12 @@ namespace gip.bso.manufacturing
             set
             {
                 _SingleDosTargetQuantity = value;
-                OnPropertyChanged("SingleDosTargetQuantity");
+                OnPropertyChanged();
             }
         }
 
         protected ACClass _SelectedSingleDosTargetStorage;
-        
+
         [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Destination'}de{'Ziel'}")]
         public virtual ACClass SelectedSingleDosTargetStorage
         {
@@ -858,7 +809,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedSingleDosTargetStorage = value;
-                OnPropertyChanged("SelectedSingleDosTargetStorage");
+                OnPropertyChanged();
             }
         }
 
@@ -978,7 +929,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50330: Can't start the weighing because the Reference to the workflow node is null.
                 // Die Verwiegung kann nicht gstartet werden weil die Referenz zum Workflowknoten null ist.
-                return new Msg(this, eMsgLevel.Error, "ManualWeihgingModel", "StartWeighing", 889, "Error50330");
+                return new Msg(this, eMsgLevel.Error, nameof(BSOManualWeighing), nameof(StartWeighing) + "10", 889, "Error50330");
             }
 
             if (SelectedWeighingMaterial != null)
@@ -994,12 +945,12 @@ namespace gip.bso.manufacturing
                 {
                     //Info50036: The component or material {0} has already been weighed or is already in the weighing process!
                     // Die Komponente bzw. Material {0} wurde bereits verwogen oder befindet sich schon im Wiegeprozess!
-                    return new Msg(this, eMsgLevel.Error, "ManualWeihgingModel", "StartWeighing", 904, "Info50036", SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialName);
+                    return new Msg(this, eMsgLevel.Error, nameof(BSOManualWeighing), nameof(StartWeighing) + "20", 904, "Info50036", SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialName);
                 }
             }
             //Info50037: The component or material and the lot (quant) has not been selected. Select it and then press the "Weighing" button.
             // Die Komponente bzw. Material und die Charge (Quant) wurde nicht ausgewählt. Wählen Sie es aus und drücken anschliessend die Taste "Wiegen".
-            return new Msg(this, eMsgLevel.Error, "ManualWeihgingModel", "StartWeighing", 908, "Info50037");
+            return new Msg(this, eMsgLevel.Error, nameof(BSOManualWeighing), nameof(StartWeighing) + "30", 908, "Info50037");
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
@@ -1012,7 +963,7 @@ namespace gip.bso.manufacturing
 
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
 
-            if (messagesToAck.Count > 1 || (messagesToAck.Any() && (ScaleBckgrState == ScaleBackgroundState.InTolerance)) 
+            if (messagesToAck.Count > 1 || (messagesToAck.Any() && (ScaleBckgrState == ScaleBackgroundState.InTolerance))
                                         || messagesToAck.Any(x => x.MessageLevel == eMsgLevel.Question))
             {
                 if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
@@ -1127,7 +1078,7 @@ namespace gip.bso.manufacturing
             if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
             {
                 ShowSelectFacilityLotInfo = true;
-                OnPropertyChanged("SelectedFacilityCharge");
+                OnPropertyChanged(nameof(SelectedFacilityCharge));
                 _CallPWLotChange = true;
                 _IsLotConsumed = false;
                 if (SelectedWeighingMaterial.IsLotManaged)
@@ -1275,12 +1226,12 @@ namespace gip.bso.manufacturing
             {
                 //Error50330: Can't start the weighing because the Reference to the workflow node is null.
                 // Die Verwiegung kann nicht gstartet werden weil die Referenz zum Workflowknoten null ist.
-                msg = new Msg(this, eMsgLevel.Error, "ManualWeighingModel", "OnApplyManuallyEnteredLot", 1035, "Error50330");
+                msg = new Msg(this, eMsgLevel.Error, nameof(BSOManualWeighing), nameof(ApplyLot) + "10", 1035, "Error50330");
                 Messages.Msg(msg);
                 return;
             }
 
-            msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.OnApplyManuallyEnteredLot), FacilityChargeNo, 
+            msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.OnApplyManuallyEnteredLot), FacilityChargeNo,
                                                 SelectedWeighingMaterial?.PosRelation?.ProdOrderPartslistPosRelationID) as Msg;
             if (msg != null)
                 Messages.Msg(msg);
@@ -1382,7 +1333,7 @@ namespace gip.bso.manufacturing
                 using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
                 {
                     _ProcessModuleScales = scalesArray;
-                    ScaleObjectsList = scaleObjectInfoList;
+                    ScaleObjectsList = new ObservableCollection<ACValueItem>(scaleObjectInfoList);
                 }
             }
 
@@ -1391,7 +1342,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, "OrderInfo");
+                Messages.Error(this, "Error50285", false, nameof(PAProcessModuleVB.OrderInfo));
                 return false;
             }
 
@@ -1437,7 +1388,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, "CurrentACMethod");
+                Messages.Info(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
                 return null;
             }
 
@@ -1446,7 +1397,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, "ManuallyAddedQuantity");
+                Messages.Info(this, "Error50287", false, nameof(PAFManualWeighing.ManuallyAddedQuantity));
                 return null;
             }
 
@@ -1455,7 +1406,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, "TareScaleState");
+                Messages.Info(this, "Error50287", false, nameof(PAFManualWeighing.TareScaleState));
                 return null;
             }
 
@@ -1487,7 +1438,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50292: Initialization error: The scale component doesn't have the property {0}.
                 // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50292", false, "ActualWeight");
+                Messages.Error(this, "Error50292", false, nameof(PAEScaleBase.ActualWeight));
                 return;
             }
 
@@ -1497,7 +1448,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50292: Initialization error: The scale component doesn't have the property {0}.
                 // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50292", false, "ActualValue");
+                Messages.Error(this, "Error50292", false, nameof(PAEScaleBase.ActualValue));
                 return;
             }
 
@@ -1531,10 +1482,10 @@ namespace gip.bso.manufacturing
             (_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
             ScaleRealWeight = _ScaleActualWeight.ValueT;
             ScaleGrossWeight = _ScaleActualValue.ValueT;
-            OnPropertyChanged("TargetWeight");
-            OnPropertyChanged("ScaleDifferenceWeight");
+            OnPropertyChanged(nameof(TargetWeight));
+            OnPropertyChanged(nameof(ScaleDifferenceWeight));
 
-            if (CurrentPAFManualWeighing != null && scale != null )
+            if (CurrentPAFManualWeighing != null && scale != null)
             {
                 CurrentPAFManualWeighing.ExecuteMethod(nameof(PAFManualWeighing.SetActiveScaleObject), scale.ACIdentifier);
             }
@@ -1570,7 +1521,7 @@ namespace gip.bso.manufacturing
                         using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
                         {
                             _CurrentOrderInfoValue = null;
-                            Messages.LogError(this.GetACUrl(), "LoadWFNode(10)", "Returned");
+                            Messages.LogError(this.GetACUrl(), nameof(LoadWFNode) + "(10)", "Returned");
                             return;
                         }
                     }
@@ -1588,7 +1539,7 @@ namespace gip.bso.manufacturing
                             using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
                             {
                                 _CurrentOrderInfoValue = null;
-                                Messages.LogError(this.GetACUrl(), "LoadWFNode(20)", "Returned");
+                                Messages.LogError(this.GetACUrl(), nameof(LoadWFNode) + "(20)", "Returned");
                                 return;
                             }
                         }
@@ -1618,7 +1569,7 @@ namespace gip.bso.manufacturing
                         using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
                         {
                             _CurrentOrderInfoValue = null;
-                            Messages.LogError(this.GetACUrl(), "LoadWFNode(30)", "Returned");
+                            Messages.LogError(this.GetACUrl(), nameof(LoadWFNode) + "(30)", "Returned");
                             return;
                         }
                     }
@@ -1694,6 +1645,10 @@ namespace gip.bso.manufacturing
                 IACComponentPWNode pwNode = pwGroup.ACUrlCommand(node.ACUrlParent + "\\" + node.ACIdentifier) as IACComponentPWNode;
                 if (pwNode == null)
                 {
+                    pwNode = pwGroup.ACUrlCommand(node.ACUrlParent + "\\" + node.ACIdentifier) as IACComponentPWNode;
+                }
+                if (pwNode == null)
+                {
                     //Error50290: The user does not have access rights for class PWManualWeighing ({0}).
                     // Der Benutzer hat keine Zugriffsrechte auf Klasse PWManualWeighing ({0}).
                     Messages.Error(this, "Error50290", false, node.ACUrlParent + "\\" + node.ACIdentifier);
@@ -1712,7 +1667,7 @@ namespace gip.bso.manufacturing
             {
                 if (ComponentPWNode != null)
                 {
-                    Messages.LogError(this.GetACUrl(), "ActivateWFNode(10)", "Returned");
+                    Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode) + "(10)", "Returned");
                     return;
                 }
 
@@ -1734,18 +1689,18 @@ namespace gip.bso.manufacturing
                 IsBinChangeAvailable = isBinChangeAvailable ?? false;
             }
 
-            using(ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
-                _= DatabaseApp.ProdOrderPartslistPos.FirstOrDefault();
+            using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
+                _ = DatabaseApp.ProdOrderPartslistPos.FirstOrDefault();
 
             LoadPWConfiguration(pwNode?.ValueT);
 
             try
             {
-                Messages.LogInfo("ManualWeighingModel", "SetupModel", "GetMaterials start.");
+                //Messages.LogInfo("ManualWeighingModel", "SetupModel", "GetMaterials start.");
 
                 WeighingMaterialList = GetWeighingMaterials(pwNode.ValueT, DatabaseApp, DefaultMaterialIcon);
 
-                Messages.LogInfo("ManualWeighingModel", "SetupModel", "After GetWeighingMaterials. Count: " + WeighingMaterialList?.Count());
+                //Messages.LogInfo("ManualWeighingModel", "SetupModel", "After GetWeighingMaterials. Count: " + WeighingMaterialList?.Count());
             }
             catch (Exception e)
             {
@@ -1791,7 +1746,7 @@ namespace gip.bso.manufacturing
             if (pwNode == null)
                 return null;
 
-            ACValue acValue = pwNode.ACUrlCommand(nameof(PWManualWeighing.WeighingComponentsInfo) +"\\"+ Const.ValueT) as ACValue;
+            ACValue acValue = pwNode.ACUrlCommand(nameof(PWManualWeighing.WeighingComponentsInfo) + "\\" + Const.ValueT) as ACValue;
             Dictionary<string, string> valueList = acValue?.Value as Dictionary<string, string>;
 
             if (valueList != null && valueList.Any())
@@ -1865,7 +1820,7 @@ namespace gip.bso.manufacturing
                         }
                     }
                 }
-                
+
                 return weighingMaterials.OrderBy(c => c.PosRelation.Sequence).ToList();
             }
             return null;
@@ -1923,7 +1878,7 @@ namespace gip.bso.manufacturing
         public void DeactivateManualWeighingModel()
         {
             UnloadWFNode();
-            DeactivateScale();
+            CurrentScaleObject = null;
             UnloadPAFManualWeighing();
 
             using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
@@ -1938,7 +1893,7 @@ namespace gip.bso.manufacturing
             }
 
             ACRef<IACComponent>[] scales = null;
-            using(ACMonitor.Lock(_70750_ProcessModuleScalesLock))
+            using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
             {
                 scales = _ProcessModuleScales;
                 _ProcessModuleScales = null;
@@ -1963,13 +1918,9 @@ namespace gip.bso.manufacturing
 
         private void DeactivateWFNode(bool reset = false)
         {
-            DelegateToMainThread((object state) =>
-            {
-                WeighingMaterialList = null;
-                SelectedWeighingMaterial = null;
-            });
-            
-            
+            WeighingMaterialList = null;
+            SelectedWeighingMaterial = null;
+
             IsBinChangeAvailable = false;
 
             if (_NextTaskInfoProperty != null)
@@ -1978,7 +1929,6 @@ namespace gip.bso.manufacturing
                 NextTaskInfo = ManualWeighingTaskInfo.None;
                 _NextTaskInfoProperty = null;
             }
-
 
             if (_WeighingComponentInfo != null)
             {
@@ -2067,7 +2017,6 @@ namespace gip.bso.manufacturing
                 (_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
                 _ScaleActualValue = null;
             }
-
         }
 
         #endregion
@@ -2093,7 +2042,7 @@ namespace gip.bso.manufacturing
             if (e.PropertyName == Const.ValueT)
             {
                 ACMethod acMethod = null;
-                using(ACMonitor.Lock(_70700_PrivateMemberLock))
+                using (ACMonitor.Lock(_70700_PrivateMemberLock))
                 {
                     acMethod = _PAFCurrentACMethod?.ValueT;
                 }
@@ -2172,14 +2121,14 @@ namespace gip.bso.manufacturing
             {
                 if (ComponentPWNodesList == null)
                 {
-                    Messages.LogError(this.GetACUrl(), "HandlePWNodeACState(10)", "ComponentPWNodesList is null!");
+                    Messages.LogError(this.GetACUrl(), nameof(HandlePWNodeACState) + "(10)", "ComponentPWNodesList is null!");
                     return;
                 }
 
                 pwNode = ComponentPWNodesList.FirstOrDefault(c => c.ComponentPWNodeACState == senderProp);
                 if (pwNode == null)
                 {
-                    Messages.LogError(this.GetACUrl(), "HandlePWNodeACState(20)", "pwNode is null!");
+                    Messages.LogError(this.GetACUrl(), nameof(HandlePWNodeACState) + "(20)", "pwNode is null!");
                     return;
                 }
 
@@ -2193,7 +2142,7 @@ namespace gip.bso.manufacturing
                         }
                         else
                         {
-                            Messages.LogError(this.GetACUrl(), "HandlePWNodeACState(30)", "ComponentPWNode is different than sender!");
+                            Messages.LogError(this.GetACUrl(), nameof(HandlePWNodeACState) + "(30)", "ComponentPWNode is different than sender!");
                             return;
                         }
                     }
@@ -2270,8 +2219,6 @@ namespace gip.bso.manufacturing
                             {
                                 comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                                 SelectActiveScaleObject(comp);
-                                //if (comp.WeighingMatState == WeighingComponentState.InWeighing)
-                                //    BtnWeighBlink = false;
                             }
                             break;
                         }
@@ -2281,36 +2228,29 @@ namespace gip.bso.manufacturing
                             if (comp == null)
                                 return;
 
-                                DelegateToMainThread((object state) =>
-                                {
-                                    if (SelectedWeighingMaterial != comp)
-                                        SelectedWeighingMaterial = comp;
+                            if (SelectedWeighingMaterial != comp)
+                                SelectedWeighingMaterial = comp;
 
-                                    comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
-                                    SelectActiveScaleObject(comp);
-                                    //if (comp.WeighingMatState == WeighingComponentState.InWeighing)
-                                    //    BtnWeighBlink = false;
+                            comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
+                            SelectActiveScaleObject(comp);
 
-                                    if (compInfo.FacilityCharge != null)
-                                    {
-                                        var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
-                                        SelectedFacilityCharge = fcItem;
-                                    }
-                                });
+                            if (compInfo.FacilityCharge != null)
+                            {
+                                var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
+                                SelectedFacilityCharge = fcItem;
+                            }
+
                             break;
                         }
                     case WeighingComponentInfoType.SelectCompReturnFC_F:
                         {
                             WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
-                            DelegateToMainThread((object state) =>
+                            if (SelectedWeighingMaterial != comp)
                             {
-                                if (SelectedWeighingMaterial != comp)
-                                {
-                                    SelectedWeighingMaterial = comp;
-                                    SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
-                                    _StartWeighingFromF_FC = true;
-                                }
-                            });
+                                SelectedWeighingMaterial = comp;
+                                SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
+                                _StartWeighingFromF_FC = true;
+                            }
                             break;
                         }
                     case WeighingComponentInfoType.StateSelectFC_F:
@@ -2318,72 +2258,66 @@ namespace gip.bso.manufacturing
                         {
                             WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
 
-                            DelegateToMainThread((object state) =>
+                            if (/*compInfoType == WeighingComponentInfoType.StateSelectFC_F && */(WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
+                            && SelectedWeighingMaterial == null)
                             {
-                                if (/*compInfoType == WeighingComponentInfoType.StateSelectFC_F && */(WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
-                                && SelectedWeighingMaterial == null)
+                                if (comp != null)
+                                    SelectedWeighingMaterial = comp;
+                            }
+
+                            if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation)
+                            {
+                                if (SelectedWeighingMaterial.WeighingMatState != (WeighingComponentState)compInfo.WeighingComponentState)
                                 {
-                                    if (comp != null)
-                                        SelectedWeighingMaterial = comp;
+                                    SelectedWeighingMaterial.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                                 }
 
-                                if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation)
+                                if (compInfoType == WeighingComponentInfoType.StateSelectFC_F)
                                 {
-                                    if (SelectedWeighingMaterial.WeighingMatState != (WeighingComponentState)compInfo.WeighingComponentState)
-                                    {
-                                        SelectedWeighingMaterial.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
-                                    }
-
-                                    if (compInfoType == WeighingComponentInfoType.StateSelectFC_F)
-                                    {
-                                        SelectActiveScaleObject(SelectedWeighingMaterial);
-                                    }
-                                    else
-                                    {
-                                        OnPropertyChanged("CurrentScaleObject");
-                                    }    
+                                    SelectActiveScaleObject(SelectedWeighingMaterial);
                                 }
-
-                                if (compInfo.FacilityCharge != null)
+                                else
                                 {
-                                    bool autoRefresh = compInfo.FC_FAutoRefresh;
-                                    if (SelectedFacilityCharge == null || _CallPWLotChange || compInfo.IsLotChange)
-                                    {
-                                        if (autoRefresh)
-                                        {
-                                            SelectedFacilityCharge = null; //check if this needed
-                                            _FacilityChargeList = null;
-                                            FacilityChargeListCount = 0;
-                                            OnPropertyChanged(nameof(FacilityChargeList));
-                                        }
-
-                                        var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
-                                        SelectedFacilityCharge = fcItem;
-                                    }
+                                    OnPropertyChanged(nameof(CurrentScaleObject));
                                 }
-                            });
+                            }
+
+                            if (compInfo.FacilityCharge != null)
+                            {
+                                bool autoRefresh = compInfo.FC_FAutoRefresh;
+                                if (SelectedFacilityCharge == null || _CallPWLotChange || compInfo.IsLotChange)
+                                {
+                                    if (autoRefresh)
+                                    {
+                                        SelectedFacilityCharge = null;
+                                        FacilityChargeList = null;
+                                        FacilityChargeListCount = 0;
+
+                                        FacilityChargeList = FillFacilityChargeList();
+                                    }
+
+                                    var fcItem = FacilityChargeList?.FirstOrDefault(c => c.FacilityChargeID == compInfo.FacilityCharge);
+                                    SelectedFacilityCharge = fcItem;
+                                }
+                            }
                             break;
                         }
                     case WeighingComponentInfoType.RefreshCompTargetQ:
                         {
-                            var refreshItems = WeighingMaterialList?.Where(c => c.WeighingMatState <= WeighingComponentState.InWeighing 
+                            var refreshItems = WeighingMaterialList?.Where(c => c.WeighingMatState <= WeighingComponentState.InWeighing
                                                                             || c.WeighingMatState == WeighingComponentState.PartialCompleted).ToList();
 
-                            DelegateToMainThread((object state) =>
+                            try
                             {
-                                try
+                                foreach (WeighingMaterial refreshItem in refreshItems)
                                 {
-                                    foreach (WeighingMaterial refreshItem in refreshItems)
-                                    {
-                                        refreshItem.PosRelation.AutoRefresh();
-                                    }
+                                    refreshItem.PosRelation.AutoRefresh();
                                 }
-                                catch
-                                {
+                            }
+                            catch
+                            {
 
-                                }
-                            });
-
+                            }
                             break;
                         }
                 }
@@ -2428,12 +2362,12 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Refresh material and lots'}de{'Refresh material and lots'}", 650, true)]
         public void RefreshMaterialOrFC_F()
         {
-            OnPropertyChanged("WeighingMaterialList");
+            OnPropertyChanged(nameof(WeighingMaterialList));
             if (SelectedWeighingMaterial != null)
             {
-                _FacilityChargeList = null;
+                FacilityChargeList = null;
                 FacilityChargeListCount = 0;
-                OnPropertyChanged("FacilityChargeList");
+                FacilityChargeList = FillFacilityChargeList();
             }
         }
 
@@ -2476,17 +2410,6 @@ namespace gip.bso.manufacturing
 
         public virtual ScaleBackgroundState? OnDetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
-            //if (CurrentScaleObject != null && CurrentScaleObject.Value != null)
-            //{
-            //    var activeScale = _ProcessModuleScales?.FirstOrDefault(c => c.ACUrl == CurrentScaleObject.GetStringValue());
-            //    if (activeScale != null && activeScale.ValueT != null)
-            //    {
-            //        bool? isTareRequestAck = activeScale.ValueT.ACUrlCommand("IsTareRequestAcknowledged") as bool?;
-            //        if (isTareRequestAck != null && isTareRequestAck.Value)
-            //            return ScaleBackgroundState.Weighing;
-            //    }
-            //}
-
             if (_TareScaleState.ValueT != (short)PAFManualWeighing.TareScaleStateEnum.TareOK)
                 return ScaleBackgroundState.Weighing;
             return null;
@@ -2497,7 +2420,7 @@ namespace gip.bso.manufacturing
             List<ACValueItem> scaleObjectsList = null;
             using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
             {
-                scaleObjectsList = ScaleObjectsList;
+                scaleObjectsList = ScaleObjectsList?.ToList();
             }
 
             if (scaleObjectsList != null && weighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
@@ -2505,7 +2428,7 @@ namespace gip.bso.manufacturing
                 SelectActiveScaleObject(scaleObjectsList);
             }
             else
-                OnPropertyChanged("CurrentScaleObject");
+                OnPropertyChanged(nameof(CurrentScaleObject));
         }
 
         private void SelectActiveScaleObject(List<ACValueItem> scaleObjects, bool setIfNotSelected = false)
@@ -2518,25 +2441,16 @@ namespace gip.bso.manufacturing
                 string activeScaleACUrl = CurrentPAFManualWeighing?.ExecuteMethod(nameof(PAFManualWeighing.GetActiveScaleObjectACUrl)) as string;
                 if (!string.IsNullOrEmpty(activeScaleACUrl))
                 {
-                    DelegateToMainThread((object state) =>
-                    {
-                        CurrentScaleObject = scaleObjects.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
-                    });
+                    CurrentScaleObject = scaleObjects.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
                 }
                 else if (setIfNotSelected)
                 {
-                    DelegateToMainThread((object state) =>
-                    {
-                        CurrentScaleObject = scaleObjects.FirstOrDefault();
-                    });
+                    CurrentScaleObject = scaleObjects.FirstOrDefault();
                 }
             }
             else
             {
-                DelegateToMainThread((object state) =>
-                {
-                    CurrentScaleObject = scaleObjects.FirstOrDefault();
-                });
+                CurrentScaleObject = scaleObjects.FirstOrDefault();
             }
         }
 
@@ -2566,7 +2480,7 @@ namespace gip.bso.manufacturing
 
             using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
             {
-                var lastUsedLotConfigs = dbApp.MaterialConfig.Where(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl 
+                var lastUsedLotConfigs = dbApp.MaterialConfig.Where(c => c.KeyACUrl == PWManualWeighing.MaterialConfigLastUsedLotKeyACUrl
                                                                       && c.VBiACClassID == currentProcessModule.ComponentClass.ACClassID);
 
                 List<vd.FacilityCharge> lastUsedLots = new List<vd.FacilityCharge>();
@@ -2625,7 +2539,7 @@ namespace gip.bso.manufacturing
             }
 
             LastUsedLotList.Remove(SelectedLastUsedLot);
-            OnPropertyChanged("LastUsedLotList");
+            OnPropertyChanged(nameof(LastUsedLotList));
         }
 
         public bool IsEnabledRemoveLastUsedLot()
@@ -2637,7 +2551,7 @@ namespace gip.bso.manufacturing
         {
             ACMethod result = null;
 
-            using(ACMonitor.Lock(_70700_PrivateMemberLock))
+            using (ACMonitor.Lock(_70700_PrivateMemberLock))
             {
                 result = _PAFCurrentACMethod?.ValueT?.Clone() as ACMethod;
             }
@@ -2655,6 +2569,60 @@ namespace gip.bso.manufacturing
                 //Info50084 : The quant quantity is negative, please check if you use right quant/lot. If current lot is consumed, please peform the Lot change task...
                 Messages.Info(this, "Info50084");
             }
+        }
+
+        protected virtual ObservableCollection<FacilityChargeItem> FillFacilityChargeList()
+        {
+            try
+            {
+                IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+
+                if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
+                {
+                    ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
+                                                                            SelectedWeighingMaterial.PosRelation.ProdOrderPartslistPosRelationID) as ACValueList;
+
+                    var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();
+                    if (facilityIDs == null)
+                        return null;
+
+                    using (vd.DatabaseApp dbApp = new vd.DatabaseApp())
+                    {
+                        //var facilitesDB = dbApp.Facility.Include(i => i.FacilityCharge_Facility).Where(c => facilityIDs.Contains(c.FacilityID));
+
+                        if (_ACFacilityManager == null)
+                        {
+                            _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
+                            if (_ACFacilityManager == null)
+                            {
+                                //Error50432: The facility manager is null.
+                                Messages.Error(this, "Error50432");
+                            }
+                        }
+
+                        if (SelectedWeighingMaterial.PosRelation != null)
+                            _FacilityChargeList = new ObservableCollection<FacilityChargeItem>(ACFacilityManager?.ManualWeighingFacilityChargeListQuery(dbApp, facilityIDs, SelectedWeighingMaterial.PosRelation.SourceProdOrderPartslistPos.MaterialID).Select(s => new FacilityChargeItem(s, TargetWeight)));
+
+                        FacilityChargeListCount = _FacilityChargeList.Count();
+                    }
+                }
+
+                if (_FacilityChargeList == null)
+                    return null;
+
+                return _FacilityChargeList;
+            }
+            catch (Exception e)
+            {
+                string message = null;
+                if (e.InnerException != null)
+                    message = string.Format("ManualWeighingModel(FacilityChargeList): {0}, {1} {2} {3}", e.Message, e.InnerException.Message, System.Environment.NewLine, e.StackTrace);
+                else
+                    message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
+
+                Messages.Error(this, message, true);
+            }
+            return null;
         }
 
         #endregion
@@ -2680,7 +2648,7 @@ namespace gip.bso.manufacturing
                 {
                     //Error50430: The routing service is unavailable.
                     Messages.Error(this, "Error50430");
-                    return; 
+                    return;
                 }
             }
 
@@ -2912,7 +2880,7 @@ namespace gip.bso.manufacturing
                     if (SingleDosTargetQuantity > maxWeight)
                     {
                         //Error50487:The dosing quantity is {0} kg but the maximum dosing qunatity is {1} kg.
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "ValidateStart", 2469, "Error50487", SingleDosTargetQuantity, Math.Round(maxWeight, 2));
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(ValidateSingleDosingStart), 2469, "Error50487", SingleDosTargetQuantity, Math.Round(maxWeight, 2));
                         return new MsgWithDetails(new Msg[] { msg });
                     }
                 }
@@ -2938,8 +2906,8 @@ namespace gip.bso.manufacturing
             {
                 case nameof(SelectedFacilityCharge):
                     {
-                        if (ShowSelectFacilityLotInfo && (   !MultipleLotsSelectionRule.HasValue || FacilityChargeListCount < 2 
-                                                          || (MultipleLotsSelectionRule.Value  != LotSelectionRuleEnum.OnlyScan) ))
+                        if (ShowSelectFacilityLotInfo && (!MultipleLotsSelectionRule.HasValue || FacilityChargeListCount < 2
+                                                          || (MultipleLotsSelectionRule.Value != LotSelectionRuleEnum.OnlyScan)))
                             return Global.ControlModes.Enabled;
                         return Global.ControlModes.Disabled;
                     }
@@ -3019,6 +2987,11 @@ namespace gip.bso.manufacturing
             InterdischargeStart(currentPWNode, false);
         }
 
+        public virtual bool IsEnabledInterdischarge()
+        {
+            return InInterdischargingQ.HasValue ? false : true;
+        }
+
         private void InterdischargeStart(IACComponentPWNode currentPWNode, bool onlyCheck)
         {
             _AbortMode = AbortModeEnum.Interdischarging;
@@ -3051,9 +3024,6 @@ namespace gip.bso.manufacturing
                 _IsEnabledCompleteInterdischarging = true;
                 if (_ScaleActualValue != null)
                 {
-                    //(_ScaleActualValue as IACPropertyNetBase).PropertyChanged -= ScaleActualValue_PropertyChanged;
-                    //(_ScaleActualValue as IACPropertyNetBase).PropertyChanged += ScaleActualValue_PropertyChanged;
-
                     _IsEnabledCompleteInterdischarging = false;
 
                     VerifyIsActualQLower(_ScaleActualValue.ValueT);
@@ -3085,11 +3055,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public virtual bool IsEnabledInterdischarge()
-        {
-            return InInterdischargingQ.HasValue ? false : true;
-        }
-
         [ACMethodInfo("", "en{'Interdischarging complete'}de{'Interdischarging complete'}", 696, true)]
         public void CompleteInterdischarging()
         {
@@ -3119,7 +3084,7 @@ namespace gip.bso.manufacturing
             ACClass processModuleClass = null;
 
             using (Database db = new core.datamodel.Database())
-            { 
+            {
                 processModuleClass = currentProcessModule?.ComponentClass.FromIPlusContext<ACClass>(db);
 
                 bool reworkEnabled = false;
@@ -3370,7 +3335,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledAddReworkMaterial();
                     return true;
                 case nameof(ConvertWeightToUIText):
-                    result = ConvertWeightToUIText((double) acParameter[0]);
+                    result = ConvertWeightToUIText((double)acParameter[0]);
                     return true;
                 case nameof(PrintLastQuant):
                     PrintLastQuant();

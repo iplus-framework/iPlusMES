@@ -2,6 +2,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -21,14 +22,14 @@ namespace gip.bso.manufacturing
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            _MainSyncContext = SynchronizationContext.Current;
+            //_MainSyncContext = SynchronizationContext.Current;
             return base.ACInit(startChildMode);
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _MScaleWFNodes = null;
-            _MainSyncContext = null;
+            //_MainSyncContext = null;
             UnSubscribeFromWFNodes();
             return base.ACDeInit(deleteACClassTask);
         }
@@ -37,8 +38,8 @@ namespace gip.bso.manufacturing
 
         #region Properties 
 
-        private SynchronizationContext _MainSyncContext;
-        private ACMonitorObject _70050_MainSyncContextLock = new ACMonitorObject(70050);
+        //private SynchronizationContext _MainSyncContext;
+        //private ACMonitorObject _70050_MainSyncContextLock = new ACMonitorObject(70050);
 
         private ACMonitorObject _70010_AlarmsLock = new ACMonitorObject(70010);
         private ACMonitorObject _70100_MessageListLock = new ACMonitorObject(70100);
@@ -101,9 +102,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<MessageItem> _MessagesList = new List<MessageItem>();
+        private ObservableCollection<MessageItem> _MessagesList = new ObservableCollection<MessageItem>();
         [ACPropertyList(610, "Messages")]
-        public List<MessageItem> MessagesList
+        public ObservableCollection<MessageItem> MessagesList
         {
             get
             {
@@ -448,21 +449,22 @@ namespace gip.bso.manufacturing
 
         public void RefreshMessageList()
         {
-            DelegateToMainThread((object state) =>
-                MessagesList = MessagesListSafe.ToList());
+            //DelegateToMainThread((object state) =>
+            //    MessagesList = MessagesListSafe.ToList());
+            MessagesList = new ObservableCollection<MessageItem>(MessagesListSafe);
         }
 
-        public void DelegateToMainThread(SendOrPostCallback d)
-        {
-            SynchronizationContext context = null;
-            using (ACMonitor.Lock(_70050_MainSyncContextLock))
-            {
-                context = _MainSyncContext;
-            }
+        //public void DelegateToMainThread(SendOrPostCallback d)
+        //{
+        //    SynchronizationContext context = null;
+        //    using (ACMonitor.Lock(_70050_MainSyncContextLock))
+        //    {
+        //        context = _MainSyncContext;
+        //    }
             
-            if (context != null)
-                context.Send(d, new object());
-        }
+        //    if (context != null)
+        //        context.Send(d, new object());
+        //}
 
         #endregion
     }
