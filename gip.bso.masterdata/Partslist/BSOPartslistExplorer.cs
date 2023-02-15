@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.Objects;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using static gip.core.datamodel.Global;
 
@@ -53,8 +54,6 @@ namespace gip.bso.masterdata
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-
-            PropagatedPartslist = null;
             CurrentPartslist = null;
             SelectedPartslist = null;
             _AccessPrimary = null;
@@ -354,8 +353,6 @@ namespace gip.bso.masterdata
 
         #region Properties -> Partslist -> Select, (Current,) List
 
-        public Partslist PropagatedPartslist;
-
         /// <summary>
         /// Gets the partslist list.
         /// </summary>
@@ -378,26 +375,30 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (AccessPrimary == null) return null; return AccessPrimary.Current;
+                if (AccessPrimary == null) 
+                    return null; 
+                return AccessPrimary.Current;
             }
             set
             {
                 if (AccessPrimary.Current != value)
                 {
-                    if (AccessPrimary == null) return; AccessPrimary.Current = value;
+                    Partslist prev = AccessPrimary.Current;
+                    if (AccessPrimary == null) 
+                        return; 
+                    AccessPrimary.Current = value;
                     if (CurrentPartslist != null)
                         CurrentPartslist.PropertyChanged -= CurrentPartslist_PropertyChanged;
                     if (value != null)
                         value.PropertyChanged += CurrentPartslist_PropertyChanged;
-                    PropagateParslistSelection(value);
-                    OnPropertyChanged("CurrentPartslist");
-                    OnPropertyChanged("MDUnitList");
-                    OnPropertyChanged("CurrentMDUnit");
-                    OnPropertyChanged("ConfigurationTransferList");
+                    OnPartslistSelectionChanged(value, prev);
+                    OnPropertyChanged();
                     LoadBOM(value);
                     if (value != null)
+                    {
                         if (!_VisitedPartslists.Any(c => c.PartslistID == value.PartslistID))
                             _VisitedPartslists.Add(value);
+                    }
                 }
             }
         }
@@ -416,22 +417,25 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (AccessPrimary == null) return null; return AccessPrimary.Selected;
+                if (AccessPrimary == null) 
+                    return null; 
+                return AccessPrimary.Selected;
             }
             set
             {
                 if (AccessPrimary.Selected != value)
                 {
-                    if (AccessPrimary == null) return;
+                    if (AccessPrimary == null) 
+                        return;
                     if (AccessPrimary.Selected != value)
                     {
+                        Partslist prev = AccessPrimary.Selected;
                         if (AccessPrimary.Selected != null)
                             AccessPrimary.Selected.PropertyChanged -= SelectedPartslist_PropertyChanged;
                         AccessPrimary.Selected = value;
                         if (AccessPrimary.Selected != null)
                             AccessPrimary.Selected.PropertyChanged += SelectedPartslist_PropertyChanged;
-
-                        PropagateParslistSelection(value);
+                        OnPartslistSelectionChanged(value, prev);
                         OnPropertyChanged("SelectedPartslist");
                     }
                 }
@@ -573,14 +577,14 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Search material'}de{'Stückliste Suche'}", (short)MISort.Search)]
         public void Search(Partslist selectedPartslist = null)
         {
-            if (!PreExecute("Search")) return;
-            if (AccessPrimary == null) return;
+            if (!PreExecute("Search")) 
+                return;
+            if (AccessPrimary == null) 
+                return;
             AccessPrimary.NavSearch(DatabaseApp);
-
             if (selectedPartslist != null)
             {
                 AccessPrimary.Selected = null;
-                PropagatedPartslist = null;
                 SelectedPartslist = selectedPartslist;
             }
             if (AccessPrimary != null && AccessPrimary.Selected != null)
@@ -598,8 +602,10 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Remove'}de{'Entfernen'}", (short)MISort.Search)]
         public void ClearSearch()
         {
-            if (!PreExecute("ClearSearch")) return;
-            if (AccessPrimary == null) return;
+            if (!PreExecute("ClearSearch")) 
+                return;
+            if (AccessPrimary == null) 
+                return;
             AccessPrimary.NavList.Clear();
             SelectedPartslist = null;
             CurrentPartslist = null;
@@ -607,12 +613,8 @@ namespace gip.bso.masterdata
             PostExecute("ClearSearch");
         }
 
-        /// <summary>
-        /// Helper 
-        /// </summary>
-        public virtual void PropagateParslistSelection(Partslist partsList)
+        public virtual void OnPartslistSelectionChanged(Partslist partsList, Partslist prevPartslist, [CallerMemberName] string name = "")
         {
-
         }
 
         [ACMethodInfo("", "en{'Key event'}de{'Tastatur Ereignis'}", 9999, false)]

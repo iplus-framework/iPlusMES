@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.masterdata
@@ -406,22 +407,25 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Helper 
         /// </summary>
-        public override void PropagateParslistSelection(Partslist partsList)
+        public override void OnPartslistSelectionChanged(Partslist partsList, Partslist prevPartslist, [CallerMemberName] string name = "")
         {
-            if (PropagatedPartslist != partsList)
+            if (name == nameof(CurrentPartslist) && prevPartslist != partsList)
             {
-                PropagatedPartslist = partsList;
-                if (CurrentPartslist != partsList)
-                    CurrentPartslist = partsList;
-                if (SelectedPartslist != partsList)
-                    SelectedPartslist = partsList;
+                //if (CurrentPartslist != partsList)
+                //    CurrentPartslist = partsList;
+                //if (SelectedPartslist != partsList)
+                //    SelectedPartslist = partsList;
+
                 SearchPos();
                 SearchIntermediate();
-
                 LoadProcessWorkflows();
                 LoadMaterialWorkflows();
 
-                OnPropertyChanged("ProdUnitMDUnitList");
+                OnPropertyChanged(nameof(ProdUnitMDUnitList));
+                OnPropertyChanged(nameof(MaterialUnitList));
+                OnPropertyChanged(nameof(MDUnitList));
+                OnPropertyChanged(nameof(CurrentMDUnit));
+                OnPropertyChanged(nameof(ConfigurationTransferList));
                 if (CurrentPartslist != null
                     && CurrentPartslist.Material != null
                     && CurrentPartslist.ProductionUnits.HasValue
@@ -1808,6 +1812,41 @@ namespace gip.bso.masterdata
             }
         }
 
+        MaterialUnit _SelectedMaterialUnit;
+        [ACPropertySelected(9999, "MaterialUnit")]
+        public MaterialUnit SelectedMaterialUnit
+        {
+            get
+            {
+                return _SelectedMaterialUnit;
+            }
+            set
+            {
+                if (_SelectedMaterialUnit != value)
+                {
+                    _SelectedMaterialUnit = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [ACPropertyList(9999, "MaterialUnit")]
+        public IEnumerable<MaterialUnit> MaterialUnitList
+        {
+            get
+            {
+                if (CurrentPartslist == null || CurrentPartslist.Material == null)
+                {
+                    SelectedMaterialUnit = null;
+                    return null;
+                }
+                if (!CurrentPartslist.Material.MaterialUnit_Material.Any())
+                    return null;
+                return CurrentPartslist.Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).ToList();
+            }
+        }
+
+
         #endregion
 
         #region ProductionUnit
@@ -2024,7 +2063,8 @@ namespace gip.bso.masterdata
             {
                 case "MaterialID":
                     {
-                        OnPropertyChanged("MDUnitList");
+                        OnPropertyChanged(nameof(MDUnitList));
+                        OnPropertyChanged(nameof(MaterialUnitList));
                         if (CurrentPartslist != null && CurrentPartslist.Material != null && CurrentPartslist.Material.BaseMDUnit != null)
                             CurrentMDUnit = CurrentPartslist.Material.BaseMDUnit;
                         else
