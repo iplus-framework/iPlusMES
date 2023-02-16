@@ -57,7 +57,11 @@ namespace gip.mes.facility
         private void DefineSelectedSchedulingGroup(MDSchedulingGroup selectedSchedulingGroup)
         {
             MDSchedulingGroup firstGroupInList = MDSchedulingGroupList.FirstOrDefault();
-            if (firstGroupInList != null && selectedSchedulingGroup != null)
+            if (
+                firstGroupInList != null 
+                && selectedSchedulingGroup != null 
+                && MDSchedulingGroupList != null
+                && MDSchedulingGroupList.Select(c=>c.MDSchedulingGroupID).Contains(selectedSchedulingGroup.MDSchedulingGroupID))
             {
                 SelectedMDSchedulingGroup = SortSchedulingGroup(firstGroupInList, selectedSchedulingGroup);
             }
