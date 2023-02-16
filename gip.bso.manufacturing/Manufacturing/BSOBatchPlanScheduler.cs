@@ -4222,6 +4222,10 @@ namespace gip.bso.manufacturing
             {
                 List<Guid> groupsForRefresh = new List<Guid>();
                 List<ProdOrderBatchPlan> batchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+                if(batchPlans.Any(c=>c.IsSelected))
+                {
+                    batchPlans = batchPlans.Where(c=>c.IsSelected).ToList();
+                }
                 DoSetBatchStateCancelled(false, batchPlans, ref groupsForRefresh);
 
                 wizardSchedulerPartslist.IsSolved = true;
