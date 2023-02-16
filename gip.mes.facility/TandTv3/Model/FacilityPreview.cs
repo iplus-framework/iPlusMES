@@ -34,6 +34,15 @@ namespace gip.mes.facility
 
         #endregion
 
+        #region Overrides
+
+        public override string ToString()
+        {
+            return FacilityNo;
+        }
+
+        #endregion
+
         #region IACObject
 
         /// <summary>Unique Identifier in a Parent-/Child-Relationship.</summary>

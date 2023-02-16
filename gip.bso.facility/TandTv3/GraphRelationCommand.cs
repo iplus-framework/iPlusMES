@@ -55,7 +55,9 @@ namespace gip.bso.facility
                         );
 
                 foreach (var item in forProcess)
+                {
                     WihleBuildNewRelationsv2(filter, calculatedRelations, item, item, filteredRelations);
+                }
 
             }
 
@@ -68,7 +70,7 @@ namespace gip.bso.facility
             IEnumerable<GraphPointRelation<IACObject>> tmpRelations = filteredRelations.Where(c => c.Source == searchPoint && !c.IsPassed);
             foreach (var tmpRelation in tmpRelations)
             {
-                tmpRelation.IsPassed = true;
+                //tmpRelation.IsPassed = true;
                 if (
                         !startPoint.IsVirtual 
                         && !tmpRelation.Target.IsVirtual
