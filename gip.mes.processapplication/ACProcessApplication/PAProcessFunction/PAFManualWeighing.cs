@@ -14,7 +14,7 @@ namespace gip.mes.processapplication
     {
         #region Constructors
 
-        public const string ClassName = "PAFManualWeighing";
+        public const string ClassName = nameof(PAFManualWeighing);
         public const string VMethodName_ManualWeighing = "ManualWeighing";
 
         static PAFManualWeighing()
@@ -325,7 +325,7 @@ namespace gip.mes.processapplication
                     if (ec.InnerException != null && ec.InnerException.Message != null)
                         msg += " Inner:" + ec.InnerException.Message;
 
-                    Messages.LogException("PAFDosing", "InheritParamsFromConfig", msg);
+                    Messages.LogException(nameof(PAFManualWeighing), nameof(InheritParamsFromConfig), msg);
                 }
             }
             else
@@ -453,7 +453,7 @@ namespace gip.mes.processapplication
             }
             catch (Exception e)
             {
-                Messages.LogException(this.GetACUrl(), "InitializeRouteAndConfig(0)", e.Message);
+                Messages.LogException(this.GetACUrl(), nameof(InitializeRouteAndConfig), e.Message);
             }
         }
 
@@ -462,7 +462,7 @@ namespace gip.mes.processapplication
             if (route == null || !route.Any())
             {
                 //Error50360: The route is null or empty.
-                return new MsgWithDetails(this, eMsgLevel.Error, ClassName, "GetACMethodFromConfig(10)", 446, "Error50360");
+                return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(10)", 446, "Error50360");
             }
             if (IsMethodChangedFromClient)
                 return null;
@@ -472,7 +472,7 @@ namespace gip.mes.processapplication
                 if (route.Count < 2)
                 {
                     //Error50361: The route has not enough route items.
-                    return new MsgWithDetails(this, eMsgLevel.Error, ClassName, "GetACMethodFromConfig(20)", 456, "Error50361");
+                    return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(20)", 456, "Error50361");
                 }
                 targetRouteItem = route[route.Count - 2];
             }
@@ -501,17 +501,20 @@ namespace gip.mes.processapplication
                 config = logicalRelation.ACClassConfig_ACClassPropertyRelation.FirstOrDefault();
                 if (!isConfigInitialization)
                 {
-                    PAMSilo pamSilo = sourceRouteItem.SourceACComponent as PAMSilo;
-                    if (pamSilo != null)
+                    ACValue plPosRelVal = acMethod.ParameterValueList.GetACValue("PLPosRelation");
+                    if (plPosRelVal != null && plPosRelVal.Value is Guid)
                     {
-                        if (pamSilo.Facility != null && pamSilo.Facility.ValueT != null && pamSilo.Facility.ValueT.ValueT != null)
+                        Guid plPosRelID = plPosRelVal.ParamAsGuid;
+                        using (var dbApp = new vd.DatabaseApp())
                         {
-                            Guid? materialID = pamSilo.Facility.ValueT.ValueT.MaterialID;
-                            if (materialID.HasValue && materialID != Guid.Empty)
+                            ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelID);
+                            if (rel != null)
                             {
-                                Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
-                                using (var dbApp = new vd.DatabaseApp())
+                                Guid? materialID = rel.SourceProdOrderPartslistPos.MaterialID;
+                                if (materialID.HasValue && materialID != Guid.Empty)
                                 {
+                                    Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
+
                                     // 1. Hole Material-Konfiguration spezielle für diesen Weg
                                     materialConfigList = dbApp.MaterialConfig.Where(c => c.VBiACClassPropertyRelationID == logicalRelation.ACClassPropertyRelationID && c.MaterialID == materialID.Value).SetMergeOption(System.Data.Objects.MergeOption.NoTracking).ToList();
                                     var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID.Value && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
@@ -768,14 +771,14 @@ namespace gip.mes.processapplication
                     if (!isOccupied)
                     {
                         //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(10)", 697, "Error50554");
                         OnNewAlarmOccurred(FunctionError, msg, true);
                         if (IsAlarmActive(FunctionError, msg.Message) == null)
                             Messages.LogMessageMsg(msg);
                     }
                     else
                     {
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(10)", 697, "Error50554");
                         if (IsAlarmActive(FunctionError, msg.Message) != null)
                         {
                             AcknowledgeAlarms();
@@ -817,7 +820,7 @@ namespace gip.mes.processapplication
                 if (scale == null)
                 {
                     //Error50362: The scale object with ACIdentifier: {0} can not be found! Please check your scale configuration!
-                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50362", targetScaleACIdentifier);
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(30)", 697, "Error50362", targetScaleACIdentifier);
                     OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
@@ -826,14 +829,14 @@ namespace gip.mes.processapplication
                 if (!isOccupied)
                 {
                     //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
-                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(40)", 697, "Error50554");
                     OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
                 }
                 else
                 {
-                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(50)", 697, "Error50554");
                     if (IsAlarmActive(FunctionError, msg.Message) != null)
                     {
                         AcknowledgeAlarms();
@@ -866,7 +869,7 @@ namespace gip.mes.processapplication
                 if (scale == null)
                 {
                     //Error50363: Can not determine appropriate scale object. Please check your scale configuration (MinDosingWeight, MaxScaleWeight or FunctionScaleConfiguration).
-                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(20)", 737, "Error50363");
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(60)", 737, "Error50363");
                     OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
@@ -880,7 +883,7 @@ namespace gip.mes.processapplication
                     if (scale == null)
                     {
                         //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(70)", 697, "Error50554");
                         OnNewAlarmOccurred(FunctionError, msg, true);
                         if (IsAlarmActive(FunctionError, msg.Message) == null)
                             Messages.LogMessageMsg(msg);
@@ -892,7 +895,7 @@ namespace gip.mes.processapplication
                     if (!isOccupied)
                     {
                         //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
-                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                        Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(80)", 697, "Error50554");
                         OnNewAlarmOccurred(FunctionError, msg, true);
                         if (IsAlarmActive(FunctionError, msg.Message) == null)
                             Messages.LogMessageMsg(msg);
@@ -903,7 +906,7 @@ namespace gip.mes.processapplication
 
                 if (isOccupied)
                 {
-                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "DetermineTargetScaleObject(10)", 697, "Error50554");
+                    Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(90)", 697, "Error50554");
                     if (IsAlarmActive(FunctionError, msg.Message) != null)
                     {
                         AcknowledgeAlarms();
@@ -980,7 +983,7 @@ namespace gip.mes.processapplication
             if (scale == null)
             {
                 //Error50364: The active scale could not be determined.
-                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "WaitForTareScale(10)", 806, "Error50364");
+                Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(WaitForTareScale) + "(10)", 806, "Error50364");
                 if (IsAlarmActive(FunctionError, msg.Message) != null)
                 {
                     Messages.LogMessageMsg(msg);
@@ -1209,13 +1212,13 @@ namespace gip.mes.processapplication
             if (ManualWeighingPW == null)
             {
                 //Error50365: This function was not invoked by a workflow node. (Diese Funktion wurde nicht durch einen Worfkowknoten gestartet.)
-                return new Msg(this, eMsgLevel.Error, "PAFManualWeighing", "LotChange(10)", 978, "Error50365");
+                return new Msg(this, eMsgLevel.Error, ClassName, nameof(LotChange) + "(10)", 978, "Error50365");
             }
 
             if (!newFacilityCharge.HasValue)
             {
                 //Error50366: The parameter newFacilityCharge is null!
-                return new Msg(this, eMsgLevel.Error, "PAFManualWeighing", "LotChange(20)", 984, "Error50366");
+                return new Msg(this, eMsgLevel.Error, ClassName, nameof(LotChange) + "(20)", 984, "Error50366");
             }
 
             double quantity = ManuallyAddedQuantity.ValueT;
@@ -1226,7 +1229,7 @@ namespace gip.mes.processapplication
             if (!CheckInToleranceOnlyManuallyAddedQuantity && ActiveScaleObject == null)
             {
                 //Error50364: Can not get the active scale object! Please check your scale configuration (MinDosingWeight, MaxScaleWeight) or manual weighing ScaleConfiguration.
-                return new Msg(this, eMsgLevel.Error, ClassName, "LotChange(30)", 993, "Error50364");
+                return new Msg(this, eMsgLevel.Error, ClassName, nameof(LotChange) + "(30)", 993, "Error50364");
             }
             else if (!CheckInToleranceOnlyManuallyAddedQuantity)
                 quantity += ActiveScaleObject.ActualWeight.ValueT;
@@ -1241,7 +1244,7 @@ namespace gip.mes.processapplication
             if (scanSequence == 1)
             {
                 // Info50050: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
-                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(10)", 10, "Info50050");
+                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnScanEvent) + "(10)", 10, "Info50050");
                 resultSequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
             }
             else
@@ -1251,7 +1254,7 @@ namespace gip.mes.processapplication
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
                     // Error50354: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
-                    resultSequence.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnScanEvent(20)", 20, "Error50354");
+                    resultSequence.Message = new Msg(this, eMsgLevel.Error, ClassName, nameof(OnScanEvent) + "(20)", 20, "Error50354");
                     resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                 }
                 else
@@ -1272,7 +1275,7 @@ namespace gip.mes.processapplication
                             else
                             {
                                 // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
-                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnScanEvent) + "(30)", 30, "Info50051");
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                                 return resultSequence;
                             }
@@ -1290,7 +1293,7 @@ namespace gip.mes.processapplication
                             else
                             {
                                 // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
-                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnScanEvent) + "(40)", 30, "Info50051");
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                                 return resultSequence;
                             }
@@ -1304,7 +1307,7 @@ namespace gip.mes.processapplication
                             else
                             {
                                 // Info50051: Lot change has been cancelled. (Chargenwechsel wurde abgebrochen.)
-                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(30)", 30, "Info50051");
+                                resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnScanEvent) + "(50)", 30, "Info50051");
                                 resultSequence.State = BarcodeSequenceBase.ActionState.Cancelled;
                                 return resultSequence;
                             }
@@ -1321,7 +1324,7 @@ namespace gip.mes.processapplication
                     else
                     {
                         // Info50052: A new lot was activated or changed. (Neue Charge wurde aktiviert bzw. gewechselt.)
-                        resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, "OnScanEvent(40)", 40, "Info50052");
+                        resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnScanEvent) + "(60)", 40, "Info50052");
                         resultSequence.State = BarcodeSequenceBase.ActionState.Completed;
                     }
                 }
