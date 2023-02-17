@@ -16,6 +16,7 @@ namespace gip.mes.processapplication
             new object[] {gip.core.datamodel.ACProgram.ClassName, Global.ParamOption.Required, typeof(Guid)},
             new object[] {gip.core.datamodel.ACProgramLog.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {Picking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid)}
         }
@@ -57,12 +58,6 @@ namespace gip.mes.processapplication
             _InDeliveryNoteManager = null;
             UnregisterFromCachedDestinationsForDN();
 
-
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _CurrentDeliveryNotePos = null;
-            }
-
             lock (_TargetCacheLock)
             {
                 _DeliveryNoteTargetCache = new Dictionary<Guid, DeliveryNoteTargets>();
@@ -76,12 +71,6 @@ namespace gip.mes.processapplication
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
         {
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _CurrentDeliveryNotePos = null;
-            }
-
-
             lock (_TargetCacheLock)
             {
                 _DeliveryNoteTargetCache = new Dictionary<Guid, DeliveryNoteTargets>();
@@ -114,28 +103,6 @@ namespace gip.mes.processapplication
                 return _InDeliveryNoteManager.ValueT as ACInDeliveryNoteManager;
             }
         }
-
-
-
-        private gip.mes.datamodel.DeliveryNotePos _CurrentDeliveryNotePos = null;
-        public gip.mes.datamodel.DeliveryNotePos CurrentDeliveryNotePos
-        {
-            get
-            {
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_CurrentDeliveryNotePos != null)
-                        return _CurrentDeliveryNotePos;
-                }
-                LoadVBEntities();
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    return _CurrentDeliveryNotePos;
-                }
-            }
-        }
-
 
         #endregion
 
@@ -217,13 +184,17 @@ namespace gip.mes.processapplication
                         if (currentDeliveryNotePos != null)
                             dbApp.Detach(currentDeliveryNotePos);
 
+                        FacilityBooking currentFacilityBooking = entity as FacilityBooking;
+                        if (currentFacilityBooking != null)
+                            dbApp.Detach(currentFacilityBooking);
+
                         using (ACMonitor.Lock(_20015_LockValue))
                         {
                             _CurrentPicking = currentPicking;
                             _CurrentPickingPos = currentPickingPos;
                             _CurrentDeliveryNotePos = currentDeliveryNotePos;
+                            _CurrentFacilityBooking = currentFacilityBooking;
                         }
-
                     }
                 }
             }

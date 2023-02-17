@@ -14,6 +14,9 @@ namespace gip.mes.processapplication
             new object[] {gip.core.datamodel.ACProgram.ClassName, Global.ParamOption.Required, typeof(Guid)},
             new object[] {gip.core.datamodel.ACProgramLog.ClassName, Global.ParamOption.Optional, typeof(Guid)},
             new object[] {Picking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {DeliveryNotePos.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {FacilityBooking.ClassName, Global.ParamOption.Optional, typeof(Guid)},
+            new object[] {PickingPos.ClassName, Global.ParamOption.Optional, typeof(Guid) },
             new object[] {PWMethodVBBase.IsLastBatchParamName, Global.ParamOption.Optional, typeof(Int16) }
         }
     )]
@@ -54,8 +57,10 @@ namespace gip.mes.processapplication
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
+                _CurrentDeliveryNotePos = null;
                 _CurrentPicking = null;
                 _CurrentPickingPos = null;
+                _CurrentFacilityBooking = null;
                 _NewAddedProgramLog = null;
             }
 
@@ -70,8 +75,10 @@ namespace gip.mes.processapplication
 
             using (ACMonitor.Lock(_20015_LockValue))
             {
+                _CurrentDeliveryNotePos = null;
                 _CurrentPicking = null;
                 _CurrentPickingPos = null;
+                _CurrentFacilityBooking = null;
                 _NewAddedProgramLog = null;
             }
             base.Recycle(content, parentACObject, parameter, acIdentifier);
@@ -133,6 +140,45 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected gip.mes.datamodel.DeliveryNotePos _CurrentDeliveryNotePos = null;
+        public gip.mes.datamodel.DeliveryNotePos CurrentDeliveryNotePos
+        {
+            get
+            {
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    if (_CurrentDeliveryNotePos != null)
+                        return _CurrentDeliveryNotePos;
+                }
+                LoadVBEntities();
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _CurrentDeliveryNotePos;
+                }
+            }
+        }
+
+        protected gip.mes.datamodel.FacilityBooking _CurrentFacilityBooking = null;
+        public gip.mes.datamodel.FacilityBooking CurrentFacilityBooking
+        {
+            get
+            {
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    if (_CurrentFacilityBooking != null)
+                        return _CurrentFacilityBooking;
+                }
+                LoadVBEntities();
+
+                using (ACMonitor.Lock(_20015_LockValue))
+                {
+                    return _CurrentFacilityBooking;
+                }
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -143,10 +189,10 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "EndPicking":
+                case nameof(EndPicking):
                     EndPicking();
                     return true;
-                case Const.IsEnabledPrefix + "EndPicking":
+                case nameof(IsEnabledEndPicking):
                     result = IsEnabledEndPicking();
                     return true;
             }
@@ -158,7 +204,7 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case Const.AskUserPrefix + "EndPicking":
+                case nameof(AskUserEndPicking):
                     result = AskUserEndPicking(acComponent);
                     return true;
             }
@@ -214,6 +260,7 @@ namespace gip.mes.processapplication
                     {
                         Picking currentPicking = entity as Picking;
                         PickingPos currentPickingPos = null;
+                        DeliveryNotePos currentDeliveryNotePos = null;
                         if (currentPicking != null)
                         {
                             currentPickingPos = currentPicking.PickingPos_Picking.FirstOrDefault();
@@ -222,11 +269,20 @@ namespace gip.mes.processapplication
                                 dbApp.Detach(currentPickingPos);
                         }
 
+                        currentDeliveryNotePos = entity as DeliveryNotePos;
+                        if (currentDeliveryNotePos != null)
+                            dbApp.Detach(currentDeliveryNotePos);
+
+                        FacilityBooking currentFacilityBooking = entity as FacilityBooking;
+                        if (currentFacilityBooking != null)
+                            dbApp.Detach(currentFacilityBooking);
 
                         using (ACMonitor.Lock(_20015_LockValue))
                         {
                             _CurrentPicking = currentPicking;
                             _CurrentPickingPos = currentPickingPos;
+                            _CurrentDeliveryNotePos = currentDeliveryNotePos;
+                            _CurrentFacilityBooking = currentFacilityBooking;
                         }
                     }
                 }

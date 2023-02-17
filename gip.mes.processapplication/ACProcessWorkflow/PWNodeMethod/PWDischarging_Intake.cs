@@ -181,9 +181,10 @@ namespace gip.mes.processapplication
             {
                 Picking picking = pwMethod.CurrentPicking != null ? pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp) : null;
                 PickingPos pickingPos = pwMethod.CurrentPickingPos != null ? pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp) : null;
-                DeliveryNotePos notePos = null;
+                DeliveryNotePos notePos = pwMethod.CurrentDeliveryNotePos != null ? pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp) : null;
+                FacilityBooking facilityBooking = pwMethod.CurrentFacilityBooking != null ? pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp) : null;
 
-                if (picking == null)
+                if (picking == null && notePos == null && facilityBooking == null)
                 {
                     IACObjectEntity entity = GetTransportEntityFromACMethod(dbApp, acMethod);
                     if (entity == null)
@@ -198,6 +199,7 @@ namespace gip.mes.processapplication
                     }
                     picking = entity as Picking;
                     notePos = entity as DeliveryNotePos;
+                    facilityBooking = entity as FacilityBooking;
                 }
                 if (picking != null)
                 {
@@ -206,6 +208,10 @@ namespace gip.mes.processapplication
                 else if (notePos != null)
                 {
                     return StartDischargingInDNote(module, acMethod, dbIPlus, dbApp, notePos);
+                }
+                else if (facilityBooking != null)
+                {
+                    return StartDischargingFBooking(module, acMethod, dbIPlus, dbApp, facilityBooking);
                 }
             }
             return StartDisResult.CancelDischarging;

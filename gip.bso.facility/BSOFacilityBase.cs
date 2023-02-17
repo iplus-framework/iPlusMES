@@ -23,6 +23,7 @@ using gip.mes.facility;
 using System.Data.Objects;
 using gip.mes.autocomponent;
 using System.Runtime.CompilerServices;
+using gip.mes.processapplication;
 
 namespace gip.bso.facility
 {
@@ -185,7 +186,7 @@ namespace gip.bso.facility
         #region Properties
         #region Workflow-Selection
         protected IList<gip.core.datamodel.ACClass> _SourceModuleList;
-        [ACPropertyList(601, "SourceModule")]
+        [ACPropertyList(601, "SourceModule", "en{'Select point of transport'}de{'Transportpunkt auswählen'}")]
         public IList<gip.core.datamodel.ACClass> SourceModuleList
         {
             get
@@ -200,7 +201,7 @@ namespace gip.bso.facility
         }
 
         protected gip.core.datamodel.ACClass _SelectedSourceModule;
-        [ACPropertySelected(602, "SourceModule")]
+        [ACPropertySelected(602, "SourceModule", "en{'Select point of transport'}de{'Transportpunkt auswählen'}")]
         public gip.core.datamodel.ACClass SelectedSourceModule
         {
             get
@@ -363,10 +364,10 @@ namespace gip.bso.facility
                                                      .Select(c => c.ACClassWF1_ParentACClassWF);
             }
             // Sonst Umlagerungsprozess von Silo zu Silo
-            else
+            else if (forBooking.OutwardFacility != null && forBooking.InwardFacility != null)
             {
-                if (forBooking.OutwardFacility == null || !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
-                    || forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
+                if (   !forBooking.OutwardFacility.VBiFacilityACClassID.HasValue
+                    || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
                     return false;
                 msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
@@ -377,11 +378,103 @@ namespace gip.bso.facility
 
                 workflowRootWFs = this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue
                                                                 && (c.PWACClass.ACIdentifier == pwClassNameOfRoot
-                                                                    || (c.PWACClass.BasedOnACClassID.HasValue 
+                                                                    || (c.PWACClass.BasedOnACClassID.HasValue
                                                                         && (c.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot
                                                                             || (c.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot))))
                                                                 && !c.ACClassMethod.IsSubMethod);
 
+            }
+            // Sonst Einlagerungsprozess in Silo
+            else if (forBooking.OutwardFacility == null && forBooking.InwardFacility != null)
+            {
+                if (!forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
+                    return false;
+                Type typeIntake = typeof(PAMIntake);
+                RoutingResult result = ACRoutingService.FindSuccessors(RoutingService, this.Database.ContextIPlus, true,
+                                        forBooking.InwardFacility.FacilityACClass, PAMIntake.SelRuleID_PAMIntake, RouteDirections.Backwards, new object[] { },
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && typeIntake.IsAssignableFrom(c.ObjectType),
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != forBooking.InwardFacility.VBiFacilityACClassID,
+                                        0, true, true, false, false, 10, false, true);
+                if (result.Routes == null || !result.Routes.Any())
+                {
+                    //Error50122: No route found for this transport.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "OnValidateRoutesForWF(30)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50122")
+                    };
+                    Messages.Msg(msg);
+                    return false;
+                }
+
+                SourceModuleList = result.Routes.Select(c => c.FirstOrDefault().Source).ToList();
+                if (SourceModuleList.Count <= 0)
+                    return false;
+                else if (SourceModuleList.Count > 1)
+                {
+                    ShowDialog(this, "SelectSourceModule");
+                    if (SelectedSourceModule == null)
+                        return false;
+                }
+                else
+                    SelectedSourceModule = SourceModuleList.FirstOrDefault();
+
+                msg = OnValidateRoutesForWF(forBooking, SelectedSourceModule, forBooking.InwardFacility.FacilityACClass);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                    return false;
+                }
+
+                gip.core.datamodel.ACClass sourceDefClass = SelectedSourceModule.ACClass1_BasedOnACClass;
+                while (sourceDefClass != null)
+                {
+                    if (sourceDefClass.ACProject == null)
+                    {
+                        sourceDefClass = null;
+                        break;
+                    }
+                    if (sourceDefClass.ACProject.ACProjectType == Global.ACProjectTypes.AppDefinition)
+                        break;
+                    sourceDefClass = sourceDefClass.ACClass1_BasedOnACClass;
+                }
+
+                if (sourceDefClass == null)
+                    return false;
+
+                if (!sourceDefClass.ACClassWF_RefPAACClass.Any())
+                {
+                    //Error50123: No workflow found for this intake place.
+                    msg = new Msg
+                    {
+                        Source = GetACUrl(),
+                        MessageLevel = eMsgLevel.Error,
+                        ACIdentifier = "PrepareStartWorkflow(10)",
+                        Message = Root.Environment.TranslateMessage(this, "Error50123")
+                    };
+                    Messages.Msg(msg);
+                    return false;
+                }
+                workflowRootWFs = sourceDefClass.ACClassWF_RefPAACClass.Where(c => c.ParentACClassWFID.HasValue
+                                                                && !c.ACClassWF1_ParentACClassWF.ParentACClassWFID.HasValue
+                                                                && (c.ACClassWF1_ParentACClassWF.PWACClass.ACIdentifier == pwClassNameOfRoot
+                                                                    || (c.ACClassWF1_ParentACClassWF.PWACClass.BasedOnACClassID.HasValue
+                                                                            && (c.ACClassWF1_ParentACClassWF.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot
+                                                                                || (c.ACClassWF1_ParentACClassWF.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.ACClassWF1_ParentACClassWF.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassNameOfRoot))))
+                                                                && !c.ACClassMethod.IsSubMethod)
+                                                     .Select(c => c.ACClassWF1_ParentACClassWF);
+
+            }
+            // Sonst Auslagerungsprozess in Silo
+            else if (forBooking.OutwardFacility != null && forBooking.InwardFacility == null)
+            {
+                return false;
+            }
+            else
+            {
+                return false;
             }
 
             SelectedWorkflow = null;
@@ -453,9 +546,30 @@ namespace gip.bso.facility
 
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
-            if (this.ACFacilityManager != null)
-                return this.ACFacilityManager.C_PWMethodRelocClass;
-            return "PWMethodRelocation";
+            if (   (forBooking.OutwardFacilityCharge != null || forBooking.OutwardFacility != null)
+                    && forBooking.InwardFacility != null)
+            {
+                if (this.ACFacilityManager != null)
+                    return this.ACFacilityManager.C_PWMethodRelocClass;
+                else
+                    return nameof(PWMethodRelocation);
+            }
+            else if (forBooking.OutwardFacility == null && forBooking.InwardFacility != null)
+            {
+                if (this.ACFacilityManager != null)
+                    return this.ACFacilityManager.C_PWMethodIntakeClass;
+                else
+                    return nameof(PWMethodIntake);
+            }
+            else if (forBooking.OutwardFacility != null && forBooking.InwardFacility == null)
+            {
+                if (this.ACFacilityManager != null)
+                    return this.ACFacilityManager.C_PWMethodLoadingClass;
+                else
+                    return nameof(PWMethodLoading);
+            }
+
+            return nameof(PWMethodRelocation);
         }
 
         protected virtual bool StartWorkflow(gip.core.datamodel.ACClassMethod acClassMethod, FacilityBooking facilityBooking)

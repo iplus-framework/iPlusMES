@@ -22,6 +22,14 @@ namespace gip.mes.facility
             set { _IntakeClass.ValueT = value; }
         }
 
+        private static ACPropertyConfigValue<string> _LoadingClass;
+        public static string LoadingClass { get { return _LoadingClass == null ? "" : _LoadingClass.ValueT; } }
+        [ACPropertyConfig("en{'Classname for Loading'}de{'Klassenname für Verladung'}")]
+        public string C_LoadingClass
+        {
+            get { return _LoadingClass.ValueT; }
+            set { _LoadingClass.ValueT = value; }
+        }
 
         private static ACPropertyConfigValue<string> _SiloClass;
         public static string SiloClass { get { return _SiloClass == null ? "" : _SiloClass.ValueT; } }
@@ -34,11 +42,29 @@ namespace gip.mes.facility
 
         private static ACPropertyConfigValue<string> _PWMethodRelocClass;
         public static string PWMethodRelocClass { get { return _PWMethodRelocClass == null ? "" : _PWMethodRelocClass.ValueT; } }
-        [ACPropertyConfig("en{'PWMEthod-Classname for relocation'}de{'PWMEthod-Klassenname für Umlagerungen'}")]
+        [ACPropertyConfig("en{'PWMEthod-Classname for Relocation'}de{'PWMEthod-Klassenname für Umlagerungen'}")]
         public string C_PWMethodRelocClass
         {
             get { return _PWMethodRelocClass.ValueT; }
             set { _PWMethodRelocClass.ValueT = value; }
+        }
+
+        private static ACPropertyConfigValue<string> _PWMethodIntakeClass;
+        public static string PWMethodIntakeClass { get { return _PWMethodIntakeClass == null ? "" : _PWMethodIntakeClass.ValueT; } }
+        [ACPropertyConfig("en{'PWMEthod-Classname for Intake'}de{'PWMEthod-Klassenname für Einlagerungen'}")]
+        public string C_PWMethodIntakeClass
+        {
+            get { return _PWMethodIntakeClass.ValueT; }
+            set { _PWMethodIntakeClass.ValueT = value; }
+        }
+
+        private static ACPropertyConfigValue<string> _PWMethodLoadingClass;
+        public static string PWMethodLoadingClass { get { return _PWMethodLoadingClass == null ? "" : _PWMethodLoadingClass.ValueT; } }
+        [ACPropertyConfig("en{'PWMEthod-Classname for Loading'}de{'PWMEthod-Klassenname für Auslagerungen'}")]
+        public string C_PWMethodLoadingClass
+        {
+            get { return _PWMethodLoadingClass.ValueT; }
+            set { _PWMethodLoadingClass.ValueT = value; }
         }
 
         protected virtual void CreateModuleConstants()
@@ -46,16 +72,22 @@ namespace gip.mes.facility
             if (_IntakeClass == null)
             {
                 _IntakeClass = new ACPropertyConfigValue<string>(this, "C_IntakeClass", "PAMIntake");
+                _LoadingClass = new ACPropertyConfigValue<string>(this, "C_LoadingClass", "PAMLoadingstation");
                 _SiloClass = new ACPropertyConfigValue<string>(this, "C_SiloClass", "PAMSilo");
                 _PWMethodRelocClass = new ACPropertyConfigValue<string>(this, "C_PWMethodRelocClass", "PWMethodRelocation");
+                _PWMethodIntakeClass = new ACPropertyConfigValue<string>(this, "C_PWMethodIntakeClass", "PWMethodIntake");
+                _PWMethodLoadingClass = new ACPropertyConfigValue<string>(this, "C_PWMethodLoadingClass", "PWMethodLoading");
             }
         }
 
         protected virtual void InitModuleConstants()
         {
             _ = C_IntakeClass;
+            _ = C_LoadingClass;
             _ = C_SiloClass;
             _ = C_PWMethodRelocClass;
+            _ = C_PWMethodIntakeClass;
+            _ = C_PWMethodLoadingClass;
         }
 
 
@@ -93,11 +125,14 @@ namespace gip.mes.facility
         #region Available Modules
 
         public virtual IList<gip.core.datamodel.ACClass> GetAvailableIntakeModulesAsACClass(Database db)
-        {
-            
+        {            
             return ACClassManager.s_cQry_GetAvailableModulesAsACClass(db, C_IntakeClass).ToList();
         }
 
+        public virtual IList<gip.core.datamodel.ACClass> GetAvailableLoadingModulesAsACClass(Database db)
+        {
+            return ACClassManager.s_cQry_GetAvailableModulesAsACClass(db, C_LoadingClass).ToList();
+        }
 
         #endregion
 

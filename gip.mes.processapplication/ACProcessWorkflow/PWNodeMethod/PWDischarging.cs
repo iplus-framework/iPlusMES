@@ -850,6 +850,7 @@ namespace gip.mes.processapplication
                                                 var pwMethod = ParentPWMethod<PWMethodIntake>();
                                                 Picking picking = null;
                                                 DeliveryNotePos notePos = null;
+                                                FacilityBooking fBooking = null;
                                                 if (pwMethod.CurrentPicking != null)
                                                 {
                                                     picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
@@ -862,6 +863,12 @@ namespace gip.mes.processapplication
                                                     notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
                                                     if (notePos != null)
                                                         DoInwardBooking(actualWeight, dbApp, routeItem, notePos, e, true);
+                                                }
+                                                else if (pwMethod.CurrentFacilityBooking != null)
+                                                {
+                                                    fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
+                                                    if (fBooking != null)
+                                                        DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
                                                 }
                                             }
                                             else if (IsRelocation)

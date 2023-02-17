@@ -47,51 +47,18 @@ namespace gip.mes.processapplication
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
-
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _CurrentFacilityBooking = null;
-            }
-
-
             if (!base.ACDeInit(deleteACClassTask))
                 return false;
-
             return true;
         }
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
         {
-
-            using (ACMonitor.Lock(_20015_LockValue))
-            {
-                _CurrentFacilityBooking = null;
-            }
-
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
         #endregion
 
         #region Properties
-        protected gip.mes.datamodel.FacilityBooking _CurrentFacilityBooking = null;
-        public gip.mes.datamodel.FacilityBooking CurrentFacilityBooking
-        {
-            get
-            {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_CurrentFacilityBooking != null)
-                        return _CurrentFacilityBooking;
-                }
-                LoadVBEntities();
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    return _CurrentFacilityBooking;
-                }
-            }
-        }
 
         #endregion
 
@@ -177,7 +144,6 @@ namespace gip.mes.processapplication
                         FacilityBooking currentFacilityBooking = entity as FacilityBooking;
                         if (currentFacilityBooking != null)
                             dbApp.Detach(currentFacilityBooking);
-
 
                         using (ACMonitor.Lock(_20015_LockValue))
                         {

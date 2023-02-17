@@ -425,7 +425,7 @@ namespace gip.mes.processapplication
                     else if (IsIntake)
                     {
                         var pwMethod = ParentPWMethod<PWMethodIntake>();
-                        if (pwMethod != null && (pwMethod.CurrentPicking != null || pwMethod.CurrentDeliveryNotePos != null))
+                        if (pwMethod != null && (pwMethod.CurrentPicking != null || pwMethod.CurrentDeliveryNotePos != null || pwMethod.CurrentFacilityBooking != null))
                         {
                             using (var db = new Database())
                             using (var dbApp = new DatabaseApp(db))
@@ -433,12 +433,15 @@ namespace gip.mes.processapplication
                                 Picking picking = null;
                                 PickingPos pickingPos = null;
                                 DeliveryNotePos notePos = null;
+                                FacilityBooking fBooking = null;
                                 if (pwMethod.CurrentPicking != null)
                                     picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                 if (pwMethod.CurrentPickingPos != null)
                                     pickingPos = pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
                                 if (pwMethod.CurrentDeliveryNotePos != null)
                                     notePos = pwMethod.CurrentDeliveryNotePos.FromAppContext<DeliveryNotePos>(dbApp);
+                                if (pwMethod.CurrentFacilityBooking != null)
+                                    fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
 
                                 if (picking != null)
                                 {
@@ -527,6 +530,28 @@ namespace gip.mes.processapplication
                                     LastTargets = targets;
                                     return LastCalculatedRouteablePMList.ToList();
                                 }
+                                else if (fBooking != null)
+                                {
+                                    if (!String.IsNullOrEmpty(fBooking.PropertyACUrl))
+                                    {
+                                        var querySource = modulesInAutomaticMode.Where(c => c.GetACUrl() == fBooking.PropertyACUrl);
+                                        if (querySource.Any())
+                                            return querySource.ToList();
+                                    }
+                                    if (fBooking.OutwardFacility != null && fBooking.OutwardFacility.VBiFacilityACClassID.HasValue)
+                                    {
+                                        var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacility.VBiFacilityACClassID.Value);
+                                        if (querySource.Any())
+                                            return querySource.ToList();
+                                    }
+                                    if (fBooking.OutwardFacilityCharge != null && fBooking.OutwardFacilityCharge.Facility != null && fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.HasValue)
+                                    {
+                                        var querySource = modulesInAutomaticMode.Where(c => c.ComponentClass.ACClassID == fBooking.OutwardFacilityCharge.Facility.VBiFacilityACClassID.Value);
+                                        if (querySource.Any())
+                                            return querySource.ToList();
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -545,8 +570,8 @@ namespace gip.mes.processapplication
                                     picking = pwMethod.CurrentPicking.FromAppContext<Picking>(dbApp);
                                 if (pwMethod.CurrentPickingPos != null)
                                     pickingPos = pwMethod.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
-                                if (IsRelocation && ParentPWMethod<PWMethodRelocation>().CurrentFacilityBooking != null)
-                                    fBooking = ParentPWMethod<PWMethodRelocation>().CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
+                                if (pwMethod.CurrentFacilityBooking != null)
+                                    fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
                                 if (picking != null)
                                 {
                                     var pmListForPicking = HandleModuleListForPicking(dbApp, db, picking, pickingPos, modulesInAutomaticMode);
@@ -956,10 +981,13 @@ namespace gip.mes.processapplication
                 var pwMethod = ParentPWMethod<PWMethodIntake>();
                 Picking picking = pwMethod.CurrentPicking;
                 DeliveryNotePos notePos = pwMethod.CurrentDeliveryNotePos;
+                var fBooking = pwMethod.CurrentFacilityBooking;
                 if (picking != null)
                     info.Add(Picking.ClassName, picking.PickingID);
                 if (notePos != null)
                     info.Add(DeliveryNotePos.ClassName, notePos.DeliveryNotePosID);
+                if (fBooking != null)
+                    info.Add(FacilityBooking.ClassName, fBooking.FacilityBookingID);
             }
             else if (IsRelocation)
             {

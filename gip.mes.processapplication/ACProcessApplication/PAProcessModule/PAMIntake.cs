@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.processapplication;
 
@@ -7,9 +8,12 @@ namespace gip.mes.processapplication
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Intake place'}de{'Annahmestelle'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
     public class PAMIntake : PAMLoadingstation
     {
+        public const string SelRuleID_PAMIntake = "PAMIntake";
+
         static PAMIntake()
         {
             RegisterExecuteHandler(typeof(PAMIntake), HandleExecuteACMethod_PAMIntake);
+            ACRoutingService.RegisterSelectionQuery(SelRuleID_PAMIntake, (c, p) => c.Component.ValueT is PAMIntake, (c, p) => c.Component.ValueT is PAProcessModule);
         }
 
         public PAMIntake(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

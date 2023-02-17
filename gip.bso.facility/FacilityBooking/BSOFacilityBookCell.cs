@@ -940,6 +940,82 @@ namespace gip.bso.facility
                 CurrentBookParamInwardMovement.InwardPartslist = CurrentFacility.Partslist;
                 CurrentBookParamInwardMovement.InwardMaterial = CurrentFacility.Material;
             }
+
+            if (IsPhysicalTransportPossible)
+            {
+                Global.MsgResult userQuestionAutomatic = Global.MsgResult.No;
+                // Question50035: Do you want to run this relocation/transport on the plant in automatic mode?
+                userQuestionAutomatic = Messages.YesNoCancel(this, "Question50035");
+                if (userQuestionAutomatic == Global.MsgResult.Yes)
+                {
+                    gip.core.datamodel.ACClassMethod acClassMethod = null;
+                    bool wfRunsBatches = false;
+                    if (!PrepareStartWorkflow(CurrentBookParamInwardMovement, out acClassMethod, out wfRunsBatches))
+                    {
+                        ClearBookingData();
+                        return;
+                    }
+
+                    ACMethodBooking booking = CurrentBookParamInwardMovement;
+                    // If Workflow doesn't contain a PWNodeProcessWorkflow => Start relocation directly
+                    if (!wfRunsBatches)
+                    {
+                        if (booking.InwardQuantity.HasValue)
+                            booking.InwardQuantity = 0.000001;
+                        if (booking.OutwardQuantity.HasValue)
+                            booking.OutwardQuantity = 0.000001;
+                        BookInwardFacilityMovement();
+                        if (booking.FacilityBooking != null)
+                        {
+                            StartWorkflow(acClassMethod, booking.FacilityBooking);
+                        }
+                    }
+                    // Workflow contains a PWNodeProcessWorkflow => It runs batches => create Picking
+                    else
+                    {
+                        if (ACPickingManager == null)
+                        {
+                            ClearBookingData();
+                            return;
+                        }
+                        Picking picking = null;
+                        MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking);
+                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+                        {
+                            Messages.Msg(msgDetails);
+                            ClearBookingData();
+                            ACUndoChanges();
+                            return;
+                        }
+                        if (picking == null)
+                        {
+                            UndoSave();
+                            ClearBookingData();
+                            return;
+                        }
+                        Save();
+                        msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict);
+                        if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
+                        {
+                            Messages.Msg(msgDetails);
+                            ClearBookingData();
+                            return;
+                        }
+                        StartWorkflow(acClassMethod, picking);
+                    }
+
+                }
+                else if (userQuestionAutomatic == Global.MsgResult.No)
+                    BookInwardFacilityMovement();
+            }
+            else
+                BookInwardFacilityMovement();
+
+            PostExecute("InwardFacilityMovement");
+        }
+
+        protected virtual bool BookInwardFacilityMovement()
+        {
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamInwardMovement, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamInwardMovement.ValidMessage.IsSucceded() || CurrentBookParamInwardMovement.ValidMessage.HasWarnings())
                 Messages.Msg(CurrentBookParamInwardMovement.ValidMessage);
@@ -955,8 +1031,11 @@ namespace gip.bso.facility
                 OnPropertyChanged("CurrentFacility");
                 OnPropertyChanged("FacilityChargeList");
             }
-            PostExecute("InwardFacilityMovement");
+
+            return true;
         }
+
+
         /// <summary>
         /// Determines whether [is enabled inward facility movement].
         /// </summary>
@@ -1159,16 +1238,16 @@ namespace gip.bso.facility
         {
             get
             {
-                if (CurrentBookParamRelocation == null)
-                    return false;
-                if (CurrentBookParamRelocation.OutwardFacility != null
-                    && CurrentBookParamRelocation.OutwardFacility.VBiFacilityACClassID.HasValue
-                    && CurrentBookParamRelocation.InwardFacility != null
-                    && CurrentBookParamRelocation.InwardFacility.VBiFacilityACClassID.HasValue)
-                {
-                    return true;
-                }
-                return false;
+                return
+                    ((CurrentBookParamRelocation != null
+                        && CurrentBookParamRelocation.OutwardFacility != null
+                        && CurrentBookParamRelocation.OutwardFacility.VBiFacilityACClassID.HasValue
+                        && CurrentBookParamRelocation.InwardFacility != null
+                        && CurrentBookParamRelocation.InwardFacility.VBiFacilityACClassID.HasValue)
+                    || (CurrentBookParamInwardMovement != null
+                        && CurrentBookParamInwardMovement.InwardFacility != null
+                        && CurrentBookParamInwardMovement.InwardFacility.VBiFacilityACClassID.HasValue)
+                  );
             }
         }
 
