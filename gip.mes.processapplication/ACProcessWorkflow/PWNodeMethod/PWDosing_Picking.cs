@@ -39,6 +39,24 @@ namespace gip.mes.processapplication
                 }
             }
         }
+
+        public bool DoseAllPosFromPicking
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("DoseAllPosFromPicking");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsBoolean;
+                    }
+                }
+                return false;
+            }
+        }
+
         #endregion
 
         public virtual StartNextCompResult StartNextPickingPos(PAProcessModule module)
@@ -59,107 +77,164 @@ namespace gip.mes.processapplication
                 Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
                 if (picking == null)
                     return StartNextCompResult.Done;
-                PickingPos pickingPos = null;
-                if (pwMethodTransport.CurrentPickingPos != null)
-                    pickingPos = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
-                if (pickingPos == null)
-                {
-                    pickingPos = picking.PickingPos_Picking
-                        .Where(c => c.MDDelivPosLoadStateID.HasValue
-                                && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
-                                    || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
-                        .OrderBy(c => c.Sequence)
-                        .FirstOrDefault();
-                }
-                if (pickingPos == null)
-                    return StartNextCompResult.Done;
-                double targetWeight = 0;
-                if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
-                {
-                    pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
-                    dbApp.ACSaveChanges();
-                    return StartNextCompResult.Done;
-                }
-                targetWeight = pickingPos.RemainingDosingWeight * -1;
-                if (targetWeight < 0.000001)
-                    targetWeight = 1;
+                PickingPos pickingPosFromPWMethod = null;
+                if (pwMethodTransport.CurrentPickingPos != null && !DoseAllPosFromPicking)
+                    pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos.FromAppContext<PickingPos>(dbApp);
 
-                IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
-                ScaleBoundaries scaleBoundaries = null;
-                if (scale != null)
-                    scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, null, null, null, null, null, null, null);
-                if (scaleBoundaries != null)
+                PickingPos[] openPickings = picking.PickingPos_Picking
+                                                    .Where(c => c.MDDelivPosLoadStateID.HasValue
+                                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                                             || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                                    .OrderBy(c => c.Sequence).ToArray();
+
+                if (!DoseAllPosFromPicking)
                 {
-                    double? remainingWeight = null;
-                    if (scaleBoundaries.RemainingWeightCapacity.HasValue)
-                        remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
-                    else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
-                        remainingWeight = scaleBoundaries.MaxWeightCapacity;
-                    if (!remainingWeight.HasValue)
+                    if (pickingPosFromPWMethod == null)
+                        openPickings = openPickings.Take(1).ToArray();
+                    else
+                        openPickings = new PickingPos[] { pickingPosFromPWMethod };
+                }
+
+
+                foreach (PickingPos pickingPos in openPickings)
+                {
+                    double targetWeight = 0;
+                    if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
                     {
-                        //Error50162: MaxWeightCapacity of scale {0} is not configured.
-                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(1.1)", 1000, "Error50162", scale.GetACUrl());
+                        pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                        dbApp.ACSaveChanges();
+                        continue;
+                    }
+                    targetWeight = pickingPos.RemainingDosingWeight * -1;
+                    if (targetWeight < 0.000001)
+                        targetWeight = 1;
 
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                    IPAMContScale scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
+                    ScaleBoundaries scaleBoundaries = null;
+                    if (scale != null)
+                        scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, null, null, null, null, null, null, null);
+                    if (scaleBoundaries != null)
+                    {
+                        double? remainingWeight = null;
+                        if (scaleBoundaries.RemainingWeightCapacity.HasValue)
+                            remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
+                        else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
+                            remainingWeight = scaleBoundaries.MaxWeightCapacity;
+                        if (!remainingWeight.HasValue)
                         {
-                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                            //Error50162: MaxWeightCapacity of scale {0} is not configured.
+                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(1.1)", 1000, "Error50162", scale.GetACUrl());
+
+                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            {
+                                Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                            }
+                        }
+                        else if (Math.Abs(targetWeight) > remainingWeight.Value)
+                        {
+                            targetWeight = remainingWeight.Value;
+                            //pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                            //dbApp.ACSaveChanges();
+                            //return StartNextCompResult.Done;
                         }
                     }
-                    else if (Math.Abs(targetWeight) > remainingWeight.Value)
+
+                    PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
+                    double newRemainingQ = pickingPos.RemainingDosingWeight + targetWeight;
+                    if (newRemainingQ >= -0.000001 && MinDosQuantity > -0.0000001)
                     {
-                        targetWeight = remainingWeight.Value;
-                        //pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
-                        //dbApp.ACSaveChanges();
-                        //return StartNextCompResult.Done;
+                        lastBatchMode = PADosingLastBatchEnum.LastBatch;
+                        if (ParentPWMethodVBBase != null)
+                            ParentPWMethodVBBase.IsLastBatch = lastBatchMode;
                     }
-                }
 
-                PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
-                double newRemainingQ = pickingPos.RemainingDosingWeight + targetWeight;
-                if (newRemainingQ >= -0.000001 && MinDosQuantity > -0.0000001)
-                {
-                    lastBatchMode = PADosingLastBatchEnum.LastBatch;
-                    if (ParentPWMethodVBBase != null)
-                        ParentPWMethodVBBase.IsLastBatch = lastBatchMode;
-                }
+                    Guid scaleACClassID = ParentPWGroup.AccessedProcessModule.ComponentClass.ACClassID;
+                    gip.core.datamodel.ACClass scaleACClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
 
-                Guid scaleACClassID = ParentPWGroup.AccessedProcessModule.ComponentClass.ACClassID;
-                gip.core.datamodel.ACClass scaleACClass = ParentPWGroup.AccessedProcessModule.ComponentClass;
+                    RoutingResult rResult = null;
+                    IList<Facility> possibleSilos = null;
+                    IEnumerable<Route> routes = null;
 
-                RoutingResult rResult = null;
-                IList<Facility> possibleSilos = null;
-                IEnumerable<Route> routes = null;
-
-                if (pickingPos.FromFacility == null)
-                {
-                    RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
-                                                                        OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                                                        null, null, ExcludedSilos);
-                    routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
-                }
-                else
-                {
-                    rResult = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
-                                    scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_Silo_Deselector, new object[] { },
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
-                                    (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
-                                    0, true, true, false, false, 10);
-                }
-
-                Route dosingRoute = null;
-
-                if (pickingPos.FromFacility == null && possibleSilos != null)
-                {
-                    foreach (var prioSilo in possibleSilos)
+                    if (pickingPos.FromFacility == null)
                     {
-                        if (!prioSilo.VBiFacilityACClassID.HasValue)
-                            continue;
-                        dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
-                        if (dosingRoute != null)
-                            break;
+                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
+                                                                            OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                                            null, null, ExcludedSilos);
+                        routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, null, out possibleSilos);
                     }
-                    if (dosingRoute == null)
+                    else
+                    {
+                        rResult = ACRoutingService.SelectRoutes(RoutingService, dbIPlus, true,
+                                        scaleACClass, pickingPos.FromFacility.FacilityACClass, RouteDirections.Backwards, PAMSilo.SelRuleID_Silo_Deselector, new object[] { },
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
+                                        (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
+                                        0, true, true, false, false, 10);
+                    }
+
+                    Route dosingRoute = null;
+
+                    if (pickingPos.FromFacility == null && possibleSilos != null)
+                    {
+                        foreach (var prioSilo in possibleSilos)
+                        {
+                            if (!prioSilo.VBiFacilityACClassID.HasValue)
+                                continue;
+                            dosingRoute = routes == null ? null : routes.Where(c => c.FirstOrDefault().Source.ACClassID == prioSilo.VBiFacilityACClassID).FirstOrDefault();
+                            if (dosingRoute != null)
+                                break;
+                        }
+                        if (dosingRoute == null)
+                        {
+                            if (NoSourceFoundForDosing.ValueT == 0)
+                            {
+                                NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
+                                NoSourceFoundForDosing.ValueT = 1;
+
+                                // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
+                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
+                                                                         pickingPos.Material.MaterialNo,
+                                                                         picking.PickingNo,
+                                                                         "");
+
+                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                return StartNextCompResult.CycleWait;
+                            }
+                            else if (NoSourceFoundForDosing.ValueT == 2)
+                            {
+                                MDDelivPosLoadState posLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+
+                                if (posLoadState == null)
+                                {
+                                    // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(30)", 181, "Error50062",
+                                                    pickingPos.Picking.PickingNo,
+                                                    "-",
+                                                    pickingPos.PickingMaterial.MaterialNo);
+
+                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    return StartNextCompResult.CycleWait;
+
+                                }
+                                pickingPos.MDDelivPosLoadState = posLoadState;
+                                dbApp.ACSaveChanges();
+                                continue;
+                            }
+                        }
+                        else if (NoSourceFoundForDosing.ValueT == 1)
+                        {
+                            NoSourceFoundForDosing.ValueT = 0;
+                            AcknowledgeAlarms();
+                        }
+
+                        CurrentDosingRoute = dosingRoute;
+                        NoSourceFoundForDosing.ValueT = 0;
+                    }
+                    else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any() || (double.IsNaN(pickingPos.RemainingDosingWeight) && NoSourceFoundForDosing.ValueT == 1 || NoSourceFoundForDosing.ValueT == 2))
                     {
                         if (NoSourceFoundForDosing.ValueT == 0)
                         {
@@ -170,7 +245,7 @@ namespace gip.mes.processapplication
                             msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
                                                                      pickingPos.Material.MaterialNo,
                                                                      picking.PickingNo,
-                                                                     "");
+                                                                     "-");
 
                             if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                 Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
@@ -196,223 +271,183 @@ namespace gip.mes.processapplication
                             }
                             pickingPos.MDDelivPosLoadState = posLoadState;
                             dbApp.ACSaveChanges();
-                            return StartNextCompResult.Done;
+                            continue;
                         }
                     }
-                    else if (NoSourceFoundForDosing.ValueT == 1)
+                    else
                     {
+                        dosingRoute = rResult.Routes.FirstOrDefault();
+                        CurrentDosingRoute = dosingRoute;
                         NoSourceFoundForDosing.ValueT = 0;
-                        AcknowledgeAlarms();
                     }
 
-                    CurrentDosingRoute = dosingRoute;
-                    NoSourceFoundForDosing.ValueT = 0;
-                }
-                else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any() || (double.IsNaN(pickingPos.RemainingDosingWeight) && NoSourceFoundForDosing.ValueT == 1 || NoSourceFoundForDosing.ValueT == 2))
-                {
-                    if (NoSourceFoundForDosing.ValueT == 0)
+                    // 4. Starte Dosierung von diesem Silo aus
+                    PAMSilo sourceSilo = CurrentDosingSilo(null);
+                    if (sourceSilo == null)
                     {
-                        NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
-                        NoSourceFoundForDosing.ValueT = 1;
-
-                        // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
-                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
-                                                                 pickingPos.Material.MaterialNo,
-                                                                 picking.PickingNo,
-                                                                 "-");
+                        // Error50064: Property sourceSilo is null at Order {0}, Bill of material {1}, Line {2}
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(8)", 1010, "Error50064",
+                                        picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
 
                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
                         return StartNextCompResult.CycleWait;
                     }
-                    else if (NoSourceFoundForDosing.ValueT == 2)
+                    MDDelivPosLoadState posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadingActive).FirstOrDefault();
+                    if (posState == null)
                     {
-                        MDDelivPosLoadState posLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                        // Error50065: MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess is null at Order {0}, Bill of material {1}, Line {2}
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(9)", 1020, "Error50065",
+                                        picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
 
-                        if (posLoadState == null)
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        return StartNextCompResult.CycleWait;
+                    }
+
+                    core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                    if (refPAACClassMethod == null)
+                        return StartNextCompResult.Done;
+
+                    ACMethod acMethod = refPAACClassMethod.TypeACSignature();
+                    if (acMethod == null)
+                    {
+                        //Error50154: acMethod is null.
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(9a)", 1030, "Error50154");
+
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        return StartNextCompResult.CycleWait;
+                    }
+                    PAProcessFunction responsibleFunc = CanStartProcessFunc(module, acMethod, dbApp, pickingPos, sourceSilo);
+                    if (responsibleFunc == null)
+                    {
+                        return StartNextCompResult.CycleWait;
+                    }
+
+                    var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
+
+                    var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
+                    var sourceClass = parentModule?.FirstOrDefault()?.Source;
+                    if (sourcePoint == null || sourceClass == null)
+                    {
+                        if (ComponentsSkippable)
+                            continue;
+                        else
+                            return StartNextCompResult.CycleWait;
+                    }
+
+                    RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(RoutingService, Database.ContextIPlus, false, sourceClass, sourcePoint, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards,
+                                                                                         null, null, null, 0, true, true);
+
+                    if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
+                    {
+                        if (ComponentsSkippable)
+                            continue;
+                        else
+                            return StartNextCompResult.CycleWait;
+                    }
+
+                    if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, pickingPos, sourceSilo))
+                        return StartNextCompResult.CycleWait;
+
+                    ACValue configuredQuantityValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
+                    if (configuredQuantityValue != null)
+                    {
+                        double configuredQuantity = configuredQuantityValue.ParamAsDouble;
+                        if (configuredQuantity > 0.00001)
                         {
-                            // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
-                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(30)", 181, "Error50062",
-                                            pickingPos.Picking.PickingNo,
-                                            "-",
-                                            pickingPos.PickingMaterial.MaterialNo);
+                            if (targetWeight > configuredQuantity)
+                            {
+                                targetWeight = configuredQuantity;
+                            }
+                        }
+                    }
+
+                    if (pickingPos != null && double.IsNaN(pickingPos.RemainingDosingWeight) && double.IsNaN(targetWeight))
+                    {
+                        NoSourceFoundForDosing.ValueT = 1;
+                        //Error50597: Dosing error on the component {0} {1}, {2};
+                        string error = pickingPos.RemainingDosingWeightError;
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", pickingPos.Material.MaterialNo, pickingPos.Material.MaterialName1, error);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        return StartNextCompResult.CycleWait;
+                    }
+
+                    acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;
+
+                    acMethod["PLPosRelation"] = pickingPos.PickingPosID;
+                    acMethod["Route"] = dosingRoute != null ? dosingRoute.Clone() as Route : null;
+                    acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
+                    acMethod["TargetQuantity"] = targetWeight;
+                    acMethod[Material.ClassName] = pickingPos.Material.MaterialName1;
+                    if (pickingPos.Material.Density > 0.00001)
+                        acMethod["Density"] = pickingPos.Material.Density;
+                    if (dosingRoute != null)
+                        dosingRoute.Detach(true);
+
+                    if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, pickingPos, sourceSilo))
+                    {
+                        return StartNextCompResult.CycleWait;
+                    }
+
+                    if (!acMethod.IsValid())
+                    {
+                        // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
+                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(10)", 1040, "Error50066",
+                                        picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
+
+                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                        return StartNextCompResult.CycleWait;
+                    }
+
+                    RecalcTimeInfo(true);
+                    CurrentDosingPos.ValueT = pickingPos.PickingPosID;
+                    if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
+                    {
+                        return StartNextCompResult.CycleWait;
+                    }
+                    _ExecutingACMethod = acMethod;
+
+                    module.TaskInvocationPoint.ClearMyInvocations(this);
+                    _CurrentMethodEventArgs = null;
+                    if (!IsTaskStarted(module.TaskInvocationPoint.AddTask(acMethod, this)))
+                    {
+                        ACMethodEventArgs eM = _CurrentMethodEventArgs;
+                        if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
+                        {
+                            // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
+                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(10a)", 1050, "Error50066",
+                                        picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
 
                             if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                 Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                             OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                            return StartNextCompResult.CycleWait;
                         }
-                        pickingPos.MDDelivPosLoadState = posLoadState;
-                        dbApp.ACSaveChanges();
-                        return StartNextCompResult.Done;
-                    }
-                }
-                else
-                {
-                    dosingRoute = rResult.Routes.FirstOrDefault();
-                    CurrentDosingRoute = dosingRoute;
-                    NoSourceFoundForDosing.ValueT = 0;
-                }
-
-                // 4. Starte Dosierung von diesem Silo aus
-                PAMSilo sourceSilo = CurrentDosingSilo(null);
-                if (sourceSilo == null)
-                {
-                    // Error50064: Property sourceSilo is null at Order {0}, Bill of material {1}, Line {2}
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(8)", 1010, "Error50064",
-                                    picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
-
-                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    return StartNextCompResult.CycleWait;
-                }
-                MDDelivPosLoadState posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadingActive).FirstOrDefault();
-                if (posState == null)
-                {
-                    // Error50065: MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess is null at Order {0}, Bill of material {1}, Line {2}
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(9)", 1020, "Error50065",
-                                    picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
-
-                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    return StartNextCompResult.CycleWait;
-                }
-
-                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
-                if (refPAACClassMethod == null)
-                    return StartNextCompResult.Done;
-
-                ACMethod acMethod = refPAACClassMethod.TypeACSignature();
-                if (acMethod == null)
-                {
-                    //Error50154: acMethod is null.
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(9a)", 1030, "Error50154");
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    return StartNextCompResult.CycleWait;
-                }
-                PAProcessFunction responsibleFunc = CanStartProcessFunc(module, acMethod, dbApp, pickingPos, sourceSilo);
-                if (responsibleFunc == null)
-                    return StartNextCompResult.CycleWait;
-
-                var parentModule = ACRoutingService.DbSelectRoutesFromPoint(dbIPlus, responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID, null, RouteDirections.Backwards, true, false).FirstOrDefault();
-
-                var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
-                var sourceClass = parentModule?.FirstOrDefault()?.Source;
-                if (sourcePoint == null || sourceClass == null)
-                {
-                    if (ComponentsSkippable)
-                        return StartNextCompResult.Done;
-                    else
+                        CurrentDosingPos.ValueT = Guid.Empty;
                         return StartNextCompResult.CycleWait;
-                }
+                    }
+                    UpdateCurrentACMethod();
 
-                RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(RoutingService, Database.ContextIPlus, false, sourceClass, sourcePoint, PAMSilo.SelRuleID_Silo, RouteDirections.Backwards,
-                                                                                     null, null, null, 0, true, true);
-
-                if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
-                {
-                    if (ComponentsSkippable)
-                        return StartNextCompResult.Done;
-                    else
+                    CachedEmptySiloHandlingOption = null;
+                    pickingPos.MDDelivPosLoadState = posState;
+                    MsgWithDetails msg2 = dbApp.ACSaveChanges();
+                    if (msg2 != null)
+                    {
+                        Messages.LogException(this.GetACUrl(), "HandleState(5)", msg2.InnerMessage);
+                        OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Exception, PWClassName, "StartNextPickingPos", 1060), true);
                         return StartNextCompResult.CycleWait;
-                }
-
-                if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, pickingPos, sourceSilo))
-                    return StartNextCompResult.CycleWait;
-
-                ACValue configuredQuantityValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
-                if (configuredQuantityValue != null)
-                {
-                    double configuredQuantity = configuredQuantityValue.ParamAsDouble;
-                    if (configuredQuantity > 0.00001)
-                    {
-                        if (targetWeight > configuredQuantity)
-                        {
-                            targetWeight = configuredQuantity;
-                        }
                     }
+                    AcknowledgeAlarms();
+
+                    return StartNextCompResult.NextCompStarted;
+
                 }
 
-                if (pickingPos != null && double.IsNaN(pickingPos.RemainingDosingWeight) &&  double.IsNaN(targetWeight))
-                {
-                    NoSourceFoundForDosing.ValueT = 1;
-                    //Error50597: Dosing error on the component {0} {1}, {2};
-                    string error = pickingPos.RemainingDosingWeightError;
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", pickingPos.Material.MaterialNo, pickingPos.Material.MaterialName1, error);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    return StartNextCompResult.CycleWait;
-                }
-
-                acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;
-
-                acMethod["PLPosRelation"] = pickingPos.PickingPosID;
-                acMethod["Route"] = dosingRoute != null ? dosingRoute.Clone() as Route : null;
-                acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
-                acMethod["TargetQuantity"] = targetWeight;
-                acMethod[Material.ClassName] = pickingPos.Material.MaterialName1;
-                if (pickingPos.Material.Density > 0.00001)
-                    acMethod["Density"] = pickingPos.Material.Density;
-                if (dosingRoute != null)
-                    dosingRoute.Detach(true);
-
-                if (!(bool)ExecuteMethod("AfterConfigForACMethodIsSet", acMethod, true, dbApp, pickingPos, sourceSilo))
-                    return StartNextCompResult.CycleWait;
-
-                if (!acMethod.IsValid())
-                {
-                    // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(10)", 1040, "Error50066",
-                                    picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
-
-                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    return StartNextCompResult.CycleWait;
-                }
-
-                RecalcTimeInfo(true);
-                CurrentDosingPos.ValueT = pickingPos.PickingPosID;
-                if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
-                    return StartNextCompResult.CycleWait;
-                _ExecutingACMethod = acMethod;
-
-                module.TaskInvocationPoint.ClearMyInvocations(this);
-                _CurrentMethodEventArgs = null;
-                if (!IsTaskStarted(module.TaskInvocationPoint.AddTask(acMethod, this)))
-                {
-                    ACMethodEventArgs eM = _CurrentMethodEventArgs;
-                    if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
-                    {
-                        // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
-                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextPickingPos(10a)", 1050, "Error50066",
-                                    picking.PickingNo, pickingPos.Material.MaterialName1, pickingPos.Sequence);
-
-                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                    }
-                    CurrentDosingPos.ValueT = Guid.Empty;
-                    return StartNextCompResult.CycleWait;
-                }
-                UpdateCurrentACMethod();
-
-                CachedEmptySiloHandlingOption = null;
-                pickingPos.MDDelivPosLoadState = posState;
-                MsgWithDetails msg2 = dbApp.ACSaveChanges();
-                if (msg2 != null)
-                {
-                    Messages.LogException(this.GetACUrl(), "HandleState(5)", msg2.InnerMessage);
-                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Exception, PWClassName, "StartNextPickingPos", 1060), true);
-                    return StartNextCompResult.CycleWait;
-                }
-                AcknowledgeAlarms();
-                return StartNextCompResult.NextCompStarted;
-
+                return StartNextCompResult.Done;
             }
         }
 
@@ -822,7 +857,7 @@ namespace gip.mes.processapplication
                                     {
                                         facilityPreBooking.DeleteACObject(dbApp, true);
                                         if (ACFacilityManager != null)
-                                            ACFacilityManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false); 
+                                            ACFacilityManager.RecalcAfterPosting(dbApp, pickingPos, bookingParam.OutwardQuantity.Value, false);
                                         //pickingPos.IncreasePickingActualUOM(bookingParam.OutwardQuantity.Value);
                                         //dosingPosRelation.TopParentPartslistPosRelation.RecalcActualQuantity();
                                         //dosingPosRelation.SourceProdOrderPartslistPos.TopParentPartslistPos.RecalcActualQuantity();
