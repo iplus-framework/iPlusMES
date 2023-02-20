@@ -914,7 +914,10 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledSearch()
         {
-            return FilterStartDate != null && FilterEndDate != null;
+            return FilterStartDate.HasValue
+                    && FilterEndDate.HasValue
+                    && FilterEndDate.Value > FilterStartDate.Value
+                    && (FilterEndDate.Value - FilterStartDate.Value).Days <= 365;
         }
 
 
