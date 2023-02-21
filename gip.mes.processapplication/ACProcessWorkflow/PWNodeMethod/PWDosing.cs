@@ -58,7 +58,7 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("FacilityNoSort", typeof(string), null, Global.ParamOption.Optional));
             paramTranslation.Add("FacilityNoSort", "en{'Priorization order container number'}de{'Priorisierungsreihenfolge Silonummer'}");
             method.ParameterValueList.Add(new ACValue("DoseAllPosFromPicking", typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all positions from picking'}de{'Dosieren Sie alle Positionen von der Kommissionierung'}");
+            paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all picking lines at the same time'}de{'Alle Kommissionierpositionen gleichzeitig dosieren'}");
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDosing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDosing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWDosing), HandleExecuteACMethod_PWDosing);
