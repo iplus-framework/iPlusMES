@@ -2036,14 +2036,12 @@ namespace gip.bso.manufacturing
 
             if (DatabaseApp.IsChanged)
             {
-                MsgWithDetails saveMsg = LocalSaveChanges();
+                LocalSaveChanges();
                 foreach (WizardSchedulerPartslist wizardItem in AllWizardSchedulerPartslistList)
                 {
                     if (!IsBSOTemplateScheduleParent && wizardItem.SelectedMDSchedulingGroup != null)
                         RefreshServerState(wizardItem.SelectedMDSchedulingGroup.MDSchedulingGroupID);
                 }
-                if (saveMsg != null)
-                    SendMessage(saveMsg);
                 OnPropertyChanged(nameof(WizardSchedulerPartslistList));
             }
         }
@@ -2587,7 +2585,7 @@ namespace gip.bso.manufacturing
             return SelectedScheduleForPWNode != null;
         }
 
-        public MsgWithDetails LocalSaveChanges()
+        public bool LocalSaveChanges()
         {
             MsgWithDetails saveMsg = new MsgWithDetails();;
             Msg msg = CheckForInappropriateComponentQuantityOccurrence();
@@ -2597,7 +2595,8 @@ namespace gip.bso.manufacturing
                 ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
             }
             saveMsg = DatabaseApp.ACSaveChanges();
-            return saveMsg;
+            Messages.Msg(saveMsg);
+            return saveMsg == null || saveMsg.IsSucceded();
         }
 
 
@@ -2784,27 +2783,23 @@ namespace gip.bso.manufacturing
             }
             if (isMovingValueValid)
             {
-                bool isSaveValid = true;
-                MsgWithDetails saveBatchPlanMoveMsg = LocalSaveChanges();
-                if (saveBatchPlanMoveMsg == null || saveBatchPlanMoveMsg.IsSucceded())
+                bool isSaveValid = LocalSaveChanges();
+                if (isSaveValid)
                 {
                     // Correct the SortOrder from ProdOrderBatchPlan
                     ProdOrderBatchPlanList = GetProdOrderBatchPlanList(SelectedScheduleForPWNode?.MDSchedulingGroupID);
                     if (ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any() && isMove)
                     {
                         MoveBatchSortOrderCorrect(ProdOrderBatchPlanList);
-                        MsgWithDetails saveOrderNoMsg = LocalSaveChanges();
-                        if (saveOrderNoMsg != null && !saveOrderNoMsg.IsSucceded())
+                        isSaveValid  = LocalSaveChanges();
+                        if (!isSaveValid)
                         {
-                            SendMessage(saveOrderNoMsg);
                             DatabaseApp.ACUndoChanges();
                         }
                     }
                 }
                 else
                 {
-                    isSaveValid = false;
-                    SendMessage(saveBatchPlanMoveMsg);
                     DatabaseApp.ACUndoChanges();
                 }
                 if (isSaveValid)
@@ -3730,9 +3725,7 @@ namespace gip.bso.manufacturing
 
             MoveBatchSortOrderCorrect();
 
-            MsgWithDetails saveMsg = saveMsg = LocalSaveChanges();
-            if (saveMsg != null)
-                SendMessage(saveMsg);
+            LocalSaveChanges();
 
         }
 
@@ -4152,9 +4145,7 @@ namespace gip.bso.manufacturing
 
             MaintainProdOrderState(prodOrders);
 
-            MsgWithDetails saveMsg = LocalSaveChanges();
-            if (saveMsg != null)
-                SendMessage(saveMsg);
+            LocalSaveChanges();
             LoadProdOrderBatchPlanList();
             if (!IsBSOTemplateScheduleParent)
             {
@@ -4307,9 +4298,7 @@ namespace gip.bso.manufacturing
                 {
                     if (DatabaseApp.IsChanged)
                     {
-                        MsgWithDetails saveMsg = LocalSaveChanges();
-                        if (saveMsg != null)
-                            SendMessage(saveMsg);
+                        LocalSaveChanges();
                     }
                     WizardPhase = NewScheduledBatchWizardPhaseEnum.PartslistForDefinition;
                     OnPropertyChanged(nameof(WizardSchedulerPartslistList));
@@ -4632,10 +4621,10 @@ namespace gip.bso.manufacturing
                                 List<vd.ProdOrderBatchPlan> generatedBatchPlans;
                                 success = FactoryBatchPlans(SelectedWizardSchedulerPartslist, ref programNo, out generatedBatchPlans);
                             }
-                            MsgWithDetails saveMsg = LocalSaveChanges();
-                            if (saveMsg != null)
-                                SendMessage(saveMsg);
-                            if (success && !string.IsNullOrEmpty(programNo) && (saveMsg == null || saveMsg.IsSucceded()))
+
+                            bool saveSuccess = LocalSaveChanges();
+                            
+                            if (success && !string.IsNullOrEmpty(programNo) && saveSuccess)
                             {
                                 AllWizardSchedulerPartslistList.ForEach(x => x.ProgramNo = programNo);
                             }
@@ -4861,6 +4850,11 @@ namespace gip.bso.manufacturing
                                         1,
                                         schedulingGroups,
                                         selectedMDSchedulingGroup);
+
+                if(schedulingGroups.Select(c=>c.MDSchedulingGroupID).Contains(selectedMDSchedulingGroup.MDSchedulingGroupID))
+                {
+                    DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup = selectedMDSchedulingGroup;
+                }
             }
 
             AllWizardSchedulerPartslistList.Clear();
@@ -5432,10 +5426,7 @@ namespace gip.bso.manufacturing
                 xml = sw.ToString();
             }
             BSOBatchPlanSchedulerRules = xml;
-            var msg = LocalSaveChanges();
-
-            if (msg != null)
-                Messages.Msg(msg);
+            LocalSaveChanges();
 
             _TempRules = GetStoredRules();
 
