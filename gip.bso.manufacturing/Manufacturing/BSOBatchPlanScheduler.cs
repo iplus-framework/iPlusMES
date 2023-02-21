@@ -2589,7 +2589,7 @@ namespace gip.bso.manufacturing
 
         public MsgWithDetails LocalSaveChanges()
         {
-            MsgWithDetails saveMsg = null;
+            MsgWithDetails saveMsg = new MsgWithDetails();;
             Msg msg = CheckForInappropriateComponentQuantityOccurrence();
             if (msg != null)
             {
@@ -2641,7 +2641,7 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
-            return null;
+            return msg;
         }
 
 
@@ -3466,16 +3466,13 @@ namespace gip.bso.manufacturing
                                                     || c.PlanState >= GlobalApp.BatchPlanState.Paused));
         }
 
-
         private void SetReadyToStart(ProdOrderBatchPlan[] batchPlans)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderBatchPlan batchPlan in batchPlans)
             {
                 bool isBatchReadyToStart = batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
-                if (isBatchReadyToStart)
-                    batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
-                else
+                if (!isBatchReadyToStart)
                 {
                     // Error50559
                     // Unable to start batch plan #{0} {1} {2} {3}x{4}! Destination not selected!
@@ -3485,11 +3482,156 @@ namespace gip.bso.manufacturing
                         batchPlan.BatchTargetCount, batchPlan.BatchSize);
                     msgWithDetails.AddDetailMessage(msg);
                 }
+
+                if (isBatchReadyToStart)
+                {
+                    // check duplicate components
+                    bool haveManyDuplicateComponents =
+                        batchPlan
+                        .ProdOrderPartslist
+                        .ProdOrderPartslistPos_ProdOrderPartslist
+                        .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                        .GroupBy(c => c.Material.MaterialNo)
+                        .Where(c => c.Count() > 1)
+                        .Count() > 1;
+
+                    if (haveManyDuplicateComponents)
+                    {
+                        // Warning50060
+                        // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
+                        // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
+                        if (Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName) != Global.MsgResult.OK)
+                        {
+                            isBatchReadyToStart = false;
+                        }
+                    }
+                }
+
+                if (isBatchReadyToStart)
+                {
+                    bool notExpectedPosQuantities = NotExpectedPosQuantities(batchPlan);
+                    if (notExpectedPosQuantities)
+                    {
+                        // Warning50061
+                        // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
+                        // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
+                        if (Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName) != Global.MsgResult.OK)
+                        {
+                            isBatchReadyToStart = false;
+                        }
+                    }
+                }
+
+                if (isBatchReadyToStart)
+                {
+                    bool notExpectedComponentSum = NotExpectedComponentSum(batchPlan);
+                    if (notExpectedComponentSum)
+                    {
+                        // Warning50062
+                        // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
+                        // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
+                        if (Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName) != Global.MsgResult.OK)
+                        {
+                            isBatchReadyToStart = false;
+                        }
+                    }
+                }
+
+                if (isBatchReadyToStart)
+                {
+                    batchPlan.PlanState = vd.GlobalApp.BatchPlanState.ReadyToStart;
+                }
             }
+
             if (msgWithDetails.MsgDetails.Any())
+            {
                 Messages.Msg(msgWithDetails);
+            }
             Save();
             OnPropertyChanged(nameof(ProdOrderBatchPlanList));
+        }
+
+        private bool NotExpectedPosQuantities(ProdOrderBatchPlan batchPlan)
+        {
+            bool notExpectedPosQuantities = false;
+
+            Partslist pl = batchPlan.ProdOrderPartslist.Partslist;
+            if (pl.TargetQuantityUOM <= double.Epsilon)
+            {
+                notExpectedPosQuantities = true;
+            }
+            else if (batchPlan.ProdOrderPartslist.TargetQuantity <= double.Epsilon)
+            {
+                notExpectedPosQuantities = true;
+            }
+            else
+            {
+                double plMinRatio = 0;
+                double plMaxRatio = 0;
+                PartslistPos[] lines = pl.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToArray();
+                foreach (PartslistPos pos in lines)
+                {
+                    double ratio = pos.TargetQuantityUOM / pl.TargetQuantityUOM;
+                    if (ratio < plMinRatio || plMinRatio == 0)
+                    {
+                        plMinRatio = ratio;
+                    }
+
+                    if (ratio > plMaxRatio || plMaxRatio == 0)
+                    {
+                        plMaxRatio = ratio;
+                    }
+                }
+
+                double prodPlMinRatio = 0;
+                double prodPlMaxRatio = 0;
+                ProdOrderPartslistPos[] prodLines = batchPlan.ProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot).ToArray();
+                foreach (ProdOrderPartslistPos prodLine in prodLines)
+                {
+                    double ratio = prodLine.TargetQuantityUOM / batchPlan.ProdOrderPartslist.TargetQuantity;
+                    if (ratio < prodPlMinRatio || prodPlMinRatio == 0)
+                    {
+                        prodPlMinRatio = ratio;
+                    }
+
+                    if (ratio > prodPlMaxRatio || prodPlMaxRatio == 0)
+                    {
+                        prodPlMaxRatio = ratio;
+                    }
+                }
+
+                notExpectedPosQuantities = (Math.Abs(plMinRatio - prodPlMinRatio) / prodPlMinRatio) >= 0.1;
+                if (!notExpectedPosQuantities)
+                {
+                    notExpectedPosQuantities = (Math.Abs(plMaxRatio - prodPlMaxRatio) / prodPlMaxRatio) >= 0.1;
+                }
+            }
+
+            return notExpectedPosQuantities;
+        }
+
+        private bool NotExpectedComponentSum(ProdOrderBatchPlan batchPlan)
+        {
+            bool notExpectedComponentSum = false;
+            double componentsSum =
+                batchPlan
+                .ProdOrderPartslist
+                .ProdOrderPartslistPos_ProdOrderPartslist
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && !c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Where(x => x.TargetProdOrderPartslistPos.Material.ExcludeFromSumCalc).Any())
+                .Select(c => c.TargetQuantityUOM)
+                .DefaultIfEmpty()
+                .Sum();
+
+            if (batchPlan.ProdOrderPartslist.TargetQuantity <= double.Epsilon)
+            {
+                notExpectedComponentSum = true;
+            }
+            else
+            {
+                notExpectedComponentSum = (Math.Abs(componentsSum - batchPlan.ProdOrderPartslist.TargetQuantity) / batchPlan.ProdOrderPartslist.TargetQuantity) >= 0.1;
+            }
+
+            return notExpectedComponentSum;
         }
 
         [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
@@ -4222,9 +4364,9 @@ namespace gip.bso.manufacturing
             {
                 List<Guid> groupsForRefresh = new List<Guid>();
                 List<ProdOrderBatchPlan> batchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
-                if(batchPlans.Any(c=>c.IsSelected))
+                if (batchPlans.Any(c => c.IsSelected))
                 {
-                    batchPlans = batchPlans.Where(c=>c.IsSelected).ToList();
+                    batchPlans = batchPlans.Where(c => c.IsSelected).ToList();
                 }
                 DoSetBatchStateCancelled(false, batchPlans, ref groupsForRefresh);
 
@@ -4623,7 +4765,7 @@ namespace gip.bso.manufacturing
                                 prodOrderPartslist);
                     else
                     {
-                        MDSchedulingGroup schedulingGroup = DatabaseApp.MDSchedulingGroup.Where(c=>c.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID).FirstOrDefault();
+                        MDSchedulingGroup schedulingGroup = DatabaseApp.MDSchedulingGroup.Where(c => c.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID).FirstOrDefault();
                         wizardSchedulerPartslist =
                             new WizardSchedulerPartslist(
                                 DatabaseApp,
@@ -4634,8 +4776,8 @@ namespace gip.bso.manufacturing
                                 sn,
                                 schedulingGroups,
                                 schedulingGroup);
-                    }    
-                        
+                    }
+
 
                     AddWizardSchedulerPartslistList(wizardSchedulerPartslist, sn);
                 }
@@ -5605,4 +5747,5 @@ namespace gip.bso.manufacturing
         DefineTargets = 6,
         DeleteBatchPlan = 7
     }
+
 }

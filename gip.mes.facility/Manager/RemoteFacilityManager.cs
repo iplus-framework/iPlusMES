@@ -295,6 +295,10 @@ namespace gip.mes.facility
                                         fbcForMirroringToPreBooking.Add(remoteFBC);
                                 }
                             }
+                            if(!queryRemoteFBCs.Any())
+                            {
+                                Messages.LogDebug(GetACUrl(), nameof(SynchronizeFacility), $"Remote FacilityBooking is null! FacilityBookingID: {entry.KeyId}!");
+                            }
                         }
                         else if (entry.EntityType == Picking.ClassName)
                         {
@@ -317,6 +321,7 @@ namespace gip.mes.facility
                             }
                             if (remotePicking == null)
                             {
+                                Messages.LogDebug(GetACUrl(), nameof(SynchronizeFacility), $"Delete local picking for not existing remote PickingID: {entry.KeyId}!");
                                 // Remote Picking was deleted, delete local Picking
                                 var localPicking = dbLocal.Picking.Include(c => c.MDPickingType)
                                             .Include("PickingPos_Picking")
