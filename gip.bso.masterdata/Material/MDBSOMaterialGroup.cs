@@ -59,9 +59,13 @@ namespace gip.bso.masterdata
             if (!base.ACInit(startChildMode))
                 return false;
             MediaSettings = new MediaSettings();
-            MDMaterialGroup dummyMDMaterialGroup = DatabaseApp.MDMaterialGroup.FirstOrDefault();
-            if (dummyMDMaterialGroup != null)
-                MediaSettings.LoadTypeFolder(dummyMDMaterialGroup);
+            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
+            if (ShowImages)
+            {
+                MDMaterialGroup dummyMDMaterialGroup = DatabaseApp.MDMaterialGroup.FirstOrDefault();
+                if (dummyMDMaterialGroup != null)
+                    MediaSettings.LoadTypeFolder(dummyMDMaterialGroup);
+            }
 
             if(BSOMedia_Child != null && BSOMedia_Child.Value != null)
                 BSOMedia_Child.Value.OnDefaultImageDelete += Value_OnDefaultImageDelete;
@@ -104,6 +108,22 @@ namespace gip.bso.masterdata
                 if (_BSOMedia_Child == null)
                     _BSOMedia_Child = new ACChildItem<BSOMedia>(this, "BSOMedia_Child");
                 return _BSOMedia_Child;
+            }
+        }
+        #endregion
+
+        #region Configuration
+        private ACPropertyConfigValue<bool> _ShowImages;
+        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}")]
+        public bool ShowImages
+        {
+            get
+            {
+                return _ShowImages.ValueT;
+            }
+            set
+            {
+                _ShowImages.ValueT = value;
             }
         }
         #endregion
@@ -188,9 +208,12 @@ namespace gip.bso.masterdata
             get
             {
                 var groupList = AccessPrimary.NavList.ToList();
-                foreach (var item in groupList)
+                if (ShowImages)
                 {
-                    MediaSettings.LoadImage(item);
+                    foreach (var item in groupList)
+                    {
+                        MediaSettings.LoadImage(item);
+                    }
                 }
                 return groupList;
             }

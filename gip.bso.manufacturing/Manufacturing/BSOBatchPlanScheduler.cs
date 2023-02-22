@@ -157,6 +157,20 @@ namespace gip.bso.manufacturing
             return poManager.GetCalculatedBatchPlanDuration(DatabaseApp, materialWFConnection.MaterialWFACClassMethodID, vbACClassWF.ACClassWFID);
         }
 
+        private ACPropertyConfigValue<bool> _ShowImages;
+        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}")]
+        public bool ShowImages
+        {
+            get
+            {
+                return _ShowImages.ValueT;
+            }
+            set
+            {
+                _ShowImages.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region c´tors
@@ -191,15 +205,24 @@ namespace gip.bso.manufacturing
             if (_SchedulingForecastManager == null)
                 throw new Exception("SchedulingForecastManager not configured");
 
+            _CreatedBatchState = new ACPropertyConfigValue<vd.GlobalApp.BatchPlanState>(this, nameof(CreatedBatchState), vd.GlobalApp.BatchPlanState.Created);
+            _AutoRemoveMDSGroupFrom = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupFrom), 0);
+            _ = AutoRemoveMDSGroupFrom;
+            _AutoRemoveMDSGroupTo = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupTo), 0);
+            _ = AutoRemoveMDSGroupTo;
+            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
+            if (ShowImages)
+            {
+                Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
+                if (dummyMaterial != null)
+                    MediaSettings.LoadTypeFolder(dummyMaterial);
+            }
 
             var refBatchPlanSchedulerComponent = ACUrlCommand(PABatchPlanSchedulerURL) as ACComponent;
             if (refBatchPlanSchedulerComponent != null)
                 _BatchPlanScheduler = new ACRef<ACComponent>(refBatchPlanSchedulerComponent, this);
 
             MediaSettings = new MediaSettings();
-            Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
-            MediaSettings.LoadTypeFolder(dummyMaterial);
-
             InitBatchPlanSchedulerComponent();
 
             if (FilterProdPartslistOrderList != null)
@@ -224,12 +247,6 @@ namespace gip.bso.manufacturing
 
             if (BSOMaterialPreparationChild != null && BSOMaterialPreparationChild.Value != null)
                 BSOMaterialPreparationChild.Value.OnSearchStockMaterial += Value_OnSearchStockMaterial;
-
-            _CreatedBatchState = new ACPropertyConfigValue<vd.GlobalApp.BatchPlanState>(this, nameof(CreatedBatchState), vd.GlobalApp.BatchPlanState.Created);
-            _AutoRemoveMDSGroupFrom = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupFrom), 0);
-            _ = AutoRemoveMDSGroupFrom;
-            _AutoRemoveMDSGroupTo = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupTo), 0);
-            _ = AutoRemoveMDSGroupTo;
 
             return true;
         }
@@ -1278,10 +1295,13 @@ namespace gip.bso.manufacturing
             }
             if (prodOrderBatchPlans != null)
             {
-                foreach (var batchPlan in prodOrderBatchPlans)
+                if (ShowImages)
                 {
-                    Material material = batchPlan.ProdOrderPartslist.Partslist.Material;
-                    MediaSettings.LoadImage(material);
+                    foreach (var batchPlan in prodOrderBatchPlans)
+                    {
+                        Material material = batchPlan.ProdOrderPartslist.Partslist.Material;
+                        MediaSettings.LoadImage(material);
+                    }
                 }
             }
             return prodOrderBatchPlans;
@@ -2595,7 +2615,8 @@ namespace gip.bso.manufacturing
                 ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
             }
             saveMsg = DatabaseApp.ACSaveChanges();
-            Messages.Msg(saveMsg);
+            if (saveMsg != null)
+                Messages.Msg(saveMsg);
             return saveMsg == null || saveMsg.IsSucceded();
         }
 
