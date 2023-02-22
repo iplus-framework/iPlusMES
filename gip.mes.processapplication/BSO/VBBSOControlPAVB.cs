@@ -90,10 +90,13 @@ namespace gip.mes.processapplication
             }
             set
             {
+                if (!value)
+                    return;
+
                 _ShowMatConfigAll = value;
-                OnPropertyChanged("ShowMatConfigAll");
+                OnPropertyChanged();
                 _ShowMatConfigPoint = !_ShowMatConfigAll;
-                OnPropertyChanged("ShowMatConfigPoint");
+                OnPropertyChanged(nameof(ShowMatConfigPoint));
                 LoadOutMaterialConfigList();
                 LoadInMaterialConfigList();
             }
@@ -109,10 +112,13 @@ namespace gip.mes.processapplication
             }
             set
             {
+                if (!value)
+                    return;
+
                 _ShowMatConfigPoint = value;
-                OnPropertyChanged("ShowMatConfigPoint");
+                OnPropertyChanged();
                 _ShowMatConfigAll = !_ShowMatConfigPoint;
-                OnPropertyChanged("ShowMatConfigAll");
+                OnPropertyChanged(nameof(ShowMatConfigAll));
                 LoadOutMaterialConfigList();
                 LoadInMaterialConfigList();
             }
@@ -131,7 +137,7 @@ namespace gip.mes.processapplication
             set
             {
                 _SelectedInMaterialConfig = value;
-                OnPropertyChanged("SelectedInMaterialConfig");
+                OnPropertyChanged();
             }
         }
 
@@ -150,7 +156,7 @@ namespace gip.mes.processapplication
             set
             {
 
-                OnPropertyChanged("InMaterialConfigList");
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -167,7 +173,7 @@ namespace gip.mes.processapplication
             set
             {
                 _SelectedOutMaterialConfig = value;
-                OnPropertyChanged("SelectedOutMaterialConfig");
+                OnPropertyChanged();
             }
         }
 
@@ -186,7 +192,7 @@ namespace gip.mes.processapplication
             set
             {
 
-                OnPropertyChanged("OutMaterialConfigList");
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -204,7 +210,7 @@ namespace gip.mes.processapplication
             set
             {
                 _SelectedInMaterial = value;
-                OnPropertyChanged("SelectedInMaterial");
+                OnPropertyChanged();
             }
         }
 
@@ -219,7 +225,7 @@ namespace gip.mes.processapplication
             set
             {
                 _SelectedOutMaterial = value;
-                OnPropertyChanged("SelectedOutMaterial");
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -231,11 +237,11 @@ namespace gip.mes.processapplication
         #region Methods
         void VBBSOControlPAVB_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "SelectedInPointConfig")
+            if (e.PropertyName == nameof(SelectedInPointConfig))
             {
                 LoadInMaterialConfigList();
             }
-            else if (e.PropertyName == "SelectedOutPointConfig")
+            else if (e.PropertyName == nameof(SelectedOutPointConfig))
             {
                 LoadOutMaterialConfigList();
             }
@@ -252,7 +258,7 @@ namespace gip.mes.processapplication
             _InMaterialConfigList = null;
             if (CurrentACComponent == null)
             {
-                OnPropertyChanged("InMaterialConfigList");
+                OnPropertyChanged(nameof(InMaterialConfigList));
                 return;
             }
             gip.core.datamodel.ACClass acClass = CurrentACComponent.ACType as gip.core.datamodel.ACClass;
@@ -309,10 +315,10 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            OnPropertyChanged("InMaterialConfigList");
+            OnPropertyChanged(nameof(InMaterialConfigList));
         }
 
-        [ACMethodInteraction("InMaterialConfig", "en{'add material configuration'}de{'Materialkonfig. hinzufügen'}", (short)MISort.New, true, "SelectedInMaterialConfig", Global.ACKinds.MSMethod)]
+        [ACMethodInteraction("InMaterialConfig", "en{'add material configuration'}de{'Materialkonfig. hinzufügen'}", (short)MISort.New, true, nameof(SelectedInMaterialConfig), Global.ACKinds.MSMethod)]
         public void AddInMaterialConfig()
         {
             if (!IsEnabledAddInMaterialConfig())
@@ -367,7 +373,7 @@ namespace gip.mes.processapplication
             _OutMaterialConfigList = null;
             if (CurrentACComponent == null)
             {
-                OnPropertyChanged("OutMaterialConfigList");
+                OnPropertyChanged(nameof(OutMaterialConfigList));
                 return;
             }
             gip.core.datamodel.ACClass acClass = CurrentACComponent.ACType as gip.core.datamodel.ACClass;
@@ -423,11 +429,11 @@ namespace gip.mes.processapplication
                     }
                 }
             }
-            OnPropertyChanged("OutMaterialConfigList");
+            OnPropertyChanged(nameof(OutMaterialConfigList));
         }
         
         
-        [ACMethodInteraction("OutMaterialConfig", "en{'Add material configuration'}de{'Materialkonfig. hinzufügen'}", (short)MISort.New, true, "SelectedOutMaterialConfig", Global.ACKinds.MSMethod)]
+        [ACMethodInteraction("OutMaterialConfig", "en{'Add material configuration'}de{'Materialkonfig. hinzufügen'}", (short)MISort.New, true, nameof(SelectedOutMaterialConfig), Global.ACKinds.MSMethod)]
         public void AddOutMaterialConfig()
         {
             if (!IsEnabledAddOutMaterialConfig())
@@ -504,28 +510,28 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case"AddInMaterialConfig":
+                case nameof(AddInMaterialConfig):
                     AddInMaterialConfig();
                     return true;
-                case"IsEnabledAddInMaterialConfig":
+                case nameof(IsEnabledAddInMaterialConfig):
                     result = IsEnabledAddInMaterialConfig();
                     return true;
-                case"RemoveInMaterialConfig":
+                case nameof(RemoveInMaterialConfig):
                     RemoveInMaterialConfig();
                     return true;
-                case"IsEnabledRemoveInMaterialConfig":
+                case nameof(IsEnabledRemoveInMaterialConfig):
                     result = IsEnabledRemoveInMaterialConfig();
                     return true;
-                case"AddOutMaterialConfig":
+                case nameof(AddOutMaterialConfig):
                     AddOutMaterialConfig();
                     return true;
-                case"IsEnabledAddOutMaterialConfig":
+                case nameof(IsEnabledAddOutMaterialConfig):
                     result = IsEnabledAddOutMaterialConfig();
                     return true;
-                case"RemoveOutMaterialConfig":
+                case nameof(RemoveOutMaterialConfig):
                     RemoveOutMaterialConfig();
                     return true;
-                case"IsEnabledRemoveOutMaterialConfig":
+                case nameof(IsEnabledRemoveOutMaterialConfig):
                     result = IsEnabledRemoveOutMaterialConfig();
                     return true;
             }
