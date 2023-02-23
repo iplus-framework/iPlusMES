@@ -2587,15 +2587,15 @@ namespace gip.bso.manufacturing
 
         public bool LocalSaveChanges()
         {
-            MsgWithDetails saveMsg = new MsgWithDetails();;
             Msg msg = CheckForInappropriateComponentQuantityOccurrence();
             if (msg != null)
             {
                 Messages.Msg(msg);
                 ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
             }
-            saveMsg = DatabaseApp.ACSaveChanges();
-            Messages.Msg(saveMsg);
+            MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
+            if (saveMsg != null)
+                Messages.Msg(saveMsg);
             return saveMsg == null || saveMsg.IsSucceded();
         }
 
@@ -2791,7 +2791,7 @@ namespace gip.bso.manufacturing
                     if (ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any() && isMove)
                     {
                         MoveBatchSortOrderCorrect(ProdOrderBatchPlanList);
-                        isSaveValid  = LocalSaveChanges();
+                        isSaveValid = LocalSaveChanges();
                         if (!isSaveValid)
                         {
                             DatabaseApp.ACUndoChanges();
@@ -4623,7 +4623,7 @@ namespace gip.bso.manufacturing
                             }
 
                             bool saveSuccess = LocalSaveChanges();
-                            
+
                             if (success && !string.IsNullOrEmpty(programNo) && saveSuccess)
                             {
                                 AllWizardSchedulerPartslistList.ForEach(x => x.ProgramNo = programNo);
@@ -4687,7 +4687,7 @@ namespace gip.bso.manufacturing
         private bool WizardFinish()
         {
             ConnectSourceProdOrderPartslist();
-            bool success = ACSaveChanges();
+            bool success = LocalSaveChanges();
             if (success)
             {
                 IsWizard = false;
@@ -4851,7 +4851,7 @@ namespace gip.bso.manufacturing
                                         schedulingGroups,
                                         selectedMDSchedulingGroup);
 
-                if(schedulingGroups.Select(c=>c.MDSchedulingGroupID).Contains(selectedMDSchedulingGroup.MDSchedulingGroupID))
+                if (schedulingGroups.Select(c => c.MDSchedulingGroupID).Contains(selectedMDSchedulingGroup.MDSchedulingGroupID))
                 {
                     DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup = selectedMDSchedulingGroup;
                 }

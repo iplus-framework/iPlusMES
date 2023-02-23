@@ -946,7 +946,14 @@ namespace gip.mes.facility
             MDProdOrderPartslistPosState mDProdOrderPartslistPosState = databaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
             PartslistACClassMethod method = wizardSchedulerPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
 
-            List<ProdOrderBatchPlan> existingBatchPlans = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.ToList();
+            List<ProdOrderBatchPlan> existingBatchPlans =
+                wizardSchedulerPartslist
+                .ProdOrderPartslistPos
+                .ProdOrderPartslist
+                .ProdOrderBatchPlan_ProdOrderPartslist
+                .Where(c => c.VBiACClassWFID == wizardSchedulerPartslist.WFNodeMES.ACClassWFID)
+                .ToList();
+
             int existingMinIndex = existingBatchPlans.Select(c => c.ScheduledOrder ?? 0).DefaultIfEmpty().Min();
 
             Guid[] wizardBatchPlanIDs = wizardSchedulerPartslist.BatchPlanSuggestion.ItemsList.Where(c => c.ProdOrderBatchPlan != null).Select(c => c.ProdOrderBatchPlan.ProdOrderBatchPlanID).ToArray();

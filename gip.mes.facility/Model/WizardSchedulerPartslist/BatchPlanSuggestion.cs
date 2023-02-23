@@ -225,8 +225,8 @@ namespace gip.mes.facility
                 double minBatchSize = ItemsList.Select(c => c.BatchSizeUOM).DefaultIfEmpty().Min();
                 double maxBatchSize = ItemsList.Select(c => c.BatchSizeUOM).DefaultIfEmpty().Max();
                 batchInRange =
-                        WizardSchedulerPartslist.BatchSizeMinUOM <= minBatchSize
-                    && (WizardSchedulerPartslist.BatchSizeMaxUOM == 0 || WizardSchedulerPartslist.BatchSizeMaxUOM >= maxBatchSize);
+                        (WizardSchedulerPartslist.BatchSizeMinUOM - 0.1) <= minBatchSize
+                    && (WizardSchedulerPartslist.BatchSizeMaxUOM == 0 || (WizardSchedulerPartslist.BatchSizeMaxUOM + 0.1) >= maxBatchSize);
             }
             return sumSizeInTolerance && batchInRange;
         }
@@ -251,7 +251,7 @@ namespace gip.mes.facility
         internal void UpdateBatchPlan()
         {
             if (WizardSchedulerPartslist.BatchSuggestionMode != null)
-                if(WizardSchedulerPartslist.PlanMode == datamodel.BatchPlanMode.UseTotalSize && ItemsList.Count() == 1)
+                if (WizardSchedulerPartslist.PlanMode == datamodel.BatchPlanMode.UseTotalSize && ItemsList.Count() == 1)
                 {
                     BatchPlanSuggestionItem item = ItemsList.FirstOrDefault();
                     if (item != null)
