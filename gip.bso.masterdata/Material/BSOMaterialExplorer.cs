@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data.Objects;
 using System.Windows.Input;
 using System;
+using gip.core.autocomponent;
 
 namespace gip.bso.masterdata
 {
@@ -51,8 +52,14 @@ namespace gip.bso.masterdata
             if (!base.ACInit(startChildMode))
                 return false;
             MediaSettings = new MediaSettings();
-            Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
-            MediaSettings.LoadTypeFolder(dummyMaterial);
+            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
+            if (ShowImages)
+            {
+                Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
+                if (dummyMaterial != null)
+                    MediaSettings.LoadTypeFolder(dummyMaterial);
+            }
+           
             return true;
         }
 
@@ -70,6 +77,22 @@ namespace gip.bso.masterdata
             return b;
         }
 
+        #endregion
+
+        #region Configuration
+        private ACPropertyConfigValue<bool> _ShowImages;
+        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}")]
+        public bool ShowImages
+        {
+            get
+            {
+                return _ShowImages.ValueT;
+            }
+            set
+            {
+                _ShowImages.ValueT = value;
+            }
+        }
         #endregion
 
         #region BSO->ACProperty
@@ -250,9 +273,12 @@ namespace gip.bso.masterdata
             get
             {
                 List<Material> materials = AccessPrimary.NavList.ToList();
-                foreach (var material in materials)
+                if (ShowImages)
                 {
-                    MediaSettings.LoadImage(material);
+                    foreach (var material in materials)
+                    {
+                        MediaSettings.LoadImage(material);
+                    }
                 }
                 return materials;
             }
