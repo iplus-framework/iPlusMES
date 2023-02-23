@@ -106,7 +106,7 @@ namespace gip.mes.maintenance
                 childBSO = _this.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowMaintenance", _this);
+            childBSO.ExecuteMethod(nameof(BSOMaintOrder.ShowMaintenance), _this);
             childBSO.Stop();
             return;
         }

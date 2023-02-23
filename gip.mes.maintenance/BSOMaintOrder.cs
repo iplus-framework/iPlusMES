@@ -572,7 +572,7 @@ namespace gip.mes.maintenance
         public void EndMaintenanceTask()
         {
             SelectedMaintTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskCompleted);
-            OnPropertyChanged("SelectedMaintTask");
+            OnPropertyChanged(nameof(SelectedMaintTask));
             MaintTaskList = _MaintTaskList.ToList();
             if (!MaintTaskList.Any(c => c.MDMaintTaskState.MDMaintTaskStateIndex != (short)MaintTaskState.TaskCompleted))
             {
@@ -581,7 +581,7 @@ namespace gip.mes.maintenance
                 CurrentMaintOrder.MaintActEndDate = MaintTaskList.Max(c => c.EndTaskDate);
                 CurrentMaintOrder.MaintActDurationTS = CurrentMaintOrder.MaintActEndDate.Value - CurrentMaintOrder.MaintActStartDate.Value;
                 Save();
-                OnPropertyChanged("CurrentMaintOrder");
+                OnPropertyChanged(nameof(CurrentMaintOrder));
             }
             Save();
         }
@@ -610,7 +610,7 @@ namespace gip.mes.maintenance
             }
 
             if (CurrentMaintOrder != null)
-                ShowDialog(this, "MaintOrder");
+                ShowDialog(this, "MaintOrderDialog");
             else
                 Messages.Info(this, "en{'There is no maintenance order for this component.'}de{'Für diese Komponente existiert keine Wartungsaufgabe.'}");
         }
@@ -651,7 +651,7 @@ namespace gip.mes.maintenance
             if (CurrentMaintOrder != null)
             {
                 CloseTopDialog();
-                ShowDialog(this, "MaintOrder");
+                ShowDialog(this, "MaintOrderDialog");
             }
         }
 
@@ -746,7 +746,7 @@ namespace gip.mes.maintenance
             {
                 switch (vbControl.VBContent)
                 {
-                    case "IsFilterVisible":
+                    case nameof(IsFilterVisible):
                         if (IsFilterVisible)
                             cm = Global.ControlModes.Enabled;
                         else
