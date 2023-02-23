@@ -63,7 +63,7 @@ namespace gip.mes.maintenance
             return base.ACDeInit(deleteACClassTask);
         }
 
-        public const string ClassName = "ACMaintService";
+        public const string ClassName = nameof(ACMaintService);
 
         #endregion
 

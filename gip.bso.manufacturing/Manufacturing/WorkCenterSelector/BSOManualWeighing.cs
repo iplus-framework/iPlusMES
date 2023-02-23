@@ -877,8 +877,8 @@ namespace gip.bso.manufacturing
 
         public override void Activate(ACComponent selectedProcessModule)
         {
-            base.Activate(selectedProcessModule);
             CurrentProcessModule = selectedProcessModule;
+            base.Activate(selectedProcessModule);
         }
 
         public override void DeActivate()
