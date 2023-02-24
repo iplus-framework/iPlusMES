@@ -46,11 +46,19 @@ namespace gip.mes.processapplication
             {
                 _HasParentPMMultipleScaleObjects = ParentACComponent?.FindChildComponents<PAEScaleGravimetric>().Count > 1;
             }
-            return base.ACPostInit();
+            bool result = base.ACPostInit();
+
+            ActiveScaleObjectUrl.PropertyChanged += ActiveScaleObjectUrl_PropertyChanged;
+
+            return result;
         }
+
+
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            ActiveScaleObjectUrl.PropertyChanged -= ActiveScaleObjectUrl_PropertyChanged;
+
             CurrentWeighingMaterial = null;
             ReleaseActiveScaleObject();
             _IsManuallyCompleted = false;
@@ -131,6 +139,13 @@ namespace gip.mes.processapplication
             set;
         }
 
+        [ACPropertyBindingSource]
+        public IACContainerTNet<string> ActiveScaleObjectUrl
+        {
+            get;
+            set;
+        }
+
         private PAEScaleGravimetric _ActiveScaleObject;
         public PAEScaleGravimetric ActiveScaleObject
         {
@@ -141,6 +156,14 @@ namespace gip.mes.processapplication
             set
             {
                 _ActiveScaleObject = value;
+                if (_ActiveScaleObject != null)
+                {
+                    ActiveScaleObjectUrl.ValueT = _ActiveScaleObject.ACUrl;
+                }
+                else 
+                {
+                    ActiveScaleObjectUrl.ValueT = null;
+                }
             }
         }
 
@@ -202,6 +225,23 @@ namespace gip.mes.processapplication
             {
                 ActiveScaleObject = null;
                 return false;
+            }
+        }
+
+        private void ActiveScaleObjectUrl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            IACContainerTNet<string> senderProp = sender as IACContainerTNet<string>;
+            if (senderProp != null)
+            {
+                string acUrl = senderProp.ValueT;
+                if (ActiveScaleObject == null || ActiveScaleObject.ACUrl != acUrl)
+                {
+                    var assignedScaleObjects = ScaleMappingHelper.AssignedScales;
+                    if (assignedScaleObjects != null && assignedScaleObjects.Any())
+                    {
+                        ActiveScaleObject = assignedScaleObjects.FirstOrDefault(c => c.ACUrl == acUrl) as PAEScaleGravimetric;
+                    }
+                }
             }
         }
 

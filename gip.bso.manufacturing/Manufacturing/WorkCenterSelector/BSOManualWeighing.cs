@@ -152,6 +152,8 @@ namespace gip.bso.manufacturing
             get => _CurrentPAFManualWeighing?.ValueT;
         }
 
+        protected IACContainerTNet<string> _ActiveScaleObjectACUrl;
+
         #endregion
 
         #region Properties => ScaleObjects
@@ -1348,10 +1350,11 @@ namespace gip.bso.manufacturing
 
             ACMethod acMethod = LoadPAFManualWeighing(pafManWeighingRef);
 
-            if (scaleObjectInfoList != null && scaleObjectInfoList.Any())
-            {
-                SelectActiveScaleObject(scaleObjectInfoList, true);
-            }
+            //if (scaleObjectInfoList != null && scaleObjectInfoList.Any())
+            //{
+            //    //HandleActiveScaleObject(scaleObjectInfoList, null);
+            //    //SelectActiveScaleObject(scaleObjectInfoList, true);
+            //}
 
             _OrderInfo = orderInfo as IACContainerTNet<string>;
 
@@ -1410,6 +1413,19 @@ namespace gip.bso.manufacturing
                 return null;
             }
 
+            var activeScaleObjectACUrl = pafManWeighing.ValueT.GetPropertyNet(nameof(PAFManualWeighing.ActiveScaleObjectUrl));
+            if (activeScaleObjectACUrl == null)
+            {
+                //Error50287: Initialization error: The weighing function doesn't have the property {0}.
+                // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
+                Messages.Info(this, "Error50287", false, nameof(PAFManualWeighing.ActiveScaleObjectUrl));
+                return null;
+            }
+
+            _ActiveScaleObjectACUrl = activeScaleObjectACUrl as IACContainerTNet<string>;
+            _ActiveScaleObjectACUrl.PropertyChanged += _ActiveScaleObjectACUrl_PropertyChanged;
+            HandleActiveScaleObject(ScaleObjectsList, _ActiveScaleObjectACUrl.ValueT, true);
+
             var tempMethod = currentACMethod as IACContainerTNet<ACMethod>;
             tempMethod.PropertyChanged += PAFCurrentACMethodPropChanged;
             ACMethod temp = tempMethod?.ValueT?.Clone() as ACMethod;
@@ -1427,6 +1443,8 @@ namespace gip.bso.manufacturing
 
             return temp;
         }
+
+
 
         protected void ActivateScale(IACComponent scale)
         {
@@ -1485,10 +1503,15 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(TargetWeight));
             OnPropertyChanged(nameof(ScaleDifferenceWeight));
 
-            if (CurrentPAFManualWeighing != null && scale != null)
+            if (_ActiveScaleObjectACUrl.ValueT != scale.ACUrl)
             {
-                CurrentPAFManualWeighing.ExecuteMethod(nameof(PAFManualWeighing.SetActiveScaleObject), scale.ACIdentifier);
+                _ActiveScaleObjectACUrl.ValueT = scale.ACUrl;
             }
+
+            //if (CurrentPAFManualWeighing != null && scale != null)
+            //{
+            //    CurrentPAFManualWeighing.ExecuteMethod(nameof(PAFManualWeighing.SetActiveScaleObject), scale.ACIdentifier);
+            //}
 
             OnPropertyChanged(nameof(CurrentScaleObject));
         }
@@ -2003,6 +2026,12 @@ namespace gip.bso.manufacturing
                 _CurrentPAFManualWeighing.Detach();
                 _CurrentPAFManualWeighing = null;
             }
+
+            if (_ActiveScaleObjectACUrl != null)
+            {
+                _ActiveScaleObjectACUrl.PropertyChanged -= _ActiveScaleObjectACUrl_PropertyChanged;
+                _ActiveScaleObjectACUrl = null;
+            }
         }
 
         private void DeactivateScale()
@@ -2105,6 +2134,19 @@ namespace gip.bso.manufacturing
             foreach (var fc in facilityCharges)
             {
                 fc.OnTargetQunatityChanged(targetWeight);
+            }
+        }
+
+        private void _ActiveScaleObjectACUrl_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Const.ValueT)
+            {
+                IACContainerTNet<string> activeScaleObjectACUrl = sender as IACContainerTNet<string>;
+                if (activeScaleObjectACUrl != null)
+                {
+                    string scaleACUrl = activeScaleObjectACUrl.ValueT;
+                    ParentBSOWCS?.ApplicationQueue.Add(() => HandleActiveScaleObject(ScaleObjectsList, scaleACUrl));
+                }
             }
         }
 
@@ -2218,7 +2260,8 @@ namespace gip.bso.manufacturing
                             if (comp != null)
                             {
                                 comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
-                                SelectActiveScaleObject(comp);
+                                OnPropertyChanged(nameof(CurrentScaleObject));
+                                //SelectActiveScaleObject(comp);
                             }
                             break;
                         }
@@ -2232,7 +2275,8 @@ namespace gip.bso.manufacturing
                                 SelectedWeighingMaterial = comp;
 
                             comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
-                            SelectActiveScaleObject(comp);
+                            OnPropertyChanged(nameof(CurrentScaleObject));
+                            //SelectActiveScaleObject(comp);
 
                             if (compInfo.FacilityCharge != null)
                             {
@@ -2272,14 +2316,16 @@ namespace gip.bso.manufacturing
                                     SelectedWeighingMaterial.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                                 }
 
-                                if (compInfoType == WeighingComponentInfoType.StateSelectFC_F)
-                                {
-                                    SelectActiveScaleObject(SelectedWeighingMaterial);
-                                }
-                                else
-                                {
-                                    OnPropertyChanged(nameof(CurrentScaleObject));
-                                }
+                                OnPropertyChanged(nameof(CurrentScaleObject));
+
+                                //if (compInfoType == WeighingComponentInfoType.StateSelectFC_F)
+                                //{
+                                //    SelectActiveScaleObject(SelectedWeighingMaterial);
+                                //}
+                                //else
+                                //{
+                                //    OnPropertyChanged(nameof(CurrentScaleObject));
+                                //}
                             }
 
                             if (compInfo.FacilityCharge != null)
@@ -2355,6 +2401,19 @@ namespace gip.bso.manufacturing
             }
 
         }
+
+        private void HandleActiveScaleObject(IEnumerable<ACValueItem> scaleObjects, string newScaleObjectACUrl, bool setIfNotSelected = false)
+        {
+            if (newScaleObjectACUrl != null)
+            {
+                CurrentScaleObject = scaleObjects.FirstOrDefault(c => c.Value as string == newScaleObjectACUrl);
+            }
+            else if (setIfNotSelected)
+            {
+                CurrentScaleObject = scaleObjects.FirstOrDefault();
+            }
+        }
+
         #endregion
 
         #region Methods => Misc.
@@ -2415,44 +2474,44 @@ namespace gip.bso.manufacturing
             return null;
         }
 
-        private void SelectActiveScaleObject(WeighingMaterial weighingMaterial)
-        {
-            List<ACValueItem> scaleObjectsList = null;
-            using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
-            {
-                scaleObjectsList = ScaleObjectsList?.ToList();
-            }
+        //private void SelectActiveScaleObject(WeighingMaterial weighingMaterial)
+        //{
+        //    List<ACValueItem> scaleObjectsList = null;
+        //    using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
+        //    {
+        //        scaleObjectsList = ScaleObjectsList?.ToList();
+        //    }
 
-            if (scaleObjectsList != null && weighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
-            {
-                SelectActiveScaleObject(scaleObjectsList);
-            }
-            else
-                OnPropertyChanged(nameof(CurrentScaleObject));
-        }
+        //    if (scaleObjectsList != null && weighingMaterial.WeighingMatState == WeighingComponentState.InWeighing)
+        //    {
+        //        SelectActiveScaleObject(scaleObjectsList);
+        //    }
+        //    else
+        //        OnPropertyChanged(nameof(CurrentScaleObject));
+        //}
 
-        private void SelectActiveScaleObject(List<ACValueItem> scaleObjects, bool setIfNotSelected = false)
-        {
-            if (scaleObjects == null)
-                return;
+        //private void SelectActiveScaleObject(List<ACValueItem> scaleObjects, bool setIfNotSelected = false)
+        //{
+        //    if (scaleObjects == null)
+        //        return;
 
-            if (scaleObjects.Count > 1)
-            {
-                string activeScaleACUrl = CurrentPAFManualWeighing?.ExecuteMethod(nameof(PAFManualWeighing.GetActiveScaleObjectACUrl)) as string;
-                if (!string.IsNullOrEmpty(activeScaleACUrl))
-                {
-                    CurrentScaleObject = scaleObjects.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
-                }
-                else if (setIfNotSelected)
-                {
-                    CurrentScaleObject = scaleObjects.FirstOrDefault();
-                }
-            }
-            else
-            {
-                CurrentScaleObject = scaleObjects.FirstOrDefault();
-            }
-        }
+        //    if (scaleObjects.Count > 1)
+        //    {
+        //        string activeScaleACUrl = CurrentPAFManualWeighing?.ExecuteMethod(nameof(PAFManualWeighing.GetActiveScaleObjectACUrl)) as string;
+        //        if (!string.IsNullOrEmpty(activeScaleACUrl))
+        //        {
+        //            CurrentScaleObject = scaleObjects.FirstOrDefault(c => c.Value as string == activeScaleACUrl);
+        //        }
+        //        else if (setIfNotSelected)
+        //        {
+        //            CurrentScaleObject = scaleObjects.FirstOrDefault();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        CurrentScaleObject = scaleObjects.FirstOrDefault();
+        //    }
+        //}
 
         public virtual void OnComponentStateChanged(WeighingMaterial weighingMaterial)
         {
