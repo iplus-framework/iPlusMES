@@ -171,6 +171,20 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private ACPropertyConfigValue<bool> _ValidateBatchPlanBeforeStart;
+        [ACPropertyConfig("en{'Validate batch plan before start'}de{'Validieren Sie den Chargenplan, bevor Sie beginnen'}")]
+        public bool ValidateBatchPlanBeforeStart
+        {
+            get
+            {
+                return _ValidateBatchPlanBeforeStart.ValueT;
+            }
+            set
+            {
+                _ValidateBatchPlanBeforeStart.ValueT = value;
+            }
+        }
+
         #endregion
 
         #region c´tors
@@ -178,9 +192,14 @@ namespace gip.bso.manufacturing
         public BSOBatchPlanScheduler(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, "PABatchPlanSchedulerURL", "");
+            _AutoRemoveMDSGroupFrom = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupFrom), 0);
+            _AutoRemoveMDSGroupTo = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupTo), 0);
+            _CreatedBatchState = new ACPropertyConfigValue<vd.GlobalApp.BatchPlanState>(this, nameof(CreatedBatchState), vd.GlobalApp.BatchPlanState.Created);
+            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
+            _ValidateBatchPlanBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBatchPlanBeforeStart), false);
             _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
-            //_ConfigPreselectedLine = new ACPropertyConfigValue<string>(this, "ConfigPreselectedLine", "");
+            _PABatchPlanSchedulerURL = new ACPropertyConfigValue<string>(this, "PABatchPlanSchedulerURL", "");
+
         }
 
         #region c´tors -> ACInit
@@ -189,8 +208,6 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
-
-            //_ConfigPreselectedLineDict = GetConfigPreselectedLineDict();
 
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
@@ -205,12 +222,14 @@ namespace gip.bso.manufacturing
             if (_SchedulingForecastManager == null)
                 throw new Exception("SchedulingForecastManager not configured");
 
-            _CreatedBatchState = new ACPropertyConfigValue<vd.GlobalApp.BatchPlanState>(this, nameof(CreatedBatchState), vd.GlobalApp.BatchPlanState.Created);
-            _AutoRemoveMDSGroupFrom = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupFrom), 0);
             _ = AutoRemoveMDSGroupFrom;
-            _AutoRemoveMDSGroupTo = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupTo), 0);
             _ = AutoRemoveMDSGroupTo;
-            _ShowImages = new ACPropertyConfigValue<bool>(this, nameof(ShowImages), false);
+            _ = CreatedBatchState;
+            _ = ShowImages;
+            _ = ValidateBatchPlanBeforeStart;
+            _ = BSOBatchPlanSchedulerRules;
+            _ = PABatchPlanSchedulerURL;
+
             if (ShowImages)
             {
                 Material dummyMaterial = DatabaseApp.Material.FirstOrDefault();
@@ -3498,59 +3517,57 @@ namespace gip.bso.manufacturing
                     msgWithDetails.AddDetailMessage(msg);
                 }
 
-                if (isBatchReadyToStart)
+                if (ValidateBatchPlanBeforeStart)
                 {
-                    // check duplicate components
-                    bool haveManyDuplicateComponents =
-                        batchPlan
-                        .ProdOrderPartslist
-                        .ProdOrderPartslistPos_ProdOrderPartslist
-                        .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
-                        .GroupBy(c => c.Material.MaterialNo)
-                        .Where(c => c.Count() > 1)
-                        .Count() > 1;
-
-                    if (haveManyDuplicateComponents)
+                    if (isBatchReadyToStart)
                     {
-                        // Warning50060
-                        // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
-                        // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
-                        if (Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName) != Global.MsgResult.OK)
+                        // check duplicate components
+                        bool haveManyDuplicateComponents =
+                            batchPlan
+                            .ProdOrderPartslist
+                            .ProdOrderPartslistPos_ProdOrderPartslist
+                            .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                            .GroupBy(c => c.Material.MaterialNo)
+                            .Where(c => c.Count() > 1)
+                            .Count() > 1;
+
+                        if (haveManyDuplicateComponents)
                         {
-                            isBatchReadyToStart = false;
+                            // Warning50060
+                            // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
+                            // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
+                            Global.MsgResult msgResult = Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
+                        }
+                    }
+
+                    if (isBatchReadyToStart)
+                    {
+                        bool notExpectedPosQuantities = NotExpectedPosQuantities(batchPlan);
+                        if (notExpectedPosQuantities)
+                        {
+                            // Warning50061
+                            // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
+                            // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
+                            Global.MsgResult msgResult = Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
+                        }
+                    }
+
+                    if (isBatchReadyToStart)
+                    {
+                        bool notExpectedComponentSum = NotExpectedComponentSum(batchPlan);
+                        if (notExpectedComponentSum)
+                        {
+                            // Warning50062
+                            // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
+                            // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
+                            Global.MsgResult msgResult = Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
                         }
                     }
                 }
 
-                if (isBatchReadyToStart)
-                {
-                    bool notExpectedPosQuantities = NotExpectedPosQuantities(batchPlan);
-                    if (notExpectedPosQuantities)
-                    {
-                        // Warning50061
-                        // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
-                        // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
-                        if (Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName) != Global.MsgResult.OK)
-                        {
-                            isBatchReadyToStart = false;
-                        }
-                    }
-                }
-
-                if (isBatchReadyToStart)
-                {
-                    bool notExpectedComponentSum = NotExpectedComponentSum(batchPlan);
-                    if (notExpectedComponentSum)
-                    {
-                        // Warning50062
-                        // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
-                        // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
-                        if (Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName) != Global.MsgResult.OK)
-                        {
-                            isBatchReadyToStart = false;
-                        }
-                    }
-                }
 
                 if (isBatchReadyToStart)
                 {
