@@ -1503,7 +1503,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(TargetWeight));
             OnPropertyChanged(nameof(ScaleDifferenceWeight));
 
-            if (_ActiveScaleObjectACUrl.ValueT != scale.ACUrl)
+            if (_ActiveScaleObjectACUrl != null && _ActiveScaleObjectACUrl.ValueT != scale.ACUrl)
             {
                 _ActiveScaleObjectACUrl.ValueT = scale.ACUrl;
             }
