@@ -2627,14 +2627,33 @@ namespace gip.bso.manufacturing
         public bool LocalSaveChanges()
         {
             Msg msg = CheckForInappropriateComponentQuantityOccurrence();
+            bool isPowerUser = _RulesForCurrentUser == null || !_RulesForCurrentUser.Any() || Root.Environment.User.IsSuperuser;
             if (msg != null)
             {
-                Messages.Msg(msg);
+                if(isPowerUser)
+                {
+                    Messages.Msg(msg);
+                }
+                else
+                {
+                    SendMessage(msg);
+                }
+                Messages.LogMessageMsg(msg);
                 ProdOrderManager.OnNewAlarmOccurred(ProdOrderManager.IsProdOrderManagerAlarm, msg);
             }
             MsgWithDetails saveMsg = DatabaseApp.ACSaveChanges();
             if (saveMsg != null)
-                Messages.Msg(saveMsg);
+            {
+                if (isPowerUser)
+                {
+                    Messages.Msg(saveMsg);
+                }
+                else
+                {
+                    SendMessage(saveMsg);
+                }
+                Messages.LogMessageMsg(saveMsg);
+            }
             return saveMsg == null || saveMsg.IsSucceded();
         }
 
