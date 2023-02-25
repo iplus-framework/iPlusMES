@@ -579,8 +579,8 @@ namespace gip.bso.manufacturing
                     FacilityChargeNo = null;
                     ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
 
-                    if (_SelectedWeighingMaterial != null)
-                        ShowSelectFacilityLotInfo = true;
+                    //if (_SelectedWeighingMaterial != null)
+                    //    ShowSelectFacilityLotInfo = true;
 
                     if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing)
                     {
@@ -1943,6 +1943,7 @@ namespace gip.bso.manufacturing
         {
             WeighingMaterialList = null;
             SelectedWeighingMaterial = null;
+            ShowSelectFacilityLotInfo = false;
 
             IsBinChangeAvailable = false;
 
@@ -2261,7 +2262,6 @@ namespace gip.bso.manufacturing
                             {
                                 comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                                 OnPropertyChanged(nameof(CurrentScaleObject));
-                                //SelectActiveScaleObject(comp);
                             }
                             break;
                         }
@@ -2272,11 +2272,14 @@ namespace gip.bso.manufacturing
                                 return;
 
                             if (SelectedWeighingMaterial != comp)
+                            {
                                 SelectedWeighingMaterial = comp;
+                                if (compInfo.FacilityCharge == null)
+                                    ShowSelectFacilityLotInfo = true;
+                            }
 
                             comp.ChangeComponentState((WeighingComponentState)compInfo.WeighingComponentState, DatabaseApp);
                             OnPropertyChanged(nameof(CurrentScaleObject));
-                            //SelectActiveScaleObject(comp);
 
                             if (compInfo.FacilityCharge != null)
                             {
@@ -2294,6 +2297,7 @@ namespace gip.bso.manufacturing
                                 SelectedWeighingMaterial = comp;
                                 SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
                                 _StartWeighingFromF_FC = true;
+                                ShowSelectFacilityLotInfo = true;
                             }
                             break;
                         }
@@ -2302,7 +2306,7 @@ namespace gip.bso.manufacturing
                         {
                             WeighingMaterial comp = WeighingMaterialList?.FirstOrDefault(c => c.PosRelation.ProdOrderPartslistPosRelationID == compInfo.PLPosRelation);
 
-                            if (/*compInfoType == WeighingComponentInfoType.StateSelectFC_F && */(WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
+                            if ((WeighingComponentState)compInfo.WeighingComponentState == WeighingComponentState.InWeighing
                             && SelectedWeighingMaterial == null)
                             {
                                 if (comp != null)
@@ -2317,15 +2321,6 @@ namespace gip.bso.manufacturing
                                 }
 
                                 OnPropertyChanged(nameof(CurrentScaleObject));
-
-                                //if (compInfoType == WeighingComponentInfoType.StateSelectFC_F)
-                                //{
-                                //    SelectActiveScaleObject(SelectedWeighingMaterial);
-                                //}
-                                //else
-                                //{
-                                //    OnPropertyChanged(nameof(CurrentScaleObject));
-                                //}
                             }
 
                             if (compInfo.FacilityCharge != null)
@@ -2362,7 +2357,6 @@ namespace gip.bso.manufacturing
                             }
                             catch
                             {
-
                             }
                             break;
                         }
