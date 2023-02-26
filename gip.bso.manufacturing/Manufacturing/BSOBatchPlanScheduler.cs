@@ -172,7 +172,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<bool> _ValidateBatchPlanBeforeStart;
-        [ACPropertyConfig("en{'Validate batch plan before start'}de{'Validieren Sie den Chargenplan, bevor Sie beginnen'}")]
+        [ACPropertyConfig("en{'Validate batch plan on start'}de{'Validierung des Batchplans bei Start'}")]
         public bool ValidateBatchPlanBeforeStart
         {
             get
@@ -888,7 +888,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Explorer -> FilterBatchPlanStartMode
 
         private ACValueItem _SelectedFilterBatchPlanStartMode;
-        [ACPropertySelected(999, "FilterBatchPlanStartMode", "en{'Active selection rule query'}de{'Aktive Selektionsregelabfrage'}")]
+        [ACPropertySelected(510, "FilterBatchPlanStartMode", "en{'Scheduler mode'}de{'Zeitplanermodus'}", "", true)]
         public ACValueItem SelectedFilterBatchPlanStartMode
         {
             get
@@ -903,7 +903,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItemList _FilterBatchPlanStartModeList;
-        [ACPropertyList(999, "FilterBatchPlanStartMode")]
+        [ACPropertyList(511, "FilterBatchPlanStartMode")]
         public ACValueItemList FilterBatchPlanStartModeList
         {
             get
@@ -911,6 +911,22 @@ namespace gip.bso.manufacturing
                 if (_FilterBatchPlanStartModeList == null)
                     _FilterBatchPlanStartModeList = DatabaseApp.BatchPlanStartModeEnumList as ACValueItemList;
                 return _FilterBatchPlanStartModeList;
+            }
+        }
+
+        public bool HasUserRoleOfPlanner
+        {
+            get
+            {
+                ClassRightManager rightManager = CurrentRightsOfInvoker;
+                if (rightManager == null)
+                    return true;
+                IACPropertyBase acProperty = this.GetProperty(nameof(SelectedFilterBatchPlanStartMode));
+                if (acProperty == null)
+                    return true;
+                Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
+                return rightMode >= Global.ControlModes.Enabled;
+
             }
         }
         #endregion
@@ -2635,7 +2651,7 @@ namespace gip.bso.manufacturing
             {
                 msg = CheckForInappropriateComponentQuantityOccurrence();
             }
-            bool isPowerUser = _RulesForCurrentUser == null || !_RulesForCurrentUser.Any() || Root.Environment.User.IsSuperuser;
+            bool isPowerUser = HasUserRoleOfPlanner;
             if (msg != null)
             {
                 if (isPowerUser)
