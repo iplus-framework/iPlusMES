@@ -1247,7 +1247,8 @@ namespace gip.bso.facility
                     || (CurrentBookParamInwardMovement != null
                         && CurrentBookParamInwardMovement.InwardFacility != null
                         && CurrentBookParamInwardMovement.InwardFacility.VBiFacilityACClassID.HasValue)
-                  );
+                  )
+                  && HasRightsForPhysicalTransport;
             }
         }
 
