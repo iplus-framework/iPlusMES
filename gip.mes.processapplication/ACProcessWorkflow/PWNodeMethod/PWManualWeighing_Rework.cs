@@ -194,7 +194,12 @@ namespace gip.mes.processapplication
                                                  .Where(c => c.TargetProdOrderPartslistPos.MaterialID == targetPos.MaterialID
                                                           && c.TargetProdOrderPartslistPos.MaterialPosType == GlobalApp.MaterialPosTypes.InwardIntern);
                 int nextSeq = 1;
-                if (existingRelations != null && existingRelations.Any())
+
+                if (CompSequenceNo > 0 && CompSequenceNo >= ComponentsSeqFrom && CompSequenceNo <= ComponentsSeqTo)
+                {
+                    nextSeq = CompSequenceNo;
+                }
+                else if (existingRelations != null && existingRelations.Any())
                 {
                     if (ComponentsSeqFrom > 0)
                         existingRelations = existingRelations.Where(c => c.Sequence >= ComponentsSeqFrom);
@@ -202,9 +207,13 @@ namespace gip.mes.processapplication
                     if (ComponentsSeqTo > 0)
                         existingRelations = existingRelations.Where(c => c.Sequence <= ComponentsSeqTo);
 
-                    nextSeq = CompSequenceNo <= 0 ? existingRelations.Max(x => x.Sequence) + 1 : CompSequenceNo;
-                    if (nextSeq < ComponentsSeqTo && CompSequenceNo <= 0)
+                    nextSeq = existingRelations.Max(x => x.Sequence);
+                    if (nextSeq < ComponentsSeqTo)
                         nextSeq++;
+                }
+                else if (ComponentsSeqFrom > 0)
+                {
+                    nextSeq = ComponentsSeqFrom;
                 }
 
                 topRelation = ProdOrderPartslistPosRelation.NewACObject(dbApp, null);
