@@ -2400,11 +2400,11 @@ namespace gip.bso.manufacturing
         {
             if (newScaleObjectACUrl != null)
             {
-                CurrentScaleObject = scaleObjects.FirstOrDefault(c => c.Value as string == newScaleObjectACUrl);
+                CurrentScaleObject = scaleObjects?.FirstOrDefault(c => c.Value as string == newScaleObjectACUrl);
             }
             else if (setIfNotSelected)
             {
-                CurrentScaleObject = scaleObjects.FirstOrDefault();
+                CurrentScaleObject = scaleObjects?.FirstOrDefault();
             }
         }
 
