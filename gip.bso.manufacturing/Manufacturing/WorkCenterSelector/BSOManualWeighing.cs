@@ -579,8 +579,8 @@ namespace gip.bso.manufacturing
                     FacilityChargeNo = null;
                     ScaleAddAcutalWeight = _PAFManuallyAddedQuantity != null ? _PAFManuallyAddedQuantity.ValueT : 0;
 
-                    //if (_SelectedWeighingMaterial != null)
-                    //    ShowSelectFacilityLotInfo = true;
+                    if (_SelectedWeighingMaterial != null && WeighingMaterialsFSM)
+                        ShowSelectFacilityLotInfo = true;
 
                     if (WeighingMaterialsFSM && _SelectedWeighingMaterial != null && _SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.ReadyToWeighing)
                     {

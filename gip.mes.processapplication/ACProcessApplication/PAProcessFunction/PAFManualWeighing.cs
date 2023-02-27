@@ -828,7 +828,13 @@ namespace gip.mes.processapplication
                 else
                 {
                     var scale = ParentACComponent as IPAMContScale;
-                    OccupyAndSetActiveScaleObject(scale?.Scale);
+                    PAEScaleGravimetric scaleObject = scale?.Scale;
+                    if (scaleObject == null)
+                    {
+                        scaleObject = ParentACComponent.FindChildComponents<PAEScaleGravimetric>(c => c is PAEScaleGravimetric).FirstOrDefault();
+                    }
+
+                    OccupyAndSetActiveScaleObject(scaleObject);
                 }
                 return;
             }
@@ -975,6 +981,7 @@ namespace gip.mes.processapplication
 
             if (ManualWeighingPW != null && ManualWeighingPW.DiffWeighing)
             {
+                DetermineTargetScaleObject();
                 UnSubscribeToProjectWorkCycle();
                 return;
             }

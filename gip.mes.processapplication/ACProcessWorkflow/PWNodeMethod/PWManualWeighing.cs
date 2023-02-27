@@ -3730,6 +3730,13 @@ namespace gip.mes.processapplication
                                                 }
                                             }
                                         }
+                                        else
+                                        {
+                                            //Error : The weiging on end {0} {1} is greather than weigh on start {2} {3}!
+                                            Msg msg1 = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(50)", 3699, "Error50598",
+                                                               grossWeight.Value, "kg", prevQuantity.Value, "kg");
+                                            ActivateProcessAlarmWithLog(msg1, false);
+                                        }
                                     }
                                     else if (grossWeight > 0.000001)
                                     {
