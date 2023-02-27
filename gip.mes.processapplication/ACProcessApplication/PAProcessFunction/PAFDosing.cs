@@ -479,6 +479,7 @@ namespace gip.mes.processapplication
                 return;
             if (DosingAbortReason.ValueT == PADosingAbortReason.NotSet)
                 DosingAbortReason.ValueT = PADosingAbortReason.CompCancelled;
+            Messages.LogDebug(this.GetACUrl(), "Abort(DosingAbortReason)", DosingAbortReason.ValueT.ToString());
             base.Abort();
         }
 
@@ -488,6 +489,7 @@ namespace gip.mes.processapplication
                 return;
             if (DosingAbortReason.ValueT == PADosingAbortReason.NotSet)
                 DosingAbortReason.ValueT = PADosingAbortReason.CompCancelled;
+            Messages.LogDebug(this.GetACUrl(), "Stopp(DosingAbortReason)", DosingAbortReason.ValueT.ToString());
             base.Stopp();
         }
 

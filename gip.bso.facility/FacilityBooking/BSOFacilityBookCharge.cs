@@ -1916,14 +1916,11 @@ namespace gip.bso.facility
             {
                 if (CurrentBookParamRelocation == null)
                     return false;
-                if (CurrentBookParamRelocation.OutwardFacilityCharge != null
-                    && CurrentBookParamRelocation.OutwardFacilityCharge.Facility != null
-                    && CurrentBookParamRelocation.InwardFacility != null
-                    && CurrentBookParamRelocation.InwardFacility.VBiFacilityACClassID.HasValue)
-                {
-                    return true;
-                }
-                return false;
+                return  CurrentBookParamRelocation.OutwardFacilityCharge != null
+                        && CurrentBookParamRelocation.OutwardFacilityCharge.Facility != null
+                        && CurrentBookParamRelocation.InwardFacility != null
+                        && CurrentBookParamRelocation.InwardFacility.VBiFacilityACClassID.HasValue
+                        && HasRightsForPhysicalTransport;
             }
         }
         #endregion

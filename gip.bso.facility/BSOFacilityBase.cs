@@ -276,12 +276,28 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyCurrent(607, "IsPhysicalTransportPossible")]
+        [ACPropertyInfo(607, "IsPhysicalTransportPossible", "en{'Is physical transport allowed'}de{'Physikalischer Transport erlaubt'}", "", true)]
         public virtual bool IsPhysicalTransportPossible
         {
             get
             {
                 return false;
+            }
+        }
+
+        public bool HasRightsForPhysicalTransport
+        {
+            get
+            {
+                ClassRightManager rightManager = CurrentRightsOfInvoker;
+                if (rightManager == null)
+                    return true;
+                IACPropertyBase acProperty = this.GetProperty(nameof(IsPhysicalTransportPossible));
+                if (acProperty == null)
+                    return true;
+                Global.ControlModes rightMode = rightManager.GetControlMode(acProperty.ACType);
+                return !(rightMode == Global.ControlModes.Collapsed || rightMode == Global.ControlModes.Disabled);
+
             }
         }
 
