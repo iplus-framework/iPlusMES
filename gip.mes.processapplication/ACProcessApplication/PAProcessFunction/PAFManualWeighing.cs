@@ -6,6 +6,7 @@ using gip.core.autocomponent;
 using vd = gip.mes.datamodel;
 using gip.core.processapplication;
 using gip.mes.datamodel;
+using System.Linq.Expressions;
 
 namespace gip.mes.processapplication
 {
@@ -230,16 +231,19 @@ namespace gip.mes.processapplication
 
         private void ActiveScaleObjectUrl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            IACContainerTNet<string> senderProp = sender as IACContainerTNet<string>;
-            if (senderProp != null)
+            if (e.PropertyName == Const.ValueT)
             {
-                string acUrl = senderProp.ValueT;
-                if (ActiveScaleObject == null || ActiveScaleObject.ACUrl != acUrl)
+                IACContainerTNet<string> senderProp = sender as IACContainerTNet<string>;
+                if (senderProp != null)
                 {
-                    var assignedScaleObjects = ScaleMappingHelper.AssignedScales;
-                    if (assignedScaleObjects != null && assignedScaleObjects.Any())
+                    string acUrl = senderProp.ValueT;
+                    if (ActiveScaleObject == null || ActiveScaleObject.ACUrl != acUrl)
                     {
-                        ActiveScaleObject = assignedScaleObjects.FirstOrDefault(c => c.ACUrl == acUrl) as PAEScaleGravimetric;
+                        var assignedScaleObjects = ScaleMappingHelper.AssignedScales;
+                        if (assignedScaleObjects != null && assignedScaleObjects.Any())
+                        {
+                            ActiveScaleObject = assignedScaleObjects.FirstOrDefault(c => c.ACUrl == acUrl) as PAEScaleGravimetric;
+                        }
                     }
                 }
             }
