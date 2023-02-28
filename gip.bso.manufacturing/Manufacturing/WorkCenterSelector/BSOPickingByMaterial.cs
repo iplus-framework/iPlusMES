@@ -672,6 +672,7 @@ namespace gip.bso.manufacturing
                         {
                             CurrentPicking.AutoRefresh();
                             CurrentPicking.OnRefreshCompleteFactor();
+                            CurrentPicking.OnEntityPropertyChanged(nameof(CurrentPicking.ActualQuantity));
                         }
                         catch
                         {
