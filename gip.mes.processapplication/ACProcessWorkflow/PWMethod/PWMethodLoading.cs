@@ -86,26 +86,6 @@ namespace gip.mes.processapplication
         #endregion
 
         #region Properties
-        private gip.mes.datamodel.DeliveryNotePos _CurrentDeliveryNotePos = null;
-        public gip.mes.datamodel.DeliveryNotePos CurrentDeliveryNotePos
-        {
-            get
-            {
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    if (_CurrentDeliveryNotePos != null)
-                        return _CurrentDeliveryNotePos;
-                }
-                LoadVBEntities();
-
-                using (ACMonitor.Lock(_20015_LockValue))
-                {
-                    return _CurrentDeliveryNotePos;
-                }
-            }
-        }
-
         protected ACRef<ACLabOrderManager> _LabOrderManager = null;
         public ACLabOrderManager LabOrderManager
         {
