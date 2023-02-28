@@ -574,10 +574,11 @@ namespace gip.bso.manufacturing
 
             FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(DatabaseApp, CurrentPicking, ScaleActualWeight);
 
-            Msg msg = DatabaseApp.ACSaveChangesWithRetry();
+            Msg msg = DatabaseApp.ACSaveChanges();
 
             if (msg != null)
             {
+                DatabaseApp.ACUndoChanges();
                 Messages.Msg(msg);
             }
             else if (preBooking != null)
@@ -619,7 +620,12 @@ namespace gip.bso.manufacturing
                     }
 
                     ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPicking, changedQuantity, false, true);
-                    DatabaseApp.ACSaveChanges();
+                    msg = DatabaseApp.ACSaveChanges();
+                    if (msg != null)
+                    {
+                        DatabaseApp.ACUndoChanges();
+                        Messages.Msg(msg);
+                    }
 
                     SelectedWeighingMaterial.RefreshFromPickingPos(CurrentPicking);
                     CurrentPicking.OnRefreshCompleteFactor();
@@ -842,6 +848,12 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999)]
         public void FinishPickingOrder()
         {
+            // Question500 : Are you sure that you want complete weighing of all components?
+            if (Messages.Question(this, "Question50096") != Global.MsgResult.Yes)
+            {
+                return;
+            }
+
             ACRef<ACInDeliveryNoteManager> inManagerRef = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
             ACRef<ACOutDeliveryNoteManager> outManagerRef = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
 

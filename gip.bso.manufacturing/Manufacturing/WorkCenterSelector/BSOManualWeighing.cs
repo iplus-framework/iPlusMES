@@ -534,7 +534,7 @@ namespace gip.bso.manufacturing
             AbortComponentScaleOtherComponents = 15,
             AbortComponentSwitchToEmptyingMode = 20,
             SwitchToEmptyingMode = 30,
-            Interdischarging = 40
+            Interdischarging = 40,
         }
 
         private AbortModeEnum _AbortMode;
@@ -990,12 +990,12 @@ namespace gip.bso.manufacturing
                     messageToAck.AcknowledgeMsg();
                 else if (componentPWNode != null)
                 {
-                    if (ScaleBckgrState != ScaleBackgroundState.InTolerance)
-                    {
-                        //Question50072 : Are you sure that you want acknowledge current component?
-                        if (Messages.Question(this, "Question50072") != Global.MsgResult.Yes)
-                            return;
-                    }
+                    //if (ScaleBckgrState != ScaleBackgroundState.InTolerance)
+                    //{
+                    //    //Question50072 : Are you sure that you want acknowledge current component?
+                    //    if (Messages.Question(this, "Question50072") != Global.MsgResult.Yes)
+                    //        return;
+                    //}
 
                     componentPWNode.ExecuteMethod(nameof(PWManualWeighing.CompleteWeighing), ScaleActualWeight, false);
                 }
@@ -1005,8 +1005,7 @@ namespace gip.bso.manufacturing
         public virtual bool IsEnabledAcknowledge()
         {
             return (MessagesList.Any(c => !c.IsAlarmMessage && c.HandleByAcknowledgeButton) || (MaxScaleWeight.HasValue && TargetWeight > MaxScaleWeight)
-                                                                                            || ScaleBckgrState == ScaleBackgroundState.InTolerance
-                                                                                            || DiffWeighing);
+                                                                                            || ScaleBckgrState == ScaleBackgroundState.InTolerance);
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
@@ -1153,54 +1152,65 @@ namespace gip.bso.manufacturing
 
             if (componentPWNode != null)
             {
-                InterdischargeStart(componentPWNode, true);
-
-                _AbortMode = AbortModeEnum.Cancel;
-                ShowDialog(this, "AbortDialog", "", false, Global.ControlModes.Hidden, Global.ControlModes.Hidden);
-
-                if (_AbortMode == AbortModeEnum.AbortComponent)
+                if (DiffWeighing)
                 {
-                    ShowSelectFacilityLotInfo = false;
-                    //Question50049: Do you still want to weigh this material in the following batches? 
-                    // Möchten Sie diese Komponente in den nachfolgenden Batchen weiter verwiegen?
-                    if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
+                    // Question500 : Are you sure that you want complete weighing of all components?
+                    if (Messages.Question(this, "Question50096") == Global.MsgResult.Yes)
                     {
-                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
-                        return;
+                        componentPWNode.ExecuteMethod(nameof(PWManualWeighing.CompleteWeighing), ScaleActualWeight, false);
                     }
-                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, false);
-
                 }
-                else if (_AbortMode == AbortModeEnum.AbortComponentScaleOtherComponents)
+                else
                 {
-                    ShowSelectFacilityLotInfo = false;
-                    if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
+                    InterdischargeStart(componentPWNode, true);
+
+                    _AbortMode = AbortModeEnum.Cancel;
+                    ShowDialog(this, "AbortDialog", "", false, Global.ControlModes.Hidden, Global.ControlModes.Hidden);
+
+                    if (_AbortMode == AbortModeEnum.AbortComponent)
                     {
-                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, true);
-                        return;
+                        ShowSelectFacilityLotInfo = false;
+                        //Question50049: Do you still want to weigh this material in the following batches? 
+                        // Möchten Sie diese Komponente in den nachfolgenden Batchen weiter verwiegen?
+                        if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
+                        {
+                            componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
+                            return;
+                        }
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, false);
+
                     }
-                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, true);
-                }
-                else if (_AbortMode == AbortModeEnum.AbortComponentSwitchToEmptyingMode)
-                {
-                    ShowSelectFacilityLotInfo = false;
-                    //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
-                    // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
-
-                    Global.MsgResult msgResult = Messages.Question(this, "Question50049");
-
-                    ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
-
-                    if (msgResult == Global.MsgResult.No)
+                    else if (_AbortMode == AbortModeEnum.AbortComponentScaleOtherComponents)
                     {
-                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
-                        return;
+                        ShowSelectFacilityLotInfo = false;
+                        if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
+                        {
+                            componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, true);
+                            return;
+                        }
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, true);
                     }
-                    componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, false);
-                }
-                else if (_AbortMode == AbortModeEnum.SwitchToEmptyingMode)
-                {
-                    ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
+                    else if (_AbortMode == AbortModeEnum.AbortComponentSwitchToEmptyingMode)
+                    {
+                        ShowSelectFacilityLotInfo = false;
+                        //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
+                        // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
+
+                        Global.MsgResult msgResult = Messages.Question(this, "Question50049");
+
+                        ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
+
+                        if (msgResult == Global.MsgResult.No)
+                        {
+                            componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
+                            return;
+                        }
+                        componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), false, false);
+                    }
+                    else if (_AbortMode == AbortModeEnum.SwitchToEmptyingMode)
+                    {
+                        ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
+                    }
                 }
             }
             else
