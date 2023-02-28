@@ -565,104 +565,118 @@ namespace gip.bso.manufacturing
 
         private void BookPickingPosition()
         {
-            FacilityCharge fc = DatabaseApp.FacilityCharge.Include(nameof(Facility)).FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
-            if (fc == null)
+            using (DatabaseApp dbApp = new DatabaseApp())
             {
-                Messages.Error(this, "Can not find in the database a FacilityCharge with ID: " + SelectedFacilityCharge.FacilityChargeID);
-                return;
-            }
-
-            FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(DatabaseApp, CurrentPicking, ScaleActualWeight);
-
-            Msg msg = DatabaseApp.ACSaveChanges();
-
-            if (msg != null)
-            {
-                DatabaseApp.ACUndoChanges();
-                Messages.Msg(msg);
-            }
-            else if (preBooking != null)
-            {
-                ACMethodBooking bookingMethod = preBooking.ACMethodBooking as ACMethodBooking;
-                bookingMethod.OutwardFacility = fc.Facility;
-                bookingMethod.OutwardFacilityCharge = fc;
-                ACMethodEventArgs result = ACFacilityManager.BookFacility(bookingMethod, DatabaseApp);
-
-
-                if (!bookingMethod.ValidMessage.IsSucceded() || bookingMethod.ValidMessage.HasWarnings())
-                    Messages.Msg(bookingMethod.ValidMessage);
-                else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+                FacilityCharge fc = dbApp.FacilityCharge.Include(nameof(Facility)).FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
+                if (fc == null)
                 {
-                    if (String.IsNullOrEmpty(result.ValidMessage.Message))
-                        result.ValidMessage.Message = result.ResultState.ToString();
-                    Messages.Msg(result.ValidMessage);
+                    Messages.Error(this, "Can not find in the database a FacilityCharge with ID: " + SelectedFacilityCharge.FacilityChargeID);
+                    return;
                 }
-                else
+
+                var currentPickingPos = CurrentPicking.FromAppContext<PickingPos>(dbApp);
+
+                FacilityPreBooking preBooking = ACFacilityManager.NewFacilityPreBooking(dbApp, currentPickingPos, ScaleActualWeight);
+
+                Msg msg = dbApp.ACSaveChanges();
+
+                if (msg != null)
                 {
-                    double changedQuantity = 0;
-                    FacilityCharge outwardFC = null;
+                    //DatabaseApp.ACUndoChanges();
+                    Messages.Msg(msg);
+                }
+                else if (preBooking != null)
+                {
+                    ACMethodBooking bookingMethod = preBooking.ACMethodBooking as ACMethodBooking;
+                    bookingMethod.OutwardFacility = fc.Facility;
+                    bookingMethod.OutwardFacilityCharge = fc;
+                    ACMethodEventArgs result = ACFacilityManager.BookFacility(bookingMethod, dbApp);
 
-                    if (bookingMethod != null)
+
+                    if (!bookingMethod.ValidMessage.IsSucceded() || bookingMethod.ValidMessage.HasWarnings())
+                        Messages.Msg(bookingMethod.ValidMessage);
+                    else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
                     {
-                        if (bookingMethod.OutwardQuantity.HasValue)
-                            changedQuantity = bookingMethod.OutwardQuantity.Value;
-                        else if (bookingMethod.InwardQuantity.HasValue)
-                            changedQuantity = bookingMethod.InwardQuantity.Value;
-
-                        outwardFC = bookingMethod.OutwardFacilityCharge;
+                        if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                            result.ValidMessage.Message = result.ResultState.ToString();
+                        Messages.Msg(result.ValidMessage);
                     }
-
-                    msg = preBooking.DeleteACObject(DatabaseApp, true);
-                    if (msg != null)
+                    else
                     {
-                        Messages.Msg(msg);
-                        return;
-                    }
+                        double changedQuantity = 0;
+                        FacilityCharge outwardFC = null;
 
-                    ACFacilityManager.RecalcAfterPosting(DatabaseApp, CurrentPicking, changedQuantity, false, true);
-                    msg = DatabaseApp.ACSaveChanges();
-                    if (msg != null)
-                    {
-                        DatabaseApp.ACUndoChanges();
-                        Messages.Msg(msg);
-                    }
-
-                    SelectedWeighingMaterial.RefreshFromPickingPos(CurrentPicking);
-                    CurrentPicking.OnRefreshCompleteFactor();
-
-                    msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, DatabaseApp);
-                    if (msg != null)
-                    {
-                        if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                        if (bookingMethod != null)
                         {
-                            if (ACFacilityManager == null)
-                                return;
+                            if (bookingMethod.OutwardQuantity.HasValue)
+                                changedQuantity = bookingMethod.OutwardQuantity.Value;
+                            else if (bookingMethod.InwardQuantity.HasValue)
+                                changedQuantity = bookingMethod.InwardQuantity.Value;
 
-                            ACMethodBooking fbtZeroBooking = ACPickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, DatabaseApp);
-                            ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
+                            outwardFC = bookingMethod.OutwardFacilityCharge;
+                        }
 
-                            fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
-                            fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+                        msg = preBooking.DeleteACObject(dbApp, true);
+                        if (msg != null)
+                        {
+                            Messages.Msg(msg);
+                            return;
+                        }
 
-                            fbtZeroBookingClone.AutoRefresh = true;
-                            ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
-                            if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                        ACFacilityManager.RecalcAfterPosting(dbApp, currentPickingPos, changedQuantity, false, true);
+                        msg = dbApp.ACSaveChanges();
+                        if (msg != null)
+                        {
+                            //DatabaseApp.ACUndoChanges();
+                            Messages.Msg(msg);
+                        }
+
+                        SelectedWeighingMaterial.RefreshFromPickingPos(currentPickingPos);
+
+                        msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, dbApp);
+                        if (msg != null)
+                        {
+                            if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
                             {
-                                Messages.Msg(fbtZeroBooking.ValidMessage);
-                            }
-                            else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
-                            {
-                                if (String.IsNullOrEmpty(result.ValidMessage.Message))
-                                    result.ValidMessage.Message = result.ResultState.ToString();
+                                if (ACFacilityManager == null)
+                                    return;
 
-                                Messages.Msg(result.ValidMessage);
+                                ACMethodBooking fbtZeroBooking = ACPickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, dbApp);
+                                ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
+
+                                fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
+                                fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                                fbtZeroBookingClone.AutoRefresh = true;
+                                ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, dbApp);
+                                if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                                {
+                                    Messages.Msg(fbtZeroBooking.ValidMessage);
+                                }
+                                else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                                {
+                                    if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                                        result.ValidMessage.Message = result.ResultState.ToString();
+
+                                    Messages.Msg(result.ValidMessage);
+                                }
                             }
                         }
-                    }
 
-                    if (AutoPrintOnPosting)
-                    {
-                        PrintLastQuant();
+                        if (AutoPrintOnPosting)
+                        {
+                            PrintLastQuant();
+                        }
+
+                        try
+                        {
+                            CurrentPicking.AutoRefresh();
+                            CurrentPicking.OnRefreshCompleteFactor();
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
