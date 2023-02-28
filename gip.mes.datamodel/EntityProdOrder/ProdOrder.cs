@@ -114,7 +114,7 @@ namespace gip.mes.datamodel
 
         #endregion
 
-        #region properties
+        #region Properties
 
         private string _ProducedMaterialNos;
         [ACPropertyInfo(9999, "ProducedMaterialNos", "en{'Produced materials No'}de{'Material Nummers'}")]
@@ -216,6 +216,32 @@ namespace gip.mes.datamodel
                     _IsSelected = value;
                     OnPropertyChanged(nameof(IsSelected));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _DepartmentUserNames;
+        [ACPropertyInfo(505, nameof(DepartmentUserNames), ConstApp.DepartmentUserName)]
+        public string DepartmentUserNames
+        {
+            get
+            {
+                if(_DepartmentUserNames == null)
+                {
+                    _DepartmentUserNames = "";
+                    List<string> departmentUserNames = new List<string>();
+                    if (ProdOrderPartslist_ProdOrder.Where(c=> !string.IsNullOrEmpty(c.DepartmentUserName)).Any())
+                    {
+                        foreach (var item in ProdOrderPartslist_ProdOrder.Where(c => !string.IsNullOrEmpty(c.DepartmentUserName)).OrderBy(c => c.Sequence))
+                        {
+                            departmentUserNames.Add(item.DepartmentUserName);
+                        }
+                        _DepartmentUserNames = string.Join(",", departmentUserNames.ToArray());
+                    }
+                }
+                return _DepartmentUserNames;
             }
         }
 

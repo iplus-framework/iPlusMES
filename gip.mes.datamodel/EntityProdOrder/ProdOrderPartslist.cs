@@ -13,7 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(3, ProdOrder.ClassName, "en{'Production Order'}de{'Produktionsauftrag'}", Const.ContextDatabase + "\\" + ProdOrder.ClassName, "", true)]
     [ACPropertyEntity(4, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName, "", true)]
     [ACPropertyEntity(5, "DepartmentUserDate", "en{'Ended by User on'}de{'Beendet von Bediener am'}", "", "", true)]
-    [ACPropertyEntity(6, "DepartmentUserName", "en{'Ended by User'}de{'Beendet von Bediener'}", "", "", true)]
+    [ACPropertyEntity(6, "DepartmentUserName", ConstApp.DepartmentUserName, "", "", true)]
     [ACPropertyEntity(7, "StartDate", "en{'Production Start'}de{'Produktionsstart'}", "", "", true)]
     [ACPropertyEntity(8, "EndDate", "en{'Production End'}de{'Produktionsende'}", "", "", true)]
     [ACPropertyEntity(9, Const.IsEnabled, "en{'Enabled'}de{'Freigegeben'}", "", "", true)]
@@ -22,17 +22,17 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(13, "ActualQuantity", ConstApp.ActualQuantity, "", "", true)]
     [ACPropertyEntity(14, "ExternProdOrderNo", "en{'Ext prod. ord. No'}de{'Ext FANr'}", "", "", true)]
     [ACPropertyEntity(15, "LastFormulaChange", "en{'Last formula change'}de{'Letzte Formeländerung'}", "", "", true)]
-   
+
     [ACPropertyEntity(16, nameof(ActualQuantityScrapUOM), "en{'Scrapped Quantity'}de{'Ausschussmenge'}", "", "", true)]
-    
+
     [ACPropertyEntity(17, nameof(InputQForActualOutputPer), ConstIInputQForActual.InputQForActualOutputPer, "", "", true)]
     [ACPropertyEntity(18, nameof(InputQForGoodActualOutputPer), ConstIInputQForActual.InputQForGoodActualOutputPer, "", "", true)]
     [ACPropertyEntity(19, nameof(InputQForScrapActualOutputPer), ConstIInputQForActual.InputQForScrapActualOutputPer, "", "", true)]
-    
+
     [ACPropertyEntity(20, nameof(InputQForFinalActualOutputPer), ConstIInputQForActual.InputQForFinalActualOutputPer, "", "", true)]
     [ACPropertyEntity(21, nameof(InputQForFinalGoodActualOutputPer), ConstIInputQForActual.InputQForFinalGoodActualOutputPer, "", "", true)]
     [ACPropertyEntity(22, nameof(InputQForFinalScrapActualOutputPer), ConstIInputQForActual.InputQForFinalScrapActualOutputPer, "", "", true)]
-    
+
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

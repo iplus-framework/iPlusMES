@@ -253,6 +253,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterDepartmentUserName;
+        [ACPropertyInfo(505, "FilterDepartmentUserName", ConstApp.DepartmentUserName)]
+        public string FilterDepartmentUserName
+        {
+            get
+            {
+                return _FilterDepartmentUserName;
+            }
+            set
+            {
+                if (_FilterDepartmentUserName != value)
+                {
+                    _FilterDepartmentUserName = value;
+                    OnPropertyChanged(nameof(FilterDepartmentUserName));
+                }
+            }
+        }
+
         #endregion
 
         #region Properties -> FilterProdOrderState
@@ -810,6 +832,9 @@ namespace gip.bso.manufacturing
                     p.Partslist.Material.MaterialNo.Contains(FilterMaterialNoName) ||
                     p.Partslist.Material.MaterialName1.Contains(FilterMaterialNoName)
                 ));
+
+            if (!string.IsNullOrEmpty(FilterDepartmentUserName))
+                result = result.Where(c => c.ProdOrderPartslist_ProdOrder.Where(x => x.DepartmentUserName != null && x.DepartmentUserName.Contains(FilterDepartmentUserName)).Any());
 
             result = FilterProdOrderByPOPosTime(result);
 
