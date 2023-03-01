@@ -154,7 +154,7 @@ namespace gip.bso.manufacturing
 
                 if (_FacilityChargeList == null && SelectedWeighingMaterial != null)
                 {
-                    ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.GetRoutableFacilities),
+                    ACValueList facilities = componentPWNode?.ExecuteMethod(nameof(PWPickingByMaterial.GetRoutableFacilities),
                                                                             SelectedWeighingMaterial.PickingPosition.PickingPosID) as ACValueList;
 
                     var facilityIDs = facilities.Select(c => c.ParamAsGuid).ToArray();

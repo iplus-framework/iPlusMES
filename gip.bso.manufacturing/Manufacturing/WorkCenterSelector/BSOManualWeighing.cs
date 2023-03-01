@@ -1718,8 +1718,8 @@ namespace gip.bso.manufacturing
 
             if (!IsBinChangeAvailable)
             {
-                bool? isBinChangeAvailable = pwNode.ValueT.ExecuteMethod(nameof(PWManualWeighing.IsBinChangeLoopNodeAvailable)) as bool?;
-                IsBinChangeAvailable = isBinChangeAvailable ?? false;
+                IACContainerTNet<bool> binChangeProp = pwNode.ValueT.GetPropertyNet(nameof(PWManualWeighing.IsBinChangeLoopNodeAvailable)) as IACContainerTNet<bool>;
+                IsBinChangeAvailable = binChangeProp != null ? binChangeProp.ValueT : false;
             }
 
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))

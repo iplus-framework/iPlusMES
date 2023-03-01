@@ -714,6 +714,13 @@ namespace gip.mes.processapplication
             set;
         }
 
+        [ACPropertyBindingSource]
+        public IACContainerTNet<bool> IsBinChangeLoopNodeAvailable
+        {
+            get;
+            set;
+        }
+
         public bool HasAnyMaterialToProcess
         {
             get
@@ -1036,6 +1043,8 @@ namespace gip.mes.processapplication
                 return;
             }
 
+            CheckIsBinChangeLoopNodeAvailable();
+
             core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
             if (pwGroup != null
                 && this.ContentACClassWF != null
@@ -1116,6 +1125,8 @@ namespace gip.mes.processapplication
 
             try
             {
+                CheckIsBinChangeLoopNodeAvailable();
+
                 PAFManualWeighing manualWeighing = CurrentExecutingFunction<PAFManualWeighing>();
 
                 bool isWeighComponentsNull;
@@ -1369,6 +1380,7 @@ namespace gip.mes.processapplication
             SetCanStartFromBSO(true);
 
             _IsBinChangeActivated = false;
+            IsBinChangeLoopNodeAvailable.ValueT = true;
 
             using (ACMonitor.Lock(_65025_MemberCompLock))
             {
@@ -3970,12 +3982,15 @@ namespace gip.mes.processapplication
         }
 
         [ACMethodInfo("", "", 9999)]
-        public bool IsBinChangeLoopNodeAvailable()
+        public void CheckIsBinChangeLoopNodeAvailable()
         {
             if (PWPointOut == null || PWPointOut.ConnectionList == null || !PWPointOut.ConnectionList.Any())
-                return false;
+            {
+                IsBinChangeLoopNodeAvailable.ValueT = false;
+                return;
+            }
 
-            return PWPointOut.ConnectionList.Any(c => c.ValueT is PWBinChangeLoop);
+            IsBinChangeLoopNodeAvailable.ValueT = PWPointOut.ConnectionList.Any(c => c.ValueT is PWBinChangeLoop);
         }
 
         [ACMethodInfo("", "", 9999)]
@@ -4348,9 +4363,9 @@ namespace gip.mes.processapplication
                 case nameof(SMResetting):
                     SMResetting();
                     return true;
-                case nameof(IsBinChangeLoopNodeAvailable):
-                    result = IsBinChangeLoopNodeAvailable();
-                    return true;
+                //case nameof(IsBinChangeLoopNodeAvailable):
+                //    result = IsBinChangeLoopNodeAvailable();
+                //    return true;
                 case nameof(GetPWParametersInfo):
                     result = GetPWParametersInfo();
                     return true;
