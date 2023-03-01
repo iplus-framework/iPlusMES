@@ -829,7 +829,7 @@ namespace gip.bso.manufacturing
 
         public override bool IsEnabledAcknowledge()
         {
-            return SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPicking != null && ScaleActualWeight > 0.000001;
+            return SelectedWeighingMaterial != null && SelectedFacilityCharge != null && CurrentPicking != null && Math.Abs(ScaleActualWeight) > 0.000001;
         }
 
         public override void AddKg()
