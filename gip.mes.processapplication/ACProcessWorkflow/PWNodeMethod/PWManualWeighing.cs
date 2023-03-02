@@ -1390,6 +1390,7 @@ namespace gip.mes.processapplication
             UnSubscribeToProjectWorkCycle();
 
             CurrentACState = ACStateEnum.SMResetting;
+            CurrentWeighingComponentInfo.ValueT = null;
 
             base.Reset();
         }
@@ -3682,8 +3683,15 @@ namespace gip.mes.processapplication
                                     return;
                                 }
 
+                                bool onlyComplete = false;
+                                ACValue onlyCompleteValue = e.GetACValue("CompleteOnDiffWeighing");
+                                if (onlyCompleteValue != null)
+                                {
+                                    onlyComplete = onlyCompleteValue.ParamAsBoolean;
+                                }
+
                                 double? grossWeight = e.GetDouble("ActualQuantity");
-                                if (grossWeight.HasValue)
+                                if (grossWeight.HasValue && !onlyComplete)
                                 {
                                     FacilityCharge facilityCharge = null;
                                     Facility facility = null;
@@ -3715,18 +3723,18 @@ namespace gip.mes.processapplication
                                             return;
                                         }
 
-                                        if (preBooking.OutwardFacilityCharge.FacilityChargeID != facilityCharge.FacilityChargeID)
-                                        {
-                                            //Error : The quant from the first weighing is not equal to the quant from the second weighing!
-                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(40)", 3699, "Error50594");
-                                            ActivateProcessAlarmWithLog(msg, false);
-                                            return;
-                                        }
+                                        //if (preBooking.OutwardFacilityCharge.FacilityChargeID != facilityCharge.FacilityChargeID)
+                                        //{
+                                        //    //Error : The quant from the first weighing is not equal to the quant from the second weighing!
+                                        //    msg = new Msg(this, eMsgLevel.Error, PWClassName, nameof(CompleteOnDifferenceWeighing) + "(40)", 3699, "Error50594");
+                                        //    ActivateProcessAlarmWithLog(msg, false);
+                                        //    return;
+                                        //}
 
                                         double bookingQuantity = prevQuantity.Value - grossWeight.Value;
                                         if (bookingQuantity > 0.000001)
                                         {
-                                            Msg msgBooking = DoManualWeighingBooking(bookingQuantity, false, isComponentConsumed, currentOpenMaterial, currentFacilityCharge);
+                                            Msg msgBooking = DoManualWeighingBooking(bookingQuantity, false, isComponentConsumed, currentOpenMaterial, preBooking.OutwardFacilityCharge.FacilityChargeID);
                                             if (msgBooking != null)
                                             {
                                                 ActivateProcessAlarmWithLog(msgBooking);

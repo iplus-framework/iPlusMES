@@ -42,11 +42,25 @@ namespace gip.bso.manufacturing
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
+            _ACPickingManager = ACRefToPickingManager();
+
             return result;
         }
 
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
+            if (_ACPickingManager != null)
+            {
+                _ACPickingManager.Detach();
+                _ACPickingManager = null;
+            }
+
+            if (_ACFacilityManager != null)
+            {
+                _ACFacilityManager.Detach();
+                _ACFacilityManager = null;
+            }
+
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -638,27 +652,30 @@ namespace gip.bso.manufacturing
                         {
                             if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
                             {
-                                if (ACFacilityManager == null)
-                                    return;
-
-                                ACMethodBooking fbtZeroBooking = ACPickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, dbApp);
-                                ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
-
-                                fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
-                                fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
-
-                                fbtZeroBookingClone.AutoRefresh = true;
-                                ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, dbApp);
-                                if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                                if (ACFacilityManager != null && ACPickingManager != null)
                                 {
-                                    Messages.Msg(fbtZeroBooking.ValidMessage);
-                                }
-                                else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
-                                {
-                                    if (String.IsNullOrEmpty(result.ValidMessage.Message))
-                                        result.ValidMessage.Message = result.ResultState.ToString();
+                                    ACMethodBooking fbtZeroBooking = ACPickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, dbApp);
+                                    ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
 
-                                    Messages.Msg(result.ValidMessage);
+                                    fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
+                                    fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                                    fbtZeroBookingClone.AutoRefresh = true;
+                                    ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, dbApp);
+                                    if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                                    {
+                                        Messages.Msg(fbtZeroBooking.ValidMessage);
+                                    }
+                                    else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                                    {
+                                        if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                                            result.ValidMessage.Message = result.ResultState.ToString();
+
+                                        Messages.Msg(result.ValidMessage);
+                                    }
+
+                                    RefreshMaterialOrFC_F();
+                                    ShowSelectFacilityLotInfo = true;
                                 }
                             }
                         }
@@ -673,11 +690,15 @@ namespace gip.bso.manufacturing
                             CurrentPicking.AutoRefresh();
                             CurrentPicking.OnRefreshCompleteFactor();
                             CurrentPicking.OnEntityPropertyChanged(nameof(CurrentPicking.ActualQuantity));
+                            if (SelectedFacilityCharge != null)
+                                SelectedFacilityCharge.StockQuantityUOM = fc.StockQuantityUOM;
                         }
                         catch
                         {
 
                         }
+
+                        CurrentPicking = null;
                     }
                 }
             }

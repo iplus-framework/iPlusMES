@@ -327,8 +327,13 @@ namespace gip.mes.processapplication
                     //TODO: error
                     return;
                 }
-                SetPAFResult(scale.ActualValue.ValueT + ManuallyAddedQuantity.ValueT);
+                SetPAFResult(scale.ActualWeight.ValueT + ManuallyAddedQuantity.ValueT);
             }
+            else
+            {
+                CurrentACMethod.ValueT.ResultValueList["CompleteOnDiffWeighing"] = true;
+            }
+
             CurrentACState = ACStateEnum.SMCompleted;
         }
 
@@ -1433,6 +1438,8 @@ namespace gip.mes.processapplication
             resultTranslation.Add("ActualQuantity", "en{'Actual quantity'}de{'Istgewicht'}");
             method.ResultValueList.Add(new ACValue("IsComponentConsumed", typeof(bool), false, Global.ParamOption.Optional));
             resultTranslation.Add("IsComponentConsumed", "en{'Is component consumed'}de{'Wird Komponente verbraucht'}");
+            method.ResultValueList.Add(new ACValue("CompleteOnDiffWeighing", typeof(bool), false, Global.ParamOption.Optional));
+            resultTranslation.Add("CompleteOnDiffWeighing", "en{'Complete on difference weighing'}de{'Complete on difference weighing'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
         }

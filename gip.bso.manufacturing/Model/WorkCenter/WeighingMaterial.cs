@@ -478,10 +478,12 @@ namespace gip.bso.manufacturing
 
                     PosRelation.AutoRefresh();
                     ActualQuantity = TargetQuantity + PosRelation.RemainingDosingWeight;
-                }
-                catch
-                {
 
+
+                }
+                catch (Exception e)
+                {
+                    dbApp.Root().Messages.LogException(nameof(WeighingMaterial), "ChangeComponentState(DiffWeighing)", e);
                 }
             }
 

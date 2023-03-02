@@ -57,12 +57,16 @@ namespace gip.bso.manufacturing
             set;
         }
 
-
+        private double _StockQuantityUOM;
         [ACPropertyInfo(9999)]
         public double StockQuantityUOM
         {
-            get;
-            set;
+            get => _StockQuantityUOM;
+            set
+            {
+                _StockQuantityUOM = value;
+                OnPropertyChanged();
+            }
         }
 
         [ACPropertyInfo(9999)]
