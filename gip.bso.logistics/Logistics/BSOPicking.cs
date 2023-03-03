@@ -92,13 +92,18 @@ namespace gip.bso.logistics
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
-            AccessFilterFromFacility.NavSearch();
-            AccessFilterToFacility.NavSearch();
+            bool skipSearchOnStart = ParameterValueT<bool>(Const.SkipSearchOnStart);
+            if (!skipSearchOnStart)
+            {
+                AccessFilterFromFacility.NavSearch();
+                AccessFilterToFacility.NavSearch();
 
-            if (Parameters != null && Parameters.Any())
-                InitParams();
+                if (Parameters != null && Parameters.Any())
+                    InitParams();
 
-            Search(false);
+                Search(false);
+            }
+
             return true;
         }
 
