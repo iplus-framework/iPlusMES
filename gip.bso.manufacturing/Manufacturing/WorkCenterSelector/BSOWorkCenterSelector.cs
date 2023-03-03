@@ -262,7 +262,7 @@ namespace gip.bso.manufacturing
                 if (lastSelected != moduleACUrl)
                     SetSelectedWorkCenterItemConfig(value);
 
-                ApplicationQueue?.Add(() => InitFunctionMonitor());
+                //ApplicationQueue?.Add(() => InitFunctionMonitor());
             }
         }
 
