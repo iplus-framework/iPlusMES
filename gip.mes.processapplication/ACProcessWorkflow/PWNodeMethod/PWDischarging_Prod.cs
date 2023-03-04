@@ -269,7 +269,7 @@ namespace gip.mes.processapplication
                         if (responsibleFunc == null)
                             return StartDisResult.CycleWait;
 
-                        if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
+                        if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
                             return StartDisResult.CycleWait;
 
                         acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
@@ -449,7 +449,7 @@ namespace gip.mes.processapplication
                                     route.Detach(true);
                                 CurrentDischargingRoute = route;
 
-                                if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
+                                if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
                                     return StartDisResult.CycleWait;
 
                                 acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
@@ -1010,7 +1010,7 @@ namespace gip.mes.processapplication
                         }
 
                         isNewACMethod = true;
-                        if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
+                        if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
                             return StartDisResult.CycleWait;
                     }
                     acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;

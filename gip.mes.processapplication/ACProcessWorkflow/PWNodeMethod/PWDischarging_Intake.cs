@@ -389,7 +389,7 @@ namespace gip.mes.processapplication
             if (responsibleFunc == null)
                 return StartDisResult.CycleWait;
 
-            if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, dnPos, targetModule))
+            if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, dnPos, targetModule))
                 return StartDisResult.CycleWait;
 
             acMethod["Route"] = CurrentDischargingRoute != null ? CurrentDischargingRoute.Clone() as Route : null;
@@ -683,7 +683,7 @@ namespace gip.mes.processapplication
                 }
 
                 isNewACMethod = true;
-                if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, dnPos, targetSilo))
+                if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, dnPos, targetSilo))
                     return StartDisResult.CycleWait;
             }
 

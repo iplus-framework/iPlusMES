@@ -65,6 +65,20 @@ namespace gip.mes.processapplication
             }
         }
 
+        public TimeSpan MixingTime
+        {
+            get
+            {
+                ACMethod paramMethod = NewACMethodPAFWithConfiguration();
+                if (paramMethod == null)
+                    return TimeSpan.Zero;
+                ACValue value = paramMethod.ParameterValueList?.GetACValue("Duration");
+                if (value == null) 
+                    return TimeSpan.Zero;
+                return value.ParamAsTimeSpan;
+            }
+        }
+
         public override void ClearMyConfiguration()
         {
             base.ClearMyConfiguration();
@@ -125,8 +139,7 @@ namespace gip.mes.processapplication
                         return;
                     }
                     ACMethod paramMethod = refPAACClassMethod.TypeACSignature();
-
-                    if (!(bool)ExecuteMethod("GetConfigForACMethod", paramMethod, true))
+                    if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), paramMethod, true))
                     {
                         // TODO: Meldung
                         return;

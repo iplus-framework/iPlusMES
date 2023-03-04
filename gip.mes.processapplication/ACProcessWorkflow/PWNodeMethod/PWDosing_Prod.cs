@@ -701,7 +701,7 @@ namespace gip.mes.processapplication
                                 return StartNextCompResult.CycleWait;
                             }
 
-                            if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                            if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
                                 return StartNextCompResult.CycleWait;
 
                             PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;

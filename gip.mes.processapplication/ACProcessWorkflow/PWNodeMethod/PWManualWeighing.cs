@@ -2898,7 +2898,7 @@ namespace gip.mes.processapplication
             if (responsibleFunc == null)
                 return StartNextCompResult.CycleWait;
 
-            if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true))
+            if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true))
                 return StartNextCompResult.CycleWait;
 
             //TODO: get target scale from partslistconfig if is rule configured for this material

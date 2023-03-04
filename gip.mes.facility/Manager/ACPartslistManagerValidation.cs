@@ -471,7 +471,8 @@ namespace gip.mes.facility
                                                               ProcessModuleList = c.RefPAACClass.ACClass_BasedOnACClass
                                                                                   .Where(d => possibleProjectIDs.Contains(d.ACProjectID))
                                                                                   .ToList()
-                                                          });
+                                                          })
+                                                          .ToArray();
                         // Apply rules to filter out the Processmodules which are allowed
                         foreach (var mapPWGroup2Module in mapPWGroup2Modules)
                         {

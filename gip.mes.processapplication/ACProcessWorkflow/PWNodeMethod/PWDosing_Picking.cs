@@ -349,7 +349,7 @@ namespace gip.mes.processapplication
                             return StartNextCompResult.CycleWait;
                     }
 
-                    if (!(bool)ExecuteMethod("GetConfigForACMethod", acMethod, true, dbApp, pickingPos, sourceSilo))
+                    if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, pickingPos, sourceSilo))
                         return StartNextCompResult.CycleWait;
 
                     ACValue configuredQuantityValue = acMethod.ParameterValueList.GetACValue("TargetQuantity");
