@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,12 +26,46 @@ namespace gip.mes.processapplication
 
         }
 
+        public override bool ACPostInit()
+        {
+            bool result = base.ACPostInit();
+
+            _PrintManager = ACPrintManager.ACRefToServiceInstance(this);
+
+            return result;
+        }
+
+        public override bool ACDeInit(bool deleteACClassTask = false)
+        {
+            if (_PrintManager != null)
+            {
+                _PrintManager.Detach();
+                _PrintManager = null;
+            }
+            return base.ACDeInit(deleteACClassTask);
+        }
+
         [ACPropertyBindingTarget]
         public IACContainerTNet<Guid> ScannedFacilityCharge
         {
             get;
             set;
         }
+
+        private ACRef<ACPrintManager> _PrintManager;
+        
+        protected ACPrintManager PrintManager
+        {
+            get
+            {
+                if (_PrintManager != null)
+                {
+                    return _PrintManager.ValueT;
+                }
+                return null;
+            }
+        }
+
 
         [ACMethodAsync("Process", "en{'Start'}de{'Start'}", (short)MISort.Start, false)]
         public override ACMethodEventArgs Start(ACMethod acMethod)
@@ -54,12 +89,11 @@ namespace gip.mes.processapplication
         [ACMethodInfo("", "", 9999)]
         public Msg PrintOverPAOrderInfo(PAOrderInfo info)
         {
-            ACPrintManager printManger = ACPrintManager.GetServiceInstance(this);
-            if (printManger != null)
+            if (PrintManager != null)
             {
-                return printManger.Print(info, 1);
+                return PrintManager.Print(info, 1);
             }
-            return new Msg(eMsgLevel.Error, "ACPrintManager is not configured!");
+            return new Msg(eMsgLevel.Error, "Print manager is not configured!");
         }
 
         protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)
