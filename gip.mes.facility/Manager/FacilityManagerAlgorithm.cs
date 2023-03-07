@@ -2459,6 +2459,7 @@ namespace gip.mes.facility
                         {
                             //PerformAnterogradePosting
                             ACMethodBooking inwardMethod = NewBookParamInwardMovement(BP, BP.DatabaseApp, posForInwardPosting, anterogradeInwardQuantityUOM, facilityReservation.Facility, posForInwardPosting.FacilityLot);
+                            inwardMethod.PropertyACUrl = BP.PropertyACUrl;
                             //FacilityBooking fbInward = NewFacilityBooking(inwardMethod);
 
                             // Mache Stackbuchung
