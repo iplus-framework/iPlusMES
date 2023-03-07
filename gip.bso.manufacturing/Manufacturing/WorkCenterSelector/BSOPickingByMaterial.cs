@@ -34,8 +34,8 @@ namespace gip.bso.manufacturing
 
             if (result)
             {
-                PickingsFrom = DateTime.Now.Date;
-                PickingsTo = DateTime.Now.AddDays(1).Date;
+                PickingsFrom = DateTime.Now.AddDays(1).Date;
+                PickingsTo = PickingsFrom;
             }
 
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
@@ -715,7 +715,7 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            if (PickingsFrom > DateTime.MinValue && PickingsTo > DateTime.MinValue && PickingsFrom < PickingsTo)
+            if (PickingsFrom > DateTime.MinValue && PickingsTo > DateTime.MinValue)
             {
                 ACComponent currentProcessModule = CurrentProcessModule;
                 if (currentProcessModule == null)
@@ -908,6 +908,8 @@ namespace gip.bso.manufacturing
                 return;
             }
 
+            //TODO: background worker
+
             foreach (var picking in _PickingItems)
             {
                 ACPickingManager.FinishOrder(DatabaseApp, picking, inManagerRef.ValueT, outManagerRef.ValueT, ACFacilityManager, out delNote, out inOrder, out outOrder, true);
@@ -921,13 +923,23 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Cancel component'}de{'Cancel component'}", 9999)]
+        [ACMethodInfo("", "en{'Cancel component'}de{'Komponente abbrechen'}", 9999)]
         public void CancelCurrentComponent()
         {
             ShowSelectFacilityLotInfo = true;
             SelectedFacilityCharge = null;
             CloseTopDialog();
         }
+
+        [ACMethodInfo("", "en{'Abort picking by material'}de{'Kommissionierung nach Material abbrechen'}", 9999)]
+        public void AbortPickingByMaterial()
+        {
+            if (_PAFPickingByMaterial != null)
+            {
+                _PAFPickingByMaterial.ValueT.ExecuteMethod(nameof(PAFPickingByMaterial.Abort));
+            }
+        }
+
 
         public override void PrintLastQuant()
         {
