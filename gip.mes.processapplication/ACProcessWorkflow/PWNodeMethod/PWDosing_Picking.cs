@@ -769,18 +769,22 @@ namespace gip.mes.processapplication
                     //    return msg;
                     //}
 
-                    if (dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
-                            || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
-                            || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenEnd
-                            || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenNextComp
-                            || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait)
+                    PickingPos pickingPos = dbApp.PickingPos.Where(c => c.PickingPosID == CurrentDosingPos.ValueT).FirstOrDefault();
+                    bool isSiloChangeOnEndlessDosing = (dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource || dosingFuncResultState == PADosingAbortReason.MachineMalfunction) 
+                                                        && isEndlessDosing 
+                                                        && pickingPos != null 
+                                                        && !pickingPos.FromFacilityID.HasValue;
+                    if (   ((dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource || dosingFuncResultState == PADosingAbortReason.MachineMalfunction) && !isSiloChangeOnEndlessDosing)
+                        || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
+                        || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenEnd
+                        || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenNextComp
+                        || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait)
                     {
 
                         if (ParentPWMethodVBBase != null)
                             ParentPWMethodVBBase.IsLastBatch = PADosingLastBatchEnum.LastBatch;
                     }
 
-                    PickingPos pickingPos = dbApp.PickingPos.Where(c => c.PickingPosID == CurrentDosingPos.ValueT).FirstOrDefault();
                     if (pickingPos != null)
                     {
                         bool changePosState = false;
@@ -867,7 +871,7 @@ namespace gip.mes.processapplication
                                         collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
                                     }
 
-                                    if ((!isEndlessDosing && (pickingPos.ActualQuantityUOM >= (pickingPos.TargetQuantityUOM - toleranceMinus)))
+                                    if (   (!isEndlessDosing && (pickingPos.ActualQuantityUOM >= (pickingPos.TargetQuantityUOM - toleranceMinus)))
                                         || (ParentPWMethodVBBase != null && ParentPWMethodVBBase.IsLastBatch == PADosingLastBatchEnum.LastBatch))
                                     {
                                         changePosState = true;
@@ -915,7 +919,7 @@ namespace gip.mes.processapplication
 
                         if (odbd)
                         {
-                            if (dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
+                            if (       dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
                                     || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
                                     || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenEnd
                                     || dosingFuncResultState == PADosingAbortReason.EndDosingThenDisThenNextComp
@@ -1009,8 +1013,11 @@ namespace gip.mes.processapplication
                                         }
                                     }
 
-                                    changePosState = true;
-                                    posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                                    if (ParentPWMethodVBBase != null && ParentPWMethodVBBase.IsLastBatch == PADosingLastBatchEnum.LastBatch)
+                                    {
+                                        changePosState = true;
+                                        posState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck).FirstOrDefault();
+                                    }
 
                                     msg = dbApp.ACSaveChangesWithRetry();
                                     if (msg != null)
@@ -1096,8 +1103,14 @@ namespace gip.mes.processapplication
                 {
                     var pwGroup = ParentPWGroup as PWGroupVB;
 
-                    if ((dosingFuncResultState == PADosingAbortReason.NotSet || dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource)
-                        && MinDosQuantity < -0.0000001
+                    bool isEndlessDosing = MinDosQuantity <= -0.00001;
+                    bool isSiloChangeOnEndlessDosing = (dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource || dosingFuncResultState == PADosingAbortReason.MachineMalfunction)
+                                    && isEndlessDosing
+                                    && pickingPos != null
+                                    && !pickingPos.FromFacilityID.HasValue;
+
+                    if (   isEndlessDosing 
+                        && (dosingFuncResultState == PADosingAbortReason.NotSet || isSiloChangeOnEndlessDosing)
                         && pickingPos.MDDelivPosLoadState != null
                         && pickingPos.MDDelivPosLoadState.DelivPosLoadState < MDDelivPosLoadState.DelivPosLoadStates.LoadToTruck)
                     {

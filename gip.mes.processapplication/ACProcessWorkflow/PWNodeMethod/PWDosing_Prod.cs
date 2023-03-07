@@ -323,6 +323,7 @@ namespace gip.mes.processapplication
                     bool hasOpenDosings = false;
                     bool isAnyCompDosableFromAnyRoutableSilo = false;
                     bool componentsSkippable = ComponentsSkippable;
+                    DosingSkipMode skipComponentsMode = SkipComponentsMode;
                     StartNextCompResult openDosingsResult = StartNextCompResult.Done;
                     // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
                     if (queryOpenDosings != null && queryOpenDosings.Any())
@@ -485,7 +486,7 @@ namespace gip.mes.processapplication
                                     .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == batchPlan.MaterialWFACClassMethodID.Value
                                                 && c.ACClassWFID != thisContentACClassWF.ACClassWFID
                                                 && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                && (componentsSkippable || c.ACClassWF.PWACClassID == thisACClassID))
+                                                && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
                                     .Select(c => c.ACClassWFID)
                                     .ToArray();
                                 }
@@ -498,7 +499,7 @@ namespace gip.mes.processapplication
                                                                 .Where(c => c.MaterialWFACClassMethod.MaterialWFACClassMethodID == plMethod.MaterialWFACClassMethodID
                                                                 && c.ACClassWFID != thisContentACClassWF.ACClassWFID
                                                                 && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                                && (componentsSkippable || c.ACClassWF.PWACClassID == thisACClassID))
+                                                                && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
                                                 .Select(c => c.ACClassWFID)
                                                 .ToArray();
                                     }
@@ -510,14 +511,15 @@ namespace gip.mes.processapplication
                                                         && c.MaterialWFACClassMethod.MaterialWFID == endBatchPos.ProdOrderPartslist.Partslist.MaterialWFID
                                                         && c.ACClassWFID != thisContentACClassWF.ACClassWFID
                                                         && c.ACClassWF.ACClassMethodID == thisContentACClassWF.ACClassMethodID
-                                                        && (componentsSkippable || c.ACClassWF.PWACClassID == thisACClassID))
+                                                        && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || c.ACClassWF.PWACClassID == thisACClassID))
                                             .Select(c => c.ACClassWFID)
                                             .ToArray();
                                     }
                                 }
 
-                                if (   otherDosingNodes != null && otherDosingNodes.Any() 
-                                    && (componentsSkippable || (possibleSilos != null && possibleSilos.Any())))
+                                if (   otherDosingNodes != null 
+                                    && otherDosingNodes.Any() 
+                                    && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.Any())))
                                 {
                                     List<IPWNodeReceiveMaterial> otherDosingWFs = this.RootPW.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial
                                                                                                 && (c as IPWNodeReceiveMaterial).ContentACClassWF != null

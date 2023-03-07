@@ -11,6 +11,37 @@ using System.Xml;
 
 namespace gip.mes.processapplication
 {
+    [ACSerializeableInfo]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Start next production stage'}de{'Überspringe nicht dosierbare Komponenten'}", Global.ACKinds.TACEnum, QRYConfig = "gip.mes.processapplication.ACValueListDosingSkipMode")]
+    public enum DosingSkipMode : short
+    {
+        /// <summary>
+        /// Doesn't skip
+        /// </summary>
+        False = 0,
+
+        /// <summary>
+        /// Skips dosing only if same types of Workflow-Nodes  are connected to the same intermediate
+        /// </summary>
+        True = 1,
+
+        /// <summary>
+        /// Skips dosing also if different Workflow-Node-Classes are connected to the same intermediate
+        /// </summary>
+        DifferentWFClasses = 2,
+    }
+
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Skip not dosable components'}de{'Überspringe nicht dosierbare Komponenten'}", Global.ACKinds.TACEnumACValueList)]
+    public class ACValueListDosingSkipMode : ACValueItemList
+    {
+        public ACValueListDosingSkipMode() : base(nameof(DosingSkipMode))
+        {
+            AddEntry(DosingSkipMode.False, "en{'No skipping'}de{'Kein überspringen'}");
+            AddEntry(DosingSkipMode.True, "en{'Skip only, if there are other node of same type'}de{'Überspringe nur, wenn es andere WF-Knoten des selben Typs gibt'}");
+            AddEntry(DosingSkipMode.DifferentWFClasses, "en{'Skip if there are other nodes'}de{'Überspringe wenn es andere WF-Knoten gibt'}");
+        }
+    }
+
     /// <summary>
     /// Class that is responsible for processing input-materials that are associated with an intermediate product. 
     /// The intermediate prduct, in turn, is linked through the material workflow to one or more workflow nodes that are from this PWDosing class. 
@@ -22,7 +53,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterialRouteable" />
     /// <seealso cref="gip.core.autocomponent.IACMyConfigCache" />
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflowclass Dosing'}de{'Workflowklasse Dosieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Skip not dosable components'}de{'Workflowklasse Dosieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public partial class PWDosing : PWNodeProcessMethod, IPWNodeReceiveMaterialRouteable
     {
         public const string PWClassName = "PWDosing";
@@ -33,7 +64,7 @@ namespace gip.mes.processapplication
             ACMethod method;
             method = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
-            method.ParameterValueList.Add(new ACValue("SkipComponents", typeof(bool), false, Global.ParamOption.Required));
+            method.ParameterValueList.Add(new ACValue("SkipComponents", typeof(DosingSkipMode), DosingSkipMode.False, Global.ParamOption.Required));
             paramTranslation.Add("SkipComponents", "en{'Skip not dosable components'}de{'Überspringe nicht dosierbare Komponenten'}");
             method.ParameterValueList.Add(new ACValue("ComponentsSeqFrom", typeof(Int32), 0, Global.ParamOption.Optional));
             paramTranslation.Add("ComponentsSeqFrom", "en{'Components from Seq.-No.'}de{'Komponenten VON Seq.-Nr.'}");
@@ -483,16 +514,36 @@ namespace gip.mes.processapplication
         {
             get
             {
+                return SkipComponentsMode > DosingSkipMode.False;
+            }
+        }
+
+        public DosingSkipMode SkipComponentsMode
+        {
+            get
+            {
                 var method = MyConfiguration;
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("SkipComponents");
                     if (acValue != null)
                     {
-                        return acValue.ParamAsBoolean;
+                        try
+                        {
+                            string value = acValue.ParamAsString;
+                            if (String.IsNullOrEmpty(value) || value.ToLower() == "false")
+                                return DosingSkipMode.False;
+                            else if (value.ToLower() == "true")
+                                return DosingSkipMode.True;
+                            else
+                                return (DosingSkipMode)acValue.ParamAsInt16;
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
-                return false;
+                return DosingSkipMode.False;
             }
         }
 
@@ -1164,7 +1215,7 @@ namespace gip.mes.processapplication
                 if (silo == null)
                     return;
 
-                DosingRestInfo restInfo = new DosingRestInfo(silo, dosing, 10);
+                DosingRestInfo restInfo = new DosingRestInfo(silo, dosing, null);
 
                 //if (silo.MatSensorEmtpy == null
                 //    || (silo.MatSensorEmtpy != null && silo.MatSensorEmtpy.SensorState.ValueT != PANotifyState.Off))
