@@ -1246,8 +1246,7 @@ namespace gip.mes.processapplication
                 if (actualQuantity < 0.0000001)
                 {
                     actualQuantity = (double)acMethod.ParameterValueList["TargetQuantity"];
-                    if (DosingAbortReason.ValueT == PADosingAbortReason.EmptySourceNextSource
-                        || DosingAbortReason.ValueT == PADosingAbortReason.CompCancelled)
+                    if (DosingAbortReason.ValueT != PADosingAbortReason.NotSet)
                     {
                         if (CurrentScaleForWeighing != null)
                         {

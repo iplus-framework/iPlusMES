@@ -39,7 +39,7 @@ namespace gip.mes.processapplication
         CompleteOnLastBatch = 5
     }
 
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Start next production stage''}de{'Nächste Fertigungsstufe starten'}", Global.ACKinds.TACEnumACValueList)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Start next production stage'}de{'Nächste Fertigungsstufe starten'}", Global.ACKinds.TACEnumACValueList)]
     public class ACValueListStartNextStageMode : ACValueItemList
     {
         public ACValueListStartNextStageMode() : base("StartNextStageMode")

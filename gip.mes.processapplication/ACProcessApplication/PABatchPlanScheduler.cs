@@ -356,13 +356,10 @@ namespace gip.mes.processapplication
             }
             catch (Exception e)
             {
-                string message = e.Message;
-                if (e.InnerException != null && e.InnerException.Message != null)
-                    message += " Inner:" + e.InnerException.Message;
                 IsSchedulingAlarm.ValueT = PANotifyState.AlarmOrFault;
-                Msg msg = new Msg(message, this, eMsgLevel.Exception, "PABatchPlanScheduler", "ProcessActivatedSchedules", 100);
-                if (IsAlarmActive(IsSchedulingAlarm, message) == null)
-                    Messages.LogException(this.GetACUrl(), "ProcessActivatedSchedules(100)", e);
+                Msg msg = new Msg(e.Message, this, eMsgLevel.Exception, "PABatchPlanScheduler", "ProcessActivatedSchedules", 100);
+                if (IsAlarmActive(IsSchedulingAlarm, e.Message) == null)
+                    Messages.LogException(this.GetACUrl(), "ProcessActivatedSchedules(100)", e, true);
                 OnNewAlarmOccurred(IsSchedulingAlarm, msg, true);
             }
         }
