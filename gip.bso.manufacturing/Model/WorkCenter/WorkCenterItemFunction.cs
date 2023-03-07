@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using gip.mes.processapplication;
 
 namespace gip.bso.manufacturing
 {
@@ -18,8 +19,8 @@ namespace gip.bso.manufacturing
             if (paf != null)
             {
                 _ProcessFunction = new ACRef<ACComponent>(paf, bso);
-                ACStateProperty = ProcessFunction.GetPropertyNet("ACState") as IACContainerTNet<ACStateEnum>;
-                NeedWorkProperty = ProcessFunction.GetPropertyNet("NeedWork") as IACContainerTNet<bool>;
+                ACStateProperty = ProcessFunction.GetPropertyNet(nameof(PAProcessFunction.ACState)) as IACContainerTNet<ACStateEnum>;
+                NeedWorkProperty = ProcessFunction.GetPropertyNet(nameof(PAFWorkCenterSelItemBase.NeedWork)) as IACContainerTNet<bool>;
                 RelatedBSOs = bsos;
 
                 if (RelatedBSOs.Any(c => BSOWorkCenterMessages._WCSMessagesType.IsAssignableFrom((c.ValueT as core.datamodel.ACClass)?.ObjectType)))
@@ -39,7 +40,7 @@ namespace gip.bso.manufacturing
             private set
             {
                 _IsFunctionActive = value;
-                OnPropertyChanged("IsFunctionActive");
+                OnPropertyChanged();
             }
         }
 

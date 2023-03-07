@@ -105,6 +105,8 @@ namespace gip.mes.processapplication
 
         protected override core.datamodel.ACClass OnResolveBSOForOrderInfo(PAOrderInfo pAOrderInfo)
         {
+            var vbDump = Root.VBDump;
+            PerformanceEvent pEvent = vbDump?.PerfLoggerStart(this.GetACUrl() + "!" + nameof(ACPrintManagerMES) + "." + nameof(OnResolveBSOForOrderInfo), 250);
             if (pAOrderInfo != null)
             {
                 PAOrderInfoEntry batchEntry = pAOrderInfo.Entities.Where(c => c.EntityName == ProdOrderBatch.ClassName).FirstOrDefault();
@@ -151,6 +153,9 @@ namespace gip.mes.processapplication
                     }
                 }
             }
+
+            vbDump?.PerfLoggerStop(this.GetACUrl() + "!" + nameof(ACPrintManagerMES) + "." + nameof(OnResolveBSOForOrderInfo), 250, pEvent);
+
             return base.OnResolveBSOForOrderInfo(pAOrderInfo);
         }
 

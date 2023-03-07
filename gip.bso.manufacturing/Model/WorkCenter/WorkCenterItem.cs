@@ -61,7 +61,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ActiveFunctionsCount = value;
-                OnPropertyChanged("ActiveFunctionsCount");
+                OnPropertyChanged();
             }
         }
 
@@ -208,7 +208,7 @@ namespace gip.bso.manufacturing
             }
 
             if (exception != null)
-                BSOWorkCenterSelector.Messages.LogMessage(eMsgLevel.Exception, "WorkCenterItem", "HandleACStatePropertyChanged", exception);
+                BSOWorkCenterSelector.Messages.LogMessage(eMsgLevel.Exception, nameof(WorkCenterItem), nameof(HandleACStatePropertyChanged), exception);
         }
 
         public void OnItemSelected(BSOWorkCenterSelector parentBSO)

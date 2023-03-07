@@ -93,7 +93,7 @@ namespace gip.bso.manufacturing
                         ActualQtyInUnits = 0;
                     }
                 }
-                OnPropertyChanged("PosRelation");
+                OnPropertyChanged();
             }
         }
 
@@ -112,7 +112,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _MaterialName = value;
-                OnPropertyChanged("MaterialName");
+                OnPropertyChanged();
             }
         }
 
@@ -124,7 +124,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _MaterialNo = value;
-                OnPropertyChanged("MaterialNo");
+                OnPropertyChanged();
             }
         }
 
@@ -136,7 +136,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _IsLotManaged = value;
-                OnPropertyChanged("IsLotManaged");
+                OnPropertyChanged();
             }
         }
 
@@ -155,7 +155,7 @@ namespace gip.bso.manufacturing
             {
 
                 _WeighingMaterialState = value;
-                OnPropertyChanged("WeighingMatState");
+                OnPropertyChanged();
             }
         }
 
@@ -177,7 +177,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _TargetQuantity = value;
-                OnPropertyChanged("TargetQuantity");
+                OnPropertyChanged();
             }
         }
 
@@ -192,7 +192,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ActualQuantity = value;
-                OnPropertyChanged("ActualQuantity");
+                OnPropertyChanged();
             }
         }
 
@@ -204,7 +204,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _UnitName = value;
-                OnPropertyChanged("UnitName");
+                OnPropertyChanged();
             }
         }
 
@@ -216,7 +216,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _TargetQtyInUnits = value;
-                OnPropertyChanged("TargetQtyInUnits");
+                OnPropertyChanged();
             }
         }
 
@@ -228,7 +228,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ActualQtyInUnits = value;
-                OnPropertyChanged("ActualQtyInUnits");
+                OnPropertyChanged();
             }
         }
 
@@ -347,7 +347,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _AddValue = value;
-                OnPropertyChanged("AddValue");
+                OnPropertyChanged();
             }
         }
 
@@ -359,7 +359,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedMaterialUnit = value;
-                OnPropertyChanged("SelectedMaterialUnit");
+                OnPropertyChanged();
             }
         }
 
@@ -377,7 +377,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _MaterialUnitList = value;
-                OnPropertyChanged("MaterialUnitList");
+                OnPropertyChanged();
             }
         }
 
