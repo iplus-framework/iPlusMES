@@ -239,9 +239,26 @@ namespace gip.bso.manufacturing
                         //_StartWeighingFromF_FC = true;
                         _SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
 
-                        PickingsList = _PickingItems.SelectMany(c => c.PickingPos_Picking).Where(c => c.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)
+                        var tempItems = _PickingItems.SelectMany(c => c.PickingPos_Picking).Where(c => c.Material.MaterialID == _SelectedWeighingMaterial.PickingPosition.Material.MaterialID)
                                                     .OrderBy(c => c.Picking.PickingNo)
                                                     .ToList();
+
+                        if (tempItems != null)
+                        {
+                            foreach (var tempItem in tempItems)
+                            {
+                                try
+                                {
+                                    tempItem.AutoRefresh();
+                                }
+                                catch
+                                {
+                                }
+                            }
+
+                        }
+
+                        PickingsList = tempItems;
                     }
                 }
             }
@@ -704,7 +721,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true)]
         public void RunPickingByMaterial()
         {
@@ -940,7 +956,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         public override void PrintLastQuant()
         {
             var pickingByMat = _PAFPickingByMaterial?.ValueT;
@@ -957,6 +972,28 @@ namespace gip.bso.manufacturing
                 {
                     Messages.Msg(msg);
                 }
+            }
+        }
+
+        public override void RefreshMaterialOrFC_F()
+        {
+            base.RefreshMaterialOrFC_F();
+
+            if (PickingsList == null)
+                return;
+
+            try
+            {
+                foreach (PickingPos tempItem in PickingsList)
+                {
+                    tempItem.AutoRefresh();
+                }
+
+                var tempList = PickingsList.ToList();
+                PickingsList = tempList;
+            }
+            catch
+            {
             }
         }
 

@@ -2423,7 +2423,7 @@ namespace gip.bso.manufacturing
         #region Methods => Misc.
 
         [ACMethodInfo("", "en{'Refresh material and lots'}de{'Refresh material and lots'}", 650, true)]
-        public void RefreshMaterialOrFC_F()
+        public virtual void RefreshMaterialOrFC_F()
         {
             OnPropertyChanged(nameof(WeighingMaterialList));
             if (SelectedWeighingMaterial != null)
@@ -2434,7 +2434,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public bool IsEnabledRefreshMaterialOrFC_F()
+        public virtual bool IsEnabledRefreshMaterialOrFC_F()
         {
             return SelectedFacilityCharge == null || _CallPWLotChange;
         }
