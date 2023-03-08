@@ -291,12 +291,15 @@ namespace gip.bso.masterdata
         public void New()
         {
             if (!PreExecute()) return;
+            IsLoadDisabled = true;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Partslist), Partslist.NoColumnName, Partslist.FormatNewNo, this);
             Partslist partsList = Partslist.NewACObject(DatabaseApp, null, secondaryKey);
             DatabaseApp.Partslist.AddObject(partsList);
+            AccessPrimary.NavList.Insert(0, partsList);
+            SelectedPartslist = partsList;
             CurrentPartslist = partsList;
-            AccessPrimary.NavList.Add(CurrentPartslist);
             OnPropertyChanged(nameof(PartslistList));
+            IsLoadDisabled = false;
             PostExecute();
         }
 
@@ -363,8 +366,8 @@ namespace gip.bso.masterdata
             if (msg == null)
             {
                 IsLoadDisabled = true;
-                if (AccessPrimary == null) 
-                    return; 
+                if (AccessPrimary == null)
+                    return;
                 AccessPrimary.NavList.Remove(CurrentPartslist);
                 SelectedPartslist = AccessPrimary.NavList.FirstOrDefault();
                 CurrentPartslist = SelectedPartslist;
@@ -458,7 +461,7 @@ namespace gip.bso.masterdata
             List<Partslist> changedPartslist = new List<Partslist>();
             foreach (Partslist partslist in VisitedPartslists)
             {
-                if(partslist.EntityState != EntityState.Deleted)
+                if (partslist.EntityState != EntityState.Deleted)
                 {
                     bool isChanged = PartslistManager.IsFormulaChanged(DatabaseApp, partslist);
                     if (isChanged)
@@ -543,9 +546,9 @@ namespace gip.bso.masterdata
         [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
-            if (!PreExecute()) 
+            if (!PreExecute())
                 return;
-            if (IsLoadDisabled) 
+            if (IsLoadDisabled)
                 return;
             IsLoadDisabled = true;
 
@@ -878,7 +881,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (SelectedPartslist == null || SelectedPartslistPos == null) 
+                if (SelectedPartslist == null || SelectedPartslistPos == null)
                     return null;
                 return SelectedPartslist.PartslistPos_Partslist.Where(x => x.AlternativePartslistPosID == SelectedPartslistPos.PartslistPosID).OrderBy(x => x.Sequence);
             }
@@ -1101,18 +1104,18 @@ namespace gip.bso.masterdata
                 {
                     if (_SelectedIntermediateParts.SourcePartslistPos == null)
                         _SelectedIntermediateParts.SourcePartslistPos = PartslistPosList.FirstOrDefault(c => c.PartslistPosID == _SelectedIntermediateParts.SourcePartslistPosID);
-                    _SelectedIntermediateParts.TargetQuantityUOM = 0;
-                    if (PartslistPosList != null && PartslistPosList.Any())
-                    {
-                        //_SelectedIntermediateParts.TargetQuantity = PartslistPosList
-                        //    .Where(p => p.MaterialID == _SelectedIntermediateParts.SourcePartslistPos.MaterialID)
-                        //    .Sum(p => p.TargetQuantity);
-                        _SelectedIntermediateParts.TargetQuantityUOM = PartslistPosList
-                            .Where(p =>
-                                _SelectedIntermediateParts.SourcePartslistPos != null
-                                && p.MaterialID == _SelectedIntermediateParts.SourcePartslistPos.MaterialID)
-                            .Sum(p => p.TargetQuantityUOM);
-                    }
+                    _SelectedIntermediateParts.TargetQuantityUOM = _SelectedIntermediateParts.SourcePartslistPos?.TargetQuantityUOM ?? 0;
+                    //if (PartslistPosList != null && PartslistPosList.Any())
+                    //{
+                    //    //_SelectedIntermediateParts.TargetQuantity = PartslistPosList
+                    //    //    .Where(p => p.MaterialID == _SelectedIntermediateParts.SourcePartslistPos.MaterialID)
+                    //    //    .Sum(p => p.TargetQuantity);
+                    //    _SelectedIntermediateParts.TargetQuantityUOM = PartslistPosList
+                    //        .Where(p =>
+                    //            _SelectedIntermediateParts.SourcePartslistPos != null
+                    //            && p.MaterialID == _SelectedIntermediateParts.SourcePartslistPos.MaterialID)
+                    //        .Sum(p => p.TargetQuantityUOM);
+                    //}
 
                     if (IntermediatePartsList != null && IntermediatePartsList.Any())
                     {
@@ -1126,6 +1129,7 @@ namespace gip.bso.masterdata
                                 _SelectedIntermediateParts.SourcePartslistPos != null
                                 && p.SourcePartslistPosID != Guid.Empty
                                 && p.SourcePartslistPos.MaterialID == _SelectedIntermediateParts.SourcePartslistPos.MaterialID
+                                && p.SourcePartslistPosID == _SelectedIntermediateParts.SourcePartslistPosID
                                 && p.PartslistPosRelationID != _SelectedIntermediateParts.PartslistPosRelationID
                                ).Sum(p => p.TargetQuantityUOM);
                         _SelectedIntermediateParts.TargetQuantityUOM = _SelectedIntermediateParts.TargetQuantityUOM - usedQuantityUOM;
@@ -1481,7 +1485,10 @@ namespace gip.bso.masterdata
                 }
 
                 OnPropertyChanged();
-                AccessConfigurationTransfer.NavSearch();
+                if(_ProcessWorkflow != null)
+                {
+                    AccessConfigurationTransfer.NavSearch();
+                }
                 OnPropertyChanged(nameof(ConfigurationTransferList));
             }
         }
@@ -2042,7 +2049,7 @@ namespace gip.bso.masterdata
         private void LoadProcessWorkflows()
         {
             OnPropertyChanged(nameof(ProcessWorkflowList));
-            if (ProcessWorkflowList != null)
+            if (ProcessWorkflowList != null && ProcessWorkflowList.Any())
                 this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
             else
                 this.CurrentProcessWorkflow = null;
