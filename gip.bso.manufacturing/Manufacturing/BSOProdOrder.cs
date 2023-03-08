@@ -4471,7 +4471,7 @@ namespace gip.bso.manufacturing
                 return null;
             using (ACMonitor.Lock(DatabaseApp.ContextIPlus.QueryLock_1X000))
             {
-                return DatabaseApp.ContextIPlus.ACProgram.Where(c => programID.Contains(c.ACProgramID)).ToArray();
+                return DatabaseApp.ContextIPlus.ACProgram.Where(c => programID.Contains(c.ACProgramID)).ToList().OrderBy(c => c.ProgramNo).ToArray();
             }
 
         }
