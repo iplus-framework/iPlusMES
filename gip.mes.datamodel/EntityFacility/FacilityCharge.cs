@@ -168,8 +168,14 @@ namespace gip.mes.datamodel
 
         public override string ToString()
         {
-            return "#" + FacilityChargeSortNo.ToString() + "/" + (NotAvailable ? "NotAvailable" : "Available") +
-                (FacilityLotID != null ? FacilityLot.LotNo : "");
+            try
+            {
+                return String.Format("No:{0}/{1}/Lot:{2}", FacilityChargeSortNo, NotAvailable ? "NotAvailable" : "Available", FacilityLot != null ? FacilityLot.LotNo : "NULL");
+            }
+            catch
+            {
+            }
+            return "";
         }
 
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>

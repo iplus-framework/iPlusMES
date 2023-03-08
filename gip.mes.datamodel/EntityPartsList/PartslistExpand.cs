@@ -17,7 +17,14 @@ namespace gip.mes.datamodel
         public PartslistExpand(Partslist partsList, int index = 1, double treeQuantityRatio = 1, ExpandBase parent = null)
             : base(partsList, index, treeQuantityRatio, parent)
         {
-            Partslist.PartslistPos_Partslist.AutoLoad();
+            if (Partslist != null
+                && Partslist.EntityState == System.Data.EntityState.Unchanged
+                && Partslist.PartslistPos_Partslist != null
+                && Partslist.PartslistPos_Partslist.IsLoaded)
+            {
+                Partslist.PartslistPos_Partslist.AutoLoad();
+                Partslist.PartslistPos_Partslist.AutoRefresh();
+            }
             LoadDisplayProperties(partsList, TreeQuantityRatio);
         }
 
@@ -111,6 +118,13 @@ namespace gip.mes.datamodel
         {
             bool isPartslistPresent = false;
             int i = 1;
+            if (   Partslist.EntityState == System.Data.EntityState.Added
+                || Partslist.EntityState == System.Data.EntityState.Detached
+                || Partslist.EntityState == System.Data.EntityState.Deleted
+                || Partslist.PartslistPos_Partslist == null)
+            {
+                return;
+            }
             var posItems =
                 Partslist
                 .PartslistPos_Partslist
@@ -143,27 +157,35 @@ namespace gip.mes.datamodel
                 }
                 else
                 {
-                    position.Material.Partslist_Material.AutoLoad();
-                    List<Partslist> positionPartslist =
-                        position
-                        .Material
-                        .Partslist_Material
-                        .Where(pl => pl.IsEnabled && (pl.IsInEnabledPeriod ?? false) && pl.DeleteDate == null)
-                        .OrderByDescending(c => c.PartslistVersion)
-                        .ToList();
-                    int localI = 0;
-                    foreach (Partslist partslistForPosition in positionPartslist)
+                    if (   position.Material != null
+                        && position.Material.Partslist_Material != null)
                     {
-                        isPartslistPresent = false;
-                        CheckIsPartslistPresent((PartslistExpand)this.Root, partslistForPosition.PartslistID, ref isPartslistPresent);
-
-                        if (!isPartslistPresent)
+                        if (position.Material.Partslist_Material.IsLoaded)
                         {
-                            childExpand = new PartslistExpand(partslistForPosition, position, i, this);
-                            childExpand.IsChecked = (childExpand.Parent != null ? childExpand.Parent.IsChecked : true) && localI <= 1;
-                            Children.Add(childExpand);
-                            i++;
-                            localI++;
+                            position.Material.Partslist_Material.AutoLoad();
+                            position.Material.Partslist_Material.AutoRefresh();
+                        }
+                        List<Partslist> positionPartslist =
+                            position
+                            .Material
+                            .Partslist_Material
+                            .Where(pl => pl.IsEnabled && (pl.IsInEnabledPeriod ?? false) && pl.DeleteDate == null)
+                            .OrderByDescending(c => c.PartslistVersion)
+                            .ToList();
+                        int localI = 0;
+                        foreach (Partslist partslistForPosition in positionPartslist)
+                        {
+                            isPartslistPresent = false;
+                            CheckIsPartslistPresent((PartslistExpand)this.Root, partslistForPosition.PartslistID, ref isPartslistPresent);
+
+                            if (!isPartslistPresent)
+                            {
+                                childExpand = new PartslistExpand(partslistForPosition, position, i, this);
+                                childExpand.IsChecked = (childExpand.Parent != null ? childExpand.Parent.IsChecked : true) && localI <= 1;
+                                Children.Add(childExpand);
+                                i++;
+                                localI++;
+                            }
                         }
                     }
                 }
