@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using gip.mes.datamodel;
 using System.Threading;
+using gip.mes.processapplication;
 
 namespace gip.bso.manufacturing
 {
@@ -45,6 +46,19 @@ namespace gip.bso.manufacturing
         public ACComponent ProcessModule
         {
             get => _ProcessModule?.ValueT;
+        }
+
+        [ACPropertyInfo(100)]
+        public IACPropertyNetBase PMOrderInfo
+        {
+            get
+            {
+                if (ProcessModule != null)
+                {
+                    return ProcessModule.GetPropertyNet(nameof(PAProcessModuleVB.OrderInfo));
+                }
+                return null;
+            }
         }
 
         public List<WorkCenterItemFunction> ItemFunctions

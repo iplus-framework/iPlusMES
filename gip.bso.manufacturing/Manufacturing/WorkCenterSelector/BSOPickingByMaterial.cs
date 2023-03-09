@@ -954,6 +954,7 @@ namespace gip.bso.manufacturing
             {
                 _PAFPickingByMaterial.ValueT.ExecuteMethod(nameof(PAFPickingByMaterial.Abort));
             }
+            CloseTopDialog();
         }
 
         public override void PrintLastQuant()
