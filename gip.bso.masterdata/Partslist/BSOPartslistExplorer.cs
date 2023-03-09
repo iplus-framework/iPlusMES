@@ -148,7 +148,7 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (_AccessPrimary == null || _AccessPrimary.NavACQueryDefinition == null) 
+                if (_AccessPrimary == null || _AccessPrimary.NavACQueryDefinition == null)
                     return null;
                 return _AccessPrimary.NavACQueryDefinition.SearchWord;
             }
@@ -376,8 +376,8 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (AccessPrimary == null) 
-                    return null; 
+                if (AccessPrimary == null)
+                    return null;
                 return AccessPrimary.Current;
             }
             set
@@ -385,8 +385,8 @@ namespace gip.bso.masterdata
                 if (AccessPrimary.Current != value)
                 {
                     Partslist prev = AccessPrimary.Current;
-                    if (AccessPrimary == null) 
-                        return; 
+                    if (AccessPrimary == null)
+                        return;
                     AccessPrimary.Current = value;
                     if (CurrentPartslist != null)
                         CurrentPartslist.PropertyChanged -= CurrentPartslist_PropertyChanged;
@@ -418,15 +418,15 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (AccessPrimary == null) 
-                    return null; 
+                if (AccessPrimary == null)
+                    return null;
                 return AccessPrimary.Selected;
             }
             set
             {
                 if (AccessPrimary.Selected != value)
                 {
-                    if (AccessPrimary == null) 
+                    if (AccessPrimary == null)
                         return;
                     if (AccessPrimary.Selected != value)
                     {
@@ -523,6 +523,30 @@ namespace gip.bso.masterdata
 
         #region Properties -> BOM components
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _BOMShowIntermediates = false;
+        [ACPropertyInfo(500, "BOMShowIntermediates", "en{'Show intermediate products'}de{'TODO:BOMShowIntermediates'}")]
+        public bool BOMShowIntermediates
+        {
+            get
+            {
+                return _BOMShowIntermediates;
+            }
+            set
+            {
+                if (_BOMShowIntermediates != value)
+                {
+                    _BOMShowIntermediates = value;
+                    OnPropertyChanged();
+
+                    _BOMComponentList = LoadBOMComponentList();
+                    OnPropertyChanged(nameof(BOMComponentList));
+                }
+            }
+        }
+
         #region BOMComponent
         private BOMModel _SelectedBOMComponent;
         /// <summary>
@@ -563,7 +587,6 @@ namespace gip.bso.masterdata
 
         #endregion
 
-
         #endregion
 
         #endregion
@@ -578,9 +601,9 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Search material'}de{'Stückliste Suche'}", (short)MISort.Search)]
         public void Search(Partslist selectedPartslist = null)
         {
-            if (!PreExecute()) 
+            if (!PreExecute())
                 return;
-            if (AccessPrimary == null) 
+            if (AccessPrimary == null)
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
             if (selectedPartslist != null)
@@ -603,9 +626,9 @@ namespace gip.bso.masterdata
         [ACMethodCommand(Partslist.ClassName, "en{'Remove'}de{'Entfernen'}", (short)MISort.Search)]
         public void ClearSearch()
         {
-            if (!PreExecute()) 
+            if (!PreExecute())
                 return;
-            if (AccessPrimary == null) 
+            if (AccessPrimary == null)
                 return;
             AccessPrimary.NavList.Clear();
             SelectedPartslist = null;
@@ -684,6 +707,7 @@ namespace gip.bso.masterdata
             }
         }
 
+
         private List<BOMModel> LoadBOMComponentList()
         {
             List<BOMModel> positions = new List<BOMModel>();
@@ -698,6 +722,14 @@ namespace gip.bso.masterdata
                     List<BOMModel> clonedComponents = new List<BOMModel>();
                     foreach (PartslistPos component in components)
                     {
+                        if (!BOMShowIntermediates)
+                        {
+                            Guid[] expandedMaterials = item.Item.Children.Where(c => c.Item != null).Select(c => c.Item as Partslist).Select(c => c.MaterialID).ToArray();
+                            if (expandedMaterials.Contains(component.MaterialID))
+                            {
+                                continue;
+                            }
+                        }
 
                         BOMModel model = new BOMModel();
 
