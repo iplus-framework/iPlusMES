@@ -61,24 +61,40 @@ namespace gip.mes.manager
                 }
             }
             else
+            {
                 foreach (ProgramLogWrapper wrapper in wrapperList)
+                {
                     wrapperListSearch.Add(new ProgramLogWrapperVB() { ACProgramLog = wrapper.ACProgramLog, DisplayOrder = _DisplayOrder++ });
+                }
+            }
         }
 
-        private DatabaseApp _DatabaseApp;
-        private DatabaseApp DatabaseApp
+        private DatabaseApp _DatabaseApp = null;
+        /// <summary>Returns the shared Database-Context for BSO's by calling GetAppContextForBSO()</summary>
+        /// <value>Returns the shared Database-Context.</value>
+        public virtual DatabaseApp DatabaseApp
         {
             get
             {
-                if (_DatabaseApp == null)
-                    _DatabaseApp = new DatabaseApp();
-                return _DatabaseApp;
+                if (_DatabaseApp == null && this.InitState != ACInitState.Destructed && this.InitState != ACInitState.Destructing && this.InitState != ACInitState.DisposedToPool && this.InitState != ACInitState.DisposingToPool)
+                    _DatabaseApp = ACObjectContextManager.GetOrCreateContext<DatabaseApp>(this.GetACUrl(), "", new core.datamodel.Database());
+                return _DatabaseApp as DatabaseApp;
+            }
+        }
+
+        public override IACEntityObjectContext Database
+        {
+            get
+            {
+                return DatabaseApp;
             }
         }
 
         [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 901, true, "CurrentProgramLogWrapper")]
         public void ShowOrder()
         {
+            //             IEnumerable<ACPropertyLogSumOfProgram> sumOfProgram = gip.core.datamodel.ACPropertyLog.GetSummarizedDurationsOfProgram(database, currentACProgram.ACProgramID, new string[] { GlobalProcApp.AvailabilityStatePropName });
+
             if (CurrentProgramLogWrapper != null)
             {
                 OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == CurrentProgramLogWrapper.ACProgramLog.ACProgramLogID);
