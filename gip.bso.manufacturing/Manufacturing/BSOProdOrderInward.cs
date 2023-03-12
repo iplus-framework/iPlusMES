@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
@@ -350,6 +351,78 @@ namespace gip.bso.manufacturing
         public bool IsEnabledShowDlgInwardFacility()
         {
             return SelectedInwardACMethodBooking != null;
+        }
+
+        [ACMethodInteraction("", "en{'Correct posting'}de{'Korrekte Buchung'}", 670, true, nameof(SelectedInwardFacilityBookingCharge))]
+        public void CorrectInwardBooking()
+        {
+            if (SelectedInwardFacilityBookingCharge == null)
+                return;
+
+            FacilityCharge inwardFacilityCharge = SelectedInwardFacilityBookingCharge.InwardFacilityCharge;
+
+            if (inwardFacilityCharge == null)
+                return;
+
+            NewInwardFacilityPreBooking();
+
+            if (SelectedInwardACMethodBooking == null)
+            {
+                //todo error
+                return;
+            }
+
+            SelectedInwardACMethodBooking.InwardFacility = inwardFacilityCharge.Facility;
+            SelectedInwardACMethodBooking.InwardFacilityCharge = inwardFacilityCharge;
+            SelectedInwardACMethodBooking.InwardQuantity = inwardFacilityCharge.StockQuantity < 0.00001 ? inwardFacilityCharge.StockQuantity : 0;
+
+            ShowDialog(this, "CorrectInwardBookingDialog");
+
+            if (ACFacilityManager != null)
+            {
+                Msg msg = ACFacilityManager.IsQuantStockConsumed(inwardFacilityCharge, DatabaseApp);
+                if (msg != null)
+                {
+                    if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                    {
+                        ACMethodBooking fbtZeroBookingClone = ACFacilityManager.GetBookParamNotAvailableClone();
+
+                        fbtZeroBookingClone.InwardFacilityCharge = inwardFacilityCharge;
+                        fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                        ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, DatabaseApp);
+                        if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+                        {
+                            //return fbtZeroBooking.ValidMessage;
+                        }
+                        else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                        {
+                            if (String.IsNullOrEmpty(resultZeroBook.ValidMessage.Message))
+                                resultZeroBook.ValidMessage.Message = resultZeroBook.ResultState.ToString();
+
+                            //return result.ValidMessage;
+                        }
+
+                        Msg msgSave = DatabaseApp.ACSaveChanges();
+                        if (msgSave != null)
+                            Messages.Msg(msgSave);
+                    }
+                }
+            }
+
+            if (SelectedInwardFacilityPreBooking != null)
+            {
+                DeleteInwardFacilityPreBooking();
+            }
+        }
+
+        public bool IsEnabledCorrectInwardBooking()
+        {
+            return SelectedInwardFacilityBookingCharge != null
+                    && SelectedInwardFacilityBookingCharge.InwardFacilityCharge != null
+                    && SelectedInwardFacilityBookingCharge.InwardFacilityCharge.Facility != null
+                    && SelectedInwardFacilityBookingCharge.InwardFacilityCharge.Facility.MDFacilityType != null
+                    && SelectedInwardFacilityBookingCharge.InwardFacilityCharge.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer;
         }
 
         #endregion
