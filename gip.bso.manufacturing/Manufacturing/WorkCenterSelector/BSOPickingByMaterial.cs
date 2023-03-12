@@ -8,6 +8,8 @@ using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -900,37 +902,17 @@ namespace gip.bso.manufacturing
         [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999)]
         public void FinishPickingOrder()
         {
-            // Question500 : Are you sure that you want complete weighing of all components?
+            // Question50096: Are you sure that you want complete weighing of all components?
             if (Messages.Question(this, "Question50096") != Global.MsgResult.Yes)
             {
                 return;
             }
 
-            ACRef<ACInDeliveryNoteManager> inManagerRef = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
-            ACRef<ACOutDeliveryNoteManager> outManagerRef = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
-
-            DeliveryNote delNote = null;
-            InOrder inOrder = null;
-            OutOrder outOrder = null;
-
-            if (ACPickingManager == null)
-            {
-                _ACPickingManager = ACRefToPickingManager();
-            }
-
-            if (ACPickingManager == null)
-            {
-                Messages.Error(this, "ACPickingManager is null!");
-                return;
-            }
-
-            //TODO: background worker
-
-            foreach (var picking in _PickingItems)
-            {
-                ACPickingManager.FinishOrder(DatabaseApp, picking, inManagerRef.ValueT, outManagerRef.ValueT, ACFacilityManager, out delNote, out inOrder, out outOrder, true);
-            }
-
+            BackgroundWorker.WorkerReportsProgress = true;
+            BackgroundWorker.WorkerSupportsCancellation = false;
+            BackgroundWorker.RunWorkerAsync(nameof(FinishPickingOrder));
+            ShowDialog(this,DesignNameProgressBar);
+            
             if (_PAFPickingByMaterial != null)
             {
                 _PAFPickingByMaterial.ValueT.ExecuteMethod(nameof(PAFPickingByMaterial.Abort));
@@ -996,6 +978,48 @@ namespace gip.bso.manufacturing
             catch
             {
             }
+        }
+
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            if (e.Argument.ToString() == nameof(FinishPickingOrder))
+            {
+                ACRef<ACInDeliveryNoteManager> inManagerRef = ACInDeliveryNoteManager.ACRefToServiceInstance(this);
+                ACRef<ACOutDeliveryNoteManager> outManagerRef = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
+
+                DeliveryNote delNote = null;
+                InOrder inOrder = null;
+                OutOrder outOrder = null;
+
+                if (ACPickingManager == null)
+                {
+                    _ACPickingManager = ACRefToPickingManager();
+                }
+
+                if (ACPickingManager == null)
+                {
+                    Messages.Error(this, "ACPickingManager is null!");
+                    return;
+                }
+
+                CurrentProgressInfo.TotalProgress.ProgressRangeFrom = 0;
+                CurrentProgressInfo.TotalProgress.ProgressRangeTo = _PickingItems.Count;
+
+                foreach (var picking in _PickingItems)
+                {
+                    CurrentProgressInfo.TotalProgress.ProgressText = picking.PickingNo;
+                    ACPickingManager.FinishOrder(DatabaseApp, picking, inManagerRef.ValueT, outManagerRef.ValueT, ACFacilityManager, out delNote, out inOrder, out outOrder, true);
+                    
+                    CurrentProgressInfo.TotalProgress.ProgressCurrent = CurrentProgressInfo.TotalProgress.ProgressCurrent + 1;
+                }
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseTopDialog();
         }
 
         #endregion
