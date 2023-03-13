@@ -353,7 +353,7 @@ namespace gip.bso.manufacturing
             return SelectedInwardACMethodBooking != null;
         }
 
-        [ACMethodInteraction("", "en{'Correct posting'}de{'Korrekte Buchung'}", 670, true, nameof(SelectedInwardFacilityBookingCharge))]
+        [ACMethodInteraction("", "en{'Correct posting'}de{'Korrigiere Buchung'}", 670, true, nameof(SelectedInwardFacilityBookingCharge))]
         public void CorrectInwardBooking()
         {
             if (SelectedInwardFacilityBookingCharge == null)

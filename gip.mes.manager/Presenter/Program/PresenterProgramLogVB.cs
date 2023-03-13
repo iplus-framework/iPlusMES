@@ -145,14 +145,14 @@ namespace gip.mes.manager
             result = null;
             switch (acMethodName)
             {
-                case"ShowOrder":
+                case nameof(ShowOrder):
                     ShowOrder();
                     return true;
-                case"IsEnabledShowOrder":
+                case nameof(IsEnabledShowOrder):
                     result = IsEnabledShowOrder();
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion

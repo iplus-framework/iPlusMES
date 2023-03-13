@@ -24,9 +24,9 @@ using gip.mes.processapplication;
 namespace gip.bso.manufacturing
 {
     /// <summary>
-    /// Class BSOProcessControl
+    /// Class BSOPropertyLogPresenterVB
     /// </summary>
-    //[ACClassInfo(Const.PackName_VarioAutomation, "en{'Equipment Analysis MES (OEE)'}de{'Geräteanalyse MES (OEE)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Equipment Analysis MES (OEE)'}de{'Geräteanalyse MES (OEE)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOPropertyLogPresenterVB : VBBSOPropertyLogPresenter
     {
         #region c´tors
@@ -93,6 +93,39 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Methods
+        [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 901, true, "SelectedPropertyLog")]
+        public void ShowOrder()
+        {
+            if (SelectedItemInTimeline == null || SelectedItemInTimeline.ProgramLog == null)
+                return;
+            OrderLog currentOrderLog = DatabaseApp.OrderLog.FirstOrDefault(c => c.VBiACProgramLogID == SelectedItemInTimeline.ProgramLog.ACProgramLogID);
+            if (currentOrderLog == null)
+            {
+                var programLog = SelectedItemInTimeline.ProgramLog.FromAppContext<gip.mes.datamodel.ACProgramLog>(DatabaseApp);
+                while (currentOrderLog == null && programLog.ACProgramLog1_ParentACProgramLog != null)
+                {
+                    currentOrderLog = programLog.OrderLog_VBiACProgramLog;
+                    programLog = programLog.ACProgramLog1_ParentACProgramLog;
+                }
+            }
+            if (currentOrderLog == null
+                || (currentOrderLog.ProdOrderPartslistPos == null && currentOrderLog.ProdOrderPartslistPosRelation == null))
+                return;
+
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(OrderLog.ClassName, currentOrderLog.VBiACProgramLogID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowOrder()
+        {
+            return SelectedItemInTimeline != null && SelectedItemInTimeline.ProgramLog != null;
+        }
 
         #endregion
 
@@ -101,10 +134,16 @@ namespace gip.bso.manufacturing
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
-            //result = null;
-            //switch (acMethodName)
-            //{
-            //}
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(ShowOrder):
+                    ShowOrder();
+                    return true;
+                case nameof(IsEnabledShowOrder):
+                    result = IsEnabledShowOrder();
+                    return true;
+            }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
