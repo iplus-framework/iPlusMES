@@ -743,6 +743,15 @@ namespace gip.bso.masterdata
                         model.TargetQuantityUOM = targetQuantityUOM;
                         model.TargetQuantity = targetQuantity;
 
+                        if (pl.TargetQuantityUOM > 0)
+                        {
+                            model.TargetQuantityPerUnitUOM = targetQuantityUOM / pl.TargetQuantityUOM;
+                        }
+                        if (pl.TargetQuantity > 0)
+                        {
+                            model.TargetQuantityPerUnit = targetQuantity / pl.TargetQuantity;
+                        }
+
                         model.BaseMDUnit = component.Material.BaseMDUnit.TechnicalSymbol;
                         model.MDUnit = component.MDUnit?.TechnicalSymbol;
 

@@ -67,5 +67,21 @@ namespace gip.bso.masterdata
             get;
             set;
         }
+
+        [ACPropertyInfo(108, "", "en{'T.Q per unit (UOM)'}de{'Sollm. pro Einheit (BME)'}")]
+        public double TargetQuantityPerUnitUOM
+        {
+
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(109, "", "en{'T.Q per unit'}de{'Sollm. pro Einheit'}")]
+        public double TargetQuantityPerUnit
+        {
+
+            get;
+            set;
+        }
     }
 }
