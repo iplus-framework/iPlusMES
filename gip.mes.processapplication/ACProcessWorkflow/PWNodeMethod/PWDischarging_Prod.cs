@@ -91,7 +91,7 @@ namespace gip.mes.processapplication
 
                             PWGroupVB pwGroup = ParentPWGroup as PWGroupVB;
                             // Prüfe zuerst ob in Leerfahrmodus und prüfe ob es sich um ein endgültiges Ziel handelt
-                            if (pwGroup != null && pwGroup.IsInEmptyingMode)
+                            if (pwGroup != null && pwGroup.IsInEmptyingMode && !KeepPlannedDestOnEmptying)
                             {
                                 var subResult = ResolveExtraDestOnEmptyingMode(ref targetSiloACComp, ref msg, true);
                                 if (subResult == StartDisResult.CycleWait)

@@ -315,7 +315,7 @@ namespace gip.bso.manufacturing
         }
 
         private IACContainerTNet<double> _NetWeightOfLargestScale = null;
-        [ACPropertyInfo(608,"", "en{'Net weight largest scale'}de{'Nettowert größte Waage'}")]
+        [ACPropertyInfo(608,"", "en{'Net weight largest scale'}de{'Nettowert größte Waage'}", IsProxyProperty = true)]
         public IACContainerTNet<double> NetWeightOfLargestScale
         {
             get
