@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 namespace gip.mes.datamodel
 {
     [DataContract]
+    [Serializable]
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioSystem, "en{'OperationLogItem'}de{'OperationLogItem'}", Global.ACKinds.TACClass)]
     public class OperationLogItem : INotifyPropertyChanged
