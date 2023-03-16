@@ -314,6 +314,21 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private IACContainerTNet<double> _NetWeightOfLargestScale = null;
+        [ACPropertyInfo(608,"", "en{'Net weight largest scale'}de{'Nettowert größte Waage'}")]
+        public IACContainerTNet<double> NetWeightOfLargestScale
+        {
+            get
+            {
+                return _NetWeightOfLargestScale;
+            }
+            set 
+            {
+                _NetWeightOfLargestScale = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Properties => WFNodes
@@ -1288,6 +1303,7 @@ namespace gip.bso.manufacturing
 
         public bool ActivateManualWeighingModel()
         {
+            NetWeightOfLargestScale = null;
             ACComponent currentProcessModule = CurrentProcessModule;
             if (currentProcessModule == null)
             {
@@ -1345,6 +1361,12 @@ namespace gip.bso.manufacturing
                 using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
                 {
                     _ProcessModuleScales = scalesArray;
+                    if (_ProcessModuleScales != null)
+                    {
+                        var scale = _ProcessModuleScales.LastOrDefault();
+                        if (scale != null)
+                            NetWeightOfLargestScale = scale.ValueT.GetPropertyNet(nameof(PAEScaleBase.ActualWeight)) as IACContainerTNet<double>;
+                    }
                     ScaleObjectsList = new ObservableCollection<ACValueItem>(scaleObjectInfoList);
                 }
             }
@@ -1925,6 +1947,7 @@ namespace gip.bso.manufacturing
                 _CurrentOrderInfoValue = null;
             }
 
+            NetWeightOfLargestScale = null;
             ACRef<IACComponent>[] scales = null;
             using (ACMonitor.Lock(_70750_ProcessModuleScalesLock))
             {

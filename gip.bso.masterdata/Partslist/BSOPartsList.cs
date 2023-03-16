@@ -2314,6 +2314,7 @@ namespace gip.bso.masterdata
         public override object Clone()
         {
             BSOPartslist clone = base.Clone() as BSOPartslist;
+            clone.SelectedPartslist = this.SelectedPartslist;
             clone.CurrentPartslist = this.CurrentPartslist;
             return clone;
         }

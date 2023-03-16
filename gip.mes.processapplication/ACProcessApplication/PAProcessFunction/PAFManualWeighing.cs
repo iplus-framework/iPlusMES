@@ -290,7 +290,10 @@ namespace gip.mes.processapplication
             if (assignedScaleObjects == null || !assignedScaleObjects.Any())
                 return null;
 
-            return new ACValueList(assignedScaleObjects.Select(c => new ACValue(c.ComponentClass.ACUrlComponent, c.ComponentClass.ACClassID)).ToArray());
+            return new ACValueList(assignedScaleObjects
+                        .OrderBy(c => c.MaxScaleWeight.ValueT)
+                        .Select(c => new ACValue(c.ComponentClass.ACUrlComponent, c.ComponentClass.ACClassID))
+                        .ToArray());
         }
 
         internal void CompleteWeighing(double actualQuantity, bool isForBinChange = false)
