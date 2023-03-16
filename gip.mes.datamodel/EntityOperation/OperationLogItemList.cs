@@ -1,9 +1,14 @@
 ﻿using gip.core.datamodel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
 
 namespace gip.mes.datamodel
 {
+    [DataContract]
+    [Serializable]
+    [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioSystem, "en{'OperationLogItemList'}de{'OperationLogItemList'}", Global.ACKinds.TACClass)]
     public class OperationLogItemList : ObservableCollection<OperationLogItem>, ICyclicRefreshableCollection
     {
