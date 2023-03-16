@@ -17,6 +17,7 @@ namespace gip.bso.manufacturing
         public const string ClassName = @"BSOTemplateSchedule";
         public const string Const_BSOBatchPlanScheduler_Child = @"BSOBatchPlanScheduler_Child";
         public const string BGWorkerMehtod_GeneratePlan = @"GeneratePlan";
+        public const string BGWorkerMehtod_ClonePlan = @"ClonePlan";
         #endregion
 
         #region c´tors
@@ -429,94 +430,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        private void GenerateProdOrders()
-        {
-            new List<ProdOrder>();
-            Guid[] filterProdOrderBatchPlanIds = new Guid[] { };
-            if (ChildBSOBatchPlanScheduler.ProdOrderBatchPlanList.Any(c => c.IsSelected))
-            {
-                // Filter is based on ProdOrderPartslist - ProdOrderBatchPlan is selected
-                // is ok select only one batch plan per ProdOrderPartslist
-                filterProdOrderBatchPlanIds =
-                    ChildBSOBatchPlanScheduler
-                    .ProdOrderBatchPlanList
-                    .Where(c => c.IsSelected)
-                    .Select(c => c.ProdOrderBatchPlanID)
-                    .Distinct()
-                    .ToArray();
-            }
 
-            using (DatabaseApp databaseApp = new DatabaseApp())
-            {
-                Guid[] prodOrderIDs = SelectedPlanningMR.PlanningMRProposal_PlanningMR.Where(c => c.ProdOrder != null).Select(c => c.ProdOrderID ?? Guid.Empty).Distinct().ToArray();
-                List<ProdOrder> prodOrders = databaseApp.ProdOrder.Where(c => prodOrderIDs.Contains(c.ProdOrderID)).ToList();
-                if (prodOrders != null && prodOrders.Any())
-                    GenerateProdOrders(databaseApp, prodOrders, filterProdOrderBatchPlanIds);
-            }
-        }
-
-        private void GenerateProdOrders(DatabaseApp databaseApp, List<ProdOrder> prodOrders, Guid[] filterProdOrderBatchPlanIds)
-        {
-            List<ProdOrder> generated = new List<ProdOrder>();
-            try
-            {
-                List<SchedulingMaxBPOrder> maxSchedulerOrders = null;
-                maxSchedulerOrders = ProdOrderManager.GetMaxScheduledOrder(databaseApp, null);
-
-                List<Guid> mdSchedulingGroupIDs = new List<Guid>();
-                foreach (var sourceProdOrder in prodOrders)
-                {
-
-                    Guid[] prodOrderMdSchedulingGroupIDs =
-                        sourceProdOrder
-                        .ProdOrderPartslist_ProdOrder
-                        .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
-                        .SelectMany(c => c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF)
-                        .Select(c => c.MDSchedulingGroupID)
-                        .Distinct()
-                        .ToArray();
-                    foreach (Guid prodOrderMdSchedulingGroupID in prodOrderMdSchedulingGroupIDs)
-                    {
-                        if (!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
-                            mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
-                    }
-
-                    bool generateProdorder = !filterProdOrderBatchPlanIds.Any();
-                    if (!generateProdorder)
-                    {
-                        generateProdorder =
-                            sourceProdOrder
-                            .ProdOrderPartslist_ProdOrder
-                            .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
-                            .Any(c => filterProdOrderBatchPlanIds.Contains(c.ProdOrderBatchPlanID));
-                    }
-                    if (generateProdorder)
-                    {
-                        ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(databaseApp, sourceProdOrder, null, BatchPlanTermin, filterProdOrderBatchPlanIds, maxSchedulerOrders);
-                        generated.Add(targetProdOrder);
-                    }
-                }
-
-                MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
-                if (msgWithDetails == null)
-                {
-                    string[] generatedNos = generated.Select(c => c.ProgramNo).OrderBy(c => c).ToArray();
-                    Messages.Info(this, "Info50074", false, string.Join(",", generatedNos));
-                }
-                else
-                    Messages.Msg(msgWithDetails);
-
-                foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
-                {
-                    ChildBSOBatchPlanScheduler.RefreshServerState(mdSchedulingGroupID);
-                }
-            }
-            catch (Exception ec)
-            {
-                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
-                Messages.Msg(msg);
-            }
-        }
 
         [ACMethodInfo("CheckIsPartslistChanged", "en{'Update template schedule orders'}de{'Aktualisiere Vorlageplan Produktionsaufträge'}", 101)]
         public void CheckIsPartslistChanged()
@@ -564,6 +478,21 @@ namespace gip.bso.manufacturing
             return isUpdate;
         }
 
+
+        [ACMethodInteraction("TemplateClone", "en{'Clone'}de{'Duplizieren'}", (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost)]
+        public void TemplateClone()
+        {
+            if (!IsEnabledTemplateClone())
+                return;
+            BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_ClonePlan);
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledTemplateClone()
+        {
+            return SelectedPlanningMR != null;
+        }
+
         #endregion
 
         #region BackgroundWorker
@@ -586,10 +515,14 @@ namespace gip.bso.manufacturing
             switch (command)
             {
                 case BGWorkerMehtod_GeneratePlan:
-                    GenerateProdOrders();
+                    GenerateProdOrders(BatchPlanTermin);
+                    break;
+                case BGWorkerMehtod_ClonePlan:
+                    e.Result = ClonePlan();
                     break;
             }
         }
+
 
         public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -609,9 +542,155 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                // Root.Messages.Info(this, "Info50074");
+                switch (command)
+                {
+                    case BGWorkerMehtod_GeneratePlan:
+                        break;
+                    case BGWorkerMehtod_ClonePlan:
+                        if (e.Result != null)
+                        {
+                            Guid planningMRID = (Guid)e.Result;
+                            DatabaseApp.PlanningMR.AutoMergeOption();
+                            PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == planningMRID);
+                            if (planningMR != null)
+                            {
+                                AccessPrimary.NavList.Insert(0, planningMR);
+                                SelectedPlanningMR = planningMR;
+                                CurrentPlanningMR = planningMR;
+                            }
+                        }
+                        break;
+                }
             }
         }
+
+
+        #region BackgroundWorker -> Mehtods
+
+        private Guid? ClonePlan()
+        {
+            Guid? planningMRID = null;
+            using (DatabaseApp databaseApp = new DatabaseApp())
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
+                PlanningMR planningMR = PlanningMR.NewACObject(DatabaseApp, null, secondaryKey);
+                planningMR.Template = true;
+                databaseApp.PlanningMR.AddObject(planningMR);
+                planningMRID = planningMR.PlanningMRID;
+                GenerateProdOrders(databaseApp, null, planningMR);
+            }
+            return planningMRID;
+        }
+
+        private void GenerateProdOrders(DateTime? batchPlanTermin, PlanningMR planningMR = null)
+        {
+            using (DatabaseApp databaseApp = new DatabaseApp())
+            {
+                GenerateProdOrders(databaseApp, batchPlanTermin, planningMR);
+            }
+        }
+
+        private void GenerateProdOrders(DatabaseApp databaseApp, DateTime? batchPlanTermin, PlanningMR planningMR = null)
+        {
+            new List<ProdOrder>();
+            Guid[] filterProdOrderBatchPlanIds = new Guid[] { };
+            if (ChildBSOBatchPlanScheduler.ProdOrderBatchPlanList.Any(c => c.IsSelected))
+            {
+                // Filter is based on ProdOrderPartslist - ProdOrderBatchPlan is selected
+                // is ok select only one batch plan per ProdOrderPartslist
+                filterProdOrderBatchPlanIds =
+                    ChildBSOBatchPlanScheduler
+                    .ProdOrderBatchPlanList
+                    .Where(c => c.IsSelected)
+                    .Select(c => c.ProdOrderBatchPlanID)
+                    .Distinct()
+                    .ToArray();
+            }
+
+            Guid[] prodOrderIDs = SelectedPlanningMR.PlanningMRProposal_PlanningMR.Where(c => c.ProdOrder != null).Select(c => c.ProdOrderID ?? Guid.Empty).Distinct().ToArray();
+            List<ProdOrder> prodOrders = databaseApp.ProdOrder.Where(c => prodOrderIDs.Contains(c.ProdOrderID)).ToList();
+            if (prodOrders != null && prodOrders.Any())
+                GenerateProdOrders(databaseApp, prodOrders, filterProdOrderBatchPlanIds, batchPlanTermin, planningMR);
+        }
+
+        private void GenerateProdOrders(DatabaseApp databaseApp, List<ProdOrder> prodOrders, Guid[] filterProdOrderBatchPlanIds, DateTime? batchPlanTermin, PlanningMR planningMR = null)
+        {
+            List<ProdOrder> generated = new List<ProdOrder>();
+            try
+            {
+                List<SchedulingMaxBPOrder> maxSchedulerOrders = null;
+                maxSchedulerOrders = ProdOrderManager.GetMaxScheduledOrder(databaseApp, null);
+
+                List<Guid> mdSchedulingGroupIDs = new List<Guid>();
+                foreach (var sourceProdOrder in prodOrders)
+                {
+
+                    Guid[] prodOrderMdSchedulingGroupIDs =
+                        sourceProdOrder
+                        .ProdOrderPartslist_ProdOrder
+                        .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                        .SelectMany(c => c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF)
+                        .Select(c => c.MDSchedulingGroupID)
+                        .Distinct()
+                        .ToArray();
+
+                    foreach (Guid prodOrderMdSchedulingGroupID in prodOrderMdSchedulingGroupIDs)
+                    {
+                        if (!mdSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
+                            mdSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
+                    }
+
+                    bool generateProdorder = !filterProdOrderBatchPlanIds.Any();
+                    if (!generateProdorder)
+                    {
+                        generateProdorder =
+                            sourceProdOrder
+                            .ProdOrderPartslist_ProdOrder
+                            .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                            .Any(c => filterProdOrderBatchPlanIds.Contains(c.ProdOrderBatchPlanID));
+                    }
+
+                    if (generateProdorder)
+                    {
+                        ProdOrder targetProdOrder = ProdOrderManager.CloneProdOrder(databaseApp, sourceProdOrder, null, batchPlanTermin, filterProdOrderBatchPlanIds, maxSchedulerOrders);
+                        if (planningMR != null)
+                        {
+                            ProdOrderPartslist[] targetPartslist = targetProdOrder.ProdOrderPartslist_ProdOrder.ToArray();
+                            foreach (ProdOrderPartslist partslist in targetPartslist)
+                            {
+                                PlanningMRProposal proposal = PlanningMRProposal.NewACObject(databaseApp, planningMR);
+                                proposal.ProdOrder = targetProdOrder;
+                                proposal.ProdOrderPartslist = partslist;
+                                planningMR.PlanningMRProposal_PlanningMR.Add(proposal);
+                            }
+                        }
+
+                        generated.Add(targetProdOrder);
+                    }
+                }
+
+                MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
+                if (msgWithDetails == null)
+                {
+                    string[] generatedNos = generated.Select(c => c.ProgramNo).OrderBy(c => c).ToArray();
+                    Messages.Info(this, "Info50074", false, (planningMR != null ? (planningMR.PlanningMRNo + ":") : "") + string.Join(",", generatedNos));
+                }
+                else
+                    Messages.Msg(msgWithDetails);
+
+                foreach (Guid mdSchedulingGroupID in mdSchedulingGroupIDs)
+                {
+                    ChildBSOBatchPlanScheduler.RefreshServerState(mdSchedulingGroupID);
+                }
+            }
+            catch (Exception ec)
+            {
+                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+                Messages.Msg(msg);
+            }
+        }
+
+        #endregion
 
         #endregion
 

@@ -2834,7 +2834,7 @@ namespace gip.mes.facility
 
         #region ProdOrder -> Clone ProdOrder
 
-        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, DateTime scheduledStartDate, Guid[] filterProdOrderBatchPlanIds, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
+        public ProdOrder CloneProdOrder(DatabaseApp databaseApp, ProdOrder sourceProdOrder, string planningMRNo, DateTime? scheduledStartDate, Guid[] filterProdOrderBatchPlanIds, List<SchedulingMaxBPOrder> maxSchedulerOrders = null)
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
             ProdOrder targetProdOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
@@ -2864,7 +2864,7 @@ namespace gip.mes.facility
 
         public ProdOrderPartslist ClonePartslist(DatabaseApp databaseApp, ProdOrderPartslist sourcePartslist, ProdOrder targetProdOrder,
             List<SchedulingMaxBPOrder> maxSchedulerOrders,
-            Dictionary<Guid, Guid> connectionOldNewItems, DateTime scheduledStartDate, Guid[] filterProdOrderBatchPlanIds)
+            Dictionary<Guid, Guid> connectionOldNewItems, DateTime? scheduledStartDate, Guid[] filterProdOrderBatchPlanIds)
         {
             ProdOrderPartslist targetPartslist = ProdOrderPartslist.NewACObject(databaseApp, targetProdOrder);
             connectionOldNewItems.Add(sourcePartslist.ProdOrderPartslistID, targetPartslist.ProdOrderPartslistID);
@@ -2925,7 +2925,7 @@ namespace gip.mes.facility
 
         public ProdOrderBatchPlan CloneBatchPlan(DatabaseApp databaseApp, ProdOrderBatchPlan sourceBatchPlan, ProdOrderPartslist targetPartslist,
             List<SchedulingMaxBPOrder> maxSchedulerOrders,
-            Dictionary<Guid, Guid> connectionOldNewItems, DateTime scheduledStartDate)
+            Dictionary<Guid, Guid> connectionOldNewItems, DateTime? scheduledStartDate)
         {
             ProdOrderBatchPlan targetBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, targetPartslist);
             targetPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(targetBatchPlan);
