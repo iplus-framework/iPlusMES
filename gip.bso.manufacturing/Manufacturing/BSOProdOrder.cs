@@ -212,6 +212,19 @@ namespace gip.bso.manufacturing
             }
         }
 
+        ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOSourceSelectionRules_Child", typeof(BSOSourceSelectionRules))]
+        public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
+        {
+            get
+            {
+                if (_BSOSourceSelectionRules_Child == null)
+                    _BSOSourceSelectionRules_Child = new ACChildItem<BSOSourceSelectionRules>(this, "BSOSourceSelectionRules_Child");
+                return _BSOSourceSelectionRules_Child;
+            }
+        }
+
         #endregion
 
         #region Properties

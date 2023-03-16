@@ -13,10 +13,13 @@ namespace gip.mes.datamodel
         [ACPropertyInfo(5, "FacilityName", ConstApp.Facility)]
         public string FacilityName { get; set; }
 
-        [ACPropertyInfo(8, "ProdOrderProgramNo", ConstApp.ProdOrderProgramNo)]
+        [ACPropertyInfo(6, "ProdOrderProgramNo", ConstApp.ProdOrderProgramNo)]
         public string ProdOrderProgramNo { get; set; }
 
-        [ACPropertyInfo(9, "BatchNo", ConstApp.BatchNo)]
+        [ACPropertyInfo(7, "ProdOrderInsertDate", Const.EntityInsertDate)]
+        public DateTime? ProdOrderInsertDate { get; set; }
+
+        [ACPropertyInfo(8, "BatchNo", ConstApp.BatchNo)]
         public string BatchNo { get; set; }
 
         [ACPropertyInfo(10, "MachineName", "en{'Machine Name'}de{'Maschinename'}")]

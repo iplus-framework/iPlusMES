@@ -804,6 +804,7 @@ namespace gip.mes.datamodel
                 MDUnitName = c.TechnicalSymbol,
 
                 ProdOrderProgramNo = (c.IntermediateItem != null) ? c.IntermediateItem.ProdOrderPartslist.ProdOrder.ProgramNo : "",
+                ProdOrderInsertDate = c.IntermediateItem.ProdOrderPartslist.ProdOrder.InsertDate,
                 BatchNo = c.IntermediateItem != null && c.IntermediateItem.ProdOrderBatchID != null ? c.IntermediateItem.ProdOrderBatch.ProdOrderBatchNo : "",
                 MachineName = c.IntermediateItem != null ?
                     c.IntermediateItem.ProdOrderBatch.ProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan

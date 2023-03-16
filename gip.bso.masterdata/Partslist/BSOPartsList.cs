@@ -18,9 +18,11 @@ using gip.core.reporthandler.Configuration;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.manager;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using static gip.core.datamodel.Global;
@@ -122,6 +124,23 @@ namespace gip.bso.masterdata
                 _AccessInputMaterial = null;
             }
             return b;
+        }
+
+        #endregion
+
+        #region ChildBSO
+
+        ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
+        [ACPropertyInfo(600)]
+        [ACChildInfo("BSOSourceSelectionRules_Child", typeof(BSOSourceSelectionRules))]
+        public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
+        {
+            get
+            {
+                if (_BSOSourceSelectionRules_Child == null)
+                    _BSOSourceSelectionRules_Child = new ACChildItem<BSOSourceSelectionRules>(this, "BSOSourceSelectionRules_Child");
+                return _BSOSourceSelectionRules_Child;
+            }
         }
 
         #endregion
@@ -2518,6 +2537,35 @@ namespace gip.bso.masterdata
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
+
+        #region ShowDialogSelectSources
+
+        [ACMethodInfo("ShowDialogSelectSources", "en{'Select Sources'}de{'Quellen auswählen'}", 655)]
+        public void ShowDialogSelectSources()
+        {
+            if (!IsEnabledShowDialogSelectSources())
+                return;
+
+            gip.core.datamodel.ACClassWF wf = ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF;
+
+
+            //BSOSourceSelectionRules_Child.Value.ShowDialogSelectSources(ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID);
+        }
+
+        public bool IsEnabledShowDialogSelectSources()
+        {
+            return
+                CurrentPartslist != null
+                && CurrentProcessWorkflow != null
+                && BSOSourceSelectionRules_Child != null
+                && BSOSourceSelectionRules_Child.Value != null
+                && ProcessWorkflowPresenter != null
+                && ProcessWorkflowPresenter.SelectedWFNode != null
+                && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;
+                //&& ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.IsWFProdNode("PWNodeProcessWorkflowVB");
         }
 
         #endregion

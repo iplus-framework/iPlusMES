@@ -249,13 +249,7 @@ namespace gip.bso.manufacturing
 
         public bool IsWFProdNode(core.datamodel.ACClassWF aclassWF)
         {
-            return aclassWF.RefPAACClassMethodID.HasValue
-                    && aclassWF.RefPAACClassID.HasValue
-                    && aclassWF.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                    && aclassWF.RefPAACClassMethod.PWACClass != null
-                    && (aclassWF.RefPAACClassMethod.PWACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName
-                        || aclassWF.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflowVB.PWClassName)
-                    && !string.IsNullOrEmpty(aclassWF.Comment);
+            return aclassWF.IsWFProdNode(PWNodeProcessWorkflowVB.PWClassName);
         }
         #endregion
 

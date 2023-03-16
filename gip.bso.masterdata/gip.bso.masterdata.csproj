@@ -128,6 +128,9 @@
     <Compile Include="Partslist\BOMModel.cs" />
     <Compile Include="Partslist\BSOPartsList.cs" />
     <Compile Include="Partslist\BSOPartslistExplorer.cs" />
+    <Compile Include="Partslist\BSOSourceSelectionRules.cs" />
+    <Compile Include="Partslist\RuleGroup.cs" />
+    <Compile Include="Partslist\RuleSelection.cs" />
     <Compile Include="Production\MDBSOProdOrderPartslistPosState.cs" />
     <Compile Include="Sales\MDBSOInvoiceState.cs" />
     <Compile Include="Sales\MDBSOInvoiceType.cs" />
