@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Interop;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -17,6 +18,7 @@ namespace gip.bso.manufacturing
         public const string ClassName = @"BSOTemplateSchedule";
         public const string Const_BSOBatchPlanScheduler_Child = @"BSOBatchPlanScheduler_Child";
         public const string BGWorkerMehtod_GeneratePlan = @"GeneratePlan";
+        public const string BGWorkerMehtod_DeletePlan = @"DeletePlan";
         public const string BGWorkerMehtod_ClonePlan = @"ClonePlan";
         #endregion
 
@@ -303,17 +305,14 @@ namespace gip.bso.manufacturing
         {
             if (AccessPrimary == null)
                 return;
-            Msg msg = CurrentPlanningMR.DeleteACObject(DatabaseApp, true);
-            if (msg != null)
+            // Question50097
+
+            Global.MsgResult result = Messages.Question(this, "Question50097", Global.MsgResult.Yes, false, SelectedPlanningMR.PlanningMRNo);
+            if (result == Global.MsgResult.Yes)
             {
-                Messages.Msg(msg);
-                return;
+                BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeletePlan);
+                ShowDialog(this, DesignNameProgressBar);
             }
-
-
-            AccessPrimary.NavList.Remove(CurrentPlanningMR);
-            SelectedPlanningMR = AccessPrimary.NavList.FirstOrDefault();
-            Load();
         }
 
         /// <summary>
@@ -520,6 +519,9 @@ namespace gip.bso.manufacturing
                 case BGWorkerMehtod_ClonePlan:
                     e.Result = ClonePlan();
                     break;
+                case BGWorkerMehtod_DeletePlan:
+                    e.Result = DeletePlan(SelectedPlanningMR.PlanningMRNo);
+                    break;
             }
         }
 
@@ -551,27 +553,33 @@ namespace gip.bso.manufacturing
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(result.PlanningMRNo))
+                        if (command == BGWorkerMehtod_DeletePlan)
                         {
-                            Messages.Info(this, "Info50074", false, result.PlanningMRNo);
-                            DatabaseApp.PlanningMR.AutoMergeOption();
-                            PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRNo == result.PlanningMRNo);
-                            if (planningMR != null)
-                            {
-                                AccessPrimary.NavList.Insert(0, planningMR);
-                                SelectedPlanningMR = planningMR;
-                                CurrentPlanningMR = planningMR;
-                            }
+                            Search();
                         }
                         else
                         {
-
-                            Messages.Info(this, "Info50074", false, string.Join(",", result.GeneratedProgramNos));
-                            if (result.MDSchedulingGroupIDs.Any())
+                            if (!string.IsNullOrEmpty(result.PlanningMRNo))
                             {
-                                foreach (Guid mdSchedulingGroupID in result.MDSchedulingGroupIDs)
+                                Messages.Info(this, "Info50090", false, result.PlanningMRNo);
+                                DatabaseApp.PlanningMR.AutoMergeOption();
+                                PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRNo == result.PlanningMRNo);
+                                if (planningMR != null)
                                 {
-                                    ChildBSOBatchPlanScheduler.RefreshServerState(mdSchedulingGroupID);
+                                    AccessPrimary.NavList.Insert(0, planningMR);
+                                    SelectedPlanningMR = planningMR;
+                                    CurrentPlanningMR = planningMR;
+                                }
+                            }
+                            else
+                            {
+                                Messages.Info(this, "Info50074", false, string.Join(",", result.GeneratedProgramNos));
+                                if (result.MDSchedulingGroupIDs.Any())
+                                {
+                                    foreach (Guid mdSchedulingGroupID in result.MDSchedulingGroupIDs)
+                                    {
+                                        ChildBSOBatchPlanScheduler.RefreshServerState(mdSchedulingGroupID);
+                                    }
                                 }
                             }
                         }
@@ -648,7 +656,6 @@ namespace gip.bso.manufacturing
 
                 foreach (var sourceProdOrder in prodOrders)
                 {
-
                     Guid[] prodOrderMdSchedulingGroupIDs =
                         sourceProdOrder
                         .ProdOrderPartslist_ProdOrder
@@ -666,7 +673,6 @@ namespace gip.bso.manufacturing
                                 result.MDSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
                         }
                     }
-
 
                     bool generateProdorder = !filterProdOrderBatchPlanIds.Any();
                     if (!generateProdorder)
@@ -711,6 +717,67 @@ namespace gip.bso.manufacturing
             {
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
                 Messages.Msg(msg);
+            }
+
+            return result;
+        }
+
+
+        private GenerateProdOrdersResult DeletePlan(string planningMRNo)
+        {
+            GenerateProdOrdersResult result = new GenerateProdOrdersResult();
+            using (DatabaseApp databaseApp = new DatabaseApp())
+            {
+                PlanningMR planningMR = databaseApp.PlanningMR.Where(c => c.PlanningMRNo == planningMRNo).FirstOrDefault();
+                if (planningMR != null)
+                {
+                    ProdOrder[] prodOrders =
+                        planningMR
+                        .PlanningMRProposal_PlanningMR
+                        .Where(c => c.ProdOrder != null)
+                        .Select(c => c.ProdOrder)
+                        .GroupBy(c => c.ProdOrderID)
+                        .Select(c => c.FirstOrDefault())
+                        .ToArray();
+                    bool success = true;
+
+                    foreach (ProdOrder prodOrder in prodOrders)
+                    {
+                        ProdOrderPartslist[] pls = prodOrder.ProdOrderPartslist_ProdOrder.ToArray();
+                        foreach (ProdOrderPartslist pl in pls)
+                        {
+                            Msg plRemoveMsg = ProdOrderManager.PartslistRemove(databaseApp, prodOrder, pl);
+                            if (plRemoveMsg != null && !plRemoveMsg.IsSucceded())
+                            {
+                                success = false;
+                                result.SaveMessage = new MsgWithDetails() { };
+                                result.SaveMessage.AddDetailMessage(plRemoveMsg);
+                                break;
+                            }
+                        }
+
+                        MsgWithDetails poRemoveMsg = prodOrder.DeleteACObject(databaseApp, false);
+                        if (poRemoveMsg != null && !poRemoveMsg.IsSucceded())
+                        {
+                            result.SaveMessage = poRemoveMsg;
+                            success = false;
+                        }
+                    }
+
+                    if (success)
+                    {
+                        MsgWithDetails mrRemoveMsg = planningMR.DeleteACObject(databaseApp, false);
+                        if (mrRemoveMsg != null && !mrRemoveMsg.IsSucceded())
+                        {
+                            success = false;
+                            result.SaveMessage = mrRemoveMsg;
+                        }
+                        if (success)
+                        {
+                            result.SaveMessage = databaseApp.ACSaveChanges();
+                        }
+                    }
+                }
             }
 
             return result;
