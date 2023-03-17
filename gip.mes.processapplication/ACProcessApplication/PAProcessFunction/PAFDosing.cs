@@ -1681,7 +1681,18 @@ namespace gip.mes.processapplication
                     if (!_SimulationScaleIncrement.HasValue)
                     {
                         Random random = new Random();
-                        int steps = random.Next(5, 20);
+                        PWDosing invokingDosNode = null;
+                        if (this.CurrentTask != null && CurrentACMethod.ValueT != null)
+                            invokingDosNode = this.CurrentTask.ValueT as PWDosing;
+                        int rndMinValue = 5;
+                        int rndMaxValue = 20;
+                        if (invokingDosNode != null && invokingDosNode.IterationCount.ValueT > 0)
+                        {
+                            rndMinValue = invokingDosNode.IterationCount.ValueT * 5;
+                            rndMaxValue = invokingDosNode.IterationCount.ValueT * 20;
+                        }
+
+                        int steps = random.Next(rndMinValue, rndMaxValue);
                         _SimulationScaleIncrement = targetQuantity / steps;
                     }
                     scale.SimulateWeight(_SimulationScaleIncrement.Value);
