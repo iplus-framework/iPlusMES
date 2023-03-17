@@ -253,7 +253,13 @@ namespace gip.bso.manufacturing
                 }
 
                 if (DefaultTabItemLayout != null)
-                    dynamicContent += DefaultTabItemLayout.Replace("[childBSO]", acBSO.ACIdentifier).Replace("[tabItemHeader]", acBSO.ACCaption);
+                {
+                    string functionCaption = selectorChild?.ItemFunction?.ProcessFunction?.ACCaption;
+                    if (string.IsNullOrEmpty(functionCaption))
+                        functionCaption = bso.ACCaption;
+
+                    dynamicContent += DefaultTabItemLayout.Replace("[childBSO]", acBSO.ACIdentifier).Replace("[tabItemHeader]", functionCaption);
+                }
             }
 
             parentBSO.LoadPartslist();
