@@ -2053,7 +2053,7 @@ namespace gip.mes.facility
 
                     if (    (behaviour == PostingBehaviourEnum.ZeroStockAlways)
                          || (isRelocation && (behaviour == PostingBehaviourEnum.BlockOnRelocation || behaviour == PostingBehaviourEnum.ZeroStockOnRelocation))
-                         || (isProdInward && behaviour == PostingBehaviourEnum.ZeroStockOnProduction))
+                         || (isProdInward && (behaviour == PostingBehaviourEnum.ZeroStockOnProduction || behaviour == PostingBehaviourEnum.ZeroStockOnProductionIfNoBOMUsage)))
                         return behaviour;
                 }
                 return PostingBehaviourEnum.DoNothing;

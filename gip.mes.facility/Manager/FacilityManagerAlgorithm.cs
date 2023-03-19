@@ -548,6 +548,7 @@ namespace gip.mes.facility
                 // If relocation posting and target should be set to blocked state for new quants, set quant to blocked
                 if (   postingBehaviour == PostingBehaviourEnum.ZeroStockOnRelocation
                     || postingBehaviour == PostingBehaviourEnum.ZeroStockOnProduction
+                    || postingBehaviour == PostingBehaviourEnum.ZeroStockOnProductionIfNoBOMUsage
                     || postingBehaviour == PostingBehaviourEnum.ZeroStockAlways)
                 {
                     List<FacilityCharge> quantsForZeroBooking = new List<FacilityCharge>();
@@ -559,6 +560,12 @@ namespace gip.mes.facility
                             {
                                 if (postings.InwardFacilityCharge != null && !postings.InwardFacilityCharge.NotAvailable)
                                 {
+                                    if (postingBehaviour == PostingBehaviourEnum.ZeroStockOnProductionIfNoBOMUsage)
+                                    {
+                                        if (BP.DatabaseApp.PartslistPos.Where(c => c.MaterialID == postings.InwardFacilityCharge.MaterialID && c.Partslist.IsEnabled).Any())
+                                            continue;
+                                    }
+                                    //postings.InwardFacilityCharge.Material.PartslistPos_Material.Where(c => c.Partslist.IsEnabled).Any();
                                     if (!quantsForZeroBooking.Contains(postings.InwardFacilityCharge))
                                         quantsForZeroBooking.Add(postings.InwardFacilityCharge);
                                 }

@@ -825,6 +825,16 @@ namespace gip.mes.processapplication
                             bookingParam.OutwardFacility = outwardFacility;
                             if (outwardFacility.Material != null)
                                 bookingParam.MDUnit = outwardFacility.Material.BaseMDUnit;
+                            if (pickingPos.ToFacility != null)
+                            {
+                                var pwDisChargings = pwMethodTransport.FindChildComponents<PWDischarging>(c => c is PWDischarging).ToArray();
+                                if (pwDisChargings.Any())
+                                {
+                                    PWDischarging nodeWithPostingBehaviour = pwDisChargings.Where(c => c.PostingBehaviour != PostingBehaviourEnum.NotSet).FirstOrDefault();
+                                    if (nodeWithPostingBehaviour != null)
+                                        bookingParam.PostingBehaviour = nodeWithPostingBehaviour.PostingBehaviour;
+                                }
+                            }
 
                             if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                                 bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();

@@ -683,6 +683,8 @@ namespace gip.mes.processapplication
                     ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                     if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                         bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
+                    if (PostingBehaviour != PostingBehaviourEnum.NotSet)
+                        bookingParam.PostingBehaviour = PostingBehaviour;
 
                     OnInwardBookingPre(facilityPreBooking, collectedMessages, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd);
 

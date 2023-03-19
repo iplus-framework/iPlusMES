@@ -863,6 +863,8 @@ namespace gip.mes.processapplication
                         bookingParam.InwardQuantity = currentPos.Material.ConvertBaseWeightToBaseUnit(bookingWeight);
                         bookingParam.InwardFacility = inwardFacility;
                         bookingParam.InwardFacilityLot = facilityLot;
+                        if (PostingBehaviour != PostingBehaviourEnum.NotSet)
+                            bookingParam.PostingBehaviour = PostingBehaviour;
 
                         msg = dbApp.ACSaveChangesWithRetry();
 

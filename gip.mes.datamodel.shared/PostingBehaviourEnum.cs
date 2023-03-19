@@ -42,9 +42,9 @@ namespace gip.mes.datamodel
         /// </summary>
         ZeroStockAlways = 4,
 
-        ///// <summary>
-        ///// Split quant on inward posting for a order
-        ///// </summary>
-        //SplitQuantOnProduction = 5,
+        /// <summary>
+        /// Sets the stock to zero after a inward posting for a order if there is no further BOM that use this material
+        /// </summary>
+        ZeroStockOnProductionIfNoBOMUsage = 5,
     }
 }

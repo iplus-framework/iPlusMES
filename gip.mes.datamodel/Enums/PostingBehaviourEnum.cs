@@ -15,6 +15,7 @@ namespace gip.mes.datamodel
             AddEntry(PostingBehaviourEnum.ZeroStockOnRelocation, "en{'Set the stock to zero after relocation'}de{'Setzt quanten auf Nullbestand nach einer Umlagerung'}");
             AddEntry(PostingBehaviourEnum.ZeroStockOnProduction, "en{'Set the stock to zero after production'}de{'Setzt quanten auf Nullbestand nach einer Produktion'}");
             AddEntry(PostingBehaviourEnum.ZeroStockAlways, "en{'Set the stock to zero always'}de{'Setzt quanten immer auf Nullbestand'}");
+            AddEntry(PostingBehaviourEnum.ZeroStockOnProductionIfNoBOMUsage, "en{'Set the stock to zero after production if no usage in further BOMs'}de{'Nullbestand nach einer Produktion falls keine weitere Stücklistenverwendung'}");
         }
     }
 }
